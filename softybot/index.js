@@ -206,10 +206,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
         reaction.message.guild.members.cache.get(user.id).roles.add(role)
         .then (response => {
             console.log(JSON.stringify(response))
-            user.send('Role ' + role.name + ' Added.')
+            user.send('Role ' + role.name + ' Added.').catch(err => console.log(err));
         })
         .catch(function (error) {
-            user.send('Error occured assigning role. Please try again.\nError Code: 500')
+            user.send('Error occured assigning role. Please try again.\nError Code: 500').catch(err => console.log(err));
         })
     }
     
@@ -224,10 +224,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
         reaction.message.guild.members.cache.get(user.id).roles.add(role)
         .then (response => {
             console.log(JSON.stringify(response))
-            user.send('Role ' + role.name + ' Added.')
+            user.send('Role ' + role.name + ' Added.').catch(err => console.log(err));
         })
         .catch(function (error) {
-            user.send('Error occured assigning role. Please try again.\nError Code: 500')
+            user.send('Error occured assigning role. Please try again.\nError Code: 500').catch(err => console.log(err));
         })
     }
 
@@ -284,9 +284,11 @@ client.on('messageReactionRemove', async (reaction, user) => {
         .then (response => {
             console.log(JSON.stringify(response))
             user.send('Role ' + role.name + ' Removed.')
+            .catch(err => console.log(err));
         })
         .catch(function (error) {
             user.send('Error occured removing role. Please try again.\nError Code: 500')
+            .catch(err => console.log(err));
         })
     }
     
@@ -302,9 +304,11 @@ client.on('messageReactionRemove', async (reaction, user) => {
         .then (response => {
             console.log(JSON.stringify(response))
             user.send('Role ' + role.name + ' Removed.')
+            .catch(err => console.log(err));
         })
         .catch(function (error) {
             user.send('Error occured removing role. Please try again.\nError Code: 500')
+            .catch(err => console.log(err));
         })
     }
     
@@ -384,7 +388,7 @@ client.on('guildMemberAdd', async member => {
         })
         .setTimestamp()
 
-    member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]});
+    member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]}).catch(err => console.log(err));
 });
 
 client.login(config.token)
@@ -392,7 +396,7 @@ client.login(config.token)
 
 //------------Command functions---------------
 function uptime(message,args) {
-    message.channel.send({content: "Current uptime: " + msToTime(new Date().getTime() - tickcount)})
+    message.channel.send({content: "Current uptime: " + msToTime(new Date().getTime() - tickcount)}).catch(err => console.log(err));
     message.react("✅")
     return
 }
@@ -412,7 +416,7 @@ function help(message,args) {
             ]
         }]
     }
-    message.channel.send(postdata)
+    message.channel.send(postdata).catch(err => console.log(err));
     message.react("✅")
     return
 }
@@ -420,7 +424,7 @@ function help(message,args) {
 async function orders(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"})
+        message.channel.send({content: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}).catch(err => console.log(err));
         message.react("✅")
         return
     }
@@ -446,7 +450,7 @@ async function orders(message,args) {
     })
     if (arrItemsUrl.length==0)
     {
-        message.channel.send("Item " + d_item_url + " does not exist.");
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
         return
     }
     if (primeFlag)
@@ -465,13 +469,13 @@ async function orders(message,args) {
     }
     if (arrItemsUrl.length > 10)
     {
-        message.channel.send("More than 10 search result detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name");
+        message.channel.send("More than 10 search result detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
         return
     }
     let processMessage = [];
     const func = await message.channel.send("Processing").then(response => {
         processMessage = response
-    })
+    }).catch(err => console.log(err));
     let embeds = []
     for (i=0; i<arrItemsUrl.length; i++)
     {
@@ -567,7 +571,7 @@ async function orders(message,args) {
 async function relics(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"})
+        message.channel.send({content: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}).catch(err => console.log(err));
         message.react("✅")
         return
     }
@@ -645,7 +649,7 @@ async function relics(message,args) {
             value2 = value2.substring(0, value2.length - 1)
             var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
             postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
-            message.channel.send(postdata)
+            message.channel.send(postdata).catch(err => console.log(err));
             message.react("✅")
             return
     }
@@ -666,18 +670,18 @@ async function relics(message,args) {
     })
     if (arrItemsUrl.length==0)
     {
-        message.channel.send("Item " + d_item_url + " does not exist.");
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
         return
     }
     if (arrItemsUrl.length > 10)
     {
-        message.channel.send("More than 10 search result detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name");
+        message.channel.send("More than 10 search result detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
         return
     }
     let processMessage = [];
     const func = await message.channel.send("Processing").then(response => {
         processMessage = response
-    })
+    }).catch(err => console.log(err));
     var X = 0
     var i = 0
     var j = 0
@@ -829,7 +833,7 @@ async function relics(message,args) {
         if (k==0)
             processMessage.edit(postdata[k])
         else 
-            message.channel.send(postdata[k])
+            message.channel.send(postdata[k]).catch(err => console.log(err));
     }
     message.react("✅")
     return
@@ -838,7 +842,7 @@ async function relics(message,args) {
 function auctions(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"})
+        message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}).catch(err => console.log(err));
         message.react("✅")
         return
     }
@@ -849,7 +853,7 @@ function auctions(message,args) {
     }
     else if ((args[args.length-1]=="slash") || (args[args.length-1]=="puncture") || (args[args.length-1]=="viral") || (args[args.length-1]=="blast") || (args[args.length-1]=="corrosive"))
     {
-        message.channel.send({content: args[args.length-1] + " is not a valid modifier."})
+        message.channel.send({content: args[args.length-1] + " is not a valid modifier."}).catch(err => console.log(err));
         return
     }
     var d_item_url = ""
@@ -871,19 +875,19 @@ function auctions(message,args) {
     })
     if (arrItemsUrl.length==0)
     {
-        message.channel.send("Item " + d_item_url + " does not exist.");
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
         return
     }
     if (arrItemsUrl.length>1)
     {
-        message.channel.send("Too many search results for the item " + d_item_url + ". Please provide full weapon name");
+        message.channel.send("Too many search results for the item " + d_item_url + ". Please provide full weapon name").catch(err => console.log(err));
         return
     }
     item_url = arrItemsUrl[0]
     let processMessage = [];
     const func = message.channel.send("Processing").then(response => {
         processMessage = response
-    })
+    }).catch(err => console.log(err));
     const api = axios("https://api.warframe.market/v1/auctions/search?type=lich&weapon_url_name=" + item_url)
     .then(response => {
         data = response.data
@@ -1029,7 +1033,7 @@ function auctions(message,args) {
 async function list(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "List a prime item on your warframe.market profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"})
+        message.channel.send({content: "List a prime item on your warframe.market profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
         message.react("✅")
         return
     }
@@ -1057,11 +1061,11 @@ async function list(message,args) {
     }
     if (JWT == "")
     {
-        message.channel.send({content: "Unauthorized. Please check your DMs"})
+        message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
         try {
-            message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"})
+            message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
         } catch (err) {
-            message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"})
+            message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
         }
         return
     }
@@ -1072,7 +1076,7 @@ async function list(message,args) {
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     if (!d_item_url.match("prime"))
     {
-        message.channel.send("This command is only limited to prime items for now.");
+        message.channel.send("This command is only limited to prime items for now.").catch(err => console.log(err));
         return
     }
     let arrItemsUrl = []
@@ -1104,17 +1108,17 @@ async function list(message,args) {
     }
     if (arrItemsUrl.length > 1)
     {
-        message.channel.send("Something went wrong. Please try again.\nError code: 500");
+        message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));
         return
     }
     if (arrItemsUrl.length==0)
     {
-        message.channel.send("Item " + d_item_url + " does not exist.");
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
         return
     }
     if (arrItemsUrl.length > 10)
     {
-        message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name");
+        message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
         return
     }
     const item_url = arrItemsUrl[0].item_url
@@ -1122,7 +1126,7 @@ async function list(message,args) {
     let processMessage = [];
     const process = await message.channel.send("Processing").then(response => {
         processMessage = response
-    })
+    }).catch(err => console.log(err));
     //----Retrieve top listing----
     const func1 = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
     .then(response => {
@@ -1241,13 +1245,13 @@ async function list(message,args) {
 async function relist(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"})
+        message.channel.send({content: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
         message.react("✅")
         return
     }
     if (args[0] != "all")
     {
-        message.channel.send({content: "Incorrect command. Usage example:\n.relist all\n.relist all +10\n.relist all -20"})
+        message.channel.send({content: "Incorrect command. Usage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
         return
     }
     var offset = 0
@@ -1255,7 +1259,7 @@ async function relist(message,args) {
     {
         if (!(args[args.length-1].match(/-?\d+/g).map(Number)))
         {
-            message.channel.send({content: "Invalid offset. Usage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"})
+            message.channel.send({content: "Invalid offset. Usage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
             return
         }
         offset = Number(args.pop())
@@ -1274,18 +1278,18 @@ async function relist(message,args) {
     }
     if (JWT == "")
     {
-        message.channel.send({content: "Unauthorized. Please check your DMs"})
+        message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
         try {
-            message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"})
+            message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
         } catch (err) {
-            message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"})
+            message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
         }
         return
     }
     if (message.author.id != "253525146923433984") {
         for (i=0;i<relist_cd.length;i++) {
             if (relist_cd[i].discord_id == message.author.id)
-                {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp)));return}
+                {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
         }
         relist_cd.push({discord_id: message.author.id, timestamp: Date.now()});
         setTimeout(() => {
@@ -1306,7 +1310,7 @@ async function relist(message,args) {
     let processMessage = [];
     const process = await message.channel.send("Processing, this might take a minute").then(response => {
         processMessage = response
-    })
+    }).catch(err => console.log(err));
     //----Retrieve current orders for the item on their own profile----
     const func1 = axios("https://api.warframe.market/v1/profile/" + ingame_name + "/orders", {headers:{Authorization: JWT}})
     .then(async response1 => {
@@ -1462,7 +1466,7 @@ async function relist(message,args) {
 async function authorize(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
+        message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
         message.react("✅")
         return
     }
@@ -1471,7 +1475,7 @@ async function authorize(message,args) {
     let processMessage = [];
     const process = await message.channel.send("Processing").then(response => {
         processMessage = response
-    })
+    }).catch(err => console.log(err));
     axios({
         method: 'POST',
         url: "https://api.warframe.market/v1/auth/signin",
@@ -1608,7 +1612,7 @@ function verify_roles() {
                                 cacheMember.roles.add(role)
                                 .then (response => {
                                     console.log(JSON.stringify(response))
-                                    user.send('Role ' + role.name + ' Added.\n(This message might be late since you reacted when bot was offline. If this is a mistake, contact MrSofty#7926)')
+                                    user.send('Role ' + role.name + ' Added.\n(This message might be late since you reacted when bot was offline. If this is a mistake, contact MrSofty#7926)').catch(err => console.log(err));
                                 })
                             }
                         })
@@ -1622,7 +1626,7 @@ function verify_roles() {
                                 cacheMember.roles.add(role)
                                 .then (response => {
                                     console.log(JSON.stringify(response))
-                                    user.send('Role ' + role.name + ' Added.\n(This message might be late since you reacted when bot was offline. If this is a mistake, contact MrSofty#7926)')
+                                    user.send('Role ' + role.name + ' Added.\n(This message might be late since you reacted when bot was offline. If this is a mistake, contact MrSofty#7926)').catch(err => console.log(err));
                                 })
                             }
                         })
