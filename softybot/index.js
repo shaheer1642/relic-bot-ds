@@ -404,7 +404,7 @@ client.on('guildMemberAdd', async member => {
     })
 });
 
-client.login(config.token)
+client.login("ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E")
 
 //------------Command functions---------------
 function uptime(message,args) {
