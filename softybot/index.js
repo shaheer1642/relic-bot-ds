@@ -445,7 +445,7 @@ async function orders(message,args) {
     let arrItemsUrl = []
     var primeFlag = 0
     //var WFM_Items_List = require('../WFM_Items_List.json')
-    const filecontent = fs.readFileSync('../WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
+    const filecontent = fs.readFileSync('./WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
     let WFM_Items_List = JSON.parse(filecontent)
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
@@ -530,7 +530,7 @@ async function orders(message,args) {
             }
             var footerText = ""
             if (item_url.match('prime')) {
-                const filecontent = fs.readFileSync("../pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
+                const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
                 let pricesDB = JSON.parse(filecontent)
                 pricesDB.forEach(element => {
                     if (element.item_url == item_url)
@@ -538,7 +538,7 @@ async function orders(message,args) {
                 })
             }
             else if (item_url.match('relic')) {
-                const filecontent = fs.readFileSync("../relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
+                const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
                 let pricesDB = JSON.parse(filecontent)
                 pricesDB.forEach(element => {
                     if (element.item_url == item_url)
