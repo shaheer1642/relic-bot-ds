@@ -1,0 +1,27 @@
+﻿++host Axi A7 Axi N1 rad 4b4
+++host Axi A7 Axi N1 rad 2b2
+++host Axi N2 Axi N4 Axi N6 rad 4b4
+++host Axi N6 rad 2b2
+++host Neo V3 Neo V5 rad 4b4
+++host Lith M1 Lith M2 rad 4b4
+++host Lith O2 int 1b1
+++host Lith O2 int 2b2
+++host Meso V1 Meso V6 rad 4b4
+++host Lith V2 Lith V8 rad 4b4
+++host Meso V6 rad 2b2
+++host Neo N3 Neo N7 Neo N11 rad 4b4
+++host Neo S10 Neo S13 Neo S2 rad 4b4
+++host Meso O3 flaw 2b2
+++host Meso V6 rad 2b2 WITH Meso V1 rad OFFCYCLE
+++host Lith V1 flaw 4b4
+++host Lith O2 int 1b1 WITH Lith V1 flaw OFFCYCLE
+++host Axi S3 int 2b2
+++host Neo O1 int 2b2
+++host Neo A4 int 2b2
+++host Neo A4 flaw 2b2
+++host Meso E1 int 2b2
+++host Lith B1 Lith B4 rad 2b2
+++host Lith C5 int 2b2
+++host Lith V8 rad 2b2
+++host Meso O3 rad 2b2
+++host Neo N9 int 2b2

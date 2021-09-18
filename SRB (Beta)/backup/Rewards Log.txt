@@ -1,0 +1,2490 @@
+﻿[17/Jun/2021 01:55] [Galatine Prime Blade]: 5.6p -  [Bronco Prime]: 3.1p -  [Paris Prime Grip]: 3.3p -  [Galatine Prime Blade]: 5.6p
+
+[17/Jun/2021 01:59] [Saryn Prime Chassis]: 137.2p -  [Galatine Prime Blade]: 5.6p -  [Paris Prime Grip]: 3.3p -  [Paris Prime String]: 5.9p
+
+[17/Jun/2021 02:39] [Corinth Prime]: 2.1p -  [Ash Prime]: 38.5p -  [Vectis Prime Barrel]: 30.6p -  [Inaros Prime Chassis]: 3.9p
+
+[17/Jun/2021 02:42] [Vectis Prime Barrel]: 30.6p -  [Carrier Prime]: 9.3p
+
+[17/Jun/2021 02:45] [Corinth Prime]: 2.1p -  [Ash Prime]: 38.5p -  [Akstiletto Prime Link]: 9.4p -  [Fang Prime Blade]: 3.1p
+
+[17/Jun/2021 02:48] [Vauban Prime Neuroptics]: 52.4p -  [Wukong Prime Neuroptics]: 3.8p -  [Octavia Prime Neuroptics]: 4.5p -  [Ash Prime]: 38.5p
+
+[17/Jun/2021 02:55] [Burston Prime Receiver]: 1.9p -  [Vectis Prime Barrel]: 30.6p -  [Carrier Prime]: 9.3p -  [Octavia Prime Neuroptics]: 4.5p
+
+[17/Jun/2021 02:58] [Fragor Prime Head]: 11p -  [Fang Prime Blade]: 3.1p -  [Vectis Prime Barrel]: 30.6p
+
+[17/Jun/2021 23:13] [Wyrm Prime Systems]: 67.1p -  [Volt Prime Chassis]: 19.4p -  [Braton Prime Stock]: 1.4p -  [Octavia Prime Systems]: 5.9p
+
+[17/Jun/2021 23:19] [Titania Prime Neuroptics]: 3.2p -  [Burston Prime]: 2.4p -  [Wyrm Prime Systems]: 67.1p -  [Volt Prime Chassis]: 19.4p
+
+[17/Jun/2021 23:24] [Loki Prime Neuroptics]: 33.8p -  [Odonata Prime Systems]: 9.5p -  [Corinth Prime]: 2.4p -  [Paris Prime Upper Limb]: 2.9p
+
+[17/Jun/2021 23:29] [Burston Prime]: 2.4p -  [Odonata Prime Systems]: 9.5p -  [Odonata Prime Wings]: 20.8p
+
+[17/Jun/2021 23:35] [Loki Prime Neuroptics]: 33.8p -  [Odonata Prime Systems]: 9.5p -  [Titania Prime Chassis]: 3.1p
+
+[17/Jun/2021 23:40] [Burston Prime]: 2.4p -  [Titania Prime Chassis]: 3.1p -  [Loki Prime Neuroptics]: 33.8p -  [Wyrm Prime Systems]: 67.1p
+
+[17/Jun/2021 23:44] [Odonata Prime Systems]: 9.5p -  [Corinth Prime]: 2.4p -  [Lex Prime Barrel]: 3.6p
+
+[17/Jun/2021 23:57] [Paris Prime Upper Limb]: 2.9p -  [Wyrm Prime Systems]: 67.1p -  [Odonata Prime Systems]: 9.5p
+
+[18/Jun/2021 15:15] [Saryn Prime Chassis]: 135.4p -  [Nova Prime Systems]: 8.5p -  [Spira Prime]: 6p -  [Nikana Prime Blade]: 30p
+
+[18/Jun/2021 15:17] [Burston Prime Stock]: 2.5p -  [Nikana Prime Blade]: 30p -  [Lex Prime]: 2.5p
+
+[18/Jun/2021 15:20] [Nova Prime Systems]: 8.5p -  [Paris Prime Upper Limb]: 2.8p -  [Saryn Prime Systems]: 9.2p -  [Spira Prime Blade]: 22.2p
+
+[18/Jun/2021 15:23] [Saryn Prime Systems]: 9.2p -  [Paris Prime Upper Limb]: 2.8p -  [Spira Prime]: 6p -  [Nikana Prime Blade]: 30p
+
+[18/Jun/2021 15:26] [Saryn Prime Systems]: 9.2p -  [Paris Prime Lower Limb]: 1.9p -  [Saryn Prime Systems]: 9.2p -  [Nikana Prime Blade]: 30p
+
+[18/Jun/2021 15:29] [Nyx Prime Systems]: 14.2p -  [Spira Prime Blade]: 22.2p -  [Spira Prime]: 6p -  [Saryn Prime Chassis]: 135.4p
+
+[18/Jun/2021 15:31] [Nyx Prime Systems]: 14.2p -  [Braton Prime Stock]: 1.6p -  [Saryn Prime Systems]: 9.2p -  [Saryn Prime Systems]: 9.2p
+
+[18/Jun/2021 15:34] [Nikana Prime Blade]: 30p -  [Saryn Prime Systems]: 9.2p -  [Cernos Prime]: 4.6p -  [Saryn Prime Chassis]: 135.4p
+
+[18/Jun/2021 15:37] [Spira Prime Blade]: 22.2p -  [Lex Prime]: 2.5p -  [Spira Prime]: 6p -  [Saryn Prime Chassis]: 135.4p
+
+[18/Jun/2021 16:06] [Braton Prime Stock]: 1.6p -  [Lex Prime]: 2.5p -  [Saryn Prime Chassis]: 135.4p -  [Burston Prime Stock]: 2.5p
+
+[18/Jun/2021 16:09] [Paris Prime Upper Limb]: 2.8p -  [Nikana Prime Blade]: 30p -  [Saryn Prime Chassis]: 135.4p -  [Burston Prime Stock]: 2.5p
+
+[18/Jun/2021 16:12] [Spira Prime Blade]: 22.2p -  [Spira Prime Blade]: 22.2p -  [Saryn Prime Chassis]: 135.4p -  [Burston Prime Stock]: 2.5p
+
+[18/Jun/2021 16:15] [Braton Prime Stock]: 1.6p -  [Spira Prime Blade]: 22.2p -  [Lex Prime]: 2.5p -  [Paris Prime Lower Limb]: 1.9p
+
+[18/Jun/2021 16:50] [Vectis Prime]: 8.6p -  [Vauban Prime Chassis]: 22p -  [Guandao Prime Blade]: 6.9p -  [Titania Prime Neuroptics]: 3.4p
+
+[18/Jun/2021 16:55] [Aksomati Prime Receiver]: 3.7p -  [Braton Prime Stock]: 1.6p -  [Ash Prime Neuroptics]: 9.4p
+
+[18/Jun/2021 16:59] [Ivara Prime Neuroptics]: 3.7p
+
+[18/Jun/2021 17:02] [Titania Prime]: 5.7p -  [Carrier Prime Carapace]: 13.1p -  [Ash Prime Neuroptics]: 9.4p
+
+[18/Jun/2021 17:06] [Carrier Prime Carapace]: 13.1p -  [Astilla Prime]: 7.7p -  [Titania Prime Neuroptics]: 3.4p
+
+[18/Jun/2021 17:14] [Braton Prime Stock]: 1.6p -  [Aksomati Prime Receiver]: 3.7p -  [Carrier Prime Carapace]: 13.1p -  [Vectis Prime]: 8.6p
+
+[18/Jun/2021 23:26] [Vasto Prime Barrel]: 10.6p -  [Vasto Prime Receiver]: 12.3p -  [Vasto Prime Receiver]: 12.3p -  [Vasto Prime]: 8.2p
+
+[18/Jun/2021 23:29] [Akvasto Prime Link]: 13.3p -  [Vasto Prime Receiver]: 12.3p -  [Vasto Prime Barrel]: 10.6p -  [Vasto Prime Receiver]: 12.3p
+
+[18/Jun/2021 23:31] [Vasto Prime Receiver]: 12.3p -  [Akvasto Prime Link]: 13.3p -  [Vasto Prime]: 8.2p -  [Akbolto Prime]: 2.8p
+
+[18/Jun/2021 23:34] [Akvasto Prime Link]: 13.3p
+
+[19/Jun/2021 20:35] [Boar Prime Receiver]: 9.7p -  [Dakra Prime]: 10.9p -  [Boar Prime Receiver]: 9.7p
+
+[19/Jun/2021 20:38] [Mag Prime]: 87.1p -  [Lex Prime Receiver]: 8.9p -  [Dakra Prime]: 10.9p -  [Boar Prime Receiver]: 9.7p
+
+[19/Jun/2021 20:41] [Dakra Prime]: 10.9p -  [Soma Prime]: 5.9p
+
+[19/Jun/2021 20:50] [Paris Prime Upper Limb]: 2.8p -  [Vauban Prime Systems]: 78.7p -  [Paris Prime Lower Limb]: 2.2p -  [Fang Prime]: 1.8p
+
+[19/Jun/2021 20:53] [Lex Prime Barrel]: 3.8p -  [Paris Prime Lower Limb]: 2.2p -  [Vauban Prime Systems]: 78.7p
+
+[19/Jun/2021 20:56] [Lex Prime Barrel]: 3.8p -  [Ash Prime Chassis]: 21p -  [Vectis Prime Stock]: 35.4p
+
+[19/Jun/2021 21:00] [Bronco Prime]: 3.5p -  [Paris Prime Lower Limb]: 2.2p -  [Fragor Prime Handle]: 13.4p
+
+[19/Jun/2021 21:06] [Fang Prime]: 1.8p -  [Paris Prime Upper Limb]: 2.8p -  [Vauban Prime Systems]: 78.7p
+
+[20/Jun/2021 03:44] [Wyrm Prime Systems]: 68.4p -  [Ivara Prime Neuroptics]: 4p -  [Helios Prime Carapace]: 6p -  [Paris Prime]: 2.3p
+
+[20/Jun/2021 03:47] [Braton Prime Barrel]: 3.4p -  [Orthos Prime Handle]: 2.5p -  [Bo Prime Ornament]: 100.8p -  [Octavia Prime Systems]: 5.6p
+
+[20/Jun/2021 03:50] [Braton Prime Stock]: 1.7p -  [Braton Prime]: 2.5p -  [Frost Prime Chassis]: 17.2p
+
+[20/Jun/2021 03:53] [Corinth Prime Receiver]: 4p -  [Bo Prime Ornament]: 100.8p -  [Orthos Prime Handle]: 2.5p -  [Nezha Prime]: 3.3p
+
+[20/Jun/2021 03:56] [Frost Prime Chassis]: 17.2p -  [Corinth Prime Receiver]: 4p -  [Tenora Prime]: 3.8p -  [Octavia Prime Systems]: 5.6p
+
+[20/Jun/2021 04:00] [Hikou Prime]: 5.9p -  [Ivara Prime Neuroptics]: 4p
+
+[20/Jun/2021 04:03] [Baza Prime Receiver]: 3.8p -  [Zakti Prime Receiver]: 3.6p
+
+[20/Jun/2021 04:06] [Burston Prime]: 2.3p -  [Frost Prime Chassis]: 17.2p -  [Tenora Prime]: 3.8p -  [Aksomati Prime Barrel]: 5.4p
+
+[20/Jun/2021 04:09] [Bo Prime Ornament]: 100.8p -  [Zakti Prime Receiver]: 3.6p -  [Nezha Prime]: 3.3p
+
+[20/Jun/2021 04:13] [Zhuge Prime]: 3.6p -  [Wyrm Prime Systems]: 68.4p -  [Octavia Prime Systems]: 5.6p
+
+[20/Jun/2021 04:15] [Braton Prime Barrel]: 3.4p -  [Zhuge Prime]: 3.6p -  [Zakti Prime Receiver]: 3.6p
+
+[20/Jun/2021 04:18] [Latron Prime Barrel]: 8.8p -  [Dethcube Prime Cerebrum]: 12.2p
+
+[20/Jun/2021 04:21] [Latron Prime Barrel]: 8.8p -  [Braton Prime Receiver]: 3.7p -  [Tenora Prime]: 3.8p -  [Nezha Prime]: 3.3p
+
+[20/Jun/2021 04:24] [Tigris Prime Receiver]: 9p -  [Astilla Prime Stock]: 9.5p
+
+[20/Jun/2021 04:27] [Galatine Prime Blade]: 5.9p -  [Galatine Prime Blade]: 5.9p -  [Frost Prime Chassis]: 17.2p
+
+[20/Jun/2021 05:49] [Braton Prime]: 2.5p -  [Equinox Prime]: 11p -  [Nekros Prime Chassis]: 9p -  [Carrier Prime Systems]: 8.6p
+
+[20/Jun/2021 05:53] [Pangolin Prime Handle]: 8.3p -  [Akstiletto Prime Receiver]: 25.6p -  [Carrier Prime Systems]: 8.6p
+
+[20/Jun/2021 05:57] [Braton Prime]: 2.5p -  [Pyrana Prime Barrel]: 5.7p -  [Nekros Prime Chassis]: 9p -  [Fragor Prime]: 10.5p
+
+[20/Jun/2021 06:00] [Pandero Prime Barrel]: 8.3p -  [Braton Prime]: 2.5p -  [Fragor Prime]: 10.5p -  [Karyst Prime]: 5.3p
+
+[20/Jun/2021 06:04] [Ash Prime Systems]: 121p -  [Ash Prime Systems]: 121p -  [Carrier Prime Systems]: 8.6p
+
+[20/Jun/2021 06:09] [Karyst Prime]: 5.3p -  [Braton Prime]: 2.5p -  [Akstiletto Prime Receiver]: 25.6p -  [Karyst Prime]: 5.3p
+
+[20/Jun/2021 06:13] [Odonata Prime Wings]: 20.2p -  [Braton Prime]: 2.5p -  [Burston Prime]: 2.3p -  [Carrier Prime Systems]: 8.6p
+
+[20/Jun/2021 06:17] [Pangolin Prime Handle]: 8.3p -  [Carrier Prime Systems]: 8.6p
+
+[20/Jun/2021 06:20] [Mirage Prime Chassis]: 8.4p -  [Braton Prime]: 2.5p -  [Ash Prime Systems]: 121p
+
+[20/Jun/2021 06:24] [Pandero Prime Barrel]: 8.3p -  [Carrier Prime Systems]: 8.6p -  [Fragor Prime]: 10.5p
+
+[21/Jun/2021 02:27] [Odonata Prime Wings]: 19.9p -  [Braton Prime]: 2.6p -  [Ash Prime Systems]: 122.3p -  [Carrier Prime Systems]: 8.5p
+
+[21/Jun/2021 02:30] [Odonata Prime Wings]: 19.9p -  [Akstiletto Prime Receiver]: 26.3p
+
+[21/Jun/2021 02:33] [Fang Prime Blade]: 3.4p -  [Braton Prime]: 2.6p -  [Akstiletto Prime Receiver]: 26.3p -  [Fragor Prime]: 9.7p
+
+[21/Jun/2021 02:39] [Akstiletto Prime Link]: 9p -  [Akstiletto Prime Link]: 9p -  [Ash Prime Systems]: 122.3p -  [Braton Prime]: 2.6p
+
+[21/Jun/2021 02:43] [Ash Prime Systems]: 122.3p -  [Braton Prime]: 2.6p -  [Braton Prime]: 2.6p
+
+[21/Jun/2021 02:46] [Akstiletto Prime Link]: 9p -  [Ash Prime Systems]: 122.3p -  [Ash Prime Systems]: 122.3p -  [Braton Prime]: 2.6p
+
+[21/Jun/2021 02:50] [Odonata Prime Wings]: 19.9p -  [Fang Prime Blade]: 3.4p -  [Carrier Prime Systems]: 8.5p -  [Fragor Prime]: 9.7p
+
+[21/Jun/2021 17:00] [Soma Prime]: 6.4p -  [Dakra Prime Handle]: 12.7p -  [Dakra Prime]: 11.7p -  [Lex Prime Receiver]: 9.3p
+
+[21/Jun/2021 17:03] [Boar Prime Receiver]: 9.4p -  [Soma Prime Barrel]: 10.7p -  [Lex Prime Receiver]: 9.3p -  [Lex Prime Receiver]: 9.3p
+
+[21/Jun/2021 17:06] [Boar Prime Receiver]: 9.4p -  [Soma Prime Barrel]: 10.7p -  [Dakra Prime]: 11.7p -  [Boar Prime Receiver]: 9.4p
+
+[21/Jun/2021 17:09] [Soma Prime]: 6.4p -  [Lex Prime Receiver]: 9.3p -  [Boar Prime Receiver]: 9.4p -  [Mag Prime]: 88.1p
+
+[21/Jun/2021 17:11] [Lex Prime Receiver]: 9.3p -  [Boar Prime Barrel]: 16.7p -  [Soma Prime]: 6.4p
+
+[21/Jun/2021 17:14] [Soma Prime]: 6.4p -  [Soma Prime Barrel]: 10.7p -  [Boar Prime Receiver]: 9.4p
+
+[21/Jun/2021 17:18] [Soma Prime]: 6.4p -  [Soma Prime Barrel]: 10.7p -  [Boar Prime Receiver]: 9.4p
+
+[21/Jun/2021 17:21] [Vauban Prime]: 29.7p -  [Akstiletto Prime Barrel]: 23.5p -  [Orthos Prime Handle]: 2.5p -  [Ivara Prime Neuroptics]: 4p
+
+[21/Jun/2021 17:24] [Titania Prime Neuroptics]: 3.6p -  [Wukong Prime Chassis]: 4.5p -  [Braton Prime Barrel]: 3.7p -  [Braton Prime Barrel]: 3.7p
+
+[24/Jun/2021 00:09] [Pangolin Prime Handle]: 8p -  [Burston Prime]: 2p -  [Akstiletto Prime Receiver]: 27.9p
+
+[24/Jun/2021 00:12] [Braton Prime]: 2.9p -  [Inaros Prime Systems]: 5.3p -  [Karyst Prime]: 4.9p
+
+[24/Jun/2021 00:14] [Pangolin Prime Handle]: 8p -  [Ash Prime Systems]: 122.1p -  [Nekros Prime Chassis]: 8.9p -  [Braton Prime]: 2.9p
+
+[24/Jun/2021 00:18] [Braton Prime]: 2.9p -  [Pangolin Prime Handle]: 8p -  [Braton Prime]: 2.9p -  [Sicarus Prime]: 4.9p
+
+[24/Jun/2021 00:21] [Ivara Prime Systems]: 3.8p -  [Carrier Prime Systems]: 7.8p -  [Akstiletto Prime Receiver]: 27.9p
+
+[24/Jun/2021 00:24] [Ash Prime Systems]: 122.1p
+
+[24/Jun/2021 00:33] [Braton Prime]: 2.9p -  [Nekros Prime Chassis]: 8.9p
+
+[24/Jun/2021 00:36] [Inaros Prime Systems]: 5.3p -  [Akstiletto Prime Receiver]: 27.9p -  [Glaive Prime Blade]: 16.1p
+
+[24/Jun/2021 00:39] [Ash Prime Systems]: 122.1p -  [Ash Prime Systems]: 122.1p
+
+[24/Jun/2021 01:03] [Carrier Prime Systems]: 7.8p -  [Stradavar Prime Receiver]: 4.7p -  [Bronco Prime Receiver]: 3.8p
+
+[24/Jun/2021 01:06] [Pandero Prime Barrel]: 8.4p -  [Volt Prime Neuroptics]: 81.5p -  [Volt Prime Neuroptics]: 81.5p
+
+[25/Jun/2021 02:01] [Guandao Prime Blade]: 6.5p -  [Odonata Prime Harness]: 8p -  [Volt Prime]: 22.3p -  [Akstiletto Prime Link]: 8.7p
+
+[25/Jun/2021 02:03] [Aklex Prime]: 7.7p -  [Wukong Prime Neuroptics]: 4.3p -  [Akbronco Prime]: 2.9p -  [Volt Prime Systems]: 27.6p
+
+[25/Jun/2021 02:06] [Braton Prime Stock]: 2p -  [Aklex Prime]: 7.7p -  [Pangolin Prime Handle]: 8.2p
+
+[25/Jun/2021 02:10] [Wukong Prime Neuroptics]: 4.3p -  [Braton Prime Stock]: 2p -  [Odonata Prime Harness]: 8p
+
+[25/Jun/2021 02:13] [Odonata Prime Harness]: 8p
+
+[25/Jun/2021 02:15] [Volt Prime]: 22.3p -  [Akbronco Prime Link]: 3.9p -  [Paris Prime Lower Limb]: 2.2p -  [Volt Prime Systems]: 27.6p
+
+[25/Jun/2021 02:18] [Titania Prime]: 6.2p -  [Volt Prime]: 22.3p -  [Volt Prime]: 22.3p -  [Dethcube Prime Systems]: 2.5p
+
+[25/Jun/2021 02:20] [Odonata Prime Harness]: 8p -  [Wukong Prime Neuroptics]: 4.3p -  [Aksomati Prime Receiver]: 4p -  [Volt Prime]: 22.3p
+
+[25/Jun/2021 02:26] [Aksomati Prime Receiver]: 4p -  [Odonata Prime Harness]: 8p -  [Volt Prime]: 22.3p -  [Wukong Prime Chassis]: 4.4p
+
+[25/Jun/2021 02:28] [Volt Prime Systems]: 27.6p -  [Akbronco Prime]: 2.9p -  [Titania Prime]: 6.2p -  [Odonata Prime Harness]: 8p
+
+[25/Jun/2021 02:31] [Aksomati Prime Receiver]: 4p -  [Odonata Prime Harness]: 8p -  [Ash Prime]: 38.5p -  [Burston Prime Stock]: 2.3p
+
+[25/Jun/2021 02:39] [Odonata Prime Systems]: 8.7p -  [Vauban Prime Chassis]: 22.9p -  [Panthera Prime]: 4.1p
+
+[25/Jun/2021 02:42] [Vauban Prime Chassis]: 22.9p -  [Panthera Prime]: 4.1p -  [Lex Prime Receiver]: 9.1p -  [Volt Prime Neuroptics]: 80.8p
+
+[25/Jun/2021 02:46] [Volt Prime Neuroptics]: 80.8p -  [Carrier Prime Systems]: 7.8p -  [Lex Prime Receiver]: 9.1p
+
+[25/Jun/2021 02:48] [Volt Prime Neuroptics]: 80.8p -  [Nezha Prime Systems]: 4.9p -  [Lex Prime Receiver]: 9.1p
+
+[25/Jun/2021 02:51] [Odonata Prime Systems]: 8.7p -  [Odonata Prime Systems]: 8.7p -  [Akbolto Prime]: 3.6p
+
+[25/Jun/2021 02:55] [Volt Prime Neuroptics]: 80.8p -  [Inaros Prime Chassis]: 3.9p -  [Bronco Prime Receiver]: 3.3p -  [Dual Kamas Prime]: 7.5p
+
+[25/Jun/2021 02:58] [Pangolin Prime Handle]: 8.2p -  [Odonata Prime Systems]: 8.7p -  [Dual Kamas Prime]: 7.5p -  [Burston Prime Receiver]: 2.1p
+
+[25/Jun/2021 03:00] [Odonata Prime Systems]: 8.7p -  [Panthera Prime]: 4.1p -  [Inaros Prime Systems]: 5.6p -  [Dual Kamas Prime]: 7.5p
+
+[25/Jun/2021 03:04] [Inaros Prime Systems]: 5.6p -  [Volt Prime Neuroptics]: 80.8p -  [Vauban Prime Chassis]: 22.9p -  [Braton Prime Barrel]: 3.6p
+
+[26/Jun/2021 00:03] [Bronco Prime]: 3.1p -  [Ash Prime Neuroptics]: 9.2p -  [Hikou Prime]: 5.5p -  [Fang Prime Handle]: 5.9p
+
+[26/Jun/2021 00:06] [Vauban Prime Neuroptics]: 52.8p -  [Bronco Prime]: 3.1p -  [Hikou Prime]: 5.5p
+
+[26/Jun/2021 00:09] [Vauban Prime Neuroptics]: 52.8p -  [Vauban Prime Neuroptics]: 52.8p -  [Fang Prime Handle]: 5.9p -  [Fang Prime Handle]: 5.9p
+
+[26/Jun/2021 00:14] [Fang Prime Handle]: 5.9p -  [Fang Prime Handle]: 5.9p -  [Hikou Prime]: 5.5p -  [Bronco Prime]: 3.1p
+
+[26/Jun/2021 00:17] [Hikou Prime]: 5.5p -  [Ash Prime Neuroptics]: 9.2p
+
+[26/Jun/2021 01:12] [Rhino Prime Neuroptics]: 45.2p -  [Mag Prime Neuroptics]: 28.7p -  [Fang Prime Handle]: 5.9p -  [Bronco Prime Receiver]: 2.9p
+
+[26/Jun/2021 01:15] [Pandero Prime]: 3.1p -  [Lex Prime Barrel]: 4.1p -  [Scindo Prime]: 7.5p -  [Scindo Prime]: 7.5p
+
+[26/Jun/2021 01:18] [Mag Prime Neuroptics]: 28.7p -  [Ankyros Prime]: 9.7p -  [Mesa Prime Chassis]: 5p -  [Volt Prime]: 22.7p
+
+[26/Jun/2021 01:20] [Helios Prime Carapace]: 4.9p -  [Rhino Prime Neuroptics]: 45.2p -  [Boltor Prime]: 29.8p
+
+[26/Jun/2021 01:23] [Nyx Prime]: 9.6p -  [Bronco Prime]: 3.1p -  [Saryn Prime Systems]: 9.6p
+
+[26/Jun/2021 01:26] [Wyrm Prime Cerebrum]: 18p -  [Scindo Prime]: 7.5p
+
+[26/Jun/2021 01:28] [Rhino Prime Neuroptics]: 45.2p -  [Paris Prime]: 2.2p -  [Nami Skyla Prime Handle]: 16.9p
+
+[26/Jun/2021 01:31] [Bo Prime]: 14.1p -  [Scindo Prime]: 7.5p -  [Scindo Prime]: 7.5p
+
+[26/Jun/2021 01:33] [Mag Prime Neuroptics]: 28.7p -  [Scindo Prime]: 7.5p -  [Paris Prime]: 2.2p -  [Akstiletto Prime Barrel]: 26.3p
+
+[26/Jun/2021 01:37] [Mag Prime Neuroptics]: 28.7p -  [Ankyros Prime]: 9.7p
+
+[26/Jun/2021 01:42] [Rhino Prime Neuroptics]: 45.2p -  [Scindo Prime]: 7.5p -  [Tigris Prime Barrel]: 5.9p -  [Braton Prime Barrel]: 3.6p
+
+[26/Jun/2021 01:44] [Karyst Prime Handle]: 3.1p -  [Saryn Prime Systems]: 9.6p -  [Ankyros Prime]: 9.7p -  [Scindo Prime]: 7.5p
+
+[26/Jun/2021 01:47] [Scindo Prime]: 7.5p -  [Boltor Prime]: 29.8p -  [Saryn Prime Systems]: 9.6p
+
+[26/Jun/2021 01:49] [Reaper Prime Handle]: 26.9p -  [Boltor Prime Receiver]: 9.7p -  [Boltor Prime]: 29.8p
+
+[26/Jun/2021 16:12] [Boar Prime Receiver]: 8.9p -  [Mag Prime]: 87.8p -  [Mag Prime]: 87.8p -  [Dakra Prime]: 10.7p
+
+[26/Jun/2021 16:15] [Lex Prime Receiver]: 8.7p -  [Soma Prime]: 6p -  [Boar Prime Receiver]: 8.9p -  [Soma Prime]: 6p
+
+[26/Jun/2021 16:18] [Boar Prime Receiver]: 8.9p -  [Dakra Prime]: 10.7p -  [Boar Prime Receiver]: 8.9p
+
+[26/Jun/2021 16:21] [Soma Prime]: 6p -  [Nova Prime Neuroptics]: 15p -  [Dakra Prime]: 10.7p
+
+[26/Jun/2021 16:24] [Lex Prime Receiver]: 8.7p -  [Soma Prime]: 6p -  [Dakra Prime Handle]: 12.1p
+
+[26/Jun/2021 16:26] [Dakra Prime]: 10.7p -  [Boar Prime Receiver]: 8.9p -  [Nova Prime Neuroptics]: 15p -  [Boar Prime Receiver]: 8.9p
+
+[26/Jun/2021 16:29] [Mag Prime]: 87.8p -  [Boar Prime Receiver]: 8.9p -  [Soma Prime]: 6p
+
+[26/Jun/2021 16:31] [Boar Prime Receiver]: 8.9p -  [Lex Prime Receiver]: 8.7p -  [Boar Prime Receiver]: 8.9p
+
+[26/Jun/2021 16:43] [Saryn Prime Chassis]: 131.7p -  [Paris Prime String]: 6.2p -  [Paris Prime Grip]: 3.5p -  [Paris Prime String]: 6.2p
+
+[26/Jun/2021 16:46] [Paris Prime String]: 6.2p -  [Paris Prime String]: 6.2p -  [Paris Prime Grip]: 3.5p
+
+[26/Jun/2021 16:59] [Paris Prime String]: 6.2p -  [Bronco Prime]: 3.1p -  [Paris Prime Grip]: 3.5p
+
+[26/Jun/2021 17:02] [Paris Prime String]: 6.2p -  [Galatine Prime Blade]: 5.1p
+
+[26/Jun/2021 17:05] [Saryn Prime Chassis]: 131.7p -  [Saryn Prime Chassis]: 131.7p -  [Paris Prime Grip]: 3.5p -  [Paris Prime String]: 6.2p
+
+[26/Jun/2021 17:09] [Paris Prime Grip]: 3.5p -  [Paris Prime Grip]: 3.5p -  [Saryn Prime Chassis]: 131.7p
+
+[26/Jun/2021 17:12] [Paris Prime Grip]: 3.5p -  [Bronco Prime]: 3.1p -  [Paris Prime Grip]: 3.5p
+
+[26/Jun/2021 17:15] [Saryn Prime Chassis]: 131.7p -  [Bronco Prime]: 3.1p -  [Akbronco Prime]: 3.4p
+
+[26/Jun/2021 17:18] [Saryn Prime Chassis]: 131.7p -  [Saryn Prime Chassis]: 131.7p -  [Paris Prime String]: 6.2p -  [Paris Prime Grip]: 3.5p
+
+[26/Jun/2021 17:34] [Volt Prime Neuroptics]: 81.1p -  [Odonata Prime Systems]: 9p -  [Helios Prime Systems]: 8.6p -  [Paris Prime Lower Limb]: 2.2p
+
+[26/Jun/2021 17:36] [Inaros Prime Systems]: 5.4p -  [Pandero Prime Barrel]: 7.9p
+
+[26/Jun/2021 17:39] [Volt Prime Neuroptics]: 81.1p -  [Inaros Prime Systems]: 5.4p -  [Ivara Prime]: 3.6p
+
+[26/Jun/2021 17:40] [Volt Prime Neuroptics]: 81.1p -  [Inaros Prime Systems]: 5.4p -  [Ivara Prime]: 3.6p
+
+[26/Jun/2021 17:43] [Inaros Prime Systems]: 5.4p -  [Volt Prime Neuroptics]: 81.1p
+
+[26/Jun/2021 17:46] [Carrier Prime Systems]: 7.8p -  [Vauban Prime Chassis]: 22.9p -  [Inaros Prime Systems]: 5.4p -  [Paris Prime Lower Limb]: 2.2p
+
+[26/Jun/2021 17:49] [Pangolin Prime Blade]: 3.8p -  [Carrier Prime Systems]: 7.8p -  [Odonata Prime Systems]: 9p
+
+[26/Jun/2021 17:56] [Pangolin Prime Blade]: 3.8p -  [Pangolin Prime Handle]: 8.2p -  [Odonata Prime Systems]: 9p -  [Odonata Prime Systems]: 9p
+
+[26/Jun/2021 17:59] [Odonata Prime Systems]: 9p -  [Burston Prime Receiver]: 2.5p -  [Aksomati Prime]: 1.9p
+
+[26/Jun/2021 18:02] [Inaros Prime Systems]: 5.4p -  [Braton Prime]: 3p -  [Volt Prime Neuroptics]: 81.1p -  [Vauban Prime Chassis]: 22.9p
+
+[26/Jun/2021 18:06] [Volt Prime Neuroptics]: 81.1p -  [Karyst Prime]: 4.7p -  [Paris Prime Lower Limb]: 2.2p
+
+[26/Jun/2021 18:09] [Pangolin Prime Blade]: 3.8p -  [Carrier Prime Systems]: 7.8p -  [Volt Prime Neuroptics]: 81.1p
+
+[27/Jun/2021 03:30] [Bronco Prime Receiver]: 3.1p -  [Nikana Prime]: 13.4p -  [Chroma Prime]: 5p -  [Nikana Prime]: 13.4p
+
+[27/Jun/2021 03:34] [Saryn Prime]: 52.2p -  [Chroma Prime]: 5p -  [Braton Prime Receiver]: 3.5p -  [Burston Prime Receiver]: 2.5p
+
+[27/Jun/2021 03:39] [Braton Prime Receiver]: 3.5p -  [Zephyr Prime Neuroptics]: 5.1p -  [Nikana Prime]: 13.4p
+
+[27/Jun/2021 03:42] [Nikana Prime]: 13.4p -  [Burston Prime Stock]: 2.4p -  [Saryn Prime]: 52.2p -  [Stradavar Prime Receiver]: 4.7p
+
+[27/Jun/2021 03:45] [Inaros Prime Systems]: 5.4p -  [Braton Prime Receiver]: 3.5p -  [Paris Prime Lower Limb]: 2.2p -  [Braton Prime Barrel]: 3.5p
+
+[27/Jun/2021 04:22] [Braton Prime]: 3p -  [Carrier Prime Systems]: 7.8p -  [Braton Prime]: 3p -  [Braton Prime]: 3p
+
+[27/Jun/2021 04:26] [Odonata Prime Wings]: 19.3p -  [Carrier Prime Systems]: 7.8p -  [Fragor Prime]: 9.4p -  [Carrier Prime Systems]: 7.8p
+
+[27/Jun/2021 04:29] [Odonata Prime Wings]: 19.3p -  [Ash Prime Systems]: 125.1p -  [Braton Prime]: 3p
+
+[27/Jun/2021 04:34] [Ash Prime Systems]: 125.1p -  [Akstiletto Prime Receiver]: 28.4p -  [Akstiletto Prime Receiver]: 28.4p
+
+[27/Jun/2021 04:39] [Odonata Prime Wings]: 19.3p -  [Akstiletto Prime Receiver]: 28.4p -  [Ash Prime Systems]: 125.1p -  [Braton Prime]: 3p
+
+[27/Jun/2021 04:42] [Braton Prime]: 3p -  [Akstiletto Prime Receiver]: 28.4p -  [Ash Prime Systems]: 125.1p
+
+[27/Jun/2021 16:58] [Paris Prime Upper Limb]: 2.3p -  [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Lower Limb]: 2.1p
+
+[27/Jun/2021 17:00] [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Upper Limb]: 2.3p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 30.6p
+
+[27/Jun/2021 17:03] [Paris Prime Upper Limb]: 2.3p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 30.6p -  [Volt Prime Systems]: 30.6p
+
+[27/Jun/2021 17:05] [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 30.6p -  [Volt Prime Systems]: 30.6p
+
+[27/Jun/2021 17:07] [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 30.6p
+
+[27/Jun/2021 17:10] [Burston Prime Stock]: 2.3p -  [Paris Prime Lower Limb]: 2.1p -  [Burston Prime Stock]: 2.3p
+
+[27/Jun/2021 17:13] [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 30.6p -  [Volt Prime Systems]: 30.6p -  [Volt Prime Systems]: 30.6p
+
+[27/Jun/2021 17:15] [Paris Prime Upper Limb]: 2.3p -  [Fragor Prime Handle]: 13.3p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 30.6p
+
+[27/Jun/2021 17:18] [Paris Prime Upper Limb]: 2.3p
+
+[27/Jun/2021 17:20] [Burston Prime Stock]: 2.3p -  [Burston Prime Stock]: 2.3p
+
+[27/Jun/2021 17:24] [Volt Prime Systems]: 30.6p -  [Burston Prime Stock]: 2.3p -  [Paris Prime Upper Limb]: 2.3p -  [Burston Prime Stock]: 2.3p
+
+[27/Jun/2021 22:15] [Ash Prime Systems]: 126.8p -  [Odonata Prime Harness]: 7.6p -  [Paris Prime String]: 6.1p -  [Aklex Prime]: 8p
+
+[27/Jun/2021 22:17] [Odonata Prime Harness]: 7.6p -  [Ash Prime Systems]: 126.8p -  [Odonata Prime Harness]: 7.6p -  [Helios Prime Carapace]: 5.1p
+
+[27/Jun/2021 22:21] [Nyx Prime Chassis]: 10.6p -  [Volt Prime]: 21.8p -  [Paris Prime String]: 6.1p
+
+[27/Jun/2021 22:23] [Volt Prime]: 21.8p -  [Vauban Prime Chassis]: 22.5p
+
+[27/Jun/2021 22:26] [Burston Prime Stock]: 2.3p -  [Odonata Prime Harness]: 7.6p -  [Aklex Prime]: 8p
+
+[27/Jun/2021 22:32] [Volt Prime Systems]: 30.6p -  [Odonata Prime Harness]: 7.6p -  [Aklex Prime]: 8p -  [Volt Prime Systems]: 30.6p
+
+[27/Jun/2021 22:35] [Volt Prime]: 21.8p -  [Wyrm Prime Systems]: 69.5p -  [Vauban Prime Chassis]: 22.5p
+
+[27/Jun/2021 22:39] [Paris Prime Lower Limb]: 2.1p -  [Aklex Prime]: 8p -  [Volt Prime]: 21.8p
+
+[27/Jun/2021 22:42] [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime]: 21.8p
+
+[27/Jun/2021 22:44] [Odonata Prime Harness]: 7.6p -  [Ash Prime Systems]: 126.8p -  [Volt Prime Systems]: 30.6p -  [Vauban Prime Chassis]: 22.5p
+
+[27/Jun/2021 22:48] [Helios Prime Carapace]: 5.1p -  [Volt Prime Systems]: 30.6p -  [Odonata Prime Harness]: 7.6p
+
+[27/Jun/2021 22:50] [Odonata Prime Harness]: 7.6p -  [Saryn Prime Systems]: 9.5p -  [Aklex Prime]: 8p -  [Nezha Prime Systems]: 4.6p
+
+[27/Jun/2021 22:53] [Nyx Prime Chassis]: 10.6p -  [Volt Prime Systems]: 30.6p -  [Latron Prime Receiver]: 14.2p -  [Odonata Prime Harness]: 7.6p
+
+[27/Jun/2021 22:56] [Volt Prime Systems]: 30.6p -  [Loki Prime Neuroptics]: 34.9p -  [Odonata Prime Harness]: 7.6p
+
+[27/Jun/2021 22:59] [Volt Prime Systems]: 30.6p -  [Volt Prime]: 21.8p -  [Reaper Prime]: 14.7p
+
+[27/Jun/2021 23:04] [Volt Prime Systems]: 30.6p -  [Volt Prime Systems]: 30.6p -  [Odonata Prime Harness]: 7.6p
+
+[28/Jun/2021 02:00] [Paris Prime]: 2.1p -  [Nyx Prime Neuroptics]: 58.6p -  [Boltor Prime Barrel]: 20.7p
+
+[28/Jun/2021 02:03] [Hikou Prime Pouch]: 25.2p -  [Orthos Prime Handle]: 2.6p -  [Aksomati Prime Barrel]: 4.8p
+
+[28/Jun/2021 02:07] [Braton Prime Barrel]: 3.1p -  [Paris Prime String]: 6.1p -  [Rhino Prime Chassis]: 52.7p
+
+[28/Jun/2021 02:10] [Scindo Prime Handle]: 11.1p -  [Nyx Prime Neuroptics]: 58.6p -  [Ivara Prime Neuroptics]: 3.8p -  [Paris Prime]: 2.1p
+
+[28/Jun/2021 02:13] [Braton Prime Barrel]: 3.1p -  [Burston Prime]: 2.7p -  [Scindo Prime Handle]: 11.1p -  [Rhino Prime Chassis]: 52.7p
+
+[28/Jun/2021 02:17] [Rhino Prime Chassis]: 52.7p -  [Rhino Prime Chassis]: 52.7p -  [Titania Prime Chassis]: 3.7p -  [Saryn Prime Neuroptics]: 19.4p
+
+[28/Jun/2021 02:20] [Braton Prime Barrel]: 3.1p -  [Burston Prime]: 2.7p -  [Rhino Prime Chassis]: 52.7p -  [Scindo Prime Handle]: 11.1p
+
+[28/Jun/2021 02:26] [Nyx Prime Systems]: 14.4p -  [Rhino Prime Systems]: 15.5p -  [Pangolin Prime Handle]: 8.4p -  [Burston Prime Barrel]: 3.2p
+
+[28/Jun/2021 02:29] [Equinox Prime Chassis]: 4.1p -  [Hikou Prime Stars]: 9.9p -  [Hikou Prime Stars]: 9.9p
+
+[28/Jun/2021 02:32] [Rhino Prime Systems]: 15.5p -  [Ankyros Prime Blade]: 35p -  [Karyst Prime]: 4.9p -  [Inaros Prime Systems]: 5.4p
+
+[28/Jun/2021 02:36] [Tekko Prime Blade]: 13p -  [Lex Prime Receiver]: 8.4p -  [Nyx Prime Systems]: 14.4p -  [Ankyros Prime Blade]: 35p
+
+[28/Jun/2021 02:39] [Rhino Prime Systems]: 15.5p -  [Nyx Prime Systems]: 14.4p -  [Panthera Prime]: 4.1p -  [Karyst Prime]: 4.9p
+
+[28/Jun/2021 02:42] [Inaros Prime Systems]: 5.4p -  [Braton Prime]: 2.6p -  [Nyx Prime Systems]: 14.4p -  [Boltor Prime Stock]: 15.9p
+
+[28/Jun/2021 02:45] [Nyx Prime Neuroptics]: 58.6p -  [Nyx Prime Neuroptics]: 58.6p -  [Ivara Prime Neuroptics]: 3.8p
+
+[28/Jun/2021 02:52] [Braton Prime Barrel]: 3.1p -  [Burston Prime Receiver]: 2.1p -  [Boltor Prime Barrel]: 20.7p -  [Hikou Prime Pouch]: 25.2p
+
+[29/Jun/2021 14:52] [Saryn Prime Systems]: 9.5p -  [Spira Prime Blade]: 21.8p -  [Saryn Prime Systems]: 9.5p -  [Spira Prime]: 5.2p
+
+[29/Jun/2021 14:55] [Spira Prime Blade]: 21.8p -  [Nikana Prime Blade]: 31p -  [Spira Prime Blade]: 21.8p -  [Saryn Prime Systems]: 9.5p
+
+[29/Jun/2021 14:57] [Nikana Prime Blade]: 31p -  [Lex Prime]: 1.7p -  [Nikana Prime Blade]: 31p -  [Nikana Prime]: 13.9p
+
+[29/Jun/2021 14:59] [Lex Prime]: 1.7p -  [Spira Prime Blade]: 21.8p -  [Spira Prime Blade]: 21.8p -  [Cernos Prime]: 5.7p
+
+[29/Jun/2021 15:01] [Spira Prime Blade]: 21.8p -  [Lex Prime]: 1.7p -  [Spira Prime Blade]: 21.8p -  [Spira Prime]: 5.2p
+
+[29/Jun/2021 15:04] [Burston Prime Stock]: 2p -  [Spira Prime Blade]: 21.8p -  [Nikana Prime Blade]: 31p -  [Spira Prime]: 5.2p
+
+[29/Jun/2021 15:06] [Cernos Prime]: 5.7p -  [Braton Prime Stock]: 2.2p -  [Spira Prime Blade]: 21.8p -  [Spira Prime]: 5.2p
+
+[29/Jun/2021 15:09] [Nikana Prime]: 13.9p -  [Saryn Prime Chassis]: 135.5p -  [Saryn Prime Chassis]: 135.5p -  [Nikana Prime]: 13.9p
+
+[29/Jun/2021 15:12] [Nikana Prime]: 13.9p -  [Nikana Prime Blade]: 31p -  [Spira Prime Blade]: 21.8p -  [Saryn Prime Chassis]: 135.5p
+
+[29/Jun/2021 15:15] [Saryn Prime Chassis]: 135.5p -  [Spira Prime Blade]: 21.8p -  [Spira Prime Blade]: 21.8p
+
+[29/Jun/2021 15:17] [Spira Prime Blade]: 21.8p -  [Saryn Prime Systems]: 9.5p
+
+[29/Jun/2021 15:20] [Spira Prime Blade]: 21.8p -  [Braton Prime Stock]: 2.2p -  [Paris Prime Grip]: 3.6p
+
+[29/Jun/2021 15:22] [Paris Prime Grip]: 3.6p -  [Braton Prime Stock]: 2.2p -  [Spira Prime Blade]: 21.8p -  [Galatine Prime Blade]: 5.5p
+
+[29/Jun/2021 15:25] [Paris Prime Grip]: 3.6p -  [Saryn Prime Chassis]: 135.5p -  [Saryn Prime Chassis]: 135.5p -  [Spira Prime]: 5.2p
+
+[29/Jun/2021 15:27] [Braton Prime Barrel]: 3.1p -  [Sybaris Prime]: 5.4p -  [Tigris Prime Stock]: 6.9p
+
+[29/Jun/2021 15:30] [Oberon Prime Systems]: 37.4p -  [Oberon Prime Systems]: 37.4p
+
+[29/Jun/2021 15:33] [Fang Prime Handle]: 5.7p -  [Paris Prime String]: 5p -  [Nekros Prime Systems]: 70.7p
+
+[29/Jun/2021 15:35] [Fang Prime Handle]: 5.7p -  [Oberon Prime Systems]: 37.4p -  [Fang Prime Handle]: 5.7p -  [Sybaris Prime]: 5.4p
+
+[29/Jun/2021 15:40] [Latron Prime Stock]: 14.1p -  [Reaper Prime Blade]: 13.4p -  [Reaper Prime Blade]: 13.4p -  [Reaper Prime Blade]: 13.4p
+
+[29/Jun/2021 15:43] [Latron Prime Stock]: 14.1p -  [Frost Prime]: 64.5p
+
+[29/Jun/2021 15:46] [Latron Prime Stock]: 14.1p -  [Reaper Prime Blade]: 13.4p -  [Reaper Prime Blade]: 13.4p -  [Reaper Prime Blade]: 13.4p
+
+[29/Jun/2021 20:38] [Galatine Prime Blade]: 5.5p -  [Paris Prime String]: 5p -  [Paris Prime Grip]: 3.6p
+
+[29/Jun/2021 20:40] [Bronco Prime]: 3.2p -  [Bronco Prime]: 3.2p -  [Galatine Prime Blade]: 5.5p
+
+[29/Jun/2021 20:43] [Paris Prime String]: 5p -  [Galatine Prime Blade]: 5.5p -  [Bronco Prime]: 3.2p -  [Paris Prime Grip]: 3.6p
+
+[30/Jun/2021 00:43] [Inaros Prime Systems]: 5.2p -  [Wukong Prime Neuroptics]: 4.2p -  [Odonata Prime Systems]: 9.4p -  [Carrier Prime Systems]: 8.3p
+
+[30/Jun/2021 00:46] [Volt Prime Neuroptics]: 85.4p -  [Dual Kamas Prime]: 7.2p -  [Panthera Prime]: 4.1p -  [Karyst Prime]: 4.3p
+
+[30/Jun/2021 00:49] [Bronco Prime Receiver]: 3.5p -  [Volt Prime Neuroptics]: 85.4p
+
+[30/Jun/2021 00:52] [Odonata Prime Systems]: 9.4p -  [Odonata Prime Systems]: 9.4p -  [Panthera Prime]: 4.1p -  [Rubico Prime Stock]: 6.6p
+
+[30/Jun/2021 00:56] [Panthera Prime]: 4.1p -  [Carrier Prime Systems]: 8.3p -  [Odonata Prime Systems]: 9.4p
+
+[30/Jun/2021 00:59] [Volt Prime Neuroptics]: 85.4p -  [Carrier Prime Systems]: 8.3p -  [Panthera Prime]: 4.1p -  [Wyrm Prime Carapace]: 53.2p
+
+[30/Jun/2021 01:01] [Bronco Prime Receiver]: 3.5p -  [Wukong Prime Neuroptics]: 4.2p -  [Odonata Prime Systems]: 9.4p -  [Volt Prime Neuroptics]: 85.4p
+
+[30/Jun/2021 01:04] [Odonata Prime Systems]: 9.4p -  [Trinity Prime Chassis]: 10.1p -  [Loki Prime Systems]: 380p
+
+[30/Jun/2021 01:04] [Odonata Prime Systems]: 9.4p -  [Trinity Prime Chassis]: 10.1p -  [Loki Prime Systems]: 380p
+
+[30/Jun/2021 01:07] [Volt Prime Systems]: 27.8p -  [Carrier Prime Systems]: 8.3p
+
+[01/Jul/2021 00:03] [Dethcube Prime Systems]: 2.8p -  [Carrier Prime Systems]: 8.3p -  [Dethcube Prime Systems]: 2.8p -  [Dual Kamas Prime]: 7.3p
+
+[01/Jul/2021 00:05] [Carrier Prime Systems]: 8.3p -  [Karyst Prime]: 4.3p -  [Carrier Prime Systems]: 8.3p -  [Stradavar Prime Receiver]: 4.4p
+
+[01/Jul/2021 00:08] [Pangolin Prime Handle]: 7.9p -  [Dual Kamas Prime]: 7.3p -  [Pangolin Prime Handle]: 7.9p
+
+[01/Jul/2021 00:11] [Dual Kamas Prime]: 7.3p -  [Karyst Prime]: 4.3p
+
+[01/Jul/2021 00:14] [Panthera Prime]: 4.1p -  [Carrier Prime Systems]: 8.3p -  [Pangolin Prime Handle]: 7.9p -  [Volt Prime Neuroptics]: 88.1p
+
+[01/Jul/2021 00:17] [Vauban Prime Chassis]: 23.2p -  [Dual Kamas Prime]: 7.3p
+
+[01/Jul/2021 00:20] [Dethcube Prime Systems]: 2.8p -  [Vauban Prime Chassis]: 23.2p -  [Volnus Prime Head]: 13.3p -  [Dual Kamas Prime]: 7.3p
+
+[01/Jul/2021 00:23] [Dual Kamas Prime]: 7.3p
+
+[01/Jul/2021 00:26] [Volnus Prime Head]: 13.3p -  [Dual Kamas Prime]: 7.3p -  [Pangolin Prime Handle]: 7.9p -  [Volt Prime Neuroptics]: 88.1p
+
+[01/Jul/2021 00:29] [Odonata Prime Systems]: 9.1p -  [Pangolin Prime Handle]: 7.9p -  [Carrier Prime Systems]: 8.3p -  [Akbronco Prime]: 2.8p
+
+[01/Jul/2021 00:32] [Pangolin Prime Handle]: 7.9p -  [Odonata Prime Systems]: 9.1p -  [Panthera Prime]: 4.1p
+
+[01/Jul/2021 23:13] [Saryn Prime Neuroptics]: 20.4p -  [Braton Prime Barrel]: 3.3p -  [Dethcube Prime Systems]: 2.5p
+
+[01/Jul/2021 23:16] [Fang Prime Blade]: 3.6p -  [Spira Prime]: 5.4p -  [Valkyr Prime Neuroptics]: 9p -  [Equinox Prime Chassis]: 4.1p
+
+[01/Jul/2021 23:19] [Valkyr Prime Neuroptics]: 9p -  [Gram Prime Blade]: 3.6p -  [Burston Prime Stock]: 1.8p -  [Saryn Prime Neuroptics]: 20.4p
+
+[01/Jul/2021 23:22] [Pandero Prime]: 2.5p -  [Valkyr Prime Neuroptics]: 9p -  [Spira Prime]: 5.4p -  [Orthos Prime Handle]: 2.6p
+
+[01/Jul/2021 23:25] [Spira Prime]: 5.4p -  [Aksomati Prime]: 2.1p -  [Saryn Prime Neuroptics]: 20.4p
+
+[01/Jul/2021 23:27] [Fang Prime Blade]: 3.6p -  [Saryn Prime Neuroptics]: 20.4p -  [Valkyr Prime Neuroptics]: 9p
+
+[01/Jul/2021 23:33] [Saryn Prime Neuroptics]: 20.4p -  [Burston Prime Stock]: 1.8p -  [Saryn Prime Neuroptics]: 20.4p -  [Fang Prime Handle]: 5.8p
+
+[01/Jul/2021 23:36] [Fang Prime Blade]: 3.6p -  [Saryn Prime Neuroptics]: 20.4p -  [Lex Prime]: 1.8p -  [Spira Prime]: 5.4p
+
+[01/Jul/2021 23:39] [Ivara Prime]: 3.4p -  [Rubico Prime Receiver]: 5.6p
+
+[01/Jul/2021 23:42] [Fang Prime Blade]: 3.6p -  [Spira Prime]: 5.4p -  [Wukong Prime Neuroptics]: 4.2p
+
+[01/Jul/2021 23:45] [Saryn Prime Neuroptics]: 20.4p -  [Burston Prime Stock]: 1.8p -  [Stradavar Prime Receiver]: 4.7p
+
+[01/Jul/2021 23:48] [Fang Prime Blade]: 3.6p -  [Panthera Prime Stock]: 2.4p -  [Valkyr Prime Neuroptics]: 9p
+
+[02/Jul/2021 22:33] [Volt Prime Systems]: 26.8p -  [Odonata Prime Harness]: 8.8p -  [Aklex Prime]: 7.9p -  [Saryn Prime Systems]: 9.5p
+
+[02/Jul/2021 22:36] [Paris Prime Upper Limb]: 2.1p -  [Titania Prime Chassis]: 3.7p -  [Odonata Prime Harness]: 8.8p
+
+[02/Jul/2021 22:39] [Volt Prime Systems]: 26.8p -  [Aklex Prime]: 7.9p -  [Odonata Prime Harness]: 8.8p -  [Ash Prime Chassis]: 19.9p
+
+[02/Jul/2021 22:42] [Paris Prime Upper Limb]: 2.1p -  [Mesa Prime Chassis]: 5p -  [Nekros Prime Chassis]: 8.7p -  [Odonata Prime Harness]: 8.8p
+
+[02/Jul/2021 22:44] [Volt Prime Systems]: 26.8p -  [Odonata Prime Harness]: 8.8p -  [Fang Prime]: 1.7p
+
+[02/Jul/2021 22:47] [Burston Prime Stock]: 1.9p -  [Akbronco Prime]: 2.5p -  [Nekros Prime Chassis]: 8.7p
+
+[02/Jul/2021 22:49] [Paris Prime Upper Limb]: 2.1p -  [Aklex Prime]: 7.9p -  [Lex Prime]: 1.8p
+
+[02/Jul/2021 22:52] [Paris Prime Upper Limb]: 2.1p -  [Wukong Prime Chassis]: 4.7p -  [Atlas Prime Systems]: 3.4p
+
+[02/Jul/2021 22:55] [Paris Prime Upper Limb]: 2.1p -  [Odonata Prime Harness]: 8.8p -  [Volt Prime]: 21.7p -  [Nikana Prime Blade]: 29.1p
+
+[02/Jul/2021 22:57] [Paris Prime Lower Limb]: 1.9p -  [Aksomati Prime]: 2.2p -  [Nyx Prime Chassis]: 10.1p
+
+[02/Jul/2021 23:00] [Aklex Prime]: 7.9p -  [Spira Prime Blade]: 25.9p
+
+[02/Jul/2021 23:02] [Dakra Prime]: 11.9p -  [Boar Prime]: 15.2p -  [Paris Prime Lower Limb]: 1.9p -  [Volt Prime Systems]: 26.8p
+
+[02/Jul/2021 23:05] [Volt Prime Systems]: 26.8p -  [Odonata Prime Harness]: 8.8p -  [Volt Prime]: 21.7p -  [Lex Prime]: 1.8p
+
+[03/Jul/2021 17:45] [Bronco Prime]: 3.1p -  [Lex Prime Receiver]: 8.4p -  [Hydroid Prime Neuroptics]: 12.8p -  [Nikana Prime Hilt]: 87.4p
+
+[03/Jul/2021 17:49] [Bronco Prime]: 3.1p -  [Bronco Prime]: 3.1p -  [Carrier Prime Carapace]: 13p -  [Lex Prime Receiver]: 8.4p
+
+[03/Jul/2021 17:52] [Bronco Prime]: 3.1p -  [Lex Prime Receiver]: 8.4p -  [Ash Prime Neuroptics]: 9.9p -  [Ash Prime Neuroptics]: 9.9p
+
+[03/Jul/2021 17:55] [Ash Prime Neuroptics]: 9.9p -  [Hydroid Prime Neuroptics]: 12.8p -  [Ash Prime Neuroptics]: 9.9p -  [Nikana Prime]: 13.4p
+
+[03/Jul/2021 17:58] [Fragor Prime Handle]: 13.6p -  [Galatine Prime Blade]: 5.8p -  [Carrier Prime Carapace]: 13p -  [Bronco Prime]: 3.1p
+
+[03/Jul/2021 18:00] [Galatine Prime Blade]: 5.8p -  [Fragor Prime Handle]: 13.6p -  [Ash Prime Neuroptics]: 9.9p
+
+[03/Jul/2021 18:03] [Fragor Prime Handle]: 13.6p -  [Galatine Prime Blade]: 5.8p -  [Ash Prime Neuroptics]: 9.9p
+
+[03/Jul/2021 18:06] [Cernos Prime Upper Limb]: 8.7p -  [Cernos Prime Upper Limb]: 8.7p -  [Bronco Prime]: 3.1p -  [Ash Prime Neuroptics]: 9.9p
+
+[03/Jul/2021 18:09] [Fragor Prime Handle]: 13.6p -  [Lex Prime Receiver]: 8.4p -  [Galatine Prime Blade]: 5.8p
+
+[04/Jul/2021 02:49] [Paris Prime String]: 5.7p -  [Paris Prime Grip]: 4.1p -  [Bronco Prime]: 3.1p -  [Galatine Prime Blade]: 5.8p
+
+[04/Jul/2021 02:53] [Bronco Prime]: 3.1p -  [Paris Prime Grip]: 4.1p -  [Paris Prime Grip]: 4.1p
+
+[04/Jul/2021 02:57] [Paris Prime String]: 5.7p -  [Paris Prime String]: 5.7p -  [Galatine Prime Blade]: 5.8p -  [Galatine Prime Blade]: 5.8p
+
+[04/Jul/2021 03:01] [Saryn Prime Chassis]: 135.5p -  [Bronco Prime]: 3.1p -  [Galatine Prime Blade]: 5.8p -  [Galatine Prime Blade]: 5.8p
+
+[04/Jul/2021 03:04] [Saryn Prime Chassis]: 135.5p -  [Galatine Prime Blade]: 5.8p -  [Paris Prime String]: 5.7p
+
+[04/Jul/2021 03:08] [Paris Prime Grip]: 4.1p -  [Paris Prime Grip]: 4.1p -  [Galatine Prime Blade]: 5.8p
+
+[04/Jul/2021 03:12] [Saryn Prime Chassis]: 135.5p -  [Galatine Prime Blade]: 5.8p -  [Saryn Prime Chassis]: 135.5p
+
+[04/Jul/2021 03:15] [Galatine Prime Blade]: 5.8p -  [Paris Prime Grip]: 4.1p -  [Paris Prime String]: 5.7p
+
+[04/Jul/2021 03:21] [Nekros Prime Systems]: 66.6p -  [Akbronco Prime]: 2.8p
+
+[04/Jul/2021 03:24] [Euphona Prime]: 4.1p -  [Trinity Prime Neuroptics]: 18.4p -  [Atlas Prime Neuroptics]: 18.6p -  [Braton Prime Barrel]: 3.5p
+
+[04/Jul/2021 03:27] [Nekros Prime Systems]: 66.6p -  [Braton Prime]: 2.4p -  [Braton Prime Barrel]: 3.5p -  [Baza Prime Barrel]: 3.4p
+
+[04/Jul/2021 03:30] [Aksomati Prime Receiver]: 4.1p -  [Trinity Prime Neuroptics]: 18.4p -  [Oberon Prime Systems]: 35.3p -  [Tigris Prime Stock]: 7p
+
+[04/Jul/2021 03:32] [Euphona Prime]: 4.1p -  [Akbronco Prime]: 2.8p -  [Braton Prime Barrel]: 3.5p
+
+[04/Jul/2021 03:35] [Sybaris Prime]: 4.9p -  [Hikou Prime]: 6p -  [Nekros Prime Systems]: 66.6p -  [Sybaris Prime]: 4.9p
+
+[04/Jul/2021 03:38] [Banshee Prime]: 4.7p -  [Gara Prime Systems]: 7.8p -  [Nekros Prime Systems]: 66.6p -  [Akbronco Prime]: 2.8p
+
+[04/Jul/2021 03:41] [Venka Prime Blades]: 10p -  [Nyx Prime Chassis]: 10.2p -  [Nekros Prime Systems]: 66.6p -  [Braton Prime Barrel]: 3.5p
+
+[04/Jul/2021 03:44] [Euphona Prime]: 4.1p -  [Karyst Prime Handle]: 3.6p -  [Braton Prime Barrel]: 3.5p
+
+[04/Jul/2021 03:47] [Aksomati Prime Receiver]: 4.1p -  [Venka Prime Blades]: 10p -  [Karyst Prime Handle]: 3.6p
+
+[04/Jul/2021 03:50] [Valkyr Prime Neuroptics]: 9.3p -  [Gara Prime Systems]: 7.8p -  [Tigris Prime Stock]: 7p -  [Akbronco Prime]: 2.8p
+
+[04/Jul/2021 03:53] [Guandao Prime Blade]: 6.8p -  [Valkyr Prime Neuroptics]: 9.3p -  [Braton Prime Barrel]: 3.5p
+
+[04/Jul/2021 03:56] [Banshee Prime]: 4.7p -  [Paris Prime String]: 5.7p -  [Braton Prime Stock]: 2.2p
+
+[04/Jul/2021 03:58] [Guandao Prime Blade]: 6.8p -  [Banshee Prime]: 4.7p -  [Sybaris Prime]: 4.9p -  [Sybaris Prime]: 4.9p
+
+[05/Jul/2021 00:54] [Nekros Prime Chassis]: 8.4p -  [Braton Prime Receiver]: 4.1p -  [Carrier Prime Carapace]: 12.9p -  [Carrier Prime Carapace]: 12.9p
+
+[05/Jul/2021 00:58] [Bronco Prime]: 3.2p -  [Bronco Prime]: 3.2p
+
+[05/Jul/2021 01:01] [Galatine Prime Blade]: 5.2p -  [Lex Prime Receiver]: 8.6p -  [Nikana Prime Hilt]: 87.1p
+
+[05/Jul/2021 01:05] [Nekros Prime Chassis]: 8.4p -  [Saryn Prime]: 49.6p -  [Lex Prime Receiver]: 8.6p -  [Ash Prime Neuroptics]: 9.6p
+
+[05/Jul/2021 01:08] [Braton Prime Receiver]: 4.1p -  [Bronco Prime]: 3.2p -  [Bronco Prime]: 3.2p
+
+[06/Jul/2021 01:09] [Titania Prime Neuroptics]: 3.9p -  [Baza Prime Receiver]: 3.8p -  [Odonata Prime Wings]: 19.3p
+
+[06/Jul/2021 01:12] [Loki Prime Neuroptics]: 30.5p -  [Dethcube Prime Cerebrum]: 12.3p -  [Odonata Prime Wings]: 19.3p -  [Titania Prime Chassis]: 3.9p
+
+[06/Jul/2021 01:15] [Corinth Prime Receiver]: 3.8p -  [Loki Prime Neuroptics]: 30.5p
+
+[06/Jul/2021 01:19] [Odonata Prime Systems]: 8.4p -  [Volt Prime Chassis]: 17.6p -  [Stradavar Prime Barrel]: 3.8p
+
+[06/Jul/2021 01:21] [Braton Prime Barrel]: 3.5p -  [Odonata Prime Systems]: 8.4p -  [Pangolin Prime Handle]: 7.7p -  [Loki Prime Neuroptics]: 30.5p
+
+[06/Jul/2021 01:24] [Wyrm Prime Systems]: 71.6p -  [Nezha Prime]: 3.6p -  [Loki Prime Neuroptics]: 30.5p -  [Titania Prime Chassis]: 3.9p
+
+[06/Jul/2021 01:27] [Loki Prime Neuroptics]: 30.5p -  [Tipedo Prime]: 3.6p -  [Wyrm Prime Systems]: 71.6p
+
+[08/Jul/2021 22:27] [Bronco Prime Receiver]: 2.3p -  [Galatine Prime Blade]: 4.9p -  [Galatine Prime Blade]: 4.9p -  [Cernos Prime Upper Limb]: 8.5p
+
+[08/Jul/2021 22:32] [Trinity Prime]: 25.1p -  [Cernos Prime Upper Limb]: 8.5p -  [Trinity Prime]: 25.1p -  [Trinity Prime]: 25.1p
+
+[08/Jul/2021 22:36] [Galatine Prime Blade]: 4.9p -  [Bronco Prime Receiver]: 2.3p -  [Galatine Prime Blade]: 4.9p -  [Bronco Prime Receiver]: 2.3p
+
+[10/Jul/2021 13:51] [Burston Prime Stock]: 1.6p -  [Burston Prime Stock]: 1.6p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 23.9p
+
+[10/Jul/2021 13:54] [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Lower Limb]: 2.1p
+
+[10/Jul/2021 13:56] [Burston Prime Stock]: 1.6p -  [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Upper Limb]: 2.7p
+
+[10/Jul/2021 13:59] [Fragor Prime Handle]: 14.2p -  [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Lower Limb]: 2.1p
+
+[10/Jul/2021 14:01] [Volt Prime Systems]: 23.9p -  [Paris Prime Lower Limb]: 2.1p -  [Burston Prime Stock]: 1.6p
+
+[10/Jul/2021 14:04] [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Lower Limb]: 2.1p -  [Burston Prime Stock]: 1.6p
+
+[10/Jul/2021 14:07] [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Lower Limb]: 2.1p -  [Burston Prime Stock]: 1.6p
+
+[10/Jul/2021 14:10] [Burston Prime Stock]: 1.6p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 23.9p -  [Paris Prime Upper Limb]: 2.7p
+
+[10/Jul/2021 14:12] [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p
+
+[10/Jul/2021 14:15] [Fragor Prime Handle]: 14.2p -  [Paris Prime Upper Limb]: 2.7p
+
+[10/Jul/2021 14:41] [Rhino Prime Systems]: 15.1p -  [Boltor Prime Stock]: 14.8p -  [Pangolin Prime Handle]: 8.5p -  [Dethcube Prime Systems]: 2.5p
+
+[10/Jul/2021 14:43] [Lex Prime]: 3.1p -  [Ankyros Prime Blade]: 33.8p -  [Nyx Prime Systems]: 15.2p
+
+[10/Jul/2021 14:46] [Nyx Prime Systems]: 15.2p -  [Ankyros Prime Blade]: 33.8p -  [Ivara Prime Systems]: 3.6p
+
+[10/Jul/2021 14:49] [Panthera Prime]: 3.9p -  [Rhino Prime Systems]: 15.1p -  [Boltor Prime Stock]: 14.8p
+
+[10/Jul/2021 14:54] [Hikou Prime Stars]: 9.7p -  [Ankyros Prime Blade]: 33.8p -  [Volnus Prime Head]: 13p -  [Karyst Prime]: 3.8p
+
+[10/Jul/2021 14:57] [Dethcube Prime Systems]: 2.5p -  [Aklex Prime]: 8.3p -  [Ankyros Prime Blade]: 33.8p -  [Hikou Prime Stars]: 9.7p
+
+[10/Jul/2021 15:00] [Ankyros Prime Blade]: 33.8p -  [Hikou Prime Stars]: 9.7p -  [Dethcube Prime Systems]: 2.5p
+
+[10/Jul/2021 15:04] [Panthera Prime]: 3.9p -  [Corinth Prime Barrel]: 21.8p -  [Boltor Prime Stock]: 14.8p -  [Boltor Prime Stock]: 14.8p
+
+[10/Jul/2021 15:07] [Nyx Prime Systems]: 15.2p -  [Ankyros Prime Blade]: 33.8p -  [Ivara Prime Systems]: 3.6p -  [Pangolin Prime Handle]: 8.5p
+
+[10/Jul/2021 15:12] [Dethcube Prime Systems]: 2.5p -  [Nyx Prime Systems]: 15.2p -  [Nyx Prime Systems]: 15.2p
+
+[10/Jul/2021 15:16] [Boltor Prime Stock]: 14.8p -  [Nyx Prime Systems]: 15.2p -  [Karyst Prime]: 3.8p -  [Baza Prime Receiver]: 3.9p
+
+[10/Jul/2021 15:19] [Pangolin Prime Handle]: 8.5p -  [Lex Prime Receiver]: 8.8p -  [Ankyros Prime Blade]: 33.8p -  [Nyx Prime Systems]: 15.2p
+
+[10/Jul/2021 16:49] [Boar Prime Receiver]: 8.6p -  [Mag Prime]: 83.1p -  [Dakra Prime]: 9.7p -  [Soma Prime]: 5.4p
+
+[10/Jul/2021 16:51] [Soma Prime]: 5.4p -  [Boar Prime Barrel]: 15.5p -  [Lex Prime Receiver]: 8.8p
+
+[10/Jul/2021 16:54] [Boar Prime Receiver]: 8.6p -  [Boar Prime Barrel]: 15.5p -  [Mag Prime]: 83.1p
+
+[10/Jul/2021 16:57] [Nova Prime Neuroptics]: 14.6p -  [Soma Prime]: 5.4p -  [Boar Prime Receiver]: 8.6p
+
+[10/Jul/2021 17:00] [Dakra Prime Handle]: 11.3p -  [Dakra Prime]: 9.7p -  [Lex Prime Receiver]: 8.8p -  [Soma Prime]: 5.4p
+
+[10/Jul/2021 17:05] [Nova Prime Neuroptics]: 14.6p -  [Lex Prime Receiver]: 8.8p -  [Boar Prime Receiver]: 8.6p -  [Lex Prime Receiver]: 8.8p
+
+[10/Jul/2021 17:08] [Nova Prime Neuroptics]: 14.6p -  [Mag Prime]: 83.1p -  [Boar Prime Receiver]: 8.6p -  [Mag Prime]: 83.1p
+
+[10/Jul/2021 17:10] [Lex Prime Receiver]: 8.8p -  [Mag Prime]: 83.1p -  [Boar Prime Receiver]: 8.6p
+
+[10/Jul/2021 17:13] [Boar Prime Receiver]: 8.6p -  [Soma Prime]: 5.4p
+
+[10/Jul/2021 17:16] [Soma Prime Barrel]: 9.5p -  [Dakra Prime]: 9.7p -  [Soma Prime]: 5.4p
+
+[10/Jul/2021 17:19] [Dakra Prime Handle]: 11.3p -  [Lex Prime Receiver]: 8.8p -  [Dakra Prime]: 9.7p
+
+[10/Jul/2021 17:21] [Soma Prime]: 5.4p -  [Soma Prime]: 5.4p -  [Lex Prime Receiver]: 8.8p -  [Soma Prime Barrel]: 9.5p
+
+[10/Jul/2021 17:24] [Soma Prime]: 5.4p -  [Boar Prime Receiver]: 8.6p -  [Dakra Prime]: 9.7p -  [Dakra Prime Handle]: 11.3p
+
+[10/Jul/2021 17:32] [Lex Prime Receiver]: 8.8p -  [Boar Prime Receiver]: 8.6p -  [Mag Prime]: 83.1p
+
+[10/Jul/2021 17:35] [Soma Prime Barrel]: 9.5p -  [Mag Prime]: 83.1p -  [Soma Prime]: 5.4p -  [Soma Prime]: 5.4p
+
+[10/Jul/2021 17:37] [Boar Prime Receiver]: 8.6p -  [Dakra Prime]: 9.7p
+
+[10/Jul/2021 17:39] [Lex Prime Receiver]: 8.8p -  [Boar Prime Receiver]: 8.6p -  [Mag Prime]: 83.1p -  [Lex Prime Receiver]: 8.8p
+
+[10/Jul/2021 17:44] [Soma Prime]: 5.4p -  [Soma Prime]: 5.4p -  [Mag Prime]: 83.1p
+
+[10/Jul/2021 17:46] [Soma Prime]: 5.4p -  [Dakra Prime]: 9.7p -  [Mag Prime]: 83.1p
+
+[10/Jul/2021 17:49] [Dakra Prime Handle]: 11.3p -  [Soma Prime]: 5.4p -  [Boar Prime Receiver]: 8.6p -  [Soma Prime Barrel]: 9.5p
+
+[10/Jul/2021 17:51] [Lex Prime Receiver]: 8.8p -  [Dakra Prime Handle]: 11.3p
+
+[11/Jul/2021 22:21] [Bo Prime]: 14.6p -  [Bo Prime]: 14.6p -  [Ninkondi Prime Chain]: 3.6p
+
+[11/Jul/2021 22:23] [Zakti Prime Receiver]: 3p -  [Bo Prime]: 14.6p
+
+[11/Jul/2021 22:26] [Volt Prime]: 23.2p -  [Fang Prime]: 1.6p -  [Burston Prime Receiver]: 2.9p
+
+[11/Jul/2021 22:29] [Burston Prime Barrel]: 3.2p -  [Mesa Prime]: 4.2p -  [Loki Prime Chassis]: 38.3p -  [Odonata Prime Wings]: 18.3p
+
+[11/Jul/2021 22:32] [Volt Prime]: 23.2p -  [Volt Prime]: 23.2p -  [Lex Prime Receiver]: 8.8p -  [Bronco Prime]: 2.4p
+
+[11/Jul/2021 22:35] [Lex Prime]: 2.4p -  [Wyrm Prime Cerebrum]: 19.8p -  [Volt Prime]: 23.2p
+
+[11/Jul/2021 22:38] [Wyrm Prime Cerebrum]: 19.8p -  [Wyrm Prime Cerebrum]: 19.8p -  [Karyst Prime Handle]: 3.2p
+
+[11/Jul/2021 22:40] [Fang Prime Blade]: 2.9p -  [Bo Prime]: 14.6p -  [Volt Prime]: 23.2p
+
+[12/Jul/2021 17:56] [Dual Kamas Prime]: 7.5p -  [Carrier Prime Systems]: 7.8p
+
+[12/Jul/2021 17:59] [Panthera Prime]: 3.4p -  [Lex Prime Receiver]: 8.8p
+
+[12/Jul/2021 18:02] [Volt Prime Neuroptics]: 76.4p -  [Ivara Prime Systems]: 3.2p -  [Paris Prime Lower Limb]: 1.8p -  [Volt Prime Neuroptics]: 76.4p
+
+[12/Jul/2021 18:04] [Panthera Prime]: 3.4p -  [Dual Kamas Prime]: 7.5p -  [Baza Prime Receiver]: 3.7p
+
+[12/Jul/2021 18:07] [Dual Kamas Prime]: 7.5p -  [Zhuge Prime Receiver]: 6.8p
+
+[12/Jul/2021 18:10] [Panthera Prime]: 3.4p -  [Vauban Prime Chassis]: 21.5p -  [Akbolto Prime]: 3.3p
+
+[12/Jul/2021 20:28] [Rhino Prime]: 122.1p -  [Ankyros Prime Gauntlet]: 25.5p -  [Aklex Prime]: 7p
+
+[12/Jul/2021 20:31] [Hikou Prime]: 5.2p -  [Nyx Prime Chassis]: 9.7p
+
+[12/Jul/2021 20:34] [Odonata Prime Harness]: 8.7p -  [Odonata Prime Harness]: 8.7p
+
+[12/Jul/2021 20:38] [Odonata Prime Harness]: 8.7p -  [Nyx Prime Chassis]: 9.7p -  [Volt Prime]: 23.1p -  [Nyx Prime Chassis]: 9.7p
+
+[12/Jul/2021 20:40] [Volt Prime]: 23.1p -  [Hikou Prime]: 5.2p -  [Volt Prime]: 23.1p
+
+[12/Jul/2021 20:42] [Volt Prime Systems]: 24.1p
+
+[12/Jul/2021 20:46] [Boltor Prime Receiver]: 10.3p -  [Aklex Prime]: 7p
+
+[12/Jul/2021 20:49] [Volt Prime]: 23.1p -  [Ankyros Prime Gauntlet]: 25.5p -  [Volt Prime]: 23.1p -  [Nyx Prime Chassis]: 9.7p
+
+[12/Jul/2021 20:52] [Boltor Prime Receiver]: 10.3p -  [Volt Prime]: 23.1p -  [Nyx Prime Chassis]: 9.7p -  [Volt Prime]: 23.1p
+
+[12/Jul/2021 20:54] [Odonata Prime Harness]: 8.7p -  [Galatine Prime]: 37.3p
+
+[12/Jul/2021 20:57] [Hikou Prime]: 5.2p -  [Boltor Prime Receiver]: 10.3p -  [Hikou Prime]: 5.2p
+
+[12/Jul/2021 21:00] [Ankyros Prime Gauntlet]: 25.5p -  [Hikou Prime]: 5.2p -  [Nyx Prime Chassis]: 9.7p
+
+[12/Jul/2021 21:02] [Rhino Prime]: 122.1p -  [Nyx Prime Chassis]: 9.7p -  [Hikou Prime]: 5.2p
+
+[12/Jul/2021 21:05] [Ankyros Prime Gauntlet]: 25.5p -  [Nyx Prime Chassis]: 9.7p -  [Nyx Prime Chassis]: 9.7p
+
+[12/Jul/2021 21:08] [Nyx Prime Chassis]: 9.7p -  [Ankyros Prime Gauntlet]: 25.5p -  [Hikou Prime]: 5.2p -  [Boltor Prime Receiver]: 10.3p
+
+[12/Jul/2021 23:39] [Aksomati Prime]: 1.9p -  [Gram Prime Blade]: 3.6p -  [Corinth Prime]: 1.6p -  [Tekko Prime]: 2.8p
+
+[12/Jul/2021 23:42] [Aksomati Prime]: 1.9p -  [Burston Prime Receiver]: 2.9p -  [Baza Prime Barrel]: 3p -  [Guandao Prime]: 3p
+
+[12/Jul/2021 23:45] [Burston Prime Stock]: 1.9p -  [Astilla Prime Barrel]: 10.8p -  [Baza Prime Barrel]: 3p -  [Bronco Prime Receiver]: 3p
+
+[12/Jul/2021 23:47] [Paris Prime Lower Limb]: 1.8p -  [Dethcube Prime]: 9.8p -  [Ivara Prime Systems]: 3.2p -  [Lex Prime Receiver]: 8.8p
+
+[12/Jul/2021 23:49] [Zakti Prime Receiver]: 2.9p -  [Aksomati Prime Receiver]: 3.6p -  [Baza Prime Barrel]: 3p -  [Atlas Prime]: 2.4p
+
+[12/Jul/2021 23:53] [Ivara Prime]: 3.2p -  [Astilla Prime Barrel]: 10.8p -  [Baza Prime]: 9p -  [Atlas Prime]: 2.4p
+
+[12/Jul/2021 23:56] [Karyst Prime Handle]: 3.1p -  [Lex Prime]: 2.3p -  [Atlas Prime Chassis]: 3.9p -  [Guandao Prime]: 3p
+
+[12/Jul/2021 23:58] [Dethcube Prime Carapace]: 3p -  [Tekko Prime]: 2.8p -  [Aksomati Prime]: 1.9p -  [Atlas Prime]: 2.4p
+
+[13/Jul/2021 00:00] [Gara Prime Chassis]: 7.6p -  [Lex Prime]: 2.3p -  [Ivara Prime]: 3.2p -  [Guandao Prime]: 3p
+
+[13/Jul/2021 00:03] [Tekko Prime]: 2.8p -  [Gara Prime Chassis]: 7.6p -  [Guandao Prime]: 3p
+
+[13/Jul/2021 00:05] [Bronco Prime Receiver]: 3p -  [Fang Prime Blade]: 2.8p -  [Titania Prime Neuroptics]: 2.9p -  [Lex Prime]: 2.3p
+
+[13/Jul/2021 00:07] [Titania Prime Neuroptics]: 2.9p -  [Fang Prime]: 1.6p -  [Lex Prime]: 2.3p
+
+[13/Jul/2021 00:09] [Karyst Prime Handle]: 3.1p -  [Titania Prime Neuroptics]: 2.9p -  [Lex Prime]: 2.3p
+
+[13/Jul/2021 00:12] [Paris Prime Grip]: 3.6p -  [Zhuge Prime]: 3.1p -  [Karyst Prime Handle]: 3.1p -  [Bronco Prime Receiver]: 3p
+
+[13/Jul/2021 00:14] [Bronco Prime]: 2.5p -  [Rubico Prime Receiver]: 4.9p -  [Burston Prime Barrel]: 3.1p -  [Bronco Prime Receiver]: 3p
+
+[13/Jul/2021 00:16] [Atlas Prime]: 2.4p -  [Corinth Prime]: 1.6p -  [Burston Prime Barrel]: 3.1p -  [Atlas Prime]: 2.4p
+
+[13/Jul/2021 00:19] [Tekko Prime Gauntlet]: 3.3p -  [Paris Prime Lower Limb]: 1.8p -  [Paris Prime Lower Limb]: 1.8p
+
+[13/Jul/2021 00:21] [Octavia Prime Neuroptics]: 4.4p -  [Galatine Prime Blade]: 4.6p
+
+[13/Jul/2021 00:24] [Zhuge Prime]: 3.1p -  [Paris Prime Lower Limb]: 1.8p
+
+[13/Jul/2021 00:27] [Paris Prime Grip]: 3.6p -  [Paris Prime Lower Limb]: 1.8p
+
+[13/Jul/2021 00:29] [Dethcube Prime Carapace]: 3p -  [Karyst Prime Handle]: 3.1p -  [Atlas Prime]: 2.4p -  [Titania Prime Neuroptics]: 2.9p
+
+[13/Jul/2021 00:31] [Zakti Prime Receiver]: 2.9p -  [Tenora Prime Barrel]: 10.2p -  [Paris Prime Grip]: 3.6p -  [Titania Prime Neuroptics]: 2.9p
+
+[13/Jul/2021 00:34] [Fang Prime Blade]: 2.8p -  [Dethcube Prime Systems]: 2.4p -  [Bronco Prime Receiver]: 3p -  [Fang Prime]: 1.6p
+
+[13/Jul/2021 00:36] [Dethcube Prime Carapace]: 3p -  [Corinth Prime]: 1.6p -  [Pangolin Prime]: 8.6p -  [Titania Prime Neuroptics]: 2.9p
+
+[13/Jul/2021 00:38] [Bronco Prime]: 2.5p -  [Paris Prime Grip]: 3.6p -  [Tekko Prime]: 2.8p -  [Zhuge Prime]: 3.1p
+
+[13/Jul/2021 00:40] [Tekko Prime Gauntlet]: 3.3p -  [Karyst Prime Handle]: 3.1p -  [Atlas Prime]: 2.4p -  [Corinth Prime]: 1.6p
+
+[13/Jul/2021 00:43] [Lex Prime]: 2.3p -  [Galatine Prime Blade]: 4.6p -  [Guandao Prime]: 3p -  [Titania Prime Neuroptics]: 2.9p
+
+[13/Jul/2021 00:45] [Zhuge Prime]: 3.1p -  [Titania Prime Neuroptics]: 2.9p -  [Lex Prime]: 2.3p -  [Titania Prime Neuroptics]: 2.9p
+
+[13/Jul/2021 00:47] [Guandao Prime]: 3p -  [Mirage Prime Chassis]: 8p -  [Tekko Prime]: 2.8p -  [Tenora Prime Barrel]: 10.2p
+
+[13/Jul/2021 00:49] [Gara Prime Chassis]: 7.6p -  [Titania Prime Systems]: 13.9p -  [Tekko Prime]: 2.8p -  [Corinth Prime]: 1.6p
+
+[13/Jul/2021 00:53] [Bronco Prime Receiver]: 3p -  [Guandao Prime]: 3p -  [Tekko Prime]: 2.8p
+
+[13/Jul/2021 00:56] [Tekko Prime]: 2.8p -  [Paris Prime Lower Limb]: 1.8p -  [Lex Prime]: 2.3p
+
+[13/Jul/2021 00:58] [Lex Prime]: 2.3p -  [Tekko Prime]: 2.8p -  [Corinth Prime]: 1.6p
+
+[13/Jul/2021 01:01] [Zakti Prime Receiver]: 2.9p -  [Zhuge Prime]: 3.1p -  [Guandao Prime]: 3p -  [Titania Prime Neuroptics]: 2.9p
+
+[13/Jul/2021 01:04] [Tekko Prime Gauntlet]: 3.3p -  [Zhuge Prime]: 3.1p -  [Atlas Prime]: 2.4p -  [Tenora Prime Barrel]: 10.2p
+
+[13/Jul/2021 01:07] [Tenora Prime Barrel]: 10.2p -  [Guandao Prime]: 3p -  [Zakti Prime Receiver]: 2.9p -  [Mesa Prime]: 4.1p
+
+[13/Jul/2021 01:09] [Karyst Prime Handle]: 3.1p -  [Titania Prime Systems]: 13.9p -  [Karyst Prime Handle]: 3.1p -  [Mesa Prime]: 4.1p
+
+[13/Jul/2021 01:11] [Bronco Prime Receiver]: 3p -  [Zakti Prime Receiver]: 2.9p -  [Dethcube Prime Carapace]: 3p -  [Dethcube Prime]: 9.8p
+
+[15/Jul/2021 00:21] [Ivara Prime Neuroptics]: 3.7p -  [Tekko Prime]: 3.1p -  [Lex Prime]: 2.7p -  [Burston Prime Barrel]: 3.5p
+
+[15/Jul/2021 00:25] [Guandao Prime Handle]: 9.6p -  [Bronco Prime]: 2.3p -  [Burston Prime Receiver]: 2.4p -  [Fang Prime Blade]: 3p
+
+[15/Jul/2021 00:27] [Bronco Prime]: 2.3p -  [Bronco Prime]: 2.3p -  [Pandero Prime]: 3p
+
+[15/Jul/2021 00:30] [Titania Prime Neuroptics]: 3.3p -  [Atlas Prime Systems]: 3.7p -  [Zephyr Prime Neuroptics]: 4p -  [Pandero Prime]: 3p
+
+[15/Jul/2021 13:10] [Panthera Prime]: 3.7p -  [Saryn Prime Systems]: 8.9p
+
+[15/Jul/2021 13:13] [Volt Prime Neuroptics]: 73.4p -  [Astilla Prime Receiver]: 18p -  [Inaros Prime Systems]: 5.7p -  [Carrier Prime Systems]: 7.8p
+
+[15/Jul/2021 13:16] [Panthera Prime]: 3.7p - [Volt Prime Neuroptics]: 73.4p -  [Volt Prime Neuroptics]: 73.4p -  [Inaros Prime Systems]: 5.7p
+
+[15/Jul/2021 13:18] [Karyst Prime]: 4p -  [Braton Prime Stock]: 1.9p -  [Odonata Prime Systems]: 8.5p
+
+[15/Jul/2021 13:21] [Nezha Prime Systems]: 4.4p -  [Odonata Prime Systems]: 8.5p -  [Volt Prime Neuroptics]: 73.4p -  [Cernos Prime Grip]: 9.1p
+
+[15/Jul/2021 13:23] [Volt Prime Neuroptics]: 73.4p -  [Fragor Prime Head]: 10.8p -  [Dual Kamas Prime]: 6.9p
+
+[15/Jul/2021 13:26] [Panthera Prime]: 3.7p -  [Dual Kamas Prime]: 6.9p -  [Braton Prime Stock]: 1.9p
+
+[15/Jul/2021 13:29] [Vauban Prime Chassis]: 21.1p -  [Karyst Prime]: 4p -  [Braton Prime Stock]: 1.9p -  [Carrier Prime Systems]: 7.8p
+
+[15/Jul/2021 13:32] [Nezha Prime Systems]: 4.4p -  [Vauban Prime Chassis]: 21.1p -  [Dual Kamas Prime]: 6.9p -  [Paris Prime]: 2.2p
+
+[15/Jul/2021 14:42] [Paris Prime Upper Limb]: 2.6p -  [Fragor Prime Handle]: 13.2p -  [Volt Prime Systems]: 24.1p
+
+[15/Jul/2021 14:44] [Paris Prime Lower Limb]: 1.7p -  [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Lower Limb]: 1.7p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 14:46] [Burston Prime Stock]: 2.3p -  [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Lower Limb]: 1.7p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 14:49] [Paris Prime Lower Limb]: 1.7p -  [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Upper Limb]: 2.6p -  [Volt Prime Systems]: 24.1p
+
+[15/Jul/2021 14:51] [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2.3p -  [Volt Prime Systems]: 24.1p -  [Paris Prime Upper Limb]: 2.6p
+
+[15/Jul/2021 14:53] [Volt Prime Systems]: 24.1p -  [Volt Prime Systems]: 24.1p -  [Fragor Prime Handle]: 13.2p -  [Paris Prime Lower Limb]: 1.7p
+
+[15/Jul/2021 14:56] [Burston Prime Stock]: 2.3p -  [Paris Prime Lower Limb]: 1.7p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 14:58] [Paris Prime Upper Limb]: 2.6p -  [Volt Prime Systems]: 24.1p -  [Burston Prime Stock]: 2.3p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 15:00] [Burston Prime Stock]: 2.3p -  [Burston Prime Stock]: 2.3p -  [Paris Prime Lower Limb]: 1.7p -  [Paris Prime Upper Limb]: 2.6p
+
+[15/Jul/2021 15:03] [Burston Prime Stock]: 2.3p -  [Volt Prime Systems]: 24.1p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 15:06] [Volt Prime Systems]: 24.1p -  [Paris Prime Upper Limb]: 2.6p
+
+[15/Jul/2021 15:08] [Paris Prime Lower Limb]: 1.7p -  [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 15:10] [Paris Prime Lower Limb]: 1.7p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 15:12] [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Lower Limb]: 1.7p
+
+[15/Jul/2021 15:15] [Paris Prime Lower Limb]: 1.7p -  [Volt Prime Systems]: 24.1p -  [Burston Prime Stock]: 2.3p -  [Burston Prime Stock]: 2.3p
+
+[15/Jul/2021 15:17] [Volt Prime Systems]: 24.1p -  [Paris Prime Lower Limb]: 1.7p -  [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Lower Limb]: 1.7p
+
+[15/Jul/2021 15:20] [Volt Prime Systems]: 24.1p -  [Fragor Prime Handle]: 13.2p -  [Paris Prime Lower Limb]: 1.7p
+
+[15/Jul/2021 22:44] [Odonata Prime]: 8.4p -  [Odonata Prime Systems]: 8.5p -  [Volt Prime Chassis]: 14.4p
+
+[15/Jul/2021 22:47] [Volt Prime Chassis]: 14.4p -  [Volt Prime Chassis]: 14.4p -  [Odonata Prime Systems]: 8.5p
+
+[15/Jul/2021 22:50] [Odonata Prime Systems]: 8.5p -  [Lex Prime Receiver]: 8.9p -  [Lex Prime Receiver]: 8.9p
+
+[15/Jul/2021 22:52] [Volt Prime Chassis]: 14.4p -  [Lex Prime Receiver]: 8.9p -  [Odonata Prime]: 8.4p -  [Odonata Prime]: 8.4p
+
+[15/Jul/2021 22:55] [Odonata Prime Systems]: 8.5p -  [Lex Prime Receiver]: 8.9p -  [Volt Prime Neuroptics]: 73.4p
+
+[15/Jul/2021 22:57] [Odonata Prime]: 8.4p -  [Volt Prime Neuroptics]: 73.4p -  [Volt Prime Chassis]: 14.4p
+
+[15/Jul/2021 23:01] [Volt Prime Chassis]: 14.4p -  [Lex Prime Receiver]: 8.9p -  [Odonata Prime]: 8.4p -  [Volt Prime Chassis]: 14.4p
+
+[15/Jul/2021 23:03] [Volt Prime Neuroptics]: 73.4p -  [Volt Prime Chassis]: 14.4p -  [Volt Prime Neuroptics]: 73.4p -  [Volt Prime Chassis]: 14.4p
+
+[15/Jul/2021 23:06] [Lex Prime Receiver]: 8.9p -  [Volt Prime Neuroptics]: 73.4p -  [Lex Prime Receiver]: 8.9p
+
+[15/Jul/2021 23:09] [Odonata Prime Systems]: 8.5p -  [Odonata Prime]: 8.4p -  [Odonata Prime Systems]: 8.5p
+
+[15/Jul/2021 23:12] [Odonata Prime]: 8.4p -  [Odonata Prime Systems]: 8.5p -  [Lex Prime Receiver]: 8.9p
+
+[15/Jul/2021 23:15] [Odonata Prime Systems]: 8.5p -  [Volt Prime Neuroptics]: 73.4p -  [Volt Prime Neuroptics]: 73.4p
+
+[15/Jul/2021 23:18] [Odonata Prime]: 8.4p -  [Odonata Prime]: 8.4p -  [Lex Prime Receiver]: 8.9p
+
+[15/Jul/2021 23:21] [Lex Prime Receiver]: 8.9p -  [Volt Prime Neuroptics]: 73.4p -  [Odonata Prime Systems]: 8.5p -  [Lex Prime Receiver]: 8.9p
+
+[15/Jul/2021 23:23] [Volt Prime Chassis]: 14.4p -  [Odonata Prime]: 8.4p -  [Lex Prime Receiver]: 8.9p -  [Lex Prime Receiver]: 8.9p
+
+[15/Jul/2021 23:27] [Volt Prime Neuroptics]: 73.4p -  [Volt Prime Chassis]: 14.4p -  [Volt Prime Chassis]: 14.4p -  [Volt Prime Chassis]: 14.4p
+
+[15/Jul/2021 23:31] [Rhino Prime]: 121.6p -  [Boltor Prime Receiver]: 9.9p -  [Ankyros Prime Gauntlet]: 22.6p
+
+[15/Jul/2021 23:34] [Nyx Prime Chassis]: 9p -  [Hikou Prime]: 4.7p -  [Nyx Prime Chassis]: 9p
+
+[15/Jul/2021 23:37] [Hikou Prime]: 4.7p -  [Ankyros Prime Gauntlet]: 22.6p -  [Ankyros Prime Gauntlet]: 22.6p
+
+[15/Jul/2021 23:41] [Boltor Prime Receiver]: 9.9p -  [Boar Prime Receiver]: 9.3p
+
+[15/Jul/2021 23:45] [Nyx Prime Chassis]: 9p -  [Boltor Prime Receiver]: 9.9p -  [Boltor Prime Receiver]: 9.9p
+
+[15/Jul/2021 23:48] [Nyx Prime Chassis]: 9p -  [Boltor Prime Receiver]: 9.9p -  [Hikou Prime]: 4.7p -  [Rhino Prime]: 121.6p
+
+[15/Jul/2021 23:51] [Boltor Prime Receiver]: 9.9p -  [Ankyros Prime Gauntlet]: 22.6p -  [Boltor Prime Receiver]: 9.9p -  [Boltor Prime Receiver]: 9.9p
+
+[18/Jul/2021 18:10] [Burston Prime Receiver]: 2.3p -  [Burston Prime Stock]: 2.4p -  [Orthos Prime Blade]: 5p
+
+[18/Jul/2021 18:13] [Burston Prime Receiver]: 2.3p -  [Atlas Prime]: 2.7p -  [Burston Prime Receiver]: 2.3p -  [Karyst Prime Handle]: 3.8p
+
+[18/Jul/2021 18:15] [Atlas Prime Chassis]: 4.4p -  [Orthos Prime]: 4p -  [Fang Prime Blade]: 2.9p
+
+[18/Jul/2021 18:18] [Zhuge Prime String]: 4.5p -  [Zakti Prime Receiver]: 3.1p -  [Equinox Prime Chassis]: 3.9p -  [Karyst Prime Handle]: 3.8p
+
+[18/Jul/2021 18:21] [Paris Prime Upper Limb]: 2p -  [Atlas Prime]: 2.7p -  [Mesa Prime]: 4.5p -  [Burston Prime Barrel]: 4p
+
+[18/Jul/2021 18:24] [Aksomati Prime]: 2.1p -  [Burston Prime Stock]: 2.4p -  [Braton Prime Receiver]: 3.9p
+
+[18/Jul/2021 18:27] [Dethcube Prime]: 11.2p -  [Paris Prime Grip]: 3.9p -  [Mesa Prime]: 4.5p -  [Burston Prime Barrel]: 4p
+
+[18/Jul/2021 18:29] [Dethcube Prime Systems]: 2.8p -  [Soma Prime Receiver]: 15.2p -  [Braton Prime Receiver]: 3.9p -  [Pandero Prime]: 3.5p
+
+[18/Jul/2021 18:32] [Baza Prime Barrel]: 4.1p -  [Atlas Prime]: 2.7p -  [Karyst Prime Handle]: 3.8p
+
+[18/Jul/2021 18:34] [Octavia Prime Neuroptics]: 4.9p -  [Burston Prime Barrel]: 4p -  [Ninkondi Prime Chain]: 3.9p -  [Pandero Prime]: 3.5p
+
+[18/Jul/2021 18:37] [Bronco Prime]: 2.9p -  [Stradavar Prime Barrel]: 4.2p -  [Lex Prime Receiver]: 8.6p -  [Karyst Prime Handle]: 3.8p
+
+[18/Jul/2021 18:40] [Titania Prime Neuroptics]: 4p -  [Mesa Prime]: 4.5p -  [Karyst Prime Handle]: 3.8p
+
+[18/Jul/2021 18:42] [Octavia Prime Neuroptics]: 4.9p -  [Paris Prime Lower Limb]: 2.2p -  [Burston Prime Barrel]: 4p -  [Fang Prime Blade]: 2.9p
+
+[18/Jul/2021 18:45] [Dethcube Prime]: 11.2p -  [Bronco Prime]: 2.9p -  [Pandero Prime]: 3.5p
+
+[20/Jul/2021 01:02] [Gara Prime Chassis]: 8.2p -  [Astilla Prime Barrel]: 13.3p -  [Baza Prime Barrel]: 4p
+
+[20/Jul/2021 01:04] [Paris Prime Upper Limb]: 2.5p -  [Atlas Prime]: 2.4p -  [Braton Prime Receiver]: 4.1p -  [Aksomati Prime]: 2.1p
+
+[20/Jul/2021 01:07] [Octavia Prime Neuroptics]: 6.1p -  [Bronco Prime]: 2.8p -  [Fang Prime]: 1.5p -  [Titania Prime Neuroptics]: 4p
+
+[20/Jul/2021 01:09] [Atlas Prime]: 2.4p -  [Zakti Prime Receiver]: 3.3p
+
+[20/Jul/2021 01:12] [Karyst Prime Blade]: 11.8p -  [Atlas Prime]: 2.4p -  [Inaros Prime]: 4.6p
+
+[20/Jul/2021 01:15] [Panthera Prime Stock]: 4.1p -  [Aksomati Prime Receiver]: 3.7p -  [Tekko Prime Gauntlet]: 3.4p -  [Burston Prime Barrel]: 4.3p
+
+[20/Jul/2021 01:17] [Aksomati Prime]: 2.1p -  [Paris Prime Grip]: 3.9p -  [Guandao Prime]: 4p -  [Zhuge Prime]: 4.1p
+
+[20/Jul/2021 01:20] [Burston Prime Receiver]: 3p -  [Atlas Prime]: 2.4p -  [Corinth Prime]: 2.2p -  [Karyst Prime Handle]: 3.9p
+
+[20/Jul/2021 01:22] [Lex Prime]: 2.2p -  [Karyst Prime Blade]: 11.8p -  [Atlas Prime Chassis]: 4.6p -  [Titania Prime Systems]: 14.6p
+
+[20/Jul/2021 01:25] [Karyst Prime Blade]: 11.8p -  [Atlas Prime]: 2.4p -  [Dethcube Prime Systems]: 3.1p -  [Titania Prime Systems]: 14.6p
+
+[20/Jul/2021 01:27] [Equinox Prime Chassis]: 3.9p -  [Bronco Prime Receiver]: 3.2p -  [Lex Prime]: 2.2p -  [Paris Prime Lower Limb]: 2.2p
+
+[20/Jul/2021 01:30] [Octavia Prime Neuroptics]: 6.1p -  [Atlas Prime]: 2.4p -  [Atlas Prime Chassis]: 4.6p -  [Dethcube Prime Carapace]: 4p
+
+[20/Jul/2021 01:52] [Orthos Prime Blade]: 5.3p -  [Burston Prime Receiver]: 3p -  [Bronco Prime Receiver]: 3.2p -  [Ivara Prime Chassis]: 14.4p
+
+[20/Jul/2021 01:56] [Paris Prime Grip]: 3.9p -  [Atlas Prime]: 2.4p -  [Pyrana Prime Barrel]: 5.4p -  [Pandero Prime]: 3.7p
+
+[20/Jul/2021 01:59] [Pandero Prime]: 3.7p -  [Orthos Prime Handle]: 2.5p -  [Tekko Prime]: 3.9p -  [Burston Prime Barrel]: 4.3p
+
+[20/Jul/2021 02:01] [Baza Prime]: 11p -  [Burston Prime Barrel]: 4.3p -  [Limbo Prime Neuroptics]: 26.2p -  [Pandero Prime]: 3.7p
+
+[20/Jul/2021 02:04] [Titania Prime Neuroptics]: 4p -  [Mesa Prime Chassis]: 5.3p -  [Equinox Prime Chassis]: 3.9p -  [Dethcube Prime Carapace]: 4p
+
+[20/Jul/2021 02:06] [Karyst Prime Handle]: 3.9p -  [Atlas Prime Systems]: 4.4p -  [Braton Prime Receiver]: 4.1p -  [Burston Prime Barrel]: 4.3p
+
+[20/Jul/2021 02:10] [Zhuge Prime String]: 4.3p -  [Braton Prime Receiver]: 4.1p
+
+[20/Jul/2021 02:13] [Corinth Prime Stock]: 11.6p -  [Paris Prime Lower Limb]: 2.2p -  [Limbo Prime Neuroptics]: 26.2p
+
+[20/Jul/2021 02:17] [Ivara Prime Chassis]: 14.4p -  [Baza Prime Barrel]: 4p -  [Equinox Prime Chassis]: 3.9p -  [Karyst Prime Handle]: 3.9p
+
+[20/Jul/2021 02:20] [Mesa Prime]: 4.5p -  [Tenora Prime Barrel]: 11.3p -  [Braton Prime Receiver]: 4.1p -  [Ivara Prime Chassis]: 14.4p
+
+[20/Jul/2021 02:23] [Burston Prime Receiver]: 3p -  [Pangolin Prime]: 11.3p -  [Braton Prime Receiver]: 4.1p -  [Karyst Prime Handle]: 3.9p
+
+[20/Jul/2021 02:26] [Aksomati Prime Receiver]: 3.7p -  [Aksomati Prime Receiver]: 3.7p -  [Equinox Prime Chassis]: 3.9p -  [Pandero Prime]: 3.7p
+
+[21/Jul/2021 03:01] [Guandao Prime]: 4p -  [Atlas Prime]: 2.2p -  [Zhuge Prime]: 3.9p -  [Bronco Prime Receiver]: 3.5p
+
+[21/Jul/2021 03:03] [Bronco Prime Receiver]: 3.5p -  [Atlas Prime Chassis]: 4.5p -  [Tekko Prime]: 3.6p -  [Pangolin Prime]: 10.5p
+
+[21/Jul/2021 03:08] [Guandao Prime]: 4p -  [Guandao Prime]: 4p -  [Atlas Prime]: 2.2p
+
+[21/Jul/2021 03:10] [Braton Prime Receiver]: 4p -  [Dethcube Prime Carapace]: 3.9p -  [Bronco Prime Receiver]: 3.5p -  [Guandao Prime]: 4p
+
+[21/Jul/2021 03:13] [Equinox Prime Chassis]: 4p -  [Dethcube Prime Systems]: 3.1p -  [Pangolin Prime]: 10.5p -  [Lex Prime]: 2.3p
+
+[21/Jul/2021 22:39] [Paris Prime String]: 5p -  [Bronco Prime]: 2.8p
+
+[21/Jul/2021 22:43] [Saryn Prime Chassis]: 126.1p -  [Galatine Prime Blade]: 5.6p -  [Saryn Prime Chassis]: 126.1p -  [Bronco Prime]: 2.8p
+
+[21/Jul/2021 22:46] [Paris Prime Grip]: 4.3p
+
+[21/Jul/2021 23:13] [Paris Prime String]: 5p -  [Paris Prime String]: 5p -  [Bronco Prime]: 2.8p -  [Paris Prime Grip]: 4.3p
+
+[21/Jul/2021 23:16] [Bronco Prime]: 2.8p -  [Galatine Prime Blade]: 5.6p -  [Bronco Prime]: 2.8p
+
+[21/Jul/2021 23:20] [Paris Prime Grip]: 4.3p -  [Paris Prime Grip]: 4.3p -  [Paris Prime Grip]: 4.3p -  [Paris Prime Grip]: 4.3p
+
+[21/Jul/2021 23:31] [Paris Prime Grip]: 4.3p -  [Paris Prime Grip]: 4.3p -  [Paris Prime String]: 5p
+
+[22/Jul/2021 19:17] [Ember Prime Systems]: 22.9p -  [Karyst Prime Handle]: 3.7p -  [Gara Prime Chassis]: 7.8p
+
+[22/Jul/2021 19:19] [Stradavar Prime Receiver]: 4.3p -  [Fang Prime Blade]: 3p -  [Karyst Prime Handle]: 3.7p -  [Inaros Prime]: 4.7p
+
+[22/Jul/2021 19:22] [Fang Prime Blade]: 3p -  [Chroma Prime]: 4.7p -  [Pandero Prime]: 3.7p
+
+[22/Jul/2021 19:25] [Rubico Prime Receiver]: 5.3p -  [Corinth Prime Stock]: 10.3p -  [Ivara Prime Chassis]: 14.7p -  [Fang Prime]: 1.8p
+
+[22/Jul/2021 19:27] [Burston Prime Receiver]: 2.3p -  [Corinth Prime Stock]: 10.3p -  [Fang Prime Blade]: 3p -  [Octavia Prime Neuroptics]: 6.4p
+
+[22/Jul/2021 19:30] [Orthos Prime Blade]: 5.1p -  [Corinth Prime Stock]: 10.3p -  [Burston Prime Receiver]: 2.3p
+
+[22/Jul/2021 19:32] [Astilla Prime Barrel]: 12.3p -  [Equinox Prime Chassis]: 4p -  [Baza Prime Barrel]: 4p -  [Titania Prime Neuroptics]: 3.8p
+
+[22/Jul/2021 19:34] [Burston Prime Receiver]: 2.3p -  [Fang Prime Blade]: 3p -  [Burston Prime Stock]: 2.4p
+
+[22/Jul/2021 19:39] [Burston Prime Receiver]: 2.3p -  [Fang Prime]: 1.8p
+
+[22/Jul/2021 19:42] [Burston Prime Receiver]: 2.3p -  [Karyst Prime Handle]: 3.7p
+
+[22/Jul/2021 19:44] [Baza Prime Barrel]: 4p -  [Fang Prime Blade]: 3p -  [Pandero Prime]: 3.7p -  [Guandao Prime Handle]: 11.3p
+
+[22/Jul/2021 19:47] [Ivara Prime]: 4.1p -  [Ember Prime Systems]: 22.9p -  [Titania Prime Systems]: 14.4p -  [Guandao Prime Handle]: 11.3p
+
+[22/Jul/2021 19:49] [Aksomati Prime]: 2.1p -  [Equinox Prime Chassis]: 4p -  [Ivara Prime Systems]: 4.3p -  [Inaros Prime]: 4.7p
+
+[22/Jul/2021 19:52] [Dethcube Prime Systems]: 2.7p -  [Fang Prime Blade]: 3p -  [Paris Prime Upper Limb]: 2.8p -  [Titania Prime Neuroptics]: 3.8p
+
+[22/Jul/2021 19:55] [Burston Prime Stock]: 2.4p -  [Octavia Prime Neuroptics]: 6.4p
+
+[22/Jul/2021 19:57] [Aksomati Prime]: 2.1p -  [Corinth Prime Stock]: 10.3p -  [Fang Prime]: 1.8p
+
+[22/Jul/2021 20:00] [Ivara Prime]: 4.1p -  [Equinox Prime Chassis]: 4p -  [Titania Prime Neuroptics]: 3.8p
+
+[22/Jul/2021 20:32] [Burston Prime Stock]: 2.4p -  [Stradavar Prime Receiver]: 4.3p -  [Gram Prime Blade]: 4p -  [Equinox Prime]: 9.4p
+
+[22/Jul/2021 20:35] [Aksomati Prime]: 2.1p -  [Paris Prime Grip]: 4.3p -  [Bronco Prime]: 2.7p -  [Titania Prime Neuroptics]: 3.8p
+
+[22/Jul/2021 20:37] [Atlas Prime Chassis]: 4.4p -  [Atlas Prime]: 2.3p -  [Pandero Prime]: 3.7p
+
+[22/Jul/2021 20:39] [Ivara Prime]: 4.1p -  [Bronco Prime Receiver]: 3.2p -  [Gram Prime Blade]: 4p -  [Titania Prime Neuroptics]: 3.8p
+
+[24/Jul/2021 20:26] [Fang Prime]: 1.8p -  [Glaive Prime]: 90.5p -  [Ember Prime Systems]: 22.6p -  [Dethcube Prime Carapace]: 3.9p
+
+[24/Jul/2021 20:29] [Latron Prime]: 7.9p -  [Octavia Prime Neuroptics]: 5.5p -  [Mesa Prime Neuroptics]: 26.6p -  [Latron Prime]: 7.9p
+
+[24/Jul/2021 20:31] [Octavia Prime Neuroptics]: 5.5p -  [Orthos Prime Handle]: 3p
+
+[24/Jul/2021 20:34] [Frost Prime Chassis]: 14.6p -  [Fang Prime]: 1.8p -  [Zakti Prime Receiver]: 3.3p
+
+[24/Jul/2021 20:36] [Octavia Prime Neuroptics]: 5.5p -  [Frost Prime Chassis]: 14.6p -  [Reaper Prime Handle]: 23.9p -  [Burston Prime Stock]: 2.6p
+
+[24/Jul/2021 20:39] [Ember Prime Systems]: 22.6p -  [Inaros Prime]: 4.6p -  [Rubico Prime Receiver]: 5.5p -  [Frost Prime Chassis]: 14.6p
+
+[24/Jul/2021 20:42] [Inaros Prime]: 4.6p -  [Latron Prime]: 7.9p -  [Ember Prime Systems]: 22.6p -  [Pandero Prime]: 3.4p
+
+[24/Jul/2021 20:44] [Latron Prime]: 7.9p -  [Fang Prime]: 1.8p -  [Lex Prime Barrel]: 3.1p
+
+[24/Jul/2021 20:46] [Octavia Prime Neuroptics]: 5.5p -  [Frost Prime Chassis]: 14.6p -  [Latron Prime]: 7.9p -  [Atlas Prime]: 2.4p
+
+[24/Jul/2021 20:52] [Burston Prime Stock]: 2.6p -  [Paris Prime Lower Limb]: 2.3p -  [Paris Prime Lower Limb]: 2.3p
+
+[24/Jul/2021 20:54] [Fragor Prime Handle]: 13.6p -  [Burston Prime Stock]: 2.6p -  [Volt Prime Systems]: 25.3p -  [Burston Prime Stock]: 2.6p
+
+[24/Jul/2021 20:57] [Paris Prime Lower Limb]: 2.3p -  [Volt Prime Systems]: 25.3p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p
+
+[24/Jul/2021 21:00] [Paris Prime Lower Limb]: 2.3p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:02] [Volt Prime Systems]: 25.3p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Lower Limb]: 2.3p
+
+[24/Jul/2021 21:05] [Burston Prime Stock]: 2.6p -  [Volt Prime Systems]: 25.3p -  [Volt Prime Systems]: 25.3p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:07] [Paris Prime Lower Limb]: 2.3p -  [Paris Prime Lower Limb]: 2.3p -  [Burston Prime Stock]: 2.6p
+
+[24/Jul/2021 21:10] [Paris Prime Lower Limb]: 2.3p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Systems]: 25.3p -  [Burston Prime Stock]: 2.6p
+
+[24/Jul/2021 21:14] [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Lower Limb]: 2.3p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:17] [Paris Prime Upper Limb]: 2.7p -  [Burston Prime Stock]: 2.6p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:19] [Fragor Prime Handle]: 13.6p -  [Volt Prime Systems]: 25.3p -  [Fragor Prime Handle]: 13.6p
+
+[24/Jul/2021 21:22] [Paris Prime Lower Limb]: 2.3p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:26] [Volt Prime Systems]: 25.3p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p -  [Burston Prime Stock]: 2.6p
+
+[24/Jul/2021 21:29] [Paris Prime Upper Limb]: 2.7p -  [Burston Prime Stock]: 2.6p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p
+
+[24/Jul/2021 21:31] [Burston Prime Stock]: 2.6p -  [Paris Prime Lower Limb]: 2.3p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:34] [Paris Prime Upper Limb]: 2.7p -  [Burston Prime Stock]: 2.6p -  [Burston Prime Stock]: 2.6p
+
+[24/Jul/2021 21:37] [Volt Prime Systems]: 25.3p -  [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:39] [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Systems]: 25.3p
+
+[24/Jul/2021 21:42] [Volt Prime Systems]: 25.3p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Systems]: 25.3p -  [Paris Prime Upper Limb]: 2.7p
+
+[24/Jul/2021 21:44] [Paris Prime Upper Limb]: 2.7p -  [Paris Prime Upper Limb]: 2.7p
+
+[24/Jul/2021 21:47] [Burston Prime Stock]: 2.6p -  [Paris Prime Upper Limb]: 2.7p
+
+[24/Jul/2021 21:50] [Burston Prime Stock]: 2.6p -  [Paris Prime Lower Limb]: 2.3p -  [Burston Prime Stock]: 2.6p
+
+[24/Jul/2021 21:53] [Paris Prime Lower Limb]: 2.3p -  [Burston Prime Stock]: 2.6p -  [Fragor Prime Handle]: 13.6p -  [Paris Prime Lower Limb]: 2.3p
+
+[24/Jul/2021 21:55] [Volt Prime Systems]: 25.3p -  [Volt Prime Systems]: 25.3p
+
+[25/Jul/2021 00:17] [Fang Prime]: 1.8p -  [Bronco Prime]: 2.8p -  [Pandero Prime]: 3.4p -  [Ash Prime Chassis]: 17.4p
+
+[25/Jul/2021 00:19] [Fragor Prime Handle]: 13.6p -  [Rubico Prime Barrel]: 5.8p -  [Vectis Prime Stock]: 31.6p -  [Ankyros Prime]: 10.2p
+
+[25/Jul/2021 00:22] [Octavia Prime Neuroptics]: 5.5p -  [Bronco Prime]: 2.8p -  [Fang Prime Blade]: 3p -  [Fragor Prime Handle]: 13.6p
+
+[25/Jul/2021 00:24] [Vectis Prime Stock]: 31.6p -  [Gram Prime Blade]: 4.2p -  [Bronco Prime]: 2.8p -  [Nyx Prime]: 9.9p
+
+[25/Jul/2021 00:27] [Boltor Prime]: 29.7p -  [Vectis Prime Stock]: 31.6p -  [Lex Prime]: 2.3p
+
+[25/Jul/2021 00:31] [Baza Prime Barrel]: 4p -  [Limbo Prime Systems]: 4p -  [Dethcube Prime]: 11.6p -  [Fang Prime Blade]: 3p
+
+[25/Jul/2021 00:34] [Ivara Prime]: 3.9p -  [Orthos Prime]: 4.2p -  [Atlas Prime]: 2.4p -  [Fang Prime Blade]: 3p
+
+[25/Jul/2021 00:36] [Atlas Prime Chassis]: 4.2p -  [Redeemer Prime]: 4.8p -  [Dethcube Prime]: 11.6p -  [Braton Prime Receiver]: 4p
+
+[25/Jul/2021 00:39] [Atlas Prime Chassis]: 4.2p -  [Orthos Prime]: 4.2p -  [Dethcube Prime]: 11.6p -  [Lex Prime Receiver]: 8.9p
+
+[25/Jul/2021 00:41] [Dethcube Prime Systems]: 2.7p -  [Limbo Prime Systems]: 4p -  [Ninkondi Prime Chain]: 4.3p
+
+[25/Jul/2021 00:44] [Dethcube Prime Systems]: 2.7p -  [Dethcube Prime]: 11.6p -  [Mesa Prime]: 4.6p
+
+[25/Jul/2021 00:50] [Burston Prime Receiver]: 2.5p -  [Burston Prime Receiver]: 2.5p -  [Burston Prime Receiver]: 2.5p -  [Baza Prime Barrel]: 4p
+
+[25/Jul/2021 00:53] [Braton Prime Stock]: 2.1p -  [Orthos Prime Blade]: 5p -  [Ninkondi Prime Chain]: 4.3p
+
+[25/Jul/2021 00:56] [Burston Prime Receiver]: 2.5p -  [Equinox Prime Chassis]: 3.7p -  [Fang Prime Handle]: 5.8p
+
+[25/Jul/2021 00:58] [Burston Prime Receiver]: 2.5p -  [Redeemer Prime]: 4.8p -  [Mesa Prime]: 4.6p -  [Baza Prime Barrel]: 4p
+
+[25/Jul/2021 01:01] [Burston Prime Receiver]: 2.5p -  [Ninkondi Prime Chain]: 4.3p -  [Rubico Prime Receiver]: 5.5p
+
+[25/Jul/2021 01:03] [Paris Prime Lower Limb]: 2.3p -  [Fang Prime Handle]: 5.8p -  [Burston Prime Receiver]: 2.5p -  [Fang Prime Handle]: 5.8p
+
+[25/Jul/2021 01:05] [Atlas Prime]: 2.4p -  [Fang Prime Handle]: 5.8p -  [Ninkondi Prime Chain]: 4.3p -  [Stradavar Prime Receiver]: 4.3p
+
+[25/Jul/2021 01:08] [Dethcube Prime]: 11.6p -  [Redeemer Prime]: 4.8p -  [Lex Prime Receiver]: 8.9p -  [Baza Prime Barrel]: 4p
+
+[25/Jul/2021 01:11] [Atlas Prime]: 2.4p -  [Atlas Prime]: 2.4p -  [Equinox Prime Chassis]: 3.7p -  [Mesa Prime]: 4.6p
+
+[25/Jul/2021 01:13] [Dethcube Prime]: 11.6p -  [Mesa Prime]: 4.6p -  [Redeemer Prime]: 4.8p -  [Stradavar Prime Receiver]: 4.3p
+
+[25/Jul/2021 01:16] [Ninkondi Prime Chain]: 4.3p -  [Lex Prime]: 2.3p -  [Zakti Prime Barrel]: 4.3p
+
+[25/Jul/2021 01:18] [Lex Prime Receiver]: 8.9p -  [Atlas Prime]: 2.4p -  [Octavia Prime Neuroptics]: 5.5p -  [Stradavar Prime Receiver]: 4.3p
+
+[29/Jul/2021 00:22] [Volt Prime Neuroptics]: 71.4p -  [Odonata Prime Systems]: 8.1p -  [Dual Kamas Prime]: 6.4p
+
+[29/Jul/2021 00:25] [Volt Prime Neuroptics]: 71.4p -  [Odonata Prime Systems]: 8.1p -  [Carrier Prime Systems]: 7.8p -  [Volt Prime Neuroptics]: 71.4p
+
+[29/Jul/2021 00:28] [Vauban Prime Chassis]: 22.7p -  [Volt Prime Neuroptics]: 71.4p -  [Carrier Prime Systems]: 7.8p -  [Volt Prime Neuroptics]: 71.4p
+
+[29/Jul/2021 00:30] [Odonata Prime Systems]: 8.1p
+
+[29/Jul/2021 00:33] [Odonata Prime Systems]: 8.1p -  [Volt Prime Neuroptics]: 71.4p -  [Dual Kamas Prime]: 6.4p -  [Odonata Prime Systems]: 8.1p
+
+[29/Jul/2021 00:36] [Odonata Prime Systems]: 8.1p -  [Carrier Prime Systems]: 7.8p -  [Carrier Prime Systems]: 7.8p -  [Carrier Prime Systems]: 7.8p
+
+[29/Jul/2021 00:38] [Dual Kamas Prime]: 6.4p -  [Carrier Prime Systems]: 7.8p -  [Carrier Prime Systems]: 7.8p -  [Volt Prime Neuroptics]: 71.4p
+
+[29/Jul/2021 00:42] [Dual Kamas Prime]: 6.4p -  [Carrier Prime Systems]: 7.8p -  [Volt Prime Neuroptics]: 71.4p
+
+[29/Jul/2021 00:44] [Volt Prime Neuroptics]: 71.4p -  [Odonata Prime Systems]: 8.1p -  [Carrier Prime Systems]: 7.8p -  [Volt Prime Neuroptics]: 71.4p
+
+[31/Jul/2021 19:06] [Burston Prime Stock]: 2.5p -  [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Upper Limb]: 2.5p -  [Burston Prime Stock]: 2.5p
+
+[31/Jul/2021 19:08] [Burston Prime Stock]: 2.5p -  [Paris Prime Upper Limb]: 2.5p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 26.2p
+
+[31/Jul/2021 19:10] [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Lower Limb]: 2.1p -  [Fragor Prime Handle]: 13.2p
+
+[31/Jul/2021 19:13] [Burston Prime Stock]: 2.5p -  [Volt Prime Systems]: 26.2p -  [Fragor Prime Handle]: 13.2p -  [Paris Prime Lower Limb]: 2.1p
+
+[31/Jul/2021 19:15] [Paris Prime Upper Limb]: 2.5p -  [Burston Prime Stock]: 2.5p -  [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Upper Limb]: 2.5p
+
+[31/Jul/2021 19:18] [Paris Prime Upper Limb]: 2.5p -  [Volt Prime Systems]: 26.2p
+
+[31/Jul/2021 20:03] [Paris Prime String]: 5.1p -  [Paris Prime String]: 5.1p -  [Saryn Prime Chassis]: 128.1p
+
+[31/Jul/2021 20:06] [Paris Prime Grip]: 3.5p -  [Paris Prime String]: 5.1p -  [Paris Prime Grip]: 3.5p -  [Bronco Prime]: 3.1p
+
+[31/Jul/2021 20:11] [Galatine Prime Blade]: 5.3p
+
+[31/Jul/2021 20:14] [Galatine Prime Blade]: 5.3p -  [Saryn Prime Chassis]: 128.1p -  [Saryn Prime Chassis]: 128.1p -  [Paris Prime Grip]: 3.5p
+
+[31/Jul/2021 20:17] [Galatine Prime Blade]: 5.3p -  [Paris Prime String]: 5.1p -  [Saryn Prime Chassis]: 128.1p -  [Galatine Prime Blade]: 5.3p
+
+[31/Jul/2021 23:58] [Vauban Prime Chassis]: 22.7p -  [Burston Prime Stock]: 2.5p -  [Carrier Prime Systems]: 7.7p
+
+[01/Aug/2021 00:02] [Panthera Prime]: 4.5p -  [Dual Kamas Prime]: 6.1p -  [Braton Prime]: 2.8p -  [Dual Kamas Prime]: 6.1p
+
+[01/Aug/2021 00:05] [Carrier Prime Systems]: 7.7p -  [Chroma Prime]: 4.1p -  [Nami Skyla Prime]: 8.8p
+
+[01/Aug/2021 00:07] [Inaros Prime Chassis]: 4.2p -  [Carrier Prime Systems]: 7.7p -  [Baza Prime Barrel]: 3p -  [Carrier Prime Systems]: 7.7p
+
+[01/Aug/2021 00:11] [Odonata Prime Systems]: 7.8p -  [Chroma Prime]: 4.1p -  [Nami Skyla Prime]: 8.8p
+
+[01/Aug/2021 00:13] [Inaros Prime Chassis]: 4.2p -  [Odonata Prime Systems]: 7.8p -  [Carrier Prime Systems]: 7.7p
+
+[01/Aug/2021 00:16] [Volt Prime Neuroptics]: 79p -  [Zephyr Prime]: 5.9p -  [Carrier Prime Systems]: 7.7p -  [Nami Skyla Prime]: 8.8p
+
+[01/Aug/2021 00:19] [Lex Prime Receiver]: 8.8p -  [Dual Kamas Prime]: 6.1p -  [Stradavar Prime Stock]: 6p -  [Carrier Prime Systems]: 7.7p
+
+[01/Aug/2021 00:22] [Carrier Prime Systems]: 7.7p -  [Burston Prime Stock]: 2.5p -  [Carrier Prime Systems]: 7.7p -  [Nami Skyla Prime]: 8.8p
+
+[01/Aug/2021 00:25] [Nezha Prime Systems]: 5.1p -  [Dual Kamas Prime]: 6.1p -  [Zhuge Prime Receiver]: 6.7p -  [Carrier Prime Systems]: 7.7p
+
+[01/Aug/2021 00:30] [Carrier Prime Systems]: 7.7p -  [Burston Prime Stock]: 2.5p
+
+[01/Aug/2021 00:33] [Panthera Prime]: 4.5p -  [Vauban Prime Chassis]: 22.7p -  [Paris Prime Lower Limb]: 2.1p
+
+[01/Aug/2021 00:36] [Carrier Prime Systems]: 7.7p -  [Chroma Prime]: 4.1p -  [Braton Prime]: 2.8p
+
+[01/Aug/2021 00:40] [Aksomati Prime Link]: 13.5p -  [Wukong Prime Neuroptics]: 4.8p -  [Odonata Prime Systems]: 7.8p
+
+[01/Aug/2021 00:44] [Odonata Prime Systems]: 7.8p -  [Burston Prime Stock]: 2.5p -  [Volt Prime Neuroptics]: 79p
+
+[01/Aug/2021 00:47] [Burston Prime Receiver]: 2.3p -  [Volt Prime Neuroptics]: 79p -  [Paris Prime Lower Limb]: 2.1p -  [Dual Kamas Prime]: 6.1p
+
+[01/Aug/2021 00:51] [Tiberon Prime Receiver]: 4.8p -  [Volt Prime Neuroptics]: 79p -  [Nami Skyla Prime]: 8.8p
+
+[01/Aug/2021 00:55] [Orthos Prime]: 3.5p -  [Volt Prime Neuroptics]: 79p -  [Braton Prime]: 2.8p -  [Carrier Prime Systems]: 7.7p
+
+[01/Aug/2021 00:59] [Zephyr Prime]: 5.9p -  [Volt Prime Neuroptics]: 79p -  [Braton Prime]: 2.8p
+
+[01/Aug/2021 01:03] [Inaros Prime Systems]: 6.3p -  [Wukong Prime Neuroptics]: 4.8p
+
+[01/Aug/2021 01:06] [Dual Kamas Prime]: 6.1p -  [Burston Prime Stock]: 2.5p -  [Vauban Prime Chassis]: 22.7p -  [Orthos Prime Handle]: 2.5p
+
+[01/Aug/2021 01:10] [Atlas Prime Chassis]: 4.3p -  [Dual Kamas Prime]: 6.1p
+
+[01/Aug/2021 01:13] [Chroma Prime]: 4.1p -  [Dual Kamas Prime]: 6.1p -  [Braton Prime]: 2.8p
+
+[01/Aug/2021 01:16] [Volt Prime Neuroptics]: 79p -  [Equinox Prime]: 9.7p
+
+[01/Aug/2021 21:26] [Wyrm Prime Carapace]: 47.2p -  [Akbronco Prime Link]: 3.7p -  [Paris Prime]: 2.4p
+
+[01/Aug/2021 21:30] [Wyrm Prime Carapace]: 47.2p -  [Destreza Prime]: 3.1p -  [Inaros Prime Systems]: 6.8p
+
+[01/Aug/2021 21:33] [Pangolin Prime Blade]: 3.7p -  [Paris Prime Grip]: 3.4p -  [Sybaris Prime Stock]: 8.1p -  [Volt Prime Systems]: 26.2p
+
+[01/Aug/2021 22:09] [Paris Prime Upper Limb]: 2.6p
+
+[01/Aug/2021 22:12] [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Upper Limb]: 2.6p -  [Volt Prime Systems]: 26.2p -  [Paris Prime Upper Limb]: 2.6p
+
+[01/Aug/2021 22:15] [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2.3p -  [Volt Prime Systems]: 26.2p -  [Fragor Prime Handle]: 13.3p
+
+[01/Aug/2021 22:17] [Paris Prime Lower Limb]: 1.9p -  [Burston Prime Stock]: 2.3p -  [Burston Prime Stock]: 2.3p -  [Fragor Prime Handle]: 13.3p
+
+[01/Aug/2021 22:20] [Volt Prime Systems]: 26.2p -  [Volt Prime Systems]: 26.2p
+
+[01/Aug/2021 22:22] [Volt Prime Systems]: 26.2p -  [Volt Prime Systems]: 26.2p -  [Paris Prime Upper Limb]: 2.6p -  [Fragor Prime Handle]: 13.3p
+
+[01/Aug/2021 22:25] [Paris Prime Lower Limb]: 1.9p -  [Burston Prime Stock]: 2.3p -  [Volt Prime Systems]: 26.2p
+
+[01/Aug/2021 22:27] [Paris Prime Lower Limb]: 1.9p -  [Paris Prime Lower Limb]: 1.9p -  [Paris Prime Upper Limb]: 2.6p
+
+[01/Aug/2021 22:29] [Burston Prime Stock]: 2.3p -  [Volt Prime Systems]: 26.2p -  [Burston Prime Stock]: 2.3p
+
+[01/Aug/2021 22:33] [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2.3p
+
+[01/Aug/2021 22:35] [Paris Prime Upper Limb]: 2.6p -  [Fragor Prime Handle]: 13.3p -  [Volt Prime Systems]: 26.2p
+
+[01/Aug/2021 22:37] [Paris Prime Upper Limb]: 2.6p -  [Volt Prime Systems]: 26.2p -  [Paris Prime Upper Limb]: 2.6p -  [Volt Prime Systems]: 26.2p
+
+[09/Aug/2021 23:46] [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Upper Limb]: 2.6p
+
+[09/Aug/2021 23:49] [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2p -  [Paris Prime Lower Limb]: 1.6p -  [Fragor Prime Handle]: 14p
+
+[09/Aug/2021 23:51] [Volt Prime Systems]: 28p -  [Volt Prime Systems]: 28p -  [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Lower Limb]: 1.6p
+
+[09/Aug/2021 23:53] [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Lower Limb]: 1.6p
+
+[09/Aug/2021 23:56] [Volt Prime Systems]: 28p -  [Paris Prime Lower Limb]: 1.6p -  [Volt Prime Systems]: 28p -  [Paris Prime Upper Limb]: 2.6p
+
+[09/Aug/2021 23:58] [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2p
+
+[10/Aug/2021 00:01] [Volt Prime Systems]: 28p -  [Fragor Prime Handle]: 14p -  [Paris Prime Lower Limb]: 1.6p
+
+[10/Aug/2021 00:03] [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2p -  [Volt Prime Systems]: 28p -  [Paris Prime Upper Limb]: 2.6p
+
+[10/Aug/2021 00:05] [Paris Prime Lower Limb]: 1.6p -  [Volt Prime Systems]: 28p -  [Paris Prime Lower Limb]: 1.6p
+
+[10/Aug/2021 00:08] [Paris Prime Upper Limb]: 2.6p -  [Burston Prime Stock]: 2p -  [Burston Prime Stock]: 2p -  [Burston Prime Stock]: 2p
+
+[10/Aug/2021 00:11] [Burston Prime Stock]: 2p -  [Volt Prime Systems]: 28p -  [Paris Prime Upper Limb]: 2.6p
+
+[10/Aug/2021 00:13] [Volt Prime Systems]: 28p -  [Paris Prime Upper Limb]: 2.6p
+
+[10/Aug/2021 00:16] [Paris Prime Lower Limb]: 1.6p -  [Volt Prime Systems]: 28p
+
+[10/Aug/2021 00:18] [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Upper Limb]: 2.6p
+
+[10/Aug/2021 00:21] [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Lower Limb]: 1.6p -  [Burston Prime Stock]: 2p -  [Burston Prime Stock]: 2p
+
+[10/Aug/2021 00:23] [Paris Prime Upper Limb]: 2.6p -  [Fragor Prime Handle]: 14p -  [Paris Prime Lower Limb]: 1.6p -  [Burston Prime Stock]: 2p
+
+[10/Aug/2021 00:26] [Fragor Prime Handle]: 14p -  [Paris Prime Lower Limb]: 1.6p -  [Burston Prime Stock]: 2p -  [Volt Prime Systems]: 28p
+
+[10/Aug/2021 00:28] [Volt Prime Systems]: 28p -  [Volt Prime Systems]: 28p -  [Paris Prime Upper Limb]: 2.6p -  [Paris Prime Lower Limb]: 1.6p
+
+[17/Aug/2021 19:43] https://wfinfo.warframestat.us/
+
+[25/Aug/2021 07:40] [Lex Prime Barrel]: 2.9p -  [Ash Prime Neuroptics]: 9p
+
+[25/Aug/2021 07:42] [Lex Prime Barrel]: 2.9p -  [Nekros Prime Systems]: 72.3p -  [Nekros Prime Systems]: 72.3p -  [Oberon Prime Systems]: 39.3p
+
+[25/Aug/2021 07:45] [Fang Prime Handle]: 5.7p -  [Braton Prime Barrel]: 3.5p -  [Odonata Prime Systems]: 8.6p -  [Oberon Prime Systems]: 39.3p
+
+[25/Aug/2021 07:48] [Odonata Prime Systems]: 8.6p -  [Tigris Prime Stock]: 6.5p -  [Paris Prime String]: 4.2p -  [Oberon Prime Systems]: 39.3p
+
+[25/Aug/2021 07:51] [Odonata Prime Systems]: 8.6p -  [Tigris Prime Stock]: 6.5p -  [Lex Prime Barrel]: 2.9p -  [Braton Prime Barrel]: 3.5p
+
+[25/Aug/2021 07:54] [Ash Prime Neuroptics]: 9p -  [Oberon Prime Systems]: 39.3p -  [Banshee Prime]: 4.9p
+
+[25/Aug/2021 08:09] [Karyst Prime]: 4.4p -  [Aksomati Prime Link]: 14.3p -  [Carrier Prime Systems]: 7.6p -  [Volt Prime Neuroptics]: 85.4p
+
+[25/Aug/2021 08:12] [Volt Prime Neuroptics]: 85.4p -  [Carrier Prime Systems]: 7.6p -  [Tiberon Prime Receiver]: 5.2p
+
+[25/Aug/2021 08:15] [Karyst Prime]: 4.4p -  [Karyst Prime]: 4.4p -  [Volt Prime Neuroptics]: 85.4p -  [Odonata Prime Systems]: 8.6p
+
+[25/Aug/2021 08:18] [Carrier Prime Systems]: 7.6p -  [Vauban Prime Chassis]: 25.3p
+
+[25/Aug/2021 08:21] [Fang Prime Handle]: 5.7p -  [Odonata Prime Systems]: 8.6p -  [Carrier Prime Systems]: 7.6p
+
+[25/Aug/2021 08:23] [Odonata Prime Systems]: 8.6p -  [Carrier Prime Systems]: 7.6p -  [Pangolin Prime Blade]: 3.4p
+
+[25/Aug/2021 08:26] [Pangolin Prime Handle]: 8.3p -  [Astilla Prime Receiver]: 14.2p -  [Dual Kamas Prime]: 6.8p -  [Volt Prime Neuroptics]: 85.4p
+
+[25/Aug/2021 19:30] [Dual Kamas Prime]: 6.8p -  [Carrier Prime Systems]: 7.6p -  [Dual Kamas Prime]: 6.8p
+
+[25/Aug/2021 19:33] [Dual Kamas Prime]: 6.8p -  [Volt Prime Neuroptics]: 85.4p -  [Odonata Prime Systems]: 8.6p
+
+[25/Aug/2021 22:16] [Lex Prime Receiver]: 8.1p -  [Stradavar Prime Stock]: 6.2p -  [Saryn Prime]: 50.3p -  [Bronco Prime Receiver]: 2.6p
+
+[25/Aug/2021 22:19] [Karyst Prime]: 4.4p -  [Braton Prime Barrel]: 3.5p -  [Bronco Prime]: 2.1p -  [Braton Prime Barrel]: 3.5p
+
+[25/Aug/2021 22:22] [Braton Prime Receiver]: 2.9p -  [Octavia Prime Systems]: 5.1p -  [Saryn Prime]: 50.3p -  [Valkyr Prime Systems]: 11.6p
+
+[25/Aug/2021 22:25] [Ivara Prime Systems]: 3p -  [Braton Prime Barrel]: 3.5p -  [Akbronco Prime]: 2.3p -  [Saryn Prime]: 50.3p
+
+[25/Aug/2021 22:29] [Nikana Prime]: 11.2p -  [Inaros Prime Systems]: 6.3p -  [Braton Prime Receiver]: 2.9p -  [Pangolin Prime Blade]: 3.4p
+
+[25/Aug/2021 22:32] [Braton Prime Receiver]: 2.9p -  [Equinox Prime]: 10.5p -  [Lex Prime Receiver]: 8.1p
+
+[25/Aug/2021 22:35] [Lex Prime Receiver]: 8.1p -  [Pangolin Prime Handle]: 8.3p -  [Nikana Prime]: 11.2p -  [Mirage Prime Neuroptics]: 4.7p
+
+[25/Aug/2021 22:38] [Karyst Prime]: 4.4p -  [Lex Prime Receiver]: 8.1p -  [Zhuge Prime Barrel]: 11.4p -  [Nikana Prime]: 11.2p
+
+[26/Aug/2021 08:31] [Galatine Prime Handle]: 5.2p -  [Galatine Prime Blade]: 5.5p
+
+[26/Aug/2021 08:34] [Fang Prime Handle]: 5.7p -  [Vauban Prime]: 32.2p -  [Galatine Prime Handle]: 5.2p
+
+[26/Aug/2021 08:37] [Braton Prime Stock]: 2.4p -  [Fang Prime Handle]: 5.7p -  [Galatine Prime Blade]: 5.5p
+
+[26/Aug/2021 20:23] [Burston Prime]: 1.9p -  [Tipedo Prime]: 3p -  [Vauban Prime]: 32.2p
+
+[26/Aug/2021 20:26] [Vauban Prime]: 32.2p -  [Bronco Prime Receiver]: 2.6p
+
+[26/Aug/2021 20:29] [Spira Prime]: 4.5p -  [Saryn Prime Systems]: 8.9p -  [Akstiletto Prime Barrel]: 17.8p -  [Carrier Prime Cerebrum]: 41.2p
+
+[26/Aug/2021 20:32] [Saryn Prime Systems]: 8.9p -  [Galatine Prime Blade]: 5.5p
+
+[26/Aug/2021 20:35] [Spira Prime]: 4.5p -  [Carrier Prime Cerebrum]: 41.2p -  [Braton Prime Barrel]: 3.6p
+
+[26/Aug/2021 20:38] [Carrier Prime Cerebrum]: 41.2p -  [Carrier Prime Cerebrum]: 41.2p -  [Cernos Prime Grip]: 8.7p -  [Braton Prime Stock]: 2.4p
+
+[26/Aug/2021 20:40] [Spira Prime]: 4.5p -  [Ash Prime Chassis]: 20.3p -  [Vectis Prime Receiver]: 68.4p -  [Braton Prime Barrel]: 3.6p
+
+[26/Aug/2021 20:43] [Braton Prime Barrel]: 3.6p -  [Carrier Prime Cerebrum]: 41.2p -  [Frost Prime Chassis]: 14.7p -  [Mag Prime Chassis]: 24.1p
+
+[26/Aug/2021 20:45] [Wyrm Prime Systems]: 67.8p -  [Saryn Prime Systems]: 8.9p -  [Vectis Prime Receiver]: 68.4p -  [Braton Prime Barrel]: 3.6p
+
+[26/Aug/2021 20:48] [Carrier Prime Cerebrum]: 41.2p -  [Frost Prime Chassis]: 14.7p -  [Glaive Prime Disc]: 27.8p
+
+[26/Aug/2021 20:51] [Odonata Prime Systems]: 8.4p -  [Carrier Prime Cerebrum]: 41.2p
+
+[26/Aug/2021 20:53] [Akstiletto Prime Barrel]: 17.8p -  [Akstiletto Prime Barrel]: 17.8p -  [Loki Prime]: 9.6p -  [Carrier Prime]: 9.3p
+
+[26/Aug/2021 20:56] [Scindo Prime Handle]: 5p -  [Carrier Prime Cerebrum]: 41.2p
+
+[27/Aug/2021 00:26] [Vauban Prime Neuroptics]: 51.8p -  [Stradavar Prime Receiver]: 4.7p -  [Akstiletto Prime Link]: 8.3p -  [Venka Prime Blades]: 9.9p
+
+[27/Aug/2021 00:29] [Octavia Prime Neuroptics]: 3.7p -  [Vectis Prime Barrel]: 32.1p -  [Lex Prime Receiver]: 8.3p -  [Fragor Prime Head]: 9.5p
+
+[27/Aug/2021 00:31] [Fragor Prime Head]: 9.5p -  [Braton Prime Stock]: 2.5p -  [Carrier Prime]: 9.3p -  [Tigris Prime Barrel]: 5.1p
+
+[27/Aug/2021 00:34] [Octavia Prime Neuroptics]: 3.7p -  [Vectis Prime Barrel]: 32.1p -  [Nekros Prime Chassis]: 8.8p -  [Fragor Prime Head]: 9.5p
+
+[27/Aug/2021 00:36] [Akstiletto Prime Link]: 8.3p -  [Carrier Prime Systems]: 8p -  [Ash Prime]: 37.2p
+
+[27/Aug/2021 00:38] [Fang Prime]: 1.6p -  [Akstiletto Prime Link]: 8.3p -  [Nekros Prime Chassis]: 8.8p -  [Ash Prime]: 37.2p
+
+[27/Aug/2021 00:40] [Vauban Prime Neuroptics]: 51.8p -  [Carrier Prime Systems]: 8p -  [Vectis Prime Barrel]: 32.1p -  [Sybaris Prime Stock]: 7.1p
+
+[27/Aug/2021 00:43] [Inaros Prime]: 3.4p -  [Akstiletto Prime Link]: 8.3p -  [Venka Prime Blades]: 9.9p -  [Ash Prime]: 37.2p
+
+[27/Aug/2021 02:03] [Volt Prime Systems]: 28.1p -  [Volt Prime Systems]: 28.1p -  [Paris Prime Lower Limb]: 1.6p
+
+[27/Aug/2021 02:06] [Paris Prime Lower Limb]: 1.6p -  [Burston Prime Stock]: 1.9p -  [Fragor Prime Handle]: 14.3p -  [Fragor Prime Handle]: 14.3p
+
+[27/Aug/2021 02:09] [Burston Prime Stock]: 1.9p -  [Fragor Prime Handle]: 14.3p
+
+[27/Aug/2021 02:09] [Burston Prime Stock]: 1.9p -  [Fragor Prime Handle]: 14.3p
+
+[27/Aug/2021 02:12] [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Upper Limb]: 1.8p -  [Paris Prime Upper Limb]: 1.8p -  [Burston Prime Stock]: 1.9p
+
+[27/Aug/2021 02:14] [Volt Prime Systems]: 28.1p -  [Volt Prime Systems]: 28.1p -  [Volt Prime Systems]: 28.1p -  [Paris Prime Upper Limb]: 1.8p
+
+[27/Aug/2021 02:17] [Paris Prime Lower Limb]: 1.6p -  [Volt Prime Systems]: 28.1p -  [Paris Prime Lower Limb]: 1.6p -  [Fragor Prime Handle]: 14.3p
+
+[27/Aug/2021 02:20] [Paris Prime Upper Limb]: 1.8p -  [Burston Prime Stock]: 1.9p -  [Fragor Prime Handle]: 14.3p
+
+[27/Aug/2021 02:23] [Volt Prime Systems]: 28.1p -  [Paris Prime Upper Limb]: 1.8p -  [Fragor Prime Handle]: 14.3p -  [Burston Prime Stock]: 1.9p
+
+[27/Aug/2021 02:26] [Paris Prime Upper Limb]: 1.8p -  [Paris Prime Upper Limb]: 1.8p -  [Volt Prime Systems]: 28.1p -  [Burston Prime Stock]: 1.9p
+
+[27/Aug/2021 02:29] [Volt Prime Systems]: 28.1p -  [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Upper Limb]: 1.8p
+
+[27/Aug/2021 02:32] [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Lower Limb]: 1.6p -  [Burston Prime Stock]: 1.9p -  [Fragor Prime Handle]: 14.3p
+
+[27/Aug/2021 02:34] [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Upper Limb]: 1.8p
+
+[27/Aug/2021 02:37] [Volt Prime Systems]: 28.1p -  [Fragor Prime Handle]: 14.3p -  [Paris Prime Lower Limb]: 1.6p -  [Paris Prime Lower Limb]: 1.6p
+
+[27/Aug/2021 02:40] [Volt Prime Systems]: 28.1p -  [Burston Prime Stock]: 1.9p -  [Fragor Prime Handle]: 14.3p -  [Volt Prime Systems]: 28.1p
+
+[27/Aug/2021 02:42] [Volt Prime Systems]: 28.1p -  [Paris Prime Upper Limb]: 1.8p -  [Burston Prime Stock]: 1.9p
+
+[27/Aug/2021 02:46] [Paris Prime Upper Limb]: 1.8p -  [Burston Prime Stock]: 1.9p
+
+[27/Aug/2021 22:44] [Burston Prime Stock]: 1.8p -  [Fragor Prime Handle]: 14.6p
+
+[27/Aug/2021 22:46] [Burston Prime Stock]: 1.8p -  [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p -  [Paris Prime Lower Limb]: 1.5p
+
+[27/Aug/2021 22:50] [Volt Prime Systems]: 28.2p -  [Paris Prime Upper Limb]: 2p -  [Fragor Prime Handle]: 14.6p -  [Burston Prime Stock]: 1.8p
+
+[27/Aug/2021 22:52] [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p -  [Fragor Prime Handle]: 14.6p
+
+[27/Aug/2021 22:55] [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 08:21] [Volt Prime Systems]: 28.2p -  [Burston Prime Stock]: 1.8p -  [Volt Prime Systems]: 28.2p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 08:23] [Volt Prime Systems]: 28.2p -  [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 08:25] [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p -  [Volt Prime Systems]: 28.2p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 08:28] [Burston Prime Stock]: 1.8p -  [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 08:31] [Burston Prime Stock]: 1.8p -  [Burston Prime Stock]: 1.8p -  [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 08:33] [Burston Prime Stock]: 1.8p -  [Paris Prime Upper Limb]: 2p -  [Paris Prime Upper Limb]: 2p -  [Paris Prime Lower Limb]: 1.5p
+
+[28/Aug/2021 08:36] [Volt Prime Systems]: 28.2p -  [Burston Prime Stock]: 1.8p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 08:38] [Paris Prime Lower Limb]: 1.5p -  [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p -  [Fragor Prime Handle]: 14.6p
+
+[28/Aug/2021 08:41] [Burston Prime Stock]: 1.8p -  [Paris Prime Upper Limb]: 2p -  [Fragor Prime Handle]: 14.6p -  [Paris Prime Lower Limb]: 1.5p
+
+[28/Aug/2021 08:44] [Paris Prime Lower Limb]: 1.5p -  [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 08:46] [Volt Prime Systems]: 28.2p -  [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p -  [Burston Prime Stock]: 1.8p
+
+[28/Aug/2021 08:49] [Paris Prime Lower Limb]: 1.5p -  [Burston Prime Stock]: 1.8p -  [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 08:51] [Paris Prime Lower Limb]: 1.5p -  [Burston Prime Stock]: 1.8p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 08:54] [Volt Prime Systems]: 28.2p -  [Paris Prime Lower Limb]: 1.5p -  [Paris Prime Upper Limb]: 2p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 08:56] [Paris Prime Upper Limb]: 2p -  [Paris Prime Lower Limb]: 1.5p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 08:59] [Burston Prime Stock]: 1.8p -  [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p -  [Burston Prime Stock]: 1.8p
+
+[28/Aug/2021 09:02] [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p -  [Paris Prime Upper Limb]: 2p -  [Paris Prime Lower Limb]: 1.5p
+
+[28/Aug/2021 09:05] [Paris Prime Lower Limb]: 1.5p -  [Volt Prime Systems]: 28.2p -  [Paris Prime Upper Limb]: 2p -  [Volt Prime Systems]: 28.2p
+
+[28/Aug/2021 09:08] [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p -  [Burston Prime Stock]: 1.8p
+
+[28/Aug/2021 09:10] [Paris Prime Upper Limb]: 2p -  [Paris Prime Upper Limb]: 2p -  [Volt Prime Systems]: 28.2p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 09:12] [Paris Prime Upper Limb]: 2p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 09:15] [Paris Prime Lower Limb]: 1.5p -  [Paris Prime Upper Limb]: 2p -  [Burston Prime Stock]: 1.8p
+
+[28/Aug/2021 09:17] [Burston Prime Stock]: 1.8p -  [Paris Prime Lower Limb]: 1.5p -  [Paris Prime Upper Limb]: 2p -  [Paris Prime Upper Limb]: 2p
+
+[28/Aug/2021 09:20] [Fragor Prime Handle]: 14.6p -  [Volt Prime Systems]: 28.2p -  [Paris Prime Lower Limb]: 1.5p -  [Paris Prime Upper Limb]: 2p
+
+[29/Aug/2021 10:57] [Galatine Prime Handle]: 5.2p -  [Braton Prime Stock]: 2.3p -  [Galatine Prime Handle]: 5.2p
+
+[29/Aug/2021 11:25] [Vauban Prime Neuroptics]: 51.9p -  [Burston Prime Barrel]: 3.2p -  [Galatine Prime Blade]: 4.6p
+
+[29/Aug/2021 11:28] [Burston Prime Barrel]: 3.2p -  [Carrier Prime Systems]: 8.5p -  [Burston Prime Barrel]: 3.2p -  [Galatine Prime Blade]: 4.6p
+
+[29/Aug/2021 11:31] [Galatine Prime Blade]: 4.6p -  [Galatine Prime Blade]: 4.6p
+
+[29/Aug/2021 11:34] [Carrier Prime Systems]: 8.5p -  [Burston Prime Barrel]: 3.2p -  [Galatine Prime Blade]: 4.6p
+
+[29/Aug/2021 11:38] [Silva & Aegis Prime Hilt]: 5.2p -  [Galatine Prime Blade]: 4.6p
+
+[29/Aug/2021 11:41] [Vauban Prime Neuroptics]: 51.9p -  [Carrier Prime Systems]: 8.5p -  [Vauban Prime Neuroptics]: 51.9p -  [Galatine Prime Blade]: 4.6p
+
+[30/Aug/2021 16:28] [Paris Prime]: 2.7p -  [Saryn Prime]: 49.8p -  [Paris Prime]: 2.7p
+
+[30/Aug/2021 16:31] [Paris Prime]: 2.7p -  [Saryn Prime]: 49.8p -  [Trinity Prime Chassis]: 9.2p -  [Paris Prime]: 2.7p
+
+[30/Aug/2021 16:33] [Trinity Prime Chassis]: 9.2p -  [Paris Prime]: 2.7p -  [Lex Prime]: 2.1p -  [Kavasa Prime Kubrow Collar]: 5p
+
+[30/Aug/2021 16:36] [Trinity Prime Chassis]: 9.2p -  [Kavasa Prime Kubrow Collar]: 5p -  [Paris Prime]: 2.7p
+
+[30/Aug/2021 16:39] [Saryn Prime]: 49.8p -  [Paris Prime]: 2.7p
+
+[30/Aug/2021 16:41] [Kavasa Prime Kubrow Collar]: 5p -  [Lex Prime]: 2.1p -  [Trinity Prime Chassis]: 9.2p -  [Kavasa Prime Kubrow Collar]: 5p
+
+[30/Aug/2021 16:44] [Lex Prime]: 2.1p -  [Kavasa Prime Kubrow Collar]: 5p -  [Trinity Prime Chassis]: 9.2p -  [Saryn Prime]: 49.8p
+
+[30/Aug/2021 16:46] [Kavasa Prime Kubrow Collar]: 5p -  [Paris Prime]: 2.7p -  [Lex Prime]: 2.1p
+
+[30/Aug/2021 16:49] [Trinity Prime Chassis]: 9.2p -  [Trinity Prime Chassis]: 9.2p -  [Paris Prime]: 2.7p
+
+[30/Aug/2021 16:51] [Saryn Prime]: 49.8p -  [Lex Prime]: 2.1p -  [Kavasa Prime Kubrow Collar]: 5p -  [Saryn Prime]: 49.8p
+
+[30/Aug/2021 16:54] [Trinity Prime Chassis]: 9.2p -  [Lex Prime]: 2.1p -  [Kavasa Prime Kubrow Collar]: 5p -  [Lex Prime]: 2.1p
+
+[30/Aug/2021 18:18] [Volt Prime]: 29.9p -  [Nezha Prime Neuroptics]: 17.5p -  [Paris Prime Lower Limb]: 1.6p
+
+[30/Aug/2021 18:21] [Odonata Prime Harness]: 10.5p -  [Braton Prime]: 2.3p -  [Volt Prime]: 29.9p
+
+[30/Aug/2021 18:24] [Odonata Prime Harness]: 10.5p -  [Gara Prime Systems]: 7.7p -  [Odonata Prime Wings]: 26.7p -  [Akbronco Prime]: 2.5p
+
+[30/Aug/2021 18:26] [Guandao Prime Blade]: 6.4p -  [Odonata Prime Harness]: 10.5p -  [Titania Prime]: 6.1p -  [Aklex Prime]: 7.9p
+
+[30/Aug/2021 18:29] [Volt Prime]: 29.9p -  [Burston Prime Receiver]: 1.7p -  [Akbronco Prime]: 2.5p
+
+[30/Aug/2021 18:31] [Titania Prime]: 6.1p -  [Paris Prime String]: 4.3p -  [Odonata Prime Harness]: 10.5p
+
+[30/Aug/2021 18:34] [Aksomati Prime Receiver]: 3.7p
+
+[30/Aug/2021 18:36] [Stradavar Prime Barrel]: 3.9p -  [Odonata Prime Harness]: 10.5p -  [Akbronco Prime]: 2.5p
+
+[30/Aug/2021 18:39] [Volt Prime Systems]: 27.6p -  [Volt Prime Systems]: 27.6p
+
+[30/Aug/2021 18:43] [Volt Prime Systems]: 27.6p
+
+[30/Aug/2021 18:45] [Titania Prime]: 6.1p -  [Volt Prime]: 29.9p -  [Volt Prime]: 29.9p
+
+[30/Aug/2021 18:48] [Dethcube Prime Systems]: 2.7p -  [Volt Prime Systems]: 27.6p -  [Dethcube Prime]: 10.2p
+
+[30/Aug/2021 18:51] [Guandao Prime Blade]: 6.4p -  [Volt Prime]: 29.9p -  [Lex Prime Barrel]: 3.1p -  [Odonata Prime Harness]: 10.5p
+
+[30/Aug/2021 18:54] [Aksomati Prime Receiver]: 3.7p -  [Wukong Prime Neuroptics]: 5.4p -  [Bo Prime]: 14.3p
+
+[30/Aug/2021 18:56] [Burston Prime Receiver]: 1.7p -  [Akbronco Prime]: 2.5p
+
+[30/Aug/2021 18:59] [Braton Prime Stock]: 2.7p -  [Akbronco Prime Link]: 3.8p -  [Volt Prime Systems]: 27.6p
+
+[30/Aug/2021 19:02] [Volt Prime Systems]: 27.6p -  [Burston Prime Receiver]: 1.7p -  [Odonata Prime Harness]: 10.5p
+
+[30/Aug/2021 19:04] [Aksomati Prime Receiver]: 3.7p -  [Volt Prime]: 29.9p -  [Gara Prime Systems]: 7.7p
+
+[30/Aug/2021 19:07] [Volt Prime]: 29.9p -  [Odonata Prime Harness]: 10.5p -  [Braton Prime Stock]: 2.7p
+
+[30/Aug/2021 19:10] [Titania Prime]: 6.1p -  [Octavia Prime Chassis]: 6p -  [Volt Prime Systems]: 27.6p
+
+[30/Aug/2021 19:13] [Odonata Prime Harness]: 10.5p -  [Odonata Prime Harness]: 10.5p -  [Braton Prime Stock]: 2.7p
+
+[30/Aug/2021 19:16] [Aklex Prime]: 7.9p -  [Volt Prime]: 29.9p -  [Braton Prime Stock]: 2.7p
+
+[30/Aug/2021 19:19] [Braton Prime Stock]: 2.7p -  [Odonata Prime Harness]: 10.5p
+
+[30/Aug/2021 19:24] [Volt Prime]: 29.9p -  [Odonata Prime Harness]: 10.5p -  [Euphona Prime]: 3.8p
+
+[30/Aug/2021 19:29] [Aksomati Prime Receiver]: 3.7p -  [Volt Prime]: 29.9p -  [Dethcube Prime Carapace]: 3.2p -  [Volt Prime]: 29.9p
+
+[30/Aug/2021 19:32] [Aklex Prime]: 7.9p -  [Euphona Prime]: 3.8p
+
+[30/Aug/2021 19:36] [Braton Prime Stock]: 2.7p -  [Volt Prime Systems]: 27.6p -  [Odonata Prime Harness]: 10.5p
+
+[30/Aug/2021 19:38] [Odonata Prime Harness]: 10.5p -  [Burston Prime Receiver]: 1.7p -  [Akbronco Prime]: 2.5p
+
+[30/Aug/2021 19:52] [Burston Prime]: 2.1p -  [Nekros Prime Chassis]: 8.8p -  [Nekros Prime Chassis]: 8.8p
+
+[30/Aug/2021 19:58] [Sybaris Prime Barrel]: 22p -  [Tigris Prime Barrel]: 5.1p -  [Silva & Aegis Prime Blade]: 6.7p -  [Burston Prime]: 2.1p
+
+[30/Aug/2021 20:02] [Tigris Prime Barrel]: 5.1p -  [Nekros Prime Chassis]: 8.8p -  [Silva & Aegis Prime Blade]: 6.7p
+
+[30/Aug/2021 20:05] [Burston Prime]: 2.1p -  [Tigris Prime Barrel]: 5.1p
+
+[30/Aug/2021 20:08] [Nekros Prime Chassis]: 8.8p -  [Burston Prime]: 2.1p
+
+[30/Aug/2021 20:12] [Nekros Prime Chassis]: 8.8p
+
+[31/Aug/2021 13:28] [Karyst Prime]: 4.6p -  [Odonata Prime Systems]: 8.8p -  [Lex Prime Receiver]: 8.3p -  [Pangolin Prime Handle]: 8p
+
+[31/Aug/2021 13:31] [Lex Prime Receiver]: 8.3p -  [Akstiletto Prime Barrel]: 17.3p
+
+[31/Aug/2021 13:34] [Odonata Prime]: 8.4p -  [Volt Prime Chassis]: 13.8p -  [Inaros Prime Systems]: 7.1p
+
+[31/Aug/2021 13:38] [Odonata Prime]: 8.4p -  [Lex Prime Receiver]: 8.3p -  [Trinity Prime Systems]: 14p -  [Odonata Prime]: 8.4p
+
+[31/Aug/2021 13:40] [Pandero Prime Barrel]: 8.1p -  [Odonata Prime Systems]: 8.8p -  [Pangolin Prime Blade]: 4p
+
+[31/Aug/2021 13:44] [Aklex Prime]: 8.2p -  [Trinity Prime Systems]: 14p -  [Lex Prime Receiver]: 8.3p
+
+[31/Aug/2021 13:46] [Pandero Prime Barrel]: 8.1p -  [Odonata Prime]: 8.4p -  [Burston Prime Receiver]: 1.8p
+
+[31/Aug/2021 13:50] [Odonata Prime]: 8.4p -  [Lex Prime Receiver]: 8.3p -  [Fragor Prime Head]: 9.6p -  [Odonata Prime Systems]: 8.8p
+
+[31/Aug/2021 13:52] [Pangolin Prime Handle]: 8p -  [Volt Prime Chassis]: 13.8p -  [Volt Prime Chassis]: 13.8p
+
+[31/Aug/2021 13:55] [Odonata Prime Systems]: 8.8p -  [Carrier Prime Systems]: 8.8p -  [Carrier Prime Systems]: 8.8p -  [Carrier Prime Systems]: 8.8p
+
+[31/Aug/2021 13:58] [Volt Prime Neuroptics]: 86.3p -  [Dual Kamas Prime]: 5.7p -  [Carrier Prime Systems]: 8.8p -  [Dual Kamas Prime]: 5.7p
+
+[31/Aug/2021 14:01] [Carrier Prime Systems]: 8.8p -  [Dual Kamas Prime]: 5.7p -  [Dual Kamas Prime]: 5.7p -  [Odonata Prime Systems]: 8.8p
+
+[31/Aug/2021 14:04] [Carrier Prime Systems]: 8.8p -  [Carrier Prime Systems]: 8.8p -  [Dual Kamas Prime]: 5.7p -  [Dual Kamas Prime]: 5.7p
+
+[31/Aug/2021 14:52] [Helios Prime Carapace]: 5.1p -  [Baza Prime Stock]: 14.5p -  [Euphona Prime]: 3.7p
+
+[31/Aug/2021 14:56] [Titania Prime]: 6.3p -  [Helios Prime Carapace]: 5.1p -  [Helios Prime Carapace]: 5.1p -  [Bronco Prime Receiver]: 3p
+
+[31/Aug/2021 14:58] [Ash Prime Systems]: 116.9p -  [Braton Prime]: 2.2p -  [Limbo Prime Systems]: 3.6p -  [Saryn Prime Systems]: 9.2p
+
+[31/Aug/2021 15:01] [Aksomati Prime Receiver]: 3.7p -  [Nikana Prime]: 12.9p -  [Bronco Prime Receiver]: 3p
+
+[31/Aug/2021 15:03] [Helios Prime Carapace]: 5.1p -  [Braton Prime]: 2.2p -  [Kronen Prime]: 4.6p -  [Saryn Prime Systems]: 9.2p
+
+[31/Aug/2021 15:06] [Kronen Prime]: 4.6p -  [Akstiletto Prime Link]: 8.6p -  [Ash Prime Systems]: 116.9p -  [Bronco Prime Receiver]: 3p
+
+[31/Aug/2021 15:10] [Ash Prime Systems]: 116.9p -  [Pyrana Prime Barrel]: 5p -  [Kronen Prime]: 4.6p -  [Akstiletto Prime Link]: 8.6p
+
+[31/Aug/2021 15:25] [Kronen Prime]: 4.6p -  [Akstiletto Prime Link]: 8.6p -  [Saryn Prime Systems]: 9.2p -  [Hydroid Prime Chassis]: 6.3p
+
+[31/Aug/2021 15:28] [Ash Prime Systems]: 116.9p -  [Limbo Prime Systems]: 3.6p -  [Pyrana Prime Barrel]: 5p -  [Akstiletto Prime Link]: 8.6p
+
+[31/Aug/2021 15:31] [Braton Prime Stock]: 2.7p -  [Helios Prime Carapace]: 5.1p -  [Saryn Prime Systems]: 9.2p -  [Akbronco Prime]: 2.5p
+
+[31/Aug/2021 15:33] [Helios Prime Carapace]: 5.1p -  [Limbo Prime Systems]: 3.6p -  [Kronen Prime]: 4.6p -  [Helios Prime Carapace]: 5.1p
+
+[31/Aug/2021 15:36] [Aksomati Prime Receiver]: 3.7p -  [Akstiletto Prime Link]: 8.6p -  [Ash Prime Systems]: 116.9p
+
+[31/Aug/2021 15:39] [Akstiletto Prime Link]: 8.6p -  [Limbo Prime Systems]: 3.6p -  [Saryn Prime Systems]: 9.2p
+
+[31/Aug/2021 15:42] [Kronen Prime]: 4.6p -  [Ash Prime Systems]: 116.9p -  [Wukong Prime Neuroptics]: 5.3p
+
+[31/Aug/2021 15:45] [Pyrana Prime Barrel]: 5p -  [Pyrana Prime Barrel]: 5p -  [Ash Prime Systems]: 116.9p
+
+[31/Aug/2021 15:47] [Pyrana Prime Barrel]: 5p -  [Akstiletto Prime Link]: 8.6p -  [Akstiletto Prime Link]: 8.6p -  [Bronco Prime Receiver]: 3p
+
+[01/Sep/2021 17:07] [Pandero Prime Barrel]: 7.9p -  [Boar Prime Receiver]: 9.3p -  [Panthera Prime]: 4.2p
+
+[01/Sep/2021 17:09] [Tenora Prime Stock]: 5.5p -  [Zakti Prime Receiver]: 2.9p -  [Boar Prime Receiver]: 9.3p
+
+[01/Sep/2021 17:12] [Pangolin Prime Handle]: 8p -  [Mag Prime Systems]: 24.4p -  [Panthera Prime]: 4.2p
+
+[01/Sep/2021 17:14] [Boar Prime Receiver]: 9.3p -  [Braton Prime Barrel]: 3.6p -  [Orthos Prime]: 3.1p -  [Nova Prime]: 9.4p
+
+[01/Sep/2021 17:17] [Karyst Prime]: 4.3p -  [Boar Prime Receiver]: 9.3p -  [Mag Prime Systems]: 24.4p -  [Pangolin Prime Handle]: 8p
+
+[01/Sep/2021 17:20] [Boar Prime Receiver]: 9.3p -  [Panthera Prime]: 4.2p -  [Dethcube Prime Systems]: 2.4p -  [Boar Prime Receiver]: 9.3p
+
+[01/Sep/2021 17:23] [Pandero Prime Barrel]: 7.9p -  [Mag Prime Systems]: 24.4p
+
+[01/Sep/2021 17:27] [Stradavar Prime Receiver]: 4.8p -  [Boar Prime Receiver]: 9.3p
+
+[01/Sep/2021 17:29] [Ivara Prime Systems]: 3.5p -  [Soma Prime Stock]: 18.2p
+
+[01/Sep/2021 22:26] [Ivara Prime Systems]: 3.5p -  [Trinity Prime Chassis]: 9.2p -  [Tigris Prime Barrel]: 5.6p
+
+[01/Sep/2021 22:28] [Saryn Prime]: 52.4p -  [Saryn Prime]: 52.4p -  [Kavasa Prime Kubrow Collar]: 5.1p -  [Trinity Prime Chassis]: 9.2p
+
+[01/Sep/2021 22:32] [Paris Prime]: 2.3p -  [Lex Prime]: 1.9p -  [Paris Prime]: 2.3p -  [Kavasa Prime Kubrow Collar]: 5.1p
+
+[01/Sep/2021 22:35] [Trinity Prime Chassis]: 9.2p -  [Paris Prime]: 2.3p -  [Paris Prime]: 2.3p -  [Paris Prime]: 2.3p
+
+[01/Sep/2021 22:38] [Lex Prime]: 1.9p -  [Paris Prime]: 2.3p -  [Lex Prime]: 1.9p
+
+[01/Sep/2021 22:41] [Trinity Prime Chassis]: 9.2p -  [Lex Prime]: 1.9p -  [Paris Prime]: 2.3p -  [Kavasa Prime Kubrow Collar]: 5.1p
+
+[02/Sep/2021 23:19] [Ash Prime]: 37.4p -  [Limbo Prime Systems]: 3.9p -  [Wyrm Prime Cerebrum]: 29.5p
+
+[02/Sep/2021 23:22] [Volt Prime]: 31p -  [Gram Prime Blade]: 4.1p -  [Bo Prime]: 13.8p -  [Lex Prime]: 1.9p
+
+[02/Sep/2021 23:25] [Tenora Prime Barrel]: 8.9p -  [Volt Prime]: 31p -  [Fang Prime Blade]: 3.3p
+
+[02/Sep/2021 23:28] [Volt Prime]: 31p -  [Braton Prime Barrel]: 3.7p -  [Loki Prime Chassis]: 27.1p -  [Burston Prime Barrel]: 2.8p
+
+[02/Sep/2021 23:31] [Wyrm Prime Cerebrum]: 29.5p -  [Limbo Prime]: 5.5p -  [Volt Prime]: 31p
+
+[02/Sep/2021 23:34] [Volt Prime]: 31p -  [Gram Prime Blade]: 4.1p -  [Bo Prime]: 13.8p -  [Dethcube Prime Carapace]: 2.6p
+
+[02/Sep/2021 23:36] [Wyrm Prime Cerebrum]: 29.5p -  [Tekko Prime Gauntlet]: 3.6p -  [Bo Prime]: 13.8p
+
+[02/Sep/2021 23:39] [Bo Prime]: 13.8p -  [Braton Prime Barrel]: 3.7p -  [Bo Prime]: 13.8p -  [Tekko Prime Gauntlet]: 3.6p
+
+[02/Sep/2021 23:42] [Volt Prime]: 31p -  [Dethcube Prime Systems]: 2.5p -  [Wyrm Prime Cerebrum]: 29.5p
+
+[02/Sep/2021 23:48] [Odonata Prime]: 8.8p -  [Corinth Prime]: 2.3p -  [Pangolin Prime Handle]: 8p -  [Karyst Prime]: 4.3p
+
+[02/Sep/2021 23:53] [Odonata Prime]: 8.8p -  [Odonata Prime Systems]: 8.4p -  [Burston Prime Receiver]: 2.1p -  [Fang Prime Handle]: 6.4p
+
+[02/Sep/2021 23:56] [Nekros Prime Chassis]: 9p -  [Bo Prime Ornament]: 87.3p
+
+[03/Sep/2021 00:32] [Odonata Prime Wings]: 25.5p -  [Odonata Prime Systems]: 8.4p -  [Fang Prime]: 2.1p -  [Titania Prime Chassis]: 3.9p
+
+[03/Sep/2021 00:35] [Lex Prime Barrel]: 3.1p -  [Paris Prime]: 2.6p -  [Volt Prime Chassis]: 13.8p -  [Loki Prime Neuroptics]: 17.1p
+
+[03/Sep/2021 00:38] [Loki Prime Neuroptics]: 17.1p -  [Volt Prime Chassis]: 13.8p -  [Braton Prime Stock]: 2.3p
+
+[03/Sep/2021 00:41] [Lex Prime Barrel]: 3.1p -  [Paris Prime Upper Limb]: 2.7p -  [Volt Prime Chassis]: 13.8p
+
+[03/Sep/2021 00:44] [Loki Prime Neuroptics]: 17.1p -  [Loki Prime Neuroptics]: 17.1p -  [Braton Prime Stock]: 2.3p
+
+[03/Sep/2021 00:46] [Burston Prime]: 2.1p -  [Baza Prime Receiver]: 3.7p -  [Volt Prime Chassis]: 13.8p -  [Wyrm Prime Systems]: 67.7p
+
+[03/Sep/2021 00:49] [Odonata Prime Systems]: 8.4p -  [Braton Prime Stock]: 2.3p
+
+[03/Sep/2021 00:52] [Nezha Prime]: 2.8p -  [Lex Prime Barrel]: 3.1p -  [Odonata Prime Systems]: 8.4p -  [Odonata Prime Systems]: 8.4p
+
+[03/Sep/2021 00:55] [Odonata Prime Systems]: 8.4p -  [Loki Prime Neuroptics]: 17.1p -  [Braton Prime Stock]: 2.3p
+
+[03/Sep/2021 00:57] [Baza Prime Receiver]: 3.7p -  [Burston Prime]: 2.1p -  [Volt Prime Chassis]: 13.8p -  [Volt Prime Chassis]: 13.8p
+
+[03/Sep/2021 01:00] [Volt Prime Chassis]: 13.8p -  [Wyrm Prime Systems]: 67.7p -  [Fang Prime]: 2.1p -  [Orthos Prime Handle]: 2.3p
+
+[03/Sep/2021 01:03] [Corinth Prime Stock]: 8.2p -  [Atlas Prime Systems]: 4p -  [Volt Prime Chassis]: 13.8p -  [Odonata Prime Systems]: 8.4p
+
+[03/Sep/2021 01:05] [Loki Prime Neuroptics]: 17.1p -  [Volt Prime Chassis]: 13.8p -  [Paris Prime Upper Limb]: 2.7p -  [Tekko Prime Gauntlet]: 3.6p
+
+[03/Sep/2021 01:08] [Nezha Prime]: 2.8p -  [Nezha Prime]: 2.8p -  [Wyrm Prime Systems]: 67.7p -  [Loki Prime Neuroptics]: 17.1p
+
+[03/Sep/2021 06:33] [Atlas Prime]: 2.8p -  [Pyrana Prime Barrel]: 5.1p -  [Guandao Prime]: 3.3p -  [Burston Prime Stock]: 2.7p
+
+[03/Sep/2021 06:40] [Ivara Prime Chassis]: 15.4p -  [Paris Prime Grip]: 3.1p -  [Burston Prime Receiver]: 2.1p
+
+[03/Sep/2021 06:45] [Bronco Prime]: 2.5p -  [Paris Prime Grip]: 3.1p -  [Karyst Prime Blade]: 8.3p -  [Corinth Prime]: 2.3p
+
+[03/Sep/2021 06:47] [Akjagara Prime]: 3p -  [Bronco Prime Receiver]: 3.1p -  [Karyst Prime Blade]: 8.3p -  [Paris Prime Grip]: 3.1p
+
+[03/Sep/2021 06:50] [Stradavar Prime Barrel]: 3.1p -  [Gara Prime Chassis]: 5.7p -  [Zakti Prime Receiver]: 2.8p
+
+[03/Sep/2021 06:52] [Equinox Prime Chassis]: 4.1p -  [Guandao Prime Handle]: 9p -  [Gara Prime Chassis]: 5.7p -  [Pandero Prime]: 3.2p
+
+[03/Sep/2021 06:55] [Stradavar Prime Barrel]: 3.1p -  [Odonata Prime Systems]: 8.4p -  [Atlas Prime]: 2.8p -  [Braton Prime]: 2.6p
+
+[03/Sep/2021 06:57] [Destreza Prime]: 4p -  [Bronco Prime]: 2.5p -  [Paris Prime Grip]: 3.1p -  [Silva & Aegis Prime Hilt]: 5.6p
+
+[03/Sep/2021 07:00] [Equinox Prime Chassis]: 4.1p -  [Spira Prime]: 4.3p -  [Paris Prime Grip]: 3.1p -  [Ivara Prime Systems]: 3.6p
+
+[03/Sep/2021 07:02] [Bronco Prime]: 2.5p -  [Guandao Prime]: 3.3p -  [Atlas Prime]: 2.8p
+
+[03/Sep/2021 07:05] [Bronco Prime]: 2.5p -  [Paris Prime Grip]: 3.1p
+
+[03/Sep/2021 07:07] [Ivara Prime]: 3.3p -  [Akjagara Prime Link]: 4.4p -  [Paris Prime Grip]: 3.1p -  [Aksomati Prime]: 2p
+
+[03/Sep/2021 07:10] [Stradavar Prime Barrel]: 3.1p -  [Bronco Prime]: 2.5p -  [Akbolto Prime]: 3.8p
+
+[03/Sep/2021 07:13] [Atlas Prime Systems]: 4p -  [Pandero Prime]: 3.2p -  [Aksomati Prime Receiver]: 3.4p -  [Karyst Prime Handle]: 2.7p
+
+[03/Sep/2021 07:15] [Bronco Prime]: 2.5p -  [Dethcube Prime]: 10.7p -  [Gara Prime Chassis]: 5.7p -  [Baza Prime]: 7.8p
+
+[03/Sep/2021 07:18] [Atlas Prime Systems]: 4p -  [Atlas Prime]: 2.8p -  [Atlas Prime]: 2.8p -  [Ivara Prime]: 3.3p
+
+[03/Sep/2021 07:21] [Bronco Prime]: 2.5p -  [Bronco Prime]: 2.5p -  [Aksomati Prime Receiver]: 3.4p -  [Guandao Prime]: 3.3p
+
+[03/Sep/2021 07:23] [Bronco Prime]: 2.5p -  [Paris Prime Grip]: 3.1p -  [Paris Prime Grip]: 3.1p -  [Gara Prime Chassis]: 5.7p
+
+[03/Sep/2021 07:26] [Stradavar Prime Barrel]: 3.1p -  [Gara Prime Chassis]: 5.7p -  [Stradavar Prime Barrel]: 3.1p
+
+[03/Sep/2021 07:32] [Aksomati Prime Receiver]: 3.4p
+
+[03/Sep/2021 07:35] [Zhuge Prime Grip]: 4.7p -  [Paris Prime Grip]: 3.1p -  [Gara Prime Chassis]: 5.7p -  [Astilla Prime Barrel]: 8.9p
+
+[03/Sep/2021 07:38] [Akjagara Prime Link]: 4.4p -  [Panthera Prime Barrel]: 8.9p -  [Karyst Prime Blade]: 8.3p -  [Baza Prime]: 7.8p
+
+[03/Sep/2021 07:40] [Stradavar Prime Barrel]: 3.1p -  [Aksomati Prime Receiver]: 3.4p -  [Burston Prime Receiver]: 2.1p
+
+[03/Sep/2021 17:15] [Bronco Prime]: 2.4p -  [Vauban Prime Neuroptics]: 52.7p -  [Vauban Prime Neuroptics]: 52.7p
+
+[03/Sep/2021 17:18] [Bronco Prime]: 2.4p -  [Hikou Prime]: 3.8p -  [Fang Prime Handle]: 6.5p -  [Vauban Prime Neuroptics]: 52.7p
+
+[03/Sep/2021 17:21] [Fang Prime Handle]: 6.5p -  [Fang Prime Handle]: 6.5p -  [Fang Prime Handle]: 6.5p -  [Vauban Prime Neuroptics]: 52.7p
+
+[03/Sep/2021 17:24] [Hikou Prime]: 3.8p -  [Bronco Prime]: 2.4p -  [Vauban Prime Neuroptics]: 52.7p
+
+[03/Sep/2021 17:27] [Vauban Prime Neuroptics]: 52.7p -  [Fang Prime Handle]: 6.5p -  [Ash Prime Neuroptics]: 9.1p
+
+[03/Sep/2021 17:34] [Ash Prime Neuroptics]: 9.1p -  [Fang Prime Handle]: 6.5p -  [Hikou Prime]: 3.8p
+
+[03/Sep/2021 17:37] [Ash Prime Neuroptics]: 9.1p
+
+[03/Sep/2021 17:58] [Glaive Prime Blade]: 19p -  [Frost Prime Neuroptics]: 5.8p -  [Ember Prime]: 30p
+
+[03/Sep/2021 18:00] [Latron Prime Barrel]: 7.7p -  [Glaive Prime Blade]: 19p -  [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 18:03] [Sicarus Prime]: 4.7p -  [Sicarus Prime]: 4.7p -  [Ember Prime]: 30p -  [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 18:06] [Glaive Prime Blade]: 19p -  [Sicarus Prime]: 4.7p -  [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 18:09] [Glaive Prime Blade]: 19p -  [Latron Prime Barrel]: 7.7p -  [Ember Prime]: 30p
+
+[03/Sep/2021 18:11] [Ember Prime]: 30p -  [Latron Prime Barrel]: 7.7p -  [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 18:14] [Frost Prime Neuroptics]: 5.8p -  [Glaive Prime Blade]: 19p -  [Frost Prime Neuroptics]: 5.8p -  [Sicarus Prime]: 4.7p
+
+[03/Sep/2021 18:17] [Glaive Prime Blade]: 19p -  [Ember Prime]: 30p -  [Latron Prime Barrel]: 7.7p -  [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 18:20] [Latron Prime Barrel]: 7.7p -  [Sicarus Prime]: 4.7p -  [Ember Prime]: 30p
+
+[03/Sep/2021 18:23] [Glaive Prime Blade]: 19p -  [Ember Prime]: 30p -  [Glaive Prime Blade]: 19p -  [Sicarus Prime]: 4.7p
+
+[03/Sep/2021 18:25] [Glaive Prime Blade]: 19p -  [Ember Prime]: 30p -  [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 18:28] [Glaive Prime Blade]: 19p -  [Latron Prime Barrel]: 7.7p -  [Sicarus Prime]: 4.7p
+
+[03/Sep/2021 18:31] [Glaive Prime Blade]: 19p -  [Ember Prime]: 30p -  [Latron Prime Barrel]: 7.7p -  [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 18:34] [Latron Prime Barrel]: 7.7p
+
+[03/Sep/2021 19:46] [Vauban Prime]: 32.4p -  [Akstiletto Prime Barrel]: 17.1p -  [Titania Prime Chassis]: 3.8p -  [Paris Prime]: 2.5p
+
+[03/Sep/2021 19:49] [Gram Prime Blade]: 4.1p -  [Vectis Prime Receiver]: 67.8p -  [Braton Prime Barrel]: 3.8p
+
+[03/Sep/2021 19:52] [Vauban Prime]: 32.4p -  [Carrier Prime Cerebrum]: 41.8p -  [Burston Prime]: 2.2p -  [Nezha Prime]: 2.8p
+
+[03/Sep/2021 19:55] [Vauban Prime]: 32.4p -  [Vectis Prime Receiver]: 67.8p
+
+[03/Sep/2021 19:58] [Vauban Prime]: 32.4p -  [Aksomati Prime Barrel]: 4.9p
+
+[03/Sep/2021 20:01] [Burston Prime]: 2.2p -  [Gram Prime Blade]: 4.1p -  [Braton Prime Barrel]: 3.8p -  [Vauban Prime]: 32.4p
+
+[03/Sep/2021 20:05] [Carrier Prime Cerebrum]: 41.8p -  [Vectis Prime Receiver]: 67.8p -  [Aksomati Prime Barrel]: 4.9p -  [Paris Prime]: 2.5p
+
+[03/Sep/2021 20:07] [Baza Prime Receiver]: 3.8p -  [Akstiletto Prime Barrel]: 17.1p -  [Vauban Prime]: 32.4p
+
+[03/Sep/2021 20:10] [Braton Prime Barrel]: 3.8p -  [Braton Prime Barrel]: 3.8p -  [Paris Prime]: 2.5p
+
+[03/Sep/2021 20:13] [Burston Prime]: 2.2p -  [Carrier Prime Cerebrum]: 41.8p -  [Braton Prime Barrel]: 3.8p
+
+[03/Sep/2021 20:16] [Aksomati Prime Barrel]: 4.9p
+
+[03/Sep/2021 20:18] [Ballistica Prime Upper Limb]: 7.1p -  [Carrier Prime Cerebrum]: 41.8p -  [Braton Prime Barrel]: 3.8p
+
+[03/Sep/2021 20:21] [Vauban Prime]: 32.4p -  [Akstiletto Prime Barrel]: 17.1p -  [Paris Prime Upper Limb]: 2.6p -  [Ivara Prime Neuroptics]: 3.5p
+
+[03/Sep/2021 20:23] [Baza Prime Receiver]: 3.8p -  [Ballistica Prime Upper Limb]: 7.1p -  [Akstiletto Prime Barrel]: 17.1p
+
+[03/Sep/2021 20:26] [Vauban Prime]: 32.4p -  [Vauban Prime]: 32.4p -  [Octavia Prime Systems]: 5.1p
+
+[03/Sep/2021 20:29] [Lex Prime Barrel]: 3p -  [Vauban Prime]: 32.4p -  [Braton Prime Barrel]: 3.8p
+
+[03/Sep/2021 20:32] [Vauban Prime]: 32.4p -  [Braton Prime Barrel]: 3.8p -  [Titania Prime Chassis]: 3.8p
+
+[03/Sep/2021 20:35] [Baza Prime Receiver]: 3.8p -  [Vauban Prime]: 32.4p -  [Braton Prime Barrel]: 3.8p
+
+[03/Sep/2021 20:39] [Titania Prime Neuroptics]: 2.7p -  [Volnus Prime]: 4.7p
+
+[03/Sep/2021 22:25] [Mag Prime]: 88.4p -  [Lex Prime Receiver]: 9p -  [Soma Prime Barrel]: 10p
+
+[03/Sep/2021 22:28] [Lex Prime Receiver]: 9p -  [Boar Prime Receiver]: 9.6p -  [Dakra Prime]: 9.9p -  [Dakra Prime Handle]: 12.8p
+
+[03/Sep/2021 22:31] [Soma Prime]: 6.1p -  [Dakra Prime]: 9.9p -  [Mag Prime]: 88.4p -  [Mag Prime]: 88.4p
+
+[03/Sep/2021 22:34] [Boar Prime Receiver]: 9.6p -  [Dakra Prime]: 9.9p -  [Dakra Prime]: 9.9p -  [Boar Prime Barrel]: 17.5p
+
+[03/Sep/2021 22:37] [Boar Prime Receiver]: 9.6p -  [Dakra Prime]: 9.9p -  [Soma Prime]: 6.1p -  [Boar Prime Barrel]: 17.5p
+
+[03/Sep/2021 22:39] [Dakra Prime]: 9.9p -  [Soma Prime]: 6.1p -  [Lex Prime Receiver]: 9p -  [Boar Prime Barrel]: 17.5p
+
+[03/Sep/2021 22:42] [Lex Prime Receiver]: 9p -  [Lex Prime Receiver]: 9p -  [Nova Prime Neuroptics]: 14.3p
+
+[03/Sep/2021 22:45] [Lex Prime Receiver]: 9p -  [Dakra Prime]: 9.9p -  [Boar Prime Barrel]: 17.5p
+
+[03/Sep/2021 22:47] [Soma Prime]: 6.1p -  [Lex Prime Receiver]: 9p -  [Dakra Prime]: 9.9p -  [Mag Prime]: 88.4p
+
+[03/Sep/2021 22:50] [Dakra Prime]: 9.9p -  [Dakra Prime]: 9.9p -  [Lex Prime Receiver]: 9p -  [Lex Prime Receiver]: 9p
+
+[03/Sep/2021 22:53] [Soma Prime]: 6.1p -  [Dakra Prime]: 9.9p
+
+[03/Sep/2021 23:36] [Volt Prime Chassis]: 13.8p -  [Lex Prime Receiver]: 9p -  [Volt Prime Chassis]: 13.8p
+
+[03/Sep/2021 23:38] [Odonata Prime]: 8.8p -  [Odonata Prime]: 8.8p -  [Volt Prime Chassis]: 13.8p
+
+[03/Sep/2021 23:41] [Volt Prime Chassis]: 13.8p -  [Odonata Prime Systems]: 8.3p -  [Volt Prime Neuroptics]: 87.1p
+
+[03/Sep/2021 23:43] [Volt Prime Chassis]: 13.8p -  [Volt Prime Chassis]: 13.8p -  [Volt Prime Chassis]: 13.8p
+
+[03/Sep/2021 23:46] [Odonata Prime Systems]: 8.3p -  [Volt Prime Neuroptics]: 87.1p -  [Lex Prime Receiver]: 9p -  [Odonata Prime]: 8.8p
+
+[03/Sep/2021 23:49] [Lex Prime Receiver]: 9p -  [Volt Prime Neuroptics]: 87.1p -  [Volt Prime Neuroptics]: 87.1p -  [Odonata Prime]: 8.8p
+
+[03/Sep/2021 23:52] [Volt Prime Chassis]: 13.8p -  [Volt Prime Chassis]: 13.8p -  [Volt Prime Neuroptics]: 87.1p
+
+[04/Sep/2021 21:32] [Burston Prime]: 2p -  [Volt Prime Chassis]: 13.8p -  [Vasto Prime Receiver]: 10.7p
+
+[04/Sep/2021 21:35] [Paris Prime]: 2.4p -  [Burston Prime]: 2p -  [Octavia Prime Systems]: 4.7p
+
+[04/Sep/2021 21:42] [Nezha Prime]: 2.7p -  [Nikana Prime Blade]: 31.4p -  [Paris Prime]: 2.4p
+
+[04/Sep/2021 21:47] [Tekko Prime Gauntlet]: 3.7p -  [Volt Prime Chassis]: 13.8p -  [Tipedo Prime]: 3.1p -  [Vasto Prime Receiver]: 10.7p
+
+[04/Sep/2021 21:51] [Volt Prime Chassis]: 13.8p -  [Lex Prime Barrel]: 2.9p -  [Paris Prime]: 2.4p -  [Paris Prime]: 2.4p
+
+[04/Sep/2021 21:54] [Braton Prime Barrel]: 3.7p -  [Paris Prime Upper Limb]: 2.5p -  [Vasto Prime Receiver]: 10.7p
+
+[04/Sep/2021 21:58] [Paris Prime]: 2.4p -  [Lex Prime Barrel]: 2.9p -  [Vasto Prime Receiver]: 10.7p -  [Paris Prime]: 2.4p
+
+[04/Sep/2021 22:02] [Burston Prime]: 2p -  [Nikana Prime Blade]: 31.4p -  [Braton Prime Stock]: 2.6p -  [Volt Prime Chassis]: 13.8p
+
+[04/Sep/2021 22:06] [Nyx Prime Neuroptics]: 17.6p -  [Vasto Prime Receiver]: 10.7p -  [Octavia Prime Systems]: 4.7p
+
+[04/Sep/2021 22:40] [Ash Prime Chassis]: 21p -  [Braton Prime Barrel]: 3.7p -  [Paris Prime Upper Limb]: 2.5p
+
+[04/Sep/2021 22:44] [Tekko Prime Gauntlet]: 3.7p -  [Nezha Prime]: 2.7p -  [Paris Prime]: 2.4p -  [Ash Prime Chassis]: 21p
+
+[04/Sep/2021 22:47] [Paris Prime]: 2.4p -  [Ash Prime Chassis]: 21p -  [Corinth Prime]: 2p -  [Atlas Prime Chassis]: 4.4p
+
+[04/Sep/2021 22:49] [Chroma Prime]: 5.2p -  [Paris Prime]: 2.4p -  [Vasto Prime Receiver]: 10.7p
+
+[04/Sep/2021 22:52] [Ash Prime Chassis]: 21p -  [Paris Prime]: 2.4p -  [Carrier Prime]: 10.1p -  [Baza Prime Receiver]: 3.2p
+
+[04/Sep/2021 22:55] [Nezha Prime]: 2.7p -  [Ash Prime Chassis]: 21p -  [Volt Prime Chassis]: 13.8p
+
+[04/Sep/2021 23:03] [Panthera Prime Stock]: 3.4p -  [Nezha Prime]: 2.7p -  [Ash Prime Chassis]: 21p -  [Ash Prime Chassis]: 21p
+
+[04/Sep/2021 23:03] [Panthera Prime Stock]: 3.4p -  [Nezha Prime]: 2.7p -  [Ash Prime Chassis]: 21p -  [Ash Prime Chassis]: 21p
+
+[04/Sep/2021 23:06] [Ash Prime Chassis]: 21p -  [Corinth Prime]: 2p -  [Kronen Prime]: 4.5p
+
+[04/Sep/2021 23:31] [Dual Kamas Prime]: 7p -  [Dual Kamas Prime]: 7p -  [Dual Kamas Prime]: 7p -  [Vauban Prime Chassis]: 25.2p
+
+[04/Sep/2021 23:34] [Vauban Prime Chassis]: 25.2p -  [Dual Kamas Prime]: 7p -  [Odonata Prime Systems]: 8.1p
+
+[04/Sep/2021 23:37] [Odonata Prime Systems]: 8.1p -  [Odonata Prime Systems]: 8.1p -  [Volt Prime Neuroptics]: 86.4p
+
+[04/Sep/2021 23:41] [Dual Kamas Prime]: 7p -  [Vauban Prime Chassis]: 25.2p -  [Volt Prime Neuroptics]: 86.4p -  [Odonata Prime Systems]: 8.1p
+
+[04/Sep/2021 23:46] [Odonata Prime Systems]: 8.1p -  [Volt Prime Neuroptics]: 86.4p -  [Odonata Prime Systems]: 8.1p
+
+[04/Sep/2021 23:48] [Vauban Prime Chassis]: 25.2p -  [Volt Prime Neuroptics]: 86.4p -  [Dual Kamas Prime]: 7p
+
+[04/Sep/2021 23:51] [Volt Prime Neuroptics]: 86.4p -  [Vauban Prime Chassis]: 25.2p -  [Dual Kamas Prime]: 7p -  [Odonata Prime Systems]: 8.1p
+
+[04/Sep/2021 23:54] [Vauban Prime Chassis]: 25.2p -  [Volt Prime Neuroptics]: 86.4p -  [Carrier Prime Systems]: 8.8p
+
+[04/Sep/2021 23:57] [Odonata Prime Systems]: 8.1p -  [Dual Kamas Prime]: 7p -  [Carrier Prime Systems]: 8.8p -  [Vauban Prime Chassis]: 25.2p
+
+[04/Sep/2021 23:59] [Dual Kamas Prime]: 7p -  [Dual Kamas Prime]: 7p -  [Carrier Prime Systems]: 8.8p
+
+[05/Sep/2021 00:02] [Volt Prime Neuroptics]: 86.4p -  [Volt Prime Neuroptics]: 86.4p -  [Volt Prime Neuroptics]: 86.4p -  [Vauban Prime Chassis]: 25.2p
+
+[05/Sep/2021 00:05] [Vauban Prime Chassis]: 25.2p -  [Dual Kamas Prime]: 7p -  [Carrier Prime Systems]: 8.8p -  [Odonata Prime Systems]: 8.1p
+
+[05/Sep/2021 00:08] [Odonata Prime Systems]: 8.1p -  [Volt Prime Neuroptics]: 86.4p -  [Carrier Prime Systems]: 8.8p
+
+[05/Sep/2021 00:10] [Carrier Prime Systems]: 8.8p -  [Dual Kamas Prime]: 7p -  [Volt Prime Neuroptics]: 86.4p
+
+[05/Sep/2021 00:13] [Odonata Prime Systems]: 8.1p -  [Vauban Prime Chassis]: 25.2p -  [Odonata Prime Systems]: 8.1p
+
+[05/Sep/2021 00:17] [Carrier Prime Systems]: 8.8p -  [Vauban Prime Chassis]: 25.2p
+
+[05/Sep/2021 00:20] [Vauban Prime Chassis]: 25.2p -  [Carrier Prime Systems]: 8.8p -  [Dual Kamas Prime]: 7p
+
+[05/Sep/2021 00:23] [Dual Kamas Prime]: 7p -  [Odonata Prime Systems]: 8.1p -  [Carrier Prime Systems]: 8.8p
+
+[05/Sep/2021 00:26] [Odonata Prime Systems]: 8.1p -  [Dual Kamas Prime]: 7p -  [Carrier Prime Systems]: 8.8p
+
+[05/Sep/2021 00:29] [Carrier Prime Systems]: 8.8p -  [Volt Prime Neuroptics]: 86.4p -  [Dual Kamas Prime]: 7p -  [Carrier Prime Systems]: 8.8p
+
+[05/Sep/2021 00:32] [Volt Prime Neuroptics]: 86.4p -  [Dual Kamas Prime]: 7p -  [Carrier Prime Systems]: 8.8p
+
+[05/Sep/2021 00:36] [Volt Prime Neuroptics]: 86.4p -  [Volt Prime Neuroptics]: 86.4p -  [Volt Prime Neuroptics]: 86.4p -  [Dual Kamas Prime]: 7p
+
+[05/Sep/2021 00:38] [Vauban Prime Chassis]: 25.2p -  [Odonata Prime Systems]: 8.1p -  [Dual Kamas Prime]: 7p
+
+[05/Sep/2021 00:41] [Carrier Prime Systems]: 8.8p -  [Carrier Prime Systems]: 8.8p -  [Dual Kamas Prime]: 7p -  [Vauban Prime Chassis]: 25.2p
+
+[05/Sep/2021 00:44] [Volt Prime Neuroptics]: 86.4p -  [Carrier Prime Systems]: 8.8p -  [Odonata Prime Systems]: 8.1p -  [Dual Kamas Prime]: 7p
+
+[05/Sep/2021 00:48] [Odonata Prime Systems]: 8.1p -  [Carrier Prime Systems]: 8.8p -  [Dual Kamas Prime]: 7p
+
+[05/Sep/2021 02:31] [Wukong Prime Neuroptics]: 4.9p -  [Soma Prime Receiver]: 16.9p
+
+[05/Sep/2021 02:33] [Mag Prime Neuroptics]: 29p -  [Braton Prime Stock]: 2.6p -  [Boar Prime]: 13.3p -  [Braton Prime Stock]: 2.6p
+
+[05/Sep/2021 02:36] [Braton Prime Stock]: 2.6p -  [Mag Prime Neuroptics]: 29p -  [Braton Prime Stock]: 2.6p -  [Dakra Prime Handle]: 12.8p
+
+[05/Sep/2021 02:39] [Mag Prime Neuroptics]: 29p -  [Boar Prime]: 13.3p -  [Dethcube Prime Carapace]: 2.5p
+
+[05/Sep/2021 02:42] [Boar Prime]: 13.3p -  [Braton Prime Stock]: 2.6p -  [Mag Prime Neuroptics]: 29p
+
+[05/Sep/2021 02:44] [Boar Prime]: 13.3p -  [Astilla Prime]: 4.9p -  [Dakra Prime Handle]: 12.8p -  [Nezha Prime Systems]: 3.9p
+
+[05/Sep/2021 02:47] [Bronco Prime Receiver]: 3.1p -  [Boar Prime]: 13.3p -  [Atlas Prime Systems]: 3.8p -  [Soma Prime Receiver]: 16.9p
+
+[05/Sep/2021 02:49] [Soma Prime Receiver]: 16.9p -  [Ivara Prime Neuroptics]: 3.4p -  [Ivara Prime Neuroptics]: 3.4p
+
+[05/Sep/2021 02:51] [Dakra Prime Handle]: 12.8p -  [Braton Prime Stock]: 2.6p -  [Dakra Prime Handle]: 12.8p
+
+[05/Sep/2021 02:54] [Boar Prime]: 13.3p -  [Aksomati Prime Receiver]: 3.6p -  [Dakra Prime Handle]: 12.8p -  [Braton Prime Stock]: 2.6p
+
+[05/Sep/2021 02:57] [Nezha Prime Systems]: 3.9p -  [Dakra Prime Handle]: 12.8p -  [Akbronco Prime Link]: 3.3p -  [Soma Prime Receiver]: 16.9p
+
+[05/Sep/2021 03:00] [Boar Prime]: 13.3p -  [Braton Prime Stock]: 2.6p -  [Zakti Prime Barrel]: 3.8p
+
+[05/Sep/2021 03:03] [Baza Prime Stock]: 15.4p -  [Boar Prime]: 13.3p -  [Akbronco Prime]: 2.4p -  [Boar Prime]: 13.3p
+
+[05/Sep/2021 03:05] [Mag Prime Neuroptics]: 29p -  [Guandao Prime Blade]: 6.1p -  [Boar Prime]: 13.3p -  [Guandao Prime Blade]: 6.1p
+
+[05/Sep/2021 03:09] [Tekko Prime]: 2.6p -  [Mag Prime Neuroptics]: 29p -  [Akbronco Prime]: 2.4p -  [Boar Prime]: 13.3p
+
+[05/Sep/2021 03:12] [Dakra Prime Handle]: 12.8p -  [Aksomati Prime Receiver]: 3.6p -  [Mag Prime Neuroptics]: 29p -  [Astilla Prime]: 4.9p
+
+[05/Sep/2021 03:32] [Galatine Prime Blade]: 5p -  [Paris Prime String]: 3.9p -  [Burston Prime Barrel]: 3p
+
+[05/Sep/2021 03:35] [Carrier Prime Systems]: 8.8p -  [Burston Prime Barrel]: 3p -  [Burston Prime Barrel]: 3p -  [Burston Prime Barrel]: 3p
+
+[05/Sep/2021 03:38] [Paris Prime String]: 3.9p -  [Burston Prime Barrel]: 3p
+
+[05/Sep/2021 03:41] [Hikou Prime]: 3.8p -  [Helios Prime Carapace]: 5.2p -  [Paris Prime String]: 3.9p
+
+[05/Sep/2021 03:44] [Tigris Prime Receiver]: 7.7p -  [Galatine Prime Blade]: 5p -  [Paris Prime String]: 3.9p
+
+[05/Sep/2021 03:47] [Paris Prime String]: 3.9p
+
+[05/Sep/2021 03:50] [Silva & Aegis Prime Hilt]: 5.1p -  [Burston Prime Barrel]: 3p
+
+[05/Sep/2021 03:53] [Helios Prime Carapace]: 5.2p -  [Vauban Prime Neuroptics]: 50.8p -  [Silva & Aegis Prime Hilt]: 5.1p
+
+[05/Sep/2021 05:30] [Volt Prime Neuroptics]: 86.4p -  [Dual Kamas Prime]: 7p -  [Braton Prime Barrel]: 3.7p
+
+[05/Sep/2021 05:33] [Ivara Prime Systems]: 3.2p -  [Karyst Prime]: 4.4p -  [Odonata Prime Systems]: 8.1p
+
+[05/Sep/2021 05:36] [Carrier Prime Systems]: 8.8p -  [Carrier Prime Systems]: 8.8p -  [Pangolin Prime Handle]: 8.3p
+
+[05/Sep/2021 05:39] [Fang Prime]: 2.3p -  [Volt Prime Neuroptics]: 86.4p -  [Odonata Prime Systems]: 8.1p
+
+[05/Sep/2021 05:42] [Volt Prime Neuroptics]: 86.4p -  [Odonata Prime Systems]: 8.1p -  [Volt Prime]: 31.9p -  [Pangolin Prime Handle]: 8.3p
+
+[05/Sep/2021 05:45] [Inaros Prime Systems]: 6.8p -  [Volt Prime Neuroptics]: 86.4p -  [Vauban Prime Chassis]: 25.2p
+
+[05/Sep/2021 05:48] [Dual Kamas Prime]: 7p -  [Dual Kamas Prime]: 7p -  [Volt Prime]: 31.9p -  [Ivara Prime Systems]: 3.2p
+
+[05/Sep/2021 06:02] [Ember Prime Chassis]: 24.5p -  [Reaper Prime Blade]: 14.7p -  [Reaper Prime Blade]: 14.7p -  [Reaper Prime]: 13.6p
+
+[05/Sep/2021 06:05] [Ember Prime Chassis]: 24.5p -  [Latron Prime Stock]: 13.3p -  [Reaper Prime Blade]: 14.7p
+
+[05/Sep/2021 06:09] [Frost Prime]: 61.8p -  [Ember Prime Chassis]: 24.5p -  [Ember Prime Chassis]: 24.5p
+
+[05/Sep/2021 06:12] [Latron Prime Stock]: 13.3p -  [Frost Prime]: 61.8p -  [Reaper Prime Blade]: 14.7p -  [Reaper Prime]: 13.6p
+
+[05/Sep/2021 06:15] [Sicarus Prime Barrel]: 12p -  [Sicarus Prime]: 4.5p -  [Frost Prime]: 61.8p -  [Sicarus Prime Barrel]: 12p
+
+[05/Sep/2021 06:17] [Latron Prime Stock]: 13.3p -  [Latron Prime Stock]: 13.3p -  [Latron Prime Stock]: 13.3p
+
+[05/Sep/2021 06:20] [Latron Prime Stock]: 13.3p -  [Latron Prime Stock]: 13.3p -  [Latron Prime Barrel]: 8.3p
+
+[05/Sep/2021 06:24] [Latron Prime Stock]: 13.3p -  [Sicarus Prime Barrel]: 12p -  [Reaper Prime Blade]: 14.7p -  [Latron Prime Barrel]: 8.3p
+
+[05/Sep/2021 06:27] [Frost Prime]: 61.8p -  [Volt Prime Systems]: 29.1p -  [Reaper Prime Blade]: 14.7p -  [Bo Prime Ornament]: 86.1p
+
+[05/Sep/2021 08:23] [Soma Prime]: 5.8p -  [Orthos Prime]: 3p -  [Dakra Prime Handle]: 12.8p -  [Soma Prime]: 5.8p
+
+[05/Sep/2021 08:25] [Dakra Prime]: 9.8p -  [Boar Prime Stock]: 46p -  [Orthos Prime Handle]: 2.8p
+
+[05/Sep/2021 08:28] [Soma Prime]: 5.8p -  [Mag Prime Chassis]: 23.1p -  [Boar Prime Stock]: 46p -  [Dakra Prime Handle]: 12.8p
+
+[05/Sep/2021 08:31] [Orthos Prime]: 3p -  [Dakra Prime Handle]: 12.8p -  [Mag Prime Chassis]: 23.1p
+
+[05/Sep/2021 08:33] [Orthos Prime]: 3p -  [Orthos Prime Handle]: 2.8p -  [Dakra Prime Handle]: 12.8p
+
+[05/Sep/2021 08:36] [Orthos Prime]: 3p -  [Orthos Prime Handle]: 2.8p -  [Orthos Prime Handle]: 2.8p -  [Orthos Prime Handle]: 2.8p
+
+[05/Sep/2021 08:38] [Mag Prime Chassis]: 23.1p -  [Mag Prime Chassis]: 23.1p -  [Orthos Prime]: 3p -  [Orthos Prime]: 3p
+
+[05/Sep/2021 08:46] [Orthos Prime Handle]: 2.8p -  [Orthos Prime Handle]: 2.8p -  [Orthos Prime]: 3p
+
+[05/Sep/2021 08:48] [Mag Prime Chassis]: 23.1p -  [Dakra Prime Handle]: 12.8p -  [Orthos Prime]: 3p
+
+[05/Sep/2021 08:50] [Orthos Prime Handle]: 2.8p -  [Dakra Prime Handle]: 12.8p -  [Dakra Prime Handle]: 12.8p
+
+[05/Sep/2021 08:53] [Boar Prime Stock]: 46p -  [Dakra Prime Handle]: 12.8p -  [Dakra Prime Handle]: 12.8p
+
+[05/Sep/2021 08:55] [Orthos Prime Handle]: 2.8p -  [Orthos Prime Handle]: 2.8p -  [Mag Prime Chassis]: 23.1p
+
+[05/Sep/2021 08:58] [Dakra Prime Handle]: 12.8p -  [Mag Prime Chassis]: 23.1p -  [Dakra Prime Handle]: 12.8p -  [Orthos Prime]: 3p
+
+[05/Sep/2021 09:01] [Orthos Prime]: 3p -  [Orthos Prime Handle]: 2.8p -  [Dakra Prime Handle]: 12.8p -  [Orthos Prime Handle]: 2.8p
+
+[06/Sep/2021 06:21] [Ninkondi Prime]: 3.8p -  [Spira Prime]: 6.1p -  [Nezha Prime]: 2.7p -  [Lex Prime Barrel]: 3p
+
+[06/Sep/2021 06:27] [Saryn Prime Neuroptics]: 20.4p -  [Tipedo Prime]: 2.9p -  [Ivara Prime Neuroptics]: 3.3p -  [Braton Prime]: 3p
+
+[06/Sep/2021 06:30] [Ninkondi Prime]: 3.8p -  [Spira Prime]: 6.1p -  [Octavia Prime Systems]: 4.9p
+
+[06/Sep/2021 06:33] [Braton Prime]: 3p -  [Paris Prime]: 2.2p
+
+[06/Sep/2021 06:36] [Saryn Prime Neuroptics]: 20.4p -  [Spira Prime Pouch]: 40.4p -  [Orthos Prime Blade]: 4.8p
+
+[06/Sep/2021 06:39] [Lex Prime Barrel]: 3p -  [Baza Prime Receiver]: 3.3p -  [Paris Prime]: 2.2p -  [Spira Prime Pouch]: 40.4p
+
+[06/Sep/2021 06:42] [Wukong Prime Chassis]: 5.6p -  [Titania Prime Chassis]: 3.7p
+
+[06/Sep/2021 06:45] [Braton Prime]: 3p -  [Burston Prime]: 2.3p -  [Ivara Prime Neuroptics]: 3.3p -  [Saryn Prime Neuroptics]: 20.4p
+
+[06/Sep/2021 06:49] [Ninkondi Prime]: 3.8p -  [Saryn Prime Neuroptics]: 20.4p -  [Spira Prime]: 6.1p -  [Paris Prime]: 2.2p
+
+[06/Sep/2021 06:52] [Spira Prime]: 6.1p -  [Nezha Prime]: 2.7p -  [Paris Prime]: 2.2p
+
+[06/Sep/2021 06:56] [Orthos Prime Handle]: 2.6p -  [Orthos Prime Blade]: 4.8p
+
+[06/Sep/2021 06:59] [Lex Prime Barrel]: 3p -  [Lex Prime Barrel]: 3p -  [Octavia Prime Systems]: 4.9p
+
+[06/Sep/2021 07:03] [Zhuge Prime]: 3.5p -  [Saryn Prime Neuroptics]: 20.4p -  [Spira Prime Pouch]: 40.4p -  [Octavia Prime Systems]: 4.9p
+
+[06/Sep/2021 07:04] [Zhuge Prime]: 3.5p -  [Saryn Prime Neuroptics]: 20.4p -  [Spira Prime Pouch]: 40.4p -  [Octavia Prime Systems]: 4.9p
+
+[06/Sep/2021 09:35] [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 29p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 09:35] [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 29p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 09:37] [Burston Prime Stock]: 2.7p -  [Paris Prime Upper Limb]: 2.2p -  [Burston Prime Stock]: 2.7p
+
+[06/Sep/2021 09:40] [Volt Prime Systems]: 29p -  [Paris Prime Upper Limb]: 2.2p
+
+[06/Sep/2021 09:42] [Burston Prime Stock]: 2.7p -  [Paris Prime Lower Limb]: 2.1p -  [Burston Prime Stock]: 2.7p -  [Paris Prime Lower Limb]: 2.1p
+
+[06/Sep/2021 09:45] [Burston Prime Stock]: 2.7p -  [Burston Prime Stock]: 2.7p -  [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p
+
+[06/Sep/2021 09:47] [Burston Prime Stock]: 2.7p -  [Burston Prime Stock]: 2.7p
+
+[06/Sep/2021 09:50] [Fragor Prime Handle]: 13.4p -  [Tigris Prime Barrel]: 5.5p -  [Vauban Prime Systems]: 79.1p
+
+[06/Sep/2021 09:53] [Bronco Prime]: 2.8p -  [Fragor Prime Handle]: 13.4p -  [Octavia Prime Neuroptics]: 3.9p -  [Bronco Prime]: 2.8p
+
+[06/Sep/2021 09:55] [Burston Prime Stock]: 2.7p -  [Vectis Prime Stock]: 35.6p -  [Corinth Prime]: 1.8p
+
+[06/Sep/2021 09:57] [Akstiletto Prime Barrel]: 18.1p -  [Vectis Prime Stock]: 35.6p -  [Karyst Prime Handle]: 2.1p -  [Ash Prime Chassis]: 20.1p
+
+[06/Sep/2021 10:01] [Ash Prime Chassis]: 20.1p -  [Corinth Prime]: 1.8p -  [Bronco Prime]: 2.8p
+
+[06/Sep/2021 10:04] [Paris Prime]: 2.2p -  [Ash Prime Chassis]: 20.1p -  [Dethcube Prime Systems]: 2.9p -  [Fragor Prime Handle]: 13.4p
+
+[06/Sep/2021 10:06] [Fragor Prime Handle]: 13.4p -  [Fang Prime]: 2.3p -  [Ash Prime Chassis]: 20.1p -  [Vasto Prime Receiver]: 11p
+
+[06/Sep/2021 10:08] [Helios Prime Cerebrum]: 43.3p -  [Paris Prime Lower Limb]: 2.1p -  [Bronco Prime]: 2.8p
+
+[06/Sep/2021 10:11] [Fragor Prime Handle]: 13.4p -  [Tekko Prime Gauntlet]: 3.8p -  [Vectis Prime Stock]: 35.6p -  [Corinth Prime]: 1.8p
+
+[06/Sep/2021 10:16] [Paris Prime]: 2.2p -  [Fragor Prime Handle]: 13.4p -  [Tekko Prime Gauntlet]: 3.8p -  [Ash Prime Chassis]: 20.1p
+
+[06/Sep/2021 10:20] [Paris Prime Upper Limb]: 2.2p -  [Burston Prime Stock]: 2.7p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 10:22] [Paris Prime Upper Limb]: 2.2p
+
+[06/Sep/2021 10:24] [Volt Prime Systems]: 29p -  [Paris Prime Upper Limb]: 2.2p -  [Burston Prime Stock]: 2.7p -  [Burston Prime Stock]: 2.7p
+
+[06/Sep/2021 10:27] [Burston Prime Stock]: 2.7p -  [Volt Prime Systems]: 29p -  [Paris Prime Lower Limb]: 2.1p
+
+[06/Sep/2021 10:29] [Burston Prime Stock]: 2.7p -  [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p
+
+[06/Sep/2021 10:31] [Paris Prime Lower Limb]: 2.1p -  [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 10:34] [Volt Prime Systems]: 29p -  [Paris Prime Upper Limb]: 2.2p -  [Volt Prime Systems]: 29p -  [Paris Prime Upper Limb]: 2.2p
+
+[06/Sep/2021 10:36] [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p -  [Burston Prime Stock]: 2.7p
+
+[06/Sep/2021 10:38] [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p
+
+[06/Sep/2021 10:41] [Volt Prime Systems]: 29p -  [Volt Prime Systems]: 29p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 10:43] [Paris Prime Upper Limb]: 2.2p -  [Volt Prime Systems]: 29p -  [Fragor Prime Handle]: 13.4p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 10:45] [Volt Prime Systems]: 29p -  [Burston Prime Stock]: 2.7p -  [Volt Prime Systems]: 29p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 10:47] [Volt Prime Systems]: 29p -  [Paris Prime Lower Limb]: 2.1p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 10:50] [Burston Prime Stock]: 2.7p -  [Fragor Prime Handle]: 13.4p -  [Volt Prime Systems]: 29p -  [Volt Prime Systems]: 29p
+
+[06/Sep/2021 10:52] [Paris Prime Upper Limb]: 2.2p -  [Burston Prime Stock]: 2.7p -  [Fragor Prime Handle]: 13.4p -  [Burston Prime Stock]: 2.7p
+
+[06/Sep/2021 10:54] [Paris Prime Upper Limb]: 2.2p -  [Burston Prime Stock]: 2.7p -  [Volt Prime Systems]: 29p -  [Burston Prime Stock]: 2.7p
+
+[06/Sep/2021 10:56] [Paris Prime Upper Limb]: 2.2p -  [Volt Prime Systems]: 29p -  [Paris Prime Upper Limb]: 2.2p -  [Paris Prime Upper Limb]: 2.2p
+
+[06/Sep/2021 11:02] [Carrier Prime Systems]: 9.1p -  [Burston Prime Barrel]: 2.9p -  [Vauban Prime Neuroptics]: 51.1p
+
+[06/Sep/2021 11:04] [Burston Prime Barrel]: 2.9p -  [Silva & Aegis Prime Hilt]: 4.8p -  [Burston Prime Barrel]: 2.9p
+
+[06/Sep/2021 11:07] [Galatine Prime Blade]: 4.8p -  [Burston Prime Barrel]: 2.9p -  [Burston Prime Barrel]: 2.9p -  [Paris Prime String]: 4p
+
+[06/Sep/2021 11:10] [Burston Prime Barrel]: 2.9p -  [Burston Prime Barrel]: 2.9p -  [Helios Prime Carapace]: 5.2p
+
+[06/Sep/2021 11:13] [Carrier Prime Systems]: 9.1p -  [Vauban Prime Neuroptics]: 51.1p -  [Paris Prime String]: 4p
+
+[06/Sep/2021 12:10] [Lex Prime Barrel]: 3p -  [Spira Prime]: 6.1p -  [Lex Prime Barrel]: 3p -  [Lex Prime Barrel]: 3p
+
+[06/Sep/2021 12:13] [Saryn Prime Neuroptics]: 20.4p -  [Lex Prime Barrel]: 3p -  [Spira Prime]: 6.1p
+
+[06/Sep/2021 12:15] [Lex Prime Barrel]: 3p -  [Lex Prime Barrel]: 3p -  [Saryn Prime Neuroptics]: 20.4p -  [Lex Prime Barrel]: 3p
+
+[06/Sep/2021 12:19] [Lex Prime Barrel]: 3p -  [Spira Prime]: 6.1p -  [Lex Prime Barrel]: 3p -  [Saryn Prime Neuroptics]: 20.4p
+
+[06/Sep/2021 12:22] [Saryn Prime Neuroptics]: 20.4p -  [Spira Prime]: 6.1p -  [Saryn Prime Neuroptics]: 20.4p -  [Lex Prime Barrel]: 3p
+
+[06/Sep/2021 12:25] [Burston Prime Stock]: 2.7p -  [Sybaris Prime Barrel]: 24.3p -  [Spira Prime]: 6.1p
+
+[06/Sep/2021 12:28] [Spira Prime Pouch]: 40.4p -  [Braton Prime Barrel]: 3.4p -  [Spira Prime]: 6.1p
+
+[06/Sep/2021 12:31] [Lex Prime Barrel]: 3p -  [Saryn Prime Neuroptics]: 20.4p -  [Lex Prime Barrel]: 3p -  [Spira Prime]: 6.1p
+
+[07/Sep/2021 11:51] [Odonata Prime Systems]: 8p -  [Odonata Prime Systems]: 8p -  [Odonata Prime]: 9.2p -  [Odonata Prime Systems]: 8p
+
+[07/Sep/2021 11:55] [Volt Prime Neuroptics]: 87.3p -  [Odonata Prime]: 9.2p -  [Volt Prime Chassis]: 13.9p -  [Volt Prime Chassis]: 13.9p
+
+[07/Sep/2021 11:57] [Lex Prime Receiver]: 8.2p
+
+[07/Sep/2021 12:00] [Lex Prime Receiver]: 8.2p -  [Lex Prime Receiver]: 8.2p -  [Volt Prime Chassis]: 13.9p -  [Odonata Prime]: 9.2p
+
+[07/Sep/2021 12:03] [Odonata Prime Systems]: 8p -  [Odonata Prime]: 9.2p -  [Lex Prime Receiver]: 8.2p -  [Odonata Prime]: 9.2p
+
+[07/Sep/2021 12:05] [Volt Prime Chassis]: 13.9p -  [Volt Prime Chassis]: 13.9p -  [Lex Prime Receiver]: 8.2p
+
+[07/Sep/2021 12:07] [Lex Prime Receiver]: 8.2p -  [Odonata Prime]: 9.2p -  [Odonata Prime]: 9.2p
+
+[07/Sep/2021 12:10] [Odonata Prime Systems]: 8p -  [Odonata Prime Systems]: 8p -  [Odonata Prime Systems]: 8p
+
+[07/Sep/2021 12:12] [Odonata Prime]: 9.2p -  [Odonata Prime]: 9.2p -  [Odonata Prime]: 9.2p
+
+[07/Sep/2021 12:16] [Nikana Prime Hilt]: 86.5p -  [Karyst Prime]: 4.3p -  [Braton Prime Stock]: 2.1p -  [Braton Prime Receiver]: 3.8p
+
+[07/Sep/2021 12:19] [Inaros Prime Chassis]: 3.6p -  [Nikana Prime]: 11.6p -  [Braton Prime Receiver]: 3.8p -  [Nezha Prime Systems]: 4.1p
+
+[07/Sep/2021 12:21] [Braton Prime Barrel]: 3.4p -  [Baza Prime Receiver]: 3.6p -  [Lex Prime Receiver]: 8.2p
+
+[07/Sep/2021 12:24] [Panthera Prime]: 4.4p -  [Braton Prime Receiver]: 3.8p -  [Saryn Prime]: 48.6p -  [Bronco Prime Receiver]: 3.2p
+
+[07/Sep/2021 12:26] [Lex Prime Receiver]: 8.2p -  [Valkyr Prime Systems]: 12.8p -  [Zhuge Prime String]: 5.8p -  [Lex Prime Receiver]: 8.2p
+
+[07/Sep/2021 12:29] [Aksomati Prime]: 1.4p -  [Nikana Prime Hilt]: 86.5p -  [Braton Prime Barrel]: 3.4p -  [Pangolin Prime Handle]: 8.5p
+
+[07/Sep/2021 12:31] [Saryn Prime]: 48.6p -  [Paris Prime]: 2.1p -  [Nikana Prime]: 11.6p
+
+[07/Sep/2021 12:36] [Braton Prime Barrel]: 3.4p -  [Volnus Prime Head]: 9.7p -  [Pangolin Prime Handle]: 8.5p -  [Nikana Prime]: 11.6p
+
+[07/Sep/2021 12:39] [Inaros Prime Chassis]: 3.6p -  [Lex Prime Receiver]: 8.2p -  [Nikana Prime Hilt]: 86.5p -  [Lex Prime Barrel]: 3.4p
+
+[07/Sep/2021 12:41] [Lex Prime Receiver]: 8.2p -  [Inaros Prime Chassis]: 3.6p -  [Volnus Prime Head]: 9.7p -  [Nikana Prime]: 11.6p
+
+[07/Sep/2021 12:44] [Panthera Prime]: 4.4p -  [Lex Prime Receiver]: 8.2p -  [Nikana Prime]: 11.6p -  [Kavasa Prime Buckle]: 15.4p
+
+[07/Sep/2021 12:46] [Lex Prime Receiver]: 8.2p -  [Lex Prime Receiver]: 8.2p -  [Astilla Prime Receiver]: 15.6p -  [Braton Prime Receiver]: 3.8p
+
+[07/Sep/2021 12:48] [Nezha Prime Systems]: 4.1p -  [Braton Prime Receiver]: 3.8p -  [Braton Prime Barrel]: 3.4p -  [Lex Prime Barrel]: 3.4p
+
+[07/Sep/2021 12:50] [Carrier Prime Systems]: 8.5p -  [Volt Prime Neuroptics]: 87.3p -  [Dual Kamas Prime]: 6.9p -  [Vauban Prime Chassis]: 24.9p
+
+[07/Sep/2021 12:53] [Carrier Prime Systems]: 8.5p -  [Volt Prime Neuroptics]: 87.3p -  [Volt Prime Neuroptics]: 87.3p -  [Carrier Prime Systems]: 8.5p
+
+[07/Sep/2021 12:53] [Carrier Prime Systems]: 8.5p -  [Volt Prime Neuroptics]: 87.3p -  [Volt Prime Neuroptics]: 87.3p -  [Carrier Prime Systems]: 8.5p
+
+[07/Sep/2021 12:55] [Odonata Prime Systems]: 8p -  [Lex Prime Receiver]: 8.2p -  [Odonata Prime Systems]: 8p
+
+[07/Sep/2021 12:57] [Carrier Prime Systems]: 8.5p -  [Odonata Prime]: 9.2p -  [Odonata Prime Systems]: 8p -  [Dual Kamas Prime]: 6.9p
+
+[07/Sep/2021 13:00] [Volt Prime Neuroptics]: 87.3p -  [Odonata Prime]: 9.2p -  [Odonata Prime Systems]: 8p -  [Volt Prime Neuroptics]: 87.3p
+
+[07/Sep/2021 13:02] [Carrier Prime Systems]: 8.5p -  [Volt Prime Neuroptics]: 87.3p -  [Volt Prime Neuroptics]: 87.3p
+
+[07/Sep/2021 13:04] [Dual Kamas Prime]: 6.9p -  [Odonata Prime]: 9.2p -  [Dual Kamas Prime]: 6.9p -  [Volt Prime Neuroptics]: 87.3p
+
+[07/Sep/2021 13:07] [Carrier Prime Systems]: 8.5p -  [Odonata Prime Systems]: 8p -  [Volt Prime Neuroptics]: 87.3p
+
+[07/Sep/2021 13:09] [Odonata Prime Systems]: 8p -  [Volt Prime Chassis]: 13.9p -  [Vauban Prime Chassis]: 24.9p -  [Carrier Prime Systems]: 8.5p
+
+[08/Sep/2021 13:31] [Fang Prime]: 2.1p -  [Paris Prime Lower Limb]: 1.9p -  [Lex Prime Barrel]: 3.5p
+
+[08/Sep/2021 13:34] [Fang Prime]: 2.1p
+
+[08/Sep/2021 13:37] [Paris Prime Lower Limb]: 1.9p -  [Paris Prime Upper Limb]: 2.3p -  [Lex Prime Barrel]: 3.5p -  [Fang Prime]: 2.1p
+
+[08/Sep/2021 13:41] [Vauban Prime Systems]: 80.9p -  [Fang Prime]: 2.1p -  [Vauban Prime Systems]: 80.9p
+
+[08/Sep/2021 13:44] [Paris Prime Upper Limb]: 2.3p -  [Fang Prime]: 2.1p -  [Vauban Prime Systems]: 80.9p
+
+[08/Sep/2021 13:51] [Braton Prime Stock]: 2.4p -  [Frost Prime Systems]: 15.1p -  [Glaive Prime Disc]: 27.9p -  [Braton Prime Receiver]: 3.8p
+
+[08/Sep/2021 13:54] [Frost Prime Systems]: 15.1p -  [Braton Prime]: 2.9p -  [Braton Prime Stock]: 2.4p -  [Sicarus Prime Receiver]: 25.5p
+
+[08/Sep/2021 13:57] [Braton Prime Stock]: 2.4p -  [Glaive Prime Disc]: 27.9p -  [Glaive Prime Disc]: 27.9p
+
+[08/Sep/2021 13:59] [Glaive Prime Disc]: 27.9p -  [Astilla Prime]: 4.7p -  [Mirage Prime Neuroptics]: 5.3p -  [Ember Prime Neuroptics]: 21p
+
+[08/Sep/2021 14:02] [Braton Prime Stock]: 2.4p -  [Glaive Prime Disc]: 27.9p -  [Latron Prime Receiver]: 11.8p -  [Ivara Prime Neuroptics]: 3.5p
+
+[08/Sep/2021 14:04] [Latron Prime Receiver]: 11.8p -  [Braton Prime Stock]: 2.4p -  [Mirage Prime Neuroptics]: 5.3p -  [Ember Prime Neuroptics]: 21p
+
+[08/Sep/2021 14:06] [Latron Prime Receiver]: 11.8p -  [Frost Prime Systems]: 15.1p
+
+[08/Sep/2021 14:10] [Glaive Prime Disc]: 27.9p -  [Ivara Prime Neuroptics]: 3.5p -  [Mirage Prime Neuroptics]: 5.3p -  [Ember Prime Neuroptics]: 21p
+
+[08/Sep/2021 14:12] [Braton Prime Stock]: 2.4p -  [Frost Prime Systems]: 15.1p -  [Reaper Prime]: 13.9p
+
+[08/Sep/2021 14:14] [Latron Prime Receiver]: 11.8p -  [Braton Prime Stock]: 2.4p -  [Paris Prime Upper Limb]: 2.3p -  [Ember Prime Neuroptics]: 21p
+
+[08/Sep/2021 23:21] [Ivara Prime]: 3.2p -  [Atlas Prime Chassis]: 4.5p -  [Octavia Prime Systems]: 5p -  [Ivara Prime]: 3.2p
+
+[08/Sep/2021 23:36] [Orthos Prime Blade]: 4.3p -  [Burston Prime Stock]: 2.6p -  [Orthos Prime Blade]: 4.3p
+
+[09/Sep/2021 00:06] [Nezha Prime]: 2.8p -  [Octavia Prime Systems]: 5p
+
+[09/Sep/2021 00:08] [Astilla Prime Stock]: 4.9p
+
+[09/Sep/2021 00:10] [Baza Prime]: 7.7p -  [Panthera Prime Stock]: 2.8p
+
+[09/Sep/2021 00:13] [Baza Prime Receiver]: 3.5p -  [Corinth Prime Receiver]: 3.4p
+
+[09/Sep/2021 00:15] [Octavia Prime Systems]: 5p
+
+[09/Sep/2021 00:21] [Atlas Prime Neuroptics]: 27.7p -  [Orthos Prime Blade]: 4.3p -  [Burston Prime Stock]: 2.6p
+
+[09/Sep/2021 00:41] [Lex Prime Barrel]: 3.5p -  [Ivara Prime]: 3.2p -  [Braton Prime]: 2.9p -  [Braton Prime]: 2.9p
+
+[09/Sep/2021 00:42] [Lex Prime Barrel]: 3.5p -  [Ivara Prime]: 3.2p -  [Braton Prime]: 2.9p -  [Braton Prime]: 2.9p
+
+[09/Sep/2021 01:17] [Akbronco Prime]: 2.5p -  [Akbronco Prime]: 2.5p -  [Octavia Prime Neuroptics]: 3.9p -  [Octavia Prime Neuroptics]: 3.9p
+
+[09/Sep/2021 01:20] [Akbronco Prime]: 2.5p -  [Mag Prime]: 91.1p -  [Octavia Prime Neuroptics]: 3.9p -  [Octavia Prime Neuroptics]: 3.9p
+
+[09/Sep/2021 01:28] [Ivara Prime Neuroptics]: 3.5p -  [Panthera Prime Barrel]: 8.5p
+
+[09/Sep/2021 01:32] [Titania Prime]: 6.5p -  [Saryn Prime]: 48.1p -  [Saryn Prime]: 48.1p
+
+[09/Sep/2021 01:39] [Vasto Prime Receiver]: 11.4p -  [Hikou Prime Stars]: 5.7p
+
+[09/Sep/2021 01:41] [Boltor Prime Stock]: 6.7p -  [Hikou Prime Stars]: 5.7p
+
+[09/Sep/2021 01:46] [Panthera Prime Stock]: 2.8p -  [Titania Prime Chassis]: 3.4p -  [Nezha Prime]: 2.8p -  [Bronco Prime Receiver]: 3.2p
+
+[09/Sep/2021 01:50] [Inaros Prime Systems]: 7.1p -  [Aksomati Prime Receiver]: 3.8p -  [Inaros Prime Systems]: 7.1p -  [Aksomati Prime Receiver]: 3.8p
+
+[09/Sep/2021 01:54] [Corinth Prime Receiver]: 3.4p -  [Tigris Prime Receiver]: 7.7p -  [Corinth Prime Receiver]: 3.4p -  [Braton Prime Barrel]: 3.5p
+
+[09/Sep/2021 02:08] [Astilla Prime Stock]: 4.9p -  [Astilla Prime]: 4.7p
+
+[09/Sep/2021 02:13] [Tenora Prime]: 3.2p -  [Guandao Prime]: 2.2p
+
+[09/Sep/2021 02:15] [Lex Prime Barrel]: 3.5p -  [Zakti Prime Barrel]: 3.8p
+
+[09/Sep/2021 02:20] [Gara Prime Systems]: 7.3p -  [Braton Prime Stock]: 2.4p
+
+[09/Sep/2021 02:26] [Panthera Prime Stock]: 2.8p -  [Titania Prime Chassis]: 3.4p -  [Nezha Prime]: 2.8p -  [Panthera Prime Stock]: 2.8p
+
+[09/Sep/2021 02:33] [Tenora Prime]: 3.2p -  [Latron Prime Receiver]: 11.8p -  [Latron Prime Receiver]: 11.8p -  [Tenora Prime]: 3.2p
+
+[09/Sep/2021 21:13] [Vasto Prime Receiver]: 11.5p -  [Paris Prime]: 2.4p -  [Paris Prime]: 2.4p -  [Ash Prime Chassis]: 21.6p
+
+[09/Sep/2021 21:19] [Vasto Prime Receiver]: 11.5p -  [Ash Prime Chassis]: 21.6p -  [Ash Prime Chassis]: 21.6p
+
+[09/Sep/2021 21:22] [Volt Prime Chassis]: 14.4p -  [Ash Prime Chassis]: 21.6p -  [Ash Prime Chassis]: 21.6p -  [Paris Prime]: 2.4p
+
+[09/Sep/2021 21:27] [Vasto Prime Receiver]: 11.5p -  [Paris Prime]: 2.4p -  [Ash Prime Chassis]: 21.6p -  [Ash Prime Chassis]: 21.6p
+
+[09/Sep/2021 21:30] [Ash Prime Chassis]: 21.6p -  [Volt Prime Chassis]: 14.4p -  [Vasto Prime Receiver]: 11.5p
+
+[12/Sep/2021 18:21] [Volt Prime]: 30.9p -  [Tekko Prime Blade]: 20.3p -  [Ivara Prime Neuroptics]: 3.8p
+
+[14/Sep/2021 07:22] [Nova Prime Neuroptics]: 16.4p -  [Mag Prime]: 91.3p -  [Dakra Prime]: 9.7p
+
+[14/Sep/2021 07:26] [Dakra Prime Handle]: 12p -  [Soma Prime Barrel]: 9.6p -  [Lex Prime Receiver]: 8.6p
+
+[14/Sep/2021 07:29] [Boar Prime Barrel]: 17.8p -  [Mag Prime]: 91.3p -  [Soma Prime]: 6p
+
+[14/Sep/2021 07:32] [Boar Prime Barrel]: 17.8p -  [Nova Prime Neuroptics]: 16.4p -  [Lex Prime Receiver]: 8.6p -  [Lex Prime Receiver]: 8.6p
+
+[14/Sep/2021 07:37] [Nova Prime Neuroptics]: 16.4p -  [Nova Prime Neuroptics]: 16.4p -  [Soma Prime Barrel]: 9.6p -  [Dakra Prime]: 9.7p
+
+[14/Sep/2021 07:41] [Boar Prime Barrel]: 17.8p -  [Boar Prime Receiver]: 8.9p -  [Dakra Prime]: 9.7p
+
+[15/Sep/2021 02:09] [Orthos Prime Handle]: 2.5p -  [Orthos Prime]: 3.1p -  [Mag Prime Chassis]: 25.5p -  [Orthos Prime]: 3.1p
+
+[15/Sep/2021 02:13] [Orthos Prime]: 3.1p
+
