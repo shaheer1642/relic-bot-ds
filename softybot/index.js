@@ -85,7 +85,11 @@ client.on('messageCreate', async message => {
                     authorize(message,args)
                     break
             }
+        return new Promise(function (resolve, reject) {
+            resolve();
+        })
     })
+
 })
 
 client.on('shardError', error => {
@@ -266,6 +270,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
         fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
         return
     }
+    return new Promise(function (resolve, reject) {
+        resolve();
+    })
 });
 
 client.on('messageReactionRemove', async (reaction, user) => {
@@ -367,6 +374,9 @@ client.on('messageReactionRemove', async (reaction, user) => {
         fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
         return
     }
+    return new Promise(function (resolve, reject) {
+        resolve();
+    })
 });
 
 client.on('guildMemberAdd', async member => {
@@ -389,9 +399,12 @@ client.on('guildMemberAdd', async member => {
         .setTimestamp()
 
     member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]}).catch(err => console.log(err));
+    return new Promise(function (resolve, reject) {
+        resolve();
+    })
 });
 
-client.login(config.token)
+client.login(config.token).catch(err => console.log(err));
 
 
 //------------Command functions---------------
