@@ -9,8 +9,8 @@ const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const relist_cd = [];
 /*----timers-----*/
-setTimeout(verify_roles, 5000);
-setTimeout(trades_update, 5000);
+//setTimeout(verify_roles, 5000);
+//setTimeout(trades_update, 5000);
 /*---------------*/
 
 //test bot "token": "ODc4MDE3NjU1MDI4NzIzODAz.YR7DqQ.a7OfA7NICFyLUU3s3oy6Z6KdbuM",
