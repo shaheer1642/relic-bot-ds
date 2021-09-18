@@ -401,7 +401,7 @@ client.on('guildMemberAdd', async member => {
     member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]}).catch(err => console.log(err));
 });
 
-client.login("ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E").catch(err => console.log(err));
+client.login(config.token).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
@@ -1273,7 +1273,7 @@ async function relist(message,args) {
         }
         offset = Number(args.pop())
     }
-    var filecontent = fs.readFileSync('../JWT_Stack/jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
+    var filecontent = fs.readFileSync('./JWT_Stack/jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
     let jwt_stack = JSON.parse(filecontent)
     var JWT = ""
     var ingame_name = ""
