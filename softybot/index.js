@@ -399,12 +399,9 @@ client.on('guildMemberAdd', async member => {
         .setTimestamp()
 
     member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]}).catch(err => console.log(err));
-    return new Promise(function (resolve, reject) {
-        resolve();
-    })
 });
 
-client.login("ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E")
+client.login("ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E").catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
