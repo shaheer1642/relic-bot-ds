@@ -404,8 +404,7 @@ client.on('guildMemberAdd', async member => {
     })
 });
 
-client.login(config.token).catch(err => console.log(err));
-
+client.login(config.token)
 
 //------------Command functions---------------
 function uptime(message,args) {
