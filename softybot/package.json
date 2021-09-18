@@ -8,5 +8,9 @@
     "fs": "^0.0.1-security",
     "request": "^2.88.2",
     "request-promise": "^4.2.6"
-  }
+  },
+  "engines": {
+    "node": "16.x",
+    "npm": "7.x"
+ }
 }
