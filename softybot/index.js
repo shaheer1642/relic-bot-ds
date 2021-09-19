@@ -1814,7 +1814,7 @@ function trades_update() {
     setTimeout(trades_update, 600000);
 }
 
-function update_wfm_items_list() {
+async function update_wfm_items_list() {
     //retrieve wfm items list
     console.log('Retrieving WFM items list')
     console.log('Establishing connection to database')
