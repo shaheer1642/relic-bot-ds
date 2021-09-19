@@ -6,11 +6,12 @@
     "discord.js": "^13.1.0",
     "fastify": "^3.21.0",
     "fs": "^0.0.1-security",
+    "pg": "^8.7.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.6"
   },
   "engines": {
     "node": "16.x",
     "npm": "7.x"
- }
+  }
 }

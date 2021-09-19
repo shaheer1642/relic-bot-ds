@@ -5,6 +5,7 @@ const axiosRetry = require('axios-retry');
 const https = require('https');
 const request = require('request');
 const fs = require('fs')
+const DB = require('pg');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const relist_cd = [];
@@ -17,12 +18,33 @@ const relist_cd = [];
 //relic bot "token": "ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E",
 
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
+const db = new DB.Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+});
+db.connect();
 //const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
 
 client.on('ready', () => {
     console.log("bot has started")
     client.user.setActivity('.help', { type: 2 })
+    db.query('SELECT * FROM softy_test2', (err, res) => {
+        if (err) throw err;
+        for (let row of res.rows) {
+          console.log(JSON.stringify(row));
+        }
+        db.end();
+      });
+      db.query('SELECT * FROM softy_test2', (err, res) => {
+          if (err) throw err;
+          for (let row of res.rows) {
+            console.log(JSON.stringify(row));
+          }
+          db.end();
+        });
 })
 
 client.on('messageCreate', async message => {
