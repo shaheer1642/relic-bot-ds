@@ -17,7 +17,7 @@ const db = new DB.Pool({
       rejectUnauthorized: false
     }
 });
-const connect = async function connection () {
+const econnect = async function connection () {
     await db.connect().then(console.log('connection established')).catch(err => {console.log(err + '\nconnection failure');return});
 }
 /*----timers-----*/
