@@ -1903,7 +1903,6 @@ async function update_wfm_items_list() {
         db.query(`UPDATE files SET wfm_items_list = '${JSON.stringify(items)}' where id=1`)
         .then(() => {
             console.log('Updating Database -> wfm_items_list success')
-            db.end()
         })
         .catch (err => {
             if (err.response)
