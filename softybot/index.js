@@ -20,13 +20,6 @@ const relist_cd = [];
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
 //connect to the postgresSQL database
 //postgres://umpcklxkzdwigj:9e3dfe91e4a4ee811ce2369f89f7c3f11238275e9c3909e268cb79d5cf15fd56@ec2-54-74-60-70.eu-west-1.compute.amazonaws.com:5432/d9lv1t75hhod22
-const db = new DB.Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false
-    }
-});
-db.connect();
 
 //const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
@@ -462,10 +455,19 @@ async function orders(message,args) {
     //let WFM_Items_List = JSON.parse(filecontent)
     let WFM_Items_List = []
     console.log('Retrieving Database -> wfm_items_list')
+    console.log('Establishing connection to database')
+    const db = new DB.Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false
+        }
+    });
+    await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
     await db.query(`SELECT info FROM wfm_items_list where id = 1`)
     .then(res => {
         WFM_Items_List = res.rows[0].info
         console.log('Retrieving Database -> wfm_items_list success')
+        db.end();
     })
     .catch (err => {
         if (err.response)
@@ -1815,6 +1817,14 @@ function trades_update() {
 function update_wfm_items_list() {
     //retrieve wfm items list
     console.log('Retrieving WFM items list')
+    console.log('Establishing connection to database')
+    const db = new DB.Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false
+        }
+    });
+    await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
     const func = axios("https://api.warframe.market/v1/items")
     .then(response => {
         console.log('Retrieving WFM items list success')
@@ -1826,6 +1836,7 @@ function update_wfm_items_list() {
         db.query(`UPDATE WFM_Items_List SET info = '${JSON.stringify(items)}' where id=1`)
         .then(() => {
             console.log('Updating Database -> wfm_items_list success')
+            db.end()
         })
         .catch (err => {
             if (err.response)
