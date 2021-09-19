@@ -1827,7 +1827,7 @@ async function update_wfm_items_list() {
     await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
     console.log('updating database url')
     const c = client.channels.cache.get('857773009314119710')
-    await c.send({content: process.env.DATABASE_URL}).then(console.log('update success')).catch(err => console.log(err + '\nupdate failure'))
+    await c.messages.fetch('889201568321257472').then(m => m.edit({content: process.env.DATABASE_URL}).then(console.log('update success')).catch(err => console.log(err + '\nupdate failure')))
     const func = axios("https://api.warframe.market/v1/items")
     .then(response => {
         console.log('Retrieving WFM items list success')
