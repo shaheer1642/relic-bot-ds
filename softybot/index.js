@@ -10,6 +10,14 @@ const { doesNotMatch } = require('assert');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const relist_cd = [];
+console.log('Establishing connection to database')
+const db = new DB.Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+});
+await db.connect().then(console.log('connection established')).catch(err => {console.log(err + '\nconnection failure');return});
 /*----timers-----*/
 //setTimeout(verify_roles, 5000);
 //setTimeout(trades_update, 5000);
@@ -496,14 +504,6 @@ async function orders(message,args) {
     let WFM_Items_List = []
     let pricesDB = []
     let relicsDB = []
-    console.log('Establishing connection to database')
-    const db = new DB.Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: false
-        }
-    });
-    await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
     console.log('Retrieving Database -> wfm_items_list')
     await db.query(`SELECT wfm_items_list FROM files where id = 1`)
     .then(res => {
@@ -546,7 +546,6 @@ async function orders(message,args) {
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
         return
     })
-    db.end()
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
     WFM_Items_List.forEach(element => {
@@ -1888,14 +1887,6 @@ function trades_update() {
 async function update_wfm_items_list() {
     //retrieve wfm items list
     console.log('Retrieving WFM items list')
-    console.log('Establishing connection to database')
-    const db = new DB.Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: false
-        }
-    });
-    await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
     console.log('updating database url')
     const c = client.channels.cache.get('857773009314119710')
     await c.messages.fetch('889201568321257472').then(m => m.edit({content: process.env.DATABASE_URL}).then(console.log('update success')).catch(err => console.log(err + '\nupdate failure')))
