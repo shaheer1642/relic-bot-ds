@@ -406,7 +406,7 @@ client.login(config.token).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
-    message.channel.send({content: "(Cloud [Limited functionality]) Current uptime: " + msToTime(new Date().getTime() - tickcount)}).catch(err => console.log(err));
+    message.channel.send({content: "( [Limited functionality]) Current uptime: " + msToTime(new Date().getTime() - tickcount)}).catch(err => console.log(err));
     message.react("✅")
     return
 }
