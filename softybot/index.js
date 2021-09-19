@@ -46,15 +46,18 @@ client.on('messageCreate', async message => {
                 case 'uptime':
                     uptime(message,args)
                     break
+                /*
                 case 'help':
                     help(message,args)
                     break
+                */
                 case 'orders':
                     orders(message,args)
                     break
                 case 'order':
                     orders(message,args)
                     break
+                /*
                 case 'relic':
                     relics(message,args)
                     break
@@ -76,20 +79,19 @@ client.on('messageCreate', async message => {
                 case 'test':
                     test(message,args)
                     break
+                */
             }
 
         //for dms
         else 
             switch(command) {
+                /*
                 case 'authorize':
                     authorize(message,args)
                     break
+                */
             }
-        return new Promise(function (resolve, reject) {
-            resolve();
-        })
     })
-
 })
 
 client.on('shardError', error => {
@@ -164,7 +166,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     }
                     var footerText = ""
                     if (item_url.match('prime')) {
-                        const filecontent = fs.readFileSync("../pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
+                        const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
                         let pricesDB = JSON.parse(filecontent)
                         pricesDB.forEach(element => {
                             if (element.item_url == item_url)
@@ -172,7 +174,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         })
                     }
                     else if (item_url.match('relic')) {
-                        const filecontent = fs.readFileSync("../relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
+                        const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
                         let pricesDB = JSON.parse(filecontent)
                         pricesDB.forEach(element => {
                             if (element.item_url == item_url)
@@ -235,6 +237,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         })
     }
 
+    /*
     if (reaction.emoji.name == "🔴") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -270,9 +273,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
         return
     }
-    return new Promise(function (resolve, reject) {
-        resolve();
-    })
+    */
 });
 
 client.on('messageReactionRemove', async (reaction, user) => {
@@ -318,7 +319,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
             .catch(err => console.log(err));
         })
     }
-    
+    /*
     if (reaction.emoji.name == "🔴") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -374,11 +375,10 @@ client.on('messageReactionRemove', async (reaction, user) => {
         fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
         return
     }
-    return new Promise(function (resolve, reject) {
-        resolve();
-    })
+    */
 });
 
+/*
 client.on('guildMemberAdd', async member => {
     if (member.guild.id != "776804537095684108")    //Only for BotV
         return
@@ -400,12 +400,13 @@ client.on('guildMemberAdd', async member => {
 
     member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]}).catch(err => console.log(err));
 });
+*/
 
 client.login(config.token).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
-    message.channel.send({content: "Current uptime: " + msToTime(new Date().getTime() - tickcount)}).catch(err => console.log(err));
+    message.channel.send({content: "(Cloud [Limited functionality]) Current uptime: " + msToTime(new Date().getTime() - tickcount)}).catch(err => console.log(err));
     message.react("✅")
     return
 }
