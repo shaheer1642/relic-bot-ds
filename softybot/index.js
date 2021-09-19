@@ -546,7 +546,7 @@ async function orders(message,args) {
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
         return
     })
-    db.pool.end();
+    await db.end().then(console.log('database connection revoked'));
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
     WFM_Items_List.forEach(element => {
