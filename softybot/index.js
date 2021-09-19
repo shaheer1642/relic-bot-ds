@@ -200,7 +200,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         }
                         if (j==ordersArr.length)
                             break
-                        sellers += ordersArr[j].seller.replace("_","\\_") + "\n"
+                        sellers += ordersArr[j].seller + "\n"
                         quantities += ordersArr[j].quantity + "\n"
                         prices += ordersArr[j].price + "\n"
                     }
