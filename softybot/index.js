@@ -34,34 +34,7 @@ var tickcount = new Date().getTime();
 client.on('ready', () => {
     console.log("bot has started")
     client.user.setActivity('.help', { type: 2 })
-    //retrieve wfm items list
-    console.log('Retrieving WFM items list')
-    const func = axios("https://api.warframe.market/v1/items")
-    .then(response => {
-        console.log('Retrieving WFM items list success')
-        let items = []
-        response.data.payload.items.forEach(e => {
-            items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
-        })
-        console.log('Updating Database -> wfm_items_list')
-        db.query(`UPDATE WFM_Items_List SET info = '${JSON.stringify(items)}' where id=1`)
-        .then(() => {
-            console.log('Updating Database -> wfm_items_list success')
-        })
-        .catch (err => {
-            if (err.response)
-                console.log(err.response.data)
-            console.log(err)
-            console.log('Updating Database -> wfm_items_list error')
-        })
-    })
-    .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
-        console.log(err)
-        console.log('Retrieving WFM items list error')
-    })
-    //-------------
+    setTimeout(update_wfm_items_list, 1);
 })
 
 client.on('messageCreate', async message => {
@@ -1837,6 +1810,38 @@ function trades_update() {
             console.log('Unknown error in trades_update')
     })
     setTimeout(trades_update, 600000);
+}
+
+function update_wfm_items_list() {
+    //retrieve wfm items list
+    console.log('Retrieving WFM items list')
+    const func = axios("https://api.warframe.market/v1/items")
+    .then(response => {
+        console.log('Retrieving WFM items list success')
+        let items = []
+        response.data.payload.items.forEach(e => {
+            items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
+        })
+        console.log('Updating Database -> wfm_items_list')
+        db.query(`UPDATE WFM_Items_List SET info = '${JSON.stringify(items)}' where id=1`)
+        .then(() => {
+            console.log('Updating Database -> wfm_items_list success')
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Updating Database -> wfm_items_list error')
+        })
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving WFM items list error')
+    })
+    setTimeout(update_wfm_items_list, 86400000);  //execute every 24h
+    //-------------
 }
 
 axiosRetry(axios, {
