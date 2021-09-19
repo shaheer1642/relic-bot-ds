@@ -552,7 +552,7 @@ async function orders(message,args) {
         done()
         return
     })
-    db.end();
+    db.pool.end();
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
     WFM_Items_List.forEach(element => {
