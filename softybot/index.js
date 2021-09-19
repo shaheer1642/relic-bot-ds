@@ -36,14 +36,12 @@ client.on('ready', () => {
         for (let row of res.rows) {
           console.log(JSON.stringify(row));
         }
-        db.end();
       });
       db.query('SELECT * FROM softy_test2', (err, res) => {
           if (err) throw err;
           for (let row of res.rows) {
             console.log(JSON.stringify(row));
           }
-          db.end();
         });
 })
 
