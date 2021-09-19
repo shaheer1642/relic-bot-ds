@@ -127,6 +127,45 @@ client.on('messageReactionAdd', async (reaction, user) => {
             return
         reaction.users.remove(user.id);
         reaction.message.edit({content: "Updating...", embeds: []})
+        let pricesDB = []
+        let relicsDB = []
+        console.log('Establishing connection to database')
+        const db = new DB.Pool({
+            connectionString: process.env.DATABASE_URL,
+            ssl: {
+              rejectUnauthorized: false
+            }
+        });
+        await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
+        console.log('Retrieving Database -> pricesDB')
+        await db.query(`SELECT pricesdb FROM files where id = 1`)
+        .then(res => {
+            pricesDB = res.rows[0].pricesdb
+            console.log('Retrieving Database -> pricesDB success')
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Retrieving Database -> pricesDB error')
+            reaction.message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+            return
+        })
+        console.log('Retrieving Database -> relicsDB')
+        await db.query(`SELECT relicsdb FROM files where id = 1`)
+        .then(res => {
+            relicsDB = res.rows[0].relicsdb
+            console.log('Retrieving Database -> relicsDB success')
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Retrieving Database -> relicsDB error')
+            reaction.message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+            return
+        })
+        db.end();
         let embeds = []
         for (i=0; i<arrItemsUrl.length; i++)
         {
@@ -171,17 +210,17 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     }
                     var footerText = ""
                     if (item_url.match('prime')) {
-                        const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
-                        let pricesDB = JSON.parse(filecontent)
+                        //const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
+                        //let pricesDB = JSON.parse(filecontent)
                         pricesDB.forEach(element => {
                             if (element.item_url == item_url)
                                 footerText = "Yesterday Avg: " + element.price + '\n\u200b'
                         })
                     }
                     else if (item_url.match('relic')) {
-                        const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
-                        let pricesDB = JSON.parse(filecontent)
-                        pricesDB.forEach(element => {
+                        //const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
+                        //let relicsDB = JSON.parse(filecontent)
+                        relicsDB.forEach(element => {
                             if (element.item_url == item_url)
                                 footerText = "Yesterday Avg: " + element.price + '\n\u200b'
                         })
