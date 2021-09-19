@@ -211,6 +211,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         quantities += ordersArr[j].quantity + "\n"
                         prices += ordersArr[j].price + "\n"
                     }
+                    sellers = sellers.replace(/_/g,"\\_")
                     console.log('executed: ' + item_url + "\n")
                     //if (!noSellers)
                     if (sellers=="")
@@ -620,7 +621,7 @@ async function orders(message,args) {
                 quantities += ordersArr[j].quantity + "\n"
                 prices += ordersArr[j].price + "\n"
             }
-            sellers = sellers.replace("_","\\_")
+            sellers = sellers.replace(/_/g,"\\_")
             console.log('executed: ' + item_url + "\n")
             //if (!noSellers)
             if (sellers=="")
