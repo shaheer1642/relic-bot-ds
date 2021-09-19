@@ -509,7 +509,6 @@ async function orders(message,args) {
     .then(res => {
         WFM_Items_List = res.rows[0].wfm_items_list
         console.log('Retrieving Database -> wfm_items_list success')
-        done()
     })
     .catch (err => {
         if (err.response)
@@ -517,7 +516,6 @@ async function orders(message,args) {
         console.log(err)
         console.log('Retrieving Database -> wfm_items_list error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        done()
         return
     })
     console.log('Retrieving Database -> pricesDB')
@@ -525,7 +523,6 @@ async function orders(message,args) {
     .then(res => {
         pricesDB = res.rows[0].pricesdb
         console.log('Retrieving Database -> pricesDB success')
-        done()
     })
     .catch (err => {
         if (err.response)
@@ -533,7 +530,6 @@ async function orders(message,args) {
         console.log(err)
         console.log('Retrieving Database -> pricesDB error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        done()
         return
     })
     console.log('Retrieving Database -> relicsDB')
@@ -541,7 +537,6 @@ async function orders(message,args) {
     .then(res => {
         relicsDB = res.rows[0].relicsdb
         console.log('Retrieving Database -> relicsDB success')
-        done()
     })
     .catch (err => {
         if (err.response)
@@ -549,7 +544,6 @@ async function orders(message,args) {
         console.log(err)
         console.log('Retrieving Database -> relicsDB error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        done()
         return
     })
     db.pool.end();
