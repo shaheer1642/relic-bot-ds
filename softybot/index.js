@@ -454,7 +454,8 @@ async function orders(message,args) {
     //const filecontent = fs.readFileSync('./WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
     //let WFM_Items_List = JSON.parse(filecontent)
     let WFM_Items_List = []
-    console.log('Retrieving Database -> wfm_items_list')
+    let pricesDB = []
+    let relicsDB = []
     console.log('Establishing connection to database')
     const db = new DB.Pool({
         connectionString: process.env.DATABASE_URL,
@@ -463,11 +464,11 @@ async function orders(message,args) {
         }
     });
     await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
-    await db.query(`SELECT info FROM wfm_items_list where id = 1`)
+    console.log('Retrieving Database -> wfm_items_list')
+    await db.query(`SELECT wfm_items_list FROM files where id = 1`)
     .then(res => {
-        WFM_Items_List = res.rows[0].info
+        WFM_Items_List = res.rows[0].wfm_items_list
         console.log('Retrieving Database -> wfm_items_list success')
-        db.end();
     })
     .catch (err => {
         if (err.response)
@@ -475,7 +476,37 @@ async function orders(message,args) {
         console.log(err)
         console.log('Retrieving Database -> wfm_items_list error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return
     })
+    console.log('Retrieving Database -> pricesDB')
+    await db.query(`SELECT pricesdb FROM files where id = 1`)
+    .then(res => {
+        pricesDB = res.rows[0].pricesdb
+        console.log('Retrieving Database -> pricesDB success')
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> pricesDB error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return
+    })
+    console.log('Retrieving Database -> relicsDB')
+    await db.query(`SELECT relicsdb FROM files where id = 1`)
+    .then(res => {
+        relicsDB = res.rows[0].relicsdb
+        console.log('Retrieving Database -> relicsDB success')
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> relicsDB error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return
+    })
+    db.end();
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
     WFM_Items_List.forEach(element => {
@@ -559,17 +590,17 @@ async function orders(message,args) {
             }
             var footerText = ""
             if (item_url.match('prime')) {
-                const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
-                let pricesDB = JSON.parse(filecontent)
+                //const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
+                //let pricesDB = JSON.parse(filecontent)
                 pricesDB.forEach(element => {
                     if (element.item_url == item_url)
                         footerText = "Yesterday Avg: " + element.price + '\n\u200b'
                 })
             }
             else if (item_url.match('relic')) {
-                const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
-                let pricesDB = JSON.parse(filecontent)
-                pricesDB.forEach(element => {
+                //const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
+                //let pricesDB = JSON.parse(filecontent)
+                relicsDB.forEach(element => {
                     if (element.item_url == item_url)
                         footerText = "Yesterday Avg: " + element.price + '\n\u200b'
                 })
@@ -1836,7 +1867,7 @@ async function update_wfm_items_list() {
             items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
         })
         console.log('Updating Database -> wfm_items_list')
-        db.query(`UPDATE WFM_Items_List SET info = '${JSON.stringify(items)}' where id=1`)
+        db.query(`UPDATE files SET wfm_items_list = '${JSON.stringify(items)}' where id=1`)
         .then(() => {
             console.log('Updating Database -> wfm_items_list success')
             db.end()
