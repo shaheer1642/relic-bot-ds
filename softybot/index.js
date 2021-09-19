@@ -18,6 +18,8 @@ const relist_cd = [];
 //relic bot "token": "ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E",
 
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
+//connect to the postgresSQL database
+//postgres://umpcklxkzdwigj:9e3dfe91e4a4ee811ce2369f89f7c3f11238275e9c3909e268cb79d5cf15fd56@ec2-54-74-60-70.eu-west-1.compute.amazonaws.com:5432/d9lv1t75hhod22
 const db = new DB.Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -25,24 +27,41 @@ const db = new DB.Pool({
     }
 });
 db.connect();
+
 //const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
 
 client.on('ready', () => {
     console.log("bot has started")
     client.user.setActivity('.help', { type: 2 })
-    db.query('SELECT * FROM softy_test2', (err, res) => {
-        if (err) throw err;
-        for (let row of res.rows) {
-          console.log(JSON.stringify(row));
-        }
-      });
-      db.query('SELECT * FROM softy_test2', (err, res) => {
-          if (err) throw err;
-          for (let row of res.rows) {
-            console.log(JSON.stringify(row));
-          }
-        });
+    //retrieve wfm items list
+    console.log('Retrieving WFM items list')
+    const func = axios("https://api.warframe.market/v1/items")
+    .then(response => {
+        console.log('Retrieving WFM items list success')
+        let items = []
+        response.data.payload.items.forEach(e => {
+            items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
+        })
+        console.log('Updating Database -> wfm_items_list')
+        db.query(`UPDATE WFM_Items_List SET info = '${JSON.stringify(items)}' where id=1`)
+        .then(() => {
+            console.log('Updating Database -> wfm_items_list success')
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Updating Database -> wfm_items_list error')
+        })
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving WFM items list error')
+    })
+    //-------------
 })
 
 client.on('messageCreate', async message => {
@@ -466,11 +485,25 @@ async function orders(message,args) {
     let arrItemsUrl = []
     var primeFlag = 0
     //var WFM_Items_List = require('../WFM_Items_List.json')
-    const filecontent = fs.readFileSync('./WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
-    let WFM_Items_List = JSON.parse(filecontent)
+    //const filecontent = fs.readFileSync('./WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
+    //let WFM_Items_List = JSON.parse(filecontent)
+    let WFM_Items_List = []
+    console.log('Retrieving Database -> wfm_items_list')
+    await db.query(`SELECT info FROM wfm_items_list where id = 1`)
+    .then(res => {
+        WFM_Items_List = res.rows[0].info
+        console.log('Retrieving Database -> wfm_items_list success')
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> wfm_items_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+    })
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
-    WFM_Items_List.payload.items.forEach(element => {
+    WFM_Items_List.forEach(element => {
         if (element.url_name.match('^' + d_item_url + '\W*'))
         {
             if (element.url_name.match("prime"))
@@ -587,7 +620,7 @@ async function orders(message,args) {
             }
         })
         .catch(function (error) {
-            processMessage.edit("Error occured retrieving order. Possibly due to command spam. Please try again.\nError code 500")
+            processMessage.edit("Error occured retrieving order. Possibly due to command spam. Please try again.\nError code 501")
             if (error.response)
                 console.log(JSON.stringify(error.response.data))
             else 
