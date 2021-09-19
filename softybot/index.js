@@ -17,7 +17,9 @@ const db = new DB.Pool({
       rejectUnauthorized: false
     }
 });
-await db.connect().then(console.log('connection established')).catch(err => {console.log(err + '\nconnection failure');return});
+const connect = async function connection () {
+    await db.connect().then(console.log('connection established')).catch(err => {console.log(err + '\nconnection failure');return});
+}
 /*----timers-----*/
 //setTimeout(verify_roles, 5000);
 //setTimeout(trades_update, 5000);
