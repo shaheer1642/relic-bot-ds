@@ -141,14 +141,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
         reaction.message.edit({content: "Updating...", embeds: []})
         let pricesDB = []
         let relicsDB = []
-        console.log('Establishing connection to database')
-        const db = new DB.Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: {
-              rejectUnauthorized: false
-            }
-        });
-        await db.connect().then(console.log('connection established')).catch(err => console.log(err + '\nconnection failure'));
         console.log('Retrieving Database -> pricesDB')
         await db.query(`SELECT pricesdb FROM files where id = 1`)
         .then(res => {
