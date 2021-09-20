@@ -125,6 +125,7 @@ client.on('shardError', error => {
 client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
+
     if (reaction.emoji.name == "🆙") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -286,7 +287,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         })
     }
 
-    /*
+    /*----Handled locally----
     if (reaction.emoji.name == "🔴") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -304,7 +305,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
         fs.writeFileSync('../Presence Updates/dnd_filter.json', JSON.stringify(dnd_filter), 'utf8')
         return
     }
+    ------------------*/
 
+    /*----Handled locally----
     if (reaction.emoji.name == "🟣") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -322,7 +325,18 @@ client.on('messageReactionAdd', async (reaction, user) => {
         fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
         return
     }
-    */
+    ------------------*/
+
+    if (reaction.emoji.name == "🎉") {      //removing giveaway reactions for hiatus members
+        if (!reaction.message.author)
+            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.channelId != "793207311891562556")     //only giveaway channel
+            return
+        if (reaction.message.author.id != "294882584201003009")    //only for giveaway bot
+            return
+        if (reaction.message.member.roles.cache.find(r => r.name == "On hiatus"))   //has hiatus role
+            reaction.message.reactions.resolve("🎉").users.remove(reaction.message.author.id);
+    }
 });
 
 client.on('messageReactionRemove', async (reaction, user) => {
