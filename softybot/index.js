@@ -328,13 +328,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
     ------------------*/
 
     if (reaction.emoji.name == "🎉") {      //removing giveaway reactions for hiatus members
-        console.log('reaction added tada')
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.channelId != "793207311891562556")     //only giveaway channel
             return
         if (reaction.message.author.id != "294882584201003009")    //only for giveaway bot
             return
+        console.log('reaction added tada')
         if (reaction.message.member.roles.cache.find(r => r.name == "On hiatus"))   //has hiatus role
             reaction.message.reactions.resolve("🎉").users.remove(reaction.message.author.id);
     }
