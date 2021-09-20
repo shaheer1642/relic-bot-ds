@@ -335,6 +335,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
         if (reaction.message.author.id != "294882584201003009")    //only for giveaway bot
             return
         console.log('reaction added tada')
+        console.log(reaction.message.member)
+        if (!reaction.message.member)
+            var fetch = await reaction.message.guild.members.fetch(user.id)
         if (reaction.message.member.roles.cache.find(r => r.name == "On hiatus"))   //has hiatus role
             reaction.message.reactions.resolve("🎉").users.remove(reaction.message.author.id);
     }
