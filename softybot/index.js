@@ -328,6 +328,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     ------------------*/
 
     if (reaction.emoji.name == "🎉") {      //removing giveaway reactions for hiatus members
+        console.log('reaction added tada')
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.channelId != "793207311891562556")     //only giveaway channel
