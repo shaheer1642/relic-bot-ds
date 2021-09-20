@@ -337,7 +337,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         if (!reaction.message.member)
             var fetch = await reaction.message.guild.members.fetch(user.id)
         if (reaction.message.member.roles.cache.find(r => r.name == "On hiatus"))   //has hiatus role
-            reaction.message.reactions.resolve("🎉").users.remove(user.id);
+            {reaction.message.reactions.resolve("🎉").users.remove(user.id);console.log('removed giveaway reaction for hiatus member')}
     }
 });
 
