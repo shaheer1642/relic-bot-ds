@@ -954,7 +954,7 @@ async function relics(message,args) {
     return
 }
 
-function auctions(message,args) {
+async function auctions(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}).catch(err => console.log(err));
@@ -1013,7 +1013,7 @@ function auctions(message,args) {
     }
     item_url = arrItemsUrl[0]
     let processMessage = [];
-    const func = message.channel.send("Processing").then(response => {
+    const func = await message.channel.send("Processing").then(response => {
         processMessage = response
     }).catch(err => console.log(err));
     const api = axios("https://api.warframe.market/v1/auctions/search?type=lich&weapon_url_name=" + item_url)
