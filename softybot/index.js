@@ -100,11 +100,9 @@ client.on('messageCreate', async message => {
         //for dms
         else 
             switch(command) {
-                /*
                 case 'authorize':
                     authorize(message,args)
                     break
-                */
             }
     })
 })
@@ -1019,6 +1017,7 @@ async function auctions(message,args) {
     const api = axios("https://api.warframe.market/v1/auctions/search?type=lich&weapon_url_name=" + item_url)
     .then(response => {
         data = response.data
+        console.log(response.data)
         let auctionsArr = []
         data.payload.auctions.forEach(element => {
             if ((element.owner.status == "ingame") && (element.owner.region == "en") && (element.visible == 1) && (element.private == 0) && (element.closed == 0))
@@ -1392,10 +1391,25 @@ async function relist(message,args) {
         }
         offset = Number(args.pop())
     }
-    var filecontent = fs.readFileSync('./jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
-    let jwt_stack = JSON.parse(filecontent)
+    //var filecontent = fs.readFileSync('./jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
+    //let jwt_stack = JSON.parse(filecontent)
     var JWT = ""
     var ingame_name = ""
+    await db.query(`SELECT * FROM discord_users WHERE discord_id=${message.author.id}`).then(async res => {
+        if (res.rows.length == 0) {
+            message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
+            try {
+                message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
+            } catch (err) {
+                message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
+            }
+            return
+        }
+        else {
+            console.log(res.rows)
+        }
+    })
+    return
     for (i=0;i<jwt_stack.length;i++)
     {
         if (jwt_stack[i].discord_id == message.author.id)
@@ -1406,13 +1420,6 @@ async function relist(message,args) {
     }
     if (JWT == "")
     {
-        message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
-        try {
-            message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
-        } catch (err) {
-            message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
-        }
-        return
     }
     if (message.author.id != "253525146923433984") {
         for (i=0;i<relist_cd.length;i++) {
@@ -1594,7 +1601,7 @@ async function relist(message,args) {
 async function authorize(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
+        message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
         message.react("✅")
         return
     }
@@ -1603,7 +1610,7 @@ async function authorize(message,args) {
     let processMessage = [];
     const process = await message.channel.send("Processing").then(response => {
         processMessage = response
-    }).catch(err => console.log(err));
+    })
     axios({
         method: 'POST',
         url: "https://api.warframe.market/v1/auth/signin",
@@ -1616,20 +1623,39 @@ async function authorize(message,args) {
             Authorization: 'JWT'
         }
     })
-    .then(response => {
+    .then(async response => {
         const JWT = response.headers.authorization
         const ingame_name = response.data.payload.user.ingame_name
         const discord_id = message.author.id
-        var filecontent = fs.readFileSync('../JWT_Stack/jwt_stack.json','utf8').replace(/^\uFEFF/, '')
-        let jwt_stack = JSON.parse(filecontent)
-        //const jwt_stack = require('../JWT_Stack/jwt_stack.json')
-        for (i=0;i<jwt_stack.length;i++) {
-            if (jwt_stack[i].discord_id == discord_id)
-                {processMessage.edit("Already authorized. If any issue, Contact MrSofty#7926"); return}
-        }
-        jwt_stack.push({discord_id: discord_id, JWT: JWT, ingame_name: ingame_name})
-        fs.writeFileSync('../JWT_Stack/jwt_stack.json', JSON.stringify(jwt_stack), 'utf8')
-        processMessage.edit("Authorization successful.")
+        await db.query(`SELECT * FROM discord_users WHERE discord_id=${discord_id}`).then(async res => {
+            if (res.rows.length == 0) {   //id does not exist
+                await db.query(`INSERT INTO discord_users (discord_id,jwt,ingame_name) values ('${discord_id}','${JWT}','${ingame_name}')`).then(res => {
+                    console.log(res)
+                    processMessage.edit("Authorization successful.")
+                    return
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> pricesDB error')
+                    processMessage.edit({content: "Some error occured inserting record into database.\nError code: 503"})
+                    return
+                })
+            }
+            else {
+                processMessage.edit("Already authorized. If any issue, Contact MrSofty#7926")
+                return
+            }
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Retrieving Database -> pricesDB error')
+            processMessage.edit({content: "Some error occured retrieving database info.\nError code: 502"})
+            return
+        })
     })
     .catch(function (error) {
         if (error.response)
