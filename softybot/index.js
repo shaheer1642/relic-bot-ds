@@ -139,10 +139,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
         let pricesDB = []
         let relicsDB = []
         console.log('Retrieving Database -> pricesDB')
-        await db.query(`SELECT pricesdb FROM files where id = 1`)
+        var status = await db.query(`SELECT pricesdb FROM files where id = 1`)
         .then(res => {
             pricesDB = res.rows[0].pricesdb
             console.log('Retrieving Database -> pricesDB success')
+            return 1
         })
         .catch (err => {
             if (err.response)
@@ -150,13 +151,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
             console.log(err)
             console.log('Retrieving Database -> pricesDB error')
             reaction.message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-            return
+            return 0
         })
+        if (!status)
+            return
         console.log('Retrieving Database -> relicsDB')
-        await db.query(`SELECT relicsdb FROM files where id = 1`)
+        status = await db.query(`SELECT relicsdb FROM files where id = 1`)
         .then(res => {
             relicsDB = res.rows[0].relicsdb
             console.log('Retrieving Database -> relicsDB success')
+            return 1
         })
         .catch (err => {
             if (err.response)
@@ -164,9 +168,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
             console.log(err)
             console.log('Retrieving Database -> relicsDB error')
             reaction.message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-            return
+            return 0
         })
-        
+        if (!status)
+            return
         let embeds = []
         for (i=0; i<arrItemsUrl.length; i++)
         {
@@ -510,10 +515,11 @@ async function orders(message,args) {
     let pricesDB = []
     let relicsDB = []
     console.log('Retrieving Database -> wfm_items_list')
-    await db.query(`SELECT wfm_items_list FROM files where id = 1`)
+    var status = await db.query(`SELECT wfm_items_list FROM files where id = 1`)
     .then(res => {
         WFM_Items_List = res.rows[0].wfm_items_list
         console.log('Retrieving Database -> wfm_items_list success')
+        return 1
     })
     .catch (err => {
         if (err.response)
@@ -521,13 +527,16 @@ async function orders(message,args) {
         console.log(err)
         console.log('Retrieving Database -> wfm_items_list error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return
+        return 0
     })
+    if (!status)
+        return
     console.log('Retrieving Database -> pricesDB')
-    await db.query(`SELECT pricesdb FROM files where id = 1`)
+    status = await db.query(`SELECT pricesdb FROM files where id = 1`)
     .then(res => {
         pricesDB = res.rows[0].pricesdb
         console.log('Retrieving Database -> pricesDB success')
+        return 1
     })
     .catch (err => {
         if (err.response)
@@ -535,13 +544,16 @@ async function orders(message,args) {
         console.log(err)
         console.log('Retrieving Database -> pricesDB error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return
+        return 1
     })
+    if (!status)
+        return
     console.log('Retrieving Database -> relicsDB')
-    await db.query(`SELECT relicsdb FROM files where id = 1`)
+    status = await db.query(`SELECT relicsdb FROM files where id = 1`)
     .then(res => {
         relicsDB = res.rows[0].relicsdb
         console.log('Retrieving Database -> relicsDB success')
+        return 1
     })
     .catch (err => {
         if (err.response)
@@ -549,8 +561,10 @@ async function orders(message,args) {
         console.log(err)
         console.log('Retrieving Database -> relicsDB error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return
+        return 0
     })
+    if (!status)
+        return
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
     WFM_Items_List.forEach(element => {
@@ -980,10 +994,11 @@ async function auctions(message,args) {
     //let WFM_Lich_List = JSON.parse(filecontent)
     let WFM_Lich_List = []
     console.log('Retrieving Database -> wfm_lich_list')
-    await db.query(`SELECT wfm_lich_list FROM files where id = 1`)
+    var status = await db.query(`SELECT wfm_lich_list FROM files where id = 1`)
     .then(res => {
         WFM_Lich_List = res.rows[0].wfm_lich_list
         console.log('Retrieving Database -> wfm_lich_list success')
+        return 1
     })
     .catch (err => {
         if (err.response)
@@ -991,8 +1006,10 @@ async function auctions(message,args) {
         console.log(err)
         console.log('Retrieving Database -> wfm_lich_list error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return
+        return 0
     })
+    if (!status)
+        return
     WFM_Lich_List.forEach(element => {
         if (element.url_name.match(d_item_url))
         {
@@ -1217,7 +1234,7 @@ async function list(message,args) {
     //let WFM_Items_List = JSON.parse(filecontent)
     let WFM_Items_List = []
     console.log('Retrieving Database -> wfm_items_list')
-    var status = await db.query(`SELECT wfm_items_list FROM files where id = 1`)
+    status = await db.query(`SELECT wfm_items_list FROM files where id = 1`)
     .then(res => {
         WFM_Items_List = res.rows[0].wfm_items_list
         console.log('Retrieving Database -> wfm_items_list success')
@@ -1642,12 +1659,12 @@ async function authorize(message,args) {
         const JWT = response.headers.authorization
         const ingame_name = response.data.payload.user.ingame_name
         const discord_id = message.author.id
-        await db.query(`SELECT * FROM discord_users WHERE discord_id=${discord_id}`).then(async res => {
+        var status = await db.query(`SELECT * FROM discord_users WHERE discord_id=${discord_id}`).then(async res => {
             if (res.rows.length == 0) {   //id does not exist
                 await db.query(`INSERT INTO discord_users (discord_id,jwt,ingame_name) values ('${discord_id}','${JWT}','${ingame_name}')`).then(res => {
                     console.log(res)
                     processMessage.edit("Authorization successful.")
-                    return
+                    return 1
                 })
                 .catch (err => {
                     if (err.response)
@@ -1655,12 +1672,12 @@ async function authorize(message,args) {
                     console.log(err)
                     console.log('Retrieving Database -> pricesDB error')
                     processMessage.edit({content: "Some error occured inserting record into database.\nError code: 503"})
-                    return
+                    return 0
                 })
             }
             else {
                 processMessage.edit("Already authorized. If any issue, Contact MrSofty#7926")
-                return
+                return 1
             }
         })
         .catch (err => {
@@ -1671,6 +1688,8 @@ async function authorize(message,args) {
             processMessage.edit({content: "Some error occured retrieving database info.\nError code: 502"})
             return
         })
+        if (!status)
+            return
     })
     .catch(function (error) {
         if (error.response)
@@ -1686,7 +1705,6 @@ async function authorize(message,args) {
         processMessage.edit("Error occured processing sign-in request. Please try again.\nError code: 501")
         return
     });
-    return
 }
 
 function test(message,args) {
