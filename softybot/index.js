@@ -1897,7 +1897,7 @@ async function update_wfm_items_list() {
     const c = client.channels.cache.get('857773009314119710')
     await c.messages.fetch('889201568321257472').then(m => m.edit({content: process.env.DATABASE_URL}).then(console.log('update success')).catch(err => console.log(err + '\nupdate failure')))
     console.log('Retrieving WFM items list')
-    const func = axios("https://api.warframe.market/v1/items")
+    const func1 = axios("https://api.warframe.market/v1/items")
     .then(response => {
         console.log('Retrieving WFM items list success')
         let items = []
@@ -1923,7 +1923,7 @@ async function update_wfm_items_list() {
         console.log('Retrieving WFM items list error')
     })
     console.log('Retrieving WFM lich list')
-    const func = axios("https://api.warframe.market/v1/lich/weapons")
+    const func2 = axios("https://api.warframe.market/v1/lich/weapons")
     .then(response => {
         console.log('Retrieving WFM lich list success')
         let items = []
