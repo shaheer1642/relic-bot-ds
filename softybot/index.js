@@ -251,6 +251,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             .catch(err => {
                 console.log(err)
                 reaction.message.edit('Error occured retrieving prices.')
+                return
             })
         }
         return
