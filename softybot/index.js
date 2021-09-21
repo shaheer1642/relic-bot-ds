@@ -1409,6 +1409,10 @@ async function relist(message,args) {
             console.log(res.rows)
         }
     })
+    .catch(err => {
+        console.log(err)
+        message.channel.send('Error occured retrieving database info. Please try again.')
+    })
     return
     for (i=0;i<jwt_stack.length;i++)
     {
