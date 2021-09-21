@@ -150,7 +150,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(err.response.data)
             console.log(err)
             console.log('Retrieving Database -> pricesDB error')
-            reaction.message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+            reaction.message.edit({content: "Some error occured retrieving database info.\nError code: 500"})
             return 0
         })
         if (!status)
@@ -167,7 +167,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(err.response.data)
             console.log(err)
             console.log('Retrieving Database -> relicsDB error')
-            reaction.message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+            reaction.message.edit({content: "Some error occured retrieving database info.\nError code: 500"})
             return 0
         })
         if (!status)
@@ -178,75 +178,79 @@ client.on('messageReactionAdd', async (reaction, user) => {
             const item_url = arrItemsUrl[i]
             let data = []
             const func = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
-                .then(response => {
-                    data = response.data
-                    let ordersArr = []
-                    data.payload.orders.forEach(element => {
-                        if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1))
-                        {
-                            ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
-                        }
-                    })
-                    ordersArr = ordersArr.sort(dynamicSort("price"))
-                    var sellers = ""
-                    var quantities = ""
-                    var prices = ""
-                    var noSellers = 0
-                    console.log(JSON.stringify(ordersArr))
-                    for (j=0; j<5; j++)
+            .then(response => {
+                data = response.data
+                let ordersArr = []
+                data.payload.orders.forEach(element => {
+                    if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1))
                     {
-                        if (ordersArr.length==0)
-                        {
-                            noSellers = 1
-                            break
-                        }
-                        if (j==ordersArr.length)
-                            break
-                        sellers += ordersArr[j].seller + "\n"
-                        quantities += ordersArr[j].quantity + "\n"
-                        prices += ordersArr[j].price + "\n"
+                        ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
                     }
-                    sellers = sellers.replace(/_/g,"\\_")
-                    console.log('executed: ' + item_url + "\n")
-                    //if (!noSellers)
-                    if (sellers=="")
+                })
+                ordersArr = ordersArr.sort(dynamicSort("price"))
+                var sellers = ""
+                var quantities = ""
+                var prices = ""
+                var noSellers = 0
+                console.log(JSON.stringify(ordersArr))
+                for (j=0; j<5; j++)
+                {
+                    if (ordersArr.length==0)
                     {
-                        sellers = "No sellers at this moment."
-                        quantities = "\u200b"
-                        prices = "\u200b"
+                        noSellers = 1
+                        break
                     }
-                    var footerText = ""
-                    if (item_url.match('prime')) {
-                        //const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
-                        //let pricesDB = JSON.parse(filecontent)
-                        pricesDB.forEach(element => {
-                            if (element.item_url == item_url)
-                                footerText = "Yesterday Avg: " + element.price + '\n\u200b'
-                        })
-                    }
-                    else if (item_url.match('relic')) {
-                        //const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
-                        //let relicsDB = JSON.parse(filecontent)
-                        relicsDB.forEach(element => {
-                            if (element.item_url == item_url)
-                                footerText = "Yesterday Avg: " + element.price + '\n\u200b'
-                        })
-                    }
-                    console.log(footerText)
-                    embeds.push({
-                        title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
-                        url: 'https://warframe.market/items/' + item_url,
-                        fields: [
-                            {name: 'Sellers', value: sellers, inline: true},
-                            {name: 'Quantity', value: quantities, inline: true},
-                            {name: 'Price', value: prices, inline: true}
-                        ],
-                        footer: {text: footerText},
-                        timestamp: new Date()
+                    if (j==ordersArr.length)
+                        break
+                    sellers += ordersArr[j].seller + "\n"
+                    quantities += ordersArr[j].quantity + "\n"
+                    prices += ordersArr[j].price + "\n"
+                }
+                sellers = sellers.replace(/_/g,"\\_")
+                console.log('executed: ' + item_url + "\n")
+                //if (!noSellers)
+                if (sellers=="")
+                {
+                    sellers = "No sellers at this moment."
+                    quantities = "\u200b"
+                    prices = "\u200b"
+                }
+                var footerText = ""
+                if (item_url.match('prime')) {
+                    //const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
+                    //let pricesDB = JSON.parse(filecontent)
+                    pricesDB.forEach(element => {
+                        if (element.item_url == item_url)
+                            footerText = "Yesterday Avg: " + element.price + '\n\u200b'
                     })
-                    console.log(embeds.length + " " + arrItemsUrl.length)
-                    if (embeds.length==arrItemsUrl.length)
-                    reaction.message.edit({content: "React with :up: to update", embeds: embeds})
+                }
+                else if (item_url.match('relic')) {
+                    //const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
+                    //let relicsDB = JSON.parse(filecontent)
+                    relicsDB.forEach(element => {
+                        if (element.item_url == item_url)
+                            footerText = "Yesterday Avg: " + element.price + '\n\u200b'
+                    })
+                }
+                console.log(footerText)
+                embeds.push({
+                    title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                    url: 'https://warframe.market/items/' + item_url,
+                    fields: [
+                        {name: 'Sellers', value: sellers, inline: true},
+                        {name: 'Quantity', value: quantities, inline: true},
+                        {name: 'Price', value: prices, inline: true}
+                    ],
+                    footer: {text: footerText},
+                    timestamp: new Date()
+                })
+                console.log(embeds.length + " " + arrItemsUrl.length)
+                if (embeds.length==arrItemsUrl.length)
+                reaction.message.edit({content: "React with :up: to update", embeds: embeds})
+            })
+            .catch(err => {
+                console.log(err)
+                reaction.message.edit('Error occured retrieving prices.')
             })
         }
         return
