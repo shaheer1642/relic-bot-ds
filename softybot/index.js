@@ -72,18 +72,18 @@ client.on('messageCreate', async message => {
                 case 'order':
                     orders(message,args)
                     break
+                case 'auctions':
+                    auctions(message,args)
+                    break
+                case 'auction':
+                    auctions(message,args)
+                    break
                 /*----Handled locally----
                 case 'relic':
                     relics(message,args)
                     break
                 case 'relics':
                     relics(message,args)
-                    break
-                case 'auctions':
-                    auctions(message,args)
-                    break
-                case 'auction':
-                    auctions(message,args)
                     break
                 case 'list':
                     list(message,args)
@@ -978,11 +978,24 @@ function auctions(message,args) {
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     let arrItemsUrl = []
     //var WFM_Lich_List = require('../WFM_Lich_List.json')
-    const filecontent = fs.readFileSync('../WFM_Lich_List.json', 'utf8').replace(/^\uFEFF/, '')
-    let WFM_Lich_List = JSON.parse(filecontent)
-    //var filecontent = fs.readFileSync('../WFM_Lich_List.json').toString()
+    //const filecontent = fs.readFileSync('../WFM_Lich_List.json', 'utf8').replace(/^\uFEFF/, '')
     //let WFM_Lich_List = JSON.parse(filecontent)
-    WFM_Lich_List.payload.weapons.forEach(element => {
+    let WFM_Lich_List = []
+    console.log('Retrieving Database -> wfm_lich_list')
+    await db.query(`SELECT wfm_lich_list FROM files where id = 1`)
+    .then(res => {
+        WFM_Lich_List = res.rows[0].wfm_lich_list
+        console.log('Retrieving Database -> wfm_lich_list success')
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> wfm_lich_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return
+    })
+    WFM_Lich_List.forEach(element => {
         if (element.url_name.match(d_item_url))
         {
             arrItemsUrl.push(element.url_name)
@@ -1138,7 +1151,7 @@ function auctions(message,args) {
         return
     })
     .catch(function (error) {
-        processMessage.edit("Error occured retrieving auctions. Possibly due to command spam. Please try again.\nError code 500")
+        processMessage.edit("Error occured retrieving auctions. Possibly due to command spam. Please try again.\nError code 501")
         if (error.response)
             console.log(JSON.stringify(error.response.data))
         return
@@ -1956,8 +1969,6 @@ async function update_wfm_items_list() {
         1, 0, 0 // ...at 01:00:00 hours
     );
     var msTill1AM = nextTime.getTime() - currTime.getTime();
-    console.log(nextTime.getTime() + " " + currTime.getTime())
-    console.log(msTill1AM)
     setTimeout(update_wfm_items_list, msTill1AM);  //execute every 1am (cloud time. 6am for me)
     //-------------
 }
