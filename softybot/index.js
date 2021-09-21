@@ -63,18 +63,16 @@ client.on('messageCreate', async message => {
                 case 'uptime':
                     uptime(message,args)
                     break
-                /*
                 case 'help':
                     help(message,args)
                     break
-                */
                 case 'orders':
                     orders(message,args)
                     break
                 case 'order':
                     orders(message,args)
                     break
-                /*
+                /*----Handled locally----
                 case 'relic':
                     relics(message,args)
                     break
@@ -96,7 +94,7 @@ client.on('messageCreate', async message => {
                 case 'test':
                     test(message,args)
                     break
-                */
+                -----------------------*/
             }
 
         //for dms
@@ -443,29 +441,26 @@ client.on('messageReactionRemove', async (reaction, user) => {
     */
 });
 
-/*
 client.on('guildMemberAdd', async member => {
-    if (member.guild.id != "776804537095684108")    //Only for BotV
-        return
-    const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
-    const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
-    const embed = new MessageEmbed()
-        .setFooter(member.displayName, member.user.displayAvatarURL())
-        .setColor('RANDOM')
-        .addFields({
-            name: 'Account information',
-            value: '**• ID:** ' + member.user.id + '\n**• Username:** ' + member.user.username + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
-            inline: true
-        },{
-            name: 'Member information',
-            value: '**• Display name:** ' + member.nickname + '\n**• Joined at:** ' + joined,
-            inline: true
-        })
-        .setTimestamp()
-
-    member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]}).catch(err => console.log(err));
+    if (member.guild.id == "776804537095684108") {      //For BotV
+        const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
+        const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
+        const embed = new MessageEmbed()
+            .setFooter(member.displayName, member.user.displayAvatarURL())
+            .setColor('RANDOM')
+            .addFields({
+                name: 'Account information',
+                value: '**• ID:** ' + member.user.id + '\n**• Username:** ' + member.user.username + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
+                inline: true
+            },{
+                name: 'Member information',
+                value: '**• Display name:** ' + member.nickname + '\n**• Joined at:** ' + joined,
+                inline: true
+            })
+            .setTimestamp()
+        member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]});
+    }
 });
-*/
 
 client.login(config.token).catch(err => console.log(err));
 
@@ -491,7 +486,7 @@ function help(message,args) {
             ]
         }]
     }
-    message.channel.send(postdata).catch(err => console.log(err));
+    message.channel.send(postdata)
     message.react("✅")
     return
 }
@@ -1898,10 +1893,10 @@ function trades_update() {
 
 async function update_wfm_items_list() {
     //retrieve wfm items list
-    console.log('Retrieving WFM items list')
-    console.log('updating database url')
+    console.log('Updating database url')
     const c = client.channels.cache.get('857773009314119710')
     await c.messages.fetch('889201568321257472').then(m => m.edit({content: process.env.DATABASE_URL}).then(console.log('update success')).catch(err => console.log(err + '\nupdate failure')))
+    console.log('Retrieving WFM items list')
     const func = axios("https://api.warframe.market/v1/items")
     .then(response => {
         console.log('Retrieving WFM items list success')
@@ -1927,7 +1922,43 @@ async function update_wfm_items_list() {
         console.log(err)
         console.log('Retrieving WFM items list error')
     })
-    setTimeout(update_wfm_items_list, 86400000);  //execute every 24h
+    console.log('Retrieving WFM lich list')
+    const func = axios("https://api.warframe.market/v1/lich/weapons")
+    .then(response => {
+        console.log('Retrieving WFM lich list success')
+        let items = []
+        response.data.payload.weapons.forEach(e => {
+            items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
+        })
+        console.log('Updating Database -> wfm_lich_list')
+        db.query(`UPDATE files SET wfm_lich_list = '${JSON.stringify(items)}' where id=1`)
+        .then(() => {
+            console.log('Updating Database -> wfm_lich_list success')
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Updating Database -> wfm_lich_list error')
+        })
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving WFM lich list error')
+    })
+    var currTime = new Date();
+    var nextTime = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate() + 1, // the next day, ...
+        1, 0, 0 // ...at 01:00:00 hours
+    );
+    var msTill1AM = nextTime.getTime() - currTime.getTime();
+    console.log(nextTime.getTime() + " " + currTime.getTime())
+    console.log(msTill1AM)
+    setTimeout(update_wfm_items_list, msTill1AM);  //execute every 1am (cloud time. 6am for me)
     //-------------
 }
 
