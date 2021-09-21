@@ -81,15 +81,15 @@ client.on('messageCreate', async message => {
                 case 'relist':
                     relist(message,args)
                     break
+                case 'list':
+                    list(message,args)
+                    break
                 /*----Handled locally----
                 case 'relic':
                     relics(message,args)
                     break
                 case 'relics':
                     relics(message,args)
-                    break
-                case 'list':
-                    list(message,args)
                     break
                 case 'test':
                     test(message,args)
@@ -1174,28 +1174,33 @@ async function list(message,args) {
         }
         offset = Number(args.pop())
     }
-    var filecontent = fs.readFileSync('../JWT_Stack/jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
-    let jwt_stack = JSON.parse(filecontent)
+    //var filecontent = fs.readFileSync('../JWT_Stack/jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
+    //let jwt_stack = JSON.parse(filecontent)
     var JWT = ""
     var ingame_name = ""
-    for (i=0;i<jwt_stack.length;i++)
-    {
-        if (jwt_stack[i].discord_id == message.author.id)
-        {
-            JWT = jwt_stack[i].JWT
-            ingame_name = jwt_stack[i].ingame_name
+    var status = await db.query(`SELECT * FROM discord_users WHERE discord_id=${message.author.id}`).then(async res => {
+        if (res.rows.length == 0) {
+            message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
+            try {
+                message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
+            } catch (err) {
+                message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
+            }
+            return 0
         }
-    }
-    if (JWT == "")
-    {
-        message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
-        try {
-            message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
-        } catch (err) {
-            message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
+        else {
+            JWT = res.rows[0].jwt
+            ingame_name = res.rows[0].ingame_name
+            return 1
         }
+    })
+    .catch(err => {
+        console.log(err)
+        message.channel.send('Error occured retrieving database info. Please try again.')
+        return 0
+    })
+    if (!status)
         return
-    }
     var d_item_url = ""
     args.forEach(element => {
         d_item_url = d_item_url + element + "_"
@@ -1208,19 +1213,35 @@ async function list(message,args) {
     }
     let arrItemsUrl = []
     //var WFM_Items_List = require('../WFM_Items_List.json')
-    var filecontent = fs.readFileSync('../WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
-    let WFM_Items_List = JSON.parse(filecontent)
+    //var filecontent = fs.readFileSync('../WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
+    //let WFM_Items_List = JSON.parse(filecontent)
+    let WFM_Items_List = []
+    console.log('Retrieving Database -> wfm_items_list')
+    var status = await db.query(`SELECT wfm_items_list FROM files where id = 1`)
+    .then(res => {
+        WFM_Items_List = res.rows[0].wfm_items_list
+        console.log('Retrieving Database -> wfm_items_list success')
+        return 1
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> wfm_items_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return 0
+    })
+    if (!status)
+        return
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
-    WFM_Items_List.payload.items.forEach(element => {
-        if (element.url_name.match('^' + d_item_url + '\W*'))
-        {
+    WFM_Items_List.forEach(element => {
+        if (element.url_name.match('^' + d_item_url + '\W*')) {
             if ((element.url_name.match("prime")) && !(element.url_name.match("primed")))
                 arrItemsUrl.push({item_url: element.url_name,item_id: element.id});
         }
     })
-    if (JSON.stringify(arrItemsUrl).match("_set"))
-    {
+    if (JSON.stringify(arrItemsUrl).match("_set")) {
         var i = 0
         var MaxIndex = arrItemsUrl.length
         for (i=0; i <= MaxIndex-1; i++)
@@ -1233,18 +1254,15 @@ async function list(message,args) {
             MaxIndex = arrItemsUrl.length
         }
     }
-    if (arrItemsUrl.length > 1)
-    {
+    if (arrItemsUrl.length > 1) {
         message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));
         return
     }
-    if (arrItemsUrl.length==0)
-    {
+    if (arrItemsUrl.length==0) {
         message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
         return
     }
-    if (arrItemsUrl.length > 10)
-    {
+    if (arrItemsUrl.length > 10) {
         message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
         return
     }
@@ -1414,7 +1432,7 @@ async function relist(message,args) {
     .catch(err => {
         console.log(err)
         message.channel.send('Error occured retrieving database info. Please try again.')
-        return
+        return 0
     })
     if (!status)
         return
