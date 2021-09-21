@@ -1406,25 +1406,15 @@ async function relist(message,args) {
             return
         }
         else {
-            console.log(res.rows)
+            JWT = res.rows[0].jwt
+            ingame_name = res.rows[0].ingame_name
         }
     })
+    console.log(ingame_name + JWT)
     .catch(err => {
         console.log(err)
         message.channel.send('Error occured retrieving database info. Please try again.')
     })
-    return
-    for (i=0;i<jwt_stack.length;i++)
-    {
-        if (jwt_stack[i].discord_id == message.author.id)
-        {
-            JWT = jwt_stack[i].JWT
-            ingame_name = jwt_stack[i].ingame_name
-        }
-    }
-    if (JWT == "")
-    {
-    }
     if (message.author.id != "253525146923433984") {
         for (i=0;i<relist_cd.length;i++) {
             if (relist_cd[i].discord_id == message.author.id)
