@@ -1395,7 +1395,7 @@ async function relist(message,args) {
     //let jwt_stack = JSON.parse(filecontent)
     var JWT = ""
     var ingame_name = ""
-    await db.query(`SELECT * FROM discord_users WHERE discord_id=${message.author.id}`).then(async res => {
+    var status = await db.query(`SELECT * FROM discord_users WHERE discord_id=${message.author.id}`).then(async res => {
         if (res.rows.length == 0) {
             message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
             try {
@@ -1403,18 +1403,21 @@ async function relist(message,args) {
             } catch (err) {
                 message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
             }
-            return
+            return 0
         }
         else {
             JWT = res.rows[0].jwt
             ingame_name = res.rows[0].ingame_name
+            return 1
         }
     })
     .catch(err => {
         console.log(err)
         message.channel.send('Error occured retrieving database info. Please try again.')
+        return
     })
-    console.log(ingame_name + JWT)
+    if (!status)
+        return
     if (message.author.id != "253525146923433984") {
         for (i=0;i<relist_cd.length;i++) {
             if (relist_cd[i].discord_id == message.author.id)
