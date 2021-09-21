@@ -78,6 +78,9 @@ client.on('messageCreate', async message => {
                 case 'auction':
                     auctions(message,args)
                     break
+                case 'relist':
+                    relist(message,args)
+                    break
                 /*----Handled locally----
                 case 'relic':
                     relics(message,args)
@@ -87,9 +90,6 @@ client.on('messageCreate', async message => {
                     break
                 case 'list':
                     list(message,args)
-                    break
-                case 'relist':
-                    relist(message,args)
                     break
                 case 'test':
                     test(message,args)
