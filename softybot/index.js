@@ -1410,11 +1410,11 @@ async function relist(message,args) {
             ingame_name = res.rows[0].ingame_name
         }
     })
-    console.log(ingame_name + JWT)
     .catch(err => {
         console.log(err)
         message.channel.send('Error occured retrieving database info. Please try again.')
     })
+    console.log(ingame_name + JWT)
     if (message.author.id != "253525146923433984") {
         for (i=0;i<relist_cd.length;i++) {
             if (relist_cd[i].discord_id == message.author.id)
