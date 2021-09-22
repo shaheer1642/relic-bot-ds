@@ -2025,14 +2025,25 @@ async function update_wfm_items_list() {
         console.log(err)
         console.log('Retrieving WFM lich list error')
     })
+    //--------Set new timer--------
     var currTime = new Date();
-    var nextTime = new Date(
+    var currDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate(), // the current day, ...
+        1, 0, 0 // ...at 01:00:00 hours
+    );
+    var nextDay = new Date(
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate() + 1, // the next day, ...
         1, 0, 0 // ...at 01:00:00 hours
     );
-    var msTill1AM = nextTime.getTime() - currTime.getTime();
+    if ((currDay.getTime() - currTime.getTime())>0)
+        var msTill1AM = currDay.getTime() - currTime.getTime()
+    else    //its past 1am. do next day
+        var msTill1AM = nextDay.getTime() - currTime.getTime()
+    console.log(msTill1AM)
     setTimeout(update_wfm_items_list, msTill1AM);  //execute every 1am (cloud time. 6am for me)
     //-------------
 }
