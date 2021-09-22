@@ -245,8 +245,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     timestamp: new Date()
                 })
                 console.log(embeds.length + " " + arrItemsUrl.length)
-                if (embeds.length==arrItemsUrl.length)
-                reaction.message.edit({content: "React with :up: to update", embeds: embeds})
+                if (embeds.length==arrItemsUrl.length) {
+                    embeds = embeds.sort(dynamicSort("title"))
+                    reaction.message.edit({content: "React with :up: to update", embeds: embeds})
+                }
             })
             .catch(err => {
                 console.log(err)
