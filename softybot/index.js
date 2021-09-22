@@ -683,8 +683,8 @@ async function orders(message,args) {
                 timestamp: new Date()
             })
             console.log(embeds.length + " " + arrItemsUrl.length)
-            if (embeds.length==arrItemsUrl.length)
-            {
+            if (embeds.length==arrItemsUrl.length) {
+                embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: "React with :up: to update", embeds: embeds})
                 processMessage.react("🆙")
                 message.react("✅")
