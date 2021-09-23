@@ -2081,7 +2081,7 @@ async function updateDatabaseItems() {
     }
     else {
         console.log('Verified all items in the DB.')
-        setTimeout(updateDatabasePrices, 5000);
+        //setTimeout(updateDatabasePrices, 5000);
     }
 }
 
@@ -2198,7 +2198,7 @@ axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
       console.log(`retry attempt: ${retryCount}`);
-      return 1000; // time interval between retries
+      return retryCount * 1000; // time interval between retries
     },
     retryCondition: (error) => {
         // if retry condition is not specified, by default idempotent requests are retried
