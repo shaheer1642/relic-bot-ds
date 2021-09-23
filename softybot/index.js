@@ -2081,7 +2081,7 @@ async function updateDatabaseItems() {
     }
     else {
         console.log('Verified all items in the DB.')
-        //setTimeout(updateDatabasePrices, 5000);
+        setTimeout(updateDatabasePrices, 5000);
     }
 }
 
