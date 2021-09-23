@@ -2092,10 +2092,27 @@ async function updateDatabasePrices () {
         for (i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic")) {
-                console.log(`Retrieving orders for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
-                var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/orders?include=item`)
+                console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
+                var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
                 .then(async itemOrders => {
                     console.log(`Success.`)
+                    var avgPrice = 0
+                    avgPrice = itemOrders.data.payload.statistics_closed["90days"][ordersArr.payload.statistics_closed["90days"].length-1].moving_avg
+                    if (avgPrice==0)
+                        avgPrice = itemOrders.data.payload.statistics_closed["90days"][ordersArr.payload.statistics_closed["90days"].length-1].median
+                    console.log(avgPrice)
+                        let ducat_value = 0
+                    var status = Object.keys(itemOrders.data.payload.include.item.items_in_set).some(function (k) {
+                        if (itemOrders.data.payload.include.item.items_in_set[k].id == item.id) {
+                            ducat_value = itemOrders.data.payload.include.item.items_in_set[k].ducats
+                            return true
+                        }
+                    })
+                    if (!status) {
+                        console.log(`Error retrieving item ducat value.`)
+                        return false
+                    }
+                    console.log(ducat_value)
                     return true
                 })
                 .catch(err => {
