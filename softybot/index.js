@@ -2087,24 +2087,29 @@ async function updateDatabaseItems() {
 
 async function updateDatabasePrices () {
     console.log('Retrieving DB items list...')
-    var func1 = await db.query(`SELECT * FROM items_list`)
+    var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
-        console.log(db_items_list.rows)
-        db_items_list.rows.forEach(async (item,index) => {
+        for (i=0;i<db_items_list.rows.length;i++) {
+            const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic")) {
-                console.log(`Retrieving orders for ${item.item_url} (${index}/${db_items_list.rows.length})...`)
-                axios(`https://api.warframe.market/v1/items/${item.item_url}/orders?include=item`)
-                .then(async wfm_items_list => {
+                console.log(`Retrieving orders for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
+                var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/orders?include=item`)
+                .then(async itemOrders => {
                     console.log(`Success.`)
+                    return true
                 })
                 .catch(err => {
                     if (err.response)
                         console.log(err.response.data)
                     console.log(err)
                     console.log('failure.')
+                    return false
                 });
+                if (!status)
+                    return false
             }
-        })
+        }
+        return true
     })
     .catch (err => {
         if (err.response)
@@ -2112,6 +2117,14 @@ async function updateDatabasePrices () {
         console.log(err)
         console.log('Error retrieving DB items list')
     })
+    if (!main) {
+        console.log('Error occurred updating DB prices\nError code: ' + main)
+        return
+    }
+    else {
+        console.log('Updated all prices in the DB.')
+        return
+    }
 }
 
 async function update_wfm_items_list() {
