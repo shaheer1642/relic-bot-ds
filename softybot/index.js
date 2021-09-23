@@ -2081,7 +2081,37 @@ async function updateDatabaseItems() {
     }
     else {
         console.log('Verified all items in the DB.')
+        setTimeout(updateDatabasePrices, 5000);
     }
+}
+
+async function updateDatabasePrices () {
+    console.log('Retrieving DB items list...')
+    var func1 = await db.query(`SELECT * FROM items_list`)
+    .then(async (db_items_list) => {
+        console.log(db_items_list.rows)
+        db_items_list.rows.forEach(async (item,index) => {
+            if (item.tags.includes("prime") || item.tags.includes("relic")) {
+                console.log(`Retrieving orders for ${item.item_url} (${index}/${db_items_list.rows.length})...`)
+                axios(`https://api.warframe.market/v1/items/${item.item_url}/orders?include=item`)
+                .then(async wfm_items_list => {
+                    console.log(`Success.`)
+                })
+                .catch(err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('failure.')
+                });
+            }
+        })
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Error retrieving DB items list')
+    })
 }
 
 async function update_wfm_items_list() {
