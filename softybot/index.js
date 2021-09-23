@@ -2198,7 +2198,7 @@ axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
       console.log(`retry attempt: ${retryCount}`);
-      return retryCount * 1000; // time interval between retries
+      return 1000; // time interval between retries
     },
     retryCondition: (error) => {
         // if retry condition is not specified, by default idempotent requests are retried
