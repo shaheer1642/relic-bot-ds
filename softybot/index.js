@@ -2195,13 +2195,16 @@ async function update_wfm_items_list() {
 }
 
 axiosRetry(axios, {
-    retries: 10, // number of retries
+    retries: 50, // number of retries
     retryDelay: (retryCount) => {
       console.log(`retry attempt: ${retryCount}`);
       return retryCount * 1000; // time interval between retries
     },
     retryCondition: (error) => {
-      // if retry condition is not specified, by default idempotent requests are retried
-      return error.response.status > 499;
+        // if retry condition is not specified, by default idempotent requests are retried
+        if (error.response)
+            return error.response.status > 499;
+        else
+            return error
     },
 });
