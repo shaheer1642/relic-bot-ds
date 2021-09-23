@@ -40,6 +40,7 @@ client.on('ready', () => {
     console.log("bot has started")
     client.user.setActivity('.help', { type: 2 })
     setTimeout(update_wfm_items_list, 1);
+    setTimeout(updateDatabaseItems, 5000);
 })
 
 client.on('messageCreate', async message => {
@@ -1968,6 +1969,119 @@ function trades_update() {
             console.log('Unknown error in trades_update')
     })
     setTimeout(trades_update, 600000);
+}
+
+async function updateDatabaseItems() {
+    console.log('Retrieving WFM items list...')
+    const func1 = await axios("https://api.warframe.market/v1/items")
+    .then(async wfm_items_list => {
+        console.log('Retrieving WFM items list success.')
+        console.log('Retrieving DB items list...')
+        var status = await db.query(`SELECT * FROM items_list`)
+        .then(async (db_items_list) => {
+            console.log('Retrieving DB items list success.')
+            for (i=0; i<wfm_items_list.data.payload.items.length;i++) {
+                console.log(`Scanning item ${wfm_items_list.data.payload.items[i].url_name} (${i+1}/${wfm_items_list.data.payload.items.length})`)
+                var exists = Object.keys(db_items_list.rows).some(function(k) {
+                    if (Object.values(db_items_list.rows[k]).includes(wfm_items_list.data.payload.items[i].id))
+                        return true
+                });
+                if (!exists) {
+                    console.log(`${wfm_items_list.data.payload.items[i].url_name} is not in the DB.`)
+                    console.log(`Adding ${wfm_items_list.data.payload.items[i].url_name} to the DB...`)
+                    var status = await db.query(`INSERT INTO items_list (id,item_url) VALUES ('${wfm_items_list.data.payload.items[i].id}', '${response.data.payload.items[i].url_name}')`)
+                    .then(() => {
+                        console.log(`Susccessfully inserted ${wfm_items_list.data.payload.items[i].url_name} into DB.`)
+                        return 1
+                    })
+                    .catch (err => {
+                        if (err.response)
+                            console.log(err.response.data)
+                        console.log(err)
+                        console.log(`Error inserting ${wfm_items_list.data.payload.items[i].url_name} into DB.`)
+                        return 0
+                    })
+                    if (!status)
+                        return 0
+                }
+                var noTags = Object.keys(db_items_list.rows).some(function (k) {
+                    if ((db_items_list.rows[k].id == wfm_items_list.data.payload.items[i].id) && (db_items_list.rows[k].tags == null)) {
+                        console.log(`${db_items_list.rows[k].item_url} has no tags.`)
+                        return true
+                    }
+                });
+                if (noTags) {
+                    console.log('Retrieving item info...')
+                    var status = await axios("https://api.warframe.market/v1/items/" + wfm_items_list.data.payload.items[i].url_name)
+                    .then(async itemInfo => {
+                        console.log('Retrieving item info success.')
+                        let tags = []
+                        var status = Object.keys(itemInfo.data.payload.item.items_in_set).some(function (k) {
+                            if (itemInfo.data.payload.item.items_in_set[k].id == wfm_items_list.data.payload.items[i].id) {
+                                tags = itemInfo.data.payload.item.items_in_set[k].tags
+                                return true
+                            }
+                        });
+                        if (!status) {
+                            console.log('Error occured assigning tags.\nError code: ' + status)
+                            return 0
+                        }
+                        console.log(`Updating tags for ${wfm_items_list.data.payload.items[i].url_name}...`)
+                        var status = await db.query(`UPDATE items_list SET tags = '${JSON.stringify(tags)}' WHERE id = '${wfm_items_list.data.payload.items[i].id}'`)
+                        .then(() => {
+                            console.log('Tags updated.')
+                            return 1
+                        })
+                        .catch (err => {
+                            if (err.response)
+                                console.log(err.response.data)
+                            console.log(err)
+                            console.log('Error updating tags into the DB.')
+                            return 0
+                        })
+                        if (!status)
+                            return 0
+                        return 1
+                    })
+                    .catch (err => {
+                        if (err.response)
+                            console.log(err.response.data)
+                        console.log(err)
+                        console.log('Error retrieving item info.')
+                        return 0
+                    })
+                    if (!status)
+                        return 0
+                }
+            }
+            return 1
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Error retrieving DB items list.')
+            return 0
+        })
+        if (!status)
+            return 0
+        else
+            return 1
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Error retrieving WFM items list')
+        return 0
+    })
+    if (!func1) {
+        console.log('Error occurred updating DB items\nError code: ' + func1)
+        return
+    }
+    else {
+        console.log('Verified all items in the DB.')
+    }
 }
 
 async function update_wfm_items_list() {
