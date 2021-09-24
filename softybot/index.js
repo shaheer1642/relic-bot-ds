@@ -1971,6 +1971,7 @@ function trades_update() {
     setTimeout(trades_update, 600000);
 }
 
+
 async function updateDatabaseItems() {
     console.log('Retrieving WFM items list...')
     const func1 = await axios("https://api.warframe.market/v1/items")
@@ -2081,11 +2082,12 @@ async function updateDatabaseItems() {
     }
     else {
         console.log('Verified all items in the DB.')
-        setTimeout(updateDatabasePrices, 5000);
+        setTimeout(updateDatabasePrices, 3000);
     }
 }
 
 async function updateDatabasePrices () {
+    //var status = await db.query(`UPDATE items_list SET rewards = null`)
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
@@ -2097,22 +2099,87 @@ async function updateDatabasePrices () {
                 .then(async itemOrders => {
                     console.log(`Success.`)
                     var avgPrice = 0
-                    avgPrice = itemOrders.data.payload.statistics_closed["90days"][ordersArr.payload.statistics_closed["90days"].length-1].moving_avg
+                    avgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].moving_avg
                     if (avgPrice==0)
-                        avgPrice = itemOrders.data.payload.statistics_closed["90days"][ordersArr.payload.statistics_closed["90days"].length-1].median
+                        avgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
                     console.log(avgPrice)
-                        let ducat_value = 0
-                    var status = Object.keys(itemOrders.data.payload.include.item.items_in_set).some(function (k) {
-                        if (itemOrders.data.payload.include.item.items_in_set[k].id == item.id) {
-                            ducat_value = itemOrders.data.payload.include.item.items_in_set[k].ducats
+                    var ducat_value = 0
+                    let relics = []
+                    var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
+                        if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
+                            if (itemOrders.data.include.item.items_in_set[k].ducats)
+                                ducat_value = itemOrders.data.include.item.items_in_set[k].ducats
+                            if (itemOrders.data.include.item.items_in_set[k].en.drop)
+                                relics = itemOrders.data.include.item.items_in_set[k].en.drop
                             return true
                         }
                     })
                     if (!status) {
-                        console.log(`Error retrieving item ducat value.`)
+                        console.log(`Error retrieving item ducat value and relics.`)
                         return false
                     }
                     console.log(ducat_value)
+                    //----update relic rewards----
+                    if (relics.length != 0) {
+                        for (j=0;j<relics.length;j++) {
+                            var temp = relics[j].name.split(" ")
+                            const rarity = temp.pop().replace("(","").replace(")","").toLowerCase()
+                            console.log(`${rarity} from ${relics[j].link}`)
+                            //----add to DB----
+                            let itemIndex = []
+                            console.log(`Scanning relic rewards...`)
+                            var exists = Object.keys(db_items_list.rows).some(function (k) {
+                                if (db_items_list.rows[k].item_url == relics[j].link) {
+                                    itemIndex = k
+                                    if (!db_items_list.rows[k].rewards)
+                                        return false
+                                    if (JSON.stringify(db_items_list.rows[k].rewards).match(item.item_url)) {
+                                        console.log(`Reward exists.`)
+                                        return true
+                                    }
+                                    return false
+                                }
+                            })
+                            if (!exists) {
+                                console.log(`Reward does not exist, updating DB...`)
+                                if (!db_items_list.rows[itemIndex].rewards)
+                                    db_items_list.rows[itemIndex].rewards = {}
+                                if (!db_items_list.rows[itemIndex].rewards[(rarity)])
+                                    db_items_list.rows[itemIndex].rewards[(rarity)] = []
+                                db_items_list.rows[itemIndex].rewards[(rarity)].push(item.item_url)
+                                var status = await db.query(`UPDATE items_list SET rewards = '${JSON.stringify(db_items_list.rows[itemIndex].rewards)}' WHERE item_url='${relics[j].link}'`)
+                                .then( () => {
+                                    console.log(`Updated relic rewards.`)
+                                    return true
+                                })
+                                .catch (err => {
+                                    if (err.response)
+                                        console.log(err.response.data)
+                                    console.log(err)
+                                    console.log('Error updating DB item rewards')
+                                    return false
+                                });
+                                if (!status)
+                                    return false
+                            }
+                        }
+                    }
+                    //---------------------
+                    console.log(`Updating DB prices...`)
+                    var status = await db.query(`UPDATE items_list SET price=${avgPrice},ducat=${ducat_value},relics='${JSON.stringify(relics)}' WHERE id='${item.id}'`)
+                    .then( () => {
+                        console.log(`Updated DB prices.`)
+                        return true
+                    })
+                    .catch (err => {
+                        if (err.response)
+                            console.log(err.response.data)
+                        console.log(err)
+                        console.log('Error updating DB prices.')
+                        return false
+                    });
+                    if (!status)
+                        return false
                     return true
                 })
                 .catch(err => {
@@ -2143,6 +2210,7 @@ async function updateDatabasePrices () {
         return
     }
 }
+
 
 async function update_wfm_items_list() {
     //retrieve wfm items list
