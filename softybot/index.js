@@ -1990,7 +1990,7 @@ async function updateDatabaseItems() {
                 if (!exists) {
                     console.log(`${wfm_items_list.data.payload.items[i].url_name} is not in the DB.`)
                     console.log(`Adding ${wfm_items_list.data.payload.items[i].url_name} to the DB...`)
-                    var status = await db.query(`INSERT INTO items_list (id,item_url) VALUES ('${wfm_items_list.data.payload.items[i].id}', '${response.data.payload.items[i].url_name}')`)
+                    var status = await db.query(`INSERT INTO items_list (id,item_url) VALUES ('${wfm_items_list.data.payload.items[i].id}', '${wfm_items_list.data.payload.items[i].url_name}')`)
                     .then(() => {
                         console.log(`Susccessfully inserted ${wfm_items_list.data.payload.items[i].url_name} into DB.`)
                         return 1
