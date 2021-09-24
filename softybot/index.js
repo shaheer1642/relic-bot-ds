@@ -2100,8 +2100,10 @@ async function updateDatabasePrices () {
                     console.log(`Success.`)
                     var avgPrice = 0
                     avgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].moving_avg
-                    if (avgPrice==0)
+                    if (!avgPrice)
                         avgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
+                    if (!avgPrice)
+                        avgPrice = null
                     console.log(avgPrice)
                     var ducat_value = 0
                     let relics = []
