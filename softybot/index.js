@@ -2105,8 +2105,8 @@ async function updateDatabasePrices () {
                     if (!avgPrice)
                         avgPrice = null
                     console.log(avgPrice)
-                    var ducat_value = 0
-                    let relics = []
+                    var ducat_value = null
+                    let relics = null
                     var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
                         if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
                             if (itemOrders.data.include.item.items_in_set[k].ducats)
