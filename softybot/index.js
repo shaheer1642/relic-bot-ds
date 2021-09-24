@@ -2002,16 +2002,6 @@ async function updateDatabaseItems() {
                         console.log(`Error inserting ${wfm_items_list.data.payload.items[i].url_name} into DB.`)
                         return 0
                     })
-                    if (!status)
-                        return 0
-                }
-                var noTags = Object.keys(db_items_list.rows).some(function (k) {
-                    if ((db_items_list.rows[k].id == wfm_items_list.data.payload.items[i].id) && (db_items_list.rows[k].tags == null)) {
-                        console.log(`${db_items_list.rows[k].item_url} has no tags.`)
-                        return true
-                    }
-                });
-                if (noTags) {
                     console.log('Retrieving item info...')
                     var status = await axios("https://api.warframe.market/v1/items/" + wfm_items_list.data.payload.items[i].url_name)
                     .then(async itemInfo => {
