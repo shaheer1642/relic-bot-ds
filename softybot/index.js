@@ -2121,24 +2121,21 @@ async function updateDatabasePrices () {
                         return false
                     }
                     console.log(ducat_value)
+                    console.log(`Scanning relic rewards...`)
                     //----update relic rewards----
                     if (relics.length != 0) {
                         for (j=0;j<relics.length;j++) {
                             var temp = relics[j].name.split(" ")
                             const rarity = temp.pop().replace("(","").replace(")","").toLowerCase()
-                            console.log(`${rarity} from ${relics[j].link}`)
                             //----add to DB----
                             let itemIndex = []
-                            console.log(`Scanning relic rewards...`)
                             var exists = Object.keys(db_items_list.rows).some(function (k) {
                                 if (db_items_list.rows[k].item_url == relics[j].link) {
                                     itemIndex = k
                                     if (!db_items_list.rows[k].rewards)
                                         return false
-                                    if (JSON.stringify(db_items_list.rows[k].rewards).match(item.item_url)) {
-                                        console.log(`Reward exists.`)
+                                    if (JSON.stringify(db_items_list.rows[k].rewards).match(item.item_url))
                                         return true
-                                    }
                                     return false
                                 }
                             })
