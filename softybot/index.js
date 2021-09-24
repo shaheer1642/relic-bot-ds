@@ -2077,6 +2077,7 @@ async function updateDatabaseItems() {
 }
 
 async function updateDatabasePrices () {
+    var updateTickcount = new Date().getTime();
     //var status = await db.query(`UPDATE items_list SET rewards = null`)
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
@@ -2196,6 +2197,7 @@ async function updateDatabasePrices () {
     }
     else {
         console.log('Updated all prices in the DB.')
+        console.log(`Update duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
         return
     }
 }
