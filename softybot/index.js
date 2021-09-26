@@ -7,6 +7,7 @@ const request = require('request');
 const fs = require('fs')
 const DB = require('pg');
 const { doesNotMatch } = require('assert');
+const { Console } = require('console');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const relist_cd = [];
@@ -39,8 +40,28 @@ var tickcount = new Date().getTime();
 client.on('ready', () => {
     console.log("bot has started")
     client.user.setActivity('.help', { type: 2 })
-    setTimeout(update_wfm_items_list, 1);
-    setTimeout(updateDatabaseItems, 5000);
+    //--------Set new timer--------
+    var currTime = new Date();
+    var currDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate(), // the current day, ...
+        1, 0, 0 // ...at 01:00:00 hours
+    );
+    var nextDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate() + 1, // the next day, ...
+        1, 1, 0 // ...at 01:01:00 hours
+    );
+    if ((currDay.getTime() - currTime.getTime())>0)
+        var msTill1AM = currDay.getTime() - currTime.getTime()
+    else    //its past 1am. do next day
+        var msTill1AM = nextDay.getTime() - currTime.getTime()
+    console.log(`DB update launching in: ${msToTime(msTill1AM)}`)
+    //-------------
+    setTimeout(update_wfm_items_list, msTill1AM);  //execute every 1am (cloud time. 6am for me)
+    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 1am (cloud time. 6am for me)
 })
 
 client.on('messageCreate', async message => {
@@ -2306,6 +2327,27 @@ async function updateDatabasePrices () {
         console.log(err)
         console.log('Error retrieving DB items list')
     })
+    //--------Set new timer--------
+    var currTime = new Date();
+    var currDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate(), // the current day, ...
+        1, 0, 0 // ...at 01:00:00 hours
+    );
+    var nextDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate() + 1, // the next day, ...
+        1, 1, 0 // ...at 01:01:00 hours
+    );
+    if ((currDay.getTime() - currTime.getTime())>0)
+        var msTill1AM = currDay.getTime() - currTime.getTime()
+    else    //its past 1am. do next day
+        var msTill1AM = nextDay.getTime() - currTime.getTime()
+    console.log(`Next update: ${msTill1AM}`)
+    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 1am (cloud time. 6am for me)
+    //-------------
     if (!main) {
         console.log('Error occurred updating DB prices\nError code: ' + main)
         return
