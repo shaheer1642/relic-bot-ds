@@ -107,7 +107,7 @@ client.on('messageCreate', async message => {
                 case 'list':
                     list(message,args)
                     break
-                case 'updateDB':
+                case 'updatedb':
                     updateDB(message,args)
                     break
                 /*----Handled locally----
