@@ -2161,12 +2161,13 @@ async function updateDatabasePrices () {
                     //----scanning relics vault status
                     var vault_status = null
                     if (item.tags.includes("relic") && !item.tags.includes("requiem")) {
-                        console.log('Retrieving wiki info for relic')
+                        console.log('Retrieving wiki info for relic...')
                         const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         //${item.item_url.replace('_relic','')}`)
                         var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&format=json`)
                         .then((wikiInfo) => {
+                            console.log('Wiki info retrieved.')
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                                 vault_status = 'V'
                             else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
@@ -2175,6 +2176,23 @@ async function updateDatabasePrices () {
                                 vault_status = 'P'
                             else if (vaultExpectedRelics.includes(item.item_url))
                                 vault_status = "E"
+                            console.log('Updating DB relic vault status...')
+                            var status = await db.query(`UPDATE items_list SET 
+                                vault_status = '${vault_status}'
+                                WHERE id = '${item.id}'`)
+                            .then( () => {
+                                console.log('Updated DB relic vault status.')
+                                return true
+                            })
+                            .catch (err => {
+                                if (err.response)
+                                    console.log(err.response.data)
+                                console.log(err)
+                                console.log('Error updating DB components vault status.')
+                                return false
+                            });
+                            if (!status)
+                                return false
                             return true
                         })
                         .catch (err => {
@@ -2185,7 +2203,7 @@ async function updateDatabasePrices () {
                             return false
                     }
                     //----scanning sets/components vault status
-                    if (item.tags.includes("set") && item.tags.includes("prime")) {
+                    else if (item.tags.includes("set") && item.tags.includes("prime") && item.item_url.match('_set')) {
                         let components_list = []
                         db_items_list.rows.forEach(e => {
                             if (e.item_url.match('^'+item.item_url.replace('_set','')) && (e.tags.includes('component') || e.tags.includes('blueprint')) && e.tags.includes('prime'))
