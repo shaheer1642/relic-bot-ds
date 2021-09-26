@@ -2193,8 +2193,8 @@ async function updateDatabasePrices () {
                         })
                         console.log("Components list: " + JSON.stringify(components_list))
                         console.log('Retrieving wiki info for set')
-                        const vaultExclusiveRelics = fs.readFileSync("../vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
-                        const vaultExpectedRelics = fs.readFileSync("../vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
+                        const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
+                        const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace('_prime','_Prime')}&prop=text&format=json`)
                         .then(async (wikiInfo) => {
                             if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
