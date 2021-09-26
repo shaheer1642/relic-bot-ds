@@ -11,6 +11,7 @@ const { Console } = require('console');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const relist_cd = [];
+var DB_Update_Timer = null
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -57,12 +58,11 @@ client.on('ready', () => {
         var msTill1AM = currDay.getTime() - currTime.getTime()
     else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
-    console.log(`DB update launching in: ${msToTime(msTill1AM)}`)
     //-------------
     setTimeout(update_wfm_items_list, msTill1AM);  //execute every 12am (cloud time. 5am for me)
-    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
-    console.log("bot has started")
-    inform_dc("bot has started")
+    DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
+    inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 })
 
 client.on('messageCreate', async message => {
@@ -106,6 +106,9 @@ client.on('messageCreate', async message => {
                     break
                 case 'list':
                     list(message,args)
+                    break
+                case 'updateDB':
+                    updateDB(message,args)
                     break
                 /*----Handled locally----
                 case 'relic':
@@ -1660,6 +1663,12 @@ async function relist(message,args) {
     return
 }
 
+async function updateDB(message,args) {
+    clearTimeout(DB_Update_Timer)
+    inform_dc('(Forced) DB update launching in 10 seconds...')
+    DB_Update_Timer = setTimeout(updateDatabaseItems, 10000);
+}
+
 async function authorize(message,args) {
     if (args.length == 0)
     {
@@ -1994,6 +2003,7 @@ function trades_update() {
 }
 
 async function updateDatabaseItems() {
+    inform_dc('Updating DB...')
     console.log('Retrieving WFM items list...')
     const func1 = await axios("https://api.warframe.market/v1/items")
     .then(async wfm_items_list => {
@@ -2347,15 +2357,17 @@ async function updateDatabasePrices () {
     else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     console.log(`Next DB update launching in: ${msToTime(msTill1AM)}`)
-    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices\nError code: ' + main)
+        inform_dc('Error updating DB.')
         return
     }
     else {
         console.log('Updated all prices in the DB.')
         console.log(`Update duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
+        inform_dc('DB successfully updated.')
         return
     }
 }
