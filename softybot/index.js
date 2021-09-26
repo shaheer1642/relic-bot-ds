@@ -1980,8 +1980,9 @@ async function updateDatabaseItems() {
         var status = await db.query(`SELECT * FROM items_list`)
         .then(async (db_items_list) => {
             console.log('Retrieving DB items list success.')
+            console.log('Scanning DB items list...')
             for (i=0; i<wfm_items_list.data.payload.items.length;i++) {
-                console.log(`Scanning item ${wfm_items_list.data.payload.items[i].url_name} (${i+1}/${wfm_items_list.data.payload.items.length})`)
+                //console.log(`Scanning item ${wfm_items_list.data.payload.items[i].url_name} (${i+1}/${wfm_items_list.data.payload.items.length})`)
                 var exists = Object.keys(db_items_list.rows).some(function(k) {
                     if (Object.values(db_items_list.rows[k]).includes(wfm_items_list.data.payload.items[i].id))
                         return true
@@ -2044,6 +2045,7 @@ async function updateDatabaseItems() {
                         return 0
                 }
             }
+            console.log('Scanned DB items list.')
             return 1
         })
         .catch (err => {
