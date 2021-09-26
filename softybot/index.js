@@ -2157,6 +2157,7 @@ async function updateDatabasePrices () {
                                         return false
                                 }
                             }
+                            console.log(`Relic rewards scanned.`)
                         }
                     //----scanning relics vault status
                     var vault_status = null
@@ -2166,7 +2167,7 @@ async function updateDatabasePrices () {
                         const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         //${item.item_url.replace('_relic','')}`)
                         var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&format=json`)
-                        .then((wikiInfo) => {
+                        .then(async (wikiInfo) => {
                             console.log('Wiki info retrieved.')
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                                 vault_status = 'V'
