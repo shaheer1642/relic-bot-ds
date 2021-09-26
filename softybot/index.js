@@ -2363,13 +2363,13 @@ async function updateDatabasePrices () {
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices\nError code: ' + main)
-        inform_dc('Error updating DB.')
+        inform_dc(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
         return
     }
     else {
         console.log('Updated all prices in the DB.')
         console.log(`Update duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
-        inform_dc('DB successfully updated.')
+        inform_dc(`DB successfully updated.\nNext update in: ${msToTime(msTill1AM)}`)
         return
     }
 }
