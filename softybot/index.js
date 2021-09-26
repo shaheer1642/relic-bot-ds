@@ -11,7 +11,7 @@ const { Console } = require('console');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const relist_cd = [];
-console.log('Establishing connection to database')
+console.log('Establishing connection to DB...')
 const db = new DB.Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -20,7 +20,7 @@ const db = new DB.Pool({
 });
 e_db_conn();
 async function e_db_conn () {
-    await db.connect().then(console.log('connection established')).catch(err => {console.log(err + '\nconnection failure');return});
+    await db.connect().then(console.log('Connection established.')).catch(err => {console.log(err + '\nConnection failure.');return});
 }
 /*----timers-----*/
 //setTimeout(verify_roles, 5000);
@@ -38,7 +38,6 @@ const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'C
 var tickcount = new Date().getTime();
 
 client.on('ready', () => {
-    console.log("bot has started")
     client.user.setActivity('.help', { type: 2 })
     //--------Set new timer--------
     var currTime = new Date();
@@ -46,22 +45,24 @@ client.on('ready', () => {
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate(), // the current day, ...
-        1, 0, 0 // ...at 01:00:00 hours
+        0, 1, 0 // ...at 00:01:00 hours
     );
     var nextDay = new Date(
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate() + 1, // the next day, ...
-        1, 1, 0 // ...at 01:01:00 hours
+        0, 1, 0 // ...at 00:01:00 hours
     );
     if ((currDay.getTime() - currTime.getTime())>0)
         var msTill1AM = currDay.getTime() - currTime.getTime()
-    else    //its past 1am. do next day
+    else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     console.log(`DB update launching in: ${msToTime(msTill1AM)}`)
     //-------------
-    setTimeout(update_wfm_items_list, msTill1AM);  //execute every 1am (cloud time. 6am for me)
-    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 1am (cloud time. 6am for me)
+    setTimeout(update_wfm_items_list, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    console.log("bot has started")
+    inform_dc("bot has started")
 })
 
 client.on('messageCreate', async message => {
@@ -2333,20 +2334,20 @@ async function updateDatabasePrices () {
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate(), // the current day, ...
-        1, 0, 0 // ...at 01:00:00 hours
+        0, 1, 0 // ...at 00:01:00 hours
     );
     var nextDay = new Date(
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate() + 1, // the next day, ...
-        1, 1, 0 // ...at 01:01:00 hours
+        0, 1, 0 // ...at 00:01:00 hours
     );
     if ((currDay.getTime() - currTime.getTime())>0)
         var msTill1AM = currDay.getTime() - currTime.getTime()
-    else    //its past 1am. do next day
+    else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
-    console.log(`Next update: ${msTill1AM}`)
-    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 1am (cloud time. 6am for me)
+    console.log(`Next DB update launching in: ${msToTime(msTill1AM)}`)
+    setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices\nError code: ' + main)
@@ -2422,21 +2423,25 @@ async function update_wfm_items_list() {
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate(), // the current day, ...
-        1, 0, 0 // ...at 01:00:00 hours
+        0, 1, 0 // ...at 01:01:00 hours
     );
     var nextDay = new Date(
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate() + 1, // the next day, ...
-        1, 0, 0 // ...at 01:00:00 hours
+        0, 1, 0 // ...at 00:01:00 hours
     );
     if ((currDay.getTime() - currTime.getTime())>0)
         var msTill1AM = currDay.getTime() - currTime.getTime()
-    else    //its past 1am. do next day
+    else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     console.log(msTill1AM)
-    setTimeout(update_wfm_items_list, msTill1AM);  //execute every 1am (cloud time. 6am for me)
+    setTimeout(update_wfm_items_list, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     //-------------
+}
+
+async function inform_dc (str) {
+    await client.channels.cache.get('891756819045826621').send(str).catch(err => console.log(err+'\nError posting bot update.'))
 }
 
 axiosRetry(axios, {
