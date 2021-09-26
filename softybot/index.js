@@ -486,15 +486,19 @@ client.on('guildMemberAdd', async member => {
             .setColor('RANDOM')
             .addFields({
                 name: 'Account information',
-                value: '**• ID:** ' + member.user.id + '\n**• Username:** ' + member.user.username + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
+                value: '**• ID:** ' + member.user.id + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
                 inline: true
             },{
                 name: 'Member information',
-                value: '**• Display name:** ' + member.nickname + '\n**• Joined at:** ' + joined,
+                value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined,
                 inline: true
             })
             .setTimestamp()
-        member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]});
+        member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]})
+        .catch(err => {
+            console.log(err + '\nError sending member welcome message.')
+            inform_dc('Error sending member welcome message.')
+        });
     }
 });
 
