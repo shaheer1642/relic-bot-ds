@@ -1664,6 +1664,8 @@ async function relist(message,args) {
 }
 
 async function updateDB(message,args) {
+    if (message.author.id != "253525146923433984")
+        return
     clearTimeout(DB_Update_Timer)
     inform_dc('(Forced) DB update launching in 10 seconds...')
     DB_Update_Timer = setTimeout(updateDatabaseItems, 10000);
