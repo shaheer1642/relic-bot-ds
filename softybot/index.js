@@ -2166,7 +2166,7 @@ async function updateDatabasePrices () {
                         const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         //${item.item_url.replace('_relic','')}`)
-                        var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&format=json`)
+                        var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
                         .then(async (wikiInfo) => {
                             console.log('Wiki info retrieved.')
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
@@ -2176,7 +2176,7 @@ async function updateDatabasePrices () {
                             else if (vaultExclusiveRelics.includes(item.item_url))
                                 vault_status = 'P'
                             else if (vaultExpectedRelics.includes(item.item_url))
-                                vault_status = "E"
+                                vault_status = 'E'
                             console.log('Updating DB relic vault status...')
                             var status = await db.query(`UPDATE items_list SET 
                                 vault_status = '${vault_status}'
@@ -2214,14 +2214,14 @@ async function updateDatabasePrices () {
                         console.log('Retrieving wiki info for set')
                         const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
-                        var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&format=json`)
+                        var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
                         .then(async (wikiInfo) => {
                             if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
                                 vault_status = 'V'
                             else if (wikiInfo.data.parse.text["*"].match(`has returned from the <a href="/wiki/Prime_Vault" title="Prime Vault">Prime Vault</a> for a limited time`))
                                 vault_status = 'P'
                             else if (vaultExpectedRelics.includes(item.item_url.replace('_set','')))
-                                vault_status = "E"
+                                vault_status = 'E'
                             console.log(`Updating DB components vault status...`)
                             for (j=0;j<components_list.length;j++) {
                                 var status = await db.query(`UPDATE items_list SET 
@@ -2240,6 +2240,21 @@ async function updateDatabasePrices () {
                                 if (!status)
                                     return false
                             }
+                            var status = await db.query(`UPDATE items_list SET 
+                                vault_status = '${vault_status}'
+                                WHERE id = '${item.id}'`)
+                            .then( () => {
+                                return true
+                            })
+                            .catch (err => {
+                                if (err.response)
+                                    console.log(err.response.data)
+                                console.log(err)
+                                console.log('Error updating DB components vault status.')
+                                return false
+                            });
+                            if (!status)
+                                return false
                             console.log('Updated DB components vault status.')
                             return true
                         })
