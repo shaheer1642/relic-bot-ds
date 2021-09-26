@@ -20,7 +20,7 @@ const db = new DB.Pool({
     }
 });
 e_db_conn();
-async function e_db_conn () {
+async function e_db_conn() {
     await db.connect().then(console.log('Connection established.')).catch(err => {console.log(err + '\nConnection failure.');return});
 }
 /*----timers-----*/
@@ -2363,13 +2363,12 @@ async function updateDatabasePrices () {
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices\nError code: ' + main)
-        inform_dc(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
+        inform_dc(`<@253525146923433984> Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
         return
     }
     else {
-        console.log('Updated all prices in the DB.')
-        console.log(`Update duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
-        inform_dc(`DB successfully updated.\nNext update in: ${msToTime(msTill1AM)}`)
+        console.log(`Updated all prices in the DB.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
+        inform_dc(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
         return
     }
 }
