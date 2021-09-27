@@ -10,7 +10,7 @@ const { doesNotMatch } = require('assert');
 const { Console } = require('console');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
-const masteryRolesMessageId = "891983658309812235"
+const masteryRolesMessageId = "892084165405716541"
 const relist_cd = [];
 var DB_Update_Timer = null
 console.log('Establishing connection to DB...')
