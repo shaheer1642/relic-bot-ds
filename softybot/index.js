@@ -228,6 +228,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return false
                 })
                 if (!status) {
+                    reaction.users.remove(user.id);
                     reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
                     try {
                         user.send({content: "Type the following command to register your ign:\nset ign your_username"})
@@ -335,6 +336,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return false
                 })
                 if (!status) {
+                    reaction.users.remove(user.id);
                     reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
                     try {
                         user.send({content: "Type the following command to register your ign:\nset ign your_username"})
