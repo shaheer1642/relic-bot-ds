@@ -71,7 +71,55 @@ client.on('messageCreate', async message => {
     if (message.author.bot)
         return
     let commandsArr = message.content.split('\n')
-    commandsArr.forEach(element => {
+    commandsArr.forEach(async element => {
+        if (!message.guild) {
+            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+            .then(async res => {
+                if (!res.rows.length == 0) {
+                    if (res.rows[0].on_session == true) {
+                        await client.users.fetch(res.rows[0].session_partner)
+                        .then(async partner => {
+                            await partner.send(`**${res.rows[0].ingame_name}:** ${message.content}`)
+                            .catch(err => {
+                                console.log(err)
+                            })
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                    }
+                }
+                return true
+            })
+            .catch (err => {
+                if (err.response)
+                    console.log(err.response.data)
+                console.log(err)
+                console.log('Retrieving Database -> items_list error')
+                message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+                return false
+            })
+            const args = element.trim().split(/ +/g)
+            if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
+                trading_bot_registeration(message,args.pop())
+                return
+            }
+        }
+        if (message.channelId == '892108718358007820') {
+            const args = element.toLowerCase().trim().split(/ +/g)
+            const command = args.shift()
+    
+            if (command == 'wts' || command == 'wtb') {
+                trading_bot(message,args,command)
+                return
+            }
+            else {
+                message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
+                setTimeout(() => message.delete(), 5000)
+            }
+            return
+        }
+
         if (element.indexOf(config.prefix) != 0)
             return
 
@@ -148,6 +196,226 @@ client.on('shardError', error => {
 client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
+
+        if (reaction.message.channelId == '892108718358007820') {
+            if (reaction.emoji.name == "🇧") {
+                if (!reaction.message.author)
+                    var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
+                var arguments = reaction.message.content.split("**")
+                if (arguments[2].match('buying'))
+                    return
+                const trader_ign = arguments[1]
+                const item = arguments[3]
+                const price = arguments[5]
+                var ingame_name = ""
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    else {
+                        ingame_name = res.rows[0].ingame_name
+                        return true
+                    }
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> users_list error')
+                    return false
+                })
+                if (!status) {
+                    reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
+                    try {
+                        user.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                    } catch (err) {
+                        reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
+                    }
+                    db.end()
+                    return
+                }
+                if (trader_ign == ingame_name) {
+                    reaction.users.remove(user.id);
+                    return
+                }
+                reaction.message.delete()
+                var trader_id = ""
+                var status = await db.query(`SELECT * FROM users_list WHERE ingame_name = '${trader_ign}'`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    else {
+                        trader_id = res.rows[0].discord_id
+                        return true
+                    }
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> users_list error')
+                    return false
+                })
+                if (!status)
+                    return
+                await db.query(`UPDATE users_list SET on_session = true, session_partner = ${user.id} WHERE discord_id = ${trader_id}`)
+                await db.query(`UPDATE users_list SET on_session = true, session_partner = ${trader_id} WHERE discord_id = ${user.id}`)
+                await client.users.fetch(trader_id)
+                .then(async partner => {
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                    await partner.send(`**${ingame_name}:** Hi, WTB ${item} for ${price}`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                await client.users.fetch(user.id)
+                .then(async partner => {
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                    await partner.send(`**${ingame_name}:** Hi, WTB ${item} for ${price}`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                setTimeout(async () => {
+                    await db.query(`UPDATE users_list SET on_session = false, session_partner = 0 WHERE discord_id = ${trader_id}`)
+                    await db.query(`UPDATE users_list SET on_session = false, session_partner = 0 WHERE discord_id = ${user.id}`)
+                    await client.users.fetch(user.id)
+                    .then(async partner => {
+                        await partner.send(`-------------Chat closed-------------`)
+                        .catch(err => console.log(err))
+                    })
+                    await client.users.fetch(trader_id)
+                    .then(async partner => {
+                        await partner.send(`-------------Chat closed-------------`)
+                        .catch(err => console.log(err))
+                    })
+                    db.end()
+                }, 60000);
+                db.end()
+                return
+            }
+            else if (reaction.emoji.name == "🇸") {
+                if (!reaction.message.author)
+                    var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
+                var arguments = reaction.message.content.split("**")
+                if (arguments[2].match('selling'))
+                    return
+                const trader_ign = arguments[1]
+                const item = arguments[3]
+                const price = arguments[5]
+                var ingame_name = ""
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    else {
+                        ingame_name = res.rows[0].ingame_name
+                        return true
+                    }
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> users_list error')
+                    return false
+                })
+                if (!status) {
+                    reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
+                    try {
+                        user.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                    } catch (err) {
+                        reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
+                    }
+                    db.end()
+                    return
+                }
+                if (trader_ign == ingame_name) {
+                    reaction.users.remove(user.id);
+                    return
+                }
+                reaction.message.delete()
+                var trader_id = ""
+                var status = await db.query(`SELECT * FROM users_list WHERE ingame_name = '${trader_ign}'`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    else {
+                        trader_id = res.rows[0].discord_id
+                        return true
+                    }
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> users_list error')
+                    return false
+                })
+                if (!status)
+                    return
+                await db.query(`UPDATE users_list SET on_session = true, session_partner = ${user.id} WHERE discord_id = ${trader_id}`)
+                await db.query(`UPDATE users_list SET on_session = true, session_partner = ${trader_id} WHERE discord_id = ${user.id}`)
+                await client.users.fetch(trader_id)
+                .then(async partner => {
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                    await partner.send(`**${ingame_name}:** Hi, WTS ${item} for ${price}`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                await client.users.fetch(user.id)
+                .then(async partner => {
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                    await partner.send(`**${ingame_name}:** Hi, WTB ${item} for ${price}`)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                setTimeout(async () => {
+                    await db.query(`UPDATE users_list SET on_session = false, session_partner = 0 WHERE discord_id = ${trader_id}`)
+                    await db.query(`UPDATE users_list SET on_session = false, session_partner = 0 WHERE discord_id = ${user.id}`)
+                    await client.users.fetch(user.id)
+                    .then(async partner => {
+                        await partner.send(`-------------Chat closed-------------`)
+                        .catch(err => console.log(err))
+                    })
+                    await client.users.fetch(trader_id)
+                    .then(async partner => {
+                        await partner.send(`-------------Chat closed-------------`)
+                        .catch(err => console.log(err))
+                    })
+                    db.end()
+                }, 60000);
+                db.end()
+                return
+            }
+            return
+        }
 
     if (reaction.emoji.name == "🆙") {
         if (!reaction.message.author)
@@ -2652,3 +2920,209 @@ axiosRetry(axios, {
             return error
     },
 });
+
+async function trading_bot(message,args,command) {
+    const price = Number(args.pop().replace(/[a-zA-Z]/g, ""))
+    if (!price) {
+        message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180').then(msg => setTimeout(() => msg.delete(), 5000))
+        setTimeout(() => message.delete(), 5000)
+    }
+    console.log(price)
+    var ingame_name = ''
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        else {
+            ingame_name = res.rows[0].ingame_name
+            return true
+        }
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> users_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return false
+    })
+    if (!status) {
+        message.channel.send({content: `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
+        try {
+            message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+        } catch (err) {
+            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
+        }
+        setTimeout(() => message.delete(), 5000)
+        db.end()
+        return
+    }
+    //---------------
+    var d_item_url = ""
+    args.forEach(element => {
+        d_item_url = d_item_url + element + "_"
+    });
+    d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    d_item_url = d_item_url.replace(/_p$/,'_prime')
+    d_item_url = d_item_url.replace('_p_','_prime_')
+    d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
+    if (!d_item_url.match("prime"))
+    {
+        message.channel.send("This command is only limited to prime items for now.").catch(err => console.log(err));
+        db.end()
+        return
+    }
+    let arrItemsUrl = []
+    let items_list = []
+    console.log('Retrieving Database -> items_list')
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+        console.log('Retrieving Database -> items_list success')
+        return true
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return false
+    })
+    if (!status) {        
+        db.end()
+        return
+    }
+    items_list.forEach(element => {
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
+                arrItemsUrl.push({item_url: element.item_url,item_id: element.id});
+        }
+    })
+    if (JSON.stringify(arrItemsUrl).match("_set")) {
+        var i = 0
+        var MaxIndex = arrItemsUrl.length
+        for (i=0; i <= MaxIndex-1; i++)
+        {
+            if (!arrItemsUrl[i].item_url.match("_set"))
+            {
+                arrItemsUrl.splice(i, 1)
+                i--
+            }
+            MaxIndex = arrItemsUrl.length
+        }
+    }
+    if (arrItemsUrl.length > 1) {
+        message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));      
+        db.end()
+        return
+    }
+    if (arrItemsUrl.length==0) {
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));      
+        db.end()
+        return
+    }
+    if (arrItemsUrl.length > 10) {
+        message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));      
+        db.end()
+        return
+    }
+    const item_url = arrItemsUrl[0].item_url
+    const item_id = arrItemsUrl[0].item_id
+    if (command == 'wts') {
+        await message.channel.send(`**${ingame_name}** is selling **${item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** for **${price}<:platinum:881692607791648778>**`)
+        .then(async msg => {
+            await msg.react("🇧")
+            .catch(err => console.log(err+"\nError reacting buy."))
+            message.delete()
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+    else if (command == 'wtb') {
+        await message.channel.send(`**${ingame_name}** is buying **${item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** for **${price}<:platinum:881692607791648778>**`)
+        .then(async msg => {
+            await msg.react("🇸")
+            .catch(err => console.log(err+"\nError reacting sell."))
+            message.delete()
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
+    db.end()
+    return
+}
+
+async function trading_bot_registeration(message,ingame_name) {
+    var status = await db.query(`SELECT * FROM users_list WHERE ingame_name = '${ingame_name}'`).then(res => {
+        if (res.rows.length == 0)
+            return true
+        else
+            return false
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        .catch(err => console.log(err + '\nError sending dm to user.'))
+        return false
+    })
+    if (!status) {
+        message.channel.send(`The given ign already exists. If any issue, contact MrSofty#7926`)
+        .catch(err => console.log(err + '\nError sending dm to user.'))
+        db.end()
+        return
+    }
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = '${message.author.id}'`)
+    .then(res => {
+        if (res.rows.length == 0)   //record does not exist
+            return false
+        else 
+            return true
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 501"})
+        .catch(err => console.log(err + '\nError sending dm to user.'))
+        return false
+    })
+    if (status) {
+        var status = await db.query(`UPDATE users_list SET ingame_name = '${ingame_name}' WHERE discord_id = ${message.author.id}`).then(res => {
+            console.log(res)
+            message.channel.send(`Your ign has been set to **${ingame_name}**`)
+            .catch(err => console.log(err + '\nError sending dm to user.'))
+            return true
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            message.channel.send({content: "Some error occured updating record in the database.\nError code: 502"})
+            .catch(err => console.log(err + '\nError sending dm to user.'))
+            return false
+        })
+        db.end()
+        return
+    }
+    var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name) values (${message.author.id},'${ingame_name}')`).then(res => {
+        console.log(res)
+        message.channel.send(`Your ign has been set to **${ingame_name}**`)
+        .catch(err => console.log(err + '\nError sending dm to user.'))
+        return true
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        message.channel.send({content: "Some error occured inserting record into database.\nError code: 503"})
+        .catch(err => console.log(err + '\nError sending dm to user.'))
+        return false
+    })
+    db.end()
+    return
+}
