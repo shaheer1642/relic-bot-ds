@@ -203,8 +203,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (!reaction.message.author)
                     var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
                 var arguments = reaction.message.content.split("**")
-                if (arguments[2].match('buying'))
+                if (arguments[2].match('buying')) {
+                    reaction.users.remove(user.id)
                     return
+                }
                 const trader_ign = arguments[1]
                 const item = arguments[3]
                 const price = arguments[5]
@@ -308,8 +310,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (!reaction.message.author)
                     var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
                 var arguments = reaction.message.content.split("**")
-                if (arguments[2].match('selling'))
+                if (arguments[2].match('selling')) {
+                    reaction.users.remove(user.id)
                     return
+                }
                 const trader_ign = arguments[1]
                 const item = arguments[3]
                 const price = arguments[5]
