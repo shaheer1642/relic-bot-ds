@@ -653,6 +653,16 @@ client.on('guildMemberAdd', async member => {
             console.log(err + '\nError sending member welcome message.')
             inform_dc('Error sending member welcome message.')
         });
+        const role = reaction.message.guild.roles.cache.find(role => role.name === 'Members')
+        member.roles.add(role)
+        .then (response => {
+            console.log(JSON.stringify(response))
+            mod_log(`Assigned role **${role.name}** to user **${user.username}**.`,'#FFFF00')
+        })
+        .catch(function (error) {
+            console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+            inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+        })
     }
 });
 
