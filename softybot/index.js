@@ -231,7 +231,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     } catch (err) {
                         reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
                     }
-                    db.end()
                     return
                 }
                 if (trader_ign == ingame_name) {
@@ -262,7 +261,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 await db.query(`UPDATE users_list SET on_session = true, session_partner = ${trader_id} WHERE discord_id = ${user.id}`)
                 await client.users.fetch(trader_id)
                 .then(async partner => {
-                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 60 seconds.`)
                     .catch(err => {
                         console.log(err)
                     })
@@ -276,7 +275,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 await client.users.fetch(user.id)
                 .then(async partner => {
-                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 60 seconds.`)
                     .catch(err => {
                         console.log(err)
                     })
@@ -301,9 +300,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         await partner.send(`-------------Chat closed-------------`)
                         .catch(err => console.log(err))
                     })
-                    db.end()
                 }, 60000);
-                db.end()
                 return
             }
             else if (reaction.emoji.name == "🇸") {
@@ -339,7 +336,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     } catch (err) {
                         reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
                     }
-                    db.end()
                     return
                 }
                 if (trader_ign == ingame_name) {
@@ -370,7 +366,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 await db.query(`UPDATE users_list SET on_session = true, session_partner = ${trader_id} WHERE discord_id = ${user.id}`)
                 await client.users.fetch(trader_id)
                 .then(async partner => {
-                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 60 seconds.`)
                     .catch(err => {
                         console.log(err)
                     })
@@ -384,7 +380,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 await client.users.fetch(user.id)
                 .then(async partner => {
-                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 20 minutes.`)
+                    await partner.send(`-------------Chat opened with your trader-------------\nThis chat will be closed in 60 seconds.`)
                     .catch(err => {
                         console.log(err)
                     })
@@ -409,9 +405,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         await partner.send(`-------------Chat closed-------------`)
                         .catch(err => console.log(err))
                     })
-                    db.end()
                 }, 60000);
-                db.end()
                 return
             }
             return
@@ -2954,7 +2948,6 @@ async function trading_bot(message,args,command) {
             message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
         }
         setTimeout(() => message.delete(), 5000)
-        db.end()
         return
     }
     //---------------
@@ -2969,7 +2962,6 @@ async function trading_bot(message,args,command) {
     if (!d_item_url.match("prime"))
     {
         message.channel.send("This command is only limited to prime items for now.").catch(err => console.log(err));
-        db.end()
         return
     }
     let arrItemsUrl = []
@@ -2990,7 +2982,6 @@ async function trading_bot(message,args,command) {
         return false
     })
     if (!status) {        
-        db.end()
         return
     }
     items_list.forEach(element => {
@@ -3013,18 +3004,15 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItemsUrl.length > 1) {
-        message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));      
-        db.end()
+        message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));    
         return
     }
     if (arrItemsUrl.length==0) {
-        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));      
-        db.end()
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));    
         return
     }
     if (arrItemsUrl.length > 10) {
-        message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));      
-        db.end()
+        message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));  
         return
     }
     const item_url = arrItemsUrl[0].item_url
@@ -3051,7 +3039,6 @@ async function trading_bot(message,args,command) {
             console.log(err)
         })
     }
-    db.end()
     return
 }
 
@@ -3073,7 +3060,6 @@ async function trading_bot_registeration(message,ingame_name) {
     if (!status) {
         message.channel.send(`The given ign already exists. If any issue, contact MrSofty#7926`)
         .catch(err => console.log(err + '\nError sending dm to user.'))
-        db.end()
         return
     }
     var status = await db.query(`SELECT * FROM users_list WHERE discord_id = '${message.author.id}'`)
@@ -3106,7 +3092,6 @@ async function trading_bot_registeration(message,ingame_name) {
             .catch(err => console.log(err + '\nError sending dm to user.'))
             return false
         })
-        db.end()
         return
     }
     var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name) values (${message.author.id},'${ingame_name}')`).then(res => {
@@ -3123,6 +3108,5 @@ async function trading_bot_registeration(message,ingame_name) {
         .catch(err => console.log(err + '\nError sending dm to user.'))
         return false
     })
-    db.end()
     return
 }
