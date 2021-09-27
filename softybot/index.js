@@ -392,7 +392,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 inform_dc(`Error adding role ${role.name} for user ${user.username}`)
             })
         }
-        if (reaction.emoji.id == "892062164813225994") {
+        else if (reaction.emoji.id == "892062164813225994") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 16+')
             reaction.message.guild.members.cache.get(user.id).roles.add(role)
             .then (response => {
@@ -407,7 +407,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 inform_dc(`Error adding role ${role.name} for user ${user.username}`)
             })
         }
-        if (reaction.emoji.id == "892062164389625898") {
+        else if (reaction.emoji.id == "892062164389625898") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 20+')
             reaction.message.guild.members.cache.get(user.id).roles.add(role)
             .then (response => {
@@ -422,7 +422,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 inform_dc(`Error adding role ${role.name} for user ${user.username}`)
             })
         }
-        if (reaction.emoji.id == "892062165115224074") {
+        else if (reaction.emoji.id == "892062165115224074") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 25+')
             reaction.message.guild.members.cache.get(user.id).roles.add(role)
             .then (response => {
@@ -437,7 +437,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 inform_dc(`Error adding role ${role.name} for user ${user.username}`)
             })
         }
-        if (reaction.emoji.id == "892062165501087765") {
+        else if (reaction.emoji.id == "892062165501087765") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 30+')
             reaction.message.guild.members.cache.get(user.id).roles.add(role)
             .then (response => {
@@ -452,6 +452,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 inform_dc(`Error adding role ${role.name} for user ${user.username}`)
             })
         }
+        else
+            reaction.users.remove(user.id);
     }
 });
 
@@ -572,7 +574,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
             })
         }
-        if (reaction.emoji.id == "892062164813225994") {
+        else if (reaction.emoji.id == "892062164813225994") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 16+')
             reaction.message.guild.members.cache.get(user.id).roles.remove(role)
             .then (response => {
@@ -586,7 +588,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
             })
         }
-        if (reaction.emoji.id == "892062164389625898") {
+        else if (reaction.emoji.id == "892062164389625898") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 20+')
             reaction.message.guild.members.cache.get(user.id).roles.remove(role)
             .then (response => {
@@ -600,7 +602,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
             })
         }
-        if (reaction.emoji.id == "892062165115224074") {
+        else if (reaction.emoji.id == "892062165115224074") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 25+')
             reaction.message.guild.members.cache.get(user.id).roles.remove(role)
             .then (response => {
@@ -614,7 +616,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
             })
         }
-        if (reaction.emoji.id == "892062165501087765") {
+        else if (reaction.emoji.id == "892062165501087765") {
             const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 30+')
             reaction.message.guild.members.cache.get(user.id).roles.remove(role)
             .then (response => {
