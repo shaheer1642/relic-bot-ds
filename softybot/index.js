@@ -11,6 +11,7 @@ const { Console } = require('console');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
+const tradingBotChannel = "892160436881993758"
 const relist_cd = [];
 var DB_Update_Timer = null
 console.log('Establishing connection to DB...')
@@ -105,7 +106,7 @@ client.on('messageCreate', async message => {
                 return
             }
         }
-        if (message.channelId == '892108718358007820') {
+        if (message.channelId == tradingBotChannel) {
             const args = element.toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
@@ -197,7 +198,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-        if (reaction.message.channelId == '892108718358007820') {
+        if (reaction.message.channelId == tradingBotChannel) {
             if (reaction.emoji.name == "🇧") {
                 if (!reaction.message.author)
                     var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
