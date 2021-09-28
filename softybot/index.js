@@ -2975,12 +2975,6 @@ async function trading_bot(message,args,command) {
     d_item_url = d_item_url.replace(/_p$/,'_prime')
     d_item_url = d_item_url.replace('_p_','_prime_')
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
-    if (!d_item_url.match("prime"))
-    {
-        message.channel.send("This command is only limited to prime items for now.").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-        setTimeout(() => message.delete(), 5000)
-        return
-    }
     let arrItemsUrl = []
     let items_list = []
     console.log('Retrieving Database -> items_list')
@@ -3019,6 +3013,12 @@ async function trading_bot(message,args,command) {
             }
             MaxIndex = arrItemsUrl.length
         }
+    }
+    if (!arrItemsUrl[0].item_url.match("prime"))
+    {
+        message.channel.send("This command is only limited to prime items for now.").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete(), 5000)
+        return
     }
     if (arrItemsUrl.length > 1) {
         message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));    
