@@ -3075,21 +3075,16 @@ async function trading_bot(message,args,command) {
             .setColor('#7cb45d')
             .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
             await message.channel.send({content: ' ', embeds: [new_embed]})
+            .then(async msg => {
+                await msg.react("🇧")
+                .catch(err => console.log(err+"\nError reacting buy."))
+                message.delete()
+            })
             .catch(err => {
                 console.log(err)
                 return
             })
         }
-        await message.channel.send(`**${ingame_name}** is selling **${item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** for **${price}<:platinum:881692607791648778>**`)
-        .then(async msg => {
-            await msg.react("🇧")
-            .catch(err => console.log(err+"\nError reacting buy."))
-            message.delete()
-        })
-        .catch(err => {
-            console.log(err)
-            return
-        })
     }
     else if (command == 'wtb') {
         await message.channel.send(`**${ingame_name}** is buying **${item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** for **${price}<:platinum:881692607791648778>**`)
