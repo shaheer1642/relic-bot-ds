@@ -2582,13 +2582,29 @@ async function updateDatabasePrices () {
                 var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
                 .then(async itemOrders => {
                     console.log(`Success.`)
-                    var avgPrice = 0
-                    avgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].moving_avg
-                    if (!avgPrice)
-                        avgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
-                    if (!avgPrice)
-                        avgPrice = null
-                    console.log(avgPrice)
+                    //-----sell avg-----
+                    var sellAvgPrice = 0
+                    sellAvgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].moving_avg
+                    if (!sellAvgPrice)
+                        sellAvgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
+                    if (!sellAvgPrice)
+                        sellAvgPrice = null
+                    console.log(sellAvgPrice)
+                    //-----buy avg-----
+                    var buyAvgPrice = 0
+                    let buyPrices = []
+                    itemOrders.data.payload.statistics_live["90days"].forEach(e => {
+                        if (e.order_type == "buy")
+                            buyPrices.push(e)
+                    })
+                    console.log(buyPrices)
+                    buyAvgPrice = buyPrices[buyPrices.length-1].moving_avg
+                    if (!buyAvgPrice)
+                        buyAvgPrice = buyPrices[buyPrices.length-1].median
+                    if (!buyAvgPrice)
+                        buyAvgPrice = null
+                    console.log(buyAvgPrice)
+                    //-------------
                     var ducat_value = null
                     let relics = null
                     var icon_url = null
@@ -2765,7 +2781,8 @@ async function updateDatabasePrices () {
                     console.log(`icon_url: ${icon_url}`)
                     console.log(`Updating DB prices...`)
                     var status = await db.query(`UPDATE items_list SET 
-                        sell_price = ${avgPrice},
+                        sell_price = ${sellAvgPrice},
+                        buy_price = ${buyAvgPrice},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}',
                         icon_url = '${icon_url}'
