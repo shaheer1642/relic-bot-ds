@@ -3035,14 +3035,13 @@ async function trading_bot(message,args,command) {
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     if (command == 'wts') {
         var msg = null
-        msg = await message.channel.messages.fetch().then(allMsgs => {
-            allMsgs.forEach(msg => {
-                if (msg.embeds.length != 0) {
-                    if (msg.embeds[0].title == `(S) ${item_name}`)
-                        return msg
+        await message.channel.messages.fetch().then(allMsgs => {
+            allMsgs.forEach(e => {
+                if (e.embeds.length != 0) {
+                    if (e.embeds[0].title == `(S) ${item_name}`)
+                        msg = e
                 }
             })
-            return null
         })
         .catch (err => {
             console.log(err)
@@ -3050,14 +3049,12 @@ async function trading_bot(message,args,command) {
         if (msg) {
             var embeds = msg.embeds
             var embIndex = null
-            var exists = false
-            exists = embeds.forEach((emb,index) => {
+            embeds.forEach((emb,index) => {
                 if (emb.description.match(`**Seller:** ${ingame_name}`)) {
                     embIndex = index
-                    return true
                 }
             })
-            if (exists) {      //edit embed coz order already exists for this seller
+            if (embIndex != null) {      //edit embed coz order already exists for this seller
                 embeds[embIndex] = {
                     description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                     color: '#7cb45d'
