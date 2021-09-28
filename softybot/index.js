@@ -3038,7 +3038,7 @@ async function trading_bot(message,args,command) {
         msg = await message.channel.messages.fetch().then(allMsgs => {
         allMsgs.forEach(msg => {
             console.log(msg)
-            if (msg.embeds)
+            if (msg.embeds.length != 0)
                 if (msg.embeds[0].title = `(S) ${item_name}`)
                     return msg
                 })
