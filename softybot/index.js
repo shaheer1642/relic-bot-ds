@@ -3133,9 +3133,9 @@ async function trading_bot(message,args,command) {
             .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
             */
             var embed1 = {
-                title: `(S) ${item_name}`,
+                //title: `(S) ${item_name}`,
                 author: {
-                    name: '...',
+                    name: `(S) ${item_name}`,
                     icon_url: icon_url
                 },
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
