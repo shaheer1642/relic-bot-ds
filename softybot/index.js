@@ -3070,11 +3070,16 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
                 for (i=0;i<embeds.length;i++) {
-                    await msg.react(num_reacts[i])
+                    var status = await msg.react(num_reacts[i])
+                    .then(() => {
+                        return true
+                    })
                     .catch(err => {
                         console.log(err)
-                        break
+                        return false
                     })
+                    if (!status)
+                        break
                 }
             })
             .catch(err => {
@@ -3101,14 +3106,10 @@ async function trading_bot(message,args,command) {
 
             await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
-                const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
-                for (i=0;i<embeds.length;i++) {
-                    await msg.react(num_reacts[i])
-                    .catch(err => {
-                        console.log(err)
-                        break
-                    })
-                }
+                await msg.react('1️⃣')
+                .catch(err => {
+                    console.log(err)
+                })
             })
             .catch(err => {
                 console.log(err)
@@ -3151,11 +3152,16 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
                 for (i=0;i<embeds.length;i++) {
-                    await msg.react(num_reacts[i])
+                    var status = await msg.react(num_reacts[i])
+                    .then(() => {
+                        return true
+                    })
                     .catch(err => {
                         console.log(err)
-                        break
+                        return false
                     })
+                    if (!status)
+                        break
                 }
             })
             .catch(err => {
@@ -3174,14 +3180,10 @@ async function trading_bot(message,args,command) {
             }
             await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
-                const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
-                for (i=0;i<embeds.length;i++) {
-                    await msg.react(num_reacts[i])
-                    .catch(err => {
-                        console.log(err)
-                        break
-                    })
-                }
+                await msg.react('1️⃣')
+                .catch(err => {
+                    console.log(err)
+                })
             })
             .catch(err => {
                 console.log(err)
