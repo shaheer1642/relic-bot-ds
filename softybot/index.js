@@ -3093,12 +3093,12 @@ async function trading_bot(message,args,command) {
                 color: '#7cb45d'
             }
 
-            await message.channel.send({content: 'test', embeds: [embed1,embed2]})
+            await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
                 await msg.react("🇧")
                 .catch(err => console.log(err+"\nError reacting buy."))
                 message.delete()
-                .catch(err => console.log(err+"\nError reacting buy."))
+                .catch(err => console.log(err+"\nError deleting original."))
             })
             .catch(err => {
                 console.log(err)
