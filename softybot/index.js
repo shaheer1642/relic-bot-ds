@@ -203,6 +203,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         return
 
         if (reaction.message.channelId == tradingBotChannel || reaction.message.channelId == '892108718358007820') {
+            return
             if (reaction.emoji.name == "🇧") {
                 if (!reaction.message.author)
                     var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -3015,16 +3016,13 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItemsUrl.length > 1) {
-        message.channel.send("Something went wrong. Please try again.<:ItsFreeRealEstate:892141191301328896>\nError code: 500").catch(err => console.log(err));    
+        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err)); 
+        setTimeout(() => message.delete(), 5000) 
         return
     }
     if (arrItemsUrl.length==0) {
         message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
         setTimeout(() => message.delete(), 5000)
-        return
-    }
-    if (arrItemsUrl.length > 10) {
-        message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));  
         return
     }
     const item_url = arrItemsUrl[0].item_url
