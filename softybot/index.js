@@ -3084,15 +3084,38 @@ async function trading_bot(message,args,command) {
             .setColor('#7cb45d')
             .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
             */
+           /*
             var embed = {
                 title: `(S) ${item_name}`,
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
             }
-            await message.channel.send({content: 'test', embeds: [embed]})
+            */
+    var embed1 = new MessageEmbed()
+    .setTitle('Item X (Buyers)')
+    .setColor('#E74C3C')
+    .setDescription(`
+        Buyer A
+        Price A
+    `)
+    var embed2 = new MessageEmbed()
+    .setColor('#E74C3C')
+    .setDescription(`
+        Buyer B
+        Price B
+    `)
+    var embed3 = new MessageEmbed()
+    .setColor('#E74C3C')
+    .setDescription(`
+        Buyer C
+        Price C
+    `)
+            await message.channel.send({content: 'test', embeds: [embed1,embed2,embed3]})
             .then(async msg => {
                 await msg.react("🇧")
+                .catch(err => console.log(err+"\nError reacting buy."))
+                message.delete()
                 .catch(err => console.log(err+"\nError reacting buy."))
             })
             .catch(err => {
