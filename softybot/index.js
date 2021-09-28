@@ -3015,7 +3015,7 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItemsUrl.length > 1) {
-        message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));    
+        message.channel.send("Something went wrong. Please try again.<:ItsFreeRealEstate:892141191301328896>\nError code: 500").catch(err => console.log(err));    
         return
     }
     if (arrItemsUrl.length==0) {
