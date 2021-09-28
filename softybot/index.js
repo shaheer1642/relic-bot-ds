@@ -106,7 +106,7 @@ client.on('messageCreate', async message => {
                 return
             }
         }
-        if (message.channelId == tradingBotChannel || reaction.message.channelId == '892108718358007820') {
+        if (message.channelId == tradingBotChannel || message.channelId == '892108718358007820') {
             const args = element.toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
