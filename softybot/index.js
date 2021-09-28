@@ -3081,13 +3081,15 @@ async function trading_bot(message,args,command) {
                     if (!status)
                         break
                 }
+                message.delete()
+                .catch(err => {
+                    console.log(err)
+                })
             })
             .catch(err => {
                 console.log(err)
                 return
             })
-            message.delete()
-            return
         }
         else {
             /*
@@ -3107,6 +3109,10 @@ async function trading_bot(message,args,command) {
             await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
                 await msg.react('1️⃣')
+                .catch(err => {
+                    console.log(err)
+                })
+                message.delete()
                 .catch(err => {
                     console.log(err)
                 })
@@ -3163,13 +3169,15 @@ async function trading_bot(message,args,command) {
                     if (!status)
                         break
                 }
+                message.delete()
+                .catch(err => {
+                    console.log(err)
+                })
             })
             .catch(err => {
                 console.log(err)
                 return
             })
-            message.delete()
-            return
         }
         else {
             var embed1 = {
@@ -3181,6 +3189,10 @@ async function trading_bot(message,args,command) {
             await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
                 await msg.react('1️⃣')
+                .catch(err => {
+                    console.log(err)
+                })
+                message.delete()
                 .catch(err => {
                     console.log(err)
                 })
