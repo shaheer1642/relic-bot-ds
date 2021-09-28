@@ -3118,9 +3118,13 @@ async function trading_bot(message,args,command) {
         else {
             var icon_url = null
             if (!item_url.match(/_set$/)) {
+                console.log("not a set")
                 var temp = item_url.split("_")
                 icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
             }
+            else 
+                console.log("is a set")
+            console.log(icon_url)
             /*
             var new_embed = new MessageEmbed()
             .setTitle(`(S) ${item_name}`)
