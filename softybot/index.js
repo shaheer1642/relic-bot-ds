@@ -3091,9 +3091,9 @@ async function trading_bot(message,args,command) {
                 color: '#7cb45d'
             }
             var new_embed2 = {
-                title: `(S) ${item_name}`,
+                title: `change`,
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                description: `**change:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
             }
             await message.channel.send({content: 'new', embeds: [new_embed1,new_embed2]})
