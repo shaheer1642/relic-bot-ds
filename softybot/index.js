@@ -3028,7 +3028,58 @@ async function trading_bot(message,args,command) {
     }
     const item_url = arrItemsUrl[0].item_url
     const item_id = arrItemsUrl[0].item_id
+    const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     if (command == 'wts') {
+        var msg = null
+        msg = await message.channel.messages.fetch().then(allMsgs => {
+        allMsgs.forEach(msg => { 
+            if (msg.embed[0].title = `(S) ${item_name}`)
+                return msg
+            })
+            return null
+        })
+        .catch (err => {
+            console.log(err)
+        })
+        if (msg) {
+            var embeds = msg.embeds
+            var embIndex = null
+            var exists = false
+            exists = embeds.forEach((emb,index) => {
+                if (emb.description.match(`**Seller:** ${ingame_name}`)) {
+                    embIndex = index
+                    return true
+                }
+            })
+            if (exists) {      //edit embed coz order already exists for this seller
+                embeds[embIndex] = new MessageEmbed()
+                .setColor('#7cb45d')
+                .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
+            }
+            else {
+                var new_seller_embed = new MessageEmbed()
+                .setColor('#7cb45d')
+                .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
+                embeds.push(new_seller_embed)
+            }
+            await msg.edit({content: ' ',embeds: embeds})
+            .catch(err => {
+                console.log(err)
+                return
+            })
+            return
+        }
+        else {
+            var new_embed = new MessageEmbed()
+            .setTitle(`(S) ${item_name}`)
+            .setColor('#7cb45d')
+            .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
+            await message.channel.send({content: ' ', embeds: [new_embed]})
+            .catch(err => {
+                console.log(err)
+                return
+            })
+        }
         await message.channel.send(`**${ingame_name}** is selling **${item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** for **${price}<:platinum:881692607791648778>**`)
         .then(async msg => {
             await msg.react("🇧")
@@ -3037,6 +3088,7 @@ async function trading_bot(message,args,command) {
         })
         .catch(err => {
             console.log(err)
+            return
         })
     }
     else if (command == 'wtb') {
