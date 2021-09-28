@@ -71,6 +71,7 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return
+    if (message.guild)
     if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
         message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
         return
@@ -104,6 +105,8 @@ client.on('messageCreate', async message => {
                 message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
                 return false
             })
+            if (!status)
+                return
             const args = element.trim().split(/ +/g)
             if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
                 trading_bot_registeration(message,args.pop())
