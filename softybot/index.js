@@ -3117,7 +3117,7 @@ async function trading_bot(message,args,command) {
         }
         else {
             var icon_url = null
-            if (!item_url.match('set')) {
+            if (!item_url.match(/_set$/)) {
                 var temp = item_url.split("_")
                 icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
             }
