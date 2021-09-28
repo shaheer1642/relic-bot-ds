@@ -3067,24 +3067,25 @@ async function trading_bot(message,args,command) {
                 })
                 var temp_title = null
                 var temp_url = null
-                //---sorting embeds----
-                embeds.forEach(async (e,index) => {
-                    temp = e.description.split("**")
-                    embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
-                    if (e.title != null) {
-                        temp_title = e.title
-                        temp_url = e.url
-                    }
-                })
-                embeds = embeds.sort(dynamicSort("price"))
-                embeds.forEach(async (e,index) => {
-                    embeds[index].title = null
-                    embeds[index].url = null
-                })
-                embeds[0].title = temp_title
-                embeds[0].url = temp_url
-                console.log(embeds)
             }
+            //---sorting embeds----
+            embeds.forEach(async (e,index) => {
+                temp = e.description.split("**")
+                embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
+                if (e.title != null) {
+                    temp_title = e.title
+                    temp_url = e.url
+                }
+            })
+            embeds = embeds.sort(dynamicSort("price"))
+            embeds.forEach(async (e,index) => {
+                embeds[index].title = null
+                embeds[index].url = null
+            })
+            embeds[0].title = temp_title
+            embeds[0].url = temp_url
+            console.log(embeds)
+            //---------------------
             await msg.edit({content: ' ',embeds: embeds})
             .then(async msg => {
                 const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
@@ -3172,6 +3173,24 @@ async function trading_bot(message,args,command) {
                     color: '#E74C3C'
                 })
             }
+            //---sorting embeds----
+            embeds.forEach(async (e,index) => {
+                temp = e.description.split("**")
+                embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
+                if (e.title != null) {
+                    temp_title = e.title
+                    temp_url = e.url
+                }
+            })
+            embeds = embeds.sort(dynamicSortDesc("price"))
+            embeds.forEach(async (e,index) => {
+                embeds[index].title = null
+                embeds[index].url = null
+            })
+            embeds[0].title = temp_title
+            embeds[0].url = temp_url
+            console.log(embeds)
+            //---------------------
             await msg.edit({content: ' ',embeds: embeds})
             .then(async msg => {
                 const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
