@@ -2597,7 +2597,6 @@ async function updateDatabasePrices () {
                         if (e.order_type == "buy")
                             buyPrices.push(e)
                     })
-                    console.log(buyPrices)
                     buyAvgPrice = buyPrices[buyPrices.length-1].moving_avg
                     if (!buyAvgPrice)
                         buyAvgPrice = buyPrices[buyPrices.length-1].median
