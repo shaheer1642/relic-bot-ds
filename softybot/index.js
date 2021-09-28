@@ -3036,12 +3036,14 @@ async function trading_bot(message,args,command) {
     if (command == 'wts') {
         var msg = null
         msg = await message.channel.messages.fetch().then(allMsgs => {
-        allMsgs.forEach(msg => {
-            console.log(msg)
-            if (msg.embeds.length != 0)
-                if (msg.embeds[0].title = `(S) ${item_name}`)
-                    return msg
-                })
+            allMsgs.forEach(msg => {
+                if (msg.embeds.length != 0) {
+                    console.log(msg.embeds[0].title)
+                    console.log(msg.embeds[0].description)
+                    if (msg.embeds[0].title = `(S) ${item_name}`)
+                        return msg
+                }
+            })
             return null
         })
         .catch (err => {
@@ -3087,10 +3089,6 @@ async function trading_bot(message,args,command) {
             var embed1 = {
                 title: `(S) ${item_name}`,
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
-                color: '#7cb45d'
-            }
-            var embed2 = {
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
             }
