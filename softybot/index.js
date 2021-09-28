@@ -2591,6 +2591,7 @@ async function updateDatabasePrices () {
                     console.log(avgPrice)
                     var ducat_value = null
                     let relics = null
+                    var icon_url = null
                     var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
                         if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
                             if (itemOrders.data.include.item.items_in_set[k].ducats)
@@ -2599,6 +2600,8 @@ async function updateDatabasePrices () {
                                 if (itemOrders.data.include.item.items_in_set[k].en.drop.length!=0)
                                     relics = itemOrders.data.include.item.items_in_set[k].en.drop
                             }
+                            if (item.tags.includes("set") && item.tags.includes("prime"))
+                                icon_url = itemOrders.data.include.item.items_in_set[k].icon
                             return true
                         }
                     })
@@ -2762,7 +2765,8 @@ async function updateDatabasePrices () {
                     var status = await db.query(`UPDATE items_list SET 
                         sell_price = ${avgPrice},
                         ducat = ${ducat_value},
-                        relics = '${JSON.stringify(relics)}'
+                        relics = '${JSON.stringify(relics)}',
+                        icon_url = '${icon_url}'
                         WHERE id = '${item.id}'`)
                     .then( () => {
                         console.log(`Updated DB prices.`)
@@ -3122,8 +3126,21 @@ async function trading_bot(message,args,command) {
                 var temp = item_url.split("_")
                 icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
             }
-            else 
-                console.log("is a set")
+            else {
+                status = await db.query(`SELECT * from items_list WHERE item_url = '${item_url}'`)
+                .then(res => {
+                    if (res.rows.length != 0)
+                        icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+                    else 
+                        return false
+                    return true
+                })
+                .catch(err => {
+                    console.log(err + '\n1st Error retreiving set icon.')
+                })
+                if (!status)
+                    console.log('2nd Error retreiving set icon.')
+            }
             console.log(icon_url)
             /*
             var new_embed = new MessageEmbed()
