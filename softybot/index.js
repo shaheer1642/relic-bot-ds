@@ -3032,10 +3032,11 @@ async function trading_bot(message,args,command) {
     if (command == 'wts') {
         var msg = null
         msg = await message.channel.messages.fetch().then(allMsgs => {
-        allMsgs.forEach(msg => { 
-            if (msg.embeds[0].title = `(S) ${item_name}`)
-                return msg
-            })
+        allMsgs.forEach(msg => {
+            if (msg.embeds[0].title)
+                if (msg.embeds[0].title = `(S) ${item_name}`)
+                    return msg
+                })
             return null
         })
         .catch (err => {
@@ -3074,7 +3075,7 @@ async function trading_bot(message,args,command) {
             .setTitle(`(S) ${item_name}`)
             .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
             .setColor('#7cb45d')
-            .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
+            .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
             await message.channel.send({content: ' ', embeds: [new_embed]})
             .then(async msg => {
                 await msg.react("🇧")
