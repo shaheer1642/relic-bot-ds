@@ -3065,13 +3065,13 @@ async function trading_bot(message,args,command) {
                     description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                     color: '#7cb45d'
                 })
-                const temp_title = null
-                const temp_url = null
+                var temp_title = null
+                var temp_url = null
                 //---sorting embeds----
                 embeds.forEach(async (e,index) => {
                     temp = e.description.split("**")
                     embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
-                    if (e.title) {
+                    if (e.title != null) {
                         temp_title = e.title
                         temp_url = e.url
                     }
