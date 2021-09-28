@@ -3056,12 +3056,8 @@ async function trading_bot(message,args,command) {
                     embIndex = index
                 }
             })
-            if (embIndex != null) {      //edit embed coz order already exists for this seller
-                embeds[embIndex] = {
-                    description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
-                    color: '#7cb45d'
-                }
-            }
+            if (embIndex != null)      //edit embed coz order already exists for this seller
+                embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`
             else {
                 embeds.push({
                     description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
@@ -3073,6 +3069,7 @@ async function trading_bot(message,args,command) {
                 console.log(err)
                 return
             })
+            message.delete()
             return
         }
         else {
