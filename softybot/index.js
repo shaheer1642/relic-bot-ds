@@ -3074,7 +3074,7 @@ async function trading_bot(message,args,command) {
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
-    else if (price < (avg_price*0.2)) {
+    else if (price < (avg_price*0.8)) {
         message.channel.send(`⚠️ Your price is a lot lower than the average price of ${avg_price} for ${item_name} ⚠️\nTry increaing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
