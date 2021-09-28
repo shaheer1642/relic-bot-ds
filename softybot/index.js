@@ -3065,12 +3065,24 @@ async function trading_bot(message,args,command) {
                     description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                     color: '#7cb45d'
                 })
+                const temp_title = null
+                const temp_url = null
                 //---sorting embeds----
                 embeds.forEach(async (e,index) => {
                     temp = e.description.split("**")
                     embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
+                    if (e.title) {
+                        temp_title = e.title
+                        temp_url = e.url
+                    }
                 })
                 embeds = embeds.sort(dynamicSort("price"))
+                embeds.forEach(async (e,index) => {
+                    embeds[index].title = null
+                    embeds[index].url = null
+                })
+                embeds[0].title = temp_title
+                embeds[0].url = temp_url
                 console.log(embeds)
             }
             await msg.edit({content: ' ',embeds: embeds})
@@ -3090,10 +3102,7 @@ async function trading_bot(message,args,command) {
                             break
                     }
                 }
-                message.delete()
-                .catch(err => {
-                    console.log(err)
-                })
+                message.delete().catch(err => console.log(err))
             })
             .catch(err => {
                 console.log(err)
