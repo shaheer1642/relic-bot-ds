@@ -3072,6 +3072,7 @@ async function trading_bot(message,args,command) {
         else {
             var new_embed = new MessageEmbed()
             .setTitle(`(S) ${item_name}`)
+            .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
             .setColor('#7cb45d')
             .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
             await message.channel.send({content: ' ', embeds: [new_embed]})
