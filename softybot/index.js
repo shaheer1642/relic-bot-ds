@@ -3084,23 +3084,16 @@ async function trading_bot(message,args,command) {
             .setColor('#7cb45d')
             .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
             */
-           /*
-            var embed = {
+            var embed1 = {
                 title: `(S) ${item_name}`,
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
             }
-            */
-            var embed1 = new MessageEmbed()
-                .setTitle(`(S) ${item_name}`)
-                .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
-                .setColor('#7cb45d')
-                .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
-            
-            var embed2 = new MessageEmbed()
-                .setColor('#7cb45d')
-                .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
+            var embed2 = {
+                description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                color: '#7cb45d'
+            }
 
             await message.channel.send({content: 'test', embeds: [embed1,embed2]})
             .then(async msg => {
