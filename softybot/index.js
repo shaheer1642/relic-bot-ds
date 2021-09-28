@@ -71,7 +71,7 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return
-    if (message.guild.id=='832677897411493949' && message.content=='!rhino') {
+    if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
         message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
         return
     }
