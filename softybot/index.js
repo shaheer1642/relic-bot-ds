@@ -3085,7 +3085,7 @@ async function trading_bot(message,args,command) {
                 embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
                 if (e.author) {
                     temp_author = e.author.name
-                    temp_icon = e.author.icon_url
+                    temp_icon = e.author.iconURL
                 }
                 embeds[index].author = null
             })
@@ -3096,7 +3096,7 @@ async function trading_bot(message,args,command) {
                 embeds[index].url = null
             })
             */
-            embeds[0].author = {name: temp_author,icon_url: temp_icon}
+            embeds[0].author = {name: temp_author,iconURL: temp_icon}
             console.log(embeds)
             //---------------------
             await msg.edit({content: ' ',embeds: embeds})
@@ -3157,7 +3157,7 @@ async function trading_bot(message,args,command) {
                 //title: `(S) ${item_name}`,
                 author: {
                     name: `(S) ${item_name}`,
-                    icon_url: icon_url
+                    iconURL: icon_url
                 },
                 //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
