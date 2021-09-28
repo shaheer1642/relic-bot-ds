@@ -3135,7 +3135,7 @@ async function trading_bot(message,args,command) {
             var embed1 = {
                 //title: `(S) ${item_name}`,
                 author: {
-                    name: `(S) ${item_name}`,
+                    name: `[${item_name}](https://www.youtube.com/watch?v=dQw4w9WgXcQ)`,
                     icon_url: icon_url
                 },
                 //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
