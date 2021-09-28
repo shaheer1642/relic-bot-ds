@@ -3070,10 +3070,10 @@ async function trading_bot(message,args,command) {
                 }
             })
             if (embIndex != null)      //edit embed coz order already exists for this seller
-                embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`
+                embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`
             else {
                 embeds.push({
-                    description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`,
                     color: '#7cb45d'
                 })
             }
@@ -3160,7 +3160,7 @@ async function trading_bot(message,args,command) {
                     iconURL: icon_url
                 },
                 //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
             }
 
@@ -3205,10 +3205,10 @@ async function trading_bot(message,args,command) {
                 }
             })
             if (embIndex != null)      //edit embed coz order already exists for this buyer
-                embeds[embIndex].description = `**Buyer:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`
+                embeds[embIndex].description = `**Buyer:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`
             else {
                 embeds.push({
-                    description: `**Buyer:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                    description: `**Buyer:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`,
                     color: '#E74C3C'
                 })
             }
@@ -3280,7 +3280,7 @@ async function trading_bot(message,args,command) {
                     name: `(B) ${item_name}`,
                     iconURL: icon_url
                 },
-                description: `**Buyer:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                description: `**Buyer:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`,
                 color: '#E74C3C'
             }
 
