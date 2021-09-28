@@ -3186,7 +3186,7 @@ async function trading_bot(message,args,command) {
         await message.channel.messages.fetch().then(allMsgs => {
             allMsgs.forEach(e => {
                 if (e.embeds.length != 0) {
-                    if (e.embeds[0].title == `(B) ${item_name}`)
+                    if (e.embeds[0].author.name == `(B) ${item_name}`)
                         msg = e
                 }
             })
@@ -3213,21 +3213,19 @@ async function trading_bot(message,args,command) {
                 })
             }
             //---sorting embeds----
+            var temp_author = null
+            var temp_icon = null
             embeds.forEach(async (e,index) => {
                 temp = e.description.split("**")
                 embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
-                if (e.title != null) {
-                    temp_title = e.title
-                    temp_url = e.url
+                if (e.author) {
+                    temp_author = e.author.name
+                    temp_icon = e.author.iconURL
                 }
+                embeds[index].author = null
             })
             embeds = embeds.sort(dynamicSortDesc("price"))
-            embeds.forEach(async (e,index) => {
-                embeds[index].title = null
-                embeds[index].url = null
-            })
-            embeds[0].title = temp_title
-            embeds[0].url = temp_url
+            embeds[0].author = {name: temp_author,iconURL: temp_icon}
             console.log(embeds)
             //---------------------
             await msg.edit({content: ' ',embeds: embeds})
@@ -3247,10 +3245,7 @@ async function trading_bot(message,args,command) {
                             break
                     }
                 }
-                message.delete()
-                .catch(err => {
-                    console.log(err)
-                })
+                message.delete().catch(err => console.log(err))
             })
             .catch(err => {
                 console.log(err)
@@ -3258,12 +3253,37 @@ async function trading_bot(message,args,command) {
             })
         }
         else {
+            var icon_url = null
+            if (!item_url.match(/_set$/)) {
+                console.log("not a set")
+                var temp = item_url.split("_")
+                icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+            }
+            else {
+                status = await db.query(`SELECT * from items_list WHERE item_url = '${item_url}'`)
+                .then(res => {
+                    if (res.rows.length != 0)
+                        icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+                    else 
+                        return false
+                    return true
+                })
+                .catch(err => {
+                    console.log(err + '\n1st Error retreiving set icon.')
+                })
+                if (!status)
+                    console.log('2nd Error retreiving set icon.')
+            }
+            console.log(icon_url)
             var embed1 = {
-                title: `(B) ${item_name}`,
-                url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+                author: {
+                    name: `(B) ${item_name}`,
+                    iconURL: icon_url
+                },
                 description: `**Buyer:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#E74C3C'
             }
+
             await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
                 await msg.react('1️⃣')
