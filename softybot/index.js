@@ -3049,7 +3049,9 @@ async function trading_bot(message,args,command) {
         if (msg) {
             var embeds = msg.embeds
             var embIndex = null
+            console.log(embeds)
             embeds.forEach((emb,index) => {
+                console.log(emb.description)
                 if (emb.description.match(`**Seller:** ${ingame_name}`)) {
                     embIndex = index
                 }
