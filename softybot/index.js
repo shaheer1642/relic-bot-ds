@@ -3116,6 +3116,11 @@ async function trading_bot(message,args,command) {
             })
         }
         else {
+            var icon_url = null
+            if (!item_url.match('set')) {
+                var temp = item_url.split("_")
+                icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+            }
             /*
             var new_embed = new MessageEmbed()
             .setTitle(`(S) ${item_name}`)
@@ -3125,6 +3130,9 @@ async function trading_bot(message,args,command) {
             */
             var embed1 = {
                 title: `(S) ${item_name}`,
+                author: {
+                    icon_url: icon_url
+                },
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
