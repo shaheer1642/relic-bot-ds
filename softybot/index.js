@@ -3070,16 +3070,18 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
                 for (i=0;i<embeds.length;i++) {
-                    var status = await msg.react(num_reacts[i])
-                    .then(() => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status)
-                        break
+                    if (!msg.reactions.cache.find(react => react.name==num_reacts[i])) {
+                        var status = await msg.react(num_reacts[i])
+                        .then(() => {
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status)
+                            break
+                    }
                 }
                 message.delete()
                 .catch(err => {
@@ -3158,16 +3160,18 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
                 for (i=0;i<embeds.length;i++) {
-                    var status = await msg.react(num_reacts[i])
-                    .then(() => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status)
-                        break
+                    if (!msg.reactions.cache.find(react => react.name==num_reacts[i])) {
+                        var status = await msg.react(num_reacts[i])
+                        .then(() => {
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status)
+                            break
+                    }
                 }
                 message.delete()
                 .catch(err => {
