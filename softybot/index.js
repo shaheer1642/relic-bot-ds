@@ -2939,9 +2939,14 @@ axiosRetry(axios, {
 });
 
 async function trading_bot(message,args,command) {
-    const price = Number(args.pop().replace(/[a-zA-Z]/g, ""))
+    const price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
     if (!price) {
         message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180').then(msg => setTimeout(() => msg.delete(), 5000))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return
+    }
+    if (price < 0) {
+        message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000))
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
