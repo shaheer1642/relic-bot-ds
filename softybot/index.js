@@ -3058,15 +3058,16 @@ async function trading_bot(message,args,command) {
                 }
             })
             if (exists) {      //edit embed coz order already exists for this seller
-                embeds[embIndex] = new MessageEmbed()
-                .setColor('#7cb45d')
-                .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
+                embeds[embIndex] = {
+                    description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                    color: '#7cb45d'
+                }
             }
             else {
-                var new_seller_embed = new MessageEmbed()
-                .setColor('#7cb45d')
-                .setDescription(`**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`)
-                embeds.push(new_seller_embed)
+                embeds.push({
+                    description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                    color: '#7cb45d'
+                })
             }
             await msg.edit({content: ' ',embeds: embeds})
             .catch(err => {
@@ -3076,11 +3077,19 @@ async function trading_bot(message,args,command) {
             return
         }
         else {
+            /*
             var new_embed = new MessageEmbed()
             .setTitle(`(S) ${item_name}`)
             .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
             .setColor('#7cb45d')
             .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
+            */
+            var new_embed = {
+                title: `(S) ${item_name}`,
+                url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+                description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                color: '#7cb45d'
+            }
             await message.channel.send({content: ' ', embeds: [new_embed]})
             .then(async msg => {
                 await msg.react("🇧")
