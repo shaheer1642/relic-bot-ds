@@ -127,7 +127,7 @@ client.on('messageCreate', async message => {
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
-                setTimeout(() => message.delete(), 5000)
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
             return
         }
@@ -255,7 +255,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     reaction.users.remove(user.id);
                     return
                 }
-                reaction.message.delete()
+                reaction.message.delete().catch(err => console.log(err))
                 var trader_id = ""
                 var status = await db.query(`SELECT * FROM users_list WHERE ingame_name = '${trader_ign}'`)
                 .then(res => {
@@ -365,7 +365,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     reaction.users.remove(user.id);
                     return
                 }
-                reaction.message.delete()
+                reaction.message.delete().catch(err => console.log(err))
                 var trader_id = ""
                 var status = await db.query(`SELECT * FROM users_list WHERE ingame_name = '${trader_ign}'`)
                 .then(res => {
@@ -2942,7 +2942,7 @@ async function trading_bot(message,args,command) {
     const price = Number(args.pop().replace(/[a-zA-Z]/g, ""))
     if (!price) {
         message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180').then(msg => setTimeout(() => msg.delete(), 5000))
-        setTimeout(() => message.delete(), 5000)
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
     console.log(price)
@@ -2971,7 +2971,7 @@ async function trading_bot(message,args,command) {
         } catch (err) {
             message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
         }
-        setTimeout(() => message.delete(), 5000)
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
     //---------------
@@ -3024,12 +3024,12 @@ async function trading_bot(message,args,command) {
     }
     if (arrItemsUrl.length > 1) {
         message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err)); 
-        setTimeout(() => message.delete(), 5000) 
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return
     }
     if (arrItemsUrl.length==0) {
         message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-        setTimeout(() => message.delete(), 5000)
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
     const item_url = arrItemsUrl[0].item_url
@@ -3065,6 +3065,12 @@ async function trading_bot(message,args,command) {
                     description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                     color: '#7cb45d'
                 })
+                //---sorting embeds----
+                embeds.forEach(async (e,index) => {
+                    temp = e.description.split("**")
+                    embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
+                })
+                console.log(embeds)
             }
             await msg.edit({content: ' ',embeds: embeds})
             .then(async msg => {
