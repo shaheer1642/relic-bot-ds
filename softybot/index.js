@@ -3076,25 +3076,27 @@ async function trading_bot(message,args,command) {
                     description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                     color: '#7cb45d'
                 })
-                var temp_title = null
-                var temp_url = null
             }
             //---sorting embeds----
+            var temp_author = null
+            var temp_icon = null
             embeds.forEach(async (e,index) => {
                 temp = e.description.split("**")
                 embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
-                if (e.title != null) {
-                    temp_title = e.title
-                    temp_url = e.url
+                if (e.author) {
+                    temp_author = e.author.name
+                    temp_icon = e.author.icon_url
                 }
+                embeds[index].author = null
             })
             embeds = embeds.sort(dynamicSort("price"))
+            /*
             embeds.forEach(async (e,index) => {
                 embeds[index].title = null
                 embeds[index].url = null
             })
-            embeds[0].title = temp_title
-            embeds[0].url = temp_url
+            */
+            embeds[0].author = {name: temp_author,icon_url: temp_icon}
             console.log(embeds)
             //---------------------
             await msg.edit({content: ' ',embeds: embeds})
@@ -3152,12 +3154,12 @@ async function trading_bot(message,args,command) {
             .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
             */
             var embed1 = {
-                title: `(S) ${item_name}`,
+                //title: `(S) ${item_name}`,
                 author: {
-                    name: `\u200b`,
+                    name: `(S) ${item_name}`,
                     icon_url: icon_url
                 },
-                url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+                //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
             }
