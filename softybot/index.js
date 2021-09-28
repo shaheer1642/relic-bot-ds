@@ -3070,6 +3070,7 @@ async function trading_bot(message,args,command) {
                     temp = e.description.split("**")
                     embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
                 })
+                embeds = embeds.sort(dynamicSort("price"))
                 console.log(embeds)
             }
             await msg.edit({content: ' ',embeds: embeds})
