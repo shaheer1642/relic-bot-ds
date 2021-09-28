@@ -3052,7 +3052,7 @@ async function trading_bot(message,args,command) {
             console.log(embeds)
             embeds.forEach((emb,index) => {
                 console.log(emb.description)
-                if (emb.description.match(`**Seller:** ${ingame_name}`)) {
+                if (emb.description.match(ingame_name)) {
                     embIndex = index
                 }
             })
