@@ -2601,7 +2601,8 @@ async function updateDatabasePrices () {
                                     relics = itemOrders.data.include.item.items_in_set[k].en.drop
                             }
                             if (item.tags.includes("set") && item.tags.includes("prime"))
-                                icon_url = itemOrders.data.include.item.items_in_set[k].icon
+                                if (itemOrders.data.include.item.items_in_set[k].icon)
+                                    icon_url = itemOrders.data.include.item.items_in_set[k].icon
                             return true
                         }
                     })
@@ -2761,6 +2762,7 @@ async function updateDatabasePrices () {
                             return false
                     }
                     //---------------------
+                    console.log(`icon_url: ${icon_url}`)
                     console.log(`Updating DB prices...`)
                     var status = await db.query(`UPDATE items_list SET 
                         sell_price = ${avgPrice},
