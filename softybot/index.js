@@ -3135,10 +3135,10 @@ async function trading_bot(message,args,command) {
             var embed1 = {
                 //title: `(S) ${item_name}`,
                 author: {
-                    name: `(S) ${item_name}`,
+                    name: `(S) [${item_name}](https://www.youtube.com/watch?v=dQw4w9WgXcQ)`,
                     icon_url: icon_url
                 },
-                url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+                //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
             }
