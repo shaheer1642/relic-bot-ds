@@ -3086,12 +3086,12 @@ async function trading_bot(message,args,command) {
         return
     }
     if (price > (avg_price*1.2)) {
-        message.channel.send(`⚠️ Your price is a lot **greater than** the average price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
     else if (price < (avg_price*0.8)) {
-        message.channel.send(`⚠️ Your price is a lot **lower than** the average price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
