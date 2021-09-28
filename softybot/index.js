@@ -2760,7 +2760,7 @@ async function updateDatabasePrices () {
                     //---------------------
                     console.log(`Updating DB prices...`)
                     var status = await db.query(`UPDATE items_list SET 
-                        price = ${avgPrice},
+                        sell_price = ${avgPrice},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}'
                         WHERE id = '${item.id}'`)
@@ -3067,6 +3067,16 @@ async function trading_bot(message,args,command) {
                 })
             }
             await msg.edit({content: ' ',embeds: embeds})
+            .then(async msg => {
+                const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
+                for (i=0;i<embeds.length;i++) {
+                    await msg.react(num_reacts[i])
+                    .catch(err => {
+                        console.log(err)
+                        break
+                    })
+                }
+            })
             .catch(err => {
                 console.log(err)
                 return
@@ -3091,10 +3101,14 @@ async function trading_bot(message,args,command) {
 
             await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
-                await msg.react("🇧")
-                .catch(err => console.log(err+"\nError reacting buy."))
-                message.delete()
-                .catch(err => console.log(err+"\nError deleting original."))
+                const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
+                for (i=0;i<embeds.length;i++) {
+                    await msg.react(num_reacts[i])
+                    .catch(err => {
+                        console.log(err)
+                        break
+                    })
+                }
             })
             .catch(err => {
                 console.log(err)
@@ -3134,6 +3148,16 @@ async function trading_bot(message,args,command) {
                 })
             }
             await msg.edit({content: ' ',embeds: embeds})
+            .then(async msg => {
+                const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
+                for (i=0;i<embeds.length;i++) {
+                    await msg.react(num_reacts[i])
+                    .catch(err => {
+                        console.log(err)
+                        break
+                    })
+                }
+            })
             .catch(err => {
                 console.log(err)
                 return
@@ -3150,10 +3174,14 @@ async function trading_bot(message,args,command) {
             }
             await message.channel.send({content: ' ', embeds: [embed1]})
             .then(async msg => {
-                await msg.react("🇸")
-                .catch(err => console.log(err+"\nError reacting sell."))
-                message.delete()
-                .catch(err => console.log(err+"\nError deleting original."))
+                const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
+                for (i=0;i<embeds.length;i++) {
+                    await msg.react(num_reacts[i])
+                    .catch(err => {
+                        console.log(err)
+                        break
+                    })
+                }
             })
             .catch(err => {
                 console.log(err)
