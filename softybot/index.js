@@ -2935,6 +2935,7 @@ async function trading_bot(message,args,command) {
     if (!price) {
         message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180').then(msg => setTimeout(() => msg.delete(), 5000))
         setTimeout(() => message.delete(), 5000)
+        return
     }
     console.log(price)
     var ingame_name = ''
@@ -2976,7 +2977,8 @@ async function trading_bot(message,args,command) {
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
     if (!d_item_url.match("prime"))
     {
-        message.channel.send("This command is only limited to prime items for now.").catch(err => console.log(err));
+        message.channel.send("This command is only limited to prime items for now.").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete(), 5000)
         return
     }
     let arrItemsUrl = []
