@@ -3019,7 +3019,8 @@ async function trading_bot(message,args,command) {
         return
     }
     if (arrItemsUrl.length==0) {
-        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").catch(err => console.log(err));    
+        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete(), 5000)
         return
     }
     if (arrItemsUrl.length > 10) {
