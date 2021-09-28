@@ -3084,18 +3084,19 @@ async function trading_bot(message,args,command) {
             .setColor('#7cb45d')
             .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
             */
-            var embeds = [{
+            var embeds = []
+            embeds.push({
                 title: `(S) ${item_name}`,
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
                 description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
-            },
-            {
-                title: `change`,
+            })
+            embeds.push({
+                title: `(S) ${item_name}`,
                 url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                description: `**change:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                description: `**Seller:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
                 color: '#7cb45d'
-            }]
+            })
             await message.channel.send({content: 'new', embeds: embeds})
             .then(async msg => {
                 await msg.react("🇧")
