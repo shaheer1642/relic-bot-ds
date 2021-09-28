@@ -3046,6 +3046,39 @@ async function trading_bot(message,args,command) {
     const item_url = arrItemsUrl[0].item_url
     const item_id = arrItemsUrl[0].item_id
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    var avg_price = null
+    status = await db.query(`SELECT * from items_list WHERE id = ${item_id}`)
+    .then(async res => {
+        if (command == 'wts')
+            if (res.rows[0].sell_price)
+                avg_price = Math.round(Number(res.rows[0].sell_price))
+        if (command == 'wtb')
+            if (res.rows[0].buy_price)
+                avg_price = Math.round(Number(res.rows[0].buy_price))
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 500").catch(err => console.log(err)); 
+        return
+    }
+    if (avg_price == null || avg_price == "null") {
+        message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501").catch(err => console.log(err)); 
+        return
+    }
+    if (price > (avg_price*1.2)) {
+        message.channel.send(`⚠️ Your price is a lot greater than the average price of ${avg_price} for ${item_name} ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return
+    }
+    else if (price < (avg_price*0.2)) {
+        message.channel.send(`⚠️ Your price is a lot lower than the average price of ${avg_price} for ${item_name} ⚠️\nTry increaing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return
+    }
     if (command == 'wts') {
         var msg = null
         await message.channel.messages.fetch().then(allMsgs => {
