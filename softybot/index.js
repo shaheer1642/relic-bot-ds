@@ -106,7 +106,7 @@ client.on('messageCreate', async message => {
                 return
             }
         }
-        if (message.channelId == tradingBotChannel) {
+        if (message.channelId == tradingBotChannel || reaction.message.channelId == '892108718358007820') {
             const args = element.toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
@@ -198,10 +198,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-        if (reaction.message.channelId == tradingBotChannel) {
+        if (reaction.message.channelId == tradingBotChannel || reaction.message.channelId == '892108718358007820') {
             if (reaction.emoji.name == "🇧") {
                 if (!reaction.message.author)
                     var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
+                if (reaction.message.author.id != client.user.id)
+                    return
                 var arguments = reaction.message.content.split("**")
                 if (arguments[2].match('buying')) {
                     reaction.users.remove(user.id)
@@ -310,6 +312,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
             else if (reaction.emoji.name == "🇸") {
                 if (!reaction.message.author)
                     var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
+                if (reaction.message.author.id != client.user.id)
+                    return
                 var arguments = reaction.message.content.split("**")
                 if (arguments[2].match('selling')) {
                     reaction.users.remove(user.id)
