@@ -3047,7 +3047,7 @@ async function trading_bot(message,args,command) {
     const item_id = arrItemsUrl[0].item_id
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     var avg_price = null
-    status = await db.query(`SELECT * from items_list WHERE id = ${item_id}`)
+    status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
         if (command == 'wts')
             if (res.rows[0].sell_price)
