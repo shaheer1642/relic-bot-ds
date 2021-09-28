@@ -3103,15 +3103,63 @@ async function trading_bot(message,args,command) {
         }
     }
     else if (command == 'wtb') {
-        await message.channel.send(`**${ingame_name}** is buying **${item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** for **${price}<:platinum:881692607791648778>**`)
-        .then(async msg => {
-            await msg.react("🇸")
-            .catch(err => console.log(err+"\nError reacting sell."))
-            message.delete()
+        var msg = null
+        await message.channel.messages.fetch().then(allMsgs => {
+            allMsgs.forEach(e => {
+                if (e.embeds.length != 0) {
+                    if (e.embeds[0].title == `(B) ${item_name}`)
+                        msg = e
+                }
+            })
         })
-        .catch(err => {
+        .catch (err => {
             console.log(err)
         })
+        if (msg) {
+            var embeds = msg.embeds
+            var embIndex = null
+            console.log(embeds)
+            embeds.forEach((emb,index) => {
+                console.log(emb.description)
+                if (emb.description.match(ingame_name)) {
+                    embIndex = index
+                }
+            })
+            if (embIndex != null)      //edit embed coz order already exists for this buyer
+                embeds[embIndex].description = `**Buyer:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`
+            else {
+                embeds.push({
+                    description: `**Buyer:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                    color: '#E74C3C'
+                })
+            }
+            await msg.edit({content: ' ',embeds: embeds})
+            .catch(err => {
+                console.log(err)
+                return
+            })
+            message.delete()
+            return
+        }
+        else {
+            var embed1 = {
+                title: `(B) ${item_name}`,
+                url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+                description: `**Buyer:** ${ingame_name}\n**Price**: ${price}<:platinum:881692607791648778>`,
+                color: '#E74C3C'
+            }
+            await message.channel.send({content: ' ', embeds: [embed1]})
+            .then(async msg => {
+                await msg.react("🇸")
+                .catch(err => console.log(err+"\nError reacting sell."))
+                message.delete()
+                .catch(err => console.log(err+"\nError deleting original."))
+            })
+            .catch(err => {
+                console.log(err)
+                return
+            })
+        }
     }
     return
 }
