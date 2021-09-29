@@ -3354,10 +3354,10 @@ async function trading_bot(message,args,command) {
                 if (noOfBuyers > 0)
                     msg.reactions.removeAll().catch(err => console.log(err))
                 for (i=0;i<noOfSellers;i++) {
-                    await msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                    await msg.react(tradingBotReactions.sell[i]).then(()=>{return true}).catch(err => console.log(err))
                 }
                 for (i=0;i<noOfBuyers;i++) {
-                    await msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                    await msg.react(tradingBotReactions.buy[i]).then(()=>{return true}).catch(err => console.log(err))
                 }
             })
             .catch(err => {
@@ -3373,10 +3373,10 @@ async function trading_bot(message,args,command) {
                 if (client.channels.cache.get(multiCid).id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                 for (i=0;i<noOfSellers;i++) {
-                    await msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                    await msg.react(tradingBotReactions.sell[i]).then(()=>{return true}).catch(err => console.log(err))
                 }
                 for (j=0;j<noOfBuyers;j++) {
-                    await msg.react(tradingBotReactions.buy[j]).catch(err => console.log(err))
+                    await msg.react(tradingBotReactions.buy[j]).then(()=>{return true}).catch(err => console.log(err))
                 }
             })
             .catch(err => {
