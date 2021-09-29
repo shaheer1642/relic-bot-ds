@@ -3766,7 +3766,7 @@ async function trading_bot_user_orders(message,args) {
     postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,max_values:3,options:[]})
     orders.forEach((e,index) => {
         if (index < 25) {
-            if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url))
+            if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
                 postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
         }
     })
