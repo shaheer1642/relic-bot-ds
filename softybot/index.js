@@ -3554,12 +3554,7 @@ axiosRetry(axios, {
 });
 
 async function trading_bot(message,args,command) {
-    const price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
-    if (!price) {
-        message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-        return
-    }
+    var price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
     if (price < 0) {
         message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
@@ -3661,7 +3656,7 @@ async function trading_bot(message,args,command) {
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
         if (command == 'wts')
-            if (res.rows[0].sell_price)
+            if (res.rows[0].sell_price) 
                 avg_price = Math.round(Number(res.rows[0].sell_price))
         if (command == 'wtb')
             if (res.rows[0].buy_price)
@@ -3679,6 +3674,9 @@ async function trading_bot(message,args,command) {
     if (avg_price == null || avg_price == "null") {
         message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501").catch(err => console.log(err)); 
         return
+    }
+    if (!price) {
+        price = avg_price
     }
     if (price > (avg_price*1.2)) {
         message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
