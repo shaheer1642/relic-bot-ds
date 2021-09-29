@@ -222,6 +222,7 @@ client.on('messageCreate', async message => {
 })
 
 client.on('interactionCreate', async interaction => {
+	console.log(interaction);
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         await interaction.deferUpdate()
         const discord_id = interaction.member.user.id
@@ -3697,8 +3698,7 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
-                if (noOfBuyers > 0)
-                    await msg.reactions.removeAll().catch(err => console.log(err))
+                await msg.reactions.removeAll().catch(err => console.log(err))
                 if (noOfSellers>0)
                     msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
                     if (noOfSellers>1)
@@ -3732,6 +3732,7 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                await msg.reactions.removeAll().catch(err => console.log(err))
                 if (noOfSellers>0)
                     msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
                     if (noOfSellers>1)
@@ -3793,6 +3794,7 @@ async function trading_bot_user_orders(message,args) {
     .then(res => {
         if (res.rows.length == 0) {
             message.channel.send(`<@${message.author.id}> No orders found on your profile`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err))
+            setTimeout(() => message.delete().catch(err => console.log(err), 10000))
             return false
         }
         else {
