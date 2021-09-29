@@ -63,7 +63,9 @@ client.on('ready', () => {
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     //-------------
     setTimeout(update_wfm_items_list, msTill1AM);  //execute every 12am (cloud time. 5am for me)
-    DB_Update_Timer = setTimeout(updateDatabaseItems(), msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    DB_Update_Timer = setTimeout(function() {
+        updateDatabaseItems()
+    }, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 })
@@ -1645,7 +1647,7 @@ async function auctions(message,args) {
         d_ownerNames = d_ownerNames.replace("_", "\\_")
         postdata.embeds.push(
             {
-                description: "```fix\n(Sorted by weapon damage incl. buyout price)```", 
+                description: "```fix\n(Sorted by weapon damage```", 
                 timestamp: new Date(),
                 fields: [
                     {name: "Owner", value: d_ownerNames, inline: true}, 
@@ -2128,7 +2130,9 @@ async function updateDB(message,args) {
     clearTimeout(DB_Update_Timer)
     inform_dc('(Forced) DB update launching in 10 seconds...')
     message.channel.send(`(Forced) DB update launching in 10 seconds...`)
-    DB_Update_Timer = setTimeout(updateDatabaseItems(message), 10000);
+    DB_Update_Timer = setTimeout(function() {
+        updateDatabaseItems(message)
+    }, 10000);
 }
 
 async function authorize(message,args) {
@@ -2851,7 +2855,9 @@ async function updateDatabasePrices(up_origin=null) {
     else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     console.log(`Next DB update launching in: ${msToTime(msTill1AM)}`)
-    DB_Update_Timer = setTimeout(updateDatabaseItems(), msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    DB_Update_Timer = setTimeout(function() {
+        updateDatabaseItems()
+    }, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices' + main)
