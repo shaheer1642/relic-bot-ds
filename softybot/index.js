@@ -12,6 +12,7 @@ const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820"]
+const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"]}
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
@@ -3210,6 +3211,8 @@ async function trading_bot(message,args,command) {
         tradingBotChannels.forEach(async multiCid => {
             var msg = null
             var embeds = []
+            var noOfSellers = 0
+            var noOfBuyers = 0
 
             //----construct embed----
             var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
@@ -3228,6 +3231,7 @@ async function trading_bot(message,args,command) {
                         emb_sellers += res.rows[i].ingame_name + '\n'
                         emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
                     }
+                    noOfSellers = i
                     if (!item_url.match(/_set$/)) {
                         var temp = item_url.split("_")
                         icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
@@ -3245,7 +3249,7 @@ async function trading_bot(message,args,command) {
                                 name: 'Sellers',
                                 value: emb_sellers,
                                 inline: true
-                            },
+                            },{name: '\u200b',value:'\u200b',inline:true},
                             {
                                 name: 'Prices',
                                 value: emb_prices,
@@ -3282,6 +3286,7 @@ async function trading_bot(message,args,command) {
                         emb_buyers += res.rows[i].ingame_name + '\n'
                         emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
                     }
+                    noOfBuyers = i
                     if (!item_url.match(/_set$/)) {
                         var temp = item_url.split("_")
                         icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
@@ -3299,7 +3304,7 @@ async function trading_bot(message,args,command) {
                                 name: 'Buyers',
                                 value: emb_buyers,
                                 inline: true
-                            },
+                            },{name: '\u200b',value:'\u200b',inline:true},
                             {
                                 name: 'Prices',
                                 value: emb_prices,
@@ -3325,8 +3330,6 @@ async function trading_bot(message,args,command) {
             console.log(embeds)
             originMessage.channel.send({content: ' ',embeds: embeds})
             .catch(err => console.log(err))
-            return
-            //------------
             await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
                 allMsgs.forEach(e => {
                     if (e.embeds.length != 0) {
@@ -3346,119 +3349,28 @@ async function trading_bot(message,args,command) {
                 return
             }
             if (msg) {
-                var embeds = msg.embeds
-                var embIndex = null
-                embeds.forEach((emb,index) => {
-                    console.log(emb.description)
-                    if (emb.description.match(ingame_name)) {
-                        embIndex = index
-                    }
-                })
-                if (embIndex != null)      //edit embed coz order already exists for this seller
-                    embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`
-                else {
-                    embeds.push({
-                        description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
-                        color: '#7cb45d'
-                    })
-                }
-                //---sorting embeds----
-                var temp_author = null
-                var temp_icon = null
-                embeds.forEach(async (e,index) => {
-                    temp = e.description.split("**")
-                    embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>\n",''))
-                    if (e.author) {
-                        temp_author = e.author.name
-                        temp_icon = e.author.iconURL
-                    }
-                    embeds[index].author = null
-                })
-                embeds = embeds.sort(dynamicSort("price"))
-                /*
-                embeds.forEach(async (e,index) => {
-                    embeds[index].title = null
-                    embeds[index].url = null
-                })
-                */
-                embeds[0].author = {name: temp_author,iconURL: temp_icon}
-                console.log(embeds)
-                //---------------------
                 await msg.edit({content: ' ',embeds: embeds})
                 .then(async msg => {
-                    const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
-                    for (i=0;i<embeds.length;i++) {
-                        if (!msg.reactions.cache.find(react => react.name==num_reacts[i])) {
-                            var status = await msg.react(num_reacts[i])
-                            .then(() => {
-                                return true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                return false
-                            })
-                            if (!status)
-                                break
-                        }
+                    if (noOfBuyers > 0)
+                        msg.reactions.removeAll()
+                    for (i=0;i<noOfSellers;i++) {
+                        await msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
                     }
-                    message.delete().catch(err => console.log(err))
+                    for (i=0;i<noOfBuyers;i++) {
+                        await msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                    }
                 })
-                .catch(err => {
-                    console.log(err)
-                    return
-                })
+                .catch(err => console.log(err))
             }
             else {
-                return
-                var icon_url = null
-                if (!item_url.match(/_set$/)) {
-                    console.log("not a set")
-                    var temp = item_url.split("_")
-                    icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
-                }
-                else {
-                    status = await db.query(`SELECT * from items_list WHERE item_url = '${item_url}'`)
-                    .then(res => {
-                        if (res.rows.length != 0)
-                            icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
-                        else 
-                            return false
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err + '\n1st Error retreiving set icon.')
-                    })
-                    if (!status)
-                        console.log('2nd Error retreiving set icon.')
-                }
-                console.log(icon_url)
-                /*
-                var new_embed = new MessageEmbed()
-                .setTitle(`(S) ${item_name}`)
-                .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
-                .setColor('#7cb45d')
-                .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
-                */
-                var embed1 = {
-                    //title: `(S) ${item_name}`,
-                    author: {
-                        name: `(S) ${item_name}`,
-                        iconURL: icon_url
-                    },
-                    //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
-                    color: '#7cb45d'
-                }
-                await client.channels.cache.get(multiCid).send({content: ' ', embeds: [embed1]})
+                await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
                 .then(async msg => {
-                    await msg.react('1️⃣')
-                    .catch(err => {
-                        console.log(err)
-                    })
-                    message.delete()
-                    .catch(err => {
-                        console.log(err)
-                    })
+                    for (i=0;i<noOfSellers;i++) {
+                        await msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                    }
+                    for (i=0;i<noOfBuyers;i++) {
+                        await msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                    }
                 })
                 .catch(err => {
                     console.log(err)
