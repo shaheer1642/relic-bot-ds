@@ -3154,6 +3154,60 @@ async function trading_bot(message,args,command) {
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
+    //----verify order in DB----
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+    .then(async res => {
+        if (res.rows.length == 0) {     //----insert order in DB----
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
+            .then(res => {
+                console.log(res)
+                return true
+            })
+            .catch(err => {
+                if (err.code == '23505') {
+                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
+                }
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        else if (res.rows.length > 1) {
+            originMessage.channel.send(`☠️ Unexpected error received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
+            return false
+        }
+        else {     //----update existing order in DB----
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        if (!status)
+            return false
+        return true
+    })
+    .catch(err => {
+        if (err.code == '23505') {
+            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
+        }
+        console.log(err)
+        return false
+    })
+    if (!status)
+        return
+    return
     if (command == 'wts') {
         tradingBotChannels.forEach(async multiCid => {
             var msg = null
@@ -3234,22 +3288,6 @@ async function trading_bot(message,args,command) {
                 })
             }
             else {
-                //----insert order in DB----
-                var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
-                .then(res => {
-                    console.log(res)
-                    return true
-                })
-                .catch(err => {
-                    if (err.code == '23505') {
-                        originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                        setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
-                    }
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    return
                 return
                 var icon_url = null
                 if (!item_url.match(/_set$/)) {
