@@ -224,6 +224,8 @@ client.on('messageCreate', async message => {
 client.on('interactionCreate', async interaction => {
 	console.log(interaction);
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
+        if (interaction.user.username != interaction.message.embeds[0].author.name)
+            return
         await interaction.deferUpdate()
         const discord_id = interaction.member.user.id
         for (i=0;i<interaction.values.length;i++) {
@@ -3831,6 +3833,7 @@ async function trading_bot_user_orders(message,args) {
         postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
     if (buy_items.length != 0)
         postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+    postdata.embeds[0].author = {name: message.author.username,iconURL: message.author.avatarURL}
     postdata.components = []
     postdata.components.push({type:1,components:[]})
     postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
