@@ -2132,7 +2132,7 @@ async function updateDB(message,args) {
     clearTimeout(DB_Update_Timer)
     inform_dc('(Forced) DB update launching in 10 seconds...')
     message.channel.send(`(Forced) DB update launching in 10 seconds...`)
-    DB_Update_Timer = setTimeout(updateDatabaseItems.bind(message), 10000);
+    DB_Update_Timer = setTimeout(updateDatabaseItems, 10000, message);
 }
 
 async function authorize(message,args) {
@@ -2579,7 +2579,7 @@ async function updateDatabaseItems(up_origin) {
     }
     else {
         console.log('Verified all items in the DB.')
-        setTimeout(updateDatabasePrices.bind(up_origin), 3000);
+        setTimeout(updateDatabasePrices, 3000, up_origin);
     }
 }
 
