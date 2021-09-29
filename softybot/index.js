@@ -3384,12 +3384,26 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
-                for (r_in_3=0;r_in_3<noOfSellers;r_in_3++) {
-                    await msg.react(tradingBotReactions.sell[r_in_3]).then(()=>{return true}).catch(err => console.log(err))
-                }
-                for (r_in_4=0;r_in_4<noOfBuyers;r_in_4++) {
-                    await msg.react(tradingBotReactions.buy[r_in_4]).then(()=>{return true}).catch(err => console.log(err))
-                }
+                if (noOfSellers>0)
+                    msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                    if (noOfSellers>1)
+                        msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                        if (noOfSellers>2)
+                            msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                            if (noOfSellers>3)
+                                msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
+                                if (noOfSellers>4)
+                                    msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
+                if (noOfBuyers>0)
+                    msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
+                    if (noOfBuyers>1)
+                        msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
+                        if (noOfBuyers>2)
+                            msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
+                            if (noOfBuyers>3)
+                                msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
+                                if (noOfBuyers>4)
+                                    msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
             })
             .catch(err => {
                 originMessage.channel.send(`☠️ Error posting new orders in channel.\nError code: 506\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
