@@ -3738,8 +3738,20 @@ async function trading_bot_user_orders(message,args) {
     })
     if (!status)
         return
+    let postdata = []
+    postdata.content = ' '
+    postdata.components = []
+    postdata.components.push({type:1,components:[]})
+    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'class_select_1',min_values:1,max_values:25,options:[]})
+    orders.forEach(e,index => {
+        if (index < 25) {
+            postdata.components[0].components[0].options.push({label: e.item_url,value: item_url})
+        }
+    })
+    message.channel.send(postdata).catch(err => console.log(err))
+/*
     var postdata = {
-        "content": "Mason is looking for new arena partners. What classes do you play?",
+        "content": "Select orders to remove: ",
         "components": [
             {
                 "type": 1,
@@ -3776,56 +3788,14 @@ async function trading_bot_user_orders(message,args) {
                                 }
                             }
                         ],
-                        "placeholder": "Choose a class",
-                        "min_values": 1,
-                        "max_values": 3
-                    }
-                ]
-            },
-            {
-                "type": 1,
-                "components": [
-                    {
-                        "type": 3,
-                        "custom_id": "class_select_1",
-                        "options":[
-                            {
-                                "label": "Rogue",
-                                "value": "rogue",
-                                "description": "Sneak n stab",
-                                "emoji": {
-                                    "name": "rogue",
-                                    "id": "625891304148303894"
-                                }
-                            },
-                            {
-                                "label": "Mage",
-                                "value": "mage",
-                                "description": "Turn 'em into a sheep",
-                                "emoji": {
-                                    "name": "mage",
-                                    "id": "625891304081063986"
-                                }
-                            },
-                            {
-                                "label": "Priest",
-                                "value": "priest",
-                                "description": "You get heals when I'm done doing damage",
-                                "emoji": {
-                                    "name": "priest",
-                                    "id": "625891303795982337"
-                                }
-                            }
-                        ],
-                        "placeholder": "Choose a class",
+                        "placeholder": "Select orders to remove",
                         "min_values": 1,
                         "max_values": 3
                     }
                 ]
             }
         ]
-    }
-    message.channel.send(postdata).catch(err => console.log(err))
+    }*/
 }
 
 async function trading_bot_registeration(message,ingame_name) {
