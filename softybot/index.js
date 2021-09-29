@@ -3328,8 +3328,6 @@ async function trading_bot(message,args,command) {
         if (embeds[1])
             embeds[1].author = null
         console.log(embeds)
-        originMessage.channel.send({content: ' ',embeds: embeds})
-        .catch(err => console.log(err))
         await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
             allMsgs.forEach(e => {
                 if (e.embeds.length != 0) {
