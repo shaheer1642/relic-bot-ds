@@ -12,6 +12,7 @@ const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannel = "892160436881993758"
+var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
 console.log('Establishing connection to DB...')
@@ -48,13 +49,13 @@ client.on('ready', () => {
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate(), // the current day, ...
-        0, 1, 0 // ...at 00:01:00 hours
+        0, 15, 0 // ...at 00:15:00 hours
     );
     var nextDay = new Date(
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate() + 1, // the next day, ...
-        0, 1, 0 // ...at 00:01:00 hours
+        0, 15, 0 // ...at 00:15:00 hours
     );
     if ((currDay.getTime() - currTime.getTime())>0)
         var msTill1AM = currDay.getTime() - currTime.getTime()
@@ -2126,7 +2127,7 @@ async function updateDB(message,args) {
         return
     clearTimeout(DB_Update_Timer)
     inform_dc('(Forced) DB update launching in 10 seconds...')
-    DB_Update_Timer = setTimeout(updateDatabaseItems, 10000);
+    DB_Update_Timer = setTimeout(updateDatabaseItems(message), 10000);
 }
 
 async function authorize(message,args) {
@@ -2462,7 +2463,13 @@ function trades_update() {
     setTimeout(trades_update, 600000);
 }
 
-async function updateDatabaseItems() {
+async function updateDatabaseItems(up_origin=null) {
+    if (DB_Updating) {
+        if (up_origin)
+            up_origin.channel.send(`An update is already in progress.`)
+        return
+    }
+    DB_Updating = true
     inform_dc('Updating DB...')
     console.log('Retrieving WFM items list...')
     const func1 = await axios("https://api.warframe.market/v1/items")
@@ -2560,16 +2567,20 @@ async function updateDatabaseItems() {
         return 0
     })
     if (!func1) {
-        console.log('Error occurred updating DB items\nError code: ' + func1)
+        console.log('Error occurred updating DB items' + func1)
+        inform_dc('DB update failure.')
+        if (up_origin)
+            up_origin.channel.send('<@253525146923433984> DB update failure.')
+        DB_Updating = false
         return
     }
     else {
         console.log('Verified all items in the DB.')
-        setTimeout(updateDatabasePrices, 3000);
+        setTimeout(updateDatabasePrices(up_origin), 3000);
     }
 }
 
-async function updateDatabasePrices () {
+async function updateDatabasePrices (up_origin=null) {
     var updateTickcount = new Date().getTime();
     //var status = await db.query(`UPDATE items_list SET rewards = null`)
     console.log('Retrieving DB items list...')
@@ -2826,13 +2837,13 @@ async function updateDatabasePrices () {
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate(), // the current day, ...
-        0, 1, 0 // ...at 00:01:00 hours
+        0, 15, 0 // ...at 00:15:00 hours
     );
     var nextDay = new Date(
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate() + 1, // the next day, ...
-        0, 1, 0 // ...at 00:01:00 hours
+        0, 15, 0 // ...at 00:15:00 hours
     );
     if ((currDay.getTime() - currTime.getTime())>0)
         var msTill1AM = currDay.getTime() - currTime.getTime()
@@ -2842,13 +2853,19 @@ async function updateDatabasePrices () {
     DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     //-------------
     if (!main) {
-        console.log('Error occurred updating DB prices\nError code: ' + main)
-        inform_dc(`<@253525146923433984> Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
+        console.log('Error occurred updating DB prices' + main)
+        inform_dc(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
+        if (up_origin)
+            up_origin.channel.send('<@253525146923433984> Error updating DB')
+        DB_Updating = false
         return
     }
     else {
         console.log(`Updated all prices in the DB.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
         inform_dc(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
+        if (up_origin)
+            up_origin.channel.send(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
+        DB_Updating = false
         return
     }
 }
