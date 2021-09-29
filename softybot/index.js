@@ -3218,7 +3218,6 @@ async function trading_bot(message,args,command) {
         //----construct embed----
         var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
         .then(res => {
-            console.log(res)
             if (res.rows.length == 0)
                 return true
             else {
@@ -3328,7 +3327,6 @@ async function trading_bot(message,args,command) {
             return
         if (embeds[1])
             embeds[1].author = null
-        console.log(embeds)
         await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
             allMsgs.forEach(e => {
                 if (e.embeds.length != 0) {
@@ -3353,11 +3351,13 @@ async function trading_bot(message,args,command) {
                 if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
                 if (noOfBuyers > 0)
-                    msg.reactions.removeAll().catch(err => console.log(err))
+                    await msg.reactions.removeAll().catch(err => console.log(err))
                 for (r_in_1=0;r_in_1<noOfSellers;r_in_1++) {
+                    console.log(`reacting with ${tradingBotReactions.sell[r_in_1]} on ${targetChannel.id}`)
                     await msg.react(tradingBotReactions.sell[r_in_1]).then(()=>{return true}).catch(err => console.log(err))
                 }
                 for (r_in_2=0;r_in_2<noOfBuyers;r_in_2++) {
+                    console.log(`reacting with ${tradingBotReactions.buy[r_in_2]} on ${targetChannel.id}`)
                     await msg.react(tradingBotReactions.buy[r_in_2]).then(()=>{return true}).catch(err => console.log(err))
                 }
             })
