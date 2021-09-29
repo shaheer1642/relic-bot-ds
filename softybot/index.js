@@ -2474,6 +2474,7 @@ async function updateDatabaseItems(up_origin) {
     inform_dc('Updating DB...')
     if (up_origin)
         up_origin.channel.send('Updating DB...')
+    return
     console.log('Retrieving WFM items list...')
     const func1 = await axios("https://api.warframe.market/v1/items")
     .then(async wfm_items_list => {
