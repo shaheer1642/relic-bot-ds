@@ -217,7 +217,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-        if (tradingBotChannels.includes(message.channelId)) {
+        if (tradingBotChannels.includes(reaction.message.channelId)) {
             return
             if (reaction.emoji.name == "🇧") {
                 if (!reaction.message.author)
