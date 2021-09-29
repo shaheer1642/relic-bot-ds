@@ -222,7 +222,6 @@ client.on('messageCreate', async message => {
 })
 
 client.on('interactionCreate', async interaction => {
-	console.log(interaction);
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         if (interaction.user.username != interaction.message.embeds[0].author.name) {
             await interaction.deferUpdate()
@@ -232,9 +231,12 @@ client.on('interactionCreate', async interaction => {
         const discord_id = interaction.member.user.id
         for (i=0;i<interaction.values.length;i++) {
             const item_id = interaction.values[i]
-            const status = await db.query(`DELETE FROM users_orders WHERE discord_id=${discord_id} AND item_id='${item_id}'`)
+            var item_name = ""
+            var item_url = ""
+            const status = await db.query(`SELECT * FROM items_list WHERE item_id='${item_id}'`)
             .then(res => {
-                console.log(res)
+                item_url = res.rows[0].item_url
+                item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                 return true
             })
             .catch(err => {
@@ -243,7 +245,16 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
-            console.log('checking trades channel')
+            const status = await db.query(`DELETE FROM users_orders WHERE discord_id=${discord_id} AND item_id='${item_id}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return
             tradingBotChannels.forEach(async multiCid => {
                 var msg = null
                 var embeds = []
@@ -254,7 +265,6 @@ client.on('interactionCreate', async interaction => {
                 //----construct embed----
                 var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
                 .then(res => {
-                    item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                     if (res.rows.length == 0)
                         return true
                     else {
