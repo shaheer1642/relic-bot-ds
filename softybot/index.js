@@ -3120,6 +3120,7 @@ async function trading_bot(message,args,command) {
     const item_id = arrItemsUrl[0].item_id
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     const originGuild = message.guild.name
+    const originMessage = message
     var avg_price = null
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
@@ -3232,6 +3233,15 @@ async function trading_bot(message,args,command) {
                 })
             }
             else {
+                //----insert order in DB----
+                var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,user_price,order_type) VALUES (${originMessage.author.id},'${item_id}',${price},'${command}')`)
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+                return
                 var icon_url = null
                 if (!item_url.match(/_set$/)) {
                     console.log("not a set")
