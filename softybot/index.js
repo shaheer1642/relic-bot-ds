@@ -3753,7 +3753,7 @@ async function trading_bot_user_orders(message,args) {
             sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
         }
         if (e.order_type == 'wtb') {
-            buy_items.push(e.item_url)
+            buy_items.push(e.item_url.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
             buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
         }
     })
