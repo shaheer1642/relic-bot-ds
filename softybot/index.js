@@ -3738,8 +3738,8 @@ async function trading_bot_user_orders(message,args) {
     })
     if (!status)
         return
-    let postdata = []
-    postdata.content = ' '
+    let postdata = {}
+    postdata.content = 'test message'
     postdata.components = []
     postdata.components.push({type:1,components:[]})
     postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'class_select_1',min_values:1,max_values:3,options:[]})
