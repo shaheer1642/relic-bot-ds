@@ -78,7 +78,7 @@ client.on('messageCreate', async message => {
             return
         }
     let commandsArr = message.content.split('\n')
-    commandsArr.forEach(async element => {
+    for(i=0;i<commandsArr.length;i++) {
         if (!message.guild) {
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
             .then(async res => {
@@ -107,37 +107,37 @@ client.on('messageCreate', async message => {
                 return false
             })
             if (!status)
-                return
-            const args = element.trim().split(/ +/g)
+                continue
+            const args = commandsArr[i].trim().split(/ +/g)
             if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
                 if (!args[2]) {
                     message.channel.send('Please write a username')
-                    return
+                    continue
                 }
                 trading_bot_registeration(message,args.pop())
-                return
+                continue
             }
         }
         if (message.channelId == tradingBotChannel || message.channelId == '892108718358007820') {
-            const args = element.toLowerCase().trim().split(/ +/g)
+            const args = commandsArr[i].toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
             if (command == 'wts' || command == 'wtb') {
-                const status = await trading_bot(message,args,command).then(()=> {return true}).catch(()=>{return false})
-                return
+                trading_bot(message,args,command)
+                continue
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
-            return
+            continue
         }
 
-        if (element.indexOf(config.prefix) != 0)
-            return
+        if (commandsArr[i].indexOf(config.prefix) != 0)
+            continue
 
         //parse arguments
-        const args = element.slice(config.prefix.length).trim().split(/ +/g)
+        const args = commandsArr[i].slice(config.prefix.length).trim().split(/ +/g)
 
         //define command
         const command = args.shift().toLowerCase();
@@ -195,7 +195,8 @@ client.on('messageCreate', async message => {
                     authorize(message,args)
                     break
             }
-    })
+    }
+    return
 })
 
 client.on('shardError', error => {
