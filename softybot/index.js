@@ -3148,7 +3148,7 @@ async function trading_bot(message,args,command) {
         return
     }
     if (command == 'wts') {
-        tradingBotChannels.forEach(multiCid => {
+        tradingBotChannels.forEach(async multiCid => {
             var msg = null
             await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
                 allMsgs.forEach(e => {
