@@ -11,7 +11,7 @@ const { Console } = require('console');
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
-const tradingBotChannel = "892160436881993758"
+const tradingBotChannels = ["892160436881993758", "892108718358007820"]
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
@@ -118,7 +118,7 @@ client.on('messageCreate', async message => {
                 continue
             }
         }
-        if (message.channelId == tradingBotChannel || message.channelId == '892108718358007820') {
+        if (tradingBotChannels.includes(message.channelId)) {
             const args = commandsArr[i].toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
@@ -217,7 +217,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-        if (reaction.message.channelId == tradingBotChannel || reaction.message.channelId == '892108718358007820') {
+        if (tradingBotChannels.includes(message.channelId)) {
             return
             if (reaction.emoji.name == "🇧") {
                 if (!reaction.message.author)
@@ -3148,139 +3148,140 @@ async function trading_bot(message,args,command) {
         return
     }
     if (command == 'wts') {
-        var msg = null
-        await message.channel.messages.fetch().then(allMsgs => {
-            allMsgs.forEach(e => {
-                if (e.embeds.length != 0) {
-                    if (e.embeds[0].author.name == `(S) ${item_name}`)
-                        msg = e
-                }
-            })
-        })
-        .catch (err => {
-            console.log(err)
-        })
-        if (msg) {
-            var embeds = msg.embeds
-            var embIndex = null
-            console.log(embeds)
-            embeds.forEach((emb,index) => {
-                console.log(emb.description)
-                if (emb.description.match(ingame_name)) {
-                    embIndex = index
-                }
-            })
-            if (embIndex != null)      //edit embed coz order already exists for this seller
-                embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`
-            else {
-                embeds.push({
-                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`,
-                    color: '#7cb45d'
-                })
-            }
-            //---sorting embeds----
-            var temp_author = null
-            var temp_icon = null
-            embeds.forEach(async (e,index) => {
-                temp = e.description.split("**")
-                embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>",''))
-                if (e.author) {
-                    temp_author = e.author.name
-                    temp_icon = e.author.iconURL
-                }
-                embeds[index].author = null
-            })
-            embeds = embeds.sort(dynamicSort("price"))
-            /*
-            embeds.forEach(async (e,index) => {
-                embeds[index].title = null
-                embeds[index].url = null
-            })
-            */
-            embeds[0].author = {name: temp_author,iconURL: temp_icon}
-            console.log(embeds)
-            //---------------------
-            await msg.edit({content: ' ',embeds: embeds})
-            .then(async msg => {
-                const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
-                for (i=0;i<embeds.length;i++) {
-                    if (!msg.reactions.cache.find(react => react.name==num_reacts[i])) {
-                        var status = await msg.react(num_reacts[i])
-                        .then(() => {
-                            return true
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return false
-                        })
-                        if (!status)
-                            break
+        tradingBotChannels.forEach(multiCid => {
+            var msg = null
+            await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
+                allMsgs.forEach(e => {
+                    if (e.embeds.length != 0) {
+                        if (e.embeds[0].author.name == `(S) ${item_name}`)
+                            msg = e
                     }
-                }
-                message.delete().catch(err => console.log(err))
+                })
             })
-            .catch(err => {
+            .catch (err => {
                 console.log(err)
-                return
             })
-        }
-        else {
-            var icon_url = null
-            if (!item_url.match(/_set$/)) {
-                console.log("not a set")
-                var temp = item_url.split("_")
-                icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+            if (msg) {
+                var embeds = msg.embeds
+                var embIndex = null
+                console.log(embeds)
+                embeds.forEach((emb,index) => {
+                    console.log(emb.description)
+                    if (emb.description.match(ingame_name)) {
+                        embIndex = index
+                    }
+                })
+                if (embIndex != null)      //edit embed coz order already exists for this seller
+                    embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.guilds.cache.get(multiCid).name}`
+                else {
+                    embeds.push({
+                        description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.guilds.cache.get(multiCid).name}`,
+                        color: '#7cb45d'
+                    })
+                }
+                //---sorting embeds----
+                var temp_author = null
+                var temp_icon = null
+                embeds.forEach(async (e,index) => {
+                    temp = e.description.split("**")
+                    embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>\n",''))
+                    if (e.author) {
+                        temp_author = e.author.name
+                        temp_icon = e.author.iconURL
+                    }
+                    embeds[index].author = null
+                })
+                embeds = embeds.sort(dynamicSort("price"))
+                /*
+                embeds.forEach(async (e,index) => {
+                    embeds[index].title = null
+                    embeds[index].url = null
+                })
+                */
+                embeds[0].author = {name: temp_author,iconURL: temp_icon}
+                console.log(embeds)
+                //---------------------
+                await msg.edit({content: ' ',embeds: embeds})
+                .then(async msg => {
+                    const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
+                    for (i=0;i<embeds.length;i++) {
+                        if (!msg.reactions.cache.find(react => react.name==num_reacts[i])) {
+                            var status = await msg.react(num_reacts[i])
+                            .then(() => {
+                                return true
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                return false
+                            })
+                            if (!status)
+                                break
+                        }
+                    }
+                    message.delete().catch(err => console.log(err))
+                })
+                .catch(err => {
+                    console.log(err)
+                    return
+                })
             }
             else {
-                status = await db.query(`SELECT * from items_list WHERE item_url = '${item_url}'`)
-                .then(res => {
-                    if (res.rows.length != 0)
-                        icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
-                    else 
-                        return false
-                    return true
+                var icon_url = null
+                if (!item_url.match(/_set$/)) {
+                    console.log("not a set")
+                    var temp = item_url.split("_")
+                    icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                }
+                else {
+                    status = await db.query(`SELECT * from items_list WHERE item_url = '${item_url}'`)
+                    .then(res => {
+                        if (res.rows.length != 0)
+                            icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+                        else 
+                            return false
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err + '\n1st Error retreiving set icon.')
+                    })
+                    if (!status)
+                        console.log('2nd Error retreiving set icon.')
+                }
+                console.log(icon_url)
+                /*
+                var new_embed = new MessageEmbed()
+                .setTitle(`(S) ${item_name}`)
+                .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
+                .setColor('#7cb45d')
+                .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
+                */
+                var embed1 = {
+                    //title: `(S) ${item_name}`,
+                    author: {
+                        name: `(S) ${item_name}`,
+                        iconURL: icon_url
+                    },
+                    //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.guilds.cache.get(multiCid).name}`,
+                    color: '#7cb45d'
+                }
+                await client.channels.get(multiCid).send({content: ' ', embeds: [embed1]})
+                .then(async msg => {
+                    await msg.react('1️⃣')
+                    .catch(err => {
+                        console.log(err)
+                    })
+                    message.delete()
+                    .catch(err => {
+                        console.log(err)
+                    })
                 })
-                .catch(err => {
-                    console.log(err + '\n1st Error retreiving set icon.')
-                })
-                if (!status)
-                    console.log('2nd Error retreiving set icon.')
-            }
-            console.log(icon_url)
-            /*
-            var new_embed = new MessageEmbed()
-            .setTitle(`(S) ${item_name}`)
-            .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
-            .setColor('#7cb45d')
-            .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
-            */
-            var embed1 = {
-                //title: `(S) ${item_name}`,
-                author: {
-                    name: `(S) ${item_name}`,
-                    iconURL: icon_url
-                },
-                //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`,
-                color: '#7cb45d'
-            }
-
-            await message.channel.send({content: ' ', embeds: [embed1]})
-            .then(async msg => {
-                await msg.react('1️⃣')
                 .catch(err => {
                     console.log(err)
+                    return
                 })
-                message.delete()
-                .catch(err => {
-                    console.log(err)
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                return
-            })
-        }
+            }
+        })
     }
     else if (command == 'wtb') {
         var msg = null
