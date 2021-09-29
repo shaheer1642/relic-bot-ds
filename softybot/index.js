@@ -2123,16 +2123,20 @@ async function relist(message,args) {
 }
 
 async function updateDB(message,args) {
-    if (message.author.id != "253525146923433984" || message.author.id != "253980061969940481" || message.author.id != "353154275745988610" || message.author.id != "385459793508302851")
-        return
-    if (DB_Updating) {
-        message.channel.send(`An update is already in progress.`)
+    if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
+        if (DB_Updating) {
+            message.channel.send(`An update is already in progress.`)
+            return
+        }
+        clearTimeout(DB_Update_Timer)
+        inform_dc('(Forced) DB update launching in 10 seconds...')
+        message.channel.send(`(Forced) DB update launching in 10 seconds...`)
+        DB_Update_Timer = setTimeout(updateDatabaseItems, 10000, message);
+    }
+    else {
+        message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`)
         return
     }
-    clearTimeout(DB_Update_Timer)
-    inform_dc('(Forced) DB update launching in 10 seconds...')
-    message.channel.send(`(Forced) DB update launching in 10 seconds...`)
-    DB_Update_Timer = setTimeout(updateDatabaseItems, 10000, message);
 }
 
 async function authorize(message,args) {
