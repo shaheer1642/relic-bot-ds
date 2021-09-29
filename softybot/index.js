@@ -3478,7 +3478,7 @@ async function trade_tut(message,args) {
     var postdata = {
         content: " ",
         embeds: [{
-            description: `Posting order\n**wtb volt 160p**\n**wts volt p 180plat**\n\nPosting multiple orders\n**wtb loki p systems 100p\nwts loki p bp 15p\nwtb plat 5$**`,
+            description: `Posting order\n**wtb volt 160p**\n\nPosting multiple orders\n**wtb loki p systems 100p\nwts loki p bp 15p\nwtb plat 5$**`,
             color: "FFFFFF"
         }]
     }
