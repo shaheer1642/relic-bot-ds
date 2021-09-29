@@ -3749,7 +3749,7 @@ async function trading_bot_user_orders(message,args) {
     var buy_prices = []
     orders.forEach((e,index) => {
         if (e.order_type == 'wts') {
-            sell_items.push(e.item_url)
+            sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
             sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
         }
         if (e.order_type == 'wtb') {
@@ -3758,9 +3758,9 @@ async function trading_bot_user_orders(message,args) {
         }
     })
     if (sell_items.length != 0)
-        postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
+        postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
     if (buy_items.length != 0)
-        postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+        postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
     postdata.components = []
     postdata.components.push({type:1,components:[]})
     postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,max_values:3,options:[]})
