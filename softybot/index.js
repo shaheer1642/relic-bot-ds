@@ -2123,7 +2123,7 @@ async function relist(message,args) {
 }
 
 async function updateDB(message,args) {
-    if (message.author.id != "253525146923433984")
+    if (message.author.id != "253525146923433984" || message.author.id != "253980061969940481" || message.author.id != "353154275745988610" || message.author.id != "385459793508302851")
         return
     if (DB_Updating) {
         message.channel.send(`An update is already in progress.`)
