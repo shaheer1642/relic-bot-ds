@@ -123,7 +123,7 @@ client.on('messageCreate', async message => {
             const command = args.shift()
     
             if (command == 'wts' || command == 'wtb') {
-                trading_bot(message,args,command)
+                await trading_bot(message,args,command)
                 return
             }
             else {
