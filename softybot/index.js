@@ -245,6 +245,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
+            console.log(`removing item order ${item_name}`)
             var status = await db.query(`DELETE FROM users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
             .then(res => {
                 return true
