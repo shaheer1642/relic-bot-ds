@@ -3114,6 +3114,7 @@ async function trading_bot(message,args,command) {
     const item_url = arrItemsUrl[0].item_url
     const item_id = arrItemsUrl[0].item_id
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    const originGuild = message.guild.name
     var avg_price = null
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
@@ -3172,10 +3173,10 @@ async function trading_bot(message,args,command) {
                     }
                 })
                 if (embIndex != null)      //edit embed coz order already exists for this seller
-                    embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.channels.cache.get(multiCid).guild.name}`
+                    embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`
                 else {
                     embeds.push({
-                        description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.channels.cache.get(multiCid).guild.name}`,
+                        description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
                         color: '#7cb45d'
                     })
                 }
@@ -3262,7 +3263,7 @@ async function trading_bot(message,args,command) {
                         iconURL: icon_url
                     },
                     //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.channels.cache.get(multiCid).guild.name}`,
+                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
                     color: '#7cb45d'
                 }
                 await client.channels.cache.get(multiCid).send({content: ' ', embeds: [embed1]})
