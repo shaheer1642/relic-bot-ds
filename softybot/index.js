@@ -3748,6 +3748,7 @@ async function trading_bot_user_orders(message,args) {
             postdata.components[0].components[0].options.push({label: e.item_url,value: e.item_url})
         }
     })
+    console.log(postdata)
     message.channel.send(postdata).catch(err => console.log(err))
 /*
     var postdata = {
