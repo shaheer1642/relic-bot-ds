@@ -3743,12 +3743,14 @@ async function trading_bot_user_orders(message,args) {
     postdata.components = []
     postdata.components.push({type:1,components:[]})
     postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'class_select_1',min_values:1,max_values:10,options:[]})
+    
     orders.forEach((e,index) => {
         if (index < 25) {
-            postdata.components[0].components[0].options.push({label: e.item_url,value: e.item_url})
+            if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url))
+                postdata.components[0].components[0].options.push({label: e.item_url,value: e.item_url})
         }
     })
-    console.log(JSON.stringify(postdata))
+    console.log(JSON.stringify(postdata.components))
     message.channel.send(postdata).catch(err => console.log(err))
 /*
     var postdata = {
