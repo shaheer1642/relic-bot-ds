@@ -175,6 +175,9 @@ client.on('messageCreate', async message => {
                 case 'getdb':
                     getDB(message,args)
                     break
+                case 'tut_template':
+                    tut_template(message,args)
+                    break
                 /*----Handled locally----
                 case 'relic':
                     relics(message,args)
@@ -3469,4 +3472,16 @@ async function trading_bot_registeration(message,ingame_name) {
         return false
     })
     return
+}
+
+async function tut_tutorial(message,args) {
+    var postdata = {
+        content: " ",
+        embeds: [{
+            description: `Posting order\n**wtb volt 160p**\n**wts volt p 180plat**\n\nPosting multiple orders\n**wtb loki p systems 100p\nwts loki p bp 15p**`,
+            color: "FFFFFF"
+        }]
+    }
+    client.channels.cache.get('892108718358007820').send(postdata)
+    client.channels.cache.get('892160436881993758').send(postdata)
 }
