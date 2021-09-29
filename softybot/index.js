@@ -3172,10 +3172,10 @@ async function trading_bot(message,args,command) {
                     }
                 })
                 if (embIndex != null)      //edit embed coz order already exists for this seller
-                    embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.guilds.cache.get(multiCid).name}`
+                    embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.channels.cache.get(multiCid).guild.name}`
                 else {
                     embeds.push({
-                        description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.guilds.cache.get(multiCid).name}`,
+                        description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.channels.cache.get(multiCid).guild.name}`,
                         color: '#7cb45d'
                     })
                 }
@@ -3262,7 +3262,7 @@ async function trading_bot(message,args,command) {
                         iconURL: icon_url
                     },
                     //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.guilds.cache.get(multiCid).name}`,
+                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.channels.cache.get(multiCid).guild.name}`,
                     color: '#7cb45d'
                 }
                 await client.channels.get(multiCid).send({content: ' ', embeds: [embed1]})
