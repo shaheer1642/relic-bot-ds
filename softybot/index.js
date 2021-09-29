@@ -233,7 +233,7 @@ client.on('interactionCreate', async interaction => {
             const item_id = interaction.values[i]
             var item_name = ""
             var item_url = ""
-            var status = await db.query(`SELECT * FROM items_list WHERE item_id='${item_id}'`)
+            var status = await db.query(`SELECT * FROM items_list WHERE items_list.id='${item_id}'`)
             .then(res => {
                 item_url = res.rows[0].item_url
                 item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
@@ -245,7 +245,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
-            var status = await db.query(`DELETE FROM users_orders WHERE discord_id=${discord_id} AND item_id='${item_id}'`)
+            var status = await db.query(`DELETE FROM users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
             .then(res => {
                 return true
             })
