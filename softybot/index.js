@@ -3332,7 +3332,7 @@ async function trading_bot(message,args,command) {
             allMsgs.forEach(e => {
                 if (e.embeds.length != 0) {
                     if (e.embeds[0].author)
-                        if (e.embeds[0].author.name == `(S) ${item_name}`)
+                        if (e.embeds[0].author.name == `${item_name}`)
                             msg = e
                 }
             })
