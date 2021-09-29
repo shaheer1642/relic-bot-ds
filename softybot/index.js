@@ -3726,8 +3726,8 @@ async function trading_bot_user_orders(message,args) {
             return false
         }
         else {
-            return true
             orders = res.rows
+            return true
         }
     })
     .catch (err => {
@@ -3743,7 +3743,7 @@ async function trading_bot_user_orders(message,args) {
     postdata.components = []
     postdata.components.push({type:1,components:[]})
     postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'class_select_1',min_values:1,max_values:25,options:[]})
-    orders.forEach(e,index => {
+    orders.forEach((e,index) => {
         if (index < 25) {
             postdata.components[0].components[0].options.push({label: e.item_url,value: item_url})
         }
