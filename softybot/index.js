@@ -2127,8 +2127,8 @@ async function updateDB(message,args) {
         return
     clearTimeout(DB_Update_Timer)
     inform_dc('(Forced) DB update launching in 10 seconds...')
-    message.channel.send(`(Forced) DB update launching in 10 seconds...'`)
-    DB_Update_Timer = () => setTimeout(updateDatabaseItems(message), 10000);
+    message.channel.send(`(Forced) DB update launching in 10 seconds...`)
+    DB_Update_Timer = setTimeout(updateDatabaseItems(message), 10000);
 }
 
 async function authorize(message,args) {
