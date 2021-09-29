@@ -3344,13 +3344,15 @@ async function trading_bot(message,args,command) {
                 msg = 'error'
             })
             if (msg == 'error') {
-                originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 504\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
                 setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
                 return
             }
             if (msg) {
                 await msg.edit({content: ' ',embeds: embeds})
                 .then(async msg => {
+                    if (client.channels.cache.get(multiCid).id == originMessage.channel.id)
+                        setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
                     if (noOfBuyers > 0)
                         msg.reactions.removeAll()
                     for (i=0;i<noOfSellers;i++) {
@@ -3360,11 +3362,18 @@ async function trading_bot(message,args,command) {
                         await msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
                     }
                 })
-                .catch(err => console.log(err))
+                .catch(err => {
+                    originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
+                    console.log(err)
+                    return
+                })
             }
             else {
                 await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
                 .then(async msg => {
+                    if (client.channels.cache.get(multiCid).id == originMessage.channel.id)
+                        setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
                     for (i=0;i<noOfSellers;i++) {
                         await msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
                     }
@@ -3373,6 +3382,8 @@ async function trading_bot(message,args,command) {
                     }
                 })
                 .catch(err => {
+                    originMessage.channel.send(`☠️ Error posting new orders in channel.\nError code: 506\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
                     console.log(err)
                     return
                 })
