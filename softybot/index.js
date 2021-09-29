@@ -3160,7 +3160,6 @@ async function trading_bot(message,args,command) {
         if (res.rows.length == 0) {     //----insert order in DB----
             var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
             .then(res => {
-                console.log(res)
                 return true
             })
             .catch(err => {
@@ -3175,7 +3174,7 @@ async function trading_bot(message,args,command) {
                 return false
         }
         else if (res.rows.length > 1) {
-            originMessage.channel.send(`☠️ Unexpected error received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+            originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
             setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
             return false
         }
@@ -3207,10 +3206,38 @@ async function trading_bot(message,args,command) {
     })
     if (!status)
         return
-    return
-    if (command == 'wts') {
+    //------------------
         tradingBotChannels.forEach(async multiCid => {
             var msg = null
+            var embeds = []
+
+            //----construct embed----
+            var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true`)
+            .then(res => {
+                console.log(res)
+                return true
+                if (res.rows.length == 0)
+                    return true
+                else {
+                    var sellers = ''
+                    for (i=0;i<res.rows.length;i++) {
+                        sellers += res.rows
+                    }
+                }
+                return true
+            })
+            .catch(err => {
+                if (err.code == '23505') {
+                    originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
+                }
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return
+            return
+            //------------
             await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
                 allMsgs.forEach(e => {
                     if (e.embeds.length != 0) {
@@ -3222,11 +3249,16 @@ async function trading_bot(message,args,command) {
             })
             .catch (err => {
                 console.log(err)
+                msg = 'error'
             })
+            if (msg == 'error') {
+                originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
+                return
+            }
             if (msg) {
                 var embeds = msg.embeds
                 var embIndex = null
-                console.log(embeds)
                 embeds.forEach((emb,index) => {
                     console.log(emb.description)
                     if (emb.description.match(ingame_name)) {
@@ -3345,8 +3377,7 @@ async function trading_bot(message,args,command) {
                 })
             }
         })
-    }
-    else if (command == 'wtb') {
+    if (command == 'wtb') {
         tradingBotChannels.forEach(async multiCid => {
             var msg = null
             await message.channel.messages.fetch().then(allMsgs => {
