@@ -256,7 +256,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
-            tradingBotChannels.forEach(async multiCid => {
+            tradingBotChannels.forEach(() => async function (multiCid) {
                 var msg = null
                 var embeds = []
                 var noOfSellers = 0
