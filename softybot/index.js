@@ -123,6 +123,10 @@ client.on('messageCreate', async message => {
             const command = args.shift()
     
             if (command == 'wts' || command == 'wtb') {
+                if (message.author.id != '253525146923433984' || message.author.id != '892087497998348349') {
+                    message.channel.send('🛑 Trading has been disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                }
                 await trading_bot(message,args,command)
                 continue
             }
