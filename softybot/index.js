@@ -234,6 +234,7 @@ client.on('interactionCreate', async interaction => {
             const item_id = interaction.values[i]
             const status = await db.query(`DELETE FROM users_orders WHERE discord_id=${discord_id} AND item_id='${item_id}'`)
             .then(res => {
+                console.log(res)
                 return true
             })
             .catch(err => {
@@ -242,6 +243,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
+            console.log('checking trades channel')
             tradingBotChannels.forEach(async multiCid => {
                 var msg = null
                 var embeds = []
