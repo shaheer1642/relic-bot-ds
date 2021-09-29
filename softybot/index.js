@@ -3349,13 +3349,35 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                const sell_emotes = ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"]
+                const buy_emotes = ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"]
                 if (noOfBuyers > 0)
                     await msg.reactions.removeAll().catch(err => console.log(err))
                 for (i=0;i<noOfSellers;i++) {
-                    var status = await msg.react(tradingBotReactions.sell[i]).then(()=>console.log(`reacting with ${tradingBotReactions.sell[i]} on ${targetChannel.id}`)).catch(err => console.log(err))
+                    var status = await msg.react(sell_emotes[i])
+                    .then(res => {
+                        console.log(`reacted with ${sell_emotes[i]} on ${targetChannel.id}`)
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return
                 }
-                for (j=0;j<noOfBuyers;j++) {
-                    var status = await msg.react(tradingBotReactions.buy[j]).then(()=>console.log(`reacting with ${tradingBotReactions.buy[j]} on ${targetChannel.id}`)).catch(err => console.log(err))
+                for (i=0;i<noOfBuyers;i++) {
+                    var status = await msg.react(buy_emotes[i])
+                    .then(res => {
+                        console.log(`reacted with ${buy_emotes[i]} on ${targetChannel.id}`)
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return
                 }
             })
             .catch(err => {
