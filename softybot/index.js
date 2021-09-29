@@ -63,7 +63,7 @@ client.on('ready', () => {
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     //-------------
     setTimeout(update_wfm_items_list, msTill1AM);  //execute every 12am (cloud time. 5am for me)
-    DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    DB_Update_Timer = setTimeout(updateDatabaseItems, 5000);  //execute every 12am (cloud time. 5am for me)
     console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 })
@@ -2474,7 +2474,6 @@ async function updateDatabaseItems(up_origin) {
     inform_dc('Updating DB...')
     if (up_origin)
         up_origin.channel.send('Updating DB...')
-    return
     console.log('Retrieving WFM items list...')
     const func1 = await axios("https://api.warframe.market/v1/items")
     .then(async wfm_items_list => {
