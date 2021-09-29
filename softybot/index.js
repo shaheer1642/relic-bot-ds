@@ -3235,17 +3235,21 @@ async function trading_bot(message,args,command) {
             }
             else {
                 //----insert order in DB----
-                var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,user_price,order_type) VALUES (${originMessage.author.id},'${item_id}',${price},'${command}')`)
+                var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
                 .then(res => {
                     console.log(res)
+                    return true
                 })
                 .catch(err => {
                     if (err.code == '23505') {
-                        originMessage.channel.send(`Error: Duplicate order insertion in the DB. Please contact MrSofty#7926\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-                        setTimeout(() => originMessage.delete(), 5000).catch(err => console.log(err));
+                        originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                        setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
                     }
                     console.log(err)
+                    return false
                 })
+                if (!status)
+                    return
                 return
                 var icon_url = null
                 if (!item_url.match(/_set$/)) {
