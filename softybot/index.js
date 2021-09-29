@@ -3375,8 +3375,8 @@ async function trading_bot(message,args,command) {
                 for (i=0;i<noOfSellers;i++) {
                     await msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
                 }
-                for (i=0;i<noOfBuyers;i++) {
-                    await msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                for (j=0;j<noOfBuyers;j++) {
+                    await msg.react(tradingBotReactions.buy[j]).catch(err => console.log(err))
                 }
             })
             .catch(err => {
