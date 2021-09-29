@@ -3482,6 +3482,6 @@ async function trade_tut(message,args) {
             color: "FFFFFF"
         }]
     }
-    client.channels.cache.get('892160436881993758').messages.cache.fetch('892684642208083968').then(m => m.edit(postdata))
-    client.channels.cache.get('892108718358007820').messages.cache.fetch('892684641847377931').then(m => m.edit(postdata))
+    client.channels.cache.get('892160436881993758').messages.fetch('892684642208083968').then(m => m.edit(postdata))
+    client.channels.cache.get('892108718358007820').messages.fetch('892684641847377931').then(m => m.edit(postdata))
 }
