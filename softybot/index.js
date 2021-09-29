@@ -3212,16 +3212,15 @@ async function trading_bot(message,args,command) {
             var embeds = []
 
             //----construct embed----
-            var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true`)
+            var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true SORT BY users_list.user_price`)
             .then(res => {
                 console.log(res)
-                return true
                 if (res.rows.length == 0)
                     return true
                 else {
                     var sellers = ''
                     for (i=0;i<res.rows.length;i++) {
-                        sellers += res.rows
+                        sellers += res.rows[i]
                     }
                 }
                 return true
