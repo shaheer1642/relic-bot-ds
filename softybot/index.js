@@ -175,8 +175,8 @@ client.on('messageCreate', async message => {
                 case 'getdb':
                     getDB(message,args)
                     break
-                case 'tut_template':
-                    tut_template(message,args)
+                case 'trade_tut':
+                    trade_tut(message,args)
                     break
                 /*----Handled locally----
                 case 'relic':
@@ -3474,7 +3474,7 @@ async function trading_bot_registeration(message,ingame_name) {
     return
 }
 
-async function tut_tutorial(message,args) {
+async function trade_tut(message,args) {
     var postdata = {
         content: " ",
         embeds: [{
