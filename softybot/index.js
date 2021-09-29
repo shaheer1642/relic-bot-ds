@@ -3742,7 +3742,7 @@ async function trading_bot_user_orders(message,args) {
     postdata.content = ' '
     postdata.components = []
     postdata.components.push({type:1,components:[]})
-    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'class_select_1',min_values:1,max_values:10,options:[]})
+    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'class_select_1',min_values:1,max_values:3,options:[]})
     
     orders.forEach((e,index) => {
         if (index < 25) {
