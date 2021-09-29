@@ -3763,13 +3763,14 @@ async function trading_bot_user_orders(message,args) {
         postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
     postdata.components = []
     postdata.components.push({type:1,components:[]})
-    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,max_values:3,options:[]})
+    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
     orders.forEach((e,index) => {
         if (index < 25) {
             if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
                 postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
         }
     })
+    postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
     console.log(JSON.stringify(postdata.components))
     message.channel.send(postdata).catch(err => console.log(err))
 /*
