@@ -219,6 +219,11 @@ client.on('messageCreate', async message => {
     return
 })
 
+client.on('interactionCreate', interaction => {
+	if (!interaction.isSelectMenu()) return;
+	console.log(interaction);
+});
+
 client.on('shardError', error => {
 	console.error('A websocket connection encountered an error:', error);
     fs.appendFile('ErrorLog.log',error + '\n\n', function (err) {
