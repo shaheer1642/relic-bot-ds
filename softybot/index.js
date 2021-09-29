@@ -2468,7 +2468,7 @@ function trades_update() {
     setTimeout(trades_update, 600000);
 }
 
-async function updateDatabaseItems(up_origin=null) {
+async function updateDatabaseItems(up_origin) {
     DB_Updating = true
     console.log(up_origin)
     inform_dc('Updating DB...')
@@ -2583,7 +2583,7 @@ async function updateDatabaseItems(up_origin=null) {
     }
 }
 
-async function updateDatabasePrices(up_origin=null) {
+async function updateDatabasePrices(up_origin) {
     var updateTickcount = new Date().getTime();
     //var status = await db.query(`UPDATE items_list SET rewards = null`)
     console.log('Retrieving DB items list...')
