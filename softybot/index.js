@@ -172,6 +172,9 @@ client.on('messageCreate', async message => {
                 case 'updatedb':
                     updateDB(message,args)
                     break
+                case 'getdb':
+                    getDB(message,args)
+                    break
                 /*----Handled locally----
                 case 'relic':
                     relics(message,args)
@@ -2132,6 +2135,27 @@ async function updateDB(message,args) {
         inform_dc('(Forced) DB update launching in 10 seconds...')
         message.channel.send(`(Forced) DB update launching in 10 seconds...`)
         DB_Update_Timer = setTimeout(updateDatabaseItems, 10000, message);
+    }
+    else {
+        message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`)
+        return
+    }
+}
+
+async function getDB(message,args) {
+    if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
+        await db.query(`SELECT * FROM items_list`)
+        .then(res => {
+            var dbBuffer = Buffer.from(JSON.stringify(res), 'utf8');
+            message.channel.send({content: " ", files: [dbBuffer]})
+            .catch(err => {
+                message.channel.send('<@253525146923433984> Error sending DB info file.')
+            })
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send('<@253525146923433984> Error retrieving DB info.')
+        })
     }
     else {
         message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`)
