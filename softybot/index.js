@@ -2147,7 +2147,7 @@ async function getDB(message,args) {
         await db.query(`SELECT * FROM items_list`)
         .then(res => {
             var dbBuffer = Buffer.from(JSON.stringify(res), 'utf8');
-            message.channel.send({content: " ", files: [dbBuffer]})
+            message.channel.send({content: " ", files: [{attachment: dbBuffer,name: 'items_list.json'}]})
             .catch(err => {
                 message.channel.send('<@253525146923433984> Error sending DB info file.')
             })
