@@ -3354,11 +3354,11 @@ async function trading_bot(message,args,command) {
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
                 if (noOfBuyers > 0)
                     msg.reactions.removeAll().catch(err => console.log(err))
-                for (i=0;i<noOfSellers;i++) {
-                    await msg.react(tradingBotReactions.sell[i]).then(()=>{return true}).catch(err => console.log(err))
+                for (r_in_1=0;r_in_1<noOfSellers;r_in_1++) {
+                    await msg.react(tradingBotReactions.sell[r_in_1]).then(()=>{return true}).catch(err => console.log(err))
                 }
-                for (i=0;i<noOfBuyers;i++) {
-                    await msg.react(tradingBotReactions.buy[i]).then(()=>{return true}).catch(err => console.log(err))
+                for (r_in_2=0;r_in_2<noOfBuyers;r_in_2++) {
+                    await msg.react(tradingBotReactions.buy[r_in_2]).then(()=>{return true}).catch(err => console.log(err))
                 }
             })
             .catch(err => {
@@ -3373,11 +3373,11 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
-                for (i=0;i<noOfSellers;i++) {
-                    await msg.react(tradingBotReactions.sell[i]).then(()=>{return true}).catch(err => console.log(err))
+                for (r_in_3=0;r_in_3<noOfSellers;r_in_3++) {
+                    await msg.react(tradingBotReactions.sell[r_in_3]).then(()=>{return true}).catch(err => console.log(err))
                 }
-                for (j=0;j<noOfBuyers;j++) {
-                    await msg.react(tradingBotReactions.buy[j]).then(()=>{return true}).catch(err => console.log(err))
+                for (r_in_4=0;r_in_4<noOfBuyers;r_in_4++) {
+                    await msg.react(tradingBotReactions.buy[r_in_4]).then(()=>{return true}).catch(err => console.log(err))
                 }
             })
             .catch(err => {
