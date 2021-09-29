@@ -3231,7 +3231,7 @@ async function trading_bot(message,args,command) {
                         icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
                     }
                     else {
-                        icon_url = res.rows[0].icon_url
+                        icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
                     }
                     var embed = {
                         author: {
@@ -3262,7 +3262,9 @@ async function trading_bot(message,args,command) {
             })
             if (!status)
                 return
+            console.log(embeds)
             originMessage.channel.send({content: ' ',embeds: embeds})
+            .catch(err => console.log(err))
             return
             //------------
             await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
