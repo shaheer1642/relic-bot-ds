@@ -386,6 +386,8 @@ client.on('interactionCreate', async interaction => {
                     return
                 }
                 if (msg) {
+                    console.log(JSON.stringify(embeds))
+                    return
                     if (embeds[0].fields[0].value = "") {    //no traders found, delete msg
                         await msg.delete().catch(err=>console.log(err))
                         return
