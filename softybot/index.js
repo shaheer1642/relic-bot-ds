@@ -3352,12 +3352,12 @@ async function trading_bot(message,args,command) {
                 if (noOfBuyers > 0)
                     await msg.reactions.removeAll().catch(err => console.log(err))
                 for (r_in_1=0;r_in_1<noOfSellers;r_in_1++) {
-                    console.log(`reacting with ${tradingBotReactions.sell[r_in_1]} on ${targetChannel.id}`)
                     await msg.react(tradingBotReactions.sell[r_in_1]).then(()=>{return true}).catch(err => console.log(err))
+                    console.log(`reacting with ${tradingBotReactions.sell[r_in_1]} on ${targetChannel.id}`)
                 }
                 for (r_in_2=0;r_in_2<noOfBuyers;r_in_2++) {
-                    console.log(`reacting with ${tradingBotReactions.buy[r_in_2]} on ${targetChannel.id}`)
                     await msg.react(tradingBotReactions.buy[r_in_2]).then(()=>{return true}).catch(err => console.log(err))
+                    console.log(`reacting with ${tradingBotReactions.buy[r_in_2]} on ${targetChannel.id}`)
                 }
             })
             .catch(err => {
