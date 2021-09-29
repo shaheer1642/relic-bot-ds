@@ -3265,7 +3265,7 @@ async function trading_bot(message,args,command) {
                     description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${client.channels.cache.get(multiCid).guild.name}`,
                     color: '#7cb45d'
                 }
-                await client.channels.get(multiCid).send({content: ' ', embeds: [embed1]})
+                await client.cache.channels.get(multiCid).send({content: ' ', embeds: [embed1]})
                 .then(async msg => {
                     await msg.react('1️⃣')
                     .catch(err => {
