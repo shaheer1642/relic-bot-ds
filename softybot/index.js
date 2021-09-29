@@ -221,8 +221,76 @@ client.on('messageCreate', async message => {
     return
 })
 
-client.on('interactionCreate', interaction => {
-	if (!interaction.isSelectMenu()) return;
+client.on('interactionCreate', async interaction => {
+    if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
+        await interaction.deferUpdate()
+        const discord_id = interaction.member.user.id
+        for (i=0;i<interaction.values.length;i++) {
+            const status = await db.query(`DELETE FROM users_orders WHERE discord_id=${discord_id} AND item_id='${interaction.values[i]}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return
+        }
+        //----update interaction with new items----
+        let orders = []
+        var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${discord_id}`)
+        .then(async res => {
+            if (res.rows.length == 0) {
+                await interaction.update({content: 'No more orders found on your profile.'}).catch(err => console.log(err))
+                return false
+            }
+            else {
+                orders = res.rows
+                return true
+            }
+        })
+        .catch (err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return
+        let postdata = {}
+        postdata.content = ' '
+        postdata.embeds = []
+        var sell_items = []
+        var sell_prices = []
+        var buy_items = []
+        var buy_prices = []
+        orders.forEach((e,index) => {
+            if (e.order_type == 'wts') {
+                sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+            }
+            if (e.order_type == 'wtb') {
+                buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+            }
+        })
+        if (sell_items.length != 0)
+            postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
+        if (buy_items.length != 0)
+            postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+        postdata.components = []
+        postdata.components.push({type:1,components:[]})
+        postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
+        orders.forEach((e,index) => {
+            if (index < 25) {
+                if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                    postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
+            }
+        })
+        postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+        console.log(JSON.stringify(postdata.components))
+        interaction.update(postdata).catch(err => console.log(err))
+        return
+    }
 	console.log(interaction);
 });
 
