@@ -14,6 +14,8 @@ const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009","892071308681166929"]
 const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"], remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"]}
+const tb_sellColor = '#7cb45d'
+const tb_buyColor = '#E74C3C'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
@@ -3739,15 +3741,33 @@ async function trading_bot_user_orders(message,args) {
     if (!status)
         return
     let postdata = {}
-    postdata.content = 'test message'
+    postdata.content = ' '
+    postdata.embeds = []
+    var sell_items = []
+    var sell_prices = []
+    var buy_items = []
+    var buy_prices = []
+    orders.forEach((e,index) => {
+        if (e.order_type == 'wts') {
+            sell_items.push(e.item_url)
+            sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+        if (e.order_type == 'wtb') {
+            buy_items.push(e.item_url)
+            buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+    })
+    if (sell_items.length != 0)
+        postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
+    if (buy_items.length != 0)
+        postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
     postdata.components = []
     postdata.components.push({type:1,components:[]})
-    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'class_select_1',min_values:1,max_values:3,options:[]})
-    
+    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,max_values:3,options:[]})
     orders.forEach((e,index) => {
         if (index < 25) {
             if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url))
-                postdata.components[0].components[0].options.push({label: e.item_url,value: e.item_url})
+                postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
         }
     })
     console.log(JSON.stringify(postdata.components))
