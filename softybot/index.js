@@ -242,7 +242,7 @@ client.on('interactionCreate', async interaction => {
         var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${discord_id}`)
         .then(async res => {
             if (res.rows.length == 0) {
-                await interaction.update({content: 'No more orders found on your profile.'}).catch(err => console.log(err))
+                await interaction.editReply({content: 'No more orders found on your profile.'}).catch(err => console.log(err))
                 return false
             }
             else {
@@ -288,7 +288,7 @@ client.on('interactionCreate', async interaction => {
         })
         postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
         console.log(JSON.stringify(postdata.components))
-        interaction.update(postdata).catch(err => console.log(err))
+        interaction.editReply(postdata).catch(err => console.log(err))
         return
     }
 	console.log(interaction);
