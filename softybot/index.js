@@ -2470,6 +2470,7 @@ function trades_update() {
 
 async function updateDatabaseItems(up_origin=null) {
     DB_Updating = true
+    console.log(up_origin)
     inform_dc('Updating DB...')
     if (up_origin)
         up_origin.channel.send('Updating DB...')
