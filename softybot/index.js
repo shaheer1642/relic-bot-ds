@@ -2125,6 +2125,10 @@ async function relist(message,args) {
 async function updateDB(message,args) {
     if (message.author.id != "253525146923433984")
         return
+    if (DB_Updating) {
+        message.channel.send(`An update is already in progress.`)
+        return
+    }
     clearTimeout(DB_Update_Timer)
     inform_dc('(Forced) DB update launching in 10 seconds...')
     message.channel.send(`(Forced) DB update launching in 10 seconds...`)
@@ -2465,11 +2469,6 @@ function trades_update() {
 }
 
 async function updateDatabaseItems(up_origin=null) {
-    if (DB_Updating) {
-        if (up_origin)
-            up_origin.channel.send(`An update is already in progress.`)
-        return
-    }
     DB_Updating = true
     inform_dc('Updating DB...')
     console.log('Retrieving WFM items list...')
