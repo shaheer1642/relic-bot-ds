@@ -12,7 +12,7 @@ const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820"]
-const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"]}
+const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"], remove: ["<:remove_order:892831810298478622>"]}
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
@@ -3353,6 +3353,7 @@ async function trading_bot(message,args,command) {
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
                 if (noOfBuyers > 0)
                     await msg.reactions.removeAll().catch(err => console.log(err))
+                await msg.react(tradingBotReactions.remove[0]).catch(err => console.log(err))
                 if (noOfSellers>0)
                     msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
                     if (noOfSellers>1)
@@ -3386,6 +3387,7 @@ async function trading_bot(message,args,command) {
             .then(async msg => {
                 if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                await msg.react(tradingBotReactions.remove[0]).catch(err => console.log(err))
                 if (noOfSellers>0)
                     msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
                     if (noOfSellers>1)
