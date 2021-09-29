@@ -3213,6 +3213,7 @@ async function trading_bot(message,args,command) {
         var embeds = []
         var noOfSellers = 0
         var noOfBuyers = 0
+        let targetChannel = client.channels.cache.get(multiCid).id
 
         //----construct embed----
         var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
@@ -3349,7 +3350,7 @@ async function trading_bot(message,args,command) {
         if (msg) {
             await msg.edit({content: ' ',embeds: embeds})
             .then(async msg => {
-                if (client.channels.cache.get(multiCid).id == originMessage.channel.id)
+                if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                 if (noOfBuyers > 0)
                     msg.reactions.removeAll().catch(err => console.log(err))
@@ -3370,7 +3371,7 @@ async function trading_bot(message,args,command) {
         else {
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
-                if (client.channels.cache.get(multiCid).id == originMessage.channel.id)
+                if (targetChannel.id == originMessage.channel.id)
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                 for (i=0;i<noOfSellers;i++) {
                     await msg.react(tradingBotReactions.sell[i]).then(()=>{return true}).catch(err => console.log(err))
