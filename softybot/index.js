@@ -3351,13 +3351,11 @@ async function trading_bot(message,args,command) {
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
                 if (noOfBuyers > 0)
                     await msg.reactions.removeAll().catch(err => console.log(err))
-                for (r_in_1=0;r_in_1<noOfSellers;r_in_1++) {
-                    await msg.react(tradingBotReactions.sell[r_in_1]).then(()=>{return true}).catch(err => console.log(err))
-                    console.log(`reacting with ${tradingBotReactions.sell[r_in_1]} on ${targetChannel.id}`)
+                for (i=0;i<noOfSellers;i++) {
+                    var status = await msg.react(tradingBotReactions.sell[i]).then(()=>console.log(`reacting with ${tradingBotReactions.sell[i]} on ${targetChannel.id}`)).catch(err => console.log(err))
                 }
-                for (r_in_2=0;r_in_2<noOfBuyers;r_in_2++) {
-                    await msg.react(tradingBotReactions.buy[r_in_2]).then(()=>{return true}).catch(err => console.log(err))
-                    console.log(`reacting with ${tradingBotReactions.buy[r_in_2]} on ${targetChannel.id}`)
+                for (j=0;j<noOfBuyers;j++) {
+                    var status = await msg.react(tradingBotReactions.buy[j]).then(()=>console.log(`reacting with ${tradingBotReactions.buy[j]} on ${targetChannel.id}`)).catch(err => console.log(err))
                 }
             })
             .catch(err => {
