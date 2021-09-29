@@ -3478,10 +3478,10 @@ async function trade_tut(message,args) {
     var postdata = {
         content: " ",
         embeds: [{
-            description: `Posting order\n**wtb volt 160p**\n**wts volt p 180plat**\n\nPosting multiple orders\n**wtb loki p systems 100p\nwts loki p bp 15p**`,
+            description: `Posting order\n**wtb volt 160p**\n**wts volt p 180plat**\n\nPosting multiple orders\n**wtb loki p systems 100p\nwts loki p bp 15p\nwtb plat 5$**`,
             color: "FFFFFF"
         }]
     }
-    client.channels.cache.get('892108718358007820').send(postdata)
-    client.channels.cache.get('892160436881993758').send(postdata)
+    client.channels.cache.get('892160436881993758').messages.cache.fetch('892684642208083968').then(m => m.edit(postdata))
+    client.channels.cache.get('892108718358007820').messages.cache.fetch('892684641847377931').then(m => m.edit(postdata))
 }
