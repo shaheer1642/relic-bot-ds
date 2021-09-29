@@ -234,7 +234,7 @@ client.on('interactionCreate', async interaction => {
             var item_name = ""
             var item_url = ""
             var status = await db.query(`SELECT * FROM items_list WHERE items_list.id='${item_id}'`)
-            .then(res => {
+            .then(async res => {
                 item_url = res.rows[0].item_url
                 item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                 return true
@@ -261,10 +261,10 @@ client.on('interactionCreate', async interaction => {
                 var noOfSellers = 0
                 var noOfBuyers = 0
                 var targetChannel = client.channels.cache.get(multiCid)
-                var item_name = ""
                 //----construct embed----
+                console.log('trades channel updating')
                 var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
-                .then(res => {
+                .then(async res => {
                     if (res.rows.length == 0)
                         return true
                     else {
@@ -316,7 +316,7 @@ client.on('interactionCreate', async interaction => {
                 if (!status)
                     return
                 var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true ORDER BY users_orders.user_price DESC`)
-                .then(res => {
+                .then(async res => {
                     if (res.rows.length == 0)
                         return true
                     else {
@@ -373,7 +373,7 @@ client.on('interactionCreate', async interaction => {
                     allMsgs.forEach(e => {
                         if (e.embeds.length != 0) {
                             if (e.embeds[0].author)
-                                if (e.embeds[0].author.name == `${item_name}`)
+                                if (e.embeds[0].author.name == item_name)
                                     msg = e
                         }
                     })
