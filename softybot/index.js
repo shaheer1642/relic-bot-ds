@@ -3212,25 +3212,51 @@ async function trading_bot(message,args,command) {
             var embeds = []
 
             //----construct embed----
-            var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true`)
+            var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
             .then(res => {
                 console.log(res)
-                return true
                 if (res.rows.length == 0)
                     return true
                 else {
-                    var sellers = ''
+                    var emb_sellers = ''
+                    var emb_prices = ''
+                    var icon_url = ''
+
                     for (i=0;i<res.rows.length;i++) {
-                        sellers += res.rows
+                        emb_sellers += res.rows[i].ingame_name + '\n'
+                        emb_prices += res.rows[i].user_price + '\n'
                     }
+                    if (!item_url.match(/_set$/)) {
+                        var temp = item_url.split("_")
+                        icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                    }
+                    else {
+                        icon_url = res.rows[0].icon_url
+                    }
+                    var embed = {
+                        author: {
+                            name: `${item_name}`,
+                            iconURL: icon_url
+                        },
+                        fields: [
+                            {
+                                name: 'Sellers',
+                                value: emb_sellers
+                            },
+                            {
+                                name: 'Prices',
+                                value: emb_prices
+                            },
+                        ],
+                        color: '#7cb45d'
+                    }
+                    embeds.push(embed)
                 }
                 return true
             })
             .catch(err => {
-                if (err.code == '23505') {
-                    originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                    setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
-                }
+                originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete(), 10000).catch(err => console.log(err));
                 console.log(err)
                 return false
             })
