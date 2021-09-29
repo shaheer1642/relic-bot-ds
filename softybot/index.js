@@ -225,7 +225,7 @@ client.on('interactionCreate', async interaction => {
 	console.log(interaction);
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         if (interaction.user.username != interaction.message.embeds[0].author.name) {
-            interaction.reply({content: 'Pong!'})
+            await interaction.deferUpdate()
             return
         }
         await interaction.deferUpdate()
