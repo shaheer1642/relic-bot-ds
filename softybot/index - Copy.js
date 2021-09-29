@@ -3240,10 +3240,6 @@ async function trading_bot(message,args,command) {
                     console.log(res)
                 })
                 .catch(err => {
-                    if (err.code == '23505') {
-                        originMessage.channel.send(`Error: Duplicate order insertion in the DB. Please contact MrSofty#7926\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-                        setTimeout(() => originMessage.delete(), 5000).catch(err => console.log(err));
-                    }
                     console.log(err)
                 })
                 return
