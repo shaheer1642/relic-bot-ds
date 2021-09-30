@@ -124,8 +124,11 @@ client.on('messageCreate', async message => {
             }
         }
         if (tradingBotChannels.includes(message.channelId)) {
-            if (message.member.presence.status)
-                console.log(`user is ${message.member.presence.status}`)
+            if (message.member.presence.status == `offline`) {
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                return
+            }
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
@@ -146,6 +149,11 @@ client.on('messageCreate', async message => {
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
+            if (message.member.presence.status == `offline`) {
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                return
+            }
             /*
             if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                 message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
