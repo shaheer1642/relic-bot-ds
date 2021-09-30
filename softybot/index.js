@@ -3752,42 +3752,48 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     continue
                 }
                 if (msg) {
-                    await msg.edit({content: ' ',embeds: embeds})
-                    .then(async msg => {
-                        if (originMessage) {
-                            if (targetChannel.id == originMessage.channel.id)
-                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
-                        }
-                        await msg.reactions.removeAll().catch(err => console.log(err))
-                        if (noOfSellers>0)
-                            msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
-                            if (noOfSellers>1)
-                                msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
-                                if (noOfSellers>2)
-                                    msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
-                                    if (noOfSellers>3)
-                                        msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
-                                        if (noOfSellers>4)
-                                            msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
-                        if (noOfBuyers>0)
-                            msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
-                            if (noOfBuyers>1)
-                                msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
-                                if (noOfBuyers>2)
-                                    msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
-                                    if (noOfBuyers>3)
-                                        msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
-                                        if (noOfBuyers>4)
-                                            msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
-                    })
-                    .catch(err => {
-                        if (originMessage) {
-                            originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-                        }
-                        console.log(err)
-                        return
-                    })
+                    if (update_type==2) {
+                        if (embeds.length==0)
+                            msg.delete().catch(err => console.log(err))
+                    }
+                    else {
+                        await msg.edit({content: ' ',embeds: embeds})
+                        .then(async msg => {
+                            if (originMessage) {
+                                if (targetChannel.id == originMessage.channel.id)
+                                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                            }
+                            await msg.reactions.removeAll().catch(err => console.log(err))
+                            if (noOfSellers>0)
+                                msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                                if (noOfSellers>1)
+                                    msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                                    if (noOfSellers>2)
+                                        msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                                        if (noOfSellers>3)
+                                            msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
+                                            if (noOfSellers>4)
+                                                msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
+                            if (noOfBuyers>0)
+                                msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
+                                if (noOfBuyers>1)
+                                    msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
+                                    if (noOfBuyers>2)
+                                        msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
+                                        if (noOfBuyers>3)
+                                            msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
+                                            if (noOfBuyers>4)
+                                                msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
+                        })
+                        .catch(err => {
+                            if (originMessage) {
+                                originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                            }
+                            console.log(err)
+                            return
+                        })
+                    }
                 }
                 else {
                     if (update_type != 1)
