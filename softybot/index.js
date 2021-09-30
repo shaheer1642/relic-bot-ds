@@ -147,6 +147,70 @@ client.on('messageCreate', async message => {
                 */
                 const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content.replace(/\n/g," ")}`)).catch(err => console.log(`Some error occured`))
             }
+            else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
+                //continue
+                var items_ids = []
+                var status_msg = ''
+                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${message.author.id}`)
+                .then(res => {
+                    if (res.rows.length==0) {
+                        status_msg = `<@${message.author.id} No orders found on your profile.>`
+                        return false
+                    }
+                    items_ids = res.rows
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    status_msg = `☠️ Error fetching your orders from db. Please contact MrSofty#7926\nError code: 500`
+                    return false
+                })
+                if (!status) {
+                    message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return
+                }
+                //set all orders as visible for this user
+                var status = await db.query(`UPDATE users_orders SET visibility=true WHERE discord_id=${message.author.id}`)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return
+                }
+                for (items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
+                    var item_id = items_ids[items_ids_index]
+                    var item_url = ''
+                    var item_name = ''
+                    var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}`)
+                    .then(res => {
+                        if (res.rows.length==0)
+                            return false
+                        if (res.rows.length>1)
+                            return false
+                        item_url = res.rows[0].item_url
+                        item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                        return
+                    }
+                    var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error`))
+                }
+                message.delete().catch(err => console.log(err))
+                return
+            }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
