@@ -339,7 +339,7 @@ client.on('interactionCreate', async interaction => {
         })
         postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
         console.log(JSON.stringify(postdata.components))
-        await interaction.update(postdata).catch(err => console.log(err))
+        await interaction.editReply(postdata).catch(err => console.log(err))
         return
     }
 	console.log(interaction);
@@ -3613,6 +3613,7 @@ async function trading_bot(message,args,command) {
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type) {
     for(i=0;i<tradingBotChannels.length;i++) {
         multiCid = tradingBotChannels[i]
+        console.log(`editing for channel ${multiCid}`)
         var msg = null
         var embeds = []
         var noOfSellers = 0
@@ -3839,6 +3840,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             }
         }
     }
+    console.log(`edited for all channels, returning`)
     return Promise.resolve()
 }
 
