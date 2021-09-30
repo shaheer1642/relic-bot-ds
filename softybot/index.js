@@ -233,10 +233,10 @@ client.on('messageCreate', async message => {
 client.on('interactionCreate', async interaction => {
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         if (interaction.user.username != interaction.message.embeds[0].author.name) {
-            //await interaction.deferUpdate()
+            await interaction.deferUpdate()
             return
         }
-        //await interaction.deferUpdate()
+        await interaction.deferUpdate()
         const discord_id = interaction.member.user.id
         for (interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
             const item_id = interaction.values[interactionIndex]
@@ -3890,7 +3890,6 @@ async function trading_bot_user_orders(message,args) {
     var sell_prices = []
     var buy_items = []
     var buy_prices = []
-    console.log(message.author.displayAvatarURL())
     orders.forEach((e,index) => {
         if (e.order_type == 'wts') {
             sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
