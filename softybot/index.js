@@ -133,7 +133,7 @@ client.on('messageCreate', async message => {
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
-                const func = await trading_bot(message,args,command)
+                const func = await trading_bot(message,args,command).catch()
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
