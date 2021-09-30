@@ -133,7 +133,7 @@ client.on('messageCreate', async message => {
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
-                const func = await trading_bot(message,args,command).catch(err => console.log(err))
+                const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content}`)).catch(err => console.log(err))
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
@@ -3745,8 +3745,8 @@ async function trading_bot(message,args,command) {
     if (!status)
         return Promise.reject()
     //------------------
-    const func = await trading_bot_orders_update(message,item_id,item_url,item_name,1)
-        return Promise.resolve()
+    const func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(err))
+    return Promise.resolve()
 }
 
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type) {
