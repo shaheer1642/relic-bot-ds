@@ -137,12 +137,13 @@ client.on('messageCreate', async message => {
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
-                const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content}`)).catch(err => console.log(`Some error occured`))
+                const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content.replace(/\n/g," ")}`)).catch(err => console.log(`Some error occured`))
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
+            console.log('after execution...')
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
