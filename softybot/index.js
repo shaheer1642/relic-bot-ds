@@ -154,7 +154,7 @@ client.on('messageCreate', async message => {
                 var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${message.author.id}`)
                 .then(res => {
                     if (res.rows.length==0) {
-                        status_msg = `<@${message.author.id} No orders found on your profile.>`
+                        status_msg = `<@${message.author.id}> No orders found on your profile.`
                         return false
                     }
                     items_ids = res.rows
