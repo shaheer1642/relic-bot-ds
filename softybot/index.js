@@ -223,10 +223,10 @@ client.on('messageCreate', async message => {
 client.on('interactionCreate', async interaction => {
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         if (interaction.user.username != interaction.message.embeds[0].author.name) {
-            await interaction.deferUpdate()
+            //await interaction.deferUpdate()
             return
         }
-        await interaction.deferUpdate()
+        //await interaction.deferUpdate()
         const discord_id = interaction.member.user.id
         for (i=0;i<interaction.values.length;i++) {
             const item_id = interaction.values[i]
@@ -474,7 +474,7 @@ client.on('interactionCreate', async interaction => {
         })
         postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
         console.log(JSON.stringify(postdata.components))
-        interaction.editReply(postdata).catch(err => console.log(err))
+        await interaction.update(postdata).catch(err => console.log(err))
         return
     }
 	console.log(interaction);
