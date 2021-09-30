@@ -3557,7 +3557,7 @@ axiosRetry(axios, {
 });
 
 async function trading_bot(message,args,command) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(async function(resolve, reject) {
         var price = ""
         if (args[args.length-1].match(/[0-9]/))
             var price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
@@ -3752,7 +3752,7 @@ async function trading_bot(message,args,command) {
 }
 
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(async function(resolve, reject) {
         tradingBotChannels.forEach(async multiCid => {
             var msg = null
             var embeds = []
