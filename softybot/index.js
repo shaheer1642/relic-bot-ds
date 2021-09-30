@@ -84,9 +84,7 @@ client.on('messageCreate', async message => {
         }
     let commandsArr = message.content.split('\n')
     for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
-        console.log(commandsArr[commandsArrIndex] + message.channelId)
         if (!message.guild) {
-            console.log(`no guild trigger`)
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
             .then(async res => {
                 if (!res.rows.length == 0) {
@@ -126,12 +124,12 @@ client.on('messageCreate', async message => {
             }
         }
         if (tradingBotChannels.includes(message.channelId)) {
-            console.log(`trade outside trigger`)
+            if (message.member.presence.status)
+                console.log(`user is ${message.member.presence.status}`)
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
             if (command == 'wts' || command == 'wtb') {
-                console.log(`trade trigger`)
                 /*
                 if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                     message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
@@ -145,11 +143,9 @@ client.on('messageCreate', async message => {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
-            console.log(`after execution... i = ${commandsArrIndex}`)
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
-            console.log(`trade bot spam trigger`)
             /*
             if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                 message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
@@ -163,7 +159,6 @@ client.on('messageCreate', async message => {
             }
             continue
         }
-        console.log(`the rest trigger`)
         if (commandsArr[commandsArrIndex].indexOf(config.prefix) != 0)
             continue
 
