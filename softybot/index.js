@@ -185,7 +185,7 @@ client.on('messageCreate', async message => {
                     return
                 }
                 for (items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
-                    var item_id = items_ids[items_ids_index]
+                    var item_id = items_ids[items_ids_index].item_id
                     var item_url = ''
                     var item_name = ''
                     console.log(item_id)
@@ -199,6 +199,7 @@ client.on('messageCreate', async message => {
                         }
                         item_url = res.rows[0].item_url
                         item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                        return true
                     })
                     .catch(err => {
                         console.log(err)
