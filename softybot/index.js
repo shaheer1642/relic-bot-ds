@@ -84,8 +84,7 @@ client.on('messageCreate', async message => {
         }
     let commandsArr = message.content.split('\n')
     for(i=0;i<commandsArr.length;i++) {
-        console.log(commandsArr[i])
-        console.log(message.channelId)
+        console.log(commandsArr[i] + message.channelId)
         if (!message.guild) {
             console.log(`no guild trigger`)
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
@@ -138,7 +137,7 @@ client.on('messageCreate', async message => {
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
-                const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content}`)).catch(err => console.log(err))
+                const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content}`)).catch(err => console.log(`Some error occured`))
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
