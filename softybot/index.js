@@ -3749,7 +3749,7 @@ async function trading_bot(message,args,command) {
     return
 }
 
-async function trading_bot_orders_update(message,item_id,item_url,originMessage,update_type) {
+async function trading_bot_orders_update(message,item_id,item_url,item_name,originMessage,update_type) {
     tradingBotChannels.forEach(async multiCid => {
         var msg = null
         var embeds = []
@@ -3805,9 +3805,9 @@ async function trading_bot_orders_update(message,item_id,item_url,originMessage,
             return true
         })
         .catch(err => {
+            console.log(err)
             originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
             setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-            console.log(err)
             return false
         })
         if (!status)
