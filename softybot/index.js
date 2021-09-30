@@ -210,7 +210,7 @@ client.on('messageCreate', async message => {
                         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                         return
                     }
-                    var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error`))
+                    setTimeout(() => trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error`)), 1);
                 }
                 message.delete().catch(err => console.log(err))
                 return
