@@ -415,8 +415,6 @@ client.on('interactionCreate', async interaction => {
                                             msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
                     })
                     .catch(err => {
-                        originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                         console.log(err)
                         return
                     })
@@ -3977,8 +3975,8 @@ async function trading_bot_user_orders(message,args) {
     var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${message.author.id}`)
     .then(res => {
         if (res.rows.length == 0) {
-            message.channel.send(`<@${message.author.id}> No orders found on your profile`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err), 10000))
+            message.channel.send(`<@${message.author.id}> No orders found on your profile`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+            setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
             return false
         }
         else {
