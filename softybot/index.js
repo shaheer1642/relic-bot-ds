@@ -84,6 +84,7 @@ client.on('messageCreate', async message => {
         }
     let commandsArr = message.content.split('\n')
     for(i=0;i<commandsArr.length;i++) {
+        console.log(commandsArr[i])
         if (!message.guild) {
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
             .then(async res => {
