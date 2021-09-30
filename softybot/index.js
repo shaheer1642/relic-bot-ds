@@ -3883,7 +3883,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 if (msg == 'error') {
                     originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 504\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-                    return
+                    continue
                 }
                 if (msg) {
                     await msg.edit({content: ' ',embeds: embeds})
