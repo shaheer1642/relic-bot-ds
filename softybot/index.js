@@ -180,7 +180,7 @@ client.on('messageCreate', async message => {
                     return false
                 })
                 if (!status) {
-                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
@@ -188,12 +188,15 @@ client.on('messageCreate', async message => {
                     var item_id = items_ids[items_ids_index]
                     var item_url = ''
                     var item_name = ''
+                    console.log(item_id)
                     var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}`)
                     .then(res => {
                         if (res.rows.length==0)
                             return false
-                        if (res.rows.length>1)
+                        if (res.rows.length>1) {
+                            console.log(res.rows)
                             return false
+                        }
                         item_url = res.rows[0].item_url
                         item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                     })
