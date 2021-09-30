@@ -132,11 +132,13 @@ client.on('messageCreate', async message => {
     
             if (command == 'wts' || command == 'wtb') {
                 console.log(`trade trigger`)
+                /*
                 if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                     message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
+                */
                 const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content.replace(/\n/g," ")}`)).catch(err => console.log(`Some error occured`))
             }
             else {
@@ -148,11 +150,13 @@ client.on('messageCreate', async message => {
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
             console.log(`trade bot spam trigger`)
+            /*
             if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                 message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                 return
             }
+            */
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
             if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
                 trading_bot_user_orders(message,args)
@@ -3996,6 +4000,7 @@ async function trade_tut(message,args) {
             color: "FFFFFF"
         }]
     }
-    client.channels.cache.get('892160436881993758').messages.fetch('892684642208083968').then(m => m.edit(postdata))
-    client.channels.cache.get('892108718358007820').messages.fetch('892684641847377931').then(m => m.edit(postdata))
+    tradingBotChannels.forEach(c => {
+        client.channels.cache.get(c).send(postdata)
+    })
 }
