@@ -3557,198 +3557,196 @@ axiosRetry(axios, {
 });
 
 async function trading_bot(message,args,command) {
-    return new Promise(async function(resolve, reject) {
-        var price = ""
-        if (args[args.length-1].match(/[0-9]/))
-            var price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
-        if (price < 0) {
-            message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-            reject()
-        }
-        console.log(price)
-        var ingame_name = ''
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false
-            else {
-                ingame_name = res.rows[0].ingame_name
-                return true
-            }
-        })
-        .catch(err => {
-            if (err.response)
-                console.log(err.response.data)
-            console.log(err)
-            console.log('Retrieving Database -> users_list error')
-            message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+    var price = ""
+    if (args[args.length-1].match(/[0-9]/))
+        var price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
+    if (price < 0) {
+        message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        reject()
+    }
+    console.log(price)
+    var ingame_name = ''
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rows.length == 0)
             return false
-        })
-        if (!status) {
-            message.channel.send({content: `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
-            try {
-                message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
-            } catch (err) {
-                message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-            }
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-            resolve()
-        }
-        //---------------
-        var d_item_url = ""
-        args.forEach(element => {
-            d_item_url = d_item_url + element + "_"
-        });
-        d_item_url = d_item_url.substring(0, d_item_url.length - 1);
-        d_item_url = d_item_url.replace(/_p$/,'_prime')
-        d_item_url = d_item_url.replace('_p_','_prime_')
-        d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
-        let arrItemsUrl = []
-        let items_list = []
-        console.log('Retrieving Database -> items_list')
-        var status = await db.query(`SELECT * FROM items_list`)
-        .then(res => {
-            items_list = res.rows
-            console.log('Retrieving Database -> items_list success')
+        else {
+            ingame_name = res.rows[0].ingame_name
             return true
-        })
-        .catch (err => {
-            if (err.response)
-                console.log(err.response.data)
-            console.log(err)
-            console.log('Retrieving Database -> items_list error')
-            message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-            return false
-        })
-        if (!status)      
-            reject()
-        items_list.forEach(element => {
-            if (element.item_url.match('^' + d_item_url + '\W*')) {
-                if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
-                    arrItemsUrl.push({item_url: element.item_url,item_id: element.id});
-            }
-        })
-        if (JSON.stringify(arrItemsUrl).match("_set")) {
-            var i = 0
-            var MaxIndex = arrItemsUrl.length
-            for (i=0; i <= MaxIndex-1; i++)
+        }
+    })
+    .catch(err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> users_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return false
+    })
+    if (!status) {
+        message.channel.send({content: `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
+        try {
+            message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+        } catch (err) {
+            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+        }
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        resolve()
+    }
+    //---------------
+    var d_item_url = ""
+    args.forEach(element => {
+        d_item_url = d_item_url + element + "_"
+    });
+    d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    d_item_url = d_item_url.replace(/_p$/,'_prime')
+    d_item_url = d_item_url.replace('_p_','_prime_')
+    d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
+    let arrItemsUrl = []
+    let items_list = []
+    console.log('Retrieving Database -> items_list')
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+        console.log('Retrieving Database -> items_list success')
+        return true
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return false
+    })
+    if (!status)      
+        reject()
+    items_list.forEach(element => {
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
+                arrItemsUrl.push({item_url: element.item_url,item_id: element.id});
+        }
+    })
+    if (JSON.stringify(arrItemsUrl).match("_set")) {
+        var i = 0
+        var MaxIndex = arrItemsUrl.length
+        for (i=0; i <= MaxIndex-1; i++)
+        {
+            if (!arrItemsUrl[i].item_url.match("_set"))
             {
-                if (!arrItemsUrl[i].item_url.match("_set"))
-                {
-                    arrItemsUrl.splice(i, 1)
-                    i--
-                }
-                MaxIndex = arrItemsUrl.length
+                arrItemsUrl.splice(i, 1)
+                i--
             }
+            MaxIndex = arrItemsUrl.length
         }
-        if (arrItemsUrl.length > 1) {
-            message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
-            reject()
-        }
-        if (arrItemsUrl.length==0) {
-            message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-            return Promise.reject()
-        }
-        const item_url = arrItemsUrl[0].item_url
-        const item_id = arrItemsUrl[0].item_id
-        const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-        const originGuild = message.guild.name
-        const originMessage = message
-        var avg_price = null
-        status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
-        .then(async res => {
-            if (command == 'wts')
-                if (res.rows[0].sell_price) 
-                    avg_price = Math.round(Number(res.rows[0].sell_price))
-            if (command == 'wtb')
-                if (res.rows[0].buy_price)
-                    avg_price = Math.round(Number(res.rows[0].buy_price))
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status) {
-            message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 500").catch(err => console.log(err)); 
-            reject()
-        }
-        if (avg_price == null || avg_price == "null") {
-            message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501").catch(err => console.log(err)); 
-            reject()
-        }
-        if (!price) {
-            price = avg_price
-        }
-        if (price > (avg_price*1.2)) {
-            message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-            reject()
-        }
-        else if (price < (avg_price*0.8)) {
-            message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-            reject()
-        }
-        //----verify order in DB----
-        var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
-        .then(async res => {
-            if (res.rows.length == 0) {     //----insert order in DB----
-                var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
-                .then(res => {
-                    return true
-                })
-                .catch(err => {
-                    if (err.code == '23505') {
-                        originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-                    }
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    return false
-            }
-            else if (res.rows.length > 1) {
-                originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-                return false
-            }
-            else {     //----update existing order in DB----
-                var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
-                .then(res => {
-                    return true
-                })
-                .catch(err => {
-                    originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+    }
+    if (arrItemsUrl.length > 1) {
+        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
+        reject()
+    }
+    if (arrItemsUrl.length==0) {
+        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        reject()
+    }
+    const item_url = arrItemsUrl[0].item_url
+    const item_id = arrItemsUrl[0].item_id
+    const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    const originGuild = message.guild.name
+    const originMessage = message
+    var avg_price = null
+    status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
+    .then(async res => {
+        if (command == 'wts')
+            if (res.rows[0].sell_price) 
+                avg_price = Math.round(Number(res.rows[0].sell_price))
+        if (command == 'wtb')
+            if (res.rows[0].buy_price)
+                avg_price = Math.round(Number(res.rows[0].buy_price))
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 500").catch(err => console.log(err)); 
+        reject()
+    }
+    if (avg_price == null || avg_price == "null") {
+        message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501").catch(err => console.log(err)); 
+        reject()
+    }
+    if (!price) {
+        price = avg_price
+    }
+    if (price > (avg_price*1.2)) {
+        message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        reject()
+    }
+    else if (price < (avg_price*0.8)) {
+        message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        reject()
+    }
+    //----verify order in DB----
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+    .then(async res => {
+        if (res.rows.length == 0) {     //----insert order in DB----
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                if (err.code == '23505') {
+                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    return false
-            }
+                }
+                console.log(err)
+                return false
+            })
             if (!status)
                 return false
-            return true
-        })
-        .catch(err => {
-            if (err.code == '23505') {
-                originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-            }
-            console.log(err)
+        }
+        else if (res.rows.length > 1) {
+            originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
             return false
-        })
+        }
+        else {     //----update existing order in DB----
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
         if (!status)
-            reject()
-        //------------------
-        const func = await trading_bot_orders_update(message,item_id,item_url,item_name,1)
-        resolve()
+            return false
+        return true
     })
+    .catch(err => {
+        if (err.code == '23505') {
+            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+        }
+        console.log(err)
+        return false
+    })
+    if (!status)
+        reject()
+    //------------------
+    const func = await trading_bot_orders_update(message,item_id,item_url,item_name,1)
+    resolve()
 }
 
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type) {
