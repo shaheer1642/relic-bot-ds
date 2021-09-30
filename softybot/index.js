@@ -284,7 +284,7 @@ client.on('interactionCreate', async interaction => {
             if (!status)
                 return
             if (visibility)
-                const func = await trading_bot_orders_update(null,item_id,item_url,item_name,2)
+                var func = await trading_bot_orders_update(null,item_id,item_url,item_name,2)
         }
         //----update interaction with new items----
         let orders = []
