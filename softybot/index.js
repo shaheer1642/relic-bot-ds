@@ -83,8 +83,8 @@ client.on('messageCreate', async message => {
             return
         }
     let commandsArr = message.content.split('\n')
-    for(i=0;i<commandsArr.length;i++) {
-        console.log(commandsArr[i] + message.channelId)
+    for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
+        console.log(commandsArr[commandsArrIndex] + message.channelId)
         if (!message.guild) {
             console.log(`no guild trigger`)
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
@@ -115,7 +115,7 @@ client.on('messageCreate', async message => {
             })
             if (!status)
                 continue
-            const args = commandsArr[i].trim().split(/ +/g)
+            const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
                 if (!args[2]) {
                     message.channel.send('Please write a username')
@@ -127,7 +127,7 @@ client.on('messageCreate', async message => {
         }
         if (tradingBotChannels.includes(message.channelId)) {
             console.log(`trade outside trigger`)
-            const args = commandsArr[i].toLowerCase().trim().split(/ +/g)
+            const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
             const command = args.shift()
     
             if (command == 'wts' || command == 'wtb') {
@@ -143,7 +143,7 @@ client.on('messageCreate', async message => {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
-            console.log(`after execution... i = ${i}`)
+            console.log(`after execution... i = ${commandsArrIndex}`)
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
@@ -153,18 +153,18 @@ client.on('messageCreate', async message => {
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                 return
             }
-            const args = commandsArr[i].toLowerCase().trim().split(/ +/g)
+            const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
             if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
                 trading_bot_user_orders(message,args)
             }
             continue
         }
         console.log(`the rest trigger`)
-        if (commandsArr[i].indexOf(config.prefix) != 0)
+        if (commandsArr[commandsArrIndex].indexOf(config.prefix) != 0)
             continue
 
         //parse arguments
-        const args = commandsArr[i].slice(config.prefix.length).trim().split(/ +/g)
+        const args = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
 
         //define command
         const command = args.shift().toLowerCase();
