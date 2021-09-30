@@ -189,7 +189,7 @@ client.on('messageCreate', async message => {
                     var item_url = ''
                     var item_name = ''
                     console.log(item_id)
-                    var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}`)
+                    var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}'`)
                     .then(res => {
                         if (res.rows.length==0)
                             return false
