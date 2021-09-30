@@ -93,9 +93,7 @@ client.on('messageCreate', async message => {
         }
     }
     let commandsArr = message.content.split('\n')
-    while (global_message_executing) {
-        //do nothing
-    }
+    
     global_message_executing = true
     for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
