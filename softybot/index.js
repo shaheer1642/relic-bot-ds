@@ -77,11 +77,16 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return
-    if (message.guild)
+    if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
             return
         }
+        else if (message.guild.id=='865904902941048862' && message.content=='!rhino2') {
+            message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
+            return
+        }
+    }
     let commandsArr = message.content.split('\n')
     for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
@@ -3617,7 +3622,17 @@ async function trading_bot(message,args,command) {
     return Promise.resolve()
 }
 
+
+
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type) {
+    /*
+    if (update_type==3) {
+        for(i=0;i<tradingBotChannels.length;i++) {
+            multiCid = tradingBotChannels[i]
+            var targetChannel = client.channels.cache.get(multiCid)
+        }
+    }
+    */
     for(i=0;i<tradingBotChannels.length;i++) {
         multiCid = tradingBotChannels[i]
         console.log(`editing for channel ${multiCid}`)
