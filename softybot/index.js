@@ -127,13 +127,11 @@ client.on('messageCreate', async message => {
             const command = args.shift()
     
             if (command == 'wts' || command == 'wtb') {
-                /*
                 if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                     message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
-                */
                 await trading_bot(message,args,command)
                 continue
             }
@@ -144,6 +142,11 @@ client.on('messageCreate', async message => {
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
+            if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
+                message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                return
+            }
             const args = commandsArr[i].toLowerCase().trim().split(/ +/g)
             if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
                 await trading_bot_user_orders(message,args)
@@ -3742,6 +3745,11 @@ async function trading_bot(message,args,command) {
     if (!status)
         return
     //------------------
+    await trading_bot_orders_update(message,item_id,item_url,item_name,originMessage,1)
+    return
+}
+
+async function trading_bot_orders_update(message,item_id,item_url,originMessage,update_type) {
     tradingBotChannels.forEach(async multiCid => {
         var msg = null
         var embeds = []
@@ -3913,6 +3921,8 @@ async function trading_bot(message,args,command) {
             })
         }
         else {
+            if (update_type != 1)
+                return
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
                 if (targetChannel.id == originMessage.channel.id)
@@ -3947,7 +3957,6 @@ async function trading_bot(message,args,command) {
             })
         }
     })
-    return
 }
 
 async function trading_bot_user_orders(message,args) {

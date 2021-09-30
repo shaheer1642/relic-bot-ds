@@ -12,6 +12,10 @@ const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820"]
+const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
+const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"], remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"]}
+const tb_sellColor = '#7cb45d'
+const tb_buyColor = '#E74C3C'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
@@ -123,11 +127,13 @@ client.on('messageCreate', async message => {
             const command = args.shift()
     
             if (command == 'wts' || command == 'wtb') {
-                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349') {
+                /*
+                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                     message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
+                */
                 await trading_bot(message,args,command)
                 continue
             }
@@ -136,6 +142,13 @@ client.on('messageCreate', async message => {
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
             continue
+        }
+        if (tradingBotSpamChannels.includes(message.channelId)) {
+            const args = commandsArr[i].toLowerCase().trim().split(/ +/g)
+            if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
+                await trading_bot_user_orders(message,args)
+                continue
+            }
         }
 
         if (commandsArr[i].indexOf(config.prefix) != 0)
@@ -207,6 +220,266 @@ client.on('messageCreate', async message => {
     return
 })
 
+client.on('interactionCreate', async interaction => {
+    if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
+        if (interaction.user.username != interaction.message.embeds[0].author.name) {
+            //await interaction.deferUpdate()
+            return
+        }
+        //await interaction.deferUpdate()
+        const discord_id = interaction.member.user.id
+        for (i=0;i<interaction.values.length;i++) {
+            const item_id = interaction.values[i]
+            var item_name = ""
+            var item_url = ""
+            var status = await db.query(`SELECT * FROM items_list WHERE items_list.id='${item_id}'`)
+            .then(async res => {
+                item_url = res.rows[0].item_url
+                item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return
+            console.log(`removing item order ${item_name}`)
+            var status = await db.query(`DELETE FROM users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return
+            for (j=0;j<tradingBotChannels.length;j++) {
+                var multiCid = tradingBotChannels[j]
+                var msg = null
+                var embeds = []
+                var noOfSellers = 0
+                var noOfBuyers = 0
+                var targetChannel = client.channels.cache.get(multiCid)
+                //----construct embed----
+                console.log('trades channel updating')
+                var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
+                .then(async res => {
+                    if (res.rows.length == 0)
+                        return true
+                    else {
+                        var emb_sellers = ''
+                        var emb_prices = ''
+                        var icon_url = ''
+        
+                        for (i=0;i<res.rows.length;i++) {
+                            if (i==5)
+                                break
+                            emb_sellers += res.rows[i].ingame_name + '\n'
+                            emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                        }
+                        noOfSellers = i
+                        if (!item_url.match(/_set$/)) {
+                            var temp = item_url.split("_")
+                            icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                        }
+                        else {
+                            icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+                        }
+                        var embed = {
+                            author: {
+                                name: item_name,
+                                iconURL: icon_url
+                            },
+                            fields: [
+                                {
+                                    name: 'Sellers',
+                                    value: emb_sellers,
+                                    inline: true
+                                },{name: '\u200b',value:'\u200b',inline:true},
+                                {
+                                    name: 'Prices',
+                                    value: emb_prices,
+                                    inline: true
+                                },
+                            ],
+                            color: '#7cb45d'
+                        }
+                        embeds.push(embed)
+                    }
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return
+                var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true ORDER BY users_orders.user_price DESC`)
+                .then(async res => {
+                    if (res.rows.length == 0)
+                        return true
+                    else {
+                        var emb_buyers = ''
+                        var emb_prices = ''
+                        var icon_url = ''
+        
+                        for (i=0;i<res.rows.length;i++) {
+                            if (i==5)
+                                break
+                            emb_buyers += res.rows[i].ingame_name + '\n'
+                            emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                        }
+                        noOfBuyers = i
+                        if (!item_url.match(/_set$/)) {
+                            var temp = item_url.split("_")
+                            icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                        }
+                        else {
+                            icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+                        }
+                        var embed = {
+                            author: {
+                                name: item_name,
+                                iconURL: icon_url
+                            },
+                            fields: [
+                                {
+                                    name: 'Buyers',
+                                    value: emb_buyers,
+                                    inline: true
+                                },{name: '\u200b',value:'\u200b',inline:true},
+                                {
+                                    name: 'Prices',
+                                    value: emb_prices,
+                                    inline: true
+                                },
+                            ],
+                            color: '#E74C3C'
+                        }
+                        embeds.push(embed)
+                    }
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return
+                if (embeds[1])
+                    embeds[1].author = null
+                await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
+                    allMsgs.forEach(e => {
+                        if (e.embeds.length != 0) {
+                            if (e.embeds[0].author)
+                                if (e.embeds[0].author.name == item_name)
+                                    msg = e
+                        }
+                    })
+                })
+                .catch (err => {
+                    console.log(err)
+                    msg = 'error'
+                })
+                if (msg == 'error') {
+                    return
+                }
+                if (msg) {
+                    if (embeds.length==0) {    //no traders found, delete msg
+                        await msg.delete().catch(err=>console.log(err))
+                        continue
+                    }
+                    await msg.edit({content: ' ',embeds: embeds})
+                    .then(async msg => {
+                        await msg.reactions.removeAll().catch(err => console.log(err))
+                        if (noOfSellers>0)
+                            msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                            if (noOfSellers>1)
+                                msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                                if (noOfSellers>2)
+                                    msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                                    if (noOfSellers>3)
+                                        msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
+                                        if (noOfSellers>4)
+                                            msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
+                        if (noOfBuyers>0)
+                            msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
+                            if (noOfBuyers>1)
+                                msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
+                                if (noOfBuyers>2)
+                                    msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
+                                    if (noOfBuyers>3)
+                                        msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
+                                        if (noOfBuyers>4)
+                                            msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return
+                    })
+                }
+            }
+        }
+        //----update interaction with new items----
+        let orders = []
+        var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${discord_id}`)
+        .then(async res => {
+            if (res.rows.length == 0) {
+                await interaction.editReply({content: 'No more orders found on your profile.',embeds: [],components:[]}).catch(err => console.log(err))
+                return false
+            }
+            else {
+                orders = res.rows
+                return true
+            }
+        })
+        .catch (err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return
+        let postdata = {}
+        postdata.content = ' '
+        postdata.embeds = []
+        var sell_items = []
+        var sell_prices = []
+        var buy_items = []
+        var buy_prices = []
+        orders.forEach((e,index) => {
+            if (e.order_type == 'wts') {
+                sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+            }
+            if (e.order_type == 'wtb') {
+                buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+            }
+        })
+        if (sell_items.length != 0)
+            postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
+        if (buy_items.length != 0)
+            postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+        postdata.embeds[0].author = {name: interaction.user.username,iconURL: interaction.user.displayAvatarURL()}
+        postdata.components = []
+        postdata.components.push({type:1,components:[]})
+        postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
+        orders.forEach((e,index) => {
+            if (index < 25) {
+                if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                    postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
+            }
+        })
+        postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+        console.log(JSON.stringify(postdata.components))
+        await interaction.update(postdata).catch(err => console.log(err))
+        return
+    }
+	console.log(interaction);
+});
+
 client.on('shardError', error => {
 	console.error('A websocket connection encountered an error:', error);
     fs.appendFile('ErrorLog.log',error + '\n\n', function (err) {
@@ -222,7 +495,268 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
+        /*
         if (tradingBotChannels.includes(reaction.message.channelId)) {
+            if (tradingBotReactions.remove.includes(reaction.emoji.identifier)) {
+                if (!reaction.message.author)
+                    await reaction.message.channel.messages.fetch(reaction.message.id)
+                if (reaction.message.author.id != client.user.id)
+                    return
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    else
+                        return true
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    reaction.users.remove(user.id);
+                    reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
+                    try {
+                        user.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                    } catch (err) {
+                        reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
+                    }
+                    return
+                }
+                var order_type = ''
+                if (reaction.emoji.identifier == tradingBotReactions.remove[0])
+                    order_type = 'wts'
+                else if (reaction.emoji.identifier == tradingBotReactions.remove[1])
+                    order_type = 'wtb'
+                else {
+                    console.log(`can't identify order_type for remove order reaction`)
+                    return
+                }
+                const item_url = reaction.message.embeds[0].author.name.toLowerCase().replace(/ /g,"_")
+                var status = await db.query(`DELETE FROM users_orders WHERE discord_id = ${user.id} AND item_url = '${item_url}' AND order_type = '${order_type}'`)
+                .then(res => {
+                        return true
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return
+                tradingBotChannels.forEach(async multiCid => {
+                    var msg = null
+                    var embeds = []
+                    var noOfSellers = 0
+                    var noOfBuyers = 0
+                    var targetChannel = client.channels.cache.get(multiCid)
+
+                    //----construct embed----
+                    var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
+                    .then(res => {
+                        if (res.rows.length == 0)
+                            return true
+                        else {
+                            var emb_sellers = ''
+                            var emb_prices = ''
+                            var icon_url = ''
+
+                            for (i=0;i<res.rows.length;i++) {
+                                if (i==5)
+                                    break
+                                emb_sellers += res.rows[i].ingame_name + '\n'
+                                emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                            }
+                            noOfSellers = i
+                            if (!item_url.match(/_set$/)) {
+                                var temp = item_url.split("_")
+                                icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                            }
+                            else {
+                                icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+                            }
+                            var embed = {
+                                author: {
+                                    name: `${item_name}`,
+                                    iconURL: icon_url
+                                },
+                                fields: [
+                                    {
+                                        name: 'Sellers',
+                                        value: emb_sellers,
+                                        inline: true
+                                    },{name: '\u200b',value:'\u200b',inline:true},
+                                    {
+                                        name: 'Prices',
+                                        value: emb_prices,
+                                        inline: true
+                                    },
+                                ],
+                                color: '#7cb45d'
+                            }
+                            embeds.push(embed)
+                        }
+                        return true
+                    })
+                    .catch(err => {
+                        originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return
+                    var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true ORDER BY users_orders.user_price DESC`)
+                    .then(res => {
+                        if (res.rows.length == 0)
+                            return true
+                        else {
+                            var emb_buyers = ''
+                            var emb_prices = ''
+                            var icon_url = ''
+
+                            for (i=0;i<res.rows.length;i++) {
+                                if (i==5)
+                                    break
+                                emb_buyers += res.rows[i].ingame_name + '\n'
+                                emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                            }
+                            noOfBuyers = i
+                            if (!item_url.match(/_set$/)) {
+                                var temp = item_url.split("_")
+                                icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                            }
+                            else {
+                                icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+                            }
+                            var embed = {
+                                author: {
+                                    name: `${item_name}`,
+                                    iconURL: icon_url
+                                },
+                                fields: [
+                                    {
+                                        name: 'Buyers',
+                                        value: emb_buyers,
+                                        inline: true
+                                    },{name: '\u200b',value:'\u200b',inline:true},
+                                    {
+                                        name: 'Prices',
+                                        value: emb_prices,
+                                        inline: true
+                                    },
+                                ],
+                                color: '#E74C3C'
+                            }
+                            embeds.push(embed)
+                        }
+                        return true
+                    })
+                    .catch(err => {
+                        originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return
+                    if (embeds[1])
+                        embeds[1].author = null
+                    await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
+                        allMsgs.forEach(e => {
+                            if (e.embeds.length != 0) {
+                                if (e.embeds[0].author)
+                                    if (e.embeds[0].author.name == `${item_name}`)
+                                        msg = e
+                            }
+                        })
+                    })
+                    .catch (err => {
+                        console.log(err)
+                        msg = 'error'
+                    })
+                    if (msg == 'error') {
+                        originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 504\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                        return
+                    }
+                    if (msg) {
+                        await msg.edit({content: ' ',embeds: embeds})
+                        .then(async msg => {
+                            if (targetChannel.id == originMessage.channel.id)
+                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                            if (noOfBuyers > 0)
+                                await msg.reactions.removeAll().catch(err => console.log(err))
+                            await msg.react(tradingBotReactions.remove[0]).catch(err => console.log(err))
+                            await msg.react(tradingBotReactions.remove[1]).catch(err => console.log(err))
+                            if (noOfSellers>0)
+                                msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                                if (noOfSellers>1)
+                                    msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                                    if (noOfSellers>2)
+                                        msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                                        if (noOfSellers>3)
+                                            msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
+                                            if (noOfSellers>4)
+                                                msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
+                            if (noOfBuyers>0)
+                                msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
+                                if (noOfBuyers>1)
+                                    msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
+                                    if (noOfBuyers>2)
+                                        msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
+                                        if (noOfBuyers>3)
+                                            msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
+                                            if (noOfBuyers>4)
+                                                msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
+                        })
+                        .catch(err => {
+                            originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                            console.log(err)
+                            return
+                        })
+                    }
+                    else {
+                        await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
+                        .then(async msg => {
+                            if (targetChannel.id == originMessage.channel.id)
+                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                            await msg.react(tradingBotReactions.remove[0]).catch(err => console.log(err))
+                            await msg.react(tradingBotReactions.remove[1]).catch(err => console.log(err))
+                            if (noOfSellers>0)
+                                msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                                if (noOfSellers>1)
+                                    msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                                    if (noOfSellers>2)
+                                        msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                                        if (noOfSellers>3)
+                                            msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
+                                            if (noOfSellers>4)
+                                                msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
+                            if (noOfBuyers>0)
+                                msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
+                                if (noOfBuyers>1)
+                                    msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
+                                    if (noOfBuyers>2)
+                                        msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
+                                        if (noOfBuyers>3)
+                                            msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
+                                            if (noOfBuyers>4)
+                                                msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
+                        })
+                        .catch(err => {
+                            originMessage.channel.send(`☠️ Error posting new orders in channel.\nError code: 506\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                            console.log(err)
+                            return
+                        })
+                    }
+                })
+            }
             return
             if (reaction.emoji.name == "🇧") {
                 if (!reaction.message.author)
@@ -446,6 +980,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             }
             return
         }
+        */
 
     if (reaction.emoji.name == "🆙") {
         if (!reaction.message.author)
@@ -3018,14 +3553,11 @@ axiosRetry(axios, {
 });
 
 async function trading_bot(message,args,command) {
-    const price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
-    if (!price) {
-        message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180').then(msg => setTimeout(() => msg.delete(), 5000))
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-        return
-    }
+    var price = ""
+    if (args[args.length-1].match(/[0-9]/))
+        var price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
     if (price < 0) {
-        message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000))
+        message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
@@ -3040,7 +3572,7 @@ async function trading_bot(message,args,command) {
             return true
         }
     })
-    .catch (err => {
+    .catch(err => {
         if (err.response)
             console.log(err.response.data)
         console.log(err)
@@ -3053,7 +3585,7 @@ async function trading_bot(message,args,command) {
         try {
             message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
         } catch (err) {
-            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
+            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         }
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
@@ -3107,12 +3639,12 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItemsUrl.length > 1) {
-        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err)); 
+        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return
     }
     if (arrItemsUrl.length==0) {
-        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
@@ -3125,7 +3657,7 @@ async function trading_bot(message,args,command) {
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
         if (command == 'wts')
-            if (res.rows[0].sell_price)
+            if (res.rows[0].sell_price) 
                 avg_price = Math.round(Number(res.rows[0].sell_price))
         if (command == 'wtb')
             if (res.rows[0].buy_price)
@@ -3144,6 +3676,9 @@ async function trading_bot(message,args,command) {
         message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501").catch(err => console.log(err)); 
         return
     }
+    if (!price) {
+        price = avg_price
+    }
     if (price > (avg_price*1.2)) {
         message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
@@ -3154,275 +3689,343 @@ async function trading_bot(message,args,command) {
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return
     }
-    if (command == 'wts') {
-        tradingBotChannels.forEach(async multiCid => {
-            var msg = null
-            await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
-                allMsgs.forEach(e => {
-                    if (e.embeds.length != 0) {
-                        if (e.embeds[0].author)
-                            if (e.embeds[0].author.name == `(S) ${item_name}`)
-                                msg = e
-                    }
-                })
+    //----verify order in DB----
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+    .then(async res => {
+        if (res.rows.length == 0) {     //----insert order in DB----
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
+            .then(res => {
+                return true
             })
-            .catch (err => {
-                console.log(err)
-            })
-            if (msg) {
-                var embeds = msg.embeds
-                var embIndex = null
-                console.log(embeds)
-                embeds.forEach((emb,index) => {
-                    console.log(emb.description)
-                    if (emb.description.match(ingame_name)) {
-                        embIndex = index
-                    }
-                })
-                if (embIndex != null)      //edit embed coz order already exists for this seller
-                    embeds[embIndex].description = `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`
-                else {
-                    embeds.push({
-                        description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
-                        color: '#7cb45d'
-                    })
+            .catch(err => {
+                if (err.code == '23505') {
+                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                 }
-                //---sorting embeds----
-                var temp_author = null
-                var temp_icon = null
-                embeds.forEach(async (e,index) => {
-                    temp = e.description.split("**")
-                    embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>\n",''))
-                    if (e.author) {
-                        temp_author = e.author.name
-                        temp_icon = e.author.iconURL
-                    }
-                    embeds[index].author = null
-                })
-                embeds = embeds.sort(dynamicSort("price"))
-                /*
-                embeds.forEach(async (e,index) => {
-                    embeds[index].title = null
-                    embeds[index].url = null
-                })
-                */
-                embeds[0].author = {name: temp_author,iconURL: temp_icon}
-                console.log(embeds)
-                //---------------------
-                await msg.edit({content: ' ',embeds: embeds})
-                .then(async msg => {
-                    const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
-                    for (i=0;i<embeds.length;i++) {
-                        if (!msg.reactions.cache.find(react => react.name==num_reacts[i])) {
-                            var status = await msg.react(num_reacts[i])
-                            .then(() => {
-                                return true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                return false
-                            })
-                            if (!status)
-                                break
-                        }
-                    }
-                    message.delete().catch(err => console.log(err))
-                })
-                .catch(err => {
-                    console.log(err)
-                    return
-                })
-            }
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        else if (res.rows.length > 1) {
+            originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            return false
+        }
+        else {     //----update existing order in DB----
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        if (!status)
+            return false
+        return true
+    })
+    .catch(err => {
+        if (err.code == '23505') {
+            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+        }
+        console.log(err)
+        return false
+    })
+    if (!status)
+        return
+    //------------------
+    tradingBotChannels.forEach(async multiCid => {
+        var msg = null
+        var embeds = []
+        var noOfSellers = 0
+        var noOfBuyers = 0
+        var targetChannel = client.channels.cache.get(multiCid)
+
+        //----construct embed----
+        var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return true
             else {
-                //----insert order in DB----
-                var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,user_price,order_type) VALUES (${originMessage.author.id},'${item_id}',${price},'${command}')`)
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-                return
-                var icon_url = null
+                var emb_sellers = ''
+                var emb_prices = ''
+                var icon_url = ''
+
+                for (i=0;i<res.rows.length;i++) {
+                    if (i==5)
+                        break
+                    emb_sellers += res.rows[i].ingame_name + '\n'
+                    emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                }
+                noOfSellers = i
                 if (!item_url.match(/_set$/)) {
-                    console.log("not a set")
                     var temp = item_url.split("_")
                     icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
                 }
                 else {
-                    status = await db.query(`SELECT * from items_list WHERE item_url = '${item_url}'`)
-                    .then(res => {
-                        if (res.rows.length != 0)
-                            icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
-                        else 
-                            return false
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err + '\n1st Error retreiving set icon.')
-                    })
-                    if (!status)
-                        console.log('2nd Error retreiving set icon.')
+                    icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
                 }
-                console.log(icon_url)
-                /*
-                var new_embed = new MessageEmbed()
-                .setTitle(`(S) ${item_name}`)
-                .setURL(`https://www.youtube.com/watch?v=dQw4w9WgXcQ`) //.setURL(`https://warframe.market/items/${item_url}`)
-                .setColor('#7cb45d')
-                .setDescription(`**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>`)
-                */
-                var embed1 = {
-                    //title: `(S) ${item_name}`,
+                var embed = {
                     author: {
-                        name: `(S) ${item_name}`,
+                        name: `${item_name}`,
                         iconURL: icon_url
                     },
-                    //url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
-                    description: `**Seller:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
+                    fields: [
+                        {
+                            name: 'Sellers',
+                            value: emb_sellers,
+                            inline: true
+                        },{name: '\u200b',value:'\u200b',inline:true},
+                        {
+                            name: 'Prices',
+                            value: emb_prices,
+                            inline: true
+                        },
+                    ],
                     color: '#7cb45d'
                 }
-                await client.channels.cache.get(multiCid).send({content: ' ', embeds: [embed1]})
-                .then(async msg => {
-                    await msg.react('1️⃣')
-                    .catch(err => {
-                        console.log(err)
-                    })
-                    message.delete()
-                    .catch(err => {
-                        console.log(err)
-                    })
-                })
-                .catch(err => {
-                    console.log(err)
-                    return
-                })
+                embeds.push(embed)
             }
+            return true
         })
-    }
-    else if (command == 'wtb') {
-        tradingBotChannels.forEach(async multiCid => {
-            var msg = null
-            await message.channel.messages.fetch().then(allMsgs => {
-                allMsgs.forEach(e => {
-                    if (e.embeds.length != 0) {
-                        if (e.embeds[0].author.name == `(B) ${item_name}`)
-                            msg = e
-                    }
-                })
-            })
-            .catch (err => {
-                console.log(err)
-            })
-            if (msg) {
-                var embeds = msg.embeds
-                var embIndex = null
-                console.log(embeds)
-                embeds.forEach((emb,index) => {
-                    console.log(emb.description)
-                    if (emb.description.match(ingame_name)) {
-                        embIndex = index
-                    }
-                })
-                if (embIndex != null)      //edit embed coz order already exists for this buyer
-                    embeds[embIndex].description = `**Buyer:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`
-                else {
-                    embeds.push({
-                        description: `**Buyer:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
-                        color: '#E74C3C'
-                    })
-                }
-                //---sorting embeds----
-                var temp_author = null
-                var temp_icon = null
-                embeds.forEach(async (e,index) => {
-                    temp = e.description.split("**")
-                    embeds[index].price = Number(temp[4].replace(": ",'').replace("<:platinum:881692607791648778>\n",''))
-                    if (e.author) {
-                        temp_author = e.author.name
-                        temp_icon = e.author.iconURL
-                    }
-                    embeds[index].author = null
-                })
-                embeds = embeds.sort(dynamicSortDesc("price"))
-                embeds[0].author = {name: temp_author,iconURL: temp_icon}
-                console.log(embeds)
-                //---------------------
-                await msg.edit({content: ' ',embeds: embeds})
-                .then(async msg => {
-                    const num_reacts = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
-                    for (i=0;i<embeds.length;i++) {
-                        if (!msg.reactions.cache.find(react => react.name==num_reacts[i])) {
-                            var status = await msg.react(num_reacts[i])
-                            .then(() => {
-                                return true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                return false
-                            })
-                            if (!status)
-                                break
-                        }
-                    }
-                    message.delete().catch(err => console.log(err))
-                })
-                .catch(err => {
-                    console.log(err)
-                    return
-                })
-            }
+        .catch(err => {
+            originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return
+        var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true ORDER BY users_orders.user_price DESC`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return true
             else {
-                var icon_url = null
+                var emb_buyers = ''
+                var emb_prices = ''
+                var icon_url = ''
+
+                for (i=0;i<res.rows.length;i++) {
+                    if (i==5)
+                        break
+                    emb_buyers += res.rows[i].ingame_name + '\n'
+                    emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                }
+                noOfBuyers = i
                 if (!item_url.match(/_set$/)) {
-                    console.log("not a set")
                     var temp = item_url.split("_")
                     icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
                 }
                 else {
-                    status = await db.query(`SELECT * from items_list WHERE item_url = '${item_url}'`)
-                    .then(res => {
-                        if (res.rows.length != 0)
-                            icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
-                        else 
-                            return false
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err + '\n1st Error retreiving set icon.')
-                    })
-                    if (!status)
-                        console.log('2nd Error retreiving set icon.')
+                    icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
                 }
-                console.log(icon_url)
-                var embed1 = {
+                var embed = {
                     author: {
-                        name: `(B) ${item_name}`,
+                        name: `${item_name}`,
                         iconURL: icon_url
                     },
-                    description: `**Buyer:** ${ingame_name}\n**Price:** ${price}<:platinum:881692607791648778>\n**Server:** ${originGuild}`,
+                    fields: [
+                        {
+                            name: 'Buyers',
+                            value: emb_buyers,
+                            inline: true
+                        },{name: '\u200b',value:'\u200b',inline:true},
+                        {
+                            name: 'Prices',
+                            value: emb_prices,
+                            inline: true
+                        },
+                    ],
                     color: '#E74C3C'
                 }
-
-                await client.channels.cache.get(multiCid).send({content: ' ', embeds: [embed1]})
-                .then(async msg => {
-                    await msg.react('1️⃣')
-                    .catch(err => {
-                        console.log(err)
-                    })
-                    message.delete()
-                    .catch(err => {
-                        console.log(err)
-                    })
-                })
-                .catch(err => {
-                    console.log(err)
-                    return
-                })
+                embeds.push(embed)
             }
+            return true
         })
-    }
+        .catch(err => {
+            originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return
+        if (embeds[1])
+            embeds[1].author = null
+        await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
+            allMsgs.forEach(e => {
+                if (e.embeds.length != 0) {
+                    if (e.embeds[0].author)
+                        if (e.embeds[0].author.name == `${item_name}`)
+                            msg = e
+                }
+            })
+        })
+        .catch (err => {
+            console.log(err)
+            msg = 'error'
+        })
+        if (msg == 'error') {
+            originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 504\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            return
+        }
+        if (msg) {
+            await msg.edit({content: ' ',embeds: embeds})
+            .then(async msg => {
+                if (targetChannel.id == originMessage.channel.id)
+                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                await msg.reactions.removeAll().catch(err => console.log(err))
+                if (noOfSellers>0)
+                    msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                    if (noOfSellers>1)
+                        msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                        if (noOfSellers>2)
+                            msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                            if (noOfSellers>3)
+                                msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
+                                if (noOfSellers>4)
+                                    msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
+                if (noOfBuyers>0)
+                    msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
+                    if (noOfBuyers>1)
+                        msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
+                        if (noOfBuyers>2)
+                            msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
+                            if (noOfBuyers>3)
+                                msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
+                                if (noOfBuyers>4)
+                                    msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
+            })
+            .catch(err => {
+                originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                console.log(err)
+                return
+            })
+        }
+        else {
+            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
+            .then(async msg => {
+                if (targetChannel.id == originMessage.channel.id)
+                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
+                await msg.reactions.removeAll().catch(err => console.log(err))
+                if (noOfSellers>0)
+                    msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                    if (noOfSellers>1)
+                        msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                        if (noOfSellers>2)
+                            msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                            if (noOfSellers>3)
+                                msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
+                                if (noOfSellers>4)
+                                    msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
+                if (noOfBuyers>0)
+                    msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
+                    if (noOfBuyers>1)
+                        msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
+                        if (noOfBuyers>2)
+                            msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
+                            if (noOfBuyers>3)
+                                msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
+                                if (noOfBuyers>4)
+                                    msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
+            })
+            .catch(err => {
+                originMessage.channel.send(`☠️ Error posting new orders in channel.\nError code: 506\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                console.log(err)
+                return
+            })
+        }
+    })
     return
+}
+
+async function trading_bot_user_orders(message,args) {
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        else
+            return true
+    })
+    .catch (err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send({content: `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+        try {
+            user.send({content: "Type the following command to register your ign:\nset ign your_username"})
+        } catch (err) {
+            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+        }
+        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+        return
+    }
+    var orders = null
+    var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rows.length == 0) {
+            message.channel.send(`<@${message.author.id}> No orders found on your profile`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+            setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+            return false
+        }
+        else {
+            orders = res.rows
+            return true
+        }
+    })
+    .catch (err => {
+        console.log(err)
+        return false
+    })
+    if (!status)
+        return
+    let postdata = {}
+    postdata.content = ' '
+    postdata.embeds = []
+    var sell_items = []
+    var sell_prices = []
+    var buy_items = []
+    var buy_prices = []
+    console.log(message.author.displayAvatarURL())
+    orders.forEach((e,index) => {
+        if (e.order_type == 'wts') {
+            sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+            sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+        if (e.order_type == 'wtb') {
+            buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+            buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+    })
+    if (sell_items.length != 0)
+        postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
+    if (buy_items.length != 0)
+        postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+    postdata.embeds[0].author = {name: message.author.username,iconURL: message.author.displayAvatarURL()}
+    postdata.components = []
+    postdata.components.push({type:1,components:[]})
+    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
+    orders.forEach((e,index) => {
+        if (index < 25) {
+            if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
+        }
+    })
+    postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+    console.log(JSON.stringify(postdata.components))
+    message.channel.send(postdata).catch(err => console.log(err))
 }
 
 async function trading_bot_registeration(message,ingame_name) {
