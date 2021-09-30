@@ -6,9 +6,11 @@ const https = require('https');
 const request = require('request');
 const fs = require('fs')
 const DB = require('pg');
+/*
 const { doesNotMatch } = require('assert');
 const { Console } = require('console');
 const { resolve } = require('path');
+*/
 const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
@@ -20,6 +22,9 @@ const tb_buyColor = '#E74C3C'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
+var global_message_executing = false
+
+
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -88,6 +93,10 @@ client.on('messageCreate', async message => {
         }
     }
     let commandsArr = message.content.split('\n')
+    while (!global_message_executing) {
+        //do nothing
+    }
+    global_message_executing = true
     for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
@@ -132,6 +141,7 @@ client.on('messageCreate', async message => {
             if (message.member.presence.status == `offline`) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                global_message_executing = false
                 return
             }
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
@@ -182,6 +192,7 @@ client.on('messageCreate', async message => {
                 if (!status) {
                     message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    global_message_executing = false
                     return
                 }
                 for (items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
@@ -208,11 +219,13 @@ client.on('messageCreate', async message => {
                     if (!status) {
                         message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                        global_message_executing = false
                         return
                     }
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error`))
                 }
                 message.delete().catch(err => console.log(err))
+                global_message_executing = false
                 return
             }
             else {
@@ -225,6 +238,7 @@ client.on('messageCreate', async message => {
             if (message.member.presence.status == `offline`) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                global_message_executing = false
                 return
             }
             /*
@@ -307,6 +321,7 @@ client.on('messageCreate', async message => {
             }
         continue
     }
+    global_message_executing = false
     return
 })
 
