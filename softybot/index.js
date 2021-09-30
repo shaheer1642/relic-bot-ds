@@ -12,7 +12,7 @@ const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820"]
-const tradingBotSpamChannels = ["892843006560981032", "892843163851563009","892071308681166929"]
+const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"], remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"]}
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
@@ -150,7 +150,6 @@ client.on('messageCreate', async message => {
                 continue
             }
         }
-
 
         if (commandsArr[i].indexOf(config.prefix) != 0)
             continue
@@ -3961,8 +3960,6 @@ async function trading_bot_user_orders(message,args) {
             return true
     })
     .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
         console.log(err)
         return false
     })
@@ -3990,8 +3987,6 @@ async function trading_bot_user_orders(message,args) {
         }
     })
     .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
         console.log(err)
         return false
     })
@@ -4032,53 +4027,6 @@ async function trading_bot_user_orders(message,args) {
     postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
     console.log(JSON.stringify(postdata.components))
     message.channel.send(postdata).catch(err => console.log(err))
-/*
-    var postdata = {
-        "content": "Select orders to remove: ",
-        "components": [
-            {
-                "type": 1,
-                "components": [
-                    {
-                        "type": 3,
-                        "custom_id": "class_select_1",
-                        "options":[
-                            {
-                                "label": "Rogue",
-                                "value": "rogue",
-                                "description": "Sneak n stab",
-                                "emoji": {
-                                    "name": "rogue",
-                                    "id": "625891304148303894"
-                                }
-                            },
-                            {
-                                "label": "Mage",
-                                "value": "mage",
-                                "description": "Turn 'em into a sheep",
-                                "emoji": {
-                                    "name": "mage",
-                                    "id": "625891304081063986"
-                                }
-                            },
-                            {
-                                "label": "Priest",
-                                "value": "priest",
-                                "description": "You get heals when I'm done doing damage",
-                                "emoji": {
-                                    "name": "priest",
-                                    "id": "625891303795982337"
-                                }
-                            }
-                        ],
-                        "placeholder": "Select orders to remove",
-                        "min_values": 1,
-                        "max_values": 3
-                    }
-                ]
-            }
-        ]
-    }*/
 }
 
 async function trading_bot_registeration(message,ingame_name) {
