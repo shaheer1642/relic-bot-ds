@@ -143,7 +143,7 @@ client.on('messageCreate', async message => {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
-            console.log('after execution...')
+            console.log(`after execution... i = ${i}`)
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
