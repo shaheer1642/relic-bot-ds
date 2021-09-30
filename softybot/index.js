@@ -132,8 +132,7 @@ client.on('messageCreate', async message => {
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return
                 }
-                await trading_bot(message,args,command)
-                continue
+                trading_bot(message,args,command)
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
@@ -149,9 +148,9 @@ client.on('messageCreate', async message => {
             }
             const args = commandsArr[i].toLowerCase().trim().split(/ +/g)
             if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
-                await trading_bot_user_orders(message,args)
-                continue
+                trading_bot_user_orders(message,args)
             }
+            continue
         }
 
         if (commandsArr[i].indexOf(config.prefix) != 0)
@@ -219,6 +218,7 @@ client.on('messageCreate', async message => {
                     authorize(message,args)
                     break
             }
+        continue
     }
     return
 })
@@ -3745,7 +3745,7 @@ async function trading_bot(message,args,command) {
     if (!status)
         return
     //------------------
-    await trading_bot_orders_update(message,item_id,item_url,item_name,1)
+    trading_bot_orders_update(message,item_id,item_url,item_name,1)
     return
 }
 
