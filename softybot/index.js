@@ -3750,7 +3750,8 @@ async function trading_bot(message,args,command) {
 }
 
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type) {
-    tradingBotChannels.forEach(async multiCid => {
+    for(i=0;i<tradingBotChannels.length;i++) {
+        multiCid = tradingBotChannels[i]
         var msg = null
         var embeds = []
         var noOfSellers = 0
@@ -3767,13 +3768,13 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 var emb_prices = ''
                 var icon_url = ''
 
-                for (i=0;i<res.rows.length;i++) {
-                    if (i==5)
+                for (j=0;j<res.rows.length;j++) {
+                    if (j==5)
                         break
-                    emb_sellers += res.rows[i].ingame_name + '\n'
-                    emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                    emb_sellers += res.rows[j].ingame_name + '\n'
+                    emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
                 }
-                noOfSellers = i
+                noOfSellers = j
                 if (!item_url.match(/_set$/)) {
                     var temp = item_url.split("_")
                     icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
@@ -3820,13 +3821,13 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     var emb_prices = ''
                     var icon_url = ''
 
-                    for (i=0;i<res.rows.length;i++) {
-                        if (i==5)
+                    for (j=0;j<res.rows.length;j++) {
+                        if (j==5)
                             break
-                        emb_buyers += res.rows[i].ingame_name + '\n'
-                        emb_prices += res.rows[i].user_price + '<:platinum:881692607791648778>\n'
+                        emb_buyers += res.rows[j].ingame_name + '\n'
+                        emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
                     }
-                    noOfBuyers = i
+                    noOfBuyers = j
                     if (!item_url.match(/_set$/)) {
                         var temp = item_url.split("_")
                         icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
@@ -3956,7 +3957,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 }
             }
         }
-    })
+    }
     return Promise.resolve()
 }
 
