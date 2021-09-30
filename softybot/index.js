@@ -389,7 +389,7 @@ client.on('interactionCreate', async interaction => {
                 if (msg) {
                     if (embeds.length==0) {    //no traders found, delete msg
                         await msg.delete().catch(err=>console.log(err))
-                        return
+                        continue
                     }
                     await msg.edit({content: ' ',embeds: embeds})
                     .then(async msg => {
