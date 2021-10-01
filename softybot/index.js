@@ -3722,7 +3722,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     }
     */
     for(i=0;i<tradingBotChannels.length;i++) {
-        multiCid = tradingBotChannels[i]
+        var multiCid = tradingBotChannels[i]
         console.log(`editing for channel ${multiCid}`)
         var msg = null
         var embeds = []
