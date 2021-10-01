@@ -3520,7 +3520,7 @@ async function trading_bot(message,args,command) {
         var price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
     if (price < 0) {
         message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.reject()
     }
     console.log(price)
@@ -3549,7 +3549,7 @@ async function trading_bot(message,args,command) {
         } catch (err) {
             message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         }
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
     //---------------
@@ -3601,12 +3601,12 @@ async function trading_bot(message,args,command) {
     }
     if (arrItemsUrl.length > 1) {
         message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.reject()
     }
     if (arrItemsUrl.length==0) {
         message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.reject()
     }
     const item_url = arrItemsUrl[0].item_url
@@ -3642,12 +3642,12 @@ async function trading_bot(message,args,command) {
     }
     if (price > (avg_price*1.2)) {
         message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.reject()
     }
     else if (price < (avg_price*0.8)) {
         message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.reject()
     }
     //----verify order in DB----
