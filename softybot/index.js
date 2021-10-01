@@ -244,67 +244,65 @@ client.on('messageCreate', async message => {
                         return Promise.resolve()
                     }
                     console.log(`updating order ${item_name} for ${message.author.username}`)
-                    var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1)
-                    .then(res => {
-                        console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
-                        setTimeout(async function() {
-                            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-                            .then(res => {
-                                return true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                return false
-                            })
-                            if (!status) {
-                                console.log(`Error setting timeout for order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-                                return Promise.reject()
-                            }
-                            console.log(`Updating orders username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type} (auto-closure)`)
-                            await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
-                                var postdata = {}
-                                postdata.content = " "
-                                postdata.embeds = []
-                                postdata.embeds.push({
-                                    description: `❕ Order Notification ❕\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after 10 seconds`,
-                                    footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
-                                    timestamp: new Date()
-                                })
-                                var status = await db.query(`SELECT * from users_list WHERE discord_id = ${message.author.id}`)
+                    await InitializeOrdersUpdate(message,item_id,item_url,item_name,1,order_type).catch(err => {return Promise.reject()})
+                    async function InitializeOrdersUpdate(message,item_id,item_url,item_name,update_type,order_type) {
+                        var func = await trading_bot_orders_update(message,item_id,item_url,item_name,update_type)
+                        .then(res => {
+                            console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
+                            setTimeout(async () => {
+                                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                                 .then(res => {
-                                    if (res.rows.length == 0)
-                                        return false
-                                    if (res.rows.length > 1)
-                                        return false
-                                    if (res.rows[0].notify_order == true) {
-                                        message.author.send(postdata).catch(err => console.log(err))
-                                        return true
-                                    }
+                                    return true
                                 })
                                 .catch(err => {
                                     console.log(err)
                                     return false
                                 })
                                 if (!status) {
-                                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
+                                    console.log(`Error setting timeout for order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                                     return Promise.reject()
                                 }
-                                return Promise.resolve()
-                            })
-                            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
-                        }, 10000);
-                        return Promise.resolve()
-                    })
-                    .catch(err => {
-                        console.log(`Error occured midway of updating orders`)
-                        return Promise.reject()
-                    })
-                    /*
-                    await InitializeOrdersUpdate(message,item_id,item_url,item_name,1,order_type).catch(err => {return Promise.reject()})
-                    async function InitializeOrdersUpdate(message,item_id,item_url,item_name,update_type,order_type) {
+                                console.log(`Updating orders username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type} (auto-closure)`)
+                                await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
+                                    var postdata = {}
+                                    postdata.content = " "
+                                    postdata.embeds = []
+                                    postdata.embeds.push({
+                                        description: `❕ Order Notification ❕\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after 10 seconds`,
+                                        footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
+                                        timestamp: new Date()
+                                    })
+                                    var status = await db.query(`SELECT * from users_list WHERE discord_id = ${message.author.id}`)
+                                    .then(res => {
+                                        if (res.rows.length == 0)
+                                            return false
+                                        if (res.rows.length > 1)
+                                            return false
+                                        if (res.rows[0].notify_order == true) {
+                                            message.author.send(postdata).catch(err => console.log(err))
+                                            return true
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                        return false
+                                    })
+                                    if (!status) {
+                                        console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
+                                        return Promise.reject()
+                                    }
+                                    return Promise.resolve()
+                                })
+                                .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
+                            }, 10000);
+                            return Promise.resolve()
+                        })
+                        .catch(err => {
+                            console.log(`Error occured midway of updating orders`)
+                            return Promise.reject()
+                        })
                         return Promise.resolve()
                     }
-                    */
                 }
                 message.delete().catch(err => console.log(err))
                 return Promise.resolve()
