@@ -3859,7 +3859,7 @@ async function trading_bot(message,args,command) {
     const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1)
     .then(res => {
         setTimeout(async () => {
-            var status = await db.query(`SELECT * FROM WHERE users_orders discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
