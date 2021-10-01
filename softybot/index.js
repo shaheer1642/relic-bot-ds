@@ -103,7 +103,7 @@ client.on('messageCreate', async message => {
                 }
                 i++
                 if (i<50)
-                    msg.edit(postdata).then(msg => setTimeout(function(){kekfunc(msg,i)},1000)).catch(err=>console.log(err))
+                    msg.edit(postdata).then(msg => setTimeout(function(){kekfunc(msg,i)},1500)).catch(err=>console.log(err))
                 else
                     console.log(`closed kekfunc`)
             }
