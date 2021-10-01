@@ -90,6 +90,19 @@ client.on('messageCreate', async message => {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
             return
         }
+        else if (message.guild.id=='832677897411493949' && message.content=='!kek') {
+            message.channel.send('<:kek:892005941195714570>').then(msg => {
+                for (var i=0;i<50;i++) {
+                    var postdata = ""
+                    for (var j=0;j<i;j++) {
+                        postdata += '<:kek:892005941195714570>'
+                    }
+                    await msg.edit(postdata).catch(err=>console.log(err))
+                    await(3000)
+                }
+            })
+            return
+        }
     }
     let commandsArr = message.content.split('\n')
     for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
@@ -3860,8 +3873,8 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                 }
-                console.log(err)
-                return false
+            console.log(err)
+            return false
         })
         if (!status)
             return Promise.reject()
