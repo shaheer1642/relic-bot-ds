@@ -3951,6 +3951,13 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 }
                 */
                 await msg.reactions.removeAll().catch(err => console.log(err))
+                for (var i=0;i<noOfSellers;i++) {
+                    msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                }
+                for (var i=0;i<noOfBuyers;i++) {
+                    msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                }
+                /*
                 if (noOfSellers>0)
                     msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
                     if (noOfSellers>1)
@@ -3971,6 +3978,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                                 msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
                                 if (noOfBuyers>4)
                                     msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
+                */
             })
             .catch(err => {
                 if (originMessage) {
