@@ -22,7 +22,6 @@ const tb_buyColor = '#E74C3C'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
-var global_message_executing = false
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -155,13 +154,11 @@ client.on('messageCreate', async message => {
             if (!message.member.presence.status) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                global_message_executing = false
                 return
             }
             if (message.member.presence.status == `offline`) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                global_message_executing = false
                 return
             }
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
@@ -217,7 +214,6 @@ client.on('messageCreate', async message => {
                 if (!status) {
                     message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    global_message_executing = false
                     return
                 }
                 for (var items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
@@ -243,14 +239,12 @@ client.on('messageCreate', async message => {
                     if (!status) {
                         message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                        global_message_executing = false
                         return
                     }
                     console.log(`updating order ${item_name} for ${message.author.username}`)
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error occured midway of updating orders`))
                 }
                 message.delete().catch(err => console.log(err))
-                global_message_executing = false
                 return
             }
             else {
@@ -273,7 +267,7 @@ client.on('messageCreate', async message => {
             }
             */
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
-            if (args[0] == "my" && (args[1] == "orders" || "order" || "profile")) {
+            if (args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) {
                 var ingame_name = ""
                 var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
@@ -290,11 +284,11 @@ client.on('messageCreate', async message => {
                 }
                 trading_bot_user_orders(message,args,ingame_name,1).catch(err => console.log(err))
             }
-            else if (args[0] == "user" && (args[1] == "orders" || "order" || "profile" )) {
+            else if (args[0] == "user" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile" )) {
                 var ingame_name = args[2]
                 trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
-            else if (args[0] == "orders" || "order" || "profile" ) {
+            else if (args[0] == "orders" || args[0] == "order" || args[0] == "profile" ) {
                 var ingame_name = args[1]
                 trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
