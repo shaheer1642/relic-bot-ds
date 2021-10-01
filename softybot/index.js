@@ -264,9 +264,12 @@ client.on('messageCreate', async message => {
                         return Promise.resolve()
                     }
                     for (var i=0;i<tradingBotChannels.length;i++) {
-                        var func = await client.channels.cache.get(tradingBotChannels[i]).messages.fetch().then((msg,index) => {
-                            if (index>0)    //ignore first tutorial message
+                        var func = await client.channels.cache.get(tradingBotChannels[i]).messages.fetch().then(allMsgs => {
+                            allMsgs.forEach(msg => {
+                                if (msg.id == '893138411861446676' || msg.id == '893138412301860865' || msg.id == '893138411995689080' )    //ignore first tutorial messages
+                                    return
                                 msg.delete().catch(err => console.log(err))
+                            })
                         }).catch(err => {
                             console.log(err)
                             message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
