@@ -261,7 +261,7 @@ client.on('messageCreate', async message => {
                                 })
                                 if (!status) {
                                     console.log(`Error setting timeout for order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-                                    return Promise.reject()
+                                    return
                                 }
                                 console.log(`Updating orders username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type} (auto-closure)`)
                                 await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
@@ -290,9 +290,9 @@ client.on('messageCreate', async message => {
                                     })
                                     if (!status) {
                                         console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
-                                        return Promise.reject()
+                                        return
                                     }
-                                    return Promise.resolve()
+                                    return
                                 })
                                 .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
                             }, u_order_close_time);
