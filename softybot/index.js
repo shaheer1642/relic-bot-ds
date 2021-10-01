@@ -265,10 +265,12 @@ client.on('messageCreate', async message => {
                     console.log(err)
                     return false
                 })
+                console.log(ingame_name)
                 trading_bot_user_orders(message,args,ingame_name,1).catch(err => console.log(err))
             }
             else if (args[0] == "user" && (args[1] == "orders" || "order" || "profile" )) {
                 var ingame_name = args[2]
+                console.log(ingame_name)
                 trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
             else if (args[0] == "orders" || "order" || "profile" ) {
