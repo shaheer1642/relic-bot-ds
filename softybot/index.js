@@ -255,8 +255,12 @@ client.on('messageCreate', async message => {
             }
             */
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
-            if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
-                trading_bot_user_orders(message,args)
+            if (args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) {
+                var status = db.query(`SELECT ingame_name FROM users_list WHERE discord_id = ${message.author.id}`)
+                trading_bot_user_orders(message,args,null,1).catch(err => console.log(err))
+            }
+            if (args[0] == "user" && (args[1] == "orders" || "order" || "profile" )) {
+                trading_bot_user_orders(message,args,args[2],2).catch(err => console.log(err))
             }
             continue
         }
@@ -3957,33 +3961,41 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     return Promise.resolve()
 }
 
-async function trading_bot_user_orders(message,args) {
-    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+async function trading_bot_user_orders(message,args,ingame_name,request_type) {
+    var discord_id = ""
+    var status_msg = ""
+    var status = await db.query(`SELECT * FROM users_list WHERE ingame_name = '${ingame_name}'`)
     .then(res => {
-        if (res.rows.length == 0)
+        if (res.rows.length == 0) {
+            status_msg = `<@${message.author.id}> The given user is not registered with the bot.`
             return false
-        else
+        }
+        else if (res.rows.length > 1) {
+            status_msg = `<@${message.author.id}> More than one search result for that username.`
+            return false
+        }
+        else {
+            discord_id = res.rows[0].discord_id
             return true
+        }
     })
     .catch (err => {
         console.log(err)
         return false
     })
     if (!status) {
-        message.channel.send({content: `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-        try {
-            user.send({content: "Type the following command to register your ign:\nset ign your_username"})
-        } catch (err) {
-            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-        }
-        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-        return
+        message.channel.send({content: status_msg}).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
     }
     var orders = null
-    var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${message.author.id}`)
+    var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${discord_id}`)
     .then(res => {
         if (res.rows.length == 0) {
-            message.channel.send(`<@${message.author.id}> No orders found on your profile`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+            if (request_type == 1)
+                message.channel.send(`<@${message.author.id}> No orders found on your profile`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+            else if (request_type == 2)
+                message.channel.send(`<@${message.author.id}> No orders found for user ${ingame_name}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
             setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
             return false
         }
@@ -3997,7 +4009,7 @@ async function trading_bot_user_orders(message,args) {
         return false
     })
     if (!status)
-        return
+        return Promise.resolve()
     let postdata = {}
     postdata.content = ' '
     postdata.embeds = []
@@ -4020,16 +4032,18 @@ async function trading_bot_user_orders(message,args) {
     if (buy_items.length != 0)
         postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
     postdata.embeds[0].author = {name: message.author.username,iconURL: message.author.displayAvatarURL()}
-    postdata.components = []
-    postdata.components.push({type:1,components:[]})
-    postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
-    orders.forEach((e,index) => {
-        if (index < 25) {
-            if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
-                postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
-        }
-    })
-    postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+    if (request_type == 1) {
+        postdata.components = []
+        postdata.components.push({type:1,components:[]})
+        postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
+        orders.forEach((e,index) => {
+            if (index < 25) {
+                if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                    postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
+            }
+        })
+        postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+    }
     console.log(JSON.stringify(postdata.components))
     message.channel.send(postdata).catch(err => console.log(err))
 }
