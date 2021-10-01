@@ -244,7 +244,6 @@ client.on('messageCreate', async message => {
             if (message.member.presence.status == `offline`) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                global_message_executing = false
                 return
             }
             /*
@@ -260,17 +259,19 @@ client.on('messageCreate', async message => {
                 var status = db.query(`SELECT ingame_name FROM users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
                     ingame_name = res.rows[0].ingame_name
+                    return true
                 })
                 .catch(err => {
                     console.log(err)
                     return false
                 })
-                console.log(ingame_name)
+                if (!status) {
+                    message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+                }
                 trading_bot_user_orders(message,args,ingame_name,1).catch(err => console.log(err))
             }
             else if (args[0] == "user" && (args[1] == "orders" || "order" || "profile" )) {
                 var ingame_name = args[2]
-                console.log(ingame_name)
                 trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
             else if (args[0] == "orders" || "order" || "profile" ) {
