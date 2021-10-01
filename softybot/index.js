@@ -91,7 +91,7 @@ client.on('messageCreate', async message => {
             return
         }
         else if (message.guild.id=='832677897411493949' && message.content=='!kek') {
-            message.channel.send('<:kek:892005941195714570>').then(msg => {
+            message.channel.send('<:kek:892005941195714570>').then(async msg => {
                 for (var i=0;i<50;i++) {
                     var postdata = ""
                     for (var j=0;j<i;j++) {
@@ -100,7 +100,7 @@ client.on('messageCreate', async message => {
                     await msg.edit(postdata).catch(err=>console.log(err))
                     await(3000)
                 }
-            })
+            }).catch(err => console.log(err))
             return
         }
     }
