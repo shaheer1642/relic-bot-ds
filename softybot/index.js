@@ -4062,8 +4062,8 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             }
         })
         postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+        console.log(JSON.stringify(postdata.components))
     }
-    console.log(JSON.stringify(postdata.components))
     message.channel.send(postdata).catch(err => console.log(err))
 }
 
