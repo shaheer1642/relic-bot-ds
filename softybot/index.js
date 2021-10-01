@@ -79,15 +79,15 @@ client.on('ready', () => {
 client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
-        return
+        return Promise.resolve()
     if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
-            return
+            return Promise.resolve()
         }
         else if (message.guild.id=='865904902941048862' && message.content=='!rhino2') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
-            return
+            return Promise.resolve()
         }
         else if ((message.guild.id=='865904902941048862' || '832677897411493949') && message.content=='!kek') {
             message.channel.send('<:kek:892005941195714570>').then(async msg => {
@@ -106,7 +106,7 @@ client.on('messageCreate', async message => {
                 else
                     console.log(`closed kekfunc`)
             }
-            return
+            return Promise.resolve()
         }
     }
     let commandsArr = message.content.split('\n')
@@ -154,12 +154,12 @@ client.on('messageCreate', async message => {
             if (!message.member.presence.status) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return
+                return Promise.resolve()
             }
             if (message.member.presence.status == `offline`) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return
+                return Promise.resolve()
             }
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
             const command = args.shift()
@@ -200,7 +200,7 @@ client.on('messageCreate', async message => {
                 if (!status) {
                     message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return
+                    return Promise.resolve()
                 }
                 //set all orders as visible for this user
                 var status = await db.query(`UPDATE users_orders SET visibility=true WHERE discord_id=${message.author.id}`)
@@ -239,7 +239,7 @@ client.on('messageCreate', async message => {
                     if (!status) {
                         message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                        return
+                        return Promise.resolve()
                     }
                     console.log(`updating order ${item_name} for ${message.author.username}`)
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error occured midway of updating orders`))
