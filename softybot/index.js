@@ -246,6 +246,7 @@ client.on('messageCreate', async message => {
                     console.log(`updating order ${item_name} for ${message.author.username}`)
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1)
                     .then(res => {
+                        console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
                         setTimeout(async () => {
                             var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                             .then(res => {
@@ -259,6 +260,7 @@ client.on('messageCreate', async message => {
                                 console.log(`Error setting timeout for order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                                 return Promise.reject()
                             }
+                            console.log(`Updating orders username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type} (auto-closure)`)
                             await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
                                 var postdata = {}
                                 postdata.content = " "
