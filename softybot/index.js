@@ -4090,7 +4090,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             if (update_type != 1)
                 continue
             if (embeds.length == 0)
-                continue
+                return Promise.reject()
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
                 /*
