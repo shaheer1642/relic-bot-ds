@@ -77,139 +77,115 @@ client.on('ready', () => {
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 })
 
-client.on('messageCreate', async message => {
-    //prevent botception
-    if (message.author.bot)
-        return
-    if (message.guild) {
-        if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
-            message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
+client.on('messageCreate', message => {
+    await messageCreate(message).catch(err => console.log(`Error executing main messageCreate func`))
+    async function messageCreate(message) {
+        //prevent botception
+        if (message.author.bot)
             return
+        if (message.guild) {
+            if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
+                message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
+                return
+            }
+            else if (message.guild.id=='865904902941048862' && message.content=='!rhino2') {
+                message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
+                return
+            }
         }
-        else if (message.guild.id=='865904902941048862' && message.content=='!rhino2') {
-            message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
-            return
-        }
-    }
-    let commandsArr = message.content.split('\n')
+        let commandsArr = message.content.split('\n')
 
-    for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
-        if (!message.guild) {
-            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
-            .then(async res => {
-                if (!res.rows.length == 0) {
-                    if (res.rows[0].on_session == true) {
-                        await client.users.fetch(res.rows[0].session_partner)
-                        .then(async partner => {
-                            await partner.send(`**${res.rows[0].ingame_name}:** ${message.content}`)
+        for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
+            if (!message.guild) {
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                .then(async res => {
+                    if (!res.rows.length == 0) {
+                        if (res.rows[0].on_session == true) {
+                            await client.users.fetch(res.rows[0].session_partner)
+                            .then(async partner => {
+                                await partner.send(`**${res.rows[0].ingame_name}:** ${message.content}`)
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            })
                             .catch(err => {
                                 console.log(err)
                             })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
+                        }
                     }
-                }
-                return true
-            })
-            .catch (err => {
-                if (err.response)
-                    console.log(err.response.data)
-                console.log(err)
-                console.log('Retrieving Database -> items_list error')
-                message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-                return false
-            })
-            if (!status)
-                continue
-            const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
-            if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
-                if (!args[2]) {
-                    message.channel.send('Please write a username')
+                    return true
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> items_list error')
+                    message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+                    return false
+                })
+                if (!status)
+                    continue
+                const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
+                if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
+                    if (!args[2]) {
+                        message.channel.send('Please write a username')
+                        continue
+                    }
+                    trading_bot_registeration(message,args.pop())
                     continue
                 }
-                trading_bot_registeration(message,args.pop())
-                continue
             }
-        }
-        if (tradingBotChannels.includes(message.channelId)) {
-            if (message.member.presence.status == `offline`) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                global_message_executing = false
-                return
-            }
-            const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
-            const command = args.shift()
-    
-            if (command == 'wts' || command == 'wtb') {
-                /*
-                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
-                    message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return
-                }
-                */
-                const func = await trading_bot(message,args,command).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
-                console.log(`commandsArrIndex = ${commandsArrIndex}`)
-                if (commandsArrIndex == (commandsArr.length-1)) {
-                    console.log(`All requests executed for user ${message.author.username}`)
-                    message.delete().catch(err => console.log(err))
-                }
-            }
-            else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-                //continue
-                var items_ids = []
-                var status_msg = ''
-                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${message.author.id}`)
-                .then(res => {
-                    if (res.rows.length==0) {
-                        status_msg = `<@${message.author.id}> No orders found on your profile.`
-                        return false
-                    }
-                    items_ids = res.rows
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    status_msg = `☠️ Error fetching your orders from db. Please contact MrSofty#7926\nError code: 500`
-                    return false
-                })
-                if (!status) {
-                    message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return
-                }
-                //set all orders as visible for this user
-                var status = await db.query(`UPDATE users_orders SET visibility=true WHERE discord_id=${message.author.id}`)
-                .then(res => {
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+            if (tradingBotChannels.includes(message.channelId)) {
+                if (message.member.presence.status == `offline`) {
+                    message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     global_message_executing = false
                     return
                 }
-                for (items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
-                    var item_id = items_ids[items_ids_index].item_id
-                    var item_url = ''
-                    var item_name = ''
-                    var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}'`)
+                const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
+                const command = args.shift()
+        
+                if (command == 'wts' || command == 'wtb') {
+                    /*
+                    if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
+                        message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                        return
+                    }
+                    */
+                    const func = await trading_bot(message,args,command).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
+                    console.log(`commandsArrIndex = ${commandsArrIndex}`)
+                    if (commandsArrIndex == (commandsArr.length-1)) {
+                        console.log(`All requests executed for user ${message.author.username}`)
+                        message.delete().catch(err => console.log(err))
+                    }
+                }
+                else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
+                    //continue
+                    var items_ids = []
+                    var status_msg = ''
+                    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${message.author.id}`)
                     .then(res => {
-                        if (res.rows.length==0)
-                            return false
-                        if (res.rows.length>1) {
-                            console.log(res.rows)
+                        if (res.rows.length==0) {
+                            status_msg = `<@${message.author.id}> No orders found on your profile.`
                             return false
                         }
-                        item_url = res.rows[0].item_url
-                        item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                        items_ids = res.rows
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        status_msg = `☠️ Error fetching your orders from db. Please contact MrSofty#7926\nError code: 500`
+                        return false
+                    })
+                    if (!status) {
+                        message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                        return
+                    }
+                    //set all orders as visible for this user
+                    var status = await db.query(`UPDATE users_orders SET visibility=true WHERE discord_id=${message.author.id}`)
+                    .then(res => {
                         return true
                     })
                     .catch(err => {
@@ -217,112 +193,139 @@ client.on('messageCreate', async message => {
                         return false
                     })
                     if (!status) {
-                        message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                        message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                         global_message_executing = false
                         return
                     }
-                    console.log(`updating order ${item_name} for ${message.author.username}`)
-                    var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error occured midway of updating orders`))
+                    for (items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
+                        var item_id = items_ids[items_ids_index].item_id
+                        var item_url = ''
+                        var item_name = ''
+                        var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}'`)
+                        .then(res => {
+                            if (res.rows.length==0)
+                                return false
+                            if (res.rows.length>1) {
+                                console.log(res.rows)
+                                return false
+                            }
+                            item_url = res.rows[0].item_url
+                            item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status) {
+                            message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                            global_message_executing = false
+                            return
+                        }
+                        console.log(`updating order ${item_name} for ${message.author.username}`)
+                        var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error occured midway of updating orders`))
+                    }
+                    message.delete().catch(err => console.log(err))
+                    global_message_executing = false
+                    return
                 }
-                message.delete().catch(err => console.log(err))
-                global_message_executing = false
-                return
+                else {
+                    message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                }
+                continue
             }
-            else {
-                message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            if (tradingBotSpamChannels.includes(message.channelId)) {
+                if (message.member.presence.status == `offline`) {
+                    message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    global_message_executing = false
+                    return
+                }
+                /*
+                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
+                    message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return
+                }
+                */
+                const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
+                if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
+                    trading_bot_user_orders(message,args)
+                }
+                continue
             }
+            if (commandsArr[commandsArrIndex].indexOf(config.prefix) != 0)
+                continue
+
+            //parse arguments
+            const args = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
+
+            //define command
+            const command = args.shift().toLowerCase();
+
+            //call function if any
+            if (message.guild)
+                switch(command) {
+                    case 'uptime':
+                        uptime(message,args)
+                        break
+                    case 'help':
+                        help(message,args)
+                        break
+                    case 'orders':
+                        orders(message,args)
+                        break
+                    case 'order':
+                        orders(message,args)
+                        break
+                    case 'auctions':
+                        auctions(message,args)
+                        break
+                    case 'auction':
+                        auctions(message,args)
+                        break
+                    case 'relist':
+                        relist(message,args)
+                        break
+                    case 'list':
+                        list(message,args)
+                        break
+                    case 'updatedb':
+                        updateDB(message,args)
+                        break
+                    case 'getdb':
+                        getDB(message,args)
+                        break
+                    case 'trade_tut':
+                        trade_tut(message,args)
+                        break
+                    /*----Handled locally----
+                    case 'relic':
+                        relics(message,args)
+                        break
+                    case 'relics':
+                        relics(message,args)
+                        break
+                    case 'test':
+                        test(message,args)
+                        break
+                    -----------------------*/
+                }
+
+            //for dms
+            else 
+                switch(command) {
+                    case 'authorize':
+                        authorize(message,args)
+                        break
+                }
             continue
         }
-        if (tradingBotSpamChannels.includes(message.channelId)) {
-            if (message.member.presence.status == `offline`) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                global_message_executing = false
-                return
-            }
-            /*
-            if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
-                message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return
-            }
-            */
-            const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
-            if (args[0] == "my" && (args[1] == "orders" || args[1] == "order")) {
-                trading_bot_user_orders(message,args)
-            }
-            continue
-        }
-        if (commandsArr[commandsArrIndex].indexOf(config.prefix) != 0)
-            continue
-
-        //parse arguments
-        const args = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
-
-        //define command
-        const command = args.shift().toLowerCase();
-
-        //call function if any
-        if (message.guild)
-            switch(command) {
-                case 'uptime':
-                    uptime(message,args)
-                    break
-                case 'help':
-                    help(message,args)
-                    break
-                case 'orders':
-                    orders(message,args)
-                    break
-                case 'order':
-                    orders(message,args)
-                    break
-                case 'auctions':
-                    auctions(message,args)
-                    break
-                case 'auction':
-                    auctions(message,args)
-                    break
-                case 'relist':
-                    relist(message,args)
-                    break
-                case 'list':
-                    list(message,args)
-                    break
-                case 'updatedb':
-                    updateDB(message,args)
-                    break
-                case 'getdb':
-                    getDB(message,args)
-                    break
-                case 'trade_tut':
-                    trade_tut(message,args)
-                    break
-                /*----Handled locally----
-                case 'relic':
-                    relics(message,args)
-                    break
-                case 'relics':
-                    relics(message,args)
-                    break
-                case 'test':
-                    test(message,args)
-                    break
-                -----------------------*/
-            }
-
-        //for dms
-        else 
-            switch(command) {
-                case 'authorize':
-                    authorize(message,args)
-                    break
-            }
-        continue
+        return Promise.resolve()
     }
-    return Promise.resolve()
 })
 
 client.on('interactionCreate', async interaction => {
