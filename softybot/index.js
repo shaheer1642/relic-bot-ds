@@ -214,7 +214,7 @@ client.on('messageCreate', async message => {
                 if (!status) {
                     message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return
+                    return Promise.resolve()
                 }
                 for (var items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
                     var item_id = items_ids[items_ids_index].item_id
@@ -245,7 +245,41 @@ client.on('messageCreate', async message => {
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error occured midway of updating orders`))
                 }
                 message.delete().catch(err => console.log(err))
-                return
+                return Promise.resolve()
+            }
+            else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
+                if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
+                    var status = await db.query(`UPDATE users_orders set visibility=false`)
+                    .then(res => {
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        console.log(err)
+                        message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                        return Promise.resolve()
+                    }
+                    for (var i=0;i<tradingBotChannels.length;i++) {
+                        var func = await client.channels.get(tradingBotChannels[i]).messages.fetch().then(msg => {
+                            msg.delete().catch(err => console.log(err))
+                        }).catch(err => {
+                            message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                            setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                            return Promise.resolve()
+                        })
+                    }
+                    message.delete().catch(err => console.log(err))
+                    return Promise.resolve()
+                }
+                else {
+                    message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return Promise.resolve()
+                }
             }
             else {
                 message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
@@ -257,7 +291,7 @@ client.on('messageCreate', async message => {
             if (message.member.presence.status == `offline`) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return
+                return Promise.resolve()
             }
             /*
             if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
