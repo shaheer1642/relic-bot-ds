@@ -259,7 +259,7 @@ client.on('messageCreate', async message => {
                 var ingame_name = ""
                 var status = db.query(`SELECT ingame_name FROM users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
-                    var ingame_name = res.rows[0].ingame_name
+                    ingame_name = res.rows[0].ingame_name
                 })
                 .catch(err => {
                     console.log(err)
@@ -3975,6 +3975,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 }
 
 async function trading_bot_user_orders(message,args,ingame_name,request_type) {
+    console.log(ingame_name)
     var discord_id = ""
     var status_msg = ""
     var status = await db.query(`SELECT * FROM users_list WHERE ingame_name = '${ingame_name}'`)
