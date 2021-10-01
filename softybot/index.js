@@ -292,9 +292,13 @@ client.on('messageCreate', async message => {
                                 return Promise.resolve()
                             })
                             .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
-                        }, 30000);
+                        }, 10000);
+                        return Promise.resolve()
                     })
-                    .catch(err => console.log(`Error occured midway of updating orders`))
+                    .catch(err => {
+                        console.log(`Error occured midway of updating orders`)
+                        return Promise.reject()
+                    })
                 }
                 message.delete().catch(err => console.log(err))
                 return Promise.resolve()
