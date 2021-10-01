@@ -264,7 +264,7 @@ client.on('messageCreate', async message => {
                         return Promise.resolve()
                     }
                     for (var i=0;i<tradingBotChannels.length;i++) {
-                        var func = await client.channels.get(tradingBotChannels[i]).messages.fetch().then((msg,index) => {
+                        var func = await client.channels.cache.get(tradingBotChannels[i]).messages.fetch().then((msg,index) => {
                             if (index>0)    //ignore first tutorial message
                                 msg.delete().catch(err => console.log(err))
                         }).catch(err => {
