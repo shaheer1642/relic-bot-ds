@@ -245,7 +245,10 @@ client.on('messageCreate', async message => {
                         return Promise.resolve()
                     }
                     console.log(`updating order ${item_name} for ${message.author.username}`)
-                    await InitializeOrdersUpdate(message,item_id,item_url,item_name,1,order_type).catch(err => {return Promise.reject()})
+                    await InitializeOrdersUpdate(message,item_id,item_url,item_name,1,order_type).catch(err => {
+                        console.log(err)
+                        return Promise.reject()
+                    })
                     async function InitializeOrdersUpdate(message,item_id,item_url,item_name,update_type,order_type) {
                         var func = await trading_bot_orders_update(message,item_id,item_url,item_name,update_type)
                         .then(res => {
@@ -299,7 +302,7 @@ client.on('messageCreate', async message => {
                             return Promise.resolve()
                         })
                         .catch(err => {
-                            console.log(`Error occured midway of updating orders`)
+                            console.log(`Error occured midway of updating orders in my orders command`)
                             return Promise.reject()
                         })
                         return Promise.resolve()
