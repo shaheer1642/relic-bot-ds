@@ -23,6 +23,7 @@ const tb_buyColor = '#E74C3C'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
+const u_order_close_time = 10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -268,7 +269,7 @@ client.on('messageCreate', async message => {
                                     postdata.content = " "
                                     postdata.embeds = []
                                     postdata.embeds.push({
-                                        description: `❕ Order Notification ❕\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after 10 seconds`,
+                                        description: `❕ Order Notification ❕\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                                         footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
                                         timestamp: new Date()
                                     })
@@ -294,7 +295,7 @@ client.on('messageCreate', async message => {
                                     return Promise.resolve()
                                 })
                                 .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
-                            }, 10000);
+                            }, u_order_close_time);
                             return Promise.resolve()
                         })
                         .catch(err => {
@@ -3858,7 +3859,7 @@ async function trading_bot(message,args,command) {
                 postdata.content = " "
                 postdata.embeds = []
                 postdata.embeds.push({
-                    description: `❕ Order Notification ❕\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after 10 seconds`,
+                    description: `❕ Order Notification ❕\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                     footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
                     timestamp: new Date()
                 })
@@ -3884,7 +3885,7 @@ async function trading_bot(message,args,command) {
                 return Promise.resolve()
             })
             .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}`))
-        }, 10000);
+        }, u_order_close_time);
     })
     .catch(err => console.log('Error occured midway of updating orders'))
     return Promise.resolve()
