@@ -3863,10 +3863,12 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             else {
                 await msg.edit({content: ' ',embeds: embeds})
                 .then(async msg => {
+                    /*
                     if (originMessage) {
                         if (targetChannel.id == originMessage.channel.id)
                             setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
                     }
+                    */
                     await msg.reactions.removeAll().catch(err => console.log(err))
                     if (noOfSellers>0)
                         msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
@@ -3904,10 +3906,12 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 continue
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
+                /*
                 if (originMessage) {
                     if (targetChannel.id == originMessage.channel.id)
                         setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
                 }
+                */
                 await msg.reactions.removeAll().catch(err => console.log(err))
                 if (noOfSellers>0)
                     msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
