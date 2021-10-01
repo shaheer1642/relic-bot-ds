@@ -3889,7 +3889,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         }
         if (msg) {
             if (embeds.length==0)
-                await msg.delete().catch(err => console.log(err))
+                msg.delete().catch(err => console.log(err))
             else {
                 msg.edit({content: ' ',embeds: embeds})
                 .then(async msg => {
