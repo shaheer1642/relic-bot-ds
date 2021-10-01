@@ -90,17 +90,19 @@ client.on('messageCreate', async message => {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
             return
         }
-        else if (message.guild.id=='865904902941048862' && message.content=='!kek') {
+        else if ((message.guild.id=='865904902941048862' || '832677897411493949') && message.content=='!kek') {
             message.channel.send('<:kek:892005941195714570>').then(async msg => {
-                for (var i=0;i<50;i++) {
-                    var postdata = ""
-                    for (var j=0;j<i;j++) {
-                        postdata += '<:kek:892005941195714570>'
-                    }
-                    await msg.edit(postdata).catch(err=>console.log(err))
-                    await(1000)
-                }
+                var i=0
+                setTimeout(kekfunc(msg,i),1000)
             }).catch(err => console.log(err))
+            async function kekfunc(msg,i) {
+                for (var j=0;j<i;j++) {
+                    postdata += '<:kek:892005941195714570>'
+                }
+                i++
+                if (i<50)
+                    msg.edit(postdata).then(msg => setTimeout(kekfunc(kek,i),1000)).catch(err=>console.log(err))
+            }
             return
         }
     }
