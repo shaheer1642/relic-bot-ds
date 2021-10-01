@@ -370,9 +370,6 @@ client.on('messageCreate', async message => {
     return Promise.resolve()
 })
 
-async function messageCreateFunc(message) {
-}
-
 client.on('interactionCreate', async interaction => {
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         if (interaction.user.username != interaction.message.embeds[0].author.name) {
@@ -1226,7 +1223,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Assigned role **${role.name}** to user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#2ECC71')
+                mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
             })
             .catch(function (error) {
                 console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
@@ -1241,7 +1238,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Assigned role **${role.name}** to user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#2ECC71')
+                mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
             })
             .catch(function (error) {
                 console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
@@ -1256,7 +1253,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Assigned role **${role.name}** to user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#2ECC71')
+                mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
             })
             .catch(function (error) {
                 console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
@@ -1271,7 +1268,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Assigned role **${role.name}** to user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#2ECC71')
+                mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
             })
             .catch(function (error) {
                 console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
@@ -1286,7 +1283,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Assigned role **${role.name}** to user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#2ECC71')
+                mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
             })
             .catch(function (error) {
                 console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
@@ -1409,7 +1406,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Removed role **${role.name}** from user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#E74C3C')
+                mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
             })
             .catch(function (error) {
                 user.send('Error occured removing role. Please try again.\nError Code: 500')
@@ -1423,7 +1420,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Removed role **${role.name}** from user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#E74C3C')
+                mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
             })
             .catch(function (error) {
                 user.send('Error occured removing role. Please try again.\nError Code: 500')
@@ -1437,7 +1434,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Removed role **${role.name}** from user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#E74C3C')
+                mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
             })
             .catch(function (error) {
                 user.send('Error occured removing role. Please try again.\nError Code: 500')
@@ -1451,7 +1448,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Removed role **${role.name}** from user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#E74C3C')
+                mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
             })
             .catch(function (error) {
                 user.send('Error occured removing role. Please try again.\nError Code: 500')
@@ -1465,7 +1462,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
                 .catch(err => console.log(err))
-                mod_log(`Removed role **${role.name}** from user **${reaction.message.guild.members.cache.get(user.id).displayName}**`,'#E74C3C')
+                mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
             })
             .catch(function (error) {
                 user.send('Error occured removing role. Please try again.\nError Code: 500')
