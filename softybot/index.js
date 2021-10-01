@@ -133,6 +133,12 @@ client.on('messageCreate', async message => {
             }
         }
         if (tradingBotChannels.includes(message.channelId)) {
+            if (!message.member.presence.status) {
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                global_message_executing = false
+                return
+            }
             if (message.member.presence.status == `offline`) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
