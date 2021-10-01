@@ -78,11 +78,6 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', async message => {
-    await messageCreateFunc(message).catch(err => console.log(`Error executing main messageCreate func`))
-    return Promise.resolve()
-})
-
-async function messageCreateFunc(message) {
     //prevent botception
     if (message.author.bot)
         return
@@ -327,6 +322,9 @@ async function messageCreateFunc(message) {
         continue
     }
     return Promise.resolve()
+})
+
+async function messageCreateFunc(message) {
 }
 
 client.on('interactionCreate', async interaction => {
