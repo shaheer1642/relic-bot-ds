@@ -255,12 +255,25 @@ client.on('messageCreate', async message => {
             }
             */
             const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
-            if (args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) {
+            if (args[0] == "my" && (args[1] == "orders" || "order" || "profile")) {
+                var ingame_name = ""
                 var status = db.query(`SELECT ingame_name FROM users_list WHERE discord_id = ${message.author.id}`)
-                trading_bot_user_orders(message,args,null,1).catch(err => console.log(err))
+                .then(res => {
+                    var ingame_name = res.rows[0].ingame_name
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                trading_bot_user_orders(message,args,ingame_name,1).catch(err => console.log(err))
             }
-            if (args[0] == "user" && (args[1] == "orders" || "order" || "profile" )) {
-                trading_bot_user_orders(message,args,args[2],2).catch(err => console.log(err))
+            else if (args[0] == "user" && (args[1] == "orders" || "order" || "profile" )) {
+                var ingame_name = args[2]
+                trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
+            }
+            else if (args[0] == "orders" || "order" || "profile" ) {
+                var ingame_name = args[1]
+                trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
             continue
         }
