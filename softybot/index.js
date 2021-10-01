@@ -254,17 +254,20 @@ client.on('messageCreate', async message => {
                         .then(res => {
                             console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
                             setTimeout(async () => {
-                                await db.query(`SELECT * FROM WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                                var status = await db.query(`SELECT * FROM WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                                 .then(res => {
                                     if (res.rows.length == 0)
-                                        return
+                                        return false
                                     if (res.rows[0].visibility == false)
-                                        return
+                                        return false
+                                    return true
                                 })
                                 .catch(err => {
                                     console.log(err)
-                                    return
+                                    return false
                                 })
+                                if (!status)
+                                    return
                                 var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                                 .then(res => {
                                     return true
@@ -3856,17 +3859,20 @@ async function trading_bot(message,args,command) {
     const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1)
     .then(res => {
         setTimeout(async () => {
-            await db.query(`SELECT * FROM WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            var status = await db.query(`SELECT * FROM WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
             .then(res => {
                 if (res.rows.length == 0)
-                    return
+                    return false
                 if (res.rows[0].visibility == false)
-                    return
+                    return false
+                return true
             })
             .catch(err => {
                 console.log(err)
-                return
+                return false
             })
+            if (!status)
+                return
             var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
             .then(res => {
                 return true
