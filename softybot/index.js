@@ -77,7 +77,7 @@ client.on('ready', () => {
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 })
 
-client.on('messageCreate', (message) => async function(message) {
+client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return
@@ -92,8 +92,7 @@ client.on('messageCreate', (message) => async function(message) {
         }
     }
     let commandsArr = message.content.split('\n')
-    
-    global_message_executing = true
+
     for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
