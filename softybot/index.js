@@ -152,7 +152,7 @@ client.on('messageCreate', async message => {
                     return
                 }
                 */
-                const func = await trading_bot(message,args,command).then(() => console.log(`Executed ${message.content.replace(/\n/g," ")}`)).catch(err => console.log(`Some error occured`))
+                const func = await trading_bot(message,args,command).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
             }
             else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
                 //continue
@@ -218,7 +218,7 @@ client.on('messageCreate', async message => {
                         global_message_executing = false
                         return
                     }
-                    console.log(item_name)
+                    console.log(`updating order ${item_name} for ${message.author.username}`)
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error occured midway of updating orders`))
                 }
                 message.delete().catch(err => console.log(err))
@@ -3859,7 +3859,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         }
         if (msg) {
             if (embeds.length==0)
-                msg.delete().catch(err => console.log(err))
+                await msg.delete().catch(err => console.log(err))
             else {
                 await msg.edit({content: ' ',embeds: embeds})
                 .then(async msg => {
