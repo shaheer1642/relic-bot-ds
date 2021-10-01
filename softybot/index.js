@@ -219,6 +219,7 @@ client.on('messageCreate', async message => {
                 }
                 for (var items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
                     var item_id = items_ids[items_ids_index].item_id
+                    var order_type = items_ids[items_ids_index].order_type
                     var item_url = ''
                     var item_name = ''
                     var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}'`)
@@ -246,7 +247,7 @@ client.on('messageCreate', async message => {
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1)
                     .then(res => {
                         setTimeout(async () => {
-                            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+                            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                             .then(res => {
                                 return true
                             })
@@ -255,7 +256,7 @@ client.on('messageCreate', async message => {
                                 return false
                             })
                             if (!status) {
-                                console.log(`Error setting timeout for order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+                                console.log(`Error setting timeout for order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                                 return Promise.reject()
                             }
                             await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
@@ -263,7 +264,7 @@ client.on('messageCreate', async message => {
                                 postdata.content = " "
                                 postdata.embeds = []
                                 postdata.embeds.push({
-                                    description: `❕ Order Notification ❕\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after 10 seconds`,
+                                    description: `❕ Order Notification ❕\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after 10 seconds`,
                                     footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
                                     timestamp: new Date()
                                 })
@@ -283,12 +284,12 @@ client.on('messageCreate', async message => {
                                     return false
                                 })
                                 if (!status) {
-                                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${command}`)
+                                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
                                     return Promise.reject()
                                 }
                                 return Promise.resolve()
                             })
-                            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${command}`))
+                            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
                         }, 10000);
                     })
                     .catch(err => console.log(`Error occured midway of updating orders`))
