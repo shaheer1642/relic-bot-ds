@@ -154,8 +154,10 @@ client.on('messageCreate', async message => {
                 */
                 const func = await trading_bot(message,args,command).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
                 console.log(`commandsArrIndex = ${commandsArrIndex}`)
-                if (commandsArrIndex == (commandsArrIndex.length-1))
+                if (commandsArrIndex == (commandsArrIndex.length-1)) {
+                    console.log(`All requests executed for user ${message.author.username}`)
                     message.delete().catch(err => console.log(err))
+                }
             }
             else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
                 //continue
