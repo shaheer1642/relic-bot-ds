@@ -1499,7 +1499,7 @@ client.on('guildMemberAdd', async member => {
         member.roles.add(role)
         .then (response => {
             console.log(JSON.stringify(response))
-            mod_log(`Assigned role **${role.name}** to user **${member.displayName}**`,'#FFFF00')
+            mod_log(`Assigned role <@&${role.id}> to user <@${member.id}>`,'#FFFF00')
         })
         .catch(function (error) {
             console.log(`${error} Error adding role ${role.name} for user ${member.user.username}`)
