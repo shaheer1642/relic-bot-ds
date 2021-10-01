@@ -322,8 +322,7 @@ client.on('messageCreate', async message => {
             }
         continue
     }
-    global_message_executing = false
-    return
+    return Promise.resolve()
 })
 
 client.on('interactionCreate', async interaction => {
