@@ -267,6 +267,7 @@ client.on('messageCreate', async message => {
                 })
                 if (!status) {
                     message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+                    continue
                 }
                 trading_bot_user_orders(message,args,ingame_name,1).catch(err => console.log(err))
             }
