@@ -97,8 +97,7 @@ async function messageCreateFunc(message) {
         }
     }
     let commandsArr = message.content.split('\n')
-    var commandsArrIndex = 0
-    for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
+    for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
             .then(async res => {
@@ -201,7 +200,7 @@ async function messageCreateFunc(message) {
                     global_message_executing = false
                     return
                 }
-                for (items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
+                for (var items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
                     var item_id = items_ids[items_ids_index].item_id
                     var item_url = ''
                     var item_name = ''
@@ -3721,7 +3720,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         }
     }
     */
-    for(i=0;i<tradingBotChannels.length;i++) {
+    for(var i=0;i<tradingBotChannels.length;i++) {
         var multiCid = tradingBotChannels[i]
         console.log(`editing for channel ${multiCid}`)
         var msg = null
@@ -3739,8 +3738,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 var emb_sellers = ''
                 var emb_prices = ''
                 var icon_url = ''
-
-                for (j=0;j<res.rows.length;j++) {
+                for (var j=0;j<res.rows.length;j++) {
                     if (j==5)
                         break
                     emb_sellers += res.rows[j].ingame_name + '\n'
@@ -3796,7 +3794,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 var emb_prices = ''
                 var icon_url = ''
 
-                for (j=0;j<res.rows.length;j++) {
+                for (var j=0;j<res.rows.length;j++) {
                     if (j==5)
                         break
                     emb_buyers += res.rows[j].ingame_name + '\n'
