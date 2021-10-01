@@ -97,7 +97,7 @@ async function messageCreateFunc(message) {
         }
     }
     let commandsArr = message.content.split('\n')
-
+    var commandsArrIndex = 0
     for(commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
