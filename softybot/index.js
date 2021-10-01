@@ -77,7 +77,7 @@ client.on('ready', () => {
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 })
 
-client.on('messageCreate', async message => {
+client.on('messageCreate', (message) => async function(message) {
     //prevent botception
     if (message.author.bot)
         return
