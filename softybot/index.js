@@ -196,7 +196,6 @@ client.on('messageCreate', async message => {
                     var item_id = items_ids[items_ids_index].item_id
                     var item_url = ''
                     var item_name = ''
-                    console.log(item_id)
                     var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}'`)
                     .then(res => {
                         if (res.rows.length==0)
@@ -219,6 +218,7 @@ client.on('messageCreate', async message => {
                         global_message_executing = false
                         return
                     }
+                    console.log(item_name)
                     var func = await trading_bot_orders_update(message,item_id,item_url,item_name,1).catch(err => console.log(`Error occured midway of updating orders`))
                 }
                 message.delete().catch(err => console.log(err))
