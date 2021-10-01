@@ -93,7 +93,8 @@ client.on('messageCreate', async message => {
         else if ((message.guild.id=='865904902941048862' || '832677897411493949') && message.content=='!kek') {
             message.channel.send('<:kek:892005941195714570>').then(async msg => {
                 var i=0
-                setTimeout(function(){kekfunc(msg,i)},1000)
+                console.log(`started kekfunc`)
+                setTimeout(function(){kekfunc(msg,i)},1500)
             }).catch(err => console.log(err))
             async function kekfunc(msg,i) {
                 var postdata = ""
@@ -103,6 +104,8 @@ client.on('messageCreate', async message => {
                 i++
                 if (i<50)
                     msg.edit(postdata).then(msg => setTimeout(function(){kekfunc(msg,i)},1000)).catch(err=>console.log(err))
+                else
+                    console.log(`closed kekfunc`)
             }
             return
         }
