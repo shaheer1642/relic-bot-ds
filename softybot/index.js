@@ -4049,7 +4049,8 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
     if (buy_items.length != 0)
         postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
-    postdata.embeds[0].author = {name: message.author.username,iconURL: message.author.displayAvatarURL()}
+    var member = await client.users.fetch(discord_id)
+    postdata.embeds[0].author = {name: member.username,iconURL: member.displayAvatarURL()}
     if (request_type == 1) {
         postdata.components = []
         postdata.components.push({type:1,components:[]})
