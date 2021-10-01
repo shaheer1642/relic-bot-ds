@@ -254,7 +254,7 @@ client.on('messageCreate', async message => {
                         .then(res => {
                             console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
                             setTimeout(async () => {
-                                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                                 .then(res => {
                                     if (res.rows.length == 0)
                                         return false
