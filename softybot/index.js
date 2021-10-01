@@ -335,7 +335,7 @@ client.on('interactionCreate', async interaction => {
         }
         await interaction.deferUpdate()
         const discord_id = interaction.member.user.id
-        for (interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
+        for (var interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
             const item_id = interaction.values[interactionIndex]
             var item_name = ""
             var item_url = ""
@@ -437,9 +437,8 @@ client.on('interactionCreate', async interaction => {
         postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
         console.log(JSON.stringify(postdata.components))
         await interaction.editReply(postdata).catch(err => console.log(err))
-        return
     }
-	console.log(interaction);
+    return Promise.resolve()
 });
 
 client.on('shardError', error => {
@@ -995,7 +994,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         if (!status)
             return
         let embeds = []
-        for (i=0; i<arrItemsUrl.length; i++)
+        for (var i=0; i<arrItemsUrl.length; i++)
         {
             const item_url = arrItemsUrl[i]
             let data = []
@@ -1015,7 +1014,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var prices = ""
                 var noSellers = 0
                 console.log(JSON.stringify(ordersArr))
-                for (j=0; j<5; j++)
+                for (var j=0; j<5; j++)
                 {
                     if (ordersArr.length==0)
                     {
@@ -1585,7 +1584,7 @@ async function orders(message,args) {
     {
         var i = 0
         var MaxIndex = arrItemsUrl.length
-        for (i=0; i <= MaxIndex-1; i++)
+        for (var i=0; i <= MaxIndex-1; i++)
         {
             if (!arrItemsUrl[i].match("prime"))
             {
@@ -1605,7 +1604,7 @@ async function orders(message,args) {
         processMessage = response
     }).catch(err => console.log(err));
     let embeds = []
-    for (i=0; i<arrItemsUrl.length; i++)
+    for (var i=0; i<arrItemsUrl.length; i++)
     {
         const item_url = arrItemsUrl[i]
         let data = []
@@ -1625,7 +1624,7 @@ async function orders(message,args) {
             var prices = ""
             var noSellers = 0
             console.log(JSON.stringify(ordersArr))
-            for (j=0; j<5; j++)
+            for (var j=0; j<5; j++)
             {
                 if (ordersArr.length==0)
                 {
@@ -1723,11 +1722,11 @@ async function relics(message,args) {
             const filecontent = fs.readFileSync('../pricesDB.json', 'utf8').replace(/^\uFEFF/, '')
             let pricesDB = JSON.parse(filecontent)
             //----
-            for (i=0; i < relic_drops.Common.length; i++)
+            for (var i=0; i < relic_drops.Common.length; i++)
             {
                 var str = relic_drops.Common[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
                 value1 += ":brown_circle: " + str + "\n"
-                for (j=0; j < pricesDB.length; j++)
+                for (var j=0; j < pricesDB.length; j++)
                 {
                     if (pricesDB[j].item_url == relic_drops.Common[i])
                     {
@@ -1739,12 +1738,12 @@ async function relics(message,args) {
             }
             if (relic_drops.Common.length < 3)
                 value1 += ":brown_circle: Forma Blueprint\n", value2 += "\n"
-            for (i=0; i < relic_drops.Uncommon.length; i++)
+            for (var i=0; i < relic_drops.Uncommon.length; i++)
             {
                 var link = relic_drops.Uncommon[i]
                 var str = relic_drops.Uncommon[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
                 value1 += ":white_circle: " + str + "\n"
-                for (j=0; j < pricesDB.length; j++)
+                for (var j=0; j < pricesDB.length; j++)
                 {
                     if (pricesDB[j].item_url == link)
                     {
@@ -1756,12 +1755,12 @@ async function relics(message,args) {
             }
             if (relic_drops.Uncommon.length < 2)
                 value1 += ":white_circle: Forma Blueprint\n", value2 += "\n"
-            for (i=0; i < relic_drops.Rare.length; i++)
+            for (var i=0; i < relic_drops.Rare.length; i++)
             {
                 var link = relic_drops.Rare[i]
                 var str = relic_drops.Rare[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
                 value1 += ":yellow_circle: " + str + "\n"
-                for (j=0; j < pricesDB.length; j++)
+                for (var j=0; j < pricesDB.length; j++)
                 {
                     if (pricesDB[j].item_url == link)
                     {
@@ -1815,7 +1814,7 @@ async function relics(message,args) {
     var j = 0
     let postdata = []
     postdata[X] = {content: " ", embeds: []}
-    for (k=0; k < arrItemsUrl.length; k++)
+    for (var k=0; k < arrItemsUrl.length; k++)
     {
         console.log(arrItemsUrl[i])
         try {
@@ -1828,14 +1827,14 @@ async function relics(message,args) {
             let best_uncommon = {lith: [],meso: [],neo: [],axi: []}
             let best_rare = {lith: [],meso: [],neo: [],axi: []}
             //-----
-            for (l=0; l < part_info.Relics.length; l++)
+            for (var l=0; l < part_info.Relics.length; l++)
             {
                 try {
                     const data2 = fs.readFileSync("../Relics Info/" + part_info.Relics[l] + ".json", 'utf8').replace(/^\uFEFF/, '')
                     relic_drops = JSON.parse(data2)
                     //----
                     var value = ""
-                    for (m=0; m < relic_drops.Common.length; m++)
+                    for (var m=0; m < relic_drops.Common.length; m++)
                     {
                         var str1 = relic_drops.Common[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
                         if (relic_drops.Common[m]==arrItemsUrl[i])
@@ -1851,7 +1850,7 @@ async function relics(message,args) {
                     }
                     if (relic_drops.Common.length < 3)
                         value += ":brown_circle: Forma Blueprint\n"
-                    for (m=0; m < relic_drops.Uncommon.length; m++)
+                    for (var m=0; m < relic_drops.Uncommon.length; m++)
                     {
                         var str1 = relic_drops.Uncommon[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
                         if (relic_drops.Uncommon[m]==arrItemsUrl[i])
@@ -1867,7 +1866,7 @@ async function relics(message,args) {
                     }
                     if (relic_drops.Uncommon.length < 2)
                         value += ":white_circle: Forma Blueprint\n"
-                    for (m=0; m < relic_drops.Rare.length; m++)
+                    for (var m=0; m < relic_drops.Rare.length; m++)
                     {
                         var str1 = relic_drops.Rare[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
                         if (relic_drops.Rare[m]==arrItemsUrl[i])
@@ -1902,12 +1901,12 @@ async function relics(message,args) {
                 }
             }
             let tier_names = ["lith", "meso", "neo", "axi"]
-            for (l=0; l < tier_names.length; l++)
+            for (var l=0; l < tier_names.length; l++)
             {
                 if (JSON.stringify(best_common[(tier_names[l])]) != "[]")
                 {
                     var relics = ""
-                    for (m=0; m < best_common[(tier_names[l])].length; m++)
+                    for (var m=0; m < best_common[(tier_names[l])].length; m++)
                     {
                         relics += best_common[(tier_names[l])][m] + "|"
                     }
@@ -1918,12 +1917,12 @@ async function relics(message,args) {
             }
             if (postdata[X].embeds[j].footer.text == "")
             {
-                for (l=0; l < tier_names.length; l++)
+                for (var l=0; l < tier_names.length; l++)
                 {
                     if (JSON.stringify(best_uncommon[(tier_names[l])]) != "[]")
                     {
                         var relics = ""
-                        for (m=0; m < best_uncommon[(tier_names[l])].length; m++)
+                        for (var m=0; m < best_uncommon[(tier_names[l])].length; m++)
                         {
                             relics += best_uncommon[(tier_names[l])][m] + "|"
                         }
@@ -1935,12 +1934,12 @@ async function relics(message,args) {
             }
             if (postdata[X].embeds[j].footer.text == "")
             {
-                for (l=0; l < tier_names.length; l++)
+                for (var l=0; l < tier_names.length; l++)
                 {
                     if (JSON.stringify(best_rare[(tier_names[l])]) != "[]")
                     {
                         var relics = ""
-                        for (m=0; m < best_rare[(tier_names[l])].length; m++)
+                        for (var m=0; m < best_rare[(tier_names[l])].length; m++)
                         {
                             relics += best_rare[(tier_names[l])][m] + "|"
                         }
@@ -1956,7 +1955,7 @@ async function relics(message,args) {
             console.error(err)
         }
     }
-    for (k=0; k<postdata.length; k++)
+    for (var k=0; k<postdata.length; k++)
     {
         if (k==0)
             processMessage.edit(postdata[k])
@@ -2061,7 +2060,7 @@ async function auctions(message,args) {
         var d_weaponDetails = ""
         var d_prices = ""
         var i=0
-        for (j=0; j<auctionsArr.length; j++)
+        for (var j=0; j<auctionsArr.length; j++)
         {
             if (i==5)
                 break
@@ -2099,7 +2098,7 @@ async function auctions(message,args) {
         var d_weaponDetails = ""
         var d_prices = ""
         var i=0
-        for (j=0; j<auctionsArr.length; j++)
+        for (var j=0; j<auctionsArr.length; j++)
         {
             if (i==5)
                 break
@@ -2135,7 +2134,7 @@ async function auctions(message,args) {
         var d_weaponDetails = ""
         var d_prices = ""
         var i=0
-        for (j=0; j<auctionsArr.length; j++)
+        for (var j=0; j<auctionsArr.length; j++)
         {
             if (i==5)
                 break
@@ -2262,7 +2261,7 @@ async function list(message,args) {
     if (JSON.stringify(arrItemsUrl).match("_set")) {
         var i = 0
         var MaxIndex = arrItemsUrl.length
-        for (i=0; i <= MaxIndex-1; i++)
+        for (var i=0; i <= MaxIndex-1; i++)
         {
             if (!arrItemsUrl[i].item_url.match("_set"))
             {
@@ -2314,7 +2313,7 @@ async function list(message,args) {
         const func2 = axios("https://api.warframe.market/v1/profile/" + ingame_name + "/orders", {headers:{Authorization: JWT}})
         .then(response => {
             data = response.data
-            for (i=0; i<data.payload.sell_orders.length;i++)
+            for (var i=0; i<data.payload.sell_orders.length;i++)
             {
                 //----Edit existing order----
                 if (data.payload.sell_orders[i].item.url_name==item_url)
@@ -2455,7 +2454,7 @@ async function relist(message,args) {
     if (!status)
         return
     if (message.author.id != "253525146923433984") {
-        for (i=0;i<relist_cd.length;i++) {
+        for (var i=0;i<relist_cd.length;i++) {
             if (relist_cd[i].discord_id == message.author.id)
                 {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
         }
@@ -2464,7 +2463,7 @@ async function relist(message,args) {
             console.log('executed timout')
             var i = 0
             var MaxIndex = relist_cd.length
-            for (i=0; i <= MaxIndex-1; i++)
+            for (var i=0; i <= MaxIndex-1; i++)
             {
                 if (relist_cd[i].discord_id==message.author.id)
                 {
@@ -2488,7 +2487,7 @@ async function relist(message,args) {
         var value_f1 = []
         var value_f3 = []
         let itemsArr = []
-        for (i=0;i<data1.payload.sell_orders.length;i++) {
+        for (var i=0;i<data1.payload.sell_orders.length;i++) {
             const item_url = data1.payload.sell_orders[i].item.url_name
             const item_id = data1.payload.sell_orders[i].item.item_id
             const order_id = data1.payload.sell_orders[i].id
@@ -2532,7 +2531,7 @@ async function relist(message,args) {
                     return
                 }
                 var sumArr = []
-                for (i=0; i<ordersArr.length;i++)
+                for (var i=0; i<ordersArr.length;i++)
                 {
                     if (i==5)
                         break
@@ -3017,7 +3016,7 @@ async function updateDatabaseItems(up_origin) {
         .then(async (db_items_list) => {
             console.log('Retrieving DB items list success.')
             console.log('Scanning DB items list...')
-            for (i=0; i<wfm_items_list.data.payload.items.length;i++) {
+            for (var i=0; i<wfm_items_list.data.payload.items.length;i++) {
                 //console.log(`Scanning item ${wfm_items_list.data.payload.items[i].url_name} (${i+1}/${wfm_items_list.data.payload.items.length})`)
                 var exists = Object.keys(db_items_list.rows).some(function(k) {
                     if (Object.values(db_items_list.rows[k]).includes(wfm_items_list.data.payload.items[i].id))
@@ -3123,7 +3122,7 @@ async function updateDatabasePrices(up_origin) {
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
-        for (i=0;i<db_items_list.rows.length;i++) {
+        for (var i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic")) { //item.tags.includes("prime") || 
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
@@ -3178,7 +3177,7 @@ async function updateDatabasePrices(up_origin) {
                     if (relics)
                         if (relics.length != 0) {
                             console.log(`Scanning relic rewards...`)
-                            for (j=0;j<relics.length;j++) {
+                            for (var j=0;j<relics.length;j++) {
                                 var temp = relics[j].name.split(" ")
                                 const rarity = temp.pop().replace("(","").replace(")","").toLowerCase()
                                 //----add to DB----
@@ -3282,7 +3281,7 @@ async function updateDatabasePrices(up_origin) {
                             else if (vaultExpectedRelics.includes(item.item_url.replace('_set','')))
                                 vault_status = 'E'
                             console.log(`Updating DB components vault status...`)
-                            for (j=0;j<components_list.length;j++) {
+                            for (var j=0;j<components_list.length;j++) {
                                 var status = await db.query(`UPDATE items_list SET 
                                     vault_status = '${vault_status}'
                                     WHERE id = '${components_list[j].id}'`)
@@ -3521,7 +3520,7 @@ async function trading_bot(message,args,command) {
     if (price < 0) {
         message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-        return Promise.reject()
+        return Promise.resolve()
     }
     console.log(price)
     var ingame_name = ''
@@ -3589,7 +3588,7 @@ async function trading_bot(message,args,command) {
     if (JSON.stringify(arrItemsUrl).match("_set")) {
         var i = 0
         var MaxIndex = arrItemsUrl.length
-        for (i=0; i <= MaxIndex-1; i++)
+        for (var i=0; i <= MaxIndex-1; i++)
         {
             if (!arrItemsUrl[i].item_url.match("_set"))
             {
@@ -3602,12 +3601,12 @@ async function trading_bot(message,args,command) {
     if (arrItemsUrl.length > 1) {
         message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
-        return Promise.reject()
+        return Promise.resolve()
     }
     if (arrItemsUrl.length==0) {
         message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-        return Promise.reject()
+        return Promise.resolve()
     }
     const item_url = arrItemsUrl[0].item_url
     const item_id = arrItemsUrl[0].item_id
