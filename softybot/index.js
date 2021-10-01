@@ -256,7 +256,7 @@ client.on('messageCreate', async message => {
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             if (args[0] == "my" && (args[1] == "orders" || "order" || "profile")) {
                 var ingame_name = ""
-                var status = db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
                     ingame_name = res.rows[0].ingame_name
                     return true
