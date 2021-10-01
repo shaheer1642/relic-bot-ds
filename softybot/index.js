@@ -3799,7 +3799,7 @@ async function trading_bot(message,args,command) {
                 postdata.content = " "
                 postdata.embeds = []
                 postdata.embeds.push({
-                    description: `❕ Order Notification ❕\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** for **${item_name}** has been auto-closed after 10 seconds`,
+                    description: `❕ Order Notification ❕\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after 10 seconds`,
                     footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
                     timestamp: new Date()
                 })
