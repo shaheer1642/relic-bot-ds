@@ -96,6 +96,7 @@ client.on('messageCreate', async message => {
                 setTimeout(kekfunc(msg,i),1000)
             }).catch(err => console.log(err))
             async function kekfunc(msg,i) {
+                var postdata = ""
                 for (var j=0;j<i;j++) {
                     postdata += '<:kek:892005941195714570>'
                 }
