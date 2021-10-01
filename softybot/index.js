@@ -92,7 +92,7 @@ client.on('messageCreate', async message => {
         }
         else if ((message.guild.id=='865904902941048862' || '832677897411493949') && message.content=='!kek') {
             message.channel.send('<:kek:892005941195714570>').then(async msg => {
-                var i=0
+                var i=1
                 console.log(`started kekfunc`)
                 setTimeout(function(){kekfunc(msg,i)},1500)
             }).catch(err => console.log(err))
