@@ -4115,6 +4115,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                 setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
             }
+            console.log(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
             return false
         })
         if (!status)
@@ -4169,7 +4170,8 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             if (originMessage) {
                 originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-                }
+            }
+            console.log(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
             console.log(err)
             return false
         })
