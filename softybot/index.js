@@ -577,10 +577,10 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             postdata.embeds = []
             postdata.embeds.push({
                 description: `
-                ❕ Offline Notification ❕\n
-                You have been detected offline. Following orders have been set invisible for you:\n 
-                ${all_orders_names.map(e => {return e})}`,
-                footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders`},
+                ❕ Offline Notification ❕
+                You have been detected offline. Following orders have been set invisible for you:
+                ${all_orders_names.map(e => {return `**${e}\n`})}`,
+                footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                 timestamp: new Date()
             })
             newMember.user.send(postdata).catch(err => console.log(err))
