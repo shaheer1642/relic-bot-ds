@@ -4381,7 +4381,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 })
                 if (!status) {
                     if (originMessage) {
-                        originMessage.channel.send(`⚠️ Cannot post ${item_id} order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                             setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                     }
                     return
