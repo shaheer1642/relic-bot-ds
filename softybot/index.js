@@ -1675,6 +1675,8 @@ async function orders(message,args) {
         d_item_url = d_item_url + element.toLowerCase() + "_"
     });
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    d_item_url = d_item_url.replace('_p_','_prime_')
+    d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
     let arrItemsUrl = []
     var primeFlag = 0
     //var WFM_Items_List = require('../WFM_Items_List.json')
