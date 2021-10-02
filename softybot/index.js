@@ -290,7 +290,7 @@ client.on('messageCreate', async message => {
                                         description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                                         footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                                         timestamp: new Date(),
-                                        color: [`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`]
+                                        color: (`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`)
                                     })
                                     var status = await db.query(`SELECT * from users_list WHERE discord_id = ${message.author.id}`)
                                     .then(res => {
@@ -580,7 +580,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 description: `
                 ❕ Offline Notification ❕\n
                 You have been detected offline. Following orders have been set invisible for you:
-                ${all_orders_names.map(e => {return `**${e}**\n`})}`,
+                ${all_orders_names.map(e => {return `**${e}**\n`}).replace(/,/g,'')}`,
                 footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                 timestamp: new Date(),
                 color: '#FFFFFF'
