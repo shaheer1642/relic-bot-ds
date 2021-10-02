@@ -725,7 +725,7 @@ client.on('interactionCreate', async interaction => {
             postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
         if (buy_items.length != 0)
             postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
-        postdata.embeds[0].author = {name: interaction.user.username,iconURL: interaction.user.displayAvatarURL()}
+        postdata.embeds[0].author = {name: ingame_name,iconURL: interaction.user.displayAvatarURL()}
         postdata.components = []
         postdata.components.push({type:1,components:[]})
         postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
