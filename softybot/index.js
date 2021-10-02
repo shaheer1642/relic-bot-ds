@@ -383,7 +383,6 @@ client.on('messageCreate', async message => {
                             var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
                             .then(async res => {
                                 if (res.rows.length == 0) {  //no message for this item 
-                                    msg = null
                                     return true
                                 }
                                 else if (res.rows.length > 1)
