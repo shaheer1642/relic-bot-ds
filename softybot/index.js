@@ -153,7 +153,7 @@ client.on('messageCreate', async message => {
             }
         }
         if (tradingBotChannels.includes(message.channelId)) {
-            if (!message.member.presence.status) {
+            if (!message.member.presence) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                 return Promise.resolve()
@@ -483,11 +483,11 @@ client.on('messageCreate', async message => {
 
 client.on('presenceUpdate', (oldMember,newMember) => {
     let username = newMember.user.username;
-    if (!newMember.user.presence)
+    if (!newMember.member.presence.status)
         console.log(`User ${username} has went offline.`)
-    else if (newMember.user.presence.status == 'online')
+    else if (newMember.member.presence.status == 'online')
         console.log(`User ${username} has come online.`)
-    else if (newMember.user.presence.status == 'offline')
+    else if (newMember.member.presence.status == 'offline')
         console.log(`User ${username} has went offline.`)
     return Promise.resolve()
 })
