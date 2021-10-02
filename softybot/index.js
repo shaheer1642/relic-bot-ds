@@ -33,9 +33,18 @@ const db = new DB.Pool({
       rejectUnauthorized: false
     }
 });
-e_db_conn();
+await e_db_conn().catch(err => console.log(err));
 async function e_db_conn() {
-    await db.connect().then(console.log('Connection established.')).catch(err => {console.log(err + '\nConnection failure.');return});
+    var status = await db.connect().then(res => {
+        console.log('Connection established.')
+        return true
+    })
+    .catch(err => {
+        console.log(err + '\nConnection failure.');
+        return false
+    });
+    if (!status)
+        return Promise.reject()
 }
 /*----timers-----*/
 //setTimeout(verify_roles, 5000);
@@ -4061,7 +4070,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         var embeds = []
         var noOfSellers = 0
         var noOfBuyers = 0
-        var targetChannel = client.channels.cache.get(multiCid)
+        //var targetChannel = client.channels.cache.get(multiCid)
 
         //----construct embed----
         var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
@@ -4179,6 +4188,48 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             return Promise.reject()
         if (embeds[1])
             embeds[1].author = null
+        var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
+        .then(res => {
+            if (res.rows.length == 0) {  //no message for this item 
+                msg = null
+                return true
+            }
+            else if (res.rows.length > 1) {
+                console.log(`Detected more than one messages for item ${item_name} in channel ${multiCid}`)
+                if (originMessage) {
+                    originMessage.channel.send(`☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    //setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                }
+                return false
+            }
+            else {
+                var c = client.channels.cache.get(multiCid)
+                var m = c.messages.cache.get(res.rows[0].message_id)
+                if (!m.author) {
+                    var status = await c.messages.fetch(res.rows[0].message_id).then(mNew => {
+                        msg = mNew
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return false
+                }
+                else {
+                    msg = m
+                }
+                return true
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return Promise.reject()
+        /*
         await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
             allMsgs.forEach(e => {
                 if (e.embeds.length != 0) {
@@ -4192,16 +4243,24 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             console.log(err)
             msg = 'error'
         })
+        */
+        /*
         if (msg == 'error') {
             if (originMessage) {
                 originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 504\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                //setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
             }
             continue
         }
+        */
+
         if (msg) {
-            if (embeds.length==0)
-                await msg.delete().catch(err => console.log(err))
+            if (embeds.length==0) {
+                await msg.delete().then(res => {
+                    var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
+                })
+                .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
+            }
             else {
                 msg.edit({content: ' ',embeds: embeds})
                 .then(async msg => {
@@ -4258,6 +4317,10 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 return Promise.reject()
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
+                await msg.delete().then(res => {
+                    var status = await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id) VALUES (${multiCid},'${item_id}',${res.id})`)
+                })
+                .catch(err => console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`))
                 /*
                 if (originMessage) {
                     if (targetChannel.id == originMessage.channel.id)
