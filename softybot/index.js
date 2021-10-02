@@ -4390,7 +4390,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                             return false
                         }
                         var msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
-                        var status = await msg.edit({content: ' ', embeds: embeds}).then(()=> {
+                        var status = await msg.edit({content: ' ', embeds: embeds}).then(async () => {
                             await msg.reactions.removeAll().catch(err => console.log(err))
                             for (var i=0;i<noOfSellers;i++) {
                                 msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
