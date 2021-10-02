@@ -4189,7 +4189,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     console.log(ingame_name)
     var discord_id = ""
     var status_msg = ""
-    var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name}'`)
+    var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
     .then(res => {
         if (res.rows.length == 0) {
             status_msg = `<@${message.author.id}> The given user is not registered with the bot.`
@@ -4201,6 +4201,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         }
         else {
             discord_id = res.rows[0].discord_id
+            ingame_name = res.rows[0].ingame_name
             return true
         }
     })
@@ -4258,7 +4259,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     if (buy_items.length != 0)
         postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
     var member = await client.users.fetch(discord_id)
-    postdata.embeds[0].author = {name: member.username,iconURL: member.displayAvatarURL()}
+    postdata.embeds[0].author = {name: ingame_name,iconURL: member.displayAvatarURL()}
     if (request_type == 1) {
         postdata.components = []
         postdata.components.push({type:1,components:[]})
@@ -4276,7 +4277,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
 }
 
 async function trading_bot_registeration(message,ingame_name) {
-    var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name}'`).then(res => {
+    var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`).then(res => {
         if (res.rows.length == 0)
             return true
         else
