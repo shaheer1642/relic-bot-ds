@@ -24,7 +24,7 @@ const tb_buyColor = '#E74C3C'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
-const u_order_close_time = 10800000
+const u_order_close_time = 10000//10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -287,9 +287,10 @@ client.on('messageCreate', async message => {
                                     postdata.content = " "
                                     postdata.embeds = []
                                     postdata.embeds.push({
-                                        description: `❕ Order Notification ❕\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                                        footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders`},
-                                        timestamp: new Date()
+                                        description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                                        footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                                        timestamp: new Date(),
+                                        color: [`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`]
                                     })
                                     var status = await db.query(`SELECT * from users_list WHERE discord_id = ${message.author.id}`)
                                     .then(res => {
@@ -577,11 +578,12 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             postdata.embeds = []
             postdata.embeds.push({
                 description: `
-                ❕ Offline Notification ❕
+                ❕ Offline Notification ❕\n
                 You have been detected offline. Following orders have been set invisible for you:
-                ${all_orders_names.map(e => {return `**${e}\n`})}`,
+                ${all_orders_names.map(e => {return `**${e}**\n`})}`,
                 footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                timestamp: new Date()
+                timestamp: new Date(),
+                color: '#FFFFFF'
             })
             newMember.user.send(postdata).catch(err => console.log(err))
             return Promise.resolve()
