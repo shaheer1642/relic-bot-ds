@@ -546,6 +546,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             var all_orders_names = []
             for (var i=0;i<orders_list.length;i++) {
                 var item_id = orders_list.item_id
+                console.log(item_id)
                 var item_url = ''
                 var item_name = ''
                 var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
