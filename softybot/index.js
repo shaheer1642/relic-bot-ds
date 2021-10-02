@@ -4159,7 +4159,9 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     },
                     */
                     title: item_name,
-                    thumbnail: icon_url,
+                    thumbnail: {
+                        url: icon_url
+                    },
                     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                     fields: [
                         {
@@ -4222,7 +4224,9 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     */
                     title: item_name,
                     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    thumbnail: icon_url,
+                    thumbnail: {
+                        url: icon_url
+                    },
                     fields: [
                         {
                             name: 'Buyers',
