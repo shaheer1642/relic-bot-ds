@@ -562,7 +562,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     }
                     item_url = res.rows[0].item_url
                     item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                    all_orders_names.push(item_name)
+                    all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ')')
                     return true
                 })
                 .catch(err => {
@@ -580,7 +580,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 description: `
                 ❕ Offline Notification ❕\n
                 You have been detected offline. Following orders have been set invisible for you:
-                ${all_orders_names.map(e => {return `**${e.replace(/,/g,'')}**\n`})}`,
+                ${all_orders_names.replace(/,/g,'').map(e => {return `**${e}**\n`})}`,
                 footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                 timestamp: new Date(),
                 color: '#FFFFFF'
@@ -4005,7 +4005,8 @@ async function trading_bot(message,args,command) {
                 postdata.embeds.push({
                     description: `❕ Order Notification ❕\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                     footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
-                    timestamp: new Date()
+                    timestamp: new Date(),
+                    color: (`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`)
                 })
                 var status = await db.query(`SELECT * from users_list WHERE discord_id = ${originMessage.author.id}`)
                 .then(res => {
