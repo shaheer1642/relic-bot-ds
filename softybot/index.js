@@ -483,7 +483,9 @@ client.on('messageCreate', async message => {
 
 client.on('presenceUpdate', (oldMember,newMember) => {
     let username = newMember.user.username;
-    if (newMember.user.presence.status == 'online')
+    if (!newMember.user.presence.status)
+        console.log(`User ${username} has went offline.`)
+    else if (newMember.user.presence.status == 'online')
         console.log(`User ${username} has come online.`)
     else if (newMember.user.presence.status == 'offline')
         console.log(`User ${username} has went offline.`)
