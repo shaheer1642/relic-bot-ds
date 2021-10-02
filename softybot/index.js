@@ -350,7 +350,7 @@ client.on('messageCreate', async message => {
                             return false
                         }
                         active_orders = res.rows
-                        db.query(`DELETE * FROM messages_ids`)
+                        db.query(`DELETE FROM messages_ids`)
                         return true
                     })
                     .catch(err => {
