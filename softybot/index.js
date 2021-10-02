@@ -372,7 +372,7 @@ client.on('messageCreate', async message => {
                     })
                     if (!status)
                         return Promise.resolve()
-                    purgeMessage = await message.channel.send(`Purging ${active_orders.length*tradingBotChannels.length} messages. Please wait...`).then(msg =>{
+                    purgeMessage = await message.channel.send(`Purging ${active_orders.length*tradingBotChannels.length} orders from all servers. Please wait...`).then(msg =>{
                         return msg
                     }).catch(err => console.log(err))
                     for (var k=0;k<active_orders.length;k++) {
