@@ -288,7 +288,7 @@ client.on('messageCreate', async message => {
                                     postdata.embeds = []
                                     postdata.embeds.push({
                                         description: `❕ Order Notification ❕\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                                        footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
+                                        footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders`},
                                         timestamp: new Date()
                                     })
                                     var status = await db.query(`SELECT * from users_list WHERE discord_id = ${message.author.id}`)
@@ -538,6 +538,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             })
             if (!status)
                 return Promise.resolve()
+            var all_orders_names = []
             for (var i=0;i<orders_list.length;i++) {
                 var item_id = orders_list.item_id
                 var item_url = ''
@@ -548,8 +549,9 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                         return false
                     if (res.rows.length>1)  //unexpected response
                         return false
-                    item_url = res.rows[0]
-                    item_name = res.rows[0]
+                    item_url = res.rows[0].item_url
+                    item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                    all_orders_names.push(item_name)
                     return true
                 })
                 .catch(err => {
@@ -560,6 +562,17 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     return Promise.resolve()
                 await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
             }
+            var postdata = {}
+            postdata.content = " "
+            postdata.embeds = []
+            postdata.embeds.push({
+                description: `
+                ❕ Offline Notification ❕\n
+                You have been detected offline. Following orders have been set invisible for you:\n 
+                ${all_orders_names.map(e => {return e})}`,
+                footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders`},
+                timestamp: new Date()
+            })
             return Promise.resolve()
         }
     }
