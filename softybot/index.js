@@ -289,9 +289,12 @@ client.on('messageCreate', async message => {
                                     postdata.embeds.push({
                                         description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                                         footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                                        timestamp: new Date(),
-                                        color: [`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`]
+                                        timestamp: new Date()
                                     })
+                                    if (order_type == 'wts')
+                                        postdata.embeds[0].color = tb_sellColor
+                                    if (order_type == 'wtb')
+                                        postdata.embeds[0].color = tb_buyColor
                                     var status = await db.query(`SELECT * from users_list WHERE discord_id = ${message.author.id}`)
                                     .then(res => {
                                         if (res.rows.length == 0)
@@ -4005,9 +4008,12 @@ async function trading_bot(message,args,command) {
                 postdata.embeds.push({
                     description: `❕ Order Notification ❕\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                     footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
-                    timestamp: new Date(),
-                    color: [`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`]
+                    timestamp: new Date()
                 })
+                if (order_type == 'wts')
+                    postdata.embeds[0].color = tb_sellColor
+                if (order_type == 'wtb')
+                    postdata.embeds[0].color = tb_buyColor
                 var status = await db.query(`SELECT * from users_list WHERE discord_id = ${originMessage.author.id}`)
                 .then(res => {
                     if (res.rows.length == 0)
