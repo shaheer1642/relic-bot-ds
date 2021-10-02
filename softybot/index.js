@@ -481,6 +481,11 @@ client.on('messageCreate', async message => {
     return Promise.resolve()
 })
 
+client.on('presenceUpdate', function(oldMember,newMember) {
+    console.log(oldMember + '\n\n' + newMember)
+    return Promise.resolve()
+})
+
 client.on('interactionCreate', async interaction => {
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         if (interaction.user.username != interaction.message.embeds[0].author.name) {
