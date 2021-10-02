@@ -4225,7 +4225,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             else {
                 var c = client.channels.cache.get(multiCid)
                 var m = c.messages.cache.get(res.rows[0].message_id)
-                if (!m.author) {
+                if (!m) {
                     var status = await c.messages.fetch(res.rows[0].message_id).then(mNew => {
                         msg = mNew
                         return true
