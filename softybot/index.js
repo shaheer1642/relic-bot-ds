@@ -4380,11 +4380,39 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     return false
                 })
                 if (!status) {
-                    if (originMessage) {
-                        originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-                    }
-                    return
+                    var status = db.query(`SELECT * from messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
+                    .then(async res => {
+                        if (res.rows.length ==0) {
+                            if (originMessage) {
+                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                            }
+                            return false
+                        }
+                        var msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
+                        var status = await msg.edit({content: ' ', embeds: embeds}).then(()=> {
+                            await msg.reactions.removeAll().catch(err => console.log(err))
+                            for (var i=0;i<noOfSellers;i++) {
+                                msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                            }
+                            for (var i=0;i<noOfBuyers;i++) {
+                                msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                            }
+                            return true
+                        })
+                        .catch(err => {
+                            if (originMessage) {
+                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                            }
+                            console.log(err)
+                            return false
+                        })
+                        if (!status)
+                            return false
+                    })
+                    if (!status)
+                        return Promise.reject()
                 }
                 /*
                 if (originMessage) {
