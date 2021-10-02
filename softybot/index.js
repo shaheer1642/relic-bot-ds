@@ -627,7 +627,8 @@ client.on('interactionCreate', async interaction => {
         })
         if (!status)
             return Promise.resolve()
-        if (ingame_name != interaction.message.embeds[0].author.name) {
+        if (ingame_name.toLowerCase() != interaction.message.embeds[0].author.name.toLowerCase()) {
+            console.log(ingame_name + '   ' + interaction.message.embeds[0].author.name)
             console.log(`Not same user`)
             await interaction.deferUpdate()
             return Promise.resolve()
