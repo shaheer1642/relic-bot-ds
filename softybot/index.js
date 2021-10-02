@@ -545,7 +545,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 return Promise.resolve()
             var all_orders_names = []
             for (var i=0;i<orders_list.length;i++) {
-                var item_id = orders_list.item_id
+                var item_id = orders_list[i].item_id
                 console.log(item_id)
                 var item_url = ''
                 var item_name = ''
