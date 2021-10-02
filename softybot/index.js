@@ -608,18 +608,20 @@ client.on('interactionCreate', async interaction => {
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         const discord_id = interaction.member.user.id
         var ingame_name = ""
-        var status = db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
+        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
         .then(res => {
             if (res.rows.length == 0) {
                 console.log(`User does not exist in db`)
                 return false
             }
-            if (res.rows.length > 1) {
+            else if (res.rows.length > 1) {
                 console.log(`Multiple users with same discord id`)
                 return false
             }
-            ingame_name = res.rows[0].ingame_name
-            return true
+            else {
+                ingame_name = res.rows[0].ingame_name
+                return true
+            }
         })
         .catch(err => {
             console.log(err)
