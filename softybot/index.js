@@ -4152,10 +4152,15 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
                 }
                 var embed = {
+                    /*
                     author: {
                         name: `${item_name}`,
                         iconURL: icon_url
                     },
+                    */
+                    title: item_name,
+                    thumbnail: icon_url,
+                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                     fields: [
                         {
                             name: 'Sellers',
@@ -4209,10 +4214,15 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
                 }
                 var embed = {
+                    /*
                     author: {
                         name: `${item_name}`,
                         iconURL: icon_url
                     },
+                    */
+                    title: item_name,
+                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    thumbnail: icon_url,
                     fields: [
                         {
                             name: 'Buyers',
@@ -4242,8 +4252,10 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         })
         if (!status)
             return Promise.reject()
-        if (embeds[1])
-            embeds[1].author = null
+        if (embeds[1]) {
+            embeds[1].title = null
+            embeds[1].thumbnail = null
+        }
         var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item 
