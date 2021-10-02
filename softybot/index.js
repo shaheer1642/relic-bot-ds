@@ -576,6 +576,8 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     return Promise.resolve()
                 await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
             }
+            var text = all_orders_names.map(e => {return `**${e}**\n`})
+            text = text.replace(/,/g,'')
             var postdata = {}
             postdata.content = " "
             postdata.embeds = []
@@ -583,7 +585,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 description: `
                 ❕ Offline Notification ❕\n
                 You have been detected offline. Following orders have been set invisible for you:
-                ${all_orders_names.replace(/,/g,'').map(e => {return `**${e}**\n`})}`,
+                ${text}}`,
                 footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                 timestamp: new Date(),
                 color: '#FFFFFF'
@@ -4010,10 +4012,11 @@ async function trading_bot(message,args,command) {
                     footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
                     timestamp: new Date()
                 })
-                if (order_type == 'wts')
+                if (command == 'wts')
                     postdata.embeds[0].color = tb_sellColor
-                if (order_type == 'wtb')
+                if (command == 'wtb')
                     postdata.embeds[0].color = tb_buyColor
+                console.log(postdata)
                 var status = await db.query(`SELECT * from users_list WHERE discord_id = ${originMessage.author.id}`)
                 .then(res => {
                     if (res.rows.length == 0)
