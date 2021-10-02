@@ -389,9 +389,8 @@ client.on('messageCreate', async message => {
                                 else if (res.rows.length > 1)
                                     console.log(`Detected more than one messages for item ${item_name} in channel ${multiCid}`)
                                 else {
-                                    //var c = client.channels.cache.get(multiCid)
-                                    msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
-                                    /*
+                                    var c = client.channels.cache.get(multiCid)
+                                    var m = c.messages.cache.get(res.rows[0].message_id)
                                     if (!m) {
                                         var status = await c.messages.fetch(res.rows[0].message_id).then(mNew => {
                                             msg = mNew
@@ -407,7 +406,6 @@ client.on('messageCreate', async message => {
                                     else {
                                         msg = m
                                     }
-                                    */
                                     return true
                                 }
                             })
