@@ -580,7 +580,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 description: `
                 ❕ Offline Notification ❕\n
                 You have been detected offline. Following orders have been set invisible for you:
-                ${all_orders_names.map(e => {return `**${e}**\n`}).replace(/,/g,'')}`,
+                ${all_orders_names.map(e => {return `**${e.replace(/,/g,'')}**\n`})}`,
                 footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                 timestamp: new Date(),
                 color: '#FFFFFF'
