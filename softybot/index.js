@@ -16,6 +16,7 @@ const botID = "832682369831141417"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"], remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"]}
 const tb_sellColor = '#7cb45d'
@@ -482,15 +483,15 @@ client.on('messageCreate', async message => {
 })
 
 client.on('presenceUpdate', (oldMember,newMember) => {
-    let username = newMember.user.username;
-    if (!newMember.member.presence.status)
-        console.log(`User ${username} has went offline.`)
-    if (oldMember.member.presence.status == newMember.member.presence.status)
-        return Promise.resolve()
-    else if (newMember.member.presence.status == 'online')
-        console.log(`User ${username} has come online.`)
-    else if (newMember.member.presence.status == 'offline')
-        console.log(`User ${username} has went offline.`)
+    if (tradingBotGuilds.includes(newMember.member.guild.id)) {
+        let username = newMember.user.username;
+        if (!newMember.member.presence.status)
+            console.log(`User ${username} has went offline.`)
+        else if (newMember.member.presence.status == 'online')
+            console.log(`User ${username} has come online.`)
+        else if (newMember.member.presence.status == 'offline')
+            console.log(`User ${username} has went offline.`)
+    }
     return Promise.resolve()
 })
 
