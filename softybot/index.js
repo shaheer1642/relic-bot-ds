@@ -482,7 +482,7 @@ client.on('messageCreate', async message => {
     return Promise.resolve()
 })
 
-client.on('presenceUpdate', (oldMember,newMember) => {
+client.on('presenceUpdate', async (oldMember,newMember) => {
     if (tradingBotGuilds.includes(newMember.member.guild.id)) {
         let username = newMember.user.username;
         if (!newMember.member.presence.status)
@@ -491,6 +491,7 @@ client.on('presenceUpdate', (oldMember,newMember) => {
             console.log(`User ${username} has come online.`)
         else if (newMember.member.presence.status == 'offline')
             console.log(`User ${username} has went offline.`)
+        return Promise.resolve()
     }
     return Promise.resolve()
 })
@@ -1671,7 +1672,7 @@ async function orders(message,args) {
     }
     var d_item_url = ""
     args.forEach(element => {
-        d_item_url = d_item_url + element + "_"
+        d_item_url = d_item_url + element.toLowerCase() + "_"
     });
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     let arrItemsUrl = []
