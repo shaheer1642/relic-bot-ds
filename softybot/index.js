@@ -4189,7 +4189,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         if (embeds[1])
             embeds[1].author = null
         var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
-        .then(res => {
+        .then(async res => {
             if (res.rows.length == 0) {  //no message for this item 
                 msg = null
                 return true
