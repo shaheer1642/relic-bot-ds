@@ -33,7 +33,7 @@ const db = new DB.Pool({
       rejectUnauthorized: false
     }
 });
-await e_db_conn().catch(err => console.log(err));
+e_db_conn().catch(err => console.log(err));
 async function e_db_conn() {
     var status = await db.connect().then(res => {
         console.log('Connection established.')
