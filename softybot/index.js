@@ -415,6 +415,7 @@ client.on('messageCreate', async message => {
                             })
                             if (!status)
                                 continue
+                            func()
                             var func = function() {
                                 msg.delete().then(async res => {
                                     db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
