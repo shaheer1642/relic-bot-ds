@@ -576,7 +576,9 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     return Promise.resolve()
                 await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
             }
-            var text = all_orders_names.map(e => {return `**${e}**\n`})
+            var text = ""
+            text = all_orders_names.map(e => {return `**${e}**\n`})
+            console.log(text)
             text = text.replace(/,/g,'')
             var postdata = {}
             postdata.content = " "
