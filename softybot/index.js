@@ -415,6 +415,8 @@ client.on('messageCreate', async message => {
                             })
                             if (!status)
                                 continue
+                            if (msg.length==0)
+                                continue
                             func(msg,multiCid,item_id)
                         }
                     }
