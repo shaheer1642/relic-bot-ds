@@ -486,7 +486,7 @@ client.on('presenceUpdate', (oldMember,newMember) => {
     if (newMember.user.presence.status == 'online')
         console.log(`User ${username} has come online.`)
     else if (newMember.user.presence.status == 'offline')
-        console.log(`User ${username} has went online.`)
+        console.log(`User ${username} has went offline.`)
     return Promise.resolve()
 })
 
