@@ -626,10 +626,10 @@ client.on('interactionCreate', async interaction => {
             return false
         })
         if (!status)
-            return Promise.reject()
+            return Promise.resolve()
         if (ingame_name != interaction.message.embeds[0].author.name) {
             await interaction.deferUpdate()
-            return Promise.reject()
+            return Promise.resolve()
         }
         await interaction.deferUpdate()
         for (var interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
