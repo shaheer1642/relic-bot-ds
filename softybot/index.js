@@ -486,9 +486,11 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
     if (tradingBotGuilds.includes(newMember.member.guild.id)) {
         let username = newMember.user.username;
         if (!newMember.member.presence.status) {
+            console.log(`User ${username} has went offline.`)
             await offline_orders_update(newMember).catch(err => console.log(err))
         }
         else if (newMember.member.presence.status == 'offline') {
+            console.log(`User ${username} has went offline.`)
             await offline_orders_update(newMember).catch(err => console.log(err))
         }
         else if (newMember.member.presence.status == 'online')
@@ -498,9 +500,11 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${newMember.user.id}`)
             .then(res => {
                 if (res.rows.length == 0) {     //user does not exist in the db
+                    console.log('User does not exist in db')
                     return false
                 }
                 if (res.rows.length > 1) {     //unexpected response
+                    console.log('Unexpected db response')
                     return false
                 }
                 return true
@@ -515,6 +519,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
             .then(res => {
                 if (res.rows.length == 0) {     //no visible orders at the time
+                    console.log('No visible orders at the time')
                     return false
                 }
                 if (res.rows.length > 0) {     //visible orders found
@@ -545,10 +550,14 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 var item_name = ''
                 var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
                 .then(res => {
-                    if (res.rows.length==0)  //unexpected response
+                    if (res.rows.length==0) { //unexpected response 
+                        console.log('Unexpected db response fetching item info')
                         return false
-                    if (res.rows.length>1)  //unexpected response
+                    }
+                    if (res.rows.length>1) { //unexpected response
+                        console.log('Unexpected db response fetching item info')
                         return false
+                    }
                     item_url = res.rows[0].item_url
                     item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                     all_orders_names.push(item_name)
@@ -573,6 +582,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders`},
                 timestamp: new Date()
             })
+            newMember.user.send(postdata).catch(err => console.log(err))
             return Promise.resolve()
         }
     }
