@@ -4317,9 +4317,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 return Promise.reject()
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
-                    await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id) VALUES (${multiCid},'${item_id}',${res.id})`)
-                    .catch(err => console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`))
-                }).catch(err => console.log(err))
+                await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id) VALUES (${multiCid},'${item_id}',${res.id})`).catch(err => console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`))
                 /*
                 if (originMessage) {
                     if (targetChannel.id == originMessage.channel.id)
