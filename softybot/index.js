@@ -485,13 +485,83 @@ client.on('messageCreate', async message => {
 client.on('presenceUpdate', async (oldMember,newMember) => {
     if (tradingBotGuilds.includes(newMember.member.guild.id)) {
         let username = newMember.user.username;
-        if (!newMember.member.presence.status)
-            console.log(`User ${username} has went offline.`)
+        if (!newMember.member.presence.status) {
+            await offline_orders_update(newMember).catch(err => console.log(err))
+        }
+        else if (newMember.member.presence.status == 'offline') {
+            await offline_orders_update(newMember).catch(err => console.log(err))
+        }
         else if (newMember.member.presence.status == 'online')
             console.log(`User ${username} has come online.`)
-        else if (newMember.member.presence.status == 'offline')
-            console.log(`User ${username} has went offline.`)
         return Promise.resolve()
+        async function offline_orders_update(newMember) {
+            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${newMember.user.id}`)
+            .then(res => {
+                if (res.rows.length == 0) {     //user does not exist in the db
+                    return false
+                }
+                if (res.rows.length > 1) {     //unexpected response
+                    return false
+                }
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return Promise.resolve()
+            var orders_list = []
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+            .then(res => {
+                if (res.rows.length == 0) {     //no visible orders at the time
+                    return false
+                }
+                if (res.rows.length > 0) {     //visible orders found
+                    orders_list = res.rows
+                    return true
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return Promise.resolve()
+            var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id}`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return Promise.resolve()
+            for (var i=0;i<orders_list.length;i++) {
+                var item_id = orders_list.item_id
+                var item_url = ''
+                var item_name = ''
+                var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+                .then(res => {
+                    if (res.rows.length==0)  //unexpected response
+                        return false
+                    if (res.rows.length>1)  //unexpected response
+                        return false
+                    item_url = res.rows[0]
+                    item_name = res.rows[0]
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return Promise.resolve()
+                await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+            }
+            return Promise.resolve()
+        }
     }
     return Promise.resolve()
 })
