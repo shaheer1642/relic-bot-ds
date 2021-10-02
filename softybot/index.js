@@ -4258,6 +4258,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             return Promise.reject()
         if (embeds[1]) {
             embeds[1].title = null
+            embeds[1].url = null
             embeds[1].thumbnail = null
         }
         var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
