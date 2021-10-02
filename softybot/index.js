@@ -481,7 +481,7 @@ client.on('messageCreate', async message => {
     return Promise.resolve()
 })
 
-client.on('presenceUpdate', function(oldMember,newMember) {
+client.on('presenceUpdate', (oldMember,newMember) => {
     console.log(oldMember + '\n\n' + newMember)
     return Promise.resolve()
 })
