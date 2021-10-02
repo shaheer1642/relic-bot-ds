@@ -373,7 +373,7 @@ client.on('messageCreate', async message => {
                     })
                     if (!status)
                         return Promise.resolve()
-                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} orders from all servers. Please wait...`).then(msg =>{
+                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg =>{
                         return msg
                     }).catch(err => console.log(err))
                     
@@ -4246,7 +4246,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 return true
             }
             else if (res.rows.length > 1) {
-                console.log(`Detected more than one messages for item ${item_name} in channel ${multiCid}`)
+                console.log(`Detected more than one message for item ${item_name} in channel ${multiCid}`)
                 if (originMessage) {
                     originMessage.channel.send(`☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     //setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
@@ -4370,7 +4370,22 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 return Promise.reject()
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
-                await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id) VALUES (${multiCid},'${item_id}',${msg.id})`).catch(err => console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`))
+                var status = await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id) VALUES (${multiCid},'${item_id}',${msg.id})`)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {     //might be a dublicate message
+                    console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`)
+                    msg.delete().catch(err => console.log(err))
+                    return false
+                })
+                if (!status) {
+                    if (originMessage) {
+                        originMessage.channel.send(`⚠️ Cannot post ${item_id} order in channel ${multiCid} due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                    }
+                    continue
+                }
                 /*
                 if (originMessage) {
                     if (targetChannel.id == originMessage.channel.id)
