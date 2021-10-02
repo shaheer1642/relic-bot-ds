@@ -415,18 +415,18 @@ client.on('messageCreate', async message => {
                             })
                             if (!status)
                                 continue
-                            func()
-                            var func = function() {
-                                msg.delete().then(async res => {
-                                    db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
-                                    .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
-                                }).catch(err => console.log(err))
-                            }
+                            func(msg,multiCid,item_id)
                         }
                     }
                     message.delete().catch(err => console.log(err))
                     purgeMessage.delete().catch(err => console.log(err))
                     return Promise.resolve()
+                    async function func(msg,multiCid,item_id) {
+                        msg.delete().then(async res => {
+                            db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
+                            .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
+                        }).catch(err => console.log(err))
+                    }
                 }
                 else {
                     message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
