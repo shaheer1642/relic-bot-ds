@@ -4069,7 +4069,7 @@ async function trading_bot(message,args,command) {
                 postdata.embeds = []
                 postdata.embeds.push({
                     description: `❕ Order Notification ❕\n\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                    footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)`},
+                    footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                     timestamp: new Date()
                 })
                 if (command == 'wts')
