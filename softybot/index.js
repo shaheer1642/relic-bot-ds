@@ -607,7 +607,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 client.on('interactionCreate', async interaction => {
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         const discord_id = interaction.member.user.id
-        var ingame_name
+        var ingame_name = ""
         var status = db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
         .then(res => {
             if (res.rows.length == 0) {
@@ -628,6 +628,7 @@ client.on('interactionCreate', async interaction => {
         if (!status)
             return Promise.resolve()
         if (ingame_name != interaction.message.embeds[0].author.name) {
+            console.log(`Not same user`)
             await interaction.deferUpdate()
             return Promise.resolve()
         }
