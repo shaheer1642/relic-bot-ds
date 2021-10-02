@@ -342,7 +342,7 @@ client.on('messageCreate', async message => {
             else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
                 if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
                     var active_orders = []
-                    var status =  await db.query(`SELECT * FROM messages_ids`)
+                    var status =  await db.query(`SELECT * FROM users_orders WHERE visibility = true`)
                     .then(res => {
                         if (res.rows.length == 0) {
                             message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
@@ -350,7 +350,6 @@ client.on('messageCreate', async message => {
                             return false
                         }
                         active_orders = res.rows
-                        db.query(`DELETE * FROM messages_ids`)
                         return true
                     })
                     .catch(err => {
@@ -373,32 +372,61 @@ client.on('messageCreate', async message => {
                     })
                     if (!status)
                         return Promise.resolve()
-                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} orders from all servers. Please wait...`).then(msg =>{
+                    purgeMessage = await message.channel.send(`Purging ${active_orders.length*tradingBotChannels.length} orders from all servers. Please wait...`).then(msg =>{
                         return msg
                     }).catch(err => console.log(err))
-                    
-                    for (var i=0;i<active_orders.length;i++) {
-                        var item_id = active_orders[i].item_id
-                        var c = client.channels.cache.get(active_orders[i].channel_id)
-                        var msg = c.messages.cache.get(active_orders[i].message_id)
-                        if (!msg) {
-                            var status = await c.messages.fetch(active_orders[i].message_id).then(mNew => {
-                                msg = mNew
-                                return true
+                    for (var k=0;k<active_orders.length;k++) {
+                        var item_id = active_orders[k].item_id
+                        for (var i=0;i<tradingBotChannels.length;i++) {
+                            var multiCid = tradingBotChannels[i]
+                            var msg = []
+                            var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
+                            .then(async res => {
+                                if (res.rows.length == 0) {  //no message for this item 
+                                    return true
+                                }
+                                else if (res.rows.length > 1)
+                                    console.log(`Detected more than one messages for item ${item_name} in channel ${multiCid}`)
+                                else {
+                                    var c = client.channels.cache.get(multiCid)
+                                    var m = c.messages.cache.get(res.rows[0].message_id)
+                                    if (!m) {
+                                        var status = await c.messages.fetch(res.rows[0].message_id).then(mNew => {
+                                            msg = mNew
+                                            return true
+                                        })
+                                        .catch(err => {
+                                            console.log(err)
+                                            return false
+                                        })
+                                        if (!status)
+                                            return false
+                                    }
+                                    else {
+                                        msg = m
+                                    }
+                                    return true
+                                }
                             })
-                            .catch(err => {     //maybe message does not exist in discord anymore, so continue
+                            .catch(err => {
                                 console.log(err)
                                 return false
                             })
                             if (!status)
                                 continue
+                            if (msg.length==0)
+                                continue
+                            func(msg,multiCid,item_id)
                         }
-                        msg.delete().catch(err => console.log(err))
                     }
                     message.delete().catch(err => console.log(err))
                     purgeMessage.delete().catch(err => console.log(err))
                     return Promise.resolve()
                     async function func(msg,multiCid,item_id) {
+                        msg.delete().then(async res => {
+                            db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
+                            .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
+                        }).catch(err => console.log(err))
                     }
                 }
                 else {
@@ -4261,11 +4289,9 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                         msg = mNew
                         return true
                     })
-                    .catch(async err => {     //maybe message does not exist in discord anymore
-                        await db.query(`DELETE FROM messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
-                        msg = null
+                    .catch(err => {
                         console.log(err)
-                        return true
+                        return false
                     })
                     if (!status)
                         return false
