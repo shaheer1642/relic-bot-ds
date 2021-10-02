@@ -341,35 +341,90 @@ client.on('messageCreate', async message => {
             }
             else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
                 if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
-                    var status = await db.query(`UPDATE users_orders set visibility=false`)
+                    var active_orders = []
+                    var status =  await db.query(`SELECT * FROM users_orders WHERE visibility = true`)
+                    .then(res => {
+                        if (res.rows.length == 0) {
+                            message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                            return false
+                        }
+                        active_orders = res.rows
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                        return false
+                    })
+                    if (!status)
+                        return Promise.resolve()
+                    var status = await db.query(`UPDATE users_orders set visibility=false WHERE visibility = true`)
                     .then(res => {
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        return false
-                    })
-                    if (!status) {
-                        console.log(err)
                         message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
                         setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                        return false
+                    })
+                    if (!status)
                         return Promise.resolve()
-                    }
-                    for (var i=0;i<tradingBotChannels.length;i++) {
-                        var func = await client.channels.cache.get(tradingBotChannels[i]).messages.fetch().then(allMsgs => {
-                            allMsgs.forEach(msg => {
-                                if (msg.id == '893138411861446676' || msg.id == '893138412301860865' || msg.id == '893138411995689080' )    //ignore first tutorial messages
-                                    return
-                                msg.delete().catch(err => console.log(err))
+                    purgeMessage = await message.channel.send(`Purging ${active_orders.length*tradingBotChannels.length} messages. Please wait...`).then(msg =>{
+                        return msg
+                    }).catch(err => console.log(err))
+                    for (var k=0;k<active_orders.length;k++) {
+                        var item_id = active_orders[k].item_id
+                        for (var i=0;i<tradingBotChannels.length;i++) {
+                            var multiCid = tradingBotChannels[i]
+                            var msg = []
+                            var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
+                            .then(async res => {
+                                if (res.rows.length == 0) {  //no message for this item 
+                                    msg = null
+                                    return true
+                                }
+                                else if (res.rows.length > 1)
+                                    console.log(`Detected more than one messages for item ${item_name} in channel ${multiCid}`)
+                                else {
+                                    //var c = client.channels.cache.get(multiCid)
+                                    msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
+                                    /*
+                                    if (!m) {
+                                        var status = await c.messages.fetch(res.rows[0].message_id).then(mNew => {
+                                            msg = mNew
+                                            return true
+                                        })
+                                        .catch(err => {
+                                            console.log(err)
+                                            return false
+                                        })
+                                        if (!status)
+                                            return false
+                                    }
+                                    else {
+                                        msg = m
+                                    }
+                                    */
+                                    return true
+                                }
                             })
-                        }).catch(err => {
-                            console.log(err)
-                            message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                            setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-                            return Promise.resolve()
-                        })
+                            .catch(err => {
+                                console.log(err)
+                                return false
+                            })
+                            if (!status)
+                                continue
+                            msg.delete().then(async res => {
+                                db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${res.id}`)
+                                .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
+                            }).catch(err => console.log(err))
+                        }
                     }
                     message.delete().catch(err => console.log(err))
+                    purgeMessage.delete().catch(err => console.log(err))
                     return Promise.resolve()
                 }
                 else {
