@@ -4696,11 +4696,7 @@ async function trading_bot_item_orders(message,args) {
     JOIN users_list ON users.list.discord_id = users_orders.discord_id 
     JOIN items_list ON users_orders.item_id = items_list.id 
     WHERE item_id = '${item_id}' AND order_type = '${order_type}'
-    ORDER BY 
-    case when users_orders.order_type = '${order_type}'
-    then users_orders.user_price DESC
-    else users_orders.user_price ASC 
-    end`)
+    `)
     .then(res => {
         if (res.rows.length == 0) {
             message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
@@ -4718,6 +4714,10 @@ async function trading_bot_item_orders(message,args) {
     })
     if (!status)
         return Promise.reject()
+    if (order_type == 'wts')
+        all_orders = all_orders.sort(dynamicSort("user_price"))
+    if (order_type == 'wts')
+        all_orders = all_orders.sort(dynamicSortDesc("user_price"))
     var postdata = {}
     postdata.content = " "
     postdata.embeds = []
