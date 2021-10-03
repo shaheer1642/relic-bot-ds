@@ -827,7 +827,7 @@ client.on('messageDelete', async message => {
                 return Promise.resolve()
             var item_url = ""
             var item_name = ""
-            var status = await db.query(`SELECT * FROM items_list WHERE id = ${item_id}`)
+            var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
             .then(res => {
                 if (res.rows.length==0) {
                     console.log(`no item info found in db`)
