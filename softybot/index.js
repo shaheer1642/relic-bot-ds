@@ -4694,7 +4694,7 @@ async function trading_bot_item_orders(message,args) {
     SELECT * FROM users_orders 
     JOIN items_list ON users_orders.item_id=items_list.id 
     JOIN users_list ON users_orders.discord_id=users_list.discord_id 
-    WHERE users_orders.item_id = '${item_id}'
+    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
     `)
     .then(res => {
         if (res.rows.length == 0) {
@@ -4733,7 +4733,7 @@ async function trading_bot_item_orders(message,args) {
             }
             text += all_orders[i].ingame_name
             vis_traders_names.push(text)
-            vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>\n')
+            vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
             noOfTraders++
         }
         else {
@@ -4743,7 +4743,7 @@ async function trading_bot_item_orders(message,args) {
             }
             text += all_orders[i].ingame_name
             invis_traders_names.push(text)
-            invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>\n')
+            invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
         }
     }
     if (vis_traders_names.length != 0) {
