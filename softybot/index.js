@@ -3109,7 +3109,6 @@ async function getDB(message,args) {
         SELECT * FROM users_orders 
         JOIN items_list ON users_orders.item_id=items_list.id 
         JOIN users_list ON users_orders.discord_id=users_list.discord_id 
-        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
         ORDER BY users_orders.visibility DESC
         `)
         .then(res => {
