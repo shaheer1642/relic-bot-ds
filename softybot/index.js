@@ -4775,7 +4775,7 @@ async function trading_bot_item_orders(message,args) {
                 },
                 {
                     name: `Price`,
-                    value: vis_traders_prices.toString().replace(/,/g,'\n'),
+                    value: invis_traders_prices.toString().replace(/,/g,'\n'),
                     inline: true
                 }
             ],
