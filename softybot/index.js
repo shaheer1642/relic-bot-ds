@@ -4786,9 +4786,17 @@ async function trading_bot_item_orders(message,args) {
         message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
         return Promise.reject()
     }
+    var icon_url = ""
+    if (!item_url.match(/_set$/)) {
+        var temp = item_url.split("_")
+        icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+    }
+    else {
+        icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+    }
     postdata.embeds[0].title = item_name
     postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    postdata.embeds[0].thumbnail = {url: all_orders[0].icon_url}
+    postdata.embeds[0].thumbnail = {url: icon_url}
     console.log(JSON.stringify(postdata))
     message.channel.send(postdata)
     .then(msg => {
