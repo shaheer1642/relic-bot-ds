@@ -435,17 +435,28 @@ client.on('messageCreate', async message => {
             if (args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) {
                 var ingame_name = ""
                 var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                var status_message = ""
                 .then(res => {
+                    if (res.rows.length==0) {
+                        status_message = `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`
+                        message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                        .catch(err => {
+                            console.log(err)
+                            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).catch(err => console.log(err))
+                        })
+                        return false
+                    }
                     ingame_name = res.rows[0].ingame_name
                     return true
                 })
                 .catch(err => {
                     console.log(err)
+                    status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`
                     return false
                 })
                 if (!status) {
-                    message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
-                    continue
+                    message.channel.send(status_message).catch(err => console.log(err))
+                    return Promise.resolve()
                 }
                 trading_bot_user_orders(message,args,ingame_name,1).catch(err => console.log(err))
             }
