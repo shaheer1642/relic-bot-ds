@@ -4699,6 +4699,7 @@ async function trading_bot_item_orders(message,args) {
     JOIN items_list ON users_orders.item_id=items_list.id 
     JOIN users_list ON users_orders.discord_id=users_list.discord_id 
     WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
+    ORDER BY users_orders.visibility
     `)
     .then(res => {
         if (res.rows.length == 0) {
@@ -4718,7 +4719,6 @@ async function trading_bot_item_orders(message,args) {
     if (!status)
         return Promise.reject()
     var color = ""
-    all_orders = all_orders.sort(dynamicSort("visibility"))
     if (order_type == 'wts') {
         all_orders = all_orders.sort(dynamicSort("user_price"))
         color = tb_sellColor
