@@ -4789,7 +4789,7 @@ async function trading_bot_item_orders(message,args) {
     postdata.embeds[0].title = item_name
     postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
     postdata.embeds[0].thumbnail = {url: all_orders[0].icon_url}
-    console.log(postdata)
+    console.log(JSON.stringify(postdata))
     message.channel.send(postdata)
     .then(msg => {
         for (var j=0;j<noOfTraders;j++) {
