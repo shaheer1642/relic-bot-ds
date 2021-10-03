@@ -185,7 +185,7 @@ client.on('messageCreate', async message => {
                     return
                 }
                 */
-                if (!args[1]) {
+                if (!args[0]) {
                     message.channel.send('⚠️ Please provide an item name ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
                     continue
