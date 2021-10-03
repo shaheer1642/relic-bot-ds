@@ -4695,7 +4695,7 @@ async function trading_bot_item_orders(message,args) {
     SELECT * FROM users_orders 
     JOIN users_list ON users.list.discord_id = users_orders.discord_id 
     JOIN items_list ON users_orders.item_id = items_list.id 
-    WHERE item_id = '${item_id} AND order_type = '${order_type}'
+    WHERE item_id = '${item_id}' AND order_type = '${order_type}'
     IF ()
     ORDER BY 
     case when ${order_type} = 'wts'
