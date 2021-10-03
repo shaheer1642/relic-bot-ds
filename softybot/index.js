@@ -787,6 +787,12 @@ client.on('shardError', error => {
     });
 });
 
+client.on('messageDelete', message => {
+    console.log(message)
+    console.log(message.author.username)
+    return Promise.resolve()
+})
+
 client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
