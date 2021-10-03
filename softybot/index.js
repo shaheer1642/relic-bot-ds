@@ -806,7 +806,7 @@ client.on('messageDelete', async message => {
                 else {
                     item_id = res.rows[0].item_id
                     channel_id = res.rows[0].channel_id
-                    await db.query(`DELETE FROM messages_ids WHERE message_id = ${message.id}`)
+                    var status = await db.query(`DELETE FROM messages_ids WHERE message_id = ${message.id}`)
                     .then(res => {
                         return true
                     })
@@ -814,6 +814,9 @@ client.on('messageDelete', async message => {
                         console.log(`error deleting message id from db`)
                         return false
                     })
+                    if (!status)
+                        return false
+                    return true
                 }
             })
             .catch(err => {
