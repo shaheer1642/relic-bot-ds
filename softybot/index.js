@@ -3125,9 +3125,6 @@ async function getDB(message,args) {
             message.channel.send(`Some error occured compiling 'users_orders'. Please contact MrSofty#7926`)
             return
         }
-        var items_list = []
-        var users_list = []
-        var users_orders = []
         var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
         var buffer_users_list = Buffer.from(JSON.stringify(users_list), 'utf8');
         var buffer_users_orders = Buffer.from(JSON.stringify(users_orders), 'utf8');
