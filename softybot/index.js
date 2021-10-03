@@ -4697,7 +4697,7 @@ async function trading_bot_item_orders(message,args) {
     JOIN items_list ON users_orders.item_id = items_list.id 
     WHERE item_id = '${item_id}' AND order_type = '${order_type}'
     ORDER BY 
-    case when ${order_type} = 'wts'
+    case when users_orders.order_type = '${order_type}'
     then users_orders.user_price DESC
     else users_orders.user_price ASC 
     end`)
@@ -4713,7 +4713,7 @@ async function trading_bot_item_orders(message,args) {
     })
     .catch(err => {
         console.log(err)
-        message.channel.send(`☠️ Error retrieving order info in db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
+        message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
         return false
     })
     if (!status)
