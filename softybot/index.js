@@ -4440,9 +4440,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         if (msg) {
             if (embeds.length==0) {
                 var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
-                .then(res => {
-                    await msg.delete().catch(err => console.log(err))
-                })
+                .then(res => msg.delete().catch(err => console.log(err)))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
             }
             else {
