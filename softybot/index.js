@@ -185,6 +185,11 @@ client.on('messageCreate', async message => {
                     return
                 }
                 */
+                if (!args[1]) {
+                    message.channel.send('⚠️ Please provide an item name ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                    continue
+                }
                 var func = await trading_bot(message,args,command).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
                 console.log(`commandsArrIndex = ${commandsArrIndex}`)
                 if (commandsArrIndex == (commandsArr.length-1)) {
@@ -211,7 +216,7 @@ client.on('messageCreate', async message => {
                     return false
                 })
                 if (!status) {
-                    message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return Promise.resolve()
                 }
@@ -409,19 +414,19 @@ client.on('messageCreate', async message => {
                 }
             }
             else {
-                message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete(), 5000))
+                message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
             if (!message.member.presence) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                 return Promise.resolve()
             }
             if (message.member.presence.status == `offline`) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                 return Promise.resolve()
             }
