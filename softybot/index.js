@@ -4738,7 +4738,7 @@ async function trading_bot_item_orders(message,args) {
         if (all_orders[i].visibility) {
             var text = ""
             if (tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
-                text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
+                text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i] + ' '
             }
             text += all_orders[i].ingame_name
             vis_traders_names.push(text)
