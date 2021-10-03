@@ -4631,7 +4631,7 @@ async function trading_bot_item_orders(message,args) {
         message.channel.send(status_message).catch(err => console.log(err))
         return Promise.resolve()
     }
-    var order_type = args.pop().replace('wts','sell').replace('wtb','buy')
+    var order_type = args.shift().replace('wts','sell').replace('wtb','buy')
     console.log(args)
     var d_item_url = ""
     args.forEach(element => {
@@ -4678,12 +4678,12 @@ async function trading_bot_item_orders(message,args) {
         }
     }
     if (arrItemsUrl.length > 1) {
-        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        message.channel.send(`❕ More than one search results detected for the item **${d_item_url}**, cannot process this request. Please provide a valid item name ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.resolve()
     }
     if (arrItemsUrl.length==0) {
-        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").catch(err => console.log(err));
+        message.channel.send(`❕ Item **${d_item_url}** either does not exist or is not a prime item. ❕`).catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
