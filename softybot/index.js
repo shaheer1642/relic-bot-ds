@@ -4632,6 +4632,7 @@ async function trading_bot_item_orders(message,args) {
         return Promise.resolve()
     }
     var order_type = args.pop().replace('wts','sell').replace('wtb','buy')
+    console.log(args)
     var d_item_url = ""
     args.forEach(element => {
         d_item_url = d_item_url + element + "_"
@@ -4682,7 +4683,7 @@ async function trading_bot_item_orders(message,args) {
         return Promise.resolve()
     }
     if (arrItemsUrl.length==0) {
-        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
