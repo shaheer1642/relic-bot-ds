@@ -198,7 +198,7 @@ client.on('messageCreate', async message => {
                 var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${message.author.id}`)
                 .then(res => {
                     if (res.rows.length==0) {
-                        status_msg = `<@${message.author.id}> No orders found on your profile.`
+                        status_msg = `❕ <@${message.author.id}> No orders found on your profile. ❕`
                         return false
                     }
                     items_ids = res.rows
@@ -438,7 +438,7 @@ client.on('messageCreate', async message => {
                 var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
                     if (res.rows.length==0) {
-                        status_message = `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`
+                        status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
                         message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
                         .catch(err => {
                             console.log(err)
@@ -3960,7 +3960,7 @@ async function trading_bot(message,args,command) {
         return false
     })
     if (!status) {
-        message.channel.send({content: `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
+        message.channel.send({content: `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`}).then(msg => setTimeout(() => msg.delete(), 5000))
         try {
             message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
         } catch (err) {
@@ -4574,7 +4574,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
     .then(res => {
         if (res.rows.length == 0) {
-            status_msg = `<@${message.author.id}> The given user is not registered with the bot.`
+            status_msg = `⚠️ <@${message.author.id}> The given user is not registered with the bot. ⚠️`
             return false
         }
         else if (res.rows.length > 1) {
@@ -4602,9 +4602,9 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     .then(res => {
         if (res.rows.length == 0) {
             if (request_type == 1)
-                message.channel.send(`<@${message.author.id}> No orders found on your profile`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                message.channel.send(`❕ <@${message.author.id}> No orders found on your profile ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
             else if (request_type == 2)
-                message.channel.send(`<@${message.author.id}> No orders found for user ${ingame_name}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                message.channel.send(`❕ <@${message.author.id}> No orders found for user ${ingame_name} ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
             setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
             return false
         }
