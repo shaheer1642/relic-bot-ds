@@ -4632,6 +4632,10 @@ async function trading_bot_item_orders(message,args) {
         return Promise.resolve()
     }
     var order_type = args.shift()
+    if (order_type == 'wts')
+        order_type = 'wtb'
+    else
+        order_type = 'wts'
     var d_item_url = ""
     args.forEach(element => {
         d_item_url = d_item_url + element + "_"
@@ -4713,10 +4717,15 @@ async function trading_bot_item_orders(message,args) {
     })
     if (!status)
         return Promise.reject()
-    if (order_type == 'wts')
+    var color = ""
+    if (order_type == 'wts') {
         all_orders = all_orders.sort(dynamicSort("user_price"))
-    if (order_type == 'wts')
+        color = tb_sellColor
+    }
+    if (order_type == 'wtb') {
         all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+        color = tb_buyColor
+    }
     var postdata = {}
     postdata.content = " "
     postdata.embeds = []
@@ -4760,7 +4769,7 @@ async function trading_bot_item_orders(message,args) {
                     inline: true
                 }
             ],
-            color: (`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`)
+            color: color
         })
     }
     if (invis_traders_names.length != 0) {
