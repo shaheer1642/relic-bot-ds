@@ -854,8 +854,6 @@ client.on('messageDelete', async message => {
             await trading_bot_orders_update(null,item_id,item_url,item_name,1).catch(err => console.log(err))
         }
     }
-    console.log(message)
-    console.log(message.author.username)
     return Promise.resolve()
 })
 
