@@ -847,6 +847,8 @@ client.on('messageDelete', async message => {
                 console.log(err)
                 return false
             })
+            if (!status)
+                return Promise.resolve()
             await trading_bot_orders_update(null,item_id,item_url,item_name,1).catch(err => console.log(err))
         }
     }
