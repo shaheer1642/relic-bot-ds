@@ -790,14 +790,19 @@ client.on('shardError', error => {
 client.on('messageDelete', async message => {
     if (message.author.id == client.user.id) {
         if (tradingBotChannels.includes(message.channelId)) {
+            console.log(`an order message was deleted from the bot`)
             var item_id = ""
             var channel_id = ""
             var status = await db.query(`SELECT * FROM messages_ids WHERE message_id = ${message.id}`)
             .then(async res => {
-                if (res.rows.length==0)
+                if (res.rows.length==0) {
+                    console.log(`no message id found in db`)
                     return false
-                else if (res.rows.length>1)
+                }
+                else if (res.rows.length>1) {
+                    console.log(`more than one message id found in db`)
                     return false
+                }
                 else {
                     item_id = res.rows[0].item_id
                     channel_id = res.rows[0].channel_id
@@ -806,6 +811,7 @@ client.on('messageDelete', async message => {
                         return true
                     })
                     .catch(err => {
+                        console.log(`error deleting message id from db`)
                         return false
                     })
                 }
@@ -820,10 +826,14 @@ client.on('messageDelete', async message => {
             var item_name = ""
             var status = await db.query(`SELECT * FROM items_list WHERE id = ${item_id}`)
             .then(res => {
-                if (res.rows.length==0)
+                if (res.rows.length==0) {
+                    console.log(`no item info found in db`)
                     return false
-                else if (res.rows.length>1)
+                }
+                else if (res.rows.length>1) {
+                    console.log(`more than one item info found in db`)
                     return false
+                }
                 else {
                     item_url = res.rows[0].item_url
                     item_name = res.rows[0].item_name
