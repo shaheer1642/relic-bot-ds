@@ -4792,7 +4792,7 @@ async function trading_bot_item_orders(message,args) {
         icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
     }
     else {
-        icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
+        icon_url = `https://warframe.market/static/assets/${all_orders[0].icon_url}`
     }
     postdata.embeds[0].title = item_name
     postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
