@@ -839,7 +839,7 @@ client.on('messageDelete', async message => {
                 }
                 else {
                     item_url = res.rows[0].item_url
-                    item_name = res.rows[0].item_name
+                    item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                     return true
                 }
             })
