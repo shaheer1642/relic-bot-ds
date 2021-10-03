@@ -4097,7 +4097,7 @@ async function trading_bot(message,args,command) {
             return false
         }
         else {     //----update existing order in DB----
-            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}' WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
             .then(res => {
                 return true
             })
