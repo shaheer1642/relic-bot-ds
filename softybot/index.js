@@ -4730,8 +4730,8 @@ async function trading_bot_item_orders(message,args) {
     for (var i=0;i<all_orders.length;i++) {
         if (all_orders[i].visibility) {
             var text = ""
-            if (trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
-                text += trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
+            if (tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
+                text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
             }
             text += all_orders[i].ingame_name
             vis_traders_names.push(text)
@@ -4740,8 +4740,8 @@ async function trading_bot_item_orders(message,args) {
         }
         else {
             var text = ""
-            if (trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
-                text += trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
+            if (tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
+                text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
             }
             text += all_orders[i].ingame_name
             invis_traders_names.push(text)
@@ -4792,7 +4792,7 @@ async function trading_bot_item_orders(message,args) {
     message.channel.send(postdata)
     .then(msg => {
         for (var j=0;j<noOfTraders;j++) {
-            msg.react(trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+            msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
         }
     })
     .catch(err => {
