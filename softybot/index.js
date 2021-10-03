@@ -788,6 +788,8 @@ client.on('shardError', error => {
 });
 
 client.on('messageDelete', async message => {
+    if (!message.author)
+        return Promise.resolve()
     if (message.author.id == client.user.id) {
         if (tradingBotChannels.includes(message.channelId)) {
             console.log(`an order message was deleted from the bot`)
