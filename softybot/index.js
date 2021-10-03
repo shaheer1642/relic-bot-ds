@@ -4741,8 +4741,8 @@ async function trading_bot_item_orders(message,args) {
                 text += trading_bot_reactions[i]
             }
             text += all_orders[i].ingame_name
-            invis_traders_names.push(all_orders.ingame_name)
-            invis_traders_prices.push(all_orders.user_price)
+            invis_traders_names.push(all_orders[i].ingame_name)
+            invis_traders_prices.push(all_orders[i].user_price)
         }
     }
     postdata.embeds[0].title = `Online ${order_type.replace('wts','Sellers').replace('wtb','Buyers')}`
