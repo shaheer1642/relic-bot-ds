@@ -4073,7 +4073,7 @@ async function trading_bot(message,args,command) {
         return Promise.reject()
     }
     //----verify order in DB----
-    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
             var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true)`)
