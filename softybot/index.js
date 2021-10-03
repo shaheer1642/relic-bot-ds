@@ -4631,7 +4631,7 @@ async function trading_bot_item_orders(message,args) {
         message.channel.send(status_message).catch(err => console.log(err))
         return Promise.resolve()
     }
-    var order_type = args.shift().replace('wts','sell').replace('wtb','buy')
+    var order_type = args.shift()
     var d_item_url = ""
     args.forEach(element => {
         d_item_url = d_item_url + element + "_"
