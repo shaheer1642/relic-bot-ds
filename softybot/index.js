@@ -4760,7 +4760,7 @@ async function trading_bot_item_orders(message,args) {
                     inline: true
                 }
             ],
-            color: [`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`]
+            color: (`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`)
         })
     }
     if (invis_traders_names.length != 0) {
