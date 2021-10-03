@@ -442,7 +442,7 @@ client.on('messageCreate', async message => {
                         message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
                         .catch(err => {
                             console.log(err)
-                            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).catch(err => console.log(err))
+                            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
                         })
                         return false
                     }
@@ -467,6 +467,33 @@ client.on('messageCreate', async message => {
             else if (args[0] == "orders" || args[0] == "order" || args[0] == "profile" ) {
                 var ingame_name = args[1]
                 trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
+            }
+            else if (args[0] == "wts" || args[0] == "wtb") {
+                var item_url = args[1]
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                .then(res => {
+                    if (res.rows.length==0) {
+                        status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
+                        message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                        .catch(err => {
+                            console.log(err)
+                            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
+                        })
+                        return false
+                    }
+                    ingame_name = res.rows[0].ingame_name
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`
+                    return false
+                })
+                if (!status) {
+                    message.channel.send(status_message).catch(err => console.log(err))
+                    return Promise.resolve()
+                }
+                //trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
             continue
         }
@@ -2619,7 +2646,7 @@ async function list(message,args) {
             try {
                 message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
             } catch (err) {
-                message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
+                message.channel.send({content: "🛑 Error occured sending DM. Make sure you have DMs turned on for the bot 🛑"}).catch(err => console.log(err));
             }
             return 0
         }
@@ -2854,7 +2881,7 @@ async function relist(message,args) {
             try {
                 message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
             } catch (err) {
-                message.channel.send({content: "Error occured sending DM. Make sure you have DMs turned on for the bot"}).catch(err => console.log(err));
+                message.channel.send({content: "🛑 Error occured sending DM. Make sure you have DMs turned on for the bot 🛑"}).catch(err => console.log(err));
             }
             return 0
         }
@@ -3964,7 +3991,7 @@ async function trading_bot(message,args,command) {
         try {
             message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
         } catch (err) {
-            message.channel.send({content: `<@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         }
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
