@@ -4693,11 +4693,12 @@ async function trading_bot_item_orders(message,args) {
     var all_orders = []
     var status = await db.query(`
     SELECT * FROM users_orders 
-    JOIN users_list ON users.list.discord_id = users_orders.discord_id 
-    JOIN items_list ON users_orders.item_id = items_list.id 
-    WHERE users_orders.item_ids = '${item_id}' AND users_orders.order_type = '${order_type}'
+    JOIN users_list ON users_list.discord_id = users_orders.discord_id 
+    JOIN items_list ON items_list.id = users_orders.item_id 
+    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
     `)
     .then(res => {
+        console.log(res)
         if (res.rows.length == 0) {
             message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
             return false
