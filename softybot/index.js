@@ -4439,20 +4439,15 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 
         if (msg) {
             if (embeds.length==0) {
-                await msg.delete().then(async res => {
-                    var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
-                    .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
-                }).catch(err => console.log(err))
+                var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
+                .then(res => {
+                    await msg.delete().catch(err => console.log(err))
+                })
+                .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
             }
             else {
                 msg.edit({content: ' ',embeds: embeds})
                 .then(async msg => {
-                    /*
-                    if (originMessage) {
-                        if (targetChannel.id == originMessage.channel.id)
-                            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
-                    }
-                    */
                     await msg.reactions.removeAll().catch(err => console.log(err))
                     for (var i=0;i<noOfSellers;i++) {
                         msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
@@ -4460,28 +4455,6 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     for (var i=0;i<noOfBuyers;i++) {
                         msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
                     }
-                    /*
-                    if (noOfSellers>0)
-                        msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
-                        if (noOfSellers>1)
-                            msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
-                            if (noOfSellers>2)
-                                msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
-                                if (noOfSellers>3)
-                                    msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
-                                    if (noOfSellers>4)
-                                        msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
-                    if (noOfBuyers>0)
-                        msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
-                        if (noOfBuyers>1)
-                            msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
-                            if (noOfBuyers>2)
-                                msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
-                                if (noOfBuyers>3)
-                                    msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
-                                    if (noOfBuyers>4)
-                                        msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
-                    */
                 })
                 .catch(err => {
                     if (originMessage) {
@@ -4544,12 +4517,6 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     if (!status)
                         return Promise.reject()
                 }
-                /*
-                if (originMessage) {
-                    if (targetChannel.id == originMessage.channel.id)
-                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 5000)
-                }
-                */
                 await msg.reactions.removeAll().catch(err => console.log(err))
                 for (var i=0;i<noOfSellers;i++) {
                     msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
@@ -4557,28 +4524,6 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 for (var i=0;i<noOfBuyers;i++) {
                     msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
                 }
-                /*
-                if (noOfSellers>0)
-                    msg.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
-                    if (noOfSellers>1)
-                        msg.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
-                        if (noOfSellers>2)
-                            msg.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
-                            if (noOfSellers>3)
-                                msg.react(tradingBotReactions.sell[3]).catch(err => console.log(err))
-                                if (noOfSellers>4)
-                                    msg.react(tradingBotReactions.sell[4]).catch(err => console.log(err))
-                if (noOfBuyers>0)
-                    msg.react(tradingBotReactions.buy[0]).catch(err => console.log(err))
-                    if (noOfBuyers>1)
-                        msg.react(tradingBotReactions.buy[1]).catch(err => console.log(err))
-                        if (noOfBuyers>2)
-                            msg.react(tradingBotReactions.buy[2]).catch(err => console.log(err))
-                            if (noOfBuyers>3)
-                                msg.react(tradingBotReactions.buy[3]).catch(err => console.log(err))
-                                if (noOfBuyers>4)
-                                    msg.react(tradingBotReactions.buy[4]).catch(err => console.log(err))
-                */
             })
             .catch(err => {
                 if (originMessage) {
