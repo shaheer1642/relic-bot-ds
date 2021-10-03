@@ -4632,7 +4632,6 @@ async function trading_bot_item_orders(message,args) {
         return Promise.resolve()
     }
     var order_type = args.shift().replace('wts','sell').replace('wtb','buy')
-    console.log(args)
     var d_item_url = ""
     args.forEach(element => {
         d_item_url = d_item_url + element + "_"
@@ -4698,7 +4697,6 @@ async function trading_bot_item_orders(message,args) {
     WHERE users_orders.item_id = '${item_id}'
     `)
     .then(res => {
-        console.log(res)
         if (res.rows.length == 0) {
             message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
             return false
