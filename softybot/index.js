@@ -21,6 +21,7 @@ const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"], remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"]}
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
+const tb_invisColor = '#71368A'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
@@ -4630,7 +4631,8 @@ async function trading_bot_item_orders(message,args) {
         message.channel.send(status_message).catch(err => console.log(err))
         return Promise.resolve()
     }
-    var order_type = args.pop().replace('wts','sell').replace('wtb','buy')
+    var order_type = args.shift().replace('wts','sell').replace('wtb','buy')
+    console.log(args)
     var d_item_url = ""
     args.forEach(element => {
         d_item_url = d_item_url + element + "_"
@@ -4651,7 +4653,7 @@ async function trading_bot_item_orders(message,args) {
             console.log(err.response.data)
         console.log(err)
         console.log('Retrieving Database -> items_list error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        message.channel.send({content: "☠️ Error retrieving item info from db. Please contact MrSofty#7926\nError code: 500 ☠️"})
         return false
     })
     if (!status)      
@@ -4676,12 +4678,12 @@ async function trading_bot_item_orders(message,args) {
         }
     }
     if (arrItemsUrl.length > 1) {
-        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        message.channel.send(`❕ More than one search results detected for the item **${d_item_url}**, cannot process this request. Please provide a valid item name ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.resolve()
     }
     if (arrItemsUrl.length==0) {
-        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        message.channel.send(`❕ Item **${d_item_url}** either does not exist or is not a prime item. ❕`).catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
@@ -4691,15 +4693,10 @@ async function trading_bot_item_orders(message,args) {
     var all_orders = []
     var status = await db.query(`
     SELECT * FROM users_orders 
-    JOIN users_list ON users.list.discord_id = users_orders.discord_id 
+    JOIN users_list ON users_list.discord_id = users_orders.discord_id 
     JOIN items_list ON users_orders.item_id = items_list.id 
-    WHERE item_id = '${item_id} AND order_type = '${order_type}'
-    IF ()
-    ORDER BY 
-    case when ${order_type} = 'wts'
-    then users_orders.user_price DESC
-    else users_orders.user_price ASC 
-    end`)
+    WHERE users_orders.item_ids = '${item_id}' AND users_orders.order_type = '${order_type}'
+    `)
     .then(res => {
         if (res.rows.length == 0) {
             message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
@@ -4712,46 +4709,96 @@ async function trading_bot_item_orders(message,args) {
     })
     .catch(err => {
         console.log(err)
-        message.channel.send(`☠️ Error retrieving order info in db. Please contact MrSofty#7926\nError code: 500 ☠️`).catch(err => console.log(err))
+        message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
         return false
     })
     if (!status)
         return Promise.reject()
+    if (order_type == 'wts')
+        all_orders = all_orders.sort(dynamicSort("user_price"))
+    if (order_type == 'wts')
+        all_orders = all_orders.sort(dynamicSortDesc("user_price"))
     var postdata = {}
     postdata.content = " "
     postdata.embeds = []
-    postdata.embeds.push({},{})
     var vis_traders_names = []
     var vis_traders_prices = []
     var invis_traders_names = []
     var invis_traders_prices = []
+    var noOfTraders = 0
     for (var i=0;i<all_orders.length;i++) {
-        if (all_orders.visibility) {
+        if (all_orders[i].visibility) {
             var text = ""
-            if (trading_bot_reactions[i]) {
-                text += trading_bot_reactions[i]
+            if (trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
+                text += trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
             }
             text += all_orders[i].ingame_name
             vis_traders_names.push(text)
-            vis_traders_prices.push(text)
+            vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>\n')
+            noOfTraders++
         }
         else {
             var text = ""
-            if (trading_bot_reactions[i]) {
-                text += trading_bot_reactions[i]
+            if (trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
+                text += trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
             }
             text += all_orders[i].ingame_name
-            invis_traders_names.push(all_orders[i].ingame_name)
-            invis_traders_prices.push(all_orders[i].user_price)
+            invis_traders_names.push(text)
+            invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>\n')
         }
     }
-    postdata.embeds[0].title = `Online ${order_type.replace('wts','Sellers').replace('wtb','Buyers')}`
-    postdata.embeds[0].push({fields: [
-        {
-            name: `${order_type.replace('wts','Seller').replace('wtb','Buyer')}`,
-            value: `${vis_traders_names}`
+    if (vis_traders_names.length != 0) {
+        postdata.embeds.push({
+            fields: [
+                {
+                    name: `Online ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
+                    value: vis_traders_names.toString().replace(/,/g,'\n'),
+                    inline: true
+                },
+                {
+                    name: `Price`,
+                    value: vis_traders_prices.toString().replace(/,/g,'\n'),
+                    inline: true
+                }
+            ],
+            color: [`tb_${order_type.replace('wts','sell').replace('wtb','buy')}Color`]
+        })
+    }
+    if (invis_traders_names.length != 0) {
+        postdata.embeds.push({
+            fields: [
+                {
+                    name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
+                    value: invis_traders_names.toString().replace(/,/g,'\n'),
+                    inline: true
+                },
+                {
+                    name: `Price`,
+                    value: vis_traders_prices.toString().replace(/,/g,'\n'),
+                    inline: true
+                }
+            ],
+            color: tb_invisColor
+        })
+    }
+    if (postdata.embeds.length == 0) {
+        message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
+        return Promise.reject()
+    }
+    postdata.embeds[0].title = item_name
+    postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    postdata.embeds[0].thumbnail = {url: all_orders[0].icon_url}
+    message.channel.send(postdata)
+    .then(msg => {
+        for (var j=0;j<noOfTraders;j++) {
+            msg.react(trading_bot_reactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
         }
-    ]})
+    })
+    .catch(err => {
+        console.log(err)
+        message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
+    })
+    return Promise.resolve()
 }
 
 async function trading_bot_registeration(message,ingame_name) {
