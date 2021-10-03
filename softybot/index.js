@@ -434,8 +434,8 @@ client.on('messageCreate', async message => {
             const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
             if (args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) {
                 var ingame_name = ""
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
                 var status_message = ""
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
                     if (res.rows.length==0) {
                         status_message = `<@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms`
