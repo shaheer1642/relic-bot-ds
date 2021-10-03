@@ -4689,7 +4689,17 @@ async function trading_bot_item_orders(message,args) {
     const item_id = arrItemsUrl[0].item_id
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     var all_orders = []
-    var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users.list.discord_id = users_orders.discord_id JOIN items_list ON users_orders.item_id = items_list.id WHERE item_id = '${item_id} AND order_type = '${order_type}'`)
+    var status = await db.query(`
+    SELECT * FROM users_orders 
+    JOIN users_list ON users.list.discord_id = users_orders.discord_id 
+    JOIN items_list ON users_orders.item_id = items_list.id 
+    WHERE item_id = '${item_id} AND order_type = '${order_type}'
+    IF ()
+    ORDER BY 
+    case when ${order_type} = 'wts'
+    then users_orders.user_price DESC
+    else users_orders.user_price ASC 
+    end`)
     .then(res => {
         if (res.rows.length == 0) {
             message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
@@ -4709,10 +4719,39 @@ async function trading_bot_item_orders(message,args) {
         return Promise.reject()
     var postdata = {}
     postdata.content = " "
-    
+    postdata.embeds = []
+    postdata.embeds.push({},{})
+    var vis_traders_names = []
+    var vis_traders_prices = []
+    var invis_traders_names = []
+    var invis_traders_prices = []
     for (var i=0;i<all_orders.length;i++) {
-        all_orders
+        if (all_orders.visibility) {
+            var text = ""
+            if (trading_bot_reactions[i]) {
+                text += trading_bot_reactions[i]
+            }
+            text += all_orders[i].ingame_name
+            vis_traders_names.push(text)
+            vis_traders_prices.push(text)
+        }
+        else {
+            var text = ""
+            if (trading_bot_reactions[i]) {
+                text += trading_bot_reactions[i]
+            }
+            text += all_orders[i].ingame_name
+            invis_traders_names.push(all_orders.ingame_name)
+            invis_traders_prices.push(all_orders.user_price)
+        }
     }
+    postdata.embeds[0].title = `Online ${order_type.replace('wts','Sellers').replace('wtb','Buyers')}`
+    postdata.embeds[0].push({fields: [
+        {
+            name: `${order_type.replace('wts','Seller').replace('wtb','Buyer')}`,
+            value: `${vis_traders_names}`
+        }
+    ]})
 }
 
 async function trading_bot_registeration(message,ingame_name) {
