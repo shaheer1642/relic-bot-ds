@@ -4746,12 +4746,7 @@ async function trading_bot_item_orders(message,args) {
             noOfTraders++
         }
         else {
-            var text = ""
-            if (tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
-                text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]
-            }
-            text += all_orders[i].ingame_name
-            invis_traders_names.push(text)
+            invis_traders_names.push(all_orders[i].ingame_name)
             invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
         }
     }
@@ -4762,7 +4757,7 @@ async function trading_bot_item_orders(message,args) {
                     name: `Online ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
                     value: vis_traders_names.toString().replace(/,/g,'\n'),
                     inline: true
-                },
+                },{name: '\u200b',value: '\u200b', inline: true},
                 {
                     name: `Price`,
                     value: vis_traders_prices.toString().replace(/,/g,'\n'),
@@ -4779,7 +4774,7 @@ async function trading_bot_item_orders(message,args) {
                     name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
                     value: invis_traders_names.toString().replace(/,/g,'\n'),
                     inline: true
-                },
+                },{name: '\u200b',value: '\u200b', inline: true},
                 {
                     name: `Price`,
                     value: invis_traders_prices.toString().replace(/,/g,'\n'),
