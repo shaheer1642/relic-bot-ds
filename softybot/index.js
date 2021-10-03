@@ -4718,6 +4718,7 @@ async function trading_bot_item_orders(message,args) {
     if (!status)
         return Promise.reject()
     var color = ""
+    all_orders = all_orders.sort(dynamicSort("visibility"))
     if (order_type == 'wts') {
         all_orders = all_orders.sort(dynamicSort("user_price"))
         color = tb_sellColor
