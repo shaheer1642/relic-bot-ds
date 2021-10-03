@@ -206,7 +206,7 @@ client.on('messageCreate', async message => {
                 })
                 .catch(err => {
                     console.log(err)
-                    status_msg = `☠️ Error fetching your orders from db. Please contact MrSofty#7926\nError code: 500`
+                    status_msg = `☠️ Error fetching your orders from db. Please contact MrSofty#7926\nError code: 500 ☠️`
                     return false
                 })
                 if (!status) {
@@ -224,7 +224,7 @@ client.on('messageCreate', async message => {
                     return false
                 })
                 if (!status) {
-                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                     return Promise.resolve()
                 }
@@ -469,30 +469,7 @@ client.on('messageCreate', async message => {
                 trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
             else if (args[0] == "wts" || args[0] == "wtb") {
-                var item_url = args[1]
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
-                .then(res => {
-                    if (res.rows.length==0) {
-                        status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
-                        message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
-                        .catch(err => {
-                            console.log(err)
-                            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
-                        })
-                        return false
-                    }
-                    ingame_name = res.rows[0].ingame_name
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`
-                    return false
-                })
-                if (!status) {
-                    message.channel.send(status_message).catch(err => console.log(err))
-                    return Promise.resolve()
-                }
+                trading_bot_item_orders(message,args).catch(err => console.log(err))
                 //trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
             }
             continue
@@ -4626,6 +4603,116 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         console.log(JSON.stringify(postdata.components))
     }
     message.channel.send(postdata).catch(err => console.log(err))
+}
+
+async function trading_bot_item_orders(message,args) {
+    var ingame_name = ""
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rows.length==0) {
+            status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
+            message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+            .catch(err => {
+                console.log(err)
+                message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
+            })
+            return false
+        }
+        ingame_name = res.rows[0].ingame_name
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`
+        return false
+    })
+    if (!status) {
+        message.channel.send(status_message).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    var order_type = args.pop().replace('wts','sell').replace('wtb','buy')
+    var d_item_url = ""
+    args.forEach(element => {
+        d_item_url = d_item_url + element + "_"
+    });
+    d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    d_item_url = d_item_url.replace(/_p$/,'_prime')
+    d_item_url = d_item_url.replace('_p_','_prime_')
+    d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
+    let arrItemsUrl = []
+    let items_list = []
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+        return true
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return false
+    })
+    if (!status)      
+        return Promise.reject()
+    items_list.forEach(element => {
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
+                arrItemsUrl.push({item_url: element.item_url,item_id: element.id});
+        }
+    })
+    if (JSON.stringify(arrItemsUrl).match("_set")) {
+        var i = 0
+        var MaxIndex = arrItemsUrl.length
+        for (var i=0; i <= MaxIndex-1; i++)
+        {
+            if (!arrItemsUrl[i].item_url.match("_set"))
+            {
+                arrItemsUrl.splice(i, 1)
+                i--
+            }
+            MaxIndex = arrItemsUrl.length
+        }
+    }
+    if (arrItemsUrl.length > 1) {
+        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
+        return Promise.resolve()
+    }
+    if (arrItemsUrl.length==0) {
+        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
+    }
+    const item_url = arrItemsUrl[0].item_url
+    const item_id = arrItemsUrl[0].item_id
+    const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    var all_orders = []
+    var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users.list.discord_id = users_orders.discord_id JOIN items_list ON users_orders.item_id = items_list.id WHERE item_id = '${item_id} AND order_type = '${order_type}'`)
+    .then(res => {
+        if (res.rows.length == 0) {
+            message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
+            return false
+        }
+        else {
+            all_orders = res.rows
+            return true
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        message.channel.send(`☠️ Error retrieving order info in db. Please contact MrSofty#7926\nError code: 500 ☠️`).catch(err => console.log(err))
+        return false
+    })
+    if (!status)
+        return Promise.reject()
+    var postdata = {}
+    postdata.content = " "
+    
+    for (var i=0;i<all_orders.length;i++) {
+        all_orders
+    }
 }
 
 async function trading_bot_registeration(message,ingame_name) {
