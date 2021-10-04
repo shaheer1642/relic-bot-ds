@@ -938,7 +938,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 JOIN users_list ON users_orders.discord_id = users_list.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
                 WHERE messages_ids.message_id = ${reaction.message.id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'
-                ORDER BY users_list.list.ingame_name`)
+                ORDER BY users_list.ingame_name ASC`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
@@ -4411,7 +4411,13 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         //var targetChannel = client.channels.cache.get(multiCid)
 
         //----construct embed----
-        var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true ORDER BY users_orders.user_price ASC`)
+        var status = await db.query(`
+        SELECT * FROM users_orders 
+        JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+        JOIN items_list ON users_orders.item_id=items_list.id 
+        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true 
+        ORDER BY users_list.ingame_name ASC
+        ORDER BY users_orders.user_price ASC`)
         .then(res => {
             if (res.rows.length == 0)
                 return true
