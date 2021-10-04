@@ -1689,6 +1689,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                             **Thread Name:** ${newThread.name}
+                            **Server:** ${newThread.guild.name}
                             **-----Chat Log----**
                             ${JSON.stringify(order_data.messages_log)}
                         `,
