@@ -984,13 +984,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (reaction.message.embeds[0]) {
                     console.log('has embed 0')
                     console.log(reaction.message.embeds[0].fields[0].name)
-                    if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','sell').replace('wtb','buy')))
+                    if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','sellers').replace('wtb','buyers')))
                         concerned_embed = reaction.message.embeds[0]
                     else {
                         if (reaction.message.embeds[1]) {
                             console.log('has embed 1')
                             console.log(reaction.message.embeds[1].fields[0].name)
-                            if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','sell').replace('wtb','buy')))
+                            if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','sellers').replace('wtb','buyers')))
                                 concerned_embed = reaction.message.embeds[1]
                         }
                     }
