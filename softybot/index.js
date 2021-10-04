@@ -902,17 +902,17 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return Promise.resolve()
                 }
                 var tradee = {}
-                tradee.id = null
+                tradee.discord_id = null
                 tradee.ingame_name = null
                 var trader = {}
-                trader.id = null
+                trader.discord_id = null
                 trader.ingame_name = null
                 var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
                 .then(res => {
                     if (res.rows.length == 0)
                         return false
                     else {
-                        tradee.id = res.rows[0].discord_id
+                        tradee.discord_id = res.rows[0].discord_id
                         tradee.ingame_name = res.rows[0].ingame_name
                         return true
                     }
@@ -978,16 +978,18 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return Promise.resolve()
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
-                trader.id = all_orders[order_rank].id
-                console.log(trader.ingame_name + ' ' + trader.id)
+                trader.discord_id = all_orders[order_rank].discord_id
+                console.log(trader.ingame_name + ' ' + trader.discord_id)
                 var concerned_embed = {}
                 if (reaction.message.embeds[0]) {
                     console.log('has embed 0')
+                    console.log(reaction.message.embeds[0].color)
                     if (reaction.message.embeds[0].color == color)
                         concerned_embed = reaction.message.embeds[0]
                     else {
                         if (reaction.message.embeds[1]) {
                             console.log('has embed 1')
+                            console.log(reaction.message.embeds[1].color)
                             if (reaction.message.embeds[1].color == color)
                                 concerned_embed = reaction.message.embeds[1]
                         }
