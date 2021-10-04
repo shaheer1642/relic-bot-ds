@@ -155,6 +155,8 @@ client.on('messageCreate', async message => {
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(err => console.log(err))
             return Promise.resolve()
         }
+        if (!order_data.messages_log)
+            order_data.messages_log = []
         order_data.messages_log = JSON.parse(order_data.messages_log)
         order_data.messages_log.push(`<@${message.author.id}>: ${message.content}`)
         var status = await db.query(`
