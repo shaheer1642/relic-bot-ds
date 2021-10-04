@@ -125,18 +125,17 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        console.log(message.channel)
-
-        return
-        const thread = message.channel.threads.cache.find(x => x.id === 'food-talk');
-        await thread.delete();
-        console.log(message.thread)
-        message.thread.id
-        console.log(`message sent in a thread`)
+        if (!tradingBotChannels.includes(message.channel.parentId))
+            return Promise.resolve()
+        if (message.channel.ownerId != client.user.id)
+            return Promise.resolve()
+        if (message.channel.archived)
+            return Promise.resolve()
+        console.log(`message sent in an active thread`)
         var order_data = null
         var status = await db.query(`
         SELECT * FROM filled_users_orders
-        WHERE thread_id = ${message.thread.id} AND channel_id = ${message.channel.id}
+        WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
         `)
         .then(res => {
             if (res.rows.length == 0) {
