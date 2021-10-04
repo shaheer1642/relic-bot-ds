@@ -125,7 +125,8 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        console.log(message.channel.id)
+        console.log(message.channel)
+
         return
         const thread = message.channel.threads.cache.find(x => x.id === 'food-talk');
         await thread.delete();
