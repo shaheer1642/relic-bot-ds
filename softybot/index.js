@@ -158,8 +158,7 @@ client.on('messageCreate', async message => {
         if (!order_data.messages_log)
             order_data.messages_log = []
         order_data.messages_log = JSON.parse(order_data.messages_log).catch(err => console.log(err))
-        order_data.messages_log.push({author: message.author.id, content: message.content})
-        console.log()
+        order_data.messages_log.push({author: message.author.id, content: message.content}).catch(err => console.log(err))
         var status = await db.query(`
         UPDATE filled_users_orders
         SET messages_log = '${JSON.stringify(order_data.messages_log)}'
