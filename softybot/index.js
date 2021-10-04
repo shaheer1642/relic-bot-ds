@@ -1009,6 +1009,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log('exact trader found')
                 //----------------
                 if (trader.discord_id = tradee.discord_id) {       //cannot trade to yourself
+                    console.log('cannot trade yourself')
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
