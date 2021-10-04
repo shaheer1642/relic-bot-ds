@@ -886,7 +886,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (tradingBotReactions.sell.includes(reaction.emoji.identifier) || tradingBotReactions.buy.includes(reaction.emoji.identifier)) {
                 if (!reaction.message.author)
                     await reaction.message.channel.messages.fetch(reaction.message.id)
-                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
+                    //message.author.id != '253525146923433984'
+                if (message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                     message.channel.send('🛑 This function is under development. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
