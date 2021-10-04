@@ -1690,7 +1690,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                             **Thread Name:** ${newThread.name}
                             **-----Chat Log----**
-                            ${order_data.messages_log}
+                            ${JSON.stringify(order_data.messages_log)}
                         `,
                         timestamp: new Date()
                     }
