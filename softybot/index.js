@@ -1599,7 +1599,7 @@ client.on('guildMemberAdd', async member => {
 client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
     console.log(newMembers)
     
-    newMembers.map(member => {
+    newMembers.map(async member => {
         var status = await db.query(`SELECT * FROM filled_users_orders`)
         .then(res => {
             res.rows.forEach(e => {
