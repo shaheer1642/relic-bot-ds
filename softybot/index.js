@@ -1039,9 +1039,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     type: 'GUILD_PRIVATE_THREAD',
                     reason: 'Trade opened.',
                 })
-                .then(res => console.log(res))
+                .then(res => {
+                    console.log('thread created')
+                    console.log(res)
+                    await res.members.add(trader.discord_id).catch(err => console.log(err))
+                    await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                    res.channel.send('hi').catch(err => console.log(err))
+                })
                 .catch(err => console.log(err))
-                console.log('thread created')
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
