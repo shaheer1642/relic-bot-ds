@@ -125,6 +125,9 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
+        console.log(message.thread)
+        return
+        message.thread.id
         console.log(`message sent in a thread`)
         var order_data = null
         var status = await db.query(`
