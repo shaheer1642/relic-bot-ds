@@ -93,6 +93,7 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
+
     if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
@@ -122,6 +123,12 @@ client.on('messageCreate', async message => {
             return Promise.resolve()
         }
     }
+
+    if (message.thread) {
+        console.log(`send in a thread`)
+        return Promise.resolve()
+    }
+
     let commandsArr = message.content.split('\n')
     for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
@@ -1596,6 +1603,7 @@ client.on('guildMemberAdd', async member => {
     }
 });
 
+/*
 client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
     console.log(newMembers)
     
@@ -1613,6 +1621,7 @@ client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
         })
     })
 })
+*/
 
 client.login(config.token).catch(err => console.log(err));
 
