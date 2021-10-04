@@ -981,31 +981,31 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 trader.discord_id = all_orders[order_rank].discord_id
                 console.log(trader.ingame_name + ' ' + trader.discord_id)
                 var concerned_embed = {}
+                var match_trade = false
                 if (reaction.message.embeds[0]) {
                     console.log('has embed 0')
                     console.log(reaction.message.embeds[0].fields[0].name)
                     if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                        console.log(reaction.message.embeds[0])
-                        concerned_embed = reaction.message.embeds[0]
+                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
+                            match_trade = true
                     }
                     else {
                         if (reaction.message.embeds[1]) {
                             console.log('has embed 1')
                             console.log(reaction.message.embeds[1].fields[0].name)
                             if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                                console.log(reaction.message.embeds[1])
-                                concerned_embed = reaction.message.embeds[1]
+                                if (reaction.message.embeds[0].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
+                                    match_trade = true
                             }
                         }
                     }
                 }
-                console.log(JSON.stringify(concerned_embed))
-                reaction.message.channel.send(JSON.stringify(concerned_embed)).catch(err => console.log(err))
-                if (!concerned_embed.color) {
+                if (!match_trade) {
                     console.log('that trader does not exist in db  check #2')
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
+                console.log('exact trader found')
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
