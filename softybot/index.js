@@ -125,8 +125,11 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        console.log(message.thread)
+        console.log(message.channel.id)
         return
+        const thread = message.channel.threads.cache.find(x => x.id === 'food-talk');
+        await thread.delete();
+        console.log(message.thread)
         message.thread.id
         console.log(`message sent in a thread`)
         var order_data = null
