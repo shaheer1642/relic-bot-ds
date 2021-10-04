@@ -2032,6 +2032,11 @@ client.on('guildMemberAdd', async member => {
     }
 });
 
+client.on('threadMemberUpdate', async (oldMember,newMember) => {
+    console.log(oldMember)
+    console.log(newMember)
+})
+
 client.login(config.token).catch(err => console.log(err));
 
 //------------Command functions---------------
