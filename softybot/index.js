@@ -896,11 +896,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     await reaction.message.channel.messages.fetch(reaction.message.id)
                 if (reaction.message.author.id != client.user.id)
                     return Promise.resolve()
+                /*
                 if (user.id != '253525146923433984' && user.id != '892087497998348349' && user.id != '212952630350184449') {
                     reaction.message.channel.send('🛑 This function is under development. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
+                */
                 var tradee = {}
                 tradee.discord_id = null
                 tradee.ingame_name = null
