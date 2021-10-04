@@ -917,7 +917,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return false
                 })
                 if (!status) {
-                    reaction.users.remove(user.id);
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 10000))
                     user.send({content: "Type the following command to register your ign:\nset ign your_username"})
                     .catch(err=> {
@@ -937,7 +937,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         return false
                     }
                     else {
-                        reaction.message.channel.send(res.rows).catch(err => console.log(err));
+                        reaction.message.channel.send(JSON.stringify(res.rows)).catch(err => console.log(err));
                         console.log(res.rows)
                         return true
                     }
@@ -952,6 +952,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return Promise.resolve()
                 }
                 console.log('message id found')
+                setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
                 if (reaction.emoji.identifier == tradingBotReactions.remove[0])
