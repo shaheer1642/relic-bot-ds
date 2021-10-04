@@ -2032,7 +2032,7 @@ client.on('guildMemberAdd', async member => {
     }
 });
 
-client.on('threadMemberUpdate', async (oldMember,newMember) => {
+client.on('threadMembersUpdate', async (oldMember,newMember) => {
     console.log(oldMember)
     console.log(newMember)
 })
