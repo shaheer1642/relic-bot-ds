@@ -966,6 +966,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     all_orders = all_orders.sort(dynamicSortDesc("user_price"))
                     color = tb_buyColor
                 }
+                console.log(order_type)
+                console.log(color)
                 var order_rank = -1
                 var temp = reaction.emoji.identifier.split('_')
                 order_rank = Number(temp[1].charAt(0)) - 1
@@ -977,14 +979,18 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
                 trader.id = all_orders[order_rank].id
+                console.log(trader.ingame_name + ' ' + trader.id)
                 var concerned_embed = {}
                 if (reaction.message.embeds[0]) {
+                    console.log('has embed 0')
                     if (reaction.message.embeds[0].color == color)
                         concerned_embed = reaction.message.embeds[0]
                     else {
-                        if (reaction.message.embeds[1])
+                        if (reaction.message.embeds[1]) {
+                            console.log('has embed 1')
                             if (reaction.message.embeds[1].color == color)
                                 concerned_embed = reaction.message.embeds[1]
+                        }
                     }
                 }
                 console.log(JSON.stringify(concerned_embed))
