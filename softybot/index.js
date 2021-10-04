@@ -1041,6 +1041,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     reason: 'Trade opened.'
                 })
                 .then(async res => {
+                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
                     console.log(res)
                     var status = await db.query(`
                     INSERT INTO filled_users_orders
@@ -1059,7 +1060,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         res.delete()
                         return
                     }
-                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
                     console.log('thread created')
                     await res.members.add(trader.discord_id).catch(err => console.log(err))
                     await res.members.add(tradee.discord_id).catch(err => console.log(err))
