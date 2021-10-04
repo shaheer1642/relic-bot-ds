@@ -1696,7 +1696,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                         timestamp: new Date()
                     }
                 ]
-            })
+            }).catch(err => console.log(err))
         })
         .catch(err => {
             console.log(err)
