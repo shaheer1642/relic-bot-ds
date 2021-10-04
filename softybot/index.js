@@ -937,7 +937,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 JOIN users_orders ON messages_ids.item_id = users_orders.item_id
                 JOIN users_list ON users_orders.discord_id = users_list.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE messages_ids.message_id = ${reaction.message.id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'`)
+                WHERE messages_ids.message_id = ${reaction.message.id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'
+                ORDER BY users_list.list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
