@@ -931,7 +931,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 FROM messages_ids
                 JOIN users_list ON messages_ids.discord_id = users_list.discord_id
                 JOIN users_orders ON messages_ids.item_id = users_orders.item_id
-                WHERE messages_ids.message_id = ${reaction.message.id});`)
+                WHERE messages_ids.message_id = ${reaction.message.id}`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         return false
