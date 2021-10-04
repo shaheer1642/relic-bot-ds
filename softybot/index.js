@@ -929,7 +929,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var status = await db.query(`
                 SELECT *
                 FROM messages_ids
-                JOIN users_list ON messages_ids.discord_id = users_list.discord_id
+                JOIN users_list ON users_orders.discord_id = users_list.discord_id
                 JOIN users_orders ON messages_ids.item_id = users_orders.item_id
                 WHERE messages_ids.message_id = ${reaction.message.id}`)
                 .then(res => {
