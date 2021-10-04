@@ -1039,7 +1039,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     type: 'GUILD_PRIVATE_THREAD',
                     reason: 'Trade opened.',
                 })
-                .then(res => {
+                .then(async res => {
                     console.log('thread created')
                     console.log(res)
                     await res.members.add(trader.discord_id).catch(err => console.log(err))
