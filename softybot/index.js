@@ -1033,6 +1033,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 .then(res => console.log(res))
                 .catch(err => console.log(err))
+                console.log('thread created')
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
