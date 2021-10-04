@@ -931,19 +931,19 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     })
                     return Promise.resolve()
                 }
+                var all_orders = []
                 var status = await db.query(`
-                SELECT *
-                FROM messages_ids
+                SELECT * FROM messages_ids
                 JOIN users_orders ON messages_ids.item_id = users_orders.item_id
                 JOIN users_list ON users_orders.discord_id = users_list.discord_id
                 WHERE messages_ids.message_id = ${reaction.message.id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
+                        reaction.message.channel.send(`⚠️ That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                         return false
                     }
                     else {
-                        reaction.message.channel.send(JSON.stringify(res.rows)).catch(err => console.log(err));
-                        console.log(res.rows)
+                        all_orders = res.rows
                         return true
                     }
                 })
@@ -957,6 +957,43 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return Promise.resolve()
                 }
                 console.log('message id found')
+                var color = ''
+                if (order_type == 'wts') {
+                    all_orders = all_orders.sort(dynamicSort("user_price"))
+                    color = tb_sellColor
+                }
+                if (order_type == 'wtb') {
+                    all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+                    color = tb_buyColor
+                }
+                var order_rank = -1
+                var temp = reaction.emoji.identifier.split('_')
+                order_rank = Number(temp[1].charAt(0)) - 1
+                console.log(order_rank)
+                if (order_rank == -1) {
+                    console.log('that trader does not exist in db check #1')
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    return Promise.resolve()
+                }
+                trader.ingame_name = all_orders[order_rank].ingame_name
+                trader.id = all_orders[order_rank].id
+                var concerned_embed = {}
+                if (reaction.message.embeds[0]) {
+                    if (reaction.message.embeds[0].color == color)
+                        concerned_embed = reaction.message.embeds[0]
+                    else {
+                        if (reaction.message.embeds[1])
+                            if (reaction.message.embeds[1].color == color)
+                                concerned_embed = reaction.message.embeds[1]
+                    }
+                }
+                if (!concerned_embed.color) {
+                    console.log('that trader does not exist in db  check #2')
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    return Promise.resolve()
+                }
+                reaction.message.channel.send(JSON.stringify(concerned_embed)).catch(err => console.log(err))
+                console.log(JSON.stringify(concerned_embed))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
