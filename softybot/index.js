@@ -1026,6 +1026,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return Promise.resolve()
                 }
                 trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
+                const thread = await reaction.message.channel.threads.create({
+                    name: `${trader.ingame_name} x ${tradee.ingame_name}`,
+                    autoArchiveDuration: 60,
+                    reason: 'Trade opened.',
+                })
+                .then(res => console.log(res))
+                .catch(err => console.log(err))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
