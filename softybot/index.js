@@ -7,6 +7,7 @@ const request = require('request');
 const fs = require('fs')
 const DB = require('pg');
 const { resolve } = require('path');
+const { time } = require('console');
 /*
 const { doesNotMatch } = require('assert');
 const { Console } = require('console');
@@ -19,6 +20,7 @@ const tradingBotChannels = ["892160436881993758", "892108718358007820", "8931338
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {sell: ["<:buy_1st:892795655888699424>" , "<:buy_2nd:892795657524510750>" , "<:buy_3rd:892795657163796490>" , "<:buy_4th:892795655624474664>" , "<:buy_5th:892795647621734431>"], buy: ["<:sell_1st:892795656408801350>" , "<:sell_2nd:892795657562230864>" , "<:sell_3rd:892795656748556308>" , "<:sell_4th:892795655867760700>" , "<:sell_5th:892795656446558298>"], remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"]}
+const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
@@ -1644,6 +1646,63 @@ client.on('guildMemberAdd', async member => {
         })
     }
 });
+
+client.on('threadUpdate', async (oldThread,newThread) => {
+    if (newThread.archived) {
+        if (newThread.ownerId != client.user.id)
+            return Promise.resolve()
+        if (!tradingBotChannels.includes(newThread.parentId))
+            return Promise.resolve()
+        var order_data = null
+        var status = await db.query(`
+        SELECT * FROM filled_users_orders
+        JOIN items_list ON filled_users_orders.item_id = items_list.id
+        WHERE filled_users_orders.thread_id = ${newThread.id} AND filled_users_orders.channel_id = ${newThread.parentId} AND filled_users_orders.archived = false
+        `)
+        .then(res => {
+            if (res.rows.length == 0) {
+                return false
+            }
+            order_data = res.rows[0]
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        var status = await db.query(`
+        UPDATE filled_users_orders
+        SET archived = true
+        WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
+        `)
+        .then(res => {
+            client.channels.cache.get(ordersFillLogChannel).send({
+                content: " ", 
+                embeds: [
+                    {
+                        description: `
+                            An order has been filled and thread archived
+                            **Created by:** <@${order_data.order_owner}>
+                            **Filled by:** <@${order_data.order_filler}>
+                            **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+                            **Price:** ${order_data.user_price}<:platinum:881692607791648778>
+                            **Thread Name:** ${newThread.name}
+                            **-----Chat Log----**
+                            ${order_data.messages_log}
+                        `,
+                        timestamp: new Date()
+                    }
+                ]
+            })
+        })
+        .catch(err => {
+            console.log(err)
+        })
+        return Promise.resolve()
+    }
+})
 
 /*
 client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
