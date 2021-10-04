@@ -1041,6 +1041,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     reason: 'Trade opened.'
                 })
                 .then(async res => {
+                    console.log(res)
                     var status = await db.query(`
                     INSERT INTO filled_users_orders
                     (thread_id,channel_id,order_owner,order_filler,item_id)
@@ -1051,14 +1052,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                         return false
                     })
-                    if (!status)
+                    if (!status) {
+                        res.delete()
                         return
+                    }
                     setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
                     console.log('thread created')
-                    console.log(res)
                     await res.members.add(trader.discord_id).catch(err => console.log(err))
                     await res.members.add(tradee.discord_id).catch(err => console.log(err))
                     client.users.cache.get(trader.discord_id).send(`You have received a ${order_type.replace('wts','Buyer').replace('wtb','Seller')} for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${res.id}> to trade`).catch(err => console.log(err))
