@@ -1008,6 +1008,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
                 console.log('exact trader found')
                 //----------------
+                if (trader.discord_id = tradee.discord_id) {       //cannot trade to yourself
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    return Promise.resolve()
+                }
                 var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
                 .then(res => {
                     return true
