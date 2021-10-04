@@ -882,11 +882,40 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-        /*
         if (tradingBotChannels.includes(reaction.message.channelId)) {
-            if (tradingBotReactions.remove.includes(reaction.emoji.identifier)) {
+            if (tradingBotReactions.sell.includes(reaction.emoji.identifier) || tradingBotReactions.buy.includes(reaction.emoji.identifier)) {
                 if (!reaction.message.author)
                     await reaction.message.channel.messages.fetch(reaction.message.id)
+                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
+                    message.channel.send('🛑 This function is under development. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    return Promise.resolve()
+                }
+                var status = db.query(`
+                SELECT *
+                FROM messages_ids
+                WHERE EXISTS
+                (SELECT * FROM messages_ids WHERE message_id = ${reaction.message.id});`)
+                .then(res => {
+                    if (res.rows.length == 0) {
+                        return false
+                    }
+                    else if (res.rows.length > 1) {
+                        reaction.message.channel.send(`☠️ Unexpected response from db about trade message.\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        return false
+                    }
+                    else
+                        return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    reaction.message.channel.send(`☠️ Error finding trade message frecord in db.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    return false
+                })
+                if (!status) {
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    return Promise.resolve()
+                }
                 if (reaction.message.author.id != client.user.id)
                     return
                 var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
@@ -1367,7 +1396,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
             }
             return
         }
-        */
 
     if (reaction.emoji.name == "🆙") {
         if (!reaction.message.author)
