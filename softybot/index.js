@@ -886,6 +886,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
             console.log('someone reacted with emoji 1')
             console.log(reaction.emoji.identifier)
             if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
+                var order_type = ""
+                if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`))
+                    order_type = 'wts'
+                if (tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`))
+                    order_type = 'wtb'
                 console.log('someone reacted with emoji 2')
                 if (!reaction.message.author)
                     await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -931,7 +936,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 FROM messages_ids
                 JOIN users_orders ON messages_ids.item_id = users_orders.item_id
                 JOIN users_list ON users_orders.discord_id = users_list.discord_id
-                WHERE messages_ids.message_id = ${reaction.message.id}`)
+                WHERE messages_ids.message_id = ${reaction.message.id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         return false
