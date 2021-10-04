@@ -125,7 +125,40 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        console.log(`sent in a thread`)
+        console.log(`message sent in a thread`)
+        var order_data = null
+        var status = await db.query(`
+        SELECT * FROM filled_users_orders
+        WHERE thread_id = ${message.thread.id} AND channel_id = ${message.channel.id}
+        `)
+        .then(res => {
+            if (res.rows.length == 0) {
+                return false
+            }
+            order_data = res.rows[0]
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
+            message.delete().catch(err => console.log(err))
+            client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(err => console.log(err))
+            return Promise.resolve()
+        }
+        order_data.messages_log = JSON.parse(order_data.messages_log)
+        order_data.messages_log.push(`<@${message.author.id}>: ${message.content}`)
+        var status = await db.query(`
+        UPDATE filled_users_orders
+        SET messages_log = '${JSON.stringify(order_data.messages_log)}'
+        WHERE thread_id = ${message.thread.id} AND channel_id = ${message.channel.id}
+        `)
+        .catch(err => {
+            console.log(err)
+        })
         return Promise.resolve()
     }
 
