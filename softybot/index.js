@@ -1046,7 +1046,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     var status = await db.query(`
                     INSERT INTO filled_users_orders
                     (thread_id,channel_id,order_owner,order_filler,item_id)
-                    VALUES (${res.id},${reaction.message.channel},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}')
+                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}')
                     `)
                     .then(res => {
                         return true
