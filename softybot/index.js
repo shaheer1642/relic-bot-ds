@@ -124,8 +124,10 @@ client.on('messageCreate', async message => {
         }
     }
 
-    if (message.thread) {
-        console.log(`send in a thread`)
+    console.log(message)
+
+    if (message.isThread) {
+        console.log(`sent in a thread`)
         return Promise.resolve()
     }
 
