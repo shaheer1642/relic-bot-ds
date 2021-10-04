@@ -162,7 +162,7 @@ client.on('messageCreate', async message => {
         var status = await db.query(`
         UPDATE filled_users_orders
         SET messages_log = '${order_data.messages_log}'
-        WHERE thread_id = ${message.thread.id} AND channel_id = ${message.channel.id}
+        WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
         `)
         .catch(err => {
             console.log(err)
