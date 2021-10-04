@@ -1604,9 +1604,9 @@ client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
         var status = await db.query(`SELECT * FROM filled_users_orders`)
         .then(res => {
             res.rows.forEach(e => {
-                if (e.thread_id = member.thread.id) {
+                if ((e.thread_id = member.thread.id) && (member.id != client.user.id)) {
                     if ((e.order_owner != member.id) && (e.order_filler != member.id)) {
-                        member.thread.members.remove(member.id).catch(err => console.log(err)).then(res => member.send('You do not have permission to join this thread.').catch(err => console.log(err)))
+                        member.thread.members.remove(member.id).catch(err => console.log(err)).then(res => member.user.send('You do not have permission to join this thread.').catch(err => console.log(err)))
                     }
                 }
             })
