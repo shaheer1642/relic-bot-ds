@@ -889,13 +889,44 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log('someone reacted with emoji 2')
                 if (!reaction.message.author)
                     await reaction.message.channel.messages.fetch(reaction.message.id)
-                    //reaction.message.author.id != '253525146923433984'
-                if (reaction.message.author.id != '892087497998348349' && reaction.message.author.id != '212952630350184449') {
+                if (reaction.message.author.id != client.user.id)
+                    return Promise.resolve()
+                if (reaction.message.author.id != '253525146923433984' && reaction.message.author.id != '892087497998348349' && reaction.message.author.id != '212952630350184449') {
                     reaction.message.channel.send('🛑 This function is under development. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var status = db.query(`
+                var tradee = {}
+                tradee.id = null
+                tradee.ingame_name = null
+                var trader = {}
+                trader.id = null
+                trader.ingame_name = null
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    else {
+                        tradee.id = res.rows[0].discord_id
+                        tradee.ingame_name = res.rows[0].ingame_name
+                        return true
+                    }
+                })
+                .catch (err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    reaction.users.remove(user.id);
+                    reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 10000))
+                    user.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                    .catch(err=> {
+                        console.log(err)
+                        reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 10000))
+                    })
+                    return Promise.resolve()
+                }
+                var status = await db.query(`
                 SELECT *
                 FROM messages_ids
                 WHERE EXISTS
@@ -913,38 +944,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message frecord in db.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     return false
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                if (reaction.message.author.id != client.user.id)
-                    return
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
-                .then(res => {
-                    if (res.rows.length == 0)
-                        return false
-                    else
-                        return true
-                })
-                .catch (err => {
-                    if (err.response)
-                        console.log(err.response.data)
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    reaction.users.remove(user.id);
-                    reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 5000))
-                    try {
-                        user.send({content: "Type the following command to register your ign:\nset ign your_username"})
-                    } catch (err) {
-                        reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 5000))
-                    }
-                    return
-                }
+                console.log('message id found')
+                return Promise.resolve()
                 var order_type = ''
                 if (reaction.emoji.identifier == tradingBotReactions.remove[0])
                     order_type = 'wts'
