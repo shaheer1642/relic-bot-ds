@@ -1599,7 +1599,7 @@ client.on('guildMemberAdd', async member => {
 client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
     console.log(newMembers)
     for (var i=0;i<newMembers.length;i++) {
-        console.log(`nothing`)
+        console.log(newMembers.id)
     }
 })
 
