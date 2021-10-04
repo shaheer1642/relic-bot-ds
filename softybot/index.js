@@ -1030,7 +1030,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
                 const thread = await reaction.message.channel.threads.create({
                     name: `${trader.ingame_name} x ${tradee.ingame_name}`,
-                    autoArchiveDuration: 15,
+                    autoArchiveDuration: 60,
                     type: 'GUILD_PRIVATE_THREAD',
                     reason: 'Trade opened.',
                 })
@@ -4416,8 +4416,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         JOIN users_list ON users_orders.discord_id=users_list.discord_id 
         JOIN items_list ON users_orders.item_id=items_list.id 
         WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true 
-        ORDER BY users_list.ingame_name ASC
-        ORDER BY users_orders.user_price ASC`)
+        ORDER BY users_orders.user_price ASC,users_list.ingame_name`)
         .then(res => {
             if (res.rows.length == 0)
                 return true
