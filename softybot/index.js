@@ -1039,11 +1039,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     reason: 'Trade opened.'
                 })
                 .then(async res => {
+                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
                     console.log('thread created')
                     console.log(res)
                     await res.members.add(trader.discord_id).catch(err => console.log(err))
                     await res.members.add(tradee.discord_id).catch(err => console.log(err))
-                    res.channel.send('hi').catch(err => console.log(err))
+                    res.send('hi').catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
