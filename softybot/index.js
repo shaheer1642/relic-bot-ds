@@ -987,13 +987,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 concerned_embed = reaction.message.embeds[1]
                     }
                 }
+                console.log(JSON.stringify(concerned_embed))
+                reaction.message.channel.send(JSON.stringify(concerned_embed)).catch(err => console.log(err))
                 if (!concerned_embed.color) {
                     console.log('that trader does not exist in db  check #2')
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                reaction.message.channel.send(JSON.stringify(concerned_embed)).catch(err => console.log(err))
-                console.log(JSON.stringify(concerned_embed))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
