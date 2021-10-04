@@ -883,7 +883,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
         return
 
         if (tradingBotChannels.includes(reaction.message.channelId)) {
+            console.log('someone reacted with emoji 1')
             if (tradingBotReactions.sell.includes(reaction.emoji.identifier) || tradingBotReactions.buy.includes(reaction.emoji.identifier)) {
+                console.log('someone reacted with emoji 2')
                 if (!reaction.message.author)
                     await reaction.message.channel.messages.fetch(reaction.message.id)
                     //message.author.id != '253525146923433984'
