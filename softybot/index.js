@@ -1049,7 +1049,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     client.users.cache.get(trader.discord_id).send(`You have received a ${order_type.replace('wts','Buyer').replace('wtb','Seller')} for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${res.id}> to trade`).catch(err => console.log(err))
                     client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
-                    res.send(`**${order_type.replace('wts','Seller').replace('wtb','Buyer')}**: <@${trader.discord_id}>\n**${order_type.replace('wts','Buyer').replace('wtb','Seller')}**: <@${tradee.discord_id}>\n**Price**: ${all_orders[order_rank].user_price}<:platinum:881692607791648778>`).catch(err => console.log(err))
+                    res.send(`**Item:**${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n**${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>\n**${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>\n**Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>`).catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
