@@ -936,10 +936,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 SELECT * FROM messages_ids
                 JOIN users_orders ON messages_ids.item_id = users_orders.item_id
                 JOIN users_list ON users_orders.discord_id = users_list.discord_id
+                JOIN items_list ON users_orders.item_id = items_list.id
                 WHERE messages_ids.message_id = ${reaction.message.id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                         return false
                     }
                     else {
@@ -949,7 +950,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     return false
                 })
                 if (!status) {
@@ -980,7 +981,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 trader.ingame_name = all_orders[order_rank].ingame_name
                 trader.discord_id = all_orders[order_rank].discord_id
                 console.log(trader.ingame_name + ' ' + trader.discord_id)
-                var concerned_embed = {}
+                //----verify trader on discord side-----
                 var match_trade = false
                 if (reaction.message.embeds[0]) {
                     console.log('has embed 0')
@@ -1006,6 +1007,21 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return Promise.resolve()
                 }
                 console.log('exact trader found')
+                //----------------
+                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    return false
+                })
+                if (!status) {
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    return Promise.resolve()
+                }
+                trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
                 var order_type = ''
