@@ -1036,8 +1036,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 const thread = await reaction.message.channel.threads.create({
                     name: `${trader.ingame_name} x ${tradee.ingame_name}`,
                     autoArchiveDuration: 60,
-                    type: 'GUILD_PRIVATE_THREAD',
-                    reason: 'Trade opened.',
+                    reason: 'Trade opened.'
                 })
                 .then(async res => {
                     console.log('thread created')
