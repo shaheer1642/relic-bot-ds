@@ -134,6 +134,7 @@ client.on('messageCreate', async message => {
         if (message.channel.archived)
             return Promise.resolve()
         console.log(`message sent in an active thread`)
+        console.log(message)
         var order_data = null
         var status = await db.query(`
         SELECT * FROM filled_users_orders
