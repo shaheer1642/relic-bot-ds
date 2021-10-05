@@ -1257,7 +1257,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 return Promise.resolve()
             var status = await db.query(`
             UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','unsuccessful').replace('order_success','successful')}'
-            WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff = null AND order_status = 'unsuccessful'
+            WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
             `)
             .then(res => {
                 console.log(res)
