@@ -160,7 +160,7 @@ client.on('messageCreate', async message => {
         if (!order_data.messages_log)
             order_data.messages_log = []
         var ingame_name = ""
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = message.author.id`)
+        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
         .then(res => {
             if (res.rows.length == 0)
                 return false
