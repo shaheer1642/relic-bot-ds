@@ -1298,7 +1298,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 desc[6] = `**Users balance changed:** No`
             }
             if (reaction.emoji.name = 'order_success') {
-                postdata.color = order_data.order_type.repalce('wts',tb_sellColor).repalce('wtb',tb_buyColor)
+                postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                 desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${user.id}>)`
                 desc[6] = `**Users balance changed:** Yes`
             }
