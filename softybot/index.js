@@ -159,8 +159,24 @@ client.on('messageCreate', async message => {
         }
         if (!order_data.messages_log)
             order_data.messages_log = []
+        var ingame_name = ""
+        var status = db.query(`SELECT * FROM users_list WHERE discord_id = message.author.id`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            if (res.rows.length > 1)
+                return false
+            ingame_name = res.rows[0].ingame_name
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
         //order_data.messages_log = JSON.parse(order_data.messages_log)
-        order_data.messages_log.push({author: message.author.id, content: message.content})
+        order_data.messages_log.push({author: message.author.id, ingame_name: ingame_name, content: message.content})
         console.log(order_data.messages_log)
         var status = await db.query(`
         UPDATE filled_users_orders
