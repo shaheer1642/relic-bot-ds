@@ -1758,7 +1758,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Thread Name:** ${newThread.name}
                             **Server:** ${newThread.guild.name}
                             **-----Chat Log----**
-                            ${JSON.stringify(order_data.messages_log)}
+                            ${chat_log}
                         `,
                         timestamp: new Date()
                     }
