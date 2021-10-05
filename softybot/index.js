@@ -155,9 +155,7 @@ client.on('messageCreate', async message => {
         if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
             message.delete().catch(err => console.log(err))
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(err => console.log(err))
-            message.channel.members.remove(message.author.id)
-            .then(res => console.log(res))
-            .catch(err => console.log(err))
+            //message.channel.members.remove(message.author.id).then(res => console.log(res)).catch(err => console.log(err))
             return Promise.resolve()
         }
         if (!order_data.messages_log)
@@ -1104,6 +1102,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
+                var threadName = 'placeholder'
+                if (order_type == 'wts') {
+                    threadName = `${trader.ingame_name} --Sells--> ${tradee.ingame_name}: ${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}`
+                }
+                else if (order_type == 'wtb') {
+                    threadName = `${tradee.ingame_name} --Sells--> ${trader.ingame_name}: ${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}`
+                }
+                if (threadName.length > 99)
+                    threadName = `${trader.ingame_name} x ${tradee.ingame_name}`
                 trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
                 const thread = await reaction.message.channel.threads.create({
                     name: `${trader.ingame_name} x ${tradee.ingame_name}`,
@@ -1691,6 +1698,45 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         })
         if (!status)
             return Promise.resolve()
+        var trader_ign = ''
+        var tradee_ign = ''
+        var status = await db.query(`
+        SELECT * FROM users_list WHERE discord_id = ${order_data.order_owner}
+        `)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            trader_ign = res.rows[0].ingame_name
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        var status = await db.query(`
+        SELECT * FROM users_list WHERE discord_id = ${order_data.order_filler}
+        `)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            tradee_ign = res.rows[0].ingame_name
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        //------
+        var chat_log = ''
+        order_data.messages_log.forEach(e => {
+            chat_log += `**${e.ingame_name}:** ${e.content}\n`
+        })
+        chat_log = chat_log.substring(0, chat_log.length - 1);
+        //------
         var status = await db.query(`
         UPDATE filled_users_orders
         SET archived = true
@@ -1703,10 +1749,12 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                     {
                         description: `
                             An order has been filled and thread archived
-                            **Created by:** <@${order_data.order_owner}>
-                            **Filled by:** <@${order_data.order_filler}>
+                            **Created by:** <@${order_data.order_owner}> (${trader_ign})
+                            **Filled by:** <@${order_data.order_filler}> (${tradee_ign})
                             **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
+                            **Order status:**
+                            **Users balance changed:**
                             **Thread Name:** ${newThread.name}
                             **Server:** ${newThread.guild.name}
                             **-----Chat Log----**
