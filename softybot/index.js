@@ -137,7 +137,7 @@ client.on('messageCreate', async message => {
         var order_data = null
         var status = await db.query(`
         SELECT * FROM filled_users_orders
-        WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
+        WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
         `)
         .then(res => {
             if (res.rows.length == 0) {
