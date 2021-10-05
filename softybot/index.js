@@ -184,7 +184,14 @@ client.on('messageCreate', async message => {
             return Promise.resolve()
         //order_data.messages_log = JSON.parse(order_data.messages_log)
         var sentMessage = ''
-        sentMessage += message.content.replace(/'/g,`''`) + '\n'
+        sentMessage += message.content.replace(/\\n/g, "\\n")
+        .replace(/\\'/g, "\\'")
+        .replace(/\\"/g, '\\"')
+        .replace(/\\&/g, "\\&")
+        .replace(/\\r/g, "\\r")
+        .replace(/\\t/g, "\\t")
+        .replace(/\\b/g, "\\b")
+        .replace(/\\f/g, "\\f") + '\n'
         message.attachments.map(attachment => {
             sentMessage += attachment.url + '\n'
         })
