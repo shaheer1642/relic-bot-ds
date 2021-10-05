@@ -155,6 +155,9 @@ client.on('messageCreate', async message => {
         if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
             message.delete().catch(err => console.log(err))
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(err => console.log(err))
+            message.thread.members.remove(message.author.id)
+            .then(res => console.log(res))
+            .catch(err => console.log(err))
             return Promise.resolve()
         }
         if (!order_data.messages_log)
