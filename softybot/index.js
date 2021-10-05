@@ -1769,8 +1769,8 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                     {
                         description: `
                             An order has been filled and thread archived
-                            **Created by:** <@${order_data.order_owner}> (${trader_ign})
-                            **Filled by:** <@${order_data.order_filler}> (${tradee_ign})
+                            **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
+                            **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
                             **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                             **Order status:** ${order_status}
@@ -1780,7 +1780,8 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **-----Chat Log-----**
                             ${chat_log}
                         `,
-                        timestamp: new Date()
+                        timestamp: new Date(), 
+                        color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
                     }
                 ]
             }).then(log_message => {
