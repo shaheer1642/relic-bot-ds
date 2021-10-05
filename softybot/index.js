@@ -1256,8 +1256,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (!status)
                 return Promise.resolve()
             var status = await db.query(`
-            UPDATE filled_users_orders SET verification_staff = ${user.id} AND order_status = '${reaction.emoji.name.replace('🛑','unsuccessful').replace('order_success','successful')}'
-            WHERE trade_log_message = ${reaction.message.id} AND archived = true AND  verification_staff = null AND order_status = 'unsuccessful'
+            UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','unsuccessful').replace('order_success','successful')}'
+            WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff = null AND order_status = 'unsuccessful'
             `)
             .then(res => {
                 return true
@@ -1815,7 +1815,7 @@ client.on('guildMemberAdd', async member => {
                 inline: true
             },{
                 name: 'Member information',
-                value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined,
+                value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined + `\n**• Profile:** <@${member.user.id}>`,
                 inline: true
             })
             .setTimestamp()
