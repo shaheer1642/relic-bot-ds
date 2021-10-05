@@ -184,13 +184,12 @@ client.on('messageCreate', async message => {
             return Promise.resolve()
         //order_data.messages_log = JSON.parse(order_data.messages_log)
         var sentMessage = ''
-        sentMessage += message.content + '\n'
+        sentMessage += message.content.replace(/_/g,'\_').replace(/'/g,`''`) + '\n'
         message.attachments.map(attachment => {
             sentMessage += attachment.url + '\n'
         })
         sentMessage = sentMessage.substring(0, sentMessage.length - 1);
         order_data.messages_log.push({author: message.author.id, ingame_name: ingame_name, content: sentMessage})
-        console.log(order_data.messages_log)
         var status = await db.query(`
         UPDATE filled_users_orders
         SET messages_log = '${JSON.stringify(order_data.messages_log)}'
