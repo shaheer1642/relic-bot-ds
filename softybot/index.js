@@ -1256,7 +1256,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (!status)
                 return Promise.resolve()
             var status = await db.query(`
-            UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','unsuccessful').replace('order_success','successful')}'
+            UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','denied').replace('order_success','successful')}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
             WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
             `)
             .then(res => {
@@ -1292,12 +1292,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 return Promise.resolve()
             var postdata = reaction.message.embeds[0]
             var desc = postdata.description.split('\n')
-            if (reaction.emoji.name = '🛑') {
+            if (reaction.emoji.name == '🛑') {
                 postdata.color = null
                 desc[5] = `**Order status:** denied 🛑 (Verified by <@${user.id}>)`
                 desc[6] = `**Users balance changed:** No`
             }
-            if (reaction.emoji.name = 'order_success') {
+            else if (reaction.emoji.name == 'order_success') {
                 postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                 desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${user.id}>)`
                 desc[6] = `**Users balance changed:** Yes`
