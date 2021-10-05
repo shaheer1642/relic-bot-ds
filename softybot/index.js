@@ -1775,7 +1775,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                             **Order status:** ${order_status}
                             **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
-                            **Thread Name:** ${newThread.name}
+                            **Thread:** <#${newThread.id}>
                             **Server:** ${newThread.guild.name}
                             **-----Chat Log-----**
                             ${chat_log}
