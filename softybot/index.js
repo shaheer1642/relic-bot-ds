@@ -1766,7 +1766,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Filled by:** <@${order_data.order_filler}> (${tradee_ign})
                             **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
-                            **Order status:** ${order_data.order_status}
+                            **Order status:** ${order_data.order_status.replace('unsuccessful','unsuccessful ⚠️').replace('successful','successful <:order_success:894992959177654332>')}
                             **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
                             **Thread Name:** ${newThread.name}
                             **Server:** ${newThread.guild.name}
