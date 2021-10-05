@@ -178,7 +178,13 @@ client.on('messageCreate', async message => {
         if (!status)
             return Promise.resolve()
         //order_data.messages_log = JSON.parse(order_data.messages_log)
-        order_data.messages_log.push({author: message.author.id, ingame_name: ingame_name, content: message.content})
+        var sentMessage = ''
+        sentMessage += message.content + '\n'
+        message.attachments.map(attachment => {
+            sentMessage += attachment.url + '\n'
+        })
+        sentMessage = sentMessage.substring(0, sentMessage.length - 1);
+        order_data.messages_log.push({author: message.author.id, ingame_name: ingame_name, content: sentMessage})
         console.log(order_data.messages_log)
         var status = await db.query(`
         UPDATE filled_users_orders
