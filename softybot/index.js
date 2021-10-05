@@ -185,7 +185,7 @@ client.on('messageCreate', async message => {
         //order_data.messages_log = JSON.parse(order_data.messages_log)
         var sentMessage = ''
         sentMessage += message.content.replace(/\\n/g, "\\n")
-        .replace(/\\'/g, "\\'")
+        .replace(/'/g, `''`)
         .replace(/\\"/g, '\\"')
         .replace(/\\&/g, "\\&")
         .replace(/\\r/g, "\\r")
