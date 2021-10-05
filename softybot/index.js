@@ -1896,11 +1896,13 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         if (!status)
             return Promise.resolve()
         //------
+        /*
         var chat_log = ''
         order_data.messages_log.forEach(e => {
             chat_log += `**${e.ingame_name}:** ${e.content}\n`
         })
         chat_log = chat_log.substring(0, chat_log.length - 1);
+        */
         //------
         var order_status = ""
         if (order_data.order_status == 'unsuccessful') {
@@ -1930,7 +1932,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Thread:** <#${newThread.id}>
                             **Server:** ${newThread.guild.name}
                             **-----Chat Log-----**
-                            ${chat_log}
+                            ${order_data.messages_log}
                         `,
                         timestamp: new Date(), 
                         color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
