@@ -1276,6 +1276,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             `)
             .then(res => {
                 if (res.rows.length == 0) {
+                    reaction.message.channel.send(`<@${user.id}> Could not find the order verifier please contact softy`).catch(err => console.log(err))
                     return false
                 }
                 order_data = res.rows[0]
