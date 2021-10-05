@@ -1170,55 +1170,150 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     if (reaction.message.channel.isThread()) {
-        if (!tradingBotChannels.includes(reaction.message.channel.parentId))
-            return Promise.resolve()
-        if (reaction.message.channel.ownerId != client.user.id)
-            return Promise.resolve()
-        if (reaction.message.channel.archived)
-            return Promise.resolve()
-        var order_data = null
-        var status = await db.query(`
-        SELECT * FROM filled_users_orders
-        WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId} AND trade_open_message = ${reaction.message.id} AND archived = false
-        `)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false
-            if (res.rows.length > 1)
-                return false
-            if ((user.id != res.rows[0].order_owner) && (user.id != res.rows[0].order_filler)) {
-                reaction.users.remove(user.id).catch(err => console.log(err))
-                return false
+        if (tradingBotChannels.includes(reaction.message.channel.parentId)) {
+            if (reaction.message.channel.ownerId == client.user.id) {
+                if (!reaction.message.channel.archived) {
+                    if (!reaction.message.author)
+                        await reaction.message.channel.messages.fetch(reaction.message.id)
+                    if (reaction.message.author.id == client.user.id) {
+                        if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
+                            return Promise.resolve()
+                        var order_data = null
+                        var status = await db.query(`
+                        SELECT * FROM filled_users_orders
+                        WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId} AND trade_open_message = ${reaction.message.id} AND archived = false
+                        `)
+                        .then(res => {
+                            if (res.rows.length == 0)
+                                return false
+                            if (res.rows.length > 1)
+                                return false
+                            if ((user.id != res.rows[0].order_owner) && (user.id != res.rows[0].order_filler)) {
+                                reaction.users.remove(user.id).catch(err => console.log(err))
+                                return false
+                            }
+                            order_data = res.rows[0]
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status)
+                            return Promise.resolve()
+                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
+                            var status = await db.query(`
+                            UPDATE filled_users_orders SET order_status = 'successful',order_rating = 5
+                            WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
+                            `)
+                            .then(res => {
+                                return true
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                return false
+                            })
+                            if (!status)
+                                return Promise.resolve()
+                            reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                        }
+                        else if (reaction.emoji.name == '⚠️') {
+                            reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                        }
+                        return Promise.resolve()
+                    }
+                }
             }
-            order_data = res.rows[0]
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status)
-            return Promise.resolve()
-        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
+        }
+    }
+
+    if (reaction.message.channel.id == ordersFillLogChannel) {
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.author.id == client.user.id) {
+            if ((reaction.emoji.name != '🛑') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
+                return Promise.resolve()
             var status = await db.query(`
-            UPDATE filled_users_orders SET order_status = 'successful',order_rating = 5
-            WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
+            SELECT * FROM users_list
+            WHERE discord_id = ${user.id}
+            `)
+            .then(res => {
+                if (res.rows.length == 0) {
+                    return false
+                }
+                if (!res.rows[0].is_staff) {
+                    reaction.message.channel.send(`🛑 <@${user.id}> You have to be a staff in order to use this function 🛑`).catch(err => console.log(err))
+                    reaction.users.remove(user.id).catch(err => console.log(err))
+                    return false 
+                }
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                reaction.message.channel.send(`<@${user.id}> Error retrieving ur info from db please contact softy`).catch(err => console.log(err))
+                return false
+            })
+            if (!status)
+                return Promise.resolve()
+            var status = await db.query(`
+            UPDATE filled_users_orders SET verification_staff = ${user.id} AND order_status = '${reaction.emoji.name.replace('🛑','unsuccessful').replace('order_success','successful')}'
+            WHERE trade_log_message = ${reaction.message.id} AND archived = true AND  verification_staff = null AND order_status = 'unsuccessful'
             `)
             .then(res => {
                 return true
             })
             .catch(err => {
                 console.log(err)
+                reaction.message.channel.send(`<@${user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
                 return false
             })
             if (!status)
                 return Promise.resolve()
-            reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+            var order_data = null
+            var status = await db.query(`
+            SELECT * FROM filled_users_orders
+            WHERE trade_log_message = ${reaction.message.id} AND archived = true AND  verification_staff = ${user.id}
+            `)
+            .then(res => {
+                if (res.rows.length == 0) {
+                    return false
+                }
+                order_data = res.rows[0]
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                reaction.message.channel.send(`<@${user.id}> Error retrieving order info from db please contact softy`).catch(err => console.log(err))
+                return false
+            })
+            if (!status)
+                return Promise.resolve()
+            var postdata = reaction.message.embeds[0]
+            var desc = postdata.description.split('\n')
+            if (reaction.emoji.name = '🛑') {
+                postdata.color = null
+                desc[5] = `**Order status:** denied 🛑 (Verified by <@${user.id}>)`
+                desc[6] = `**Users balance changed:** No`
+            }
+            if (reaction.emoji.name = 'order_success') {
+                postdata.color = order_data.order_type.repalce('wts',tb_sellColor).repalce('wtb',tb_buyColor)
+                desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${user.id}>)`
+                desc[6] = `**Users balance changed:** Yes`
+            }
+            postdata.description = ''
+            desc.forEach(e => {
+                postdata.description += e + '\n'
+            })
+            postdata.timestamp = new Date()
+            reaction.message.edit({content: ' ',embeds: [postdata]})
+            .then(res => {
+                reaction.message.reactions.removeAll().catch(err => console.log(err))
+            })
+            .catch(err => {
+                console.log(err)
+                reaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
+            })
         }
-        else if (reaction.emoji.name == '⚠️') {
-            reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-        }
-        return Promise.resolve()
     }
 
     if (reaction.emoji.name == "🆙") {
@@ -1809,7 +1904,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         //------
         var order_status = ""
         if (order_data.order_status == 'unsuccessful') {
-            order_status = `unsuccessful ⚠️ (React with ${tradingBotReactions.success[0]} after staff verification)`
+            order_status = `unsuccessful ⚠️ (React with ${tradingBotReactions.success[0]} or 🛑 after staff verification)`
         }
         else if (order_data.order_status == 'successful') {
             order_status = `successful ${tradingBotReactions.success[0]}`
