@@ -1109,11 +1109,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 else if (order_type == 'wtb') {
                     threadName = `${tradee.ingame_name} --Sells--> ${trader.ingame_name}: ${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}`
                 }
-                if (threadName.length > 99)
+                if (threadName.length > 99) {
+                    console.log(`${threadName} thread's name is longer than 99`)
                     threadName = `${trader.ingame_name} x ${tradee.ingame_name}`
+                }
                 trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
                 const thread = await reaction.message.channel.threads.create({
-                    name: `${trader.ingame_name} x ${tradee.ingame_name}`,
+                    name: threadName,
                     autoArchiveDuration: 60,
                     reason: 'Trade opened.'
                 })
