@@ -1776,6 +1776,15 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                         timestamp: new Date()
                     }
                 ]
+            }).then(log_message => {
+                var status = db.query(`
+                UPDATE filled_users_orders
+                SET trade_log_message = ${log_message.id}
+                WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
+                `)
+                if (order_data.order_status == 'unsuccessful') 
+                    log_message.react('<:order_success:894992959177654332>')
+                
             }).catch(err => console.log(err))
         })
         .catch(err => {
