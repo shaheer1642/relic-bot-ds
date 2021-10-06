@@ -1149,6 +1149,27 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 client.users.cache.get(trader.discord_id).send(`You have received a ${order_type.replace('wts','Buyer').replace('wtb','Seller')} for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${res.id}> to trade`).catch(err => console.log(err))
                 client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                 client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                var postdata = {}
+                postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                postdata.timestamp = new Date()
+                postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                postdata.footer = {text: `React with ${tradingBotReactions.success[0]} to finish this trade.\nReact with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)`}
+                //----------
+                var icon_url = ""
+                if (!all_orders[order_rank].item_url.match(/_set$/)) {
+                    var temp = all_orders[order_rank].item_url.split("_")
+                    icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                }
+                else {
+                    icon_url = `https://warframe.market/static/assets/${all_orders[order_rank].icon_url}`
+                }
+                //-----------
+                postdata.thumbnail =  {url: icon_url}
+                postdata.description = `
+                    **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
+                    **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
+                    **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
+                `
                 res.send(`**Item:** ${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n**${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>\n**${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>\n**Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>`)
                 .then(open_message => {
                     var status = db.query(`
