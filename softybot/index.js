@@ -1153,7 +1153,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                 postdata.timestamp = new Date()
                 postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                postdata.footer = {text: `React with ${tradingBotReactions.success[0]} to finish this trade.\nReact with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)\nThis trade will be auto-closed in 15 minutes\n\u200b`}
+                postdata.footer = {text: `React with ${tradingBotReactions.success[0].replace('<:','<a:')} to finish this trade.\nReact with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)\nThis trade will be auto-closed in 15 minutes\n\u200b`}
                 //----------
                 var icon_url = ""
                 if (!all_orders[order_rank].item_url.match(/_set$/)) {
@@ -1181,7 +1181,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     open_message.react('⚠️').catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
-                setTimeout(() => res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`), 60000)
+                setTimeout(() => res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`), 900000)
                 setTimeout(() => {
                     db.query(`SELECT * FROM filled_users_orders
                     WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
@@ -1191,10 +1191,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             return
                         if (foundThread.rows.length > 1)
                             return
-                        res.send({content: 'This trade will be auto-closed in X minutes. Please react with the appropriate emote above to close it properly'})
+                        res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
                         .catch(err => console.log(err))
                     })
-                }, 30000)
+                }, 720000)
             })
             .catch(err => console.log(err))
             setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
