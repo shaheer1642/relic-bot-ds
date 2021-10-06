@@ -1153,7 +1153,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                 postdata.timestamp = new Date()
                 postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                postdata.footer = {text: `React with ${tradingBotReactions.success[0].replace('<:','<a:')} to finish this trade.\nReact with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)\nThis trade will be auto-closed in 15 minutes\n\u200b`}
+                postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
                 //----------
                 var icon_url = ""
                 if (!all_orders[order_rank].item_url.match(/_set$/)) {
@@ -1169,6 +1169,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
                     **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                     **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
+
+                    React with ${tradingBotReactions.success[0].replace('<:','<a:')} to finish this trade.
+                    React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
                 `
                 res.send({content: ' ',embeds: [postdata]})
                 .then(open_message => {
