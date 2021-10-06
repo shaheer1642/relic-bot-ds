@@ -1170,7 +1170,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                     **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
 
-                    React with ${tradingBotReactions.success[0].replace('<:','<a:')} to finish this trade.
+                    React with ${tradingBotReactions.success[0]} to finish this trade.
                     React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
                 `
                 res.send({content: ' ',embeds: [postdata]})
