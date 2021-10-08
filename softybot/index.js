@@ -1167,6 +1167,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log('thread created')
                 await res.members.add(trader.discord_id).catch(err => console.log(err))
                 await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                if (cross_thread) {
+                    await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
+                    await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
+                }
                 var owner_refer = res.id
                 if (cross_thread)
                     owner_refer = cross_thread.id
@@ -1221,6 +1225,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         .catch(err => console.log(err))
                         c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
                         c_open_message.react('⚠️').catch(err => console.log(err))
+                        cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa (not yet really, kek). Say hi!').catch(err => console.log(err))
                     })
                 }
                 setTimeout(() => {
