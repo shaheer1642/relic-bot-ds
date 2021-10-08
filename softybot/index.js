@@ -208,7 +208,6 @@ client.on('messageCreate', async message => {
         message.attachments.map(attachment => {
             sentMessage += attachment.url + '\n'
         })
-        sentMessage = sentMessage.substring(0, sentMessage.length - 1);
         order_data.messages_log += `**${ingame_name}:** ${sentMessage}`
         if (!from_cross) {
             var status = await db.query(`
@@ -1184,6 +1183,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             cross_thread = crossRes
                             cross_thread_id = crossRes.id
                             cross_channel_id = crossRes.parentId
+                            setTimeout(() => reaction.message.channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
                         })
                         .catch(err => console.log(err))
                     }
