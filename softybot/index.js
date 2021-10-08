@@ -1257,7 +1257,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
                     open_message.react('⚠️').catch(err => console.log(err))
                     if (cross_thread)
-                        res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa (not yet really, kek). Say hi!').catch(err => console.log(err))
+                        res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
                 if (cross_thread) {
@@ -1270,7 +1270,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         .catch(err => console.log(err))
                         c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
                         c_open_message.react('⚠️').catch(err => console.log(err))
-                        cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa (not yet really, kek). Say hi!').catch(err => console.log(err))
+                        cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
                     })
                 }
                 setTimeout(() => {
