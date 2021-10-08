@@ -4823,7 +4823,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         },
         title: 'Profile',
         fields: [{
-            name: 'Plat gained',
+            name: '<:profit:896079718955233301> Plat gained',
             value: orders[0].plat_gained,
             inline: true
         },{
@@ -4831,11 +4831,11 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             value: '\u200b',
             inline: true
         },{
-            name: 'Plat spent',
+            name: '<:loss:896079691755180103> Plat spent',
             value: orders[0].plat_spent,
             inline: true
         },{
-            name: 'User rating',
+            name: '⭐ User rating',
             value: '\u200b',
             inline: true
         }],
