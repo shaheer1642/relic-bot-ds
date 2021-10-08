@@ -100,7 +100,7 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
-
+        
     if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
@@ -4303,7 +4303,7 @@ async function trading_bot(message,args,command) {
     var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
-            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility,origin_channel_id) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true,${originMessage.channel.id})`)
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility,origin_channel_id,origin_guild_id) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true,${originMessage.channel.id},${originMessage.guild.id})`)
             .then(res => {
                 return true
             })
@@ -4324,7 +4324,7 @@ async function trading_bot(message,args,command) {
             return false
         }
         else {     //----update existing order in DB----
-            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
             .then(res => {
                 return true
             })
