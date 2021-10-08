@@ -1311,6 +1311,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
                             return Promise.resolve()
                         var order_data = null
+                        var from_cross = false
                         var status = await db.query(`
                         SELECT * FROM filled_users_orders
                         WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId} AND trade_open_message = ${reaction.message.id} AND archived = false
@@ -1318,12 +1319,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         .then(res => {
                             if (res.rows.length == 0)
                                 return false
-                            if (res.rows.length > 1)
-                                return false
-                            if ((user.id != res.rows[0].order_owner) && (user.id != res.rows[0].order_filler)) {
-                                reaction.users.remove(user.id).catch(err => console.log(err))
-                                return false
-                            }
                             order_data = res.rows[0]
                             return true
                         })
@@ -1331,22 +1326,60 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             console.log(err)
                             return false
                         })
-                        if (!status)
-                            return Promise.resolve()
-                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
-                            var status = await db.query(`
-                            UPDATE filled_users_orders SET order_status = 'successful',order_rating = 5
-                            WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
+                        if (!status) {
+                            var status2 = await db.query(`
+                            SELECT * FROM filled_users_orders
+                            WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId} AND cross_trade_open_message = ${reaction.message.id} AND archived = false
                             `)
                             .then(res => {
+                                if (res.rows.length == 0)
+                                    return false
+                                from_cross = true
+                                order_data = res.rows[0]
                                 return true
                             })
                             .catch(err => {
                                 console.log(err)
                                 return false
                             })
-                            if (!status)
+                            if (!status2)
                                 return Promise.resolve()
+                        }
+                        if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
+                            reaction.users.remove(user.id).catch(err => console.log(err))
+                            return Promise.resolve()
+                        }
+                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
+                            if (!from_cross) {
+                                var status = await db.query(`
+                                UPDATE filled_users_orders SET order_status = 'successful',order_rating = 5
+                                WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
+                                `)
+                                .then(res => {
+                                    return true
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    return false
+                                })
+                                if (!status)
+                                    return Promise.resolve()
+                            }
+                            else {
+                                var status = await db.query(`
+                                UPDATE filled_users_orders SET order_status = 'successful',order_rating = 5
+                                WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
+                                `)
+                                .then(res => {
+                                    return true
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    return false
+                                })
+                                if (!status)
+                                    return Promise.resolve()
+                            }
                             //update plat balance for users
                             if (order_data.order_type == 'wts') {
                                 var status = db.query(`
@@ -1376,10 +1409,33 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 .then(res => console.log(`updated plat balance for seller`))
                                 .catch(err => console.log(err))
                             }
-                            reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                            //-------
+                            if (!from_cross) {
+                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                                if (order_data.cross_thread_id) {
+                                    const channel = client.channels.cache.get(order_data.cross_thread_id)
+                                    channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                                }
+                            }
+                            else {
+                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                                const channel = client.channels.cache.get(order_data.thread_id)
+                                channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                            }
                         }
                         else if (reaction.emoji.name == '⚠️') {
-                            reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                            if (!from_cross) {
+                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                                if (order_data.cross_thread_id) {
+                                    const channel = client.channels.cache.get(order_data.cross_thread_id)
+                                    channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                                }
+                            }
+                            else {
+                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                                const channel = client.channels.cache.get(order_data.thread_id)
+                                channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
+                            }
                         }
                         return Promise.resolve()
                     }
