@@ -4817,12 +4817,15 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     })
     var member = await client.users.fetch(discord_id)
     postdata.embeds.push({
-        name: ingame_name,
-        iconURL: member.displayAvatarURL(),
+        author: {
+            name: ingame_name,
+            iconURL: member.displayAvatarURL()
+        },
         title: 'Profile',
         description: `
         **Plat spent:** ${orders[0].plat_spent}
         **Plat gained:** ${orders[0].plat_gained}
+        **User rating:** 
     `,
         color: tb_invisColor
     })
