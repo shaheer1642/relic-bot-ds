@@ -3980,6 +3980,8 @@ async function updateDatabasePrices(up_origin) {
                     if (!buyAvgPrice)
                         buyAvgPrice = null
                     console.log(buyAvgPrice)
+                    if (buyAvgPrice > sellAvgPrice)
+                        buyAvgPrice = sellAvgPrice
                     //-------------
                     var ducat_value = null
                     let relics = null
