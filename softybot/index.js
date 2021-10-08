@@ -110,6 +110,10 @@ client.on('messageCreate', async message => {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
             return Promise.resolve()
         }
+        else if (message.guild.id=='865904902941048862' && message.content=='!rhino3') {
+            message.channel.send('https://cdn.discordapp.com/attachments/864199722676125757/896138812718219345/unknown.png')
+            return Promise.resolve()
+        }
         else if ((message.guild.id=='865904902941048862' || '832677897411493949') && message.content=='!kek') {
             message.channel.send('<:kek:892005941195714570>').then(async msg => {
                 var i=1
