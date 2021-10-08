@@ -1254,6 +1254,35 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             })
                             if (!status)
                                 return Promise.resolve()
+                            //update plat balance for users
+                            if (order_data.order_type == 'wts') {
+                                var status = db.query(`
+                                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+                                WHERE discord_id = ${(order_data.order_owner)}
+                                `)
+                                .then(res => console.log(`updated plat balance for seller`))
+                                .catch(err => console.log(err))
+                                var status = db.query(`
+                                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+                                WHERE discord_id = ${(order_data.order_filler)}
+                                `)
+                                .then(res => console.log(`updated plat balance for buyer`))
+                                .catch(err => console.log(err))
+                            }
+                            else if (order_data.order_type == 'wtb') {
+                                var status = db.query(`
+                                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+                                WHERE discord_id = ${(order_data.order_owner)}
+                                `)
+                                .then(res => console.log(`updated plat balance for buyer`))
+                                .catch(err => console.log(err))
+                                var status = db.query(`
+                                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+                                WHERE discord_id = ${(order_data.order_filler)}
+                                `)
+                                .then(res => console.log(`updated plat balance for seller`))
+                                .catch(err => console.log(err))
+                            }
                             reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
                         }
                         else if (reaction.emoji.name == '⚠️') {
