@@ -1132,7 +1132,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var cross_channel_id = null
                 if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
                     const guild = client.guilds.cache.get(reaction.message.guild.id)
-                    if (!guild.members.cache.find(all_orders[order_rank].discord_id)) {
+                    if (!guild.members.cache.find(member => member.id == all_orders[order_rank].discord_id)) {
                         cross_channel =  client.channels.cache.get(all_orders[order_rank].origin_channel_id)
                         await cross_channel.threads.create({
                             name: threadName,
