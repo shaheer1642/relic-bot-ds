@@ -1118,7 +1118,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
             }
             trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
-            
             const thread = await reaction.message.channel.threads.create({
                 name: threadName,
                 autoArchiveDuration: 60,
@@ -1127,10 +1126,27 @@ client.on('messageReactionAdd', async (reaction, user) => {
             .then(async res => {
                 setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
                 console.log(res)
+                var cross_thread = null
+                var cross_channel = null
+                if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
+                    const guild = client.guilds.cache.get(reaction.message.guild.id)
+                    if (!guild.members.cache.find(all_orders[order_rank].discord_id)) {
+                        cross_channel =  client.channels.cache.get(all_orders[order_rank].origin_channel_id)
+                        await cross_channel.threads.create({
+                            name: threadName,
+                            autoArchiveDuration: 60,
+                            reason: 'Trade opened.'
+                        })
+                        .then(async crossRes => {
+                            cross_thread = crossRes
+                        })
+                        .catch(err => console.log(err))
+                    }
+                }
                 var status = await db.query(`
                 INSERT INTO filled_users_orders
-                (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price)
-                VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}',${all_orders[order_rank].user_price})
+                (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id)
+                VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}',${all_orders[order_rank].user_price},${cross_thread.id},${cross_channel.id})
                 `)
                 .then(res => {
                     return true
@@ -1147,7 +1163,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log('thread created')
                 await res.members.add(trader.discord_id).catch(err => console.log(err))
                 await res.members.add(tradee.discord_id).catch(err => console.log(err))
-                client.users.cache.get(trader.discord_id).send(`You have received a ${order_type.replace('wts','Buyer').replace('wtb','Seller')} for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${res.id}> to trade`).catch(err => console.log(err))
+                var owner_refer = res.id
+                if (cross_thread)
+                    owner_refer = cross_thread.id
+                client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
                 client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                 client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                 var postdata = {}
@@ -1188,7 +1207,24 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     open_message.react('⚠️').catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
-                setTimeout(() => res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`), 900000)
+                if (cross_thread) {
+                    cross_thread.send({content: ' ',embeds: [postdata]})
+                    .then(c_open_message => {
+                        var status = db.query(`
+                        UPDATE filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                        WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
+                        `)
+                        .catch(err => console.log(err))
+                        c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                        c_open_message.react('⚠️').catch(err => console.log(err))
+                    })
+                }
+                setTimeout(() => {
+                    res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                    if (cross_thread) 
+                        cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                }
+                , 900000)
                 setTimeout(() => {
                     db.query(`SELECT * FROM filled_users_orders
                     WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
@@ -1200,6 +1236,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             return
                         res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
                         .catch(err => console.log(err))
+                        if (cross_thread)
+                            cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
                     })
                 }, 720000)
             })
