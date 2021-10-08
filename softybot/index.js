@@ -4822,10 +4822,23 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             iconURL: member.displayAvatarURL()
         },
         title: 'Profile',
-        description: `
-        **Plat spent:** ${orders[0].plat_spent}        **Plat gained:** ${orders[0].plat_gained}
-        **User rating:** 
-    `,
+        fields: [{
+            name: 'Plat gained',
+            value: orders[0].plat_gained,
+            inline: true
+        },{
+            name: '\u200b',
+            value: '\u200b',
+            inline: true
+        },{
+            name: 'Plat spent',
+            value: orders[0].plat_spent,
+            inline: true
+        },{
+            name: 'User rating',
+            value: '\u200b',
+            inline: true
+        }],
         color: tb_invisColor
     })
     if (sell_items.length != 0)
