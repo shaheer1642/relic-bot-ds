@@ -4822,7 +4822,8 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         description: `
         **Plat spent:** ${orders[0].plat_spent}
         **Plat gained:** ${orders[0].plat_gained}
-    `
+    `,
+        color: tb_invisColor
     })
     if (sell_items.length != 0)
         postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
