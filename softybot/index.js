@@ -157,9 +157,8 @@ client.on('messageCreate', async message => {
             console.log(err)
             return false
         })
-        var status2 = false
         if (!status) {
-            status2 = await db.query(`
+            var status2 = await db.query(`
             SELECT * FROM filled_users_orders
             WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
             `)
@@ -174,9 +173,9 @@ client.on('messageCreate', async message => {
                 console.log(err)
                 return false
             })
+            if (!status2)
+                return Promise.resolve()
         }
-        if (!status2)
-            return Promise.resolve()
         if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
             message.delete().catch(err => console.log(err))
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(err => console.log(err))
