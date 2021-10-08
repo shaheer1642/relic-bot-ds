@@ -1532,7 +1532,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(err)
                 reaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
             })
-            if (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]) {   
+            if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {   
                 //update plat balance for users
                 if (order_data.order_type == 'wts') {
                     var status = db.query(`
