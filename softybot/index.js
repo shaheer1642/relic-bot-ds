@@ -176,7 +176,7 @@ client.on('messageCreate', async message => {
                 return false
             })
         }
-        if (!status)
+        if (!status2)
             return Promise.resolve()
         if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
             message.delete().catch(err => console.log(err))
