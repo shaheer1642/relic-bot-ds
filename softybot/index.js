@@ -138,9 +138,11 @@ client.on('messageCreate', async message => {
             return Promise.resolve()
         if (message.channel.archived)
             return Promise.resolve()
+        if (message.author.id == client.user.id)
+            return Promise.resolve()
         console.log(`message sent in an active thread`)
-        console.log(message)
         var order_data = null
+        var from_cross = false
         var status = await db.query(`
         SELECT * FROM filled_users_orders
         WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
@@ -156,6 +158,24 @@ client.on('messageCreate', async message => {
             console.log(err)
             return false
         })
+        if (!status) {
+            var status2 = await db.query(`
+            SELECT * FROM filled_users_orders
+            WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
+            `)
+            .then(res => {
+                if (res.rows.length == 0) {
+                    return false
+                }
+                from_cross = true
+                order_data = res.rows[0]
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+        }
         if (!status)
             return Promise.resolve()
         if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
@@ -188,15 +208,36 @@ client.on('messageCreate', async message => {
         message.attachments.map(attachment => {
             sentMessage += attachment.url + '\n'
         })
+        sentMessage = sentMessage.substring(0, sentMessage.length - 1);
         order_data.messages_log += `**${ingame_name}:** ${sentMessage}`
-        var status = await db.query(`
-        UPDATE filled_users_orders
-        SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
-        WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
-        `)
-        .catch(err => {
-            console.log(err)
-        })
+        if (!from_cross) {
+            var status = await db.query(`
+            UPDATE filled_users_orders
+            SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
+            `)
+            .catch(err => {
+                console.log(err)
+            })
+        }
+        else {
+            var status = await db.query(`
+            UPDATE filled_users_orders
+            SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
+            `)
+            .catch(err => {
+                console.log(err)
+            })
+        }
+        if (from_cross) {
+            const thread = client.channels.cache.get(order_data.thread_id)
+            thread.send(`**${ingame_name}:** ${sentMessage}`).catch(err => console.log(err))
+        }
+        else if (order_data.cross_thread_id) {
+            const thread = client.channels.cache.get(order_data.cross_thread_id)
+            thread.send(`**${ingame_name}:** ${sentMessage}`).catch(err => console.log(err))
+        }
         return Promise.resolve()
     }
 
