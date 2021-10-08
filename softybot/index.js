@@ -4823,8 +4823,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         },
         title: 'Profile',
         description: `
-        **Plat spent:** ${orders[0].plat_spent}
-        **Plat gained:** ${orders[0].plat_gained}
+        **Plat spent:** ${orders[0].plat_spent}        **Plat gained:** ${orders[0].plat_gained}
         **User rating:** 
     `,
         color: tb_invisColor
