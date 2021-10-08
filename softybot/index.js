@@ -1213,6 +1213,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     .catch(err => console.log(err))
                     open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
                     open_message.react('⚠️').catch(err => console.log(err))
+                    if (cross_thread)
+                        res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa (not yet really, kek). Say hi!').catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
                 if (cross_thread) {
