@@ -148,9 +148,8 @@ client.on('messageCreate', async message => {
         WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
         `)
         .then(res => {
-            if (res.rows.length == 0) {
+            if (res.rows.length == 0)
                 return false
-            }
             order_data = res.rows[0]
             return true
         })
@@ -158,15 +157,15 @@ client.on('messageCreate', async message => {
             console.log(err)
             return false
         })
+        var status2 = false
         if (!status) {
-            var status2 = await db.query(`
+            status2 = await db.query(`
             SELECT * FROM filled_users_orders
             WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
             `)
             .then(res => {
-                if (res.rows.length == 0) {
+                if (res.rows.length == 0)
                     return false
-                }
                 from_cross = true
                 order_data = res.rows[0]
                 return true
@@ -1183,7 +1182,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             cross_thread = crossRes
                             cross_thread_id = crossRes.id
                             cross_channel_id = crossRes.parentId
-                            setTimeout(() => reaction.message.channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
+                            setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
                         })
                         .catch(err => console.log(err))
                     }
