@@ -4823,7 +4823,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         },
         title: 'Profile',
         fields: [{
-            name: 'Plat gained<:profit:896079718955233301>',
+            name: 'Plat gained <:profit:896079718955233301>',
             value: orders[0].plat_gained + '<:platinum:881692607791648778>',
             inline: true
         },{
@@ -4831,7 +4831,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             value: '\u200b',
             inline: true
         },{
-            name: 'Plat spent<:loss:896079691755180103>',
+            name: 'Plat spent <:loss:896079691755180103>',
             value: orders[0].plat_spent + '<:platinum:881692607791648778>',
             inline: true
         },{
