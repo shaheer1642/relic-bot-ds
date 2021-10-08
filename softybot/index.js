@@ -1128,6 +1128,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(res)
                 var cross_thread = null
                 var cross_channel = null
+                var cross_thread_id = null
+                var cross_channel_id = null
                 if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
                     const guild = client.guilds.cache.get(reaction.message.guild.id)
                     if (!guild.members.cache.find(all_orders[order_rank].discord_id)) {
@@ -1139,6 +1141,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         })
                         .then(async crossRes => {
                             cross_thread = crossRes
+                            cross_thread_id = crossRes.id
+                            cross_channel_id = crossRes.parentId
                         })
                         .catch(err => console.log(err))
                     }
