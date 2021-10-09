@@ -5330,7 +5330,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     else if (request_type == 2) {
         message.edit(postdata)
         .then(res => {
-            message.reactions.removeall()
+            message.reactions.removeAll()
             for (var j=0;j<noOfTraders;j++) {
                 message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
             }
