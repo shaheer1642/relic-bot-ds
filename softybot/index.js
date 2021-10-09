@@ -1083,7 +1083,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             var check_msg_id = reaction.message.id
             if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
                 var search_item_id = ""
-                var status = await db.query(`SELECT * FROM items_list WHERE item_url = ${reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_')}`)
+                var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_')}'`)
                 .then(res => {
                     if (res.rows.length == 0)
                         return false
@@ -1098,7 +1098,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status)
                     return Promise.resolve()
-                var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = ${search_item_id}`)
+                var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = '${search_item_id}'`)
                 .then(res => {
                     if (res.rows.length == 0)
                         return false
