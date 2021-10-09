@@ -1191,6 +1191,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             }
             if (!match_trade) {
                 console.log('that trader does not exist in db  check #2')
+                reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
             }
