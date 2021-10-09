@@ -437,7 +437,13 @@ client.on('messageCreate', async message => {
                                         if (res.rows.length > 1)
                                             return false
                                         if (res.rows[0].notify_order == true) {
-                                            message.author.send(postdata).catch(err => console.log(err))
+                                            var user_presc = client.guilds.cache.get(message.guild.id).presences.cache.find(mem => mem.userId == message.author.id)
+                                            if (user_presc) {
+                                                if (user_presc.status != 'dnd')
+                                                    message.author.send(postdata).catch(err => console.log(err))
+                                            }
+                                            else
+                                                message.author.send(postdata).catch(err => console.log(err))
                                             return true
                                         }
                                     })
@@ -685,6 +691,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             console.log(`User ${username} has come online.`)
         return Promise.resolve()
         async function offline_orders_update(newMember) {
+            var user_data = null
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${newMember.user.id}`)
             .then(res => {
                 if (res.rows.length == 0) {     //user does not exist in the db
@@ -695,6 +702,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     console.log('Unexpected db response')
                     return false
                 }
+                user_data = res.rows[0]
                 return true
             })
             .catch(err => {
@@ -772,7 +780,8 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 timestamp: new Date(),
                 color: '#FFFFFF'
             })
-            newMember.user.send(postdata).catch(err => console.log(err))
+            if (user_data.notify_offline)
+                newMember.user.send(postdata).catch(err => console.log(err))
             return Promise.resolve()
         }
     }
