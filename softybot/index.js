@@ -1102,6 +1102,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
+                        if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+                            var args = []
+                            var tempp = reaction.message.embeds[0].replace('Buyers','wts').replace('Sellers','wtb')
+                            args.push(tempp)
+                            args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                            trading_bot_item_orders(reaction.message,args,2)
+                        }
                         return false
                     }
                     check_msg_id = res.rows[0].message_id
@@ -1192,6 +1199,17 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (!match_trade) {
                 console.log('that trader does not exist in db  check #2')
                 reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+                    var args = []
+                    var tempp = all_orders[order_rank].order_type
+                    if (tempp == 'wts')
+                        tempp = 'wtb'
+                    else 
+                        tempp = 'wts'
+                    args.push(tempp)
+                    args.push(all_orders[order_rank].item_url)
+                    trading_bot_item_orders(reaction.message,args,2)
+                }
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
             }
