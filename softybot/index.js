@@ -1028,7 +1028,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-    if (tradingBotChannels.includes(reaction.message.channelId)) {
+    if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
         console.log(reaction.emoji.identifier)
         if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
@@ -1159,6 +1159,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log('that trader does not exist in db  check #2')
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
+            }
+            if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+                var args = []
+                args[0] = all_orders[order_rank].item_url
+                trading_bot_item_orders(reaction.message,args,2)
             }
             console.log('exact trader found')
             //----------------
@@ -5073,30 +5078,32 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     message.channel.send(postdata).catch(err => console.log(err))
 }
 
-async function trading_bot_item_orders(message,args) {
-    var ingame_name = ""
-    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
-    .then(res => {
-        if (res.rows.length==0) {
-            status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
-            message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
-            .catch(err => {
-                console.log(err)
-                message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
-            })
+async function trading_bot_item_orders(message,args,request_type = 1) {
+    if (request_type == 1) {
+        var ingame_name = ""
+        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+        .then(res => {
+            if (res.rows.length==0) {
+                status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
+                message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                .catch(err => {
+                    console.log(err)
+                    message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
+                })
+                return false
+            }
+            ingame_name = res.rows[0].ingame_name
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`
             return false
+        })
+        if (!status) {
+            message.channel.send(status_message).catch(err => console.log(err))
+            return Promise.resolve()
         }
-        ingame_name = res.rows[0].ingame_name
-        return true
-    })
-    .catch(err => {
-        console.log(err)
-        status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`
-        return false
-    })
-    if (!status) {
-        message.channel.send(status_message).catch(err => console.log(err))
-        return Promise.resolve()
     }
     var order_type = args.shift()
     if (order_type == 'wts')
@@ -5168,8 +5175,6 @@ async function trading_bot_item_orders(message,args) {
     WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
     `)
     .then(res => {
-        
-    //ORDER BY ${order_type.replace('wts','users_orders.user_price').replace('wtb','users_orders.user_price DESC')},users_orders.visibility
         if (res.rows.length == 0) {
             message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
             return false
@@ -5226,12 +5231,12 @@ async function trading_bot_item_orders(message,args) {
         postdata.embeds.push({
             fields: [
                 {
-                    name: `Online ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
+                    name: order_type.replace('wts','Sellers').replace('wtb','Buyers'),
                     value: vis_traders_names.toString().replace(/,/g,'\n'),
                     inline: true
                 },{name: '\u200b',value: '\u200b', inline: true},
                 {
-                    name: `Price`,
+                    name: `Prices`,
                     value: vis_traders_prices.toString().replace(/,/g,'\n'),
                     inline: true
                 }
@@ -5272,16 +5277,31 @@ async function trading_bot_item_orders(message,args) {
     postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
     postdata.embeds[0].thumbnail = {url: icon_url}
     console.log(JSON.stringify(postdata))
-    message.channel.send(postdata)
-    .then(msg => {
-        for (var j=0;j<noOfTraders;j++) {
-            msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
-        }
-    })
-    .catch(err => {
-        console.log(err)
-        message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
-    })
+    if (request_type == 1) {
+        message.channel.send(postdata)
+        .then(msg => {
+            for (var j=0;j<noOfTraders;j++) {
+                msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
+        })
+    }
+    else if (request_type == 2) {
+        message.edit(postdata)
+        .then(res => {
+            message.reactions.removeall()
+            for (var j=0;j<noOfTraders;j++) {
+                message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(err => console.log(err))
+        })
+    }
     return Promise.resolve()
 }
 
