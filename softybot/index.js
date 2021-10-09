@@ -136,7 +136,7 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        if (!tradingBotChannels.includes(message.channel.parentId))
+        if (!tradingBotChannels.includes(message.channel.parentId) && !tradingBotSpamChannels.includes(message.channel.parentId))
             return Promise.resolve()
         if (message.channel.ownerId != client.user.id)
             return Promise.resolve()
@@ -1371,7 +1371,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     if (reaction.message.channel.isThread()) {
-        if (tradingBotChannels.includes(reaction.message.channel.parentId)) {
+        if (tradingBotChannels.includes(reaction.message.channel.parentId) || tradingBotSpamChannels.includes(reaction.message.channel.parentId)) {
             if (reaction.message.channel.ownerId == client.user.id) {
                 if (!reaction.message.channel.archived) {
                     if (!reaction.message.author)
