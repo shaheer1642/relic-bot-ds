@@ -1160,11 +1160,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 return Promise.resolve()
             }
-            if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
-                var args = []
-                args[0] = all_orders[order_rank].item_url
-                trading_bot_item_orders(reaction.message,args,2)
-            }
             console.log('exact trader found')
             //----------------
             if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
@@ -1191,6 +1186,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
             }
             trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
+            if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+                var args = []
+                args[0] = all_orders[order_rank].item_url
+                trading_bot_item_orders(reaction.message,args,2)
+            }
             const thread = await reaction.message.channel.threads.create({
                 name: threadName,
                 autoArchiveDuration: 60,
