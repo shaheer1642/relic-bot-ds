@@ -2162,7 +2162,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
     if (newThread.archived) {
         if (newThread.ownerId != client.user.id)
             return Promise.resolve()
-        if (!tradingBotChannels.includes(newThread.parentId))
+        if (!tradingBotChannels.includes(newThread.parentId) && !tradingBotSpamChannels.includes(newThread.parentId))
             return Promise.resolve()
         var order_data = null
         var status = await db.query(`
