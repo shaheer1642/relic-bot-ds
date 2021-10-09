@@ -782,6 +782,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 client.on('interactionCreate', async interaction => {
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         const discord_id = interaction.member.user.id
+        var user_profile = null
         var ingame_name = ""
         var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
         .then(res => {
@@ -795,6 +796,7 @@ client.on('interactionCreate', async interaction => {
             }
             else {
                 ingame_name = res.rows[0].ingame_name
+                user_profile = res.rows[0]
                 return true
             }
         })
@@ -896,11 +898,35 @@ client.on('interactionCreate', async interaction => {
                 buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
             }
         })
+        postdata.embeds.push({
+            author: {
+                name: ingame_name,
+                iconURL: interaction.user.displayAvatarURL()
+            },
+            title: 'Profile',
+            fields: [{
+                name: 'Plat gained <:profit:896079718955233301>',
+                value: user_profile.plat_gained + '<:platinum:881692607791648778>',
+                inline: true
+            },{
+                name: '\u200b',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Plat spent <:loss:896079691755180103>',
+                value: user_profile.plat_spent + '<:platinum:881692607791648778>',
+                inline: true
+            },{
+                name: '⭐ User rating',
+                value: '\u200b',
+                inline: true
+            }],
+            color: tb_invisColor
+        })
         if (sell_items.length != 0)
             postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
         if (buy_items.length != 0)
             postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
-        postdata.embeds[0].author = {name: ingame_name,iconURL: interaction.user.displayAvatarURL()}
         postdata.components = []
         postdata.components.push({type:1,components:[]})
         postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
@@ -4960,7 +4986,10 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         return Promise.resolve()
     }
     var orders = null
-    var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${discord_id}`)
+    var status = await db.query(`SELECT * FROM users_orders 
+    JOIN items_list ON users_orders.item_id=items_list.id 
+    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    WHERE users_orders.discord_id = ${discord_id}`)
     .then(res => {
         if (res.rows.length == 0) {
             if (request_type == 1)
