@@ -5196,7 +5196,8 @@ async function trading_bot_item_orders(message,args) {
         all_orders = all_orders.sort(dynamicSortDesc("user_price"))
         color = tb_buyColor
     }
-    all_orders.sort(function(a,b){return a.visibility-b.visibility});
+    all_orders.sort(function(a,b){return b.visibility-a.visibility});
+    console.log(all_orders)
     var postdata = {}
     postdata.content = " "
     postdata.embeds = []
