@@ -1100,8 +1100,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return Promise.resolve()
                 var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = '${search_item_id}'`)
                 .then(res => {
-                    if (res.rows.length == 0)
+                    if (res.rows.length == 0) {
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
                         return false
+                    }
                     check_msg_id = res.rows[0].message_id
                     return true
                 })
