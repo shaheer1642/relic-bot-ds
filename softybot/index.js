@@ -32,7 +32,7 @@ const tb_invisColor = '#71368A'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
-const u_order_close_time = 10800000
+const u_order_close_time = 10000 //10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -3570,7 +3570,7 @@ async function getDB(message,args) {
             return false
         })
         if (!status) {
-            message.channel.send(`Some error occured compiling 'users_orders'. Please contact MrSofty#7926`)
+            message.channel.send(`Some error occured compiling 'filled_users_orders'. Please contact MrSofty#7926`)
             return
         }
         var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
@@ -4695,7 +4695,13 @@ async function trading_bot(message,args,command) {
                     if (res.rows.length > 1)
                         return false
                     if (res.rows[0].notify_order == true) {
-                        originMessage.author.send(postdata).catch(err => console.log(err))
+                        var user_presc = client.guilds.cache.get(originMessage.guild.id).presences.cache.find(mem => mem.userId == originMessage.author.id)
+                        if (user_presc) {
+                            if (user_presc.status != 'dnd')
+                                originMessage.author.send(postdata).catch(err => console.log(err))
+                        }
+                        else
+                            originMessage.author.send(postdata).catch(err => console.log(err))
                         return true
                     }
                 })
