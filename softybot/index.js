@@ -3507,6 +3507,7 @@ async function getDB(message,args) {
         var items_list = []
         var users_list = []
         var users_orders = []
+        var filled_users_orders = []
         var status = await db.query(`SELECT * FROM items_list`)
         .then(res => {
             if (res.rows.length == 0)
@@ -3557,9 +3558,25 @@ async function getDB(message,args) {
             message.channel.send(`Some error occured compiling 'users_orders'. Please contact MrSofty#7926`)
             return
         }
+        var status = await db.query(`SELECT * FROM filled_users_orders`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            filled_users_orders = res.rows
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            message.channel.send(`Some error occured compiling 'users_orders'. Please contact MrSofty#7926`)
+            return
+        }
         var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
         var buffer_users_list = Buffer.from(JSON.stringify(users_list), 'utf8');
         var buffer_users_orders = Buffer.from(JSON.stringify(users_orders), 'utf8');
+        var buffer_filled_users_orders = Buffer.from(JSON.stringify(filled_users_orders), 'utf8');
         message.channel.send({
             content: " ", 
             files: [
@@ -3574,6 +3591,10 @@ async function getDB(message,args) {
                 {
                     attachment: buffer_users_orders,
                     name: 'users_orders.json'
+                },
+                {
+                    attachment: buffer_filled_users_orders,
+                    name: 'filled_users_orders.json'
                 },
             ]
         })
