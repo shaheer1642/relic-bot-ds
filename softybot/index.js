@@ -32,7 +32,7 @@ const tb_invisColor = '#71368A'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
-const u_order_close_time = 10000 //10800000
+const u_order_close_time = 10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -4398,44 +4398,44 @@ async function updateDatabasePrices(up_origin) {
                         continue
                     if (all_orders[i].visibility)
                         trading_bot_orders_update(null,item_data.id,item_data.item_url,item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
-                }
-                var user_data = null
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${all_orders[i].discord_id}`)
-                .then(res => {
-                    if (res.rows.length == 0)
+                    var user_data = null
+                    var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${all_orders[i].discord_id}`)
+                    .then(res => {
+                        if (res.rows.length == 0)
+                            return false
+                        if (res.rows.length > 1)
+                            return false
+                        user_data = res.rows[0]
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
                         return false
-                    if (res.rows.length > 1)
-                        return false
-                    user_data = res.rows[0]
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    continue
-                var postdata = {}
-                postdata.content = " "
-                postdata.embeds = []
-                postdata.embeds.push({
-                    description: `❕ Order Remove Notification ❕\n\nYour **${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** has been removed as its price is out of range of the average item price.`,
-                    footer: {text: `Type 'disable notify_remove' to disable these notifications in the future. (NOT IMPLEMENTED YET)\n\u200b`},
-                    timestamp: new Date()
-                })
-                if (all_orders[i].order_type == 'wts')
-                    postdata.embeds[0].color = tb_sellColor
-                if (all_orders[i].order_type == 'wtb')
-                    postdata.embeds[0].color = tb_buyColor
-                const user = client.users.cache.get(all_orders[i].discord_id)
-                if (user_data.notify_remove) {
-                    var user_presc = client.guilds.cache.get(all_orders[i].origin_guild_id).presences.cache.find(mem => mem.userId == all_orders[i].discord_id)
-                    if (user_presc) {
-                        if (user_presc.status != 'dnd')
+                    })
+                    if (!status)
+                        continue
+                    var postdata = {}
+                    postdata.content = " "
+                    postdata.embeds = []
+                    postdata.embeds.push({
+                        description: `❕ Order Remove Notification ❕\n\nYour **${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** has been removed as its price is out of range of the average item price.`,
+                        footer: {text: `Type 'disable notify_remove' to disable these notifications in the future. (NOT IMPLEMENTED YET)\n\u200b`},
+                        timestamp: new Date()
+                    })
+                    if (all_orders[i].order_type == 'wts')
+                        postdata.embeds[0].color = tb_sellColor
+                    if (all_orders[i].order_type == 'wtb')
+                        postdata.embeds[0].color = tb_buyColor
+                    const user = client.users.cache.get(all_orders[i].discord_id)
+                    if (user_data.notify_remove) {
+                        var user_presc = client.guilds.cache.get(all_orders[i].origin_guild_id).presences.cache.find(mem => mem.userId == all_orders[i].discord_id)
+                        if (user_presc) {
+                            if (user_presc.status != 'dnd')
+                                user.send(postdata).catch(err => console.log(err))
+                        }
+                        else
                             user.send(postdata).catch(err => console.log(err))
                     }
-                    else
-                        user.send(postdata).catch(err => console.log(err))
                 }
             }
         }
