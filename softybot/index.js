@@ -1104,7 +1104,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
                         if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
                             var args = []
-                            var tempp = reaction.message.embeds[0].replace('Buyers','wts').replace('Sellers','wtb')
+                            var tempp = reaction.message.embeds[0].fields[0].name.replace('Buyers','wts').replace('Sellers','wtb')
                             args.push(tempp)
                             args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                             trading_bot_item_orders(reaction.message,args,2)
