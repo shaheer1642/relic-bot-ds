@@ -1080,12 +1080,44 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 return Promise.resolve()
             }
             var all_orders = []
+            var check_msg_id = reaction.message.id
+            if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+                var search_item_id = ""
+                var status = await db.query(`SELECT * FROM items_list WHERE item_url = ${reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_')}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    if (res.rows.length > 1)
+                        return false
+                    search_item_id = res.rows[0].id
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return Promise.resolve()
+                var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = ${search_item_id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    check_msg_id = res.rows[0].message_id
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return Promise.resolve()
+            }
             var status = await db.query(`
             SELECT * FROM messages_ids
             JOIN users_orders ON messages_ids.item_id = users_orders.item_id
             JOIN users_list ON users_orders.discord_id = users_list.discord_id
             JOIN items_list ON users_orders.item_id = items_list.id
-            WHERE messages_ids.message_id = ${reaction.message.id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'
+            WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'
             ORDER BY users_list.ingame_name`)
             .then(res => {
                 if (res.rows.length == 0) {
@@ -1188,7 +1220,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
             trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2).catch(err => console.log(err))
             if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
                 var args = []
-                args[0] = all_orders[order_rank].item_url
+                var tempp = all_orders[order_rank].order_type
+                if (tempp == 'wts')
+                    tempp = 'wtb'
+                else 
+                    tempp = 'wts'
+                args.push(tempp)
+                args.push(all_orders[order_rank].item_url)
                 trading_bot_item_orders(reaction.message,args,2)
             }
             const thread = await reaction.message.channel.threads.create({
