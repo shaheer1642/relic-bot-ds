@@ -2377,68 +2377,30 @@ async function orders(message,args) {
     //var WFM_Items_List = require('../WFM_Items_List.json')
     //const filecontent = fs.readFileSync('./WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
     //let WFM_Items_List = JSON.parse(filecontent)
-    let WFM_Items_List = []
-    let pricesDB = []
-    let relicsDB = []
-    console.log('Retrieving Database -> wfm_items_list')
-    var status = await db.query(`SELECT wfm_items_list FROM files where id = 1`)
+    let items_list = []
+    console.log('Retrieving Database -> items_list')
+    var status = await db.query(`SELECT * FROM items_list`)
     .then(res => {
-        WFM_Items_List = res.rows[0].wfm_items_list
-        console.log('Retrieving Database -> wfm_items_list success')
-        return 1
+        items_list = res.rows
+        console.log('Retrieving Database -> items_list success')
+        return true
     })
     .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
         console.log(err)
-        console.log('Retrieving Database -> wfm_items_list error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return 0
-    })
-    if (!status)
-        return
-    console.log('Retrieving Database -> pricesDB')
-    status = await db.query(`SELECT pricesdb FROM files where id = 1`)
-    .then(res => {
-        pricesDB = res.rows[0].pricesdb
-        console.log('Retrieving Database -> pricesDB success')
-        return 1
-    })
-    .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
-        console.log(err)
-        console.log('Retrieving Database -> pricesDB error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return 1
-    })
-    if (!status)
-        return
-    console.log('Retrieving Database -> relicsDB')
-    status = await db.query(`SELECT relicsdb FROM files where id = 1`)
-    .then(res => {
-        relicsDB = res.rows[0].relicsdb
-        console.log('Retrieving Database -> relicsDB success')
-        return 1
-    })
-    .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
-        console.log(err)
-        console.log('Retrieving Database -> relicsDB error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return 0
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"})
+        return false
     })
     if (!status)
         return
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
-    WFM_Items_List.forEach(element => {
-        if (element.url_name.match('^' + d_item_url + '\W*'))
+    items_list.forEach(element => {
+        if (element.item_url.match('^' + d_item_url + '\W*'))
         {
-            if (element.url_name.match("prime"))
+            if (element.item_url.match("prime"))
                 primeFlag = 1
-            arrItemsUrl.push(element.url_name);
+            arrItemsUrl.push(element.item_url);
         }
     })
     if (arrItemsUrl.length==0)
@@ -2513,22 +2475,10 @@ async function orders(message,args) {
                 prices = "\u200b"
             }
             var footerText = ""
-            if (item_url.match('prime')) {
-                //const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
-                //let pricesDB = JSON.parse(filecontent)
-                pricesDB.forEach(element => {
-                    if (element.item_url == item_url)
-                        footerText = "Yesterday Avg: " + element.price + '\n\u200b'
-                })
-            }
-            else if (item_url.match('relic')) {
-                //const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
-                //let pricesDB = JSON.parse(filecontent)
-                relicsDB.forEach(element => {
-                    if (element.item_url == item_url)
-                        footerText = "Yesterday Avg: " + element.price + '\n\u200b'
-                })
-            }
+            items_list.forEach(element => {
+                if (element.item_url == item_url)
+                    footerText = "Yesterday Avg: " + element.sell_price + '\n\u200b'
+            })
             console.log(footerText)
             embeds.push({
                 title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
