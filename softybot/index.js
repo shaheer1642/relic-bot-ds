@@ -4083,9 +4083,7 @@ async function updateDatabasePrices(up_origin) {
                     console.log(`Success.`)
                     //-----sell avg-----
                     var sellAvgPrice = 0
-                    sellAvgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].moving_avg
-                    if (!sellAvgPrice)
-                        sellAvgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
+                    sellAvgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
                     if (!sellAvgPrice)
                         sellAvgPrice = null
                     console.log(sellAvgPrice)
@@ -4096,9 +4094,7 @@ async function updateDatabasePrices(up_origin) {
                         if (e.order_type == "buy")
                             buyPrices.push(e)
                     })
-                    buyAvgPrice = buyPrices[buyPrices.length-1].moving_avg
-                    if (!buyAvgPrice)
-                        buyAvgPrice = buyPrices[buyPrices.length-1].median
+                    buyAvgPrice = buyPrices[buyPrices.length-1].median
                     if (!buyAvgPrice)
                         buyAvgPrice = null
                     console.log(buyAvgPrice)
