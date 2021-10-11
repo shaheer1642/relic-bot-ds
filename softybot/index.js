@@ -729,9 +729,11 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             })
             if (!status)
                 return Promise.resolve()
-            var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id}`)
+            var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
             .then(res => {
                 console.log(res)
+                if (res.rowCount == 0)
+                    return false
                 return true
             })
             .catch(err => {
