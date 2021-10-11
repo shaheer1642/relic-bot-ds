@@ -1682,39 +1682,19 @@ client.on('messageReactionAdd', async (reaction, user) => {
             return
         reaction.users.remove(user.id);
         reaction.message.edit({content: "Updating...", embeds: []})
-        let pricesDB = []
-        let relicsDB = []
-        console.log('Retrieving Database -> pricesDB')
-        var status = await db.query(`SELECT pricesdb FROM files where id = 1`)
+        let items_list = []
+        console.log('Retrieving Database -> items_list')
+        var status = await db.query(`SELECT * FROM items_list`)
         .then(res => {
-            pricesDB = res.rows[0].pricesdb
-            console.log('Retrieving Database -> pricesDB success')
-            return 1
+            items_list = res.rows
+            console.log('Retrieving Database -> items_list success')
+            return true
         })
         .catch (err => {
-            if (err.response)
-                console.log(err.response.data)
             console.log(err)
-            console.log('Retrieving Database -> pricesDB error')
-            reaction.message.edit({content: "Some error occured retrieving database info.\nError code: 500"})
-            return 0
-        })
-        if (!status)
-            return
-        console.log('Retrieving Database -> relicsDB')
-        status = await db.query(`SELECT relicsdb FROM files where id = 1`)
-        .then(res => {
-            relicsDB = res.rows[0].relicsdb
-            console.log('Retrieving Database -> relicsDB success')
-            return 1
-        })
-        .catch (err => {
-            if (err.response)
-                console.log(err.response.data)
-            console.log(err)
-            console.log('Retrieving Database -> relicsDB error')
-            reaction.message.edit({content: "Some error occured retrieving database info.\nError code: 500"})
-            return 0
+            console.log('Retrieving Database -> items_list error')
+            message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"})
+            return false
         })
         if (!status)
             return
@@ -1762,22 +1742,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     prices = "\u200b"
                 }
                 var footerText = ""
-                if (item_url.match('prime')) {
-                    //const filecontent = fs.readFileSync("./pricesDB.json", 'utf8').replace(/^\uFEFF/, '')
-                    //let pricesDB = JSON.parse(filecontent)
-                    pricesDB.forEach(element => {
-                        if (element.item_url == item_url)
-                            footerText = "Yesterday Avg: " + element.price + '\n\u200b'
-                    })
-                }
-                else if (item_url.match('relic')) {
-                    //const filecontent = fs.readFileSync("./relicsDB.json", 'utf8').replace(/^\uFEFF/, '')
-                    //let relicsDB = JSON.parse(filecontent)
-                    relicsDB.forEach(element => {
-                        if (element.item_url == item_url)
-                            footerText = "Yesterday Avg: " + element.price + '\n\u200b'
-                    })
-                }
+                items_list.forEach(element => {
+                    if (element.item_url == item_url)
+                        footerText = "Yesterday Avg: " + element.sell_price + '\n\u200b'
+                })
                 console.log(footerText)
                 embeds.push({
                     title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
