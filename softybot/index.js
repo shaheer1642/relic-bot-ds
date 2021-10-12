@@ -1752,7 +1752,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 console.log(postdata)
                 reaction.message.edit(postdata).catch(err => console.log(err))
-                reaction.users.remove(user.id)
+                reaction.users.remove(user.id).catch(err => console.log(err))
                 return
             }
         }
