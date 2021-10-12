@@ -295,9 +295,9 @@ client.on('messageCreate', async message => {
                 postdata.embeds.push({
                     title: 'Notification Settings',
                     description: `
-                        ${user_data.notify_offline.replace(true, '🟢').replace(false, '🔴')} Notify orders when going offline
-                        ${user_data.notify_order.replace(true, '🟢').replace(false, '🔴')} Notify when orders auto-close in 3 hours
-                        ${user_data.notify_remove.replace(true, '🟢').replace(false, '🔴')} Notify when orders are removed if item price changes`,
+                        ${notify_offline} Notify orders when going offline
+                        ${notify_order} Notify when orders auto-close in 3 hours
+                        ${notify_remove} Notify when orders are removed if item price changes`,
                     footer: {text: `You will not receive these notfications on 'do not disturb'`},
                     color: tb_invisColor
                 })
