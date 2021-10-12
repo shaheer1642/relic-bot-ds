@@ -69,7 +69,7 @@ const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'C
 //const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
 
-client.on('ready', () => {
+client.on('ready', async () => {
     client.user.setActivity('.help', { type: 2 })
     //--------Set new timer--------
     var currTime = new Date();
