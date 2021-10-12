@@ -106,6 +106,7 @@ client.on('ready', async () => {
         console.log(err)
         return false
     })
+    console.log(all_orders)
     if (status) {
         var currTime = new Date().getTime()
         for (var i=0;i<all_orders.length;i++) {
