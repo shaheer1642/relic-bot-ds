@@ -688,9 +688,9 @@ client.on('messageCreate', async message => {
                             inline: true
                         })
                     }
-                    postdata.embeds[0].fields[x].value += i+1 + ' ' + all_users[i].ingame_name
-                    postdata.embeds[0].fields[x+1].value += all_users[i].plat_gained
-                    postdata.embeds[0].fields[x+2].value += all_users[i].plat_spent
+                    postdata.embeds[0].fields[x].value += i+1 + '. ' + all_users[i].ingame_name + '\n'
+                    postdata.embeds[0].fields[x+1].value += all_users[i].plat_gained + '\n'
+                    postdata.embeds[0].fields[x+2].value += all_users[i].plat_spent + '\n'
                 }
                 message.channel.send(postdata).catch(err => {
                     console.log(err)
