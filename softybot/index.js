@@ -255,7 +255,7 @@ client.on('messageCreate', async message => {
                 trading_bot_registeration(message,args.pop())
                 continue
             }
-            else if (args[0] == 'notifications') {
+            else if (args[0].toLowerCase() == 'notifications' || args[0].toLowerCase() == 'notification') {
                 var user_data = null
                 var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
@@ -274,6 +274,21 @@ client.on('messageCreate', async message => {
                 })
                 if (!status)
                     return
+                var notify_offline = ""
+                var notify_order = ""
+                var notify_remove = ""
+                if (user_data.notify_offline)
+                    notify_offline = '🟢'
+                else
+                    notify_offline = '🔴'
+                if (user_data.notify_order)
+                    notify_order = '🟢'
+                else
+                    notify_order = '🔴'
+                if (user_data.notify_remove)
+                    notify_remove = '🟢'
+                else
+                    notify_remove = '🔴'
                 var postdata = {}
                 postdata.content = " "
                 postdata.embeds = []
