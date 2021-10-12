@@ -107,9 +107,9 @@ client.on('ready', async () => {
         return false
     })
     if (status) {
-        var after3h = new Date().getTime()
-        var after3h = after3h + (10800000 - (after3h - all_orders[i].update_timestamp))
         for (var i=0;i<all_orders.length;i++) {
+            var after3h = new Date().getTime()
+            var after3h = after3h + (u_order_close_time - (after3h - all_orders[i].update_timestamp))
             console.log(after3h - all_orders[i].update_timestamp)
             setTimeout(async () => {
                 var item_id = all_orders[i].item_id
