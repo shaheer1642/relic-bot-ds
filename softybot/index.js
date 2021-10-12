@@ -94,6 +94,115 @@ client.on('ready', () => {
     DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
+
+    //----Set timeouts for orders if any----
+    var all_orders = []
+    var status = await db.query(`SELECT * FROM users_orders WHERE visibility = true`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false 
+        all_orders = res.rows
+        return true 
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (status) {
+        var currTime = new Date().getTime()
+        for (var i=0;i<all_orders.length;i++) {
+            console.log(currTime - all_orders[i].update_timestamp)
+            setTimeout(async () => {
+                var item_id = all_orders[i].item_id
+                var order_type = all_orders[i].order_type
+                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    if (res.rows[0].visibility == false)
+                        return false
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return
+                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    console.log(`Error setting timeout for order discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                    return Promise.reject()
+                }
+                var item_detail = []
+                var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false 
+                    item_detail =res.rows[0]
+                    return true 
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return
+                var item_url = item_detail.item_url
+                var item_name = item_detail.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
+                    var postdata = {}
+                    postdata.content = " "
+                    postdata.embeds = []
+                    postdata.embeds.push({
+                        description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                        footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                        timestamp: new Date()
+                    })
+                    if (order_type == 'wts')
+                        postdata.embeds[0].color = tb_sellColor
+                    if (order_type == 'wtb')
+                        postdata.embeds[0].color = tb_buyColor
+                    console.log(postdata)
+                    var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders[i].discord_id}`)
+                    .then(res => {
+                        if (res.rows.length == 0)
+                            return false
+                        if (res.rows.length > 1)
+                            return false
+                        const user = client.users.cache.get(all_orders[i].discord_id)
+                        if (res.rows[0].notify_order == true) {
+                            var user_presc = client.guilds.cache.get(all_orders[i].origin_guild_id).presences.cache.find(mem => mem.userId == all_orders[i].discord_id)
+                            if (user_presc) {
+                                if (user_presc.status != 'dnd')
+                                    user.send(postdata).catch(err => console.log(err))
+                            }
+                            else
+                                user.send(postdata).catch(err => console.log(err))
+                            return true
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
+                        return Promise.reject()
+                    }
+                    return Promise.resolve()
+                })
+                .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
+            }, currTime - all_orders[i].update_timestamp);
+        }
+    }
 })
 
 client.on('messageCreate', async message => {
