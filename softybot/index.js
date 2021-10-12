@@ -450,7 +450,7 @@ client.on('messageCreate', async message => {
                                     postdata.embeds = []
                                     postdata.embeds.push({
                                         description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                                        footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                                         timestamp: new Date()
                                     })
                                     if (order_type == 'wts')
@@ -805,7 +805,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 ❕ Offline Notification ❕\n
                 You have been detected offline. Following orders have been set invisible for you:\n
                 ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                footer: {text: `Type 'disable notify_offline' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                 timestamp: new Date(),
                 color: '#FFFFFF'
             })
@@ -4498,7 +4498,7 @@ async function updateDatabasePrices(up_origin) {
                     postdata.embeds = []
                     postdata.embeds.push({
                         description: `❕ Order Remove Notification ❕\n\nYour **${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** has been removed as its price is out of range of the average item price.`,
-                        footer: {text: `Type 'disable notify_remove' to disable these notifications in the future. (NOT IMPLEMENTED YET)\n\u200b`},
+                        footer: {text: `Type 'notifications' to disable these notifications in the future.\n\u200b`},
                         timestamp: new Date()
                     })
                     if (all_orders[i].order_type == 'wts')
@@ -4853,7 +4853,7 @@ async function trading_bot(message,args,command) {
                 postdata.embeds = []
                 postdata.embeds.push({
                     description: `❕ Order Notification ❕\n\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                    footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                     timestamp: new Date()
                 })
                 if (command == 'wts')
@@ -5721,7 +5721,7 @@ async function td_set_orders_timeouts() {
                 postdata.embeds = []
                 postdata.embeds.push({
                     description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                    footer: {text: `Type 'disable notify_order' to disable these notifications in the future. (NOT IMPLEMENTED YET)\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                     timestamp: new Date()
                 })
                 if (order_type == 'wts')
