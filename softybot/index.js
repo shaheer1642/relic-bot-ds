@@ -94,7 +94,7 @@ client.on('ready', async () => {
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 
     //----Set timeouts for orders if any----
-    var all_orders = []
+    var all_orders = null
     var status = await db.query(`SELECT * FROM users_orders WHERE visibility = true`)
     .then(res => {
         if (res.rows.length == 0)
@@ -141,7 +141,7 @@ client.on('ready', async () => {
                     console.log(`Error setting timeout for order discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
                     return Promise.reject()
                 }
-                var item_detail = []
+                var item_detail = null
                 var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
                 .then(res => {
                     if (res.rows.length == 0)
