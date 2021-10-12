@@ -1701,13 +1701,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
         if (reaction.message.author.id == client.user.id) {
             if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
                 if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[0])
-                    var status = await db.query(`UPDATE users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${message.author.id}`).catch(err => console.log(err))
+                    var status = await db.query(`UPDATE users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                 else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[1])
-                    var status = await db.query(`UPDATE users_list SET notify_order = NOT notify_order WHERE discord_id = ${message.author.id}`).catch(err => console.log(err))
+                    var status = await db.query(`UPDATE users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                 else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[2])
-                    var status = await db.query(`UPDATE users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${message.author.id}`).catch(err => console.log(err))
+                    var status = await db.query(`UPDATE users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                 var user_data = null
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
                 .then(res => {
                     if (res.rows.length==0) {
                         message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
