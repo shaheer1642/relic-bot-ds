@@ -341,7 +341,7 @@ client.on('messageCreate', async message => {
                     return Promise.resolve()
                 }
                 //set all orders as visible for this user
-                var status = await db.query(`UPDATE users_orders SET visibility=true, update_timestamp = ${new Date()} WHERE discord_id=${message.author.id}`)
+                var status = await db.query(`UPDATE users_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${message.author.id}`)
                 .then(res => {
                     return true
                 })
@@ -4606,7 +4606,7 @@ async function trading_bot(message,args,command) {
     var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
-            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true,${originMessage.channel.id},${originMessage.guild.id},${new Date()})`)
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
             .then(res => {
                 return true
             })
@@ -4627,7 +4627,7 @@ async function trading_bot(message,args,command) {
             return false
         }
         else {     //----update existing order in DB----
-            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
             .then(res => {
                 return true
             })
