@@ -633,7 +633,7 @@ client.on('messageCreate', async message => {
             }
             else if (commandsArr[commandsArrIndex].toLowerCase() == 'leaderboard') {
                 var all_users = null
-                var status = await db.query(`SELECT * FROM users_list ORDER BY ingame_name,plat_spent DESC,plat_gained DESC`)
+                var status = await db.query(`SELECT * FROM users_list ORDER BY plat_gained DESC,plat_spent DESC,ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         message.channel.send('No users found in the DB currently')
