@@ -63,8 +63,6 @@ async function e_db_conn() {
 //relic bot "token": "ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E",
 
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
-//connect to the postgresSQL database
-//postgres://umpcklxkzdwigj:9e3dfe91e4a4ee811ce2369f89f7c3f11238275e9c3909e268cb79d5cf15fd56@ec2-54-74-60-70.eu-west-1.compute.amazonaws.com:5432/d9lv1t75hhod22
 
 //const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
@@ -109,9 +107,10 @@ client.on('ready', async () => {
         return false
     })
     if (status) {
-        var currTime = new Date().getTime()
+        var after3h = new Date().getTime()
+        var after3h = after3h + (10800000 - (after3h - all_orders[i].update_timestamp))
         for (var i=0;i<all_orders.length;i++) {
-            console.log(currTime - all_orders[i].update_timestamp)
+            console.log(after3h - all_orders[i].update_timestamp)
             setTimeout(async () => {
                 var item_id = all_orders[i].item_id
                 var order_type = all_orders[i].order_type
@@ -200,7 +199,7 @@ client.on('ready', async () => {
                     return Promise.resolve()
                 })
                 .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
-            }, currTime - all_orders[i].update_timestamp);
+            }, after3h - all_orders[i].update_timestamp);
         }
     }
 })
