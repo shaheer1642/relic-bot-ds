@@ -1752,7 +1752,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 console.log(postdata)
                 reaction.message.edit(postdata).catch(err => console.log(err))
-                reaction.users.remove(user.id).catch(err => console.log(err))
                 return
             }
         }
@@ -2039,6 +2038,68 @@ client.on('messageReactionAdd', async (reaction, user) => {
 client.on('messageReactionRemove', async (reaction, user) => {
     if (user.bot)
         return
+
+    if (!reaction.message.guildId) {
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.author.id == client.user.id) {
+            if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
+                if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[0])
+                    var status = await db.query(`UPDATE users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[1])
+                    var status = await db.query(`UPDATE users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[2])
+                    var status = await db.query(`UPDATE users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                var user_data = null
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+                .then(res => {
+                    if (res.rows.length==0) {
+                        message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+                        return false
+                    }
+                    user_data = res.rows[0]
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    message.channel.send(`☠️ Error fetching your info from DB.\nError code: 501\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+                    return false
+                })
+                if (!status)
+                    return
+                var notify_offline = ""
+                var notify_order = ""
+                var notify_remove = ""
+                if (user_data.notify_offline)
+                    notify_offline = '🟢'
+                else
+                    notify_offline = '🔴'
+                if (user_data.notify_order)
+                    notify_order = '🟢'
+                else
+                    notify_order = '🔴'
+                if (user_data.notify_remove)
+                    notify_remove = '🟢'
+                else
+                    notify_remove = '🔴'
+                var postdata = {}
+                postdata.content = " "
+                postdata.embeds = []
+                postdata.embeds.push({
+                    title: 'Notification Settings',
+                    description: `
+                        ${notify_offline} Notify orders when going offline
+                        ${notify_order} Notify when orders auto-close in 3 hours
+                        ${notify_remove} Notify when orders are removed if item price changes`,
+                    footer: {text: `You will not receive these notfications on 'do not disturb'`},
+                    color: tb_invisColor
+                })
+                console.log(postdata)
+                reaction.message.edit(postdata).catch(err => console.log(err))
+                return
+            }
+        }
+    }
 
     if (reaction.emoji.name == "⭐") {
         if (!reaction.message.author)
