@@ -246,34 +246,6 @@ client.on('messageCreate', async message => {
     let commandsArr = message.content.split('\n')
     for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
-            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
-            .then(async res => {
-                if (!res.rows.length == 0) {
-                    if (res.rows[0].on_session == true) {
-                        await client.users.fetch(res.rows[0].session_partner)
-                        .then(async partner => {
-                            await partner.send(`**${res.rows[0].ingame_name}:** ${message.content}`)
-                            .catch(err => {
-                                console.log(err)
-                            })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                    }
-                }
-                return true
-            })
-            .catch (err => {
-                if (err.response)
-                    console.log(err.response.data)
-                console.log(err)
-                console.log('Retrieving Database -> items_list error')
-                message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-                return false
-            })
-            if (!status)
-                continue
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
                 if (!args[2]) {
@@ -282,6 +254,45 @@ client.on('messageCreate', async message => {
                 }
                 trading_bot_registeration(message,args.pop())
                 continue
+            }
+            else if (args[0] == 'notifications') {
+                var user_data = null
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                .then(res => {
+                    if (res.rows.length==0) {
+                        message.author.send({content: "⚠️ Your in-game name is not registered with the bot ⚠️"}).catch(err => console.log(err))
+                        message.author.send({content: "Type the following command to register your ign:\nset ign your_username"}).catch(err => console.log(err))
+                        return false
+                    }
+                    user_data = res.rows[0]
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+                    return false
+                })
+                if (!status)
+                    return
+                var postdata = {}
+                postdata.content = " "
+                postdata.embeds = []
+                postdata.embeds.push({
+                    title: 'Notification Settings',
+                    description: `
+                        ${user_data.notify_offline.replace(true, '🟢').replace(false, '🔴')} Notify orders when going offline
+                        ${user_data.notify_order.replace(true, '🟢').replace(false, '🔴')} Notify when orders auto-close in 3 hours
+                        ${user_data.notify_remove.replace(true, '🟢').replace(false, '🔴')} Notify when orders are removed if item price changes`,
+                    footer: {text: `You will not receive these notfications on 'do not disturb'`},
+                    color: tb_invisColor
+                })
+                console.log(postdata)
+                message.channel.send(postdata).then(res => {
+                    res.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
+                    res.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
+                    res.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+                return
             }
         }
         if (tradingBotChannels.includes(message.channelId)) {
