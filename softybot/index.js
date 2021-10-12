@@ -107,10 +107,10 @@ client.on('ready', async () => {
         return false
     })
     if (status) {
+        var currTime = new Date().getTime()
         for (var i=0;i<all_orders.length;i++) {
-            var after3h = new Date().getTime()
-            var after3h = after3h + (u_order_close_time - (after3h - all_orders[i].update_timestamp))
-            console.log(after3h - all_orders[i].update_timestamp)
+            var after3h = currTime + (u_order_close_time - (currTime - all_orders[i].update_timestamp))
+            console.log(after3h - currTime)
             setTimeout(async () => {
                 var item_id = all_orders[i].item_id
                 var order_type = all_orders[i].order_type
@@ -199,7 +199,7 @@ client.on('ready', async () => {
                     return Promise.resolve()
                 })
                 .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders[i].discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
-            }, after3h - all_orders[i].update_timestamp);
+            }, after3h - currTime);
         }
     }
 })
