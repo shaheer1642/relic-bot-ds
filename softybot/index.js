@@ -4901,6 +4901,7 @@ async function trading_bot(message,args,command) {
                 else if (command == 'wtb')
                     res.rows = res.rows.sort(dynamicSortDesc("user_price"))
                 price = res.rows[0].user_price
+                console.log(res.rows)
                 console.log('auto price is ' + price)
             }
             return true
