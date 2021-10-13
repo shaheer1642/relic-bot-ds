@@ -4788,7 +4788,7 @@ axiosRetry(axios, {
 });
 
 async function trading_bot(message,args,command) {
-    var price = "" 
+    var price = 0
     if (args[args.length-1].match(/[0-9]/))
         var price = Math.round(Number(args.pop().replace(/[^0-9]/gi, "")))
     if (price < 0) {
