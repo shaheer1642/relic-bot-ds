@@ -4893,7 +4893,7 @@ async function trading_bot(message,args,command) {
     const originGuild = message.guild.name
     const originMessage = message
     if (list_low) {
-        status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true`)
+        var status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}'`)
         .then(res => {
             if (res.rows.length > 0) {
                 if (command == 'wts')
@@ -4914,6 +4914,7 @@ async function trading_bot(message,args,command) {
             return Promise.reject()
         }
     }
+    console.log('auto price is ' + price)
     var avg_price = null
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
