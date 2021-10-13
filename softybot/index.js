@@ -4873,12 +4873,12 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItemsUrl.length > 1) {
-        message.channel.send("More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        message.channel.send("⚠️ More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.resolve()
     }
     if (arrItemsUrl.length==0) {
-        message.channel.send("Item " + d_item_url + " either does not exist or is not a prime item.").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        message.channel.send("⚠️ Item " + d_item_url + " either does not exist or is not a prime item. ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
@@ -4903,12 +4903,12 @@ async function trading_bot(message,args,command) {
         return false
     })
     if (!status) {
-        message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 500").catch(err => console.log(err)); 
-        reject()
+        message.channel.send("☠️ Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 500 ☠️").catch(err => console.log(err)); 
+        return Promise.reject()
     }
     if (avg_price == null || avg_price == "null") {
-        message.channel.send("Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501").catch(err => console.log(err)); 
-        reject()
+        message.channel.send("☠️ Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501 ☠️").catch(err => console.log(err)); 
+        return Promise.reject()
     }
     if (!price) {
         price = avg_price
@@ -5077,7 +5077,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         JOIN users_list ON users_orders.discord_id=users_list.discord_id 
         JOIN items_list ON users_orders.item_id=items_list.id 
         WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true 
-        ORDER BY users_orders.user_price ASC,users_list.ingame_name`)
+        ORDER BY users_orders.user_price ASC,users_orders.update_timestamp`)
         .then(res => {
             if (res.rows.length == 0)
                 return true
@@ -5140,7 +5140,12 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         })
         if (!status)
             return Promise.reject()
-        var status = await db.query(`SELECT * FROM users_orders JOIN users_list ON users_orders.discord_id=users_list.discord_id JOIN items_list ON users_orders.item_id=items_list.id WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true ORDER BY users_orders.user_price DESC`)
+        var status = await db.query(`
+        SELECT * FROM users_orders 
+        JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+        JOIN items_list ON users_orders.item_id=items_list.id 
+        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true 
+        ORDER BY users_orders.user_price DESC,users_orders.update_timestamp`)
         .then(res => {
             if (res.rows.length == 0)
                 return true
@@ -5609,7 +5614,6 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     if (!status)
         return Promise.reject()
     var color = ""
-
     if (order_type == 'wts') {
         all_orders = all_orders.sort(dynamicSort("user_price"))
         color = tb_sellColor
