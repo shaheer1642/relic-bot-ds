@@ -4789,6 +4789,11 @@ axiosRetry(axios, {
 
 async function trading_bot(message,args,command) {
     var price = 0
+    var list_low = false
+    if (args[args.length-1] == 'auto') {
+        list_low = true
+        args.pop()
+    }
     if (args[args.length-1].match(/[0-9]/))
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
     if (price < 0) {
@@ -4887,6 +4892,27 @@ async function trading_bot(message,args,command) {
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     const originGuild = message.guild.name
     const originMessage = message
+    if (list_low) {
+        status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true`)
+        .then(async res => {
+            if (res.rows.length > 0) {
+                if (command == 'wts')
+                    res.rows = res.rows.sort(dynamicSort("user_price"))
+                else if (command == 'wtb')
+                    res.rows = res.rows.sort(dynamicSortDesc("user_price"))
+                price = res.rows[0].user_price
+            }
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500 ☠️").catch(err => console.log(err)); 
+            return Promise.reject()
+        }
+    }
     var avg_price = null
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
