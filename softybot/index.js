@@ -4788,9 +4788,9 @@ axiosRetry(axios, {
 });
 
 async function trading_bot(message,args,command) {
-    var price = ""
+    var price = "" 
     if (args[args.length-1].match(/[0-9]/))
-        var price = Math.round(Number(args.pop().replace(/[a-zA-Z]/g, "")))
+        var price = Math.round(Number(args.pop().replace(/[0-9]/g, ''))) //.replace(/[a-zA-Z]/g, "")))
     if (price < 0) {
         message.channel.send('Price cannot be negative.').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
