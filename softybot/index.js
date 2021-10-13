@@ -4894,13 +4894,14 @@ async function trading_bot(message,args,command) {
     const originMessage = message
     if (list_low) {
         status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true`)
-        .then(async res => {
+        .then(res => {
             if (res.rows.length > 0) {
                 if (command == 'wts')
                     res.rows = res.rows.sort(dynamicSort("user_price"))
                 else if (command == 'wtb')
                     res.rows = res.rows.sort(dynamicSortDesc("user_price"))
                 price = res.rows[0].user_price
+                console.log('auto price is ' + price)
             }
             return true
         })
