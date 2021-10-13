@@ -4895,13 +4895,14 @@ async function trading_bot(message,args,command) {
     if (list_low) {
         var status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}'`)
         .then(res => {
+            var all_orders = res.rows
             if (res.rows.length > 0) {
                 if (command == 'wts')
-                    res.rows = res.rows.sort(dynamicSort("user_price"))
+                    all_orders = all_orders.sort(dynamicSort("user_price"))
                 else if (command == 'wtb')
-                    res.rows = res.rows.sort(dynamicSortDesc("user_price"))
-                price = res.rows[0].user_price
-                console.log(res.rows)
+                    all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+                price = all_orders[0].user_price
+                console.log(all_orders)
                 console.log('auto price is ' + price)
             }
             return true
@@ -4915,7 +4916,6 @@ async function trading_bot(message,args,command) {
             return Promise.reject()
         }
     }
-    console.log('auto price is ' + price)
     var avg_price = null
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
