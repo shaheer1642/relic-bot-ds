@@ -2812,92 +2812,99 @@ async function relics(message,args) {
         d_item_url = d_item_url + element + "_"
     });
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    let items_list = []
+    console.log('Retrieving Database -> items_list')
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+        console.log('Retrieving Database -> items_list success')
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"})
+        return false
+    })
+    if (!status)
+        return
     if (d_item_url.match("lith") || d_item_url.match("meso") || d_item_url.match("neo") || d_item_url.match("axi"))
     {
         if (!d_item_url.match("relic"))
             d_item_url += "_relic"
         let postdata = {content: " ", embeds: []}
-            const data1 = fs.readFileSync("../Relics Info/" + d_item_url + ".json", 'utf8').replace(/^\uFEFF/, '')
-            var relic_drops = JSON.parse(data1)
-            //----
-            var value1 = ""
-            var value2 = ""
-            var drops_value = 0
-            //const pricesDB = require('../pricesDB.json')
-            const filecontent = fs.readFileSync('../pricesDB.json', 'utf8').replace(/^\uFEFF/, '')
-            let pricesDB = JSON.parse(filecontent)
-            //----
-            for (var i=0; i < relic_drops.Common.length; i++)
-            {
-                var str = relic_drops.Common[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-                value1 += ":brown_circle: " + str + "\n"
-                for (var j=0; j < pricesDB.length; j++)
-                {
-                    if (pricesDB[j].item_url == relic_drops.Common[i])
-                    {
-                        value2 += pricesDB[j].price + "p\n"
-                        drops_value += pricesDB[j].price
-                        break
-                    }
-                }
-            }
-            if (relic_drops.Common.length < 3)
-                value1 += ":brown_circle: Forma Blueprint\n", value2 += "\n"
-            for (var i=0; i < relic_drops.Uncommon.length; i++)
-            {
-                var link = relic_drops.Uncommon[i]
-                var str = relic_drops.Uncommon[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-                value1 += ":white_circle: " + str + "\n"
-                for (var j=0; j < pricesDB.length; j++)
-                {
-                    if (pricesDB[j].item_url == link)
-                    {
-                        value2 += pricesDB[j].price + "p\n"
-                        drops_value += pricesDB[j].price
-                        break
-                    }
-                }
-            }
-            if (relic_drops.Uncommon.length < 2)
-                value1 += ":white_circle: Forma Blueprint\n", value2 += "\n"
-            for (var i=0; i < relic_drops.Rare.length; i++)
-            {
-                var link = relic_drops.Rare[i]
-                var str = relic_drops.Rare[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-                value1 += ":yellow_circle: " + str + "\n"
-                for (var j=0; j < pricesDB.length; j++)
-                {
-                    if (pricesDB[j].item_url == link)
-                    {
-                        value2 += pricesDB[j].price + "p\n"
-                        drops_value += pricesDB[j].price
-                        break
-                    }
-                }
-            }
-            if (relic_drops.Rare.length < 1)
-                value1 += ":yellow_circle: Forma Blueprint\n", value2 += "\n"
-            value1 = value1.substring(0, value1.length - 1)
-            value2 = value2.substring(0, value2.length - 1)
-            var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-            postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
-            message.channel.send(postdata).catch(err => console.log(err));
-            message.react("✅")
+        //----
+        var value1 = ""
+        var value2 = ""
+        var drops_value = 0
+        var relic_drops = null
+        items_list.forEach(element => {
+            if (element.item_url == d_item_url.toLowerCase())
+                relic_drops = element
+        })
+        if (!relic_drops) {
+            message.channel.send(`Could not find the relic named **${d_item_url}**`).catch(err => console.log(err))
             return
+        }
+        if (!relic_drops.rewards) {
+            message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
+            return
+        }
+        //----
+        for (var i=0; i < relic_drops.rewards.common.length; i++) {
+            var str = relic_drops.rewards.common[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
+            value1 += ":brown_circle: " + str + "\n"
+            items_list.forEach(element => {
+                if (element.item_url ==  relic_drops.rewards.common[i]) {
+                    value2 += element.sell_price + "p\n"
+                    drops_value += element.sell_price
+                }
+            })
+        }
+        if (relic_drops.rewards.common.length < 3)
+            value1 += ":brown_circle: Forma Blueprint\n", value2 += "\n"
+        for (var i=0; i < relic_drops.rewards.uncommon.length; i++)
+        {
+            var str = relic_drops.rewards.uncommon[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
+            value1 += ":white_circle: " + str + "\n"
+            items_list.forEach(element => {
+                if (element.item_url ==  relic_drops.rewards.uncommon[i]) {
+                    value2 += element.sell_price + "p\n"
+                    drops_value += element.sell_price
+                }
+            })
+        }
+        if (relic_drops.rewards.uncommon.length < 2)
+            value1 += ":white_circle: Forma Blueprint\n", value2 += "\n"
+        for (var i=0; i < relic_drops.rewards.rare.length; i++)
+        {
+            var str = relic_drops.rewards.rare[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
+            value1 += ":yellow_circle: " + str + "\n"
+            items_list.forEach(element => {
+                if (element.item_url ==  relic_drops.rewards.rare[i]) {
+                    value2 += element.sell_price + "p\n"
+                    drops_value += element.sell_price
+                }
+            })
+        }
+        if (relic_drops.rewards.rare.length < 1)
+            value1 += ":yellow_circle: Forma Blueprint\n", value2 += "\n"
+        value1 = value1.substring(0, value1.length - 1)
+        value2 = value2.substring(0, value2.length - 1)
+        var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
+        message.channel.send(postdata).catch(err => console.log(err));
+        message.react("✅")
+        return
     }
     var foundItem = 0
     let arrItemsUrl = []
     var primeFlag = 0
-    //WFM_Items_List = require('../WFM_Items_List.json')
-    const filecontent = fs.readFileSync('../WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
-    let WFM_Items_List = JSON.parse(filecontent)
-    //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
-    //let WFM_Items_List = JSON.parse(filecontent)
-    WFM_Items_List.payload.items.forEach(element => {
-        if (element.url_name.match('^' + d_item_url + '\W*'))
+    items_list.forEach(element => {
+        if (element.item_url.match('^' + d_item_url + '\W*'))
         {
-            if ((element.url_name.match("prime")) && (!element.url_name.match("set")))
-                arrItemsUrl.push(element.url_name);
+            if ((element.item_url.match("prime")) && (!element.item_url.match("set")))
+                arrItemsUrl.push(element.item_url);
         }
     })
     if (arrItemsUrl.length==0)
@@ -2922,152 +2929,162 @@ async function relics(message,args) {
     for (var k=0; k < arrItemsUrl.length; k++)
     {
         console.log(arrItemsUrl[i])
-        try {
-            const data1 = fs.readFileSync("../Prime Parts Info/" + arrItemsUrl[i] + ".json", 'utf8').replace(/^\uFEFF/, '')
-            part_info = JSON.parse(data1)
-            const str = arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-            postdata[X].embeds[j] = {title: str,url: "https://warframe.market/items/" + arrItemsUrl[i], fields: [], footer: {text: ""}}
-            //-----
-            let best_common = {lith: [],meso: [],neo: [],axi: []}
-            let best_uncommon = {lith: [],meso: [],neo: [],axi: []}
-            let best_rare = {lith: [],meso: [],neo: [],axi: []}
-            //-----
-            for (var l=0; l < part_info.Relics.length; l++)
+        var part_info = null
+        items_list.forEach(element => {
+            if (element.item_url == arrItemsUrl[i])
+                part_info = element
+        })
+        if (!part_info.relics) {
+            message.channel.send(`Could not find relic data for item **${arrItemsUrl[i]}**`)
+            continue
+        }
+        postdata[X].embeds[j] = {
+            title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+            url: "https://warframe.market/items/" + arrItemsUrl[i], 
+            fields: [], 
+            footer: {
+                text: ""
+            }
+        }
+        //-----
+        let best_common = {lith: [],meso: [],neo: [],axi: []}
+        let best_uncommon = {lith: [],meso: [],neo: [],axi: []}
+        let best_rare = {lith: [],meso: [],neo: [],axi: []}
+        //-----
+        for (var l=0; l < part_info.relics.length; l++)
+        {
+            var relic_drops = null
+            items_list.forEach(element => {
+                if (element.item_url ==  part_info.relics[l].link)
+                    relic_drops = element
+            })
+            if (!relic_drops.rewards) {
+                message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
+                continue
+            }
+            var value = ""
+            for (var m=0; m < relic_drops.rewards.common.length; m++)
             {
-                try {
-                    const data2 = fs.readFileSync("../Relics Info/" + part_info.Relics[l] + ".json", 'utf8').replace(/^\uFEFF/, '')
-                    relic_drops = JSON.parse(data2)
-                    //----
-                    var value = ""
-                    for (var m=0; m < relic_drops.Common.length; m++)
-                    {
-                        var str1 = relic_drops.Common[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-                        if (relic_drops.Common[m]==arrItemsUrl[i])
-                            str1 = "`" + str1 + "`"
-                        value += ":brown_circle: " + str1 + "\n"
-                        if (relic_drops.Common[m] == arrItemsUrl[i])
-                        {
-                            var relic_name = part_info.Relics[l]
-                            let temp = relic_name.split("_")
-                            var relic_tier = temp[0]
-                            best_common[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                        }
-                    }
-                    if (relic_drops.Common.length < 3)
-                        value += ":brown_circle: Forma Blueprint\n"
-                    for (var m=0; m < relic_drops.Uncommon.length; m++)
-                    {
-                        var str1 = relic_drops.Uncommon[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-                        if (relic_drops.Uncommon[m]==arrItemsUrl[i])
-                            str1 = "`" + str1 + "`"
-                        value += ":white_circle: " + str1 + "\n"
-                        if (relic_drops.Uncommon[m] == arrItemsUrl[i])
-                        {
-                            var relic_name = part_info.Relics[l]
-                            let temp = relic_name.split("_")
-                            var relic_tier = temp[0]
-                            best_uncommon[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                        }
-                    }
-                    if (relic_drops.Uncommon.length < 2)
-                        value += ":white_circle: Forma Blueprint\n"
-                    for (var m=0; m < relic_drops.Rare.length; m++)
-                    {
-                        var str1 = relic_drops.Rare[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-                        if (relic_drops.Rare[m]==arrItemsUrl[i])
-                            str1 = "`" + str1 + "`"
-                        value += ":yellow_circle: " + str1 + "\n"
-                        if (relic_drops.Rare[m] == arrItemsUrl[i])
-                        {
-                            var relic_name = part_info.Relics[l]
-                            let temp = relic_name.split("_")
-                            var relic_tier = temp[0]
-                            best_rare[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                        }
-                    }
-                    if (relic_drops.Rare.length < 1)
-                        value += ":yellow_circle: Forma Blueprint\n"
-                    value = value.substring(0, value.length - 1)
-                    var relic_name = part_info.Relics[l].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                    if ((JSON.stringify(postdata[X])).length + JSON.stringify({name: "`" + relic_name + "`", value: value, inline: true}).length > 6000)
-                    {
-                        // Create new array key for another message
-                        {
-                            X++
-                            j = 0
-                            postdata[X] = {content: " ", embeds: []}
-                        }
-                        postdata[X].embeds[j] = {fields: [],footer: {text: ""}}
-                    }
-                    postdata[X].embeds[j].fields.push({name: "`" + relic_name + "`", "value": value, inline: true})
-                } catch (err) {
-                    console.error(err)
-                    return
+                var str1 = relic_drops.rewards.common[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
+                if (relic_drops.rewards.common[m]==arrItemsUrl[i])
+                    str1 = "`" + str1 + "`"
+                value += ":brown_circle: " + str1 + "\n"
+                if (relic_drops.rewards.common[m] == arrItemsUrl[i])
+                {
+                    var relic_name = part_info.relics[l].link
+                    let temp = relic_name.split("_")
+                    var relic_tier = temp[0]
+                    best_common[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
                 }
             }
-            let tier_names = ["lith", "meso", "neo", "axi"]
+            if (relic_drops.rewards.common.length < 3)
+                value += ":brown_circle: Forma Blueprint\n"
+            for (var m=0; m < relic_drops.rewards.uncommon.length; m++)
+            {
+                var str1 = relic_drops.rewards.uncommon[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
+                if (relic_drops.rewards.uncommon[m]==arrItemsUrl[i])
+                    str1 = "`" + str1 + "`"
+                value += ":white_circle: " + str1 + "\n"
+                if (relic_drops.rewards.uncommon[m] == arrItemsUrl[i])
+                {
+                    var relic_name = part_info.relics[l].link
+                    let temp = relic_name.split("_")
+                    var relic_tier = temp[0]
+                    best_uncommon[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                }
+            }
+            if (relic_drops.rewards.uncommon.length < 2)
+                value += ":white_circle: Forma Blueprint\n"
+            for (var m=0; m < relic_drops.rewards.rare.length; m++)
+            {
+                var str1 = relic_drops.rewards.rare[m].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
+                if (relic_drops.rewards.rare[m]==arrItemsUrl[i])
+                    str1 = "`" + str1 + "`"
+                value += ":yellow_circle: " + str1 + "\n"
+                if (relic_drops.rewards.rare[m] == arrItemsUrl[i])
+                {
+                    var relic_name = part_info.relics[l].link
+                    let temp = relic_name.split("_")
+                    var relic_tier = temp[0]
+                    best_rare[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                }
+            }
+            if (relic_drops.rewards.rare.length < 1)
+                value += ":yellow_circle: Forma Blueprint\n"
+            value = value.substring(0, value.length - 1)
+            var relic_name = part_info.relics[l].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+            if ((JSON.stringify(postdata[X])).length + JSON.stringify({name: "`" + relic_name + "`", value: value, inline: true}).length > 6000)
+            {
+                // Create new array key for another message
+                {
+                    X++
+                    j = 0
+                    postdata[X] = {content: " ", embeds: []}
+                }
+                postdata[X].embeds[j] = {fields: [],footer: {text: ""}}
+            }
+            postdata[X].embeds[j].fields.push({name: "`" + relic_name + "`", "value": value, inline: true})
+        }
+        let tier_names = ["lith", "meso", "neo", "axi"]
+        for (var l=0; l < tier_names.length; l++)
+        {
+            if (JSON.stringify(best_common[(tier_names[l])]) != "[]")
+            {
+                var relics = ""
+                for (var m=0; m < best_common[(tier_names[l])].length; m++)
+                {
+                    relics += best_common[(tier_names[l])][m] + "|"
+                }
+                relics = relics.substring(0, relics.length - 1)
+                postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
+                break
+            }
+        }
+        if (postdata[X].embeds[j].footer.text == "")
+        {
             for (var l=0; l < tier_names.length; l++)
             {
-                if (JSON.stringify(best_common[(tier_names[l])]) != "[]")
+                if (JSON.stringify(best_uncommon[(tier_names[l])]) != "[]")
                 {
                     var relics = ""
-                    for (var m=0; m < best_common[(tier_names[l])].length; m++)
+                    for (var m=0; m < best_uncommon[(tier_names[l])].length; m++)
                     {
-                        relics += best_common[(tier_names[l])][m] + "|"
+                        relics += best_uncommon[(tier_names[l])][m] + "|"
                     }
                     relics = relics.substring(0, relics.length - 1)
                     postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
                     break
                 }
             }
-            if (postdata[X].embeds[j].footer.text == "")
-            {
-                for (var l=0; l < tier_names.length; l++)
-                {
-                    if (JSON.stringify(best_uncommon[(tier_names[l])]) != "[]")
-                    {
-                        var relics = ""
-                        for (var m=0; m < best_uncommon[(tier_names[l])].length; m++)
-                        {
-                            relics += best_uncommon[(tier_names[l])][m] + "|"
-                        }
-                        relics = relics.substring(0, relics.length - 1)
-                        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
-                        break
-                    }
-                }
-            }
-            if (postdata[X].embeds[j].footer.text == "")
-            {
-                for (var l=0; l < tier_names.length; l++)
-                {
-                    if (JSON.stringify(best_rare[(tier_names[l])]) != "[]")
-                    {
-                        var relics = ""
-                        for (var m=0; m < best_rare[(tier_names[l])].length; m++)
-                        {
-                            relics += best_rare[(tier_names[l])][m] + "|"
-                        }
-                        relics = relics.substring(0, relics.length - 1)
-                        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
-                        break
-                    }
-                }
-            }
-            i++
-            j++
-        } catch (err) {
-            console.error(err)
         }
+        if (postdata[X].embeds[j].footer.text == "")
+        {
+            for (var l=0; l < tier_names.length; l++)
+            {
+                if (JSON.stringify(best_rare[(tier_names[l])]) != "[]")
+                {
+                    var relics = ""
+                    for (var m=0; m < best_rare[(tier_names[l])].length; m++)
+                    {
+                        relics += best_rare[(tier_names[l])][m] + "|"
+                    }
+                    relics = relics.substring(0, relics.length - 1)
+                    postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
+                    break
+                }
+            }
+        }
+        i++
+        j++
     }
     for (var k=0; k<postdata.length; k++)
     {
         if (k==0)
-            processMessage.edit(postdata[k])
+            processMessage.edit(postdata[k]).catch(err => console.log(err));
         else 
             message.channel.send(postdata[k]).catch(err => console.log(err));
     }
-    message.react("✅")
+    message.react("✅").catch(err => console.log(err));
     return
 }
 
