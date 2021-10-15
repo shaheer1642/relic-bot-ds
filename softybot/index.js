@@ -4337,13 +4337,11 @@ async function updateDatabasePrices(up_origin) {
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
                 var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
                 .then(async itemOrders => {
-                    console.log(`Success.`)
                     //-----sell avg-----
                     var sellAvgPrice = 0
                     sellAvgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
                     if (!sellAvgPrice)
                         sellAvgPrice = null
-                    console.log(sellAvgPrice)
                     //-----buy avg-----
                     var buyAvgPrice = 0
                     let buyPrices = []
@@ -4354,7 +4352,6 @@ async function updateDatabasePrices(up_origin) {
                     buyAvgPrice = buyPrices[buyPrices.length-1].median
                     if (!buyAvgPrice)
                         buyAvgPrice = null
-                    console.log(buyAvgPrice)
                     if (buyAvgPrice > sellAvgPrice)
                         buyAvgPrice = sellAvgPrice
                     //-------------
@@ -4379,7 +4376,7 @@ async function updateDatabasePrices(up_origin) {
                         console.log(`Error retrieving item ducat value and relics.`)
                         return false
                     }
-                    console.log(ducat_value)
+                    console.log(`Sell price: ${sellAvgPrice} Buy price: ${buyAvgPrice} Ducats: ${ducat_value}`)
                     //----update relic rewards----
                     if (relics)
                         if (relics.length != 0) {
@@ -4408,7 +4405,6 @@ async function updateDatabasePrices(up_origin) {
                                     db_items_list.rows[itemIndex].rewards[(rarity)].push(item.item_url)
                                     var status = await db.query(`UPDATE items_list SET rewards = '${JSON.stringify(db_items_list.rows[itemIndex].rewards)}' WHERE item_url='${relics[j].link}'`)
                                     .then( () => {
-                                        console.log(`Updated relic rewards.`)
                                         return true
                                     })
                                     .catch (err => {
@@ -4422,7 +4418,6 @@ async function updateDatabasePrices(up_origin) {
                                         return false
                                 }
                             }
-                            console.log(`Relic rewards scanned.`)
                         }
                     //----scanning relics vault status
                     var vault_status = null
@@ -4433,7 +4428,6 @@ async function updateDatabasePrices(up_origin) {
                         //${item.item_url.replace('_relic','')}`)
                         var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
                         .then(async (wikiInfo) => {
-                            console.log('Wiki info retrieved.')
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                                 vault_status = 'V'
                             else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
@@ -4447,7 +4441,6 @@ async function updateDatabasePrices(up_origin) {
                                 vault_status = '${vault_status}'
                                 WHERE id = '${item.id}'`)
                             .then( () => {
-                                console.log('Updated DB relic vault status.')
                                 return true
                             })
                             .catch (err => {
@@ -4475,8 +4468,7 @@ async function updateDatabasePrices(up_origin) {
                             if (e.item_url.match('^'+item.item_url.replace('_set','')) && (e.tags.includes('component') || e.tags.includes('blueprint')) && e.tags.includes('prime'))
                                 components_list.push({id: e.id,item_url: e.item_url})
                         })
-                        console.log("Components list: " + JSON.stringify(components_list))
-                        console.log('Retrieving wiki info for set')
+                        console.log('Retrieving wiki info for set...')
                         const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
                         var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
@@ -4520,7 +4512,6 @@ async function updateDatabasePrices(up_origin) {
                             });
                             if (!status)
                                 return false
-                            console.log('Updated DB components vault status.')
                             return true
                         })
                         .catch (err => {
@@ -4531,7 +4522,6 @@ async function updateDatabasePrices(up_origin) {
                             return false
                     }
                     //---------------------
-                    console.log(`icon_url: ${icon_url}`)
                     console.log(`Updating DB prices...`)
                     var status = await db.query(`UPDATE items_list SET 
                         sell_price = ${sellAvgPrice},
@@ -4541,7 +4531,6 @@ async function updateDatabasePrices(up_origin) {
                         icon_url = '${icon_url}'
                         WHERE id = '${item.id}'`)
                     .then( () => {
-                        console.log(`Updated DB prices.`)
                         return true
                     })
                     .catch (err => {
@@ -4559,7 +4548,7 @@ async function updateDatabasePrices(up_origin) {
                     if (err.response)
                         console.log(err.response.data)
                     console.log(err)
-                    console.log('failure.')
+                    console.log('Error retrieving statistics.')
                     return false
                 });
                 if (!status)
