@@ -1923,7 +1923,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
     if (reaction.emoji.name == "🆙") {
         if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != botID)
             return
         var arrItemsUrl = []
