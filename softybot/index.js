@@ -2809,9 +2809,11 @@ async function relics(message,args) {
     }
     var d_item_url = ""
     args.forEach(element => {
-        d_item_url = d_item_url + element + "_"
+        d_item_url = d_item_url + element.toLowerCase() + "_"
     });
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    d_item_url = d_item_url.replace('_p_','_prime_')
+    d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
     let items_list = []
     console.log('Retrieving Database -> items_list')
     var status = await db.query(`SELECT * FROM items_list`)
@@ -3107,7 +3109,7 @@ async function auctions(message,args) {
     }
     var d_item_url = ""
     args.forEach(element => {
-        d_item_url = d_item_url + element + "_"
+        d_item_url = d_item_url + element.toLowerCase() + "_"
     });
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     let arrItemsUrl = []
@@ -3342,7 +3344,7 @@ async function list(message,args) {
         return
     var d_item_url = ""
     args.forEach(element => {
-        d_item_url = d_item_url + element + "_"
+        d_item_url = d_item_url + element.toLowerCase() + "_"
     });
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     if (!d_item_url.match("prime"))
