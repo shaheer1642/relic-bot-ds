@@ -1930,7 +1930,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         reaction.message.embeds.forEach((element,index)=> {
             if (element.title) {
                 arrItemsUrl.push(element.title.toLowerCase().replace(/ /g, "_"));
-                reaction.message.embeds[index].title += '(Updating...)'
+                reaction.message.embeds[index].title += ' (Updating...)'
             }
         });
         if (arrItemsUrl.length == 0)
