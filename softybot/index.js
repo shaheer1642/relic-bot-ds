@@ -1927,14 +1927,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
         if (reaction.message.author.id != botID)
             return
         var arrItemsUrl = []
-        reaction.message.embeds.forEach(element => {
-            if (element.title)
+        reaction.message.embeds.forEach((element,index)=> {
+            if (element.title) {
                 arrItemsUrl.push(element.title.toLowerCase().replace(/ /g, "_"));
+                reaction.message.embeds[index].title += '(Updating...)'
+            }
         });
         if (arrItemsUrl.length == 0)
             return
         reaction.users.remove(user.id);
-        reaction.message.edit({content: "Updating...", embeds: []})
+        reaction.message.edit({embeds: reaction.message.embeds}).catch(err => console.log(err))
         let items_list = []
         console.log('Retrieving Database -> items_list')
         var status = await db.query(`SELECT * FROM items_list`)
