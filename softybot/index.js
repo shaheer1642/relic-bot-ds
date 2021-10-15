@@ -836,13 +836,13 @@ client.on('messageCreate', async message => {
                 case 'trade_tut':
                     trade_tut(message,args)
                     break
-                /*----Handled locally----
                 case 'relic':
                     relics(message,args)
                     break
                 case 'relics':
                     relics(message,args)
                     break
+                /*----------------------
                 case 'test':
                     test(message,args)
                     break
