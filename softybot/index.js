@@ -4333,6 +4333,7 @@ async function updateDatabasePrices(up_origin) {
     .then(async (db_items_list) => {
         for (var i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
+            if (db_items_list.rows[i].item_url == 'euphona_prime_receiver')
             if (item.tags.includes("prime") || item.tags.includes("relic")) { //item.tags.includes("prime") || 
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
                 var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
