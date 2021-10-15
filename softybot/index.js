@@ -5294,30 +5294,6 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         })
         if (!status)
             return Promise.reject()
-        /*
-        await client.channels.cache.get(multiCid).messages.fetch().then(allMsgs => {
-            allMsgs.forEach(e => {
-                if (e.embeds.length != 0) {
-                    if (e.embeds[0].author)
-                        if (e.embeds[0].author.name == `${item_name}`)
-                            msg = e
-                }
-            })
-        })
-        .catch (err => {
-            console.log(err)
-            msg = 'error'
-        })
-        */
-        /*
-        if (msg == 'error') {
-            if (originMessage) {
-                originMessage.channel.send(`☠️ Error fetching channel messages.\nError code: 504\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                //setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-            }
-            continue
-        }
-        */
 
         if (msg) {
             if (embeds.length==0) {
@@ -5359,13 +5335,13 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 })
                 .catch(err => {     //might be a dublicate message
                     console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`)
-                    msg.delete().catch(err => console.log(err))
+                    setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
                     return false
                 })
                 if (!status) {
                     var status = db.query(`SELECT * from messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
                     .then(async res => {
-                        if (res.rows.length ==0) {
+                        if (res.rows.length == 0) {
                             if (originMessage) {
                                 originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                                 setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
@@ -5406,12 +5382,12 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 }
             })
             .catch(err => {
+                console.log(err)
                 if (originMessage) {
-                    originMessage.channel.send(`☠️ Error posting new orders in channel.\nError code: 506\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    originMessage.channel.send(`☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                 }
-                console.log(err)
-                return
+                return Promise.reject()
             })
         }
     }
