@@ -2962,6 +2962,7 @@ async function relics(message,args) {
                 message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
                 continue
             }
+            console.log(`Reading relic ${part_info.relics[l].link}`)
             var value = ""
             for (var m=0; m < relic_drops.rewards.common.length; m++)
             {
@@ -5868,7 +5869,6 @@ async function td_set_orders_timeouts() {
         console.log(err)
         return false
     })
-    console.log(all_orders)
     if (status) {
         var currTime = new Date().getTime()
         for (var i=0;i<all_orders.length;i++) {
