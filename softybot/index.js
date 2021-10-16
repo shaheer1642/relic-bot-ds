@@ -5756,7 +5756,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                     }
                 }
             }
-            user_rating = (total_rating / total_orders,2).toFixed(2)
+            user_rating = (total_rating / total_orders).toFixed(2)
         }
         return true
     })
