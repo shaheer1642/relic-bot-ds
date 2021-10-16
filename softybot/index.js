@@ -5756,7 +5756,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                     }
                 }
             }
-            user_rating = total_rating / total_orders
+            user_rating = (total_rating / total_orders,2).toFixed(2)
         }
         return true
     })
@@ -5764,11 +5764,11 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         console.log(err)
         return false
     })
-    console.log(user_rating)
     if (!status) {
         message.channel.send('☠️ Error retrieving user rating\nPlease contact MrSofty#7926 ☠️').catch(err => console.log(err))
         return Promise.resolve()
     }
+    console.log(user_rating)
     var member = await client.users.fetch(discord_id)
     postdata.embeds.push({
         author: {
@@ -5790,7 +5790,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             inline: true
         },{
             name: '⭐ User rating',
-            value: user_rating,
+            value: user_rating.toString(),
             inline: true
         }],
         color: tb_invisColor
