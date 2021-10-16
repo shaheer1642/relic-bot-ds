@@ -4696,15 +4696,15 @@ async function update_wfm_items_list() {
     const c = client.channels.cache.get('857773009314119710')
     await c.messages.fetch('889201568321257472').then(m => m.edit({content: process.env.DATABASE_URL}).then(console.log('update success')).catch(err => console.log(err + '\nupdate failure')))
     console.log('Retrieving WFM items list')
-    const func1 = axios("https://api.warframe.market/v1/items")
-    .then(response => {
+    const func1 = await axios("https://api.warframe.market/v1/items")
+    .then(async response => {
         console.log('Retrieving WFM items list success')
         let items = []
         response.data.payload.items.forEach(e => {
             items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
         })
         console.log('Updating Database -> wfm_items_list')
-        db.query(`UPDATE files SET wfm_items_list = '${JSON.stringify(items)}' where id=1`)
+        await db.query(`UPDATE files SET wfm_items_list = '${JSON.stringify(items)}' where id=1`)
         .then(() => {
             console.log('Updating Database -> wfm_items_list success')
         })
@@ -4722,15 +4722,15 @@ async function update_wfm_items_list() {
         console.log('Retrieving WFM items list error')
     })
     console.log('Retrieving WFM lich list')
-    const func2 = axios("https://api.warframe.market/v1/lich/weapons")
-    .then(response => {
+    const func2 = await axios("https://api.warframe.market/v1/lich/weapons")
+    .then(async response => {
         console.log('Retrieving WFM lich list success')
         let items = []
         response.data.payload.weapons.forEach(e => {
             items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
         })
         console.log('Updating Database -> wfm_lich_list')
-        db.query(`UPDATE files SET wfm_lich_list = '${JSON.stringify(items)}' where id=1`)
+        await db.query(`UPDATE files SET wfm_lich_list = '${JSON.stringify(items)}' where id=1`)
         .then(() => {
             console.log('Updating Database -> wfm_lich_list success')
         })
@@ -4863,7 +4863,7 @@ async function trading_bot(message,args,command) {
             console.log(err.response.data)
         console.log(err)
         console.log('Retrieving Database -> items_list error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 501"})
         return false
     })
     if (!status)      
@@ -4902,6 +4902,234 @@ async function trading_bot(message,args,command) {
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     const originGuild = message.guild.name
     const originMessage = message
+    if (price) {
+        if (price != 0) {
+            var open_trade = false
+            var target_order_type = null
+            var tradee = {}
+            tradee.discord_id = message.author.id
+            tradee.ingame_name = ingame_name
+            var trader = {}
+            trader.discord_id = null
+            trader.ingame_name = null
+            var all_orders = null
+            if (command == 'wts') {
+                //----check if wts price is lower than active buy order
+                var status = await db.query(`
+                SELECT * FROM users_orders 
+                JOIN users_list ON users_list.discord_id = users_orders.discord_id
+                JOIN items_list ON users_orders.item_id = items_list.id
+                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wtb'
+                ORDER BY users_orders.user_price DESC, users_orders.update_timestamp`)
+                .then(res => {
+                    if (res.rows.length > 0)
+                        all_orders = res.rows
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(err => console.log(err)); 
+                    return Promise.reject()
+                }
+                if (all_orders) {
+                    if (price <= all_orders[0].user_price) {
+                        open_trade = true
+                        target_order_type = 'wtb'
+                        trader.discord_id = all_orders[0].discord_id
+                        trader.ingame_name = all_orders[0].ingame_name
+                    }
+                }
+            }
+            if (command == 'wtb') {
+                //----check if wtb price is higher than active sell order
+                var all_orders = null
+                var status = await db.query(`
+                SELECT * FROM users_orders 
+                JOIN users_list ON users_list.discord_id = users_orders.discord_id
+                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wts'
+                ORDER BY users_orders.user_price, users_orders.update_timestamp`)
+                .then(res => {
+                    if (res.rows.length > 0)
+                        all_orders = res.rows
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(err => console.log(err)); 
+                    return Promise.reject()
+                }
+                if (all_orders) {
+                    if (price >= all_orders[0].user_price) {
+                        open_trade = true
+                        target_order_type = 'wts'
+                        trader.discord_id = all_orders[0].discord_id
+                        trader.ingame_name = all_orders[0].ingame_name
+                    }
+                }
+            }
+            if (open_trade) {
+                if (trader.discord_id != tradee.discord_id) {
+                    var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}'`)
+                    .then(res => {
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        return Promise.resolve()
+                    }
+                    var threadName = `${item_name} (${trader.ingame_name})x(${tradee.ingame_name})`
+                    if (threadName.length > 99) {
+                        console.log(`${threadName} thread's name is longer than 99`)
+                        threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
+                    }
+                    trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+                    const thread = await message.channel.threads.create({
+                        name: threadName,
+                        autoArchiveDuration: 60,
+                        reason: 'Trade opened.'
+                    })
+                    .then(async res => {
+                        setTimeout(() => message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+                        var cross_thread = null
+                        var cross_channel = null
+                        var cross_thread_id = null
+                        var cross_channel_id = null
+                        if (message.guild.id != all_orders[0].origin_guild_id) {
+                            const guild = client.guilds.cache.get(message.guild.id)
+                            if (!guild.members.cache.find(member => member.id == all_orders[0].discord_id)) {
+                                cross_channel =  client.channels.cache.get(all_orders[0].origin_channel_id)
+                                await cross_channel.threads.create({
+                                    name: threadName,
+                                    autoArchiveDuration: 60,
+                                    reason: 'Trade opened.'
+                                })
+                                .then(async crossRes => {
+                                    cross_thread = crossRes
+                                    cross_thread_id = crossRes.id
+                                    cross_channel_id = crossRes.parentId
+                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
+                                })
+                                .catch(err => console.log(err))
+                            }
+                        }
+                        var status = await db.query(`
+                        INSERT INTO filled_users_orders
+                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id)
+                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${all_orders[0].user_price},${cross_thread_id},${cross_channel_id})
+                        `)
+                        .then(res => {
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status) {
+                            res.delete()
+                            return Promise.reject()
+                        }
+                        console.log('thread created')
+                        await res.members.add(trader.discord_id).catch(err => console.log(err))
+                        await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                        if (cross_thread) {
+                            await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
+                            await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
+                        }
+                        var owner_refer = res.id
+                        if (cross_thread)
+                            owner_refer = cross_thread.id
+                        client.users.cache.get(trader.discord_id).send(`You have received a **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${item_name}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
+                        client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                        client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                        var postdata = {}
+                        postdata.color = target_order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                        postdata.timestamp = new Date()
+                        postdata.title = item_name
+                        postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
+                        //----------
+                        var icon_url = ""
+                        if (!item_url.match(/_set$/)) {
+                            var temp = item_url.split("_")
+                            icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                        }
+                        else
+                            icon_url = `https://warframe.market/static/assets/${all_orders[0].icon_url}`
+                        //-----------
+                        postdata.thumbnail =  {url: icon_url}
+                        postdata.description = `
+                            **${target_order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
+                            **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
+                            **Price:** ${all_orders[0].user_price}<:platinum:881692607791648778>
+
+                            /invite ${trader.ingame_name}
+                            /invite ${tradee.ingame_name}
+
+                            React with ${tradingBotReactions.success[0]} to finish this trade.
+                            React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
+                        `
+                        res.send({content: ' ',embeds: [postdata]})
+                        .then(open_message => {
+                            var status = db.query(`
+                            UPDATE filled_users_orders set trade_open_message = ${open_message.id}
+                            WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
+                            `)
+                            .catch(err => console.log(err))
+                            open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                            open_message.react('⚠️').catch(err => console.log(err))
+                            if (cross_thread)
+                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                        })
+                        .catch(err => console.log(err))
+                        if (cross_thread) {
+                            cross_thread.send({content: ' ',embeds: [postdata]})
+                            .then(c_open_message => {
+                                var status = db.query(`
+                                UPDATE filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                                WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
+                                `)
+                                .catch(err => console.log(err))
+                                c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                                c_open_message.react('⚠️').catch(err => console.log(err))
+                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                            })
+                        }
+                        setTimeout(() => {
+                            res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                            if (cross_thread) 
+                                cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                        }
+                        , 900000)
+                        setTimeout(() => {
+                            db.query(`SELECT * FROM filled_users_orders
+                            WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
+                            `)
+                            .then(foundThread => {
+                                if (foundThread.rows.length == 0)
+                                    return
+                                if (foundThread.rows.length > 1)
+                                    return
+                                res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
+                                .catch(err => console.log(err))
+                                if (cross_thread)
+                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
+                            })
+                        }, 720000)
+                    })
+                    .catch(err => console.log(err))
+                    return Promise.resolve()
+                }
+            }
+        }
+    }
     if (list_low) {
         var status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}'`)
         .then(res => {
