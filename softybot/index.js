@@ -4949,6 +4949,7 @@ async function trading_bot(message,args,command) {
                 var status = await db.query(`
                 SELECT * FROM users_orders 
                 JOIN users_list ON users_list.discord_id = users_orders.discord_id
+                JOIN items_list ON users_orders.item_id = items_list.id
                 WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wts'
                 ORDER BY users_orders.user_price, users_orders.update_timestamp`)
                 .then(res => {
