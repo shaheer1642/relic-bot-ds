@@ -1478,8 +1478,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
                 var status = await db.query(`
                 INSERT INTO filled_users_orders
-                (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id)
-                VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}',${all_orders[order_rank].user_price},${cross_thread_id},${cross_channel_id})
+                (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id,trade_timestamp)
+                VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}',${all_orders[order_rank].user_price},${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                 `)
                 .then(res => {
                     return true
@@ -2584,6 +2584,10 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         else if (order_data.order_status == 'successful') {
             order_status = `successful ${tradingBotReactions.success[0]}`
         }
+        var reported_by = ""
+        if (order_data.reported_by) {
+            reported_by = `\n**Reported by:** <@${order_data.reported_by}>`
+        }
         var status = await db.query(`
         UPDATE filled_users_orders
         SET archived = true
@@ -2600,7 +2604,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
                             **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
-                            **Order status:** ${order_status}
+                            **Order status:** ${order_status} ${reported_by}
                             **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
                             **Thread:** <#${newThread.id}>
                             **Server:** ${newThread.guild.name}
@@ -5055,8 +5059,8 @@ async function trading_bot(message,args,command) {
                         }
                         var status = await db.query(`
                         INSERT INTO filled_users_orders
-                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id)
-                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},${cross_thread_id},${cross_channel_id})
+                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id,trade_timestamp)
+                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                         `)
                         .then(res => {
                             return true
