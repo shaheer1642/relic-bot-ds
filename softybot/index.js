@@ -5764,6 +5764,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         console.log(err)
         return false
     })
+    console.log(user_rating)
     if (!status) {
         message.channel.send('☠️ Error retrieving user rating\nPlease contact MrSofty#7926 ☠️').catch(err => console.log(err))
         return Promise.resolve()
