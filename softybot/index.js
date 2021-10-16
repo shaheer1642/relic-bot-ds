@@ -1094,6 +1094,40 @@ client.on('interactionCreate', async interaction => {
                 buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
             }
         })
+        //----retrieve user rating----
+        var user_rating = 0
+        var status = await db.query(`
+        SELECT * FROM filled_users_orders
+        WHERE order_owner = ${discord_id} OR order_filler = ${discord_id}`)
+        .then(res => {
+            if (res.rows.length > 0) {
+                var total_rating = 0
+                var total_orders = 0
+                for (var i=0; i<res.rows.length; i++) {
+                    if (res.rows[i].order_rating) {
+                        total_orders++
+                        if (res.rows[i].reporter_id) {
+                            if (res.rows[i].reporter_id == discord_id)
+                                total_rating += 5
+                            else
+                                total_rating += res.rows[i].order_rating
+                        }
+                        else {
+                            total_rating += res.rows[i].order_rating
+                        }
+                    }
+                }
+                user_rating = (total_rating / total_orders).toFixed(2)
+            }
+            return true
+        })
+        .catch (err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            return
+        }
         postdata.embeds.push({
             author: {
                 name: ingame_name,
@@ -1114,7 +1148,7 @@ client.on('interactionCreate', async interaction => {
                 inline: true
             },{
                 name: '⭐ User rating',
-                value: '\u200b',
+                value: user_rating.toString(),
                 inline: true
             }],
             color: tb_invisColor
@@ -5754,7 +5788,6 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                     else {
                         total_rating += res.rows[i].order_rating
                     }
-                    console.log(total_orders + ' ' + total_rating)
                 }
             }
             user_rating = (total_rating / total_orders).toFixed(2)
