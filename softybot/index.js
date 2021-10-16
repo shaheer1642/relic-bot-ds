@@ -2585,8 +2585,8 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             order_status = `successful ${tradingBotReactions.success[0]}`
         }
         var reported_by = ""
-        if (order_data.reported_by) {
-            reported_by = `\n**Reported by:** <@${order_data.reported_by}>`
+        if (order_data.reporter_id) {
+            reported_by = `\n**Reported by:** <@${order_data.reporter_id}>`
         }
         var status = await db.query(`
         UPDATE filled_users_orders
