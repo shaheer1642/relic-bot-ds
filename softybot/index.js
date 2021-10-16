@@ -1828,12 +1828,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (reaction.emoji.name == '🛑') {
                 postdata.color = null
                 desc[5] = `**Order status:** denied 🛑 (Verified by <@${user.id}>)`
-                desc[6] = `**Users balance changed:** No`
+                desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** No` : desc[7] = `**Users balance changed:** No`
             }
             else if (reaction.emoji.name == 'order_success') {
                 postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                 desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${user.id}>)`
-                desc[6] = `**Users balance changed:** Yes`
+                desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** Yes` : desc[7] = `**Users balance changed:** Yes`
             }
             postdata.description = ''
             desc.forEach(e => {
