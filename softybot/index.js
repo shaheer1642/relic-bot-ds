@@ -5024,7 +5024,7 @@ async function trading_bot(message,args,command) {
                         var status = await db.query(`
                         INSERT INTO filled_users_orders
                         (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id)
-                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${all_orders[0].user_price},${cross_thread_id},${cross_channel_id})
+                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},${cross_thread_id},${cross_channel_id})
                         `)
                         .then(res => {
                             return true
@@ -5068,7 +5068,7 @@ async function trading_bot(message,args,command) {
                         postdata.description = `
                             **${target_order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
                             **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
-                            **Price:** ${all_orders[0].user_price}<:platinum:881692607791648778>
+                            **Price:** ${price}<:platinum:881692607791648778>
 
                             /invite ${trader.ingame_name}
                             /invite ${tradee.ingame_name}
