@@ -1148,7 +1148,7 @@ client.on('interactionCreate', async interaction => {
                 inline: true
             },{
                 name: '⭐ User rating',
-                value: user_rating.toString(),
+                value: user_rating.toString() + ' out of 5',
                 inline: true
             }],
             color: tb_invisColor
@@ -5824,7 +5824,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             inline: true
         },{
             name: '⭐ User rating',
-            value: user_rating.toString(),
+            value: user_rating.toString() + ' out of 5',
             inline: true
         }],
         color: tb_invisColor
