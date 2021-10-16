@@ -5754,6 +5754,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                     else {
                         total_rating += res.rows[i].order_rating
                     }
+                    console.log(total_orders + ' ' + total_rating)
                 }
             }
             user_rating = (total_rating / total_orders).toFixed(2)
