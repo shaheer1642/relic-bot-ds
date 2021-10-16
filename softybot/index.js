@@ -1711,6 +1711,36 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         }
                         else if (reaction.emoji.name == '⚠️') {
                             if (!from_cross) {
+                                var status = await db.query(`
+                                UPDATE filled_users_orders SET reporter_id = ${user.id}
+                                WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
+                                `)
+                                .then(res => {
+                                    return true
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    return false
+                                })
+                                if (!status)
+                                    return Promise.resolve()
+                            }
+                            else {
+                                var status = await db.query(`
+                                UPDATE filled_users_orders SET reporter_id = ${user.id}
+                                WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
+                                `)
+                                .then(res => {
+                                    return true
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    return false
+                                })
+                                if (!status)
+                                    return Promise.resolve()
+                            }
+                            if (!from_cross) {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
                                 if (order_data.cross_thread_id) {
                                     const channel = client.channels.cache.get(order_data.cross_thread_id)
