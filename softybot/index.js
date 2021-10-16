@@ -4974,6 +4974,7 @@ async function trading_bot(message,args,command) {
                 }
             }
             if (open_trade) {
+                console.log(all_orders)
                 if (trader.discord_id != tradee.discord_id) {
                     var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}'`)
                     .then(res => {
