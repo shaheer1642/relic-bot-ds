@@ -2736,14 +2736,18 @@ async function orders(message,args) {
         return
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
+    var vault_status = ''
     items_list.forEach(element => {
         if (element.item_url.match('^' + d_item_url + '\W*'))
         {
             if (element.item_url.match("prime"))
                 primeFlag = 1
             arrItemsUrl.push(element.item_url);
+            vault_status = element.vault_status
         }
     })
+    if (vault_status)
+        vault_status = '(' + vault_status + ')'
     if (arrItemsUrl.length==0)
     {
         message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
@@ -2822,7 +2826,7 @@ async function orders(message,args) {
             })
             console.log(footerText)
             embeds.push({
-                title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' ' + vault_status,
                 url: 'https://warframe.market/items/' + item_url,
                 fields: [
                     {name: 'Sellers', value: sellers, inline: true},
@@ -2892,10 +2896,13 @@ async function relics(message,args) {
         var value2 = ""
         var drops_value = 0
         var relic_drops = null
+        var vault_status = ''
         items_list.forEach(element => {
             if (element.item_url == d_item_url.toLowerCase())
                 relic_drops = element
         })
+        if (relic_drops.vault_status)
+            vault_status = '(' + relic_drops.vault_status + ')'
         if (!relic_drops) {
             message.channel.send(`Could not find the relic named **${d_item_url}**`).catch(err => console.log(err))
             return
@@ -2946,7 +2953,7 @@ async function relics(message,args) {
         value1 = value1.substring(0, value1.length - 1)
         value2 = value2.substring(0, value2.length - 1)
         var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name + '(' + relic_drops.vault_status + ')',url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
+        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name + ' ' + vault_status,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
         message.channel.send(postdata).catch(err => console.log(err));
         message.react("✅")
         return
@@ -2984,16 +2991,19 @@ async function relics(message,args) {
     {
         console.log(arrItemsUrl[i])
         var part_info = null
+        var vault_status = ''
         items_list.forEach(element => {
             if (element.item_url == arrItemsUrl[i])
                 part_info = element
         })
+        if (part_info.vault_status)
+            vault_status = '(' + part_info.vault_status + ')'
         if (!part_info.relics) {
             message.channel.send(`Could not find relic data for item **${arrItemsUrl[i]}**`)
             continue
         }
         postdata[X].embeds[j] = {
-            title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '(' + part_info.vault_status + ')',
+            title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' ' + vault_status,
             url: "https://warframe.market/items/" + arrItemsUrl[i], 
             fields: [], 
             footer: {
@@ -3012,10 +3022,13 @@ async function relics(message,args) {
                 if (element.item_url ==  part_info.relics[l].link)
                     relic_drops = element
             })
+            var vault_status = ''
             if (!relic_drops.rewards) {
                 message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
                 continue
             }
+            if (relic_drops.vault_status)
+                vault_status = '(' + relic_drops.vault_status + ')'
             var value = ""
             for (var m=0; m < relic_drops.rewards.common.length; m++)
             {
@@ -3077,7 +3090,7 @@ async function relics(message,args) {
                 }
                 postdata[X].embeds[j] = {fields: [],footer: {text: ""}}
             }
-            postdata[X].embeds[j].fields.push({name: "`" + relic_name + '(' + relic_drops.vault_status + ')' + "`", "value": value, inline: true})
+            postdata[X].embeds[j].fields.push({name: "`" + relic_name + ' ' + vault_status + "`", "value": value, inline: true})
         }
         let tier_names = ["lith", "meso", "neo", "axi"]
         for (var l=0; l < tier_names.length; l++)
