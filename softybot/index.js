@@ -4048,7 +4048,7 @@ async function dc_ducat_update() {
             var item_orders = []
             var status = await axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
             .then(res => {
-                const item_orders = res.data
+                item_orders = res.data
                 return true
             })
             .catch(err => {
