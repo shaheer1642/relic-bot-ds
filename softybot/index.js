@@ -4160,7 +4160,7 @@ async function dc_ducat_update() {
     var user_mentions = []
     var dnd_filter = []
     var invis_filter = []
-    var ducat_stacks = []
+    var ducat_stacks = {}
     ducat_stacks.push({role_1: [],role_2: [],sold_out: []})
     var mention_users = false
     await db.query(`SELECT * FROM ducat_users_details`)
