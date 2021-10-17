@@ -4265,7 +4265,6 @@ async function dc_ducat_update() {
             })
             .catch(err => console.log(err))
         }
-        console.log(mentioned_roles)
         if (total_quantity==2)                              //yellow color
             colorSymbol = "```fix\n"
         else if (total_quantity==3 && total_price<25)       //cyan color
@@ -4283,7 +4282,6 @@ async function dc_ducat_update() {
         }
         else
             whisper = mentioned_roles.toString() + "\n" + colorSymbol + whisper + " (warframe.market)\n(Quantity:Price - " + total_quantity + ":" + total_price + ")\n(Price per part - " + avg_price + ")```"
-        console.log(whisper)
         whisperListArr.push({whisper: whisper, total_quantity: total_quantity, total_price: total_price, avg_price: avg_price})
     }
     whisperListArr = whisperListArr.sort(dynamicSort("total_quantity"))
