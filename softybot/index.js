@@ -4030,7 +4030,7 @@ async function authorize(message,args) {
 
 async function dc_ducat_update() {
     var all_items = []
-    var status = db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16`)
+    var status = await db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16`)
     .then(res => {
         if (res.rows.length == 0)
             return false
