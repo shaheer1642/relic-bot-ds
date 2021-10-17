@@ -97,7 +97,7 @@ client.on('ready', () => {
     td_set_orders_timeouts().catch(err => console.log(err))
 
     //----Ducat updater timeout----
-    //setTimeout(dc_ducat_update, 300000); //execute every 5m
+    setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
 })
 
 client.on('messageCreate', async message => {
@@ -4029,7 +4029,43 @@ async function authorize(message,args) {
 }
 
 async function dc_ducat_update() {
-    
+    var all_items = []
+    var status = db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        all_items = res.rows
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status)
+        return 
+    for (var i=0;i<all_items.length;i++) {
+        if (all_items[i].tags.includes("prime") && !all_items[i].tags.includes("set")) {
+            var item_orders = []
+            var status = await axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
+            .then(res => {
+                const item_orders = res.data
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                continue
+            all_items[i].orders = []
+            item_orders.payload.orders.forEach(element => {
+                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1) && (element.platinum <= 15))
+                    all_items[i].orders.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
+            })
+        }
+    }
+    console.log(all_items)
+    setTimeout(dc_ducat_update, 300000)
 }
 
 function test(message,args) {
