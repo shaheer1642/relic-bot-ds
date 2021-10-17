@@ -2946,7 +2946,7 @@ async function relics(message,args) {
         value1 = value1.substring(0, value1.length - 1)
         value2 = value2.substring(0, value2.length - 1)
         var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
+        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name + '(' + relic_drops.vault_status + ')',url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
         message.channel.send(postdata).catch(err => console.log(err));
         message.react("✅")
         return
@@ -2993,7 +2993,7 @@ async function relics(message,args) {
             continue
         }
         postdata[X].embeds[j] = {
-            title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+            title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '(' + part_info.vault_status + ')',
             url: "https://warframe.market/items/" + arrItemsUrl[i], 
             fields: [], 
             footer: {
@@ -3077,7 +3077,7 @@ async function relics(message,args) {
                 }
                 postdata[X].embeds[j] = {fields: [],footer: {text: ""}}
             }
-            postdata[X].embeds[j].fields.push({name: "`" + relic_name + "`", "value": value, inline: true})
+            postdata[X].embeds[j].fields.push({name: "`" + relic_name + '(' + relic_drops.vault_status + ')' + "`", "value": value, inline: true})
         }
         let tier_names = ["lith", "meso", "neo", "axi"]
         for (var l=0; l < tier_names.length; l++)
