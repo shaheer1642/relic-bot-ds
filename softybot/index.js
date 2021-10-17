@@ -4063,7 +4063,7 @@ async function dc_ducat_update() {
             all_items[i].orders = []
             item_orders.payload.orders = item_orders.payload.orders.sort(dynamicSort('platinum'))
             item_orders.payload.orders.forEach(element => {
-                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) {  //&& (element.platinum <= 15)
+                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1) && (element.platinum <= 15)) {
                     all_items[i].orders.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
                     if (!all_seller_names.includes(element.user.ingame_name))
                         all_seller_names.push(element.user.ingame_name)
