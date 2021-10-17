@@ -2103,7 +2103,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.emoji.name == "⭐") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+        if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.id != ducatRolesMessageId)
             return
@@ -2121,7 +2121,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.emoji.name == "💎") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+        if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.id != ducatRolesMessageId)
             return
@@ -2136,45 +2136,39 @@ client.on('messageReactionAdd', async (reaction, user) => {
         })
     }
 
-    /*----Handled locally----
     if (reaction.emoji.name == "🔴") {
         if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
-        var filecontent = fs.readFileSync('../Presence Updates/dnd_filter.json','utf8').replace(/^\uFEFF/, '')
-        let dnd_filter = JSON.parse(filecontent)
-
-        if (JSON.stringify(dnd_filter).match(user.id))      //Already in stack
-            return
-
-        dnd_filter.push(user.id)
-        fs.writeFileSync('../Presence Updates/dnd_filter.json', JSON.stringify(dnd_filter), 'utf8')
+        await db.query(`UPDATE ducat_users_details SET dnd = true WHERE discord_id = ${user.id}`)
+        .then(async res => {
+            if (res.rowCount == 0) {
+                await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},true)`).catch(err => console.log(err))
+            }
+        })
+        .catch(err => console.log(err))
         return
     }
-    ------------------*/
 
-    /*----Handled locally----
     if (reaction.emoji.name == "🟣") {
         if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
-        var filecontent = fs.readFileSync('../Presence Updates/invis_filter.json','utf8').replace(/^\uFEFF/, '')
-        let invis_filter = JSON.parse(filecontent)
-
-        if (JSON.stringify(invis_filter).match(user.id))      //Already in stack
-            return
-
-        invis_filter.push(user.id)
-        fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
+        await db.query(`UPDATE ducat_users_details SET invis = true WHERE discord_id = ${user.id}`)
+        .then(async res => {
+            if (res.rowCount == 0) {
+                await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},true)`).catch(err => console.log(err))
+            }
+        })
+        .catch(err => console.log(err))
         return
     }
-    ------------------*/
 
     if (reaction.emoji.name == "🎉") {      //removing giveaway reactions for hiatus members
         if (!reaction.message.author)
@@ -2384,63 +2378,40 @@ client.on('messageReactionRemove', async (reaction, user) => {
             .catch(err => console.log(err));
         })
     }
-    /*
+
     if (reaction.emoji.name == "🔴") {
         if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
-        var filecontent = fs.readFileSync('../Presence Updates/dnd_filter.json','utf8').replace(/^\uFEFF/, '')
-        let dnd_filter = JSON.parse(filecontent)
-
-        if (!JSON.stringify(dnd_filter).match(user.id))      //Not in stack
-            return
-
-        var i = 0
-        var MaxIndex = dnd_filter.length
-        for (i=0; i <= MaxIndex-1; i++)
-        {
-            if (dnd_filter[i]==user.id)
-            {
-                dnd_filter.splice(i, 1)
-                i--
+        await db.query(`UPDATE ducat_users_details SET dnd = false WHERE discord_id = ${user.id}`)
+        .then(async res => {
+            if (res.rowCount == 0) {
+                await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},false)`).catch(err => console.log(err))
             }
-            MaxIndex = dnd_filter.length
-        }
-        fs.writeFileSync('../Presence Updates/dnd_filter.json', JSON.stringify(dnd_filter), 'utf8')
+        })
+        .catch(err => console.log(err))
         return
     }
 
     if (reaction.emoji.name == "🟣") {
         if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
-        var filecontent = fs.readFileSync('../Presence Updates/invis_filter.json','utf8').replace(/^\uFEFF/, '')
-        let invis_filter = JSON.parse(filecontent)
-
-        if (!JSON.stringify(invis_filter).match(user.id))      //Not in stack
-            return
-
-        var i = 0
-        var MaxIndex = invis_filter.length
-        for (i=0; i <= MaxIndex-1; i++)
-        {
-            if (invis_filter[i]==user.id)
-            {
-                invis_filter.splice(i, 1)
-                i--
+        await db.query(`UPDATE ducat_users_details SET invis = false WHERE discord_id = ${user.id}`)
+        .then(async res => {
+            if (res.rowCount == 0) {
+                await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},false)`).catch(err => console.log(err))
             }
-            MaxIndex = invis_filter.length
-        }
-        fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
+        })
+        .catch(err => console.log(err))
         return
     }
-    */
 
     if (reaction.message.id == masteryRolesMessageId)
     {
