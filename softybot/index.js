@@ -4115,7 +4115,7 @@ async function dc_ducat_update() {
                             await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
                             .catch(err => {
                                 console.log(err)
-                                res.delete()
+                                res.delete().catch(err => console.log(err))
                             })
                         })
                         client.channels.cache.get('899291255064920144').send(postdata).catch(err => console.log(err))
@@ -4123,7 +4123,7 @@ async function dc_ducat_update() {
                             await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
                             .catch(err => {
                                 console.log(err)
-                                res.delete()
+                                res.delete().catch(err => console.log(err))
                             })
                         })
                     }
@@ -4143,7 +4143,7 @@ async function dc_ducat_update() {
         }
     }
     //----edit remaining ids----
-    db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'ducat_parts_msg'`)
+    await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'ducat_parts_msg'`)
     .then(res => {
         res.rows.forEach(async element => {
             var channel = client.channels.cache.get(element.channel_id)
@@ -4152,6 +4152,7 @@ async function dc_ducat_update() {
             channel.messages.cache.get(element.message_id).edit("--").catch(err => console.log(err))
         })
     })
+    .catch(err => console.log(err))
     //---------------------------------------
     setTimeout(dc_ducat_update, 300000)
 }
