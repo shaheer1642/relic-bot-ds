@@ -4225,9 +4225,9 @@ async function dc_ducat_update() {
             continue
         var mentioned_roles = []
         var colorSymbol = "```\n"
-        if ((total_quantity>=5 && avg_price<=15) || (total_quantity>=4 && avg_price<=8)) {
+        if ((total_quantity>=6 && avg_price<=10) || (total_quantity>=4 && avg_price<=8)) {
             var find_role = ""
-            if (total_quantity>=5 && avg_price<=15) {
+            if (total_quantity>=6 && avg_price<=10) {
                 if (!ducat_stacks.role_1.includes(whisper)) {
                     await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
                     mention_users = true
@@ -4291,6 +4291,8 @@ async function dc_ducat_update() {
     var msg_id_counter = 0
     for (var i=0; i<whisperListArr.length; i++) {
         if ((postdata.content + whisperListArr[i].whisper).length > 1900 || (i == whisperListArr.length-1)) {
+            if (i == whisperListArr.length-1)
+                postdata.content += whisperListArr[i].whisper
             await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
             .then(async res => {
                 if (res.rows.length == 0) {
