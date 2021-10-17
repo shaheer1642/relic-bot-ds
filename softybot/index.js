@@ -4160,10 +4160,7 @@ async function dc_ducat_update() {
     var user_mentions = []
     var dnd_filter = []
     var invis_filter = []
-    var ducat_stacks = {}
-    ducat_stacks.role_1 = []
-    ducat_stacks.role_2 = []
-    ducat_stacks.sold_out = []
+    var ducat_stacks = {role_1: [], role_2: [], sold_out: []}
     var mention_users = false
     await db.query(`SELECT * FROM ducat_users_details`)
     .then(res => {
@@ -4284,6 +4281,7 @@ async function dc_ducat_update() {
         }
         else
             whisper = mentioned_role + "\n" + colorSymbol + whisper + " (warframe.market)\n(Quantity:Price - " + total_quantity + ":" + total_price + ")\n(Price per part - " + avg_price + ")```"
+        console.log(whisper)
         whisperListArr.push({whisper: whisper, total_quantity: total_quantity, total_price: total_price, avg_price: avg_price})
     }
     whisperListArr = whisperListArr.sort(dynamicSort("total_quantity"))
