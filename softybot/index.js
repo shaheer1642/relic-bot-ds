@@ -4056,12 +4056,12 @@ async function bought(message,args) {
                         if (whispersArr[i] != '###')
                             newContent += whispersArr[i] + '\n'
                     }
-                    ducat_Bot.editMessage(m, {content: newContent})
+                    m.edit({content: newContent})
                     .then(res => {
-                        processMessage.edit('List edited. Thanks for letting us know.').then(msg => setTimeout(() => msg.delete(), 3000))
+                        processMessage.edit('List edited. Thanks for letting us know.').then(msg => setTimeout(() => msg.delete(), 3000)).catch(err => console.log(err))
                     })
                     .catch (err => {
-                        message.channel.send({content: "Error occured editing channel message. Please try again\nError code: 501\n<@253525146923433984>"})
+                        message.channel.send({content: "Error occured editing channel message. Please contact MrSofty#7926\nError code: 501\n<@253525146923433984>"}).catch(err => console.log(err))
                         console.log(err)
                         return
                     })
@@ -4073,7 +4073,7 @@ async function bought(message,args) {
         setTimeout(() => message.delete(), 3000)
     })
     .catch (err => {
-        message.channel.send({content: "Error occured retrieving channel messages. Please try again\nError code: 500\n<@253525146923433984>"})
+        message.channel.send({content: "Error occured retrieving channel messages. Please contact MrSofty#7926\nError code: 500\n<@253525146923433984>"}).catch(err => console.log(err))
         console.log(err)
         return
     })
