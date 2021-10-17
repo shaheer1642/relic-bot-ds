@@ -4299,6 +4299,7 @@ async function dc_ducat_update() {
                     if (!mentioned_roles.includes(`<@&${role.id}>`))
                         mentioned_roles.push(`<@&${role.id}>`)
                     if (member.roles.resolveId(role.id)) {
+                        console.log(`${member.user.username} has role ${role.name}`)
                         if (member.presence) {
                             if (member.presence.status == 'dnd')
                                 if (dnd_filter.includes(member.id))
