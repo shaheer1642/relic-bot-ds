@@ -4155,6 +4155,195 @@ async function dc_ducat_update() {
     })
     .catch(err => console.log(err))
     //---------------------------------------
+    //----Generate whisper list----
+    var whisperListArr = []
+    var user_mentions = []
+    var dnd_filter = []
+    var invis_filter = []
+    var ducat_stacks = []
+    ducat_stacks.push({role_1: [],role_2: [],sold_out: []})
+    var mention_users = false
+    await db.query(`SELECT * FROM ducat_users_details`)
+    .then(res => {
+        res.rows.forEach(element => {
+            if (element.dnd)
+                dnd_filter.push(element.discord_id)
+            if (element.invis)
+                invis_filter.push(element.discord_id)
+        })
+    })
+    .catch(err => console.log(err))
+    await db.query(`SELECT * FROM ducat_stacks`)
+    .then(res => {
+        res.rows.forEach(element => {
+            if (element.type == 'role_1')
+                ducat_stacks.role_1.push(element.text)
+            if (element.type == 'role_2')
+                ducat_stacks.role_2.push(element.text)
+            if (element.type == 'sold_out')
+                ducat_stacks.sold_out.push(element.text)
+        })
+        if (ducat_stacks.role_1.length > 10)
+            await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.roles_1[0]}' AND type='role_1')`).catch(err => console.log(err))
+        if (ducat_stacks.role_2.length > 10)
+            await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.roles_2[0]}' AND type='role_2')`).catch(err => console.log(err))
+        if (ducat_stacks.sold_out.length > 10)
+            await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.sold_out[0]}' AND type='sold_out')`).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+    for (var i=0; i<all_seller_names.length; i++) {
+        var total_items = []
+        for (var j=0; j<all_items.length; j++) {
+            for (var k=0; k<all_items.length; k++) {
+                if (all_items[j].orders[k].seller == all_seller_names[i]) {
+                    total_items.push({item_url: all_items[j].item_url, price: all_items[j].orders[k].price, quantity: all_items[j].orders[k].quantity})
+                }
+            }
+        }
+        var total_quantity = 0
+        var total_price = 0
+        var whisper = "/w " + all_seller_names[i] + " Hi, WTB"
+        for (var j=0; j<total_items.length; j++) {
+            if (j==7)
+                break
+            if (whisper.match(total_items[j].item_url)) // For duplicate entries
+                continue
+            whisper = whisper + " [" + total_items[j].item_url + "] x" + total_items[j].quantity + " for " + total_items[j].quantity*total_items[j].price + "p"
+            if (total_items[j].quantity>1)
+                whisper = whisper + " total"
+            total_quantity += total_items[j].quantity 
+            total_price +=  total_items[j].quantity*total_items[j].price
+        }
+        whisper = whisper.replace(/ blueprint]/g, '] Blueprint')
+        var avg_price = (total_price/total_quantity,2).toFixed(2)
+        if (total_quantity < 2)
+            continue
+        if (total_quantity==2 && total_price>19)
+            continue
+        if (total_quantity==3 && total_price>30)
+            continue
+        if (avg_price < 4)
+            continue
+        var mentioned_role = ""
+        var colorSymbol = "```\n"
+        if ((total_quantity>=6 && avg_price<=10) || (total_quantity>=4 && avg_price<=8)) {
+            var guild = client.guilds.cache.get(botv_guild_id)
+            await guild.members.fetch()
+            .then(members => {
+                members.map(async member => {
+                    var find_role = ""
+                    if (total_quantity>=6 && avg_price<=10) {
+                        if (!ducat_stacks.role_1.includes(whisper)) {
+                            await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
+                            mention_users = true
+                        }
+                        find_role = "Ducats-1" 
+                    }
+                    else {
+                        if (!ducat_stacks.role_2.includes(whisper)) {
+                            await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_2')`).catch(err => console.log(err))
+                            mention_users = true
+                        }
+                        find_role = "Ducats-2"
+                    }
+                    var role = guild.roles.cache.find(r => r.name == find_role)
+                    mentioned_role += `<@&${role.id}>`
+                    if (member.roles.resolveId(role.id)) {
+                        if (member.presence) {
+                            if (member.presence.status == 'dnd')
+                                if (dnd_filter.includes(member.id))
+                                    if (!user_mentions.includes(`<@${member.id}>`))
+                                        user_mentions.push(`<@${member.id}>`)
+                            else if (!user_mentions.includes(`<@${member.id}>`))
+                                user_mentions.push(`<@${member.id}>`)
+                        }
+                        else if (invis_filter.includes(member.id))
+                            if (!user_mentions.includes(`<@${member.id}>`))
+                                user_mentions.push(`<@${member.id}>`)
+                    }
+                })
+            })
+            .catch(err => console.log(err))
+        }
+        if (total_quantity==2)                              //yellow color
+            colorSymbol = "```fix\n"
+        else if (total_quantity==3 && total_price<25)       //cyan color
+            colorSymbol = "```yaml\n"
+        else if (total_quantity>4)                          //cyan color
+            colorSymbol = "```yaml\n"
+        else if (total_quantity==4 && total_price<48)       //cyan color
+            colorSymbol = "```yaml\n"
+        if (ducat_stacks.sold_out.includes(whisper + ' (warframe.market)')) {
+            colorSymbol = colorSymbol.replace("```yaml", "")
+            colorSymbol = colorSymbol.replace("```fix", "")
+            colorSymbol = colorSymbol.replace("```", "")
+            whisper = mentioned_role + "\n" + colorSymbol + "> ~~" + whisper + " (warframe.market)~~\n> ~~(Quantity:Price - " + total_quantity + ":" + total_price + ")~~\n> ~~(Price per part - " + avg_price + ")~~\n> (Sold out!)\n"
+            whisper = whisper.replace("\n\n>", "\n>")
+        }
+        else
+            whisper = mentioned_role + "\n" + colorSymbol + whisper + " (warframe.market)\n(Quantity:Price - " + total_quantity + ":" + total_price + ")\n(Price per part - " + avg_price + ")```"
+        whisperListArr.push({whisper: whisper, total_quantity: total_quantity, total_price: total_price, avg_price: avg_price})
+    }
+    whisperListArr = whisperListArr.sort(dynamicSort("total_quantity"))
+    //----post whisper list to dc----
+    var postdata = {content: ''}
+    postdata.content = '```diff\nWhisper List (Beta)```'
+    var msg_id_counter = 0
+    for (var i=0; i<whisperListArr.length; i++) {
+        if ((postdata.content + whisperListArr[i].whisper).length > 1900 || (i == whisperListArr.length-1)) {
+            await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
+            .then(async res => {
+                if (res.rows.length == 0) {
+                    await client.channels.cache.get('899290597259640853').send(postdata).catch(err => console.log(err))
+                    .then(async res => {
+                        await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_whispers_msg')`)
+                        .catch(err => {
+                            console.log(err)
+                            res.delete().catch(err => console.log(err))
+                        })
+                    })
+                    await client.channels.cache.get('899291255064920144').send(postdata).catch(err => console.log(err))
+                    .then(async res => {
+                        await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_whispers_msg')`)
+                        .catch(err => {
+                            console.log(err)
+                            res.delete().catch(err => console.log(err))
+                        })
+                    })
+                }
+                else {
+                    for (var j=0;j<res.rows.length;j++) {
+                        var element = res.rows[j]
+                        var channel = client.channels.cache.get(element.channel_id)
+                        if (!channel.messages.cache.get(element.message_id))
+                            await channel.messages.fetch()
+                        await channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
+                    }
+                }
+            })
+            .catch(err => console.log(err))
+            msg_id_counter++
+            postdata.content = ''
+        }
+        postdata.content += whisperListArr[i].whisper
+    }
+    //----edit remaining ids----
+    await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
+    .then(res => {
+        res.rows.forEach(async element => {
+            var channel = client.channels.cache.get(element.channel_id)
+            if (!channel.messages.cache.get(element.message_id))
+                await channel.messages.fetch()
+            channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
+        })
+    })
+    .catch(err => console.log(err))
+    //----mention users----
+    if (mention_users && user_mentions.length != 0) {
+        await client.channels.cache.get('899290597259640853').send({content: user_mentions.toString()}).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
+        await client.channels.cache.get('899291255064920144').send({content: user_mentions.toString()}).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
+    }
+    //-------------------------------
     setTimeout(dc_ducat_update, 300000)
 }
 
