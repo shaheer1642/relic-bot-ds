@@ -850,6 +850,9 @@ client.on('messageCreate', async message => {
                 case 'ducat_template':
                     ducat_template(message)
                     break
+                case 'bought':
+                    bought(message,args)
+                    break
                 /*----------------------
                 case 'test':
                     test(message,args)
@@ -4002,6 +4005,79 @@ async function authorize(message,args) {
         processMessage.edit("Error occured processing sign-in request. Please try again.\nError code: 501")
         return
     });
+}
+
+async function bought(message,args) {
+    if (message.channelId != '899290597259640853')
+        return
+    if (args.length == 0)
+    {
+        message.channel.send({content: "Usage example:\n.bought seller_name"}).then(msg => setTimeout(() => msg.delete(), 3000))
+        setTimeout(() => message.delete(), 3000)
+        return
+    }
+    if (args[1])
+    {
+        message.channel.send({content: "Incorrect command. Usage example:\n.bought seller_name"}).then(msg => setTimeout(() => msg.delete(), 3000))
+        setTimeout(() => message.delete(), 3000)
+        return
+    }
+    let processMessage = [];
+    const func = await message.channel.send("Processing").then(response => {
+        processMessage = response
+    })
+    const trader_username = args[0]
+    client.channels.cache.get(message.channelId).messages.fetch().then(ms => {
+        var hasFound1 = 0
+        ms.forEach(m => {
+            var hasFound2 = 0
+            if ((m.embeds.length == 0) && (m.content.match('Whisper List')))
+            {
+                let whispersArr = m.content.split('\n')
+                var markedSold = 0
+                for (i=0; i<whispersArr.length; i++) {
+                    if (whispersArr[i].match('\\b' + trader_username + '\\b')) {
+                        hasFound1 = 1
+                        hasFound2 = 1
+                        if (whispersArr[i].match('> ~~')) {
+                            markedSold = 1
+                            processMessage.edit('Seller already marked as sold.').then(msg => setTimeout(() => msg.delete(), 3000))
+                        }
+                        await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whispersArr[i] + ' (warframe.market)'}','sold_out')`).catch(err => console.log(err))
+                        whispersArr[i-1] = '###'
+                        whispersArr[i] = '> ~~' + whispersArr[i] + '~~'
+                        whispersArr[i+1] = '> ~~' + whispersArr[i+1] + '~~'
+                        whispersArr[i+2] = '> ~~' + whispersArr[i+2].replace(/```/g,'~~\n> (Sold out!)\n')
+                    }
+                }
+                if (hasFound2 && !markedSold) {
+                    var newContent = ''
+                    for (i=0; i<whispersArr.length; i++) {
+                        if (whispersArr[i] != '###')
+                            newContent += whispersArr[i] + '\n'
+                    }
+                    ducat_Bot.editMessage(m, {content: newContent})
+                    .then(res => {
+                        processMessage.edit('List edited. Thanks for letting us know.').then(msg => setTimeout(() => msg.delete(), 3000))
+                    })
+                    .catch (err => {
+                        message.channel.send({content: "Error occured editing channel message. Please try again\nError code: 501\n<@253525146923433984>"})
+                        console.log(err)
+                        return
+                    })
+                }
+            }
+        })
+        if (!hasFound1)
+            processMessage.edit('Could not find that seller.').then(msg => setTimeout(() => msg.delete(), 3000))
+        setTimeout(() => message.delete(), 3000)
+    })
+    .catch (err => {
+        message.channel.send({content: "Error occured retrieving channel messages. Please try again\nError code: 500\n<@253525146923433984>"})
+        console.log(err)
+        return
+    })
+    return
 }
 
 async function dc_ducat_update() {
