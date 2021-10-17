@@ -4046,7 +4046,7 @@ async function dc_ducat_update() {
     for (var i=0;i<all_items.length;i++) {
         if (all_items[i].tags.includes("prime") && !all_items[i].tags.includes("set")) {
             var item_orders = []
-            var status = await axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
+            var status = await axios("https://api.warframe.market/v1/items/" + all_items[i].item_url + "/orders")
             .then(res => {
                 item_orders = res.data
                 return true
