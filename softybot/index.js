@@ -4029,7 +4029,7 @@ async function bought(message,args) {
     const trader_username = args[0]
     client.channels.cache.get(message.channelId).messages.fetch().then(ms => {
         var hasFound1 = 0
-        ms.forEach(m => {
+        ms.forEach(async m => {
             var hasFound2 = 0
             if ((m.embeds.length == 0) && (m.content.match('Whisper List')))
             {
