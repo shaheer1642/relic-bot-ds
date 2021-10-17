@@ -95,6 +95,9 @@ client.on('ready', () => {
 
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
+
+    //----Ducat updater timeout----
+    //setTimeout(dc_ducat_update, 300000); //execute every 5m
 })
 
 client.on('messageCreate', async message => {
@@ -4023,6 +4026,10 @@ async function authorize(message,args) {
         processMessage.edit("Error occured processing sign-in request. Please try again.\nError code: 501")
         return
     });
+}
+
+async function dc_ducat_update() {
+    
 }
 
 function test(message,args) {
