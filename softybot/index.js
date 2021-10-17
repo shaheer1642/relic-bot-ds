@@ -4031,6 +4031,7 @@ async function authorize(message,args) {
 }
 
 async function dc_ducat_update() {
+    return
     var all_items = []
     var status = await db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16`)
     .then(res => {
@@ -4083,7 +4084,7 @@ async function dc_ducat_update() {
             var value2 = ""
             var value3 = ""
             all_items[i].orders.forEach(element => {
-                value1 += element.ingame_name.replace(/_/g,'\_') + '\n'
+                value1 += element.seller.replace(/_/g,'\_') + '\n'
                 value2 += element.quantity + '\n'
                 value3 += element.price + '\n'
             })
