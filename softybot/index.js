@@ -4866,7 +4866,7 @@ async function dc_update_msgs() {
             var element = all_items[i]
             if (element.tags.includes('prime') && !element.tags.includes('set')) {
                 var item_name = '[' + element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '](' + "https://warframe.market/items/" + element.item_url + ')'
-                if ((postdata.embeds[0].fields[field_id].name + item_name).length > 1000) {
+                if ((postdata.embeds[0].fields[field_id].value + item_name).length > 1000) {
                     field_id += 3
                     postdata.embeds[0].fields.push({name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true})
                 }
