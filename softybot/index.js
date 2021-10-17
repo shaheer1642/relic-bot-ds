@@ -4301,10 +4301,11 @@ async function dc_ducat_update() {
                     if (member.roles.cache.find(r => r.id == role.id)) {
                         console.log(`${member.user.username} has role ${role.name}`)
                         if (member.presence) {
-                            if (member.presence.status == 'dnd')
+                            if (member.presence.status == 'dnd') {
                                 if (dnd_filter.includes(member.id))
                                     if (!user_mentions.includes(`<@${member.id}>`))
                                         user_mentions.push(`<@${member.id}>`)
+                            }
                             else if (!user_mentions.includes(`<@${member.id}>`))
                                 user_mentions.push(`<@${member.id}>`)
                         }
