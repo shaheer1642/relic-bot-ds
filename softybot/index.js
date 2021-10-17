@@ -2004,7 +2004,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         var arrItemsUrl = []
         reaction.message.embeds.forEach((element,index)=> {
             if (element.title) {
-                arrItemsUrl.push(element.title.toLowerCase().replace(/ /g, "_"));
+                arrItemsUrl.push(element.title.toLowerCase().replace('(V)','').replace('(E)','').replace('(P)','').replace(/ /g, "_"));
                 reaction.message.embeds[index].title += ' (Updating...)'
             }
         });
@@ -2746,8 +2746,9 @@ async function orders(message,args) {
             vault_status = element.vault_status
         }
     })
-    if (vault_status != 'null')
-        vault_status = '(' + vault_status + ')'
+    if (vault_status)
+        if (vault_status != 'null')
+            vault_status = '(' + vault_status + ')'
     if (arrItemsUrl.length==0)
     {
         message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
