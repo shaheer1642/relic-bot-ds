@@ -2674,7 +2674,7 @@ client.login(config.token).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
-    message.channel.send({content: `(Cloud [Limited functionality]) Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms`});
+    message.channel.send({content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms`});
     message.react("✅");
     return
 }
