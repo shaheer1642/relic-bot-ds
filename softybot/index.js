@@ -4106,11 +4106,11 @@ async function dc_ducat_update() {
                 }],
                 timestamp: new Date()
             })
-            if (postdata.embeds.length == 10) {
+            if ((postdata.embeds.length == 10) || (i == all_items.length-1)) {
                 await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_parts_msg'`)
                 .then(async res => {
                     if (res.rows.length == 0) {
-                        client.channels.cache.get('899290597259640853').send(postdata).catch(err => console.log(err))
+                        await client.channels.cache.get('899290597259640853').send(postdata).catch(err => console.log(err))
                         .then(async res => {
                             await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
                             .catch(err => {
@@ -4118,7 +4118,7 @@ async function dc_ducat_update() {
                                 res.delete().catch(err => console.log(err))
                             })
                         })
-                        client.channels.cache.get('899291255064920144').send(postdata).catch(err => console.log(err))
+                        await client.channels.cache.get('899291255064920144').send(postdata).catch(err => console.log(err))
                         .then(async res => {
                             await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
                             .catch(err => {
