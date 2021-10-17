@@ -2746,9 +2746,10 @@ async function orders(message,args) {
             vault_status = element.vault_status
         }
     })
-    if (vault_status)
+    if (vault_status) {
         if (vault_status != 'null')
             vault_status = '(' + vault_status + ')'
+    }
     else
         vault_status = ''
     if (arrItemsUrl.length==0)
