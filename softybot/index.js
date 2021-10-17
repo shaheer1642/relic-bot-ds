@@ -4891,8 +4891,10 @@ async function dc_update_msgs() {
                 })
                 .catch(err => console.log(err))
             }
-            res.rows.forEach(element => {
-                client.channels.cache.get(element.channel_id).messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
+            res.rows.forEach(async element => {
+                var channel = client.channels.cache.get(element.channel_id)
+                await channel.messages.fetch()
+                channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
             })
         })
         .catch(err => {
