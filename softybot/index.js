@@ -4132,7 +4132,7 @@ async function dc_ducat_update() {
                             var channel = client.channels.cache.get(element.channel_id)
                             if (!channel.messages.cache.get(element.message_id))
                                 await channel.messages.fetch()
-                            channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
+                            await channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
                         })
                     }
                 })
