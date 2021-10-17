@@ -4853,7 +4853,7 @@ async function updateDatabasePrices(up_origin) {
 
 async function dc_update_msgs() {
     //----post ducats parts main msg----
-    db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC`)
+    db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC,item_url`)
     .then(res => {
         var all_items = res.rows
         var postdata = {}
