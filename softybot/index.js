@@ -4031,7 +4031,6 @@ async function authorize(message,args) {
 }
 
 async function dc_ducat_update() {
-    return
     var all_items = []
     var status = await db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16`)
     .then(res => {
@@ -4107,13 +4106,46 @@ async function dc_ducat_update() {
                 timestamp: new Date()
             })
             if (postdata.embeds.length == 10) {
-
+                await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_parts_msg'`)
+                .then(res => {
+                    if (res.rows.length == 0) {
+                        client.channels.cache.get('899290597259640853').send(postdata).catch(err => console.log(err))
+                        .then(res => {
+                            db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
+                            .catch(err => console.log(err))
+                        })
+                        client.channels.cache.get('899291255064920144').send(postdata).catch(err => console.log(err))
+                        .then(res => {
+                            db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
+                            .catch(err => console.log(err))
+                        })
+                    }
+                    else {
+                        res.rows.forEach(async element => {
+                            var channel = client.channels.cache.get(element.channel_id)
+                            if (!channel.messages.cache.get(element.message_id))
+                                await channel.messages.fetch()
+                            channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
+                        })
+                    }
+                })
+                .catch(err => console.log(err))
+                postdata.embeds = []
+                msg_id_counter++
             }
         }
     }
+    //----edit remaining ids----
+    db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'ducat_parts_msg'`)
+    .then(res => {
+        res.rows.forEach(async element => {
+            var channel = client.channels.cache.get(element.channel_id)
+            if (!channel.messages.cache.get(element.message_id))
+                await channel.messages.fetch()
+            channel.messages.cache.get(element.message_id).edit("--").catch(err => console.log(err))
+        })
+    })
     //---------------------------------------
-    console.log(JSON.stringify(all_items))
-    console.log(all_seller_names)
     setTimeout(dc_ducat_update, 300000)
 }
 
@@ -4147,22 +4179,6 @@ function msToTime(s) {
     if (mins != 0)
         return pad(mins) + ' minutes ' + pad(secs) + ' seconds';
     return pad(secs) + ' seconds';
-}
-
-function msToS(s) {
-    var ms = s % 1000;
-    s = (s - ms) / 1000;
-    var secs = s % 60;
-    s = (s - secs) / 60;
-    return secs
-}
-
-async function getOrder(item_url)
-{
-    const response = await request('https://api.warframe.market/v1/items/' + item_url + '/orders');
-    console.log(JSON.parse(response))
-    response = JSON.parse(response)
-    return response
 }
 
 function dynamicSort(property) {
@@ -4891,11 +4907,14 @@ async function dc_update_msgs() {
                 })
                 .catch(err => console.log(err))
             }
-            res.rows.forEach(async element => {
-                var channel = client.channels.cache.get(element.channel_id)
-                await channel.messages.fetch()
-                channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
-            })
+            else {
+                res.rows.forEach(async element => {
+                    var channel = client.channels.cache.get(element.channel_id)
+                    if (!channel.messages.cache.get(element.message_id))
+                        await channel.messages.fetch()
+                    channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
+                })
+            }
         })
         .catch(err => {
             console.log(err)
