@@ -4858,22 +4858,21 @@ async function dc_update_msgs() {
         var all_items = res.rows
         var postdata = {}
         postdata.content = " "
-        postdata.embeds = {}
-        postdata.fields = []
-        postdata.embeds.timestamp = new Date()
+        postdata.embeds = []
+        postdata.embeds.push({fields: [],timestamp: new Date()})
         var field_id = 0
-        postdata.fields.push({name: 'Prime Part',value: '',inline: true},{name: 'Price',value: '',inline: true},{name: 'Ducats',value: '',inline: true})
+        postdata.embeds[0].fields.push({name: 'Prime Part',value: '',inline: true},{name: 'Price',value: '',inline: true},{name: 'Ducats',value: '',inline: true})
         for (var i=0; i<all_items.length; i++) {
             var element = all_items[i]
             if (element.tags.includes('prime') && !element.tags.includes('set')) {
                 var item_name = '[' + element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '](' + "https://warframe.market/items/" + element.item_url + ')'
-                if ((postdata.fields[field_id].name + item_name).length > 1000) {
+                if ((postdata.embeds[0].fields[field_id].name + item_name).length > 1000) {
                     field_id += 3
-                    postdata.fields.push({name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true})
+                    postdata.embeds[0].fields.push({name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true})
                 }
-                postdata.fields[field_id].value += item_name + '\n'
-                postdata.fields[field_id+1].value += Math.round(element.sell_price) + '\n'
-                postdata.fields[field_id+2].value += element.ducat + '\n'
+                postdata.embeds[0].fields[field_id].value += item_name + '\n'
+                postdata.embeds[0].fields[field_id+1].value += Math.round(element.sell_price) + '\n'
+                postdata.embeds[0].fields[field_id+2].value += element.ducat + '\n'
             }
         }
         db.query(`SELECT * FROM bot_updates_msg_ids WHERE type = 'ducat_main_msg'`)
