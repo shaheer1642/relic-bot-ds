@@ -847,6 +847,9 @@ client.on('messageCreate', async message => {
                 case 'relics':
                     relics(message,args)
                     break
+                case 'ducat_template':
+                    ducat_template(message)
+                    break
                 /*----------------------
                 case 'test':
                     test(message,args)
@@ -4358,6 +4361,13 @@ function test(message,args) {
           return
 }
 //-------------------------------------------
+function ducat_template(message) {
+    if (message.author.id != '253525146923433984')
+        message.channel.send(`You do not have permission to use this command`).catch(err => console.log(err))
+    var postdata = {content: ''}
+    postdata.content = '```md\nNotes:\nThis data will be updated every 5 mins\n\nColors & filters:\nIf price per part is less than 4, whipser is filtered out (usually troll orders)\nIf quantity is 1, it is filtered out\n<If quantity is 2, it is highlighted yellow>\nIf quantity is 2 but price is greater than 19p, it is filtered out\nIf quantity is 3 but price is greater than 30p, it is filtered out\n[If quantity is equal to 3 but price is lower than 25p, it is highlighted cyan][]\n[If quantity is equal to 4 but price is lower than 48p, it is highlighted cyan][]\n[If quantity is greater than 4, it is highlighted cyan][]\n```\nReact with the following emotes to obtain the given roles below. These roles are mentioned whenever a *new* trader appears with the given criteria. Removing reaction should remove the role. (If any suggestions, dm MrSofty)\n\n:star:   `(Ducats-1) :: Quantity >= 6 AND AvgPrice <= 10.00p`\n:gem:   `(Ducats-2) :: Quantity >= 4 AND AvgPrice <= 8.00p`\n\n:red_circle:   `:: Ping on \'Do not Disturb\'`\n:purple_circle:   `:: Ping on \'Invisible\'/offline`\n\nYou may use the following command in this channel to let your fellow buyers know if you have already bought ducats from a seller\n`.bought seller_name`'
+    message.channel.send(postdata).catch(err => console.log(err))
+}
 
 function msToTime(s) {
 
