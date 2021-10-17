@@ -4214,7 +4214,7 @@ async function dc_ducat_update() {
             total_price +=  total_items[j].quantity*total_items[j].price
         }
         whisper = whisper.replace(/ blueprint]/g, '] Blueprint')
-        var avg_price = (total_price/total_quantity,2).toFixed(2)
+        var avg_price = (total_price/total_quantity).toFixed(2)
         if (total_quantity < 2)
             continue
         if (total_quantity==2 && total_price>19)
