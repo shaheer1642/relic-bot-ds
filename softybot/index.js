@@ -4223,7 +4223,7 @@ async function dc_ducat_update() {
             continue
         if (avg_price < 4)
             continue
-        var mentioned_role = ""
+        var mentioned_roles = []
         var colorSymbol = "```\n"
         if ((total_quantity>=5 && avg_price<=15) || (total_quantity>=4 && avg_price<=8)) {
             var find_role = ""
@@ -4246,7 +4246,8 @@ async function dc_ducat_update() {
             .then(members => {
                 members.map(async member => {
                     var role = guild.roles.cache.find(r => r.name == find_role)
-                    mentioned_role += `<@&${role.id}>`
+                    if (!mentioned_roles.includes(`<@&${role.id}>`))
+                        mentioned_roles.push(`<@&${role.id}>`)
                     if (member.roles.resolveId(role.id)) {
                         if (member.presence) {
                             if (member.presence.status == 'dnd')
@@ -4264,7 +4265,7 @@ async function dc_ducat_update() {
             })
             .catch(err => console.log(err))
         }
-        console.log(mentioned_role)
+        console.log(mentioned_roles)
         if (total_quantity==2)                              //yellow color
             colorSymbol = "```fix\n"
         else if (total_quantity==3 && total_price<25)       //cyan color
@@ -4277,11 +4278,11 @@ async function dc_ducat_update() {
             colorSymbol = colorSymbol.replace("```yaml", "")
             colorSymbol = colorSymbol.replace("```fix", "")
             colorSymbol = colorSymbol.replace("```", "")
-            whisper = mentioned_role + "\n" + colorSymbol + "> ~~" + whisper + " (warframe.market)~~\n> ~~(Quantity:Price - " + total_quantity + ":" + total_price + ")~~\n> ~~(Price per part - " + avg_price + ")~~\n> (Sold out!)\n"
+            whisper = mentioned_roles.toString() + "\n" + colorSymbol + "> ~~" + whisper + " (warframe.market)~~\n> ~~(Quantity:Price - " + total_quantity + ":" + total_price + ")~~\n> ~~(Price per part - " + avg_price + ")~~\n> (Sold out!)\n"
             whisper = whisper.replace("\n\n>", "\n>")
         }
         else
-            whisper = mentioned_role + "\n" + colorSymbol + whisper + " (warframe.market)\n(Quantity:Price - " + total_quantity + ":" + total_price + ")\n(Price per part - " + avg_price + ")```"
+            whisper = mentioned_roles.toString() + "\n" + colorSymbol + whisper + " (warframe.market)\n(Quantity:Price - " + total_quantity + ":" + total_price + ")\n(Price per part - " + avg_price + ")```"
         console.log(whisper)
         whisperListArr.push({whisper: whisper, total_quantity: total_quantity, total_price: total_price, avg_price: avg_price})
     }
