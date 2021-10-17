@@ -4292,26 +4292,27 @@ async function dc_ducat_update() {
                 find_role = "Ducats-2"
             }
             var guild = client.guilds.cache.get(botv_guild_id)
+            var role = guild.roles.cache.find(r => r.name == find_role)
             await guild.members.fetch()
             .then(members => {
                 members.map(async member => {
-                    var role = guild.roles.cache.find(r => r.name == find_role)
-                    if (!mentioned_roles.includes(`<@&${role.id}>`))
-                        mentioned_roles.push(`<@&${role.id}>`)
-                    if (member.roles.cache.find(r => r.id == role.id)) {
-                        console.log(`${member.user.username} has role ${role.name}`)
-                        if (member.presence) {
-                            if (member.presence.status == 'dnd') {
-                                if (dnd_filter.includes(member.id))
-                                    if (!user_mentions.includes(`<@${member.id}>`))
-                                        user_mentions.push(`<@${member.id}>`)
+                    if (member.id != client.user.id) {
+                        if (!mentioned_roles.includes(`<@&${role.id}>`))
+                            mentioned_roles.push(`<@&${role.id}>`)
+                        if (member.roles.cache.find(r => r.id == role.id)) {
+                            if (member.presence) {
+                                if (member.presence.status == 'dnd') {
+                                    if (dnd_filter.includes(member.id))
+                                        if (!user_mentions.includes(`<@${member.id}>`))
+                                            user_mentions.push(`<@${member.id}>`)
+                                }
+                                else if (!user_mentions.includes(`<@${member.id}>`))
+                                    user_mentions.push(`<@${member.id}>`)
                             }
-                            else if (!user_mentions.includes(`<@${member.id}>`))
-                                user_mentions.push(`<@${member.id}>`)
+                            else if (invis_filter.includes(member.id))
+                                if (!user_mentions.includes(`<@${member.id}>`))
+                                    user_mentions.push(`<@${member.id}>`)
                         }
-                        else if (invis_filter.includes(member.id))
-                            if (!user_mentions.includes(`<@${member.id}>`))
-                                user_mentions.push(`<@${member.id}>`)
                     }
                 })
             })
