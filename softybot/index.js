@@ -4183,9 +4183,9 @@ async function dc_ducat_update() {
                 ducat_stacks.sold_out.push(element.text)
         })
         if (ducat_stacks.role_1.length > 10)
-            await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.roles_1[0]}' AND type='role_1')`).catch(err => console.log(err))
+            await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.role_1[0]}' AND type='role_1')`).catch(err => console.log(err))
         if (ducat_stacks.role_2.length > 10)
-            await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.roles_2[0]}' AND type='role_2')`).catch(err => console.log(err))
+            await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.role_2[0]}' AND type='role_2')`).catch(err => console.log(err))
         if (ducat_stacks.sold_out.length > 10)
             await db.query(`DELETE FROM ducat_stacks WHERE text='${ducat_stacks.sold_out[0]}' AND type='sold_out')`).catch(err => console.log(err))
     })
@@ -4207,7 +4207,7 @@ async function dc_ducat_update() {
                 break
             if (whisper.match(total_items[j].item_url)) // For duplicate entries
                 continue
-            whisper = whisper + " [" + total_items[j].item_url + "] x" + total_items[j].quantity + " for " + total_items[j].quantity*total_items[j].price + "p"
+            whisper = whisper + " [" + total_items[j].item_url.replace(/_/g,' ') + "] x" + total_items[j].quantity + " for " + total_items[j].quantity*total_items[j].price + "p"
             if (total_items[j].quantity>1)
                 whisper = whisper + " total"
             total_quantity += total_items[j].quantity 
@@ -4225,13 +4225,13 @@ async function dc_ducat_update() {
             continue
         var mentioned_role = ""
         var colorSymbol = "```\n"
-        if ((total_quantity>=6 && avg_price<=10) || (total_quantity>=4 && avg_price<=8)) {
+        if ((total_quantity>=6 && avg_price<=15) || (total_quantity>=4 && avg_price<=8)) {
             var guild = client.guilds.cache.get(botv_guild_id)
             await guild.members.fetch()
             .then(members => {
                 members.map(async member => {
                     var find_role = ""
-                    if (total_quantity>=6 && avg_price<=10) {
+                    if (total_quantity>=6 && avg_price<=15) {
                         if (!ducat_stacks.role_1.includes(whisper)) {
                             await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
                             mention_users = true
