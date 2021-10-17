@@ -4032,7 +4032,7 @@ async function authorize(message,args) {
 
 async function dc_ducat_update() {
     var all_items = []
-    var status = await db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16`)
+    var status = await db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC, item_url`)
     .then(res => {
         if (res.rows.length == 0)
             return false
@@ -4061,6 +4061,7 @@ async function dc_ducat_update() {
             if (!status)
                 continue
             all_items[i].orders = []
+            item_orders.payload.orders = item_orders.payload.orders.sort('platinum')
             item_orders.payload.orders.forEach(element => {
                 if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1) && (element.platinum <= 15)) {
                     all_items[i].orders.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
@@ -4111,13 +4112,19 @@ async function dc_ducat_update() {
                     if (res.rows.length == 0) {
                         client.channels.cache.get('899290597259640853').send(postdata).catch(err => console.log(err))
                         .then(res => {
-                            db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
-                            .catch(err => console.log(err))
+                            db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
+                            .catch(err => {
+                                console.log(err)
+                                res.delete()
+                            })
                         })
                         client.channels.cache.get('899291255064920144').send(postdata).catch(err => console.log(err))
                         .then(res => {
-                            db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
-                            .catch(err => console.log(err))
+                            db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
+                            .catch(err => {
+                                console.log(err)
+                                res.delete()
+                            })
                         })
                     }
                     else {
@@ -4897,13 +4904,19 @@ async function dc_update_msgs() {
                 client.channels.cache.get('899290597259640853').send(postdata)
                 .then(res => {
                     db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_main_msg')`)
-                    .catch(err => console.log(err))
+                    .catch(err => {
+                        console.log(err)
+                        res.delete()
+                    })
                 })
                 .catch(err => console.log(err))
                 client.channels.cache.get('899291255064920144').send(postdata)
                 .then(res => {
                     db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_main_msg')`)
-                    .catch(err => console.log(err))
+                    .catch(err => {
+                        console.log(err)
+                        res.delete()
+                    })
                 })
                 .catch(err => console.log(err))
             }
