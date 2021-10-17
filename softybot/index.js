@@ -4225,13 +4225,13 @@ async function dc_ducat_update() {
             continue
         var mentioned_role = ""
         var colorSymbol = "```\n"
-        if ((total_quantity>=6 && avg_price<=15) || (total_quantity>=4 && avg_price<=8)) {
+        if ((total_quantity>=5 && avg_price<=15) || (total_quantity>=4 && avg_price<=8)) {
             var guild = client.guilds.cache.get(botv_guild_id)
             await guild.members.fetch()
             .then(members => {
                 members.map(async member => {
                     var find_role = ""
-                    if (total_quantity>=6 && avg_price<=15) {
+                    if (total_quantity>=5 && avg_price<=15) {
                         if (!ducat_stacks.role_1.includes(whisper)) {
                             await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
                             mention_users = true
