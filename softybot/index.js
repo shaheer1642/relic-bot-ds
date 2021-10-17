@@ -4043,7 +4043,7 @@ async function bought(message,args) {
                             markedSold = 1
                             processMessage.edit('Seller already marked as sold.').then(msg => setTimeout(() => msg.delete(), 3000))
                         }
-                        await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whispersArr[i] + ' (warframe.market)'}','sold_out')`).catch(err => console.log(err))
+                        await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whispersArr[i]}','sold_out')`).catch(err => console.log(err))
                         whispersArr[i-1] = '###'
                         whispersArr[i] = '> ~~' + whispersArr[i] + '~~'
                         whispersArr[i+1] = '> ~~' + whispersArr[i+1] + '~~'
