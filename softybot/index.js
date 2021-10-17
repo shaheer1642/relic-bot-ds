@@ -4043,6 +4043,7 @@ async function dc_ducat_update() {
     })
     if (!status)
         return 
+    var all_seller_names = []
     for (var i=0;i<all_items.length;i++) {
         if (all_items[i].tags.includes("prime") && !all_items[i].tags.includes("set")) {
             var item_orders = []
@@ -4059,12 +4060,16 @@ async function dc_ducat_update() {
                 continue
             all_items[i].orders = []
             item_orders.payload.orders.forEach(element => {
-                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1) && (element.platinum <= 15))
+                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1) && (element.platinum <= 15)) {
                     all_items[i].orders.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
+                    if (!all_seller_names.includes(element.user.ingame_name))
+                        all_seller_names.push(element.user.ingame_name)
+                }
             })
         }
     }
-    console.log(all_items)
+    console.log(JSON.stringify(all_items))
+    console.log(all_seller_names)
     setTimeout(dc_ducat_update, 300000)
 }
 
