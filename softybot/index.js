@@ -4226,25 +4226,25 @@ async function dc_ducat_update() {
         var mentioned_role = ""
         var colorSymbol = "```\n"
         if ((total_quantity>=5 && avg_price<=15) || (total_quantity>=4 && avg_price<=8)) {
+            var find_role = ""
+            if (total_quantity>=5 && avg_price<=15) {
+                if (!ducat_stacks.role_1.includes(whisper)) {
+                    await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
+                    mention_users = true
+                }
+                find_role = "Ducats-1" 
+            }
+            else {
+                if (!ducat_stacks.role_2.includes(whisper)) {
+                    await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_2')`).catch(err => console.log(err))
+                    mention_users = true
+                }
+                find_role = "Ducats-2"
+            }
             var guild = client.guilds.cache.get(botv_guild_id)
             await guild.members.fetch()
             .then(members => {
                 members.map(async member => {
-                    var find_role = ""
-                    if (total_quantity>=5 && avg_price<=15) {
-                        if (!ducat_stacks.role_1.includes(whisper)) {
-                            await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
-                            mention_users = true
-                        }
-                        find_role = "Ducats-1" 
-                    }
-                    else {
-                        if (!ducat_stacks.role_2.includes(whisper)) {
-                            await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_2')`).catch(err => console.log(err))
-                            mention_users = true
-                        }
-                        find_role = "Ducats-2"
-                    }
                     var role = guild.roles.cache.find(r => r.name == find_role)
                     mentioned_role += `<@&${role.id}>`
                     if (member.roles.resolveId(role.id)) {
@@ -4264,6 +4264,7 @@ async function dc_ducat_update() {
             })
             .catch(err => console.log(err))
         }
+        console.log(mentioned_role)
         if (total_quantity==2)                              //yellow color
             colorSymbol = "```fix\n"
         else if (total_quantity==3 && total_price<25)       //cyan color
@@ -4285,7 +4286,6 @@ async function dc_ducat_update() {
         whisperListArr.push({whisper: whisper, total_quantity: total_quantity, total_price: total_price, avg_price: avg_price})
     }
     whisperListArr = whisperListArr.sort(dynamicSort("total_quantity"))
-    console.log(whisperListArr)
     //----post whisper list to dc----
     var postdata = {content: ''}
     postdata.content = '```diff\nWhisper List (Beta)```'
