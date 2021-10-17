@@ -16,7 +16,7 @@ const { resolve } = require('path');
 const botID = "832682369831141417"
 const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
-const rolesMessageId = "874104958755168256"
+const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
@@ -2105,7 +2105,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != botID)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
         const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-1')
         reaction.message.guild.members.cache.get(user.id).roles.add(role)
@@ -2123,7 +2123,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != botID)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
         const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-2')
         reaction.message.guild.members.cache.get(user.id).roles.add(role)
@@ -2350,7 +2350,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != botID)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
         const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-1')
         reaction.message.guild.members.cache.get(user.id).roles.remove(role)
@@ -2370,7 +2370,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != botID)
             return
-        if (reaction.message.id != rolesMessageId)
+        if (reaction.message.id != ducatRolesMessageId)
             return
         const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-2')
         reaction.message.guild.members.cache.get(user.id).roles.remove(role)
@@ -4429,70 +4429,6 @@ function dynamicSortDesc(property) {
         var result = (a[property] > b[property]) ? -1 : (a[property] < b[property]) ? 1 : 0;
         return result * sortOrder;
     }
-}
-
-function verify_roles() {
-    console.log('verify_roles Initialize')
-    //client.channels.fetch('884055410515017778')
-    client.guilds.fetch('776804537095684108').then((cacheGuild) => {
-        cacheGuild.channels.fetch('863744615768784916').then((cacheChannel) => {
-            cacheChannel.messages.fetch(rolesMessageId).then(reactionMessage => {
-                reactionMessage.reactions.resolve('⭐').users.fetch().then(userList => {
-                    userList.map((user) => {
-                        cacheGuild.members.fetch(user.id).then((cacheMember) => {
-                            if (!cacheMember.roles.cache.find(r => r.name === "Ducats-1")) {
-                                const role = cacheGuild.roles.cache.find(role => role.name === 'Ducats-1')
-                                cacheMember.roles.add(role)
-                                .then (response => {
-                                    console.log(JSON.stringify(response))
-                                    user.send('Role ' + role.name + ' Added.\n(This message might be late since you reacted when bot was offline. If this is a mistake, contact MrSofty#7926)').catch(err => console.log(err));
-                                })
-                            }
-                        })
-                    })
-                });
-                reactionMessage.reactions.resolve('💎').users.fetch().then(userList => {
-                    userList.map((user) => {
-                        cacheGuild.members.fetch(user.id).then((cacheMember) => {
-                            if (!cacheMember.roles.cache.find(r => r.name === "Ducats-2")) {
-                                const role = cacheGuild.roles.cache.find(role => role.name === 'Ducats-2')
-                                cacheMember.roles.add(role)
-                                .then (response => {
-                                    console.log(JSON.stringify(response))
-                                    user.send('Role ' + role.name + ' Added.\n(This message might be late since you reacted when bot was offline. If this is a mistake, contact MrSofty#7926)').catch(err => console.log(err));
-                                })
-                            }
-                        })
-                    })
-                });
-                reactionMessage.reactions.resolve('🔴').users.fetch().then(userList => {
-                    userList.map((user) => {
-                        var filecontent = fs.readFileSync('../Presence Updates/dnd_filter.json','utf8').replace(/^\uFEFF/, '')
-                        let dnd_filter = JSON.parse(filecontent)
-                
-                        if (JSON.stringify(dnd_filter).match(user.id))      //Already in stack
-                            return
-                
-                        dnd_filter.push(user.id)
-                        fs.writeFileSync('../Presence Updates/dnd_filter.json', JSON.stringify(dnd_filter), 'utf8')
-                    })
-                });
-                reactionMessage.reactions.resolve('🟣').users.fetch().then(userList => {
-                    userList.map((user) => {
-                        var filecontent = fs.readFileSync('../Presence Updates/invis_filter.json','utf8').replace(/^\uFEFF/, '')
-                        let invis_filter = JSON.parse(filecontent)
-                
-                        if (JSON.stringify(invis_filter).match(user.id))      //Already in stack
-                            return
-                
-                        invis_filter.push(user.id)
-                        fs.writeFileSync('../Presence Updates/invis_filter.json', JSON.stringify(invis_filter), 'utf8')
-                    })
-                });
-                console.log('verify_roles Executed')
-            });
-        });
-    })
 }
 
 function trades_update() {
