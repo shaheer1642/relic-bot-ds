@@ -4031,7 +4031,7 @@ async function bought(message,args) {
         var hasFound1 = 0
         ms.forEach(async m => {
             var hasFound2 = 0
-            if ((m.embeds.length == 0) && (m.content.match('Whisper List')))
+            if ((m.embeds.length == 0) && (m.content.match('Quantity:Price')))
             {
                 let whispersArr = m.content.split('\n')
                 var markedSold = 0
