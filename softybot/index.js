@@ -4337,6 +4337,7 @@ async function dc_ducat_update() {
             whisper = mentioned_roles.toString() + "\n" + colorSymbol + whisper + " (warframe.market)\n(Quantity:Price - " + total_quantity + ":" + total_price + ")\n(Price per part - " + avg_price + ")```"
         whisperListArr.push({whisper: whisper, total_quantity: total_quantity, total_price: total_price, avg_price: avg_price})
     }
+    whisperListArr = whisperListArr.sort(dynamicSort("total_price"))
     whisperListArr = whisperListArr.sort(dynamicSort("total_quantity"))
     //----post whisper list to dc----
     var postdata = {content: ''}
