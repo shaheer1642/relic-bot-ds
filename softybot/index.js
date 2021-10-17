@@ -4298,7 +4298,7 @@ async function dc_ducat_update() {
                     var role = guild.roles.cache.find(r => r.name == find_role)
                     if (!mentioned_roles.includes(`<@&${role.id}>`))
                         mentioned_roles.push(`<@&${role.id}>`)
-                    if (member.roles.resolveId(role.id)) {
+                    if (member.roles.cache.find(r => r.id == role.id)) {
                         console.log(`${member.user.username} has role ${role.name}`)
                         if (member.presence) {
                             if (member.presence.status == 'dnd')
