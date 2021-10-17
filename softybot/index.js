@@ -4194,7 +4194,7 @@ async function dc_ducat_update() {
     for (var i=0; i<all_seller_names.length; i++) {
         var total_items = []
         for (var j=0; j<all_items.length; j++) {
-            for (var k=0; k<all_items.orders.length; k++) {
+            for (var k=0; k<all_items[j].orders.length; k++) {
                 if (all_items[j].orders[k].seller == all_seller_names[i]) {
                     total_items.push({item_url: all_items[j].item_url, price: all_items[j].orders[k].price, quantity: all_items[j].orders[k].quantity})
                 }
