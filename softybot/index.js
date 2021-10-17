@@ -14,6 +14,8 @@ const { Console } = require('console');
 const { resolve } = require('path');
 */
 const botID = "832682369831141417"
+const botv_guild_id = "776804537095684108"
+const relicStocks_guild_id = "765542868265730068"
 const rolesMessageId = "874104958755168256"
 const masteryRolesMessageId = "892084165405716541"
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
@@ -4068,6 +4070,47 @@ async function dc_ducat_update() {
             })
         }
     }
+    //----Post all item orders on discord----
+    var postdata = {}
+    postdata.content = " "
+    postdata.embeds = []
+    var msg_id_counter = 0
+    for (var i=0;i<all_items.length;i++) {
+        if (all_items[i].tags.includes("prime") && !all_items[i].tags.includes("set")) {
+            if (all_items[i].orders.length == 0)
+                continue
+            var value1 = ""
+            var value2 = ""
+            var value3 = ""
+            all_items[i].orders.forEach(element => {
+                value1 += element.ingame_name.replace(/_/g,'\_') + '\n'
+                value2 += element.quantity + '\n'
+                value3 += element.price + '\n'
+            })
+            postdata.embeds.push({
+                title: all_items[i].item_url.replace(/_/g, ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                url: "https://warframe.market/items/" + all_items[i].item_url,
+                fields: [{
+                    name: 'Seller',
+                    value: value1,
+                    inline: true
+                },{
+                    name: 'Quantity',
+                    value: value2,
+                    inline: true
+                },{
+                    name: 'Price',
+                    value: value3,
+                    inline: true
+                }],
+                timestamp: new Date()
+            })
+            if (postdata.embeds.length == 10) {
+
+            }
+        }
+    }
+    //---------------------------------------
     console.log(JSON.stringify(all_items))
     console.log(all_seller_names)
     setTimeout(dc_ducat_update, 300000)
@@ -4450,7 +4493,7 @@ async function updateDatabasePrices(up_origin) {
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
-        for (var i=0;i<db_items_list.rows.length;i++) {
+        for (var i=0;i>db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic")) { //item.tags.includes("prime") || 
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
@@ -4712,6 +4755,7 @@ async function updateDatabasePrices(up_origin) {
         return
     }
     else {
+        dc_update_msgs()
         console.log(`Updated all prices in the DB.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
         inform_dc(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
         if (up_origin)
@@ -4804,6 +4848,62 @@ async function updateDatabasePrices(up_origin) {
         }
         return
     }
+}
+
+async function dc_update_msgs() {
+    //----post ducats parts main msg----
+    db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC`)
+    .then(res => {
+        var all_items = res.rows
+        var postdata = {}
+        postdata.content = " "
+        postdata.embeds = {}
+        postdata.fields = []
+        postdata.embeds.timestamp = new Date()
+        var field_id = 0
+        postdata.fields.push({name: 'Prime Part',value: '',inline: true},{name: 'Price',value: '',inline: true},{name: 'Ducats',value: '',inline: true})
+        for (var i=0; i<all_items.length; i++) {
+            var element = all_items[i]
+            if (element.tags.includes('prime') && !element.tags.includes('set')) {
+                var item_name = '[' + element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '](' + "https://warframe.market/items/" + element.item_url + ')'
+                if ((postdata.fields[field_id].name + item_name).length > 1000) {
+                    field_id += 3
+                    postdata.fields.push({name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true})
+                }
+                postdata.fields[field_id].value += item_name + '\n'
+                postdata.fields[field_id+1].value += Math.round(element.sell_price) + '\n'
+                postdata.fields[field_id+2].value += element.ducat + '\n'
+            }
+        }
+        db.query(`SELECT * FROM bot_updates_msg_ids WHERE type = 'ducat_main_msg'`)
+        .then(res => {
+            if (res.rows.length == 0) {
+                client.channels.cache.get('899290597259640853').send(postdata)
+                .then(res => {
+                    db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_main_msg')`)
+                    .catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
+                client.channels.cache.get('899291255064920144').send(postdata)
+                .then(res => {
+                    db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_main_msg')`)
+                    .catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
+            }
+            res.rows.forEach(element => {
+                client.channels.cache.get(element.channel_id).messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
+            })
+        })
+        .catch(err => {
+            console.log(err)
+            console.log('Error retreiving db msg_id for ducats parts main')
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        console.log('Error retreiving ducats parts main')
+    })
 }
 
 async function update_wfm_items_list() {
