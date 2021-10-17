@@ -4371,6 +4371,12 @@ async function ducat_template(message) {
     const channel = client.channels.cache.get('899290597259640853')
     await channel.messages.fetch()
     channel.messages.cache.get('899402069159608320').edit(postdata).catch(err => console.log(err))
+    .then(res => {
+        res.react('⭐').catch(err => console.log(err))
+        res.react('💎').catch(err => console.log(err))
+        res.react('🔴').catch(err => console.log(err))
+        res.react('🟣').catch(err => console.log(err))
+    })
 }
 
 function msToTime(s) {
