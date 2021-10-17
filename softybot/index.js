@@ -4033,9 +4033,9 @@ async function bought(message,args) {
             var hasFound2 = 0
             if ((m.embeds.length == 0) && (m.content.match('Quantity:Price')))
             {
-                let whispersArr = m.content.split('\n')
+                var whispersArr = m.content.split('\n')
                 var markedSold = 0
-                for (i=0; i<whispersArr.length; i++) {
+                for (var i=0; i<whispersArr.length; i++) {
                     if (whispersArr[i].match('\\b' + trader_username + '\\b')) {
                         hasFound1 = 1
                         hasFound2 = 1
@@ -4052,7 +4052,7 @@ async function bought(message,args) {
                 }
                 if (hasFound2 && !markedSold) {
                     var newContent = ''
-                    for (i=0; i<whispersArr.length; i++) {
+                    for (var i=0; i<whispersArr.length; i++) {
                         if (whispersArr[i] != '###')
                             newContent += whispersArr[i] + '\n'
                     }
