@@ -4391,6 +4391,7 @@ async function dc_ducat_update() {
     })
     .catch(err => console.log(err))
     //----mention users----
+    console.log(user_mentions)
     if (mention_users && user_mentions.length != 0) {
         await client.channels.cache.get('899290597259640853').send({content: user_mentions.toString()}).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
         await client.channels.cache.get('899291255064920144').send({content: user_mentions.toString()}).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
