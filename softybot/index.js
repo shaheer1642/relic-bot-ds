@@ -4143,40 +4143,6 @@ async function dc_ducat_update() {
             }
         }
     }
-    while (msg_id_counter < 5) {
-        await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_parts_msg'`)
-        .then(async res => {
-            if (res.rows.length == 0) {
-                await client.channels.cache.get('899290597259640853').send({content: 'dummy msg'}).catch(err => console.log(err))
-                .then(async res => {
-                    await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
-                    .catch(err => {
-                        console.log(err)
-                        res.delete().catch(err => console.log(err))
-                    })
-                })
-                await client.channels.cache.get('899291255064920144').send({content: 'dummy msg'}).catch(err => console.log(err))
-                .then(async res => {
-                    await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_parts_msg')`)
-                    .catch(err => {
-                        console.log(err)
-                        res.delete().catch(err => console.log(err))
-                    })
-                })
-            }
-            else {
-                for (var j=0;j<res.rows.length;j++) {
-                    var element = res.rows[j]
-                    var channel = client.channels.cache.get(element.channel_id)
-                    if (!channel.messages.cache.get(element.message_id))
-                        await channel.messages.fetch()
-                    await channel.messages.cache.get(element.message_id).edit({content: 'dummy msg'}).catch(err => console.log(err))
-                }
-            }
-        })
-        .catch(err => console.log(err))
-        msg_id_counter++
-    }
     //----edit remaining ids----
     await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'ducat_parts_msg'`)
     .then(res => {
@@ -4362,40 +4328,6 @@ async function dc_ducat_update() {
             postdata.content = ''
         }
         postdata.content += whisperListArr[i].whisper
-    }
-    while (msg_id_counter < 7) {
-        await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
-        .then(async res => {
-            if (res.rows.length == 0) {
-                await client.channels.cache.get('899290597259640853').send({content: 'dummy msg'}).catch(err => console.log(err))
-                .then(async res => {
-                    await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_whispers_msg')`)
-                    .catch(err => {
-                        console.log(err)
-                        res.delete().catch(err => console.log(err))
-                    })
-                })
-                await client.channels.cache.get('899291255064920144').send({content: 'dummy msg'}).catch(err => console.log(err))
-                .then(async res => {
-                    await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'ducat_whispers_msg')`)
-                    .catch(err => {
-                        console.log(err)
-                        res.delete().catch(err => console.log(err))
-                    })
-                })
-            }
-            else {
-                for (var j=0;j<res.rows.length;j++) {
-                    var element = res.rows[j]
-                    var channel = client.channels.cache.get(element.channel_id)
-                    if (!channel.messages.cache.get(element.message_id))
-                        await channel.messages.fetch()
-                    await channel.messages.cache.get(element.message_id).edit({content: 'dummy msg'}).catch(err => console.log(err))
-                }
-            }
-        })
-        .catch(err => console.log(err))
-        msg_id_counter++
     }
     //----edit remaining ids----
     await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
