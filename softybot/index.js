@@ -5165,7 +5165,16 @@ async function dc_update_msgs() {
             }
             else 
                 console.log(element.item_url + ' is missing relics')
-            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + relics
+            var vault_status = ''
+            if (element.vault_status) {
+                if (element.vault_status != 'null')
+                    vault_status = ' (' + element.vault_status + ')'
+                else
+                    vault_status = ''
+            }
+            else
+                vault_status = ''
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status + '                        ' + element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + relics
             if (((content + str).length > 1800) || (i == parts_list.length-1)) {
                 if (i == parts_list.length-1)
                     content += str + '\n'
@@ -5179,7 +5188,16 @@ async function dc_update_msgs() {
         var content = '`'
         for (var i=0; i<sets_list.length; i++) {
             var element = sets_list[i]
-            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat
+            var vault_status = ''
+            if (element.vault_status) {
+                if (element.vault_status != 'null')
+                    vault_status = ' (' + element.vault_status + ')'
+                else
+                    vault_status = ''
+            }
+            else
+                vault_status = ''
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status + '                        ' + element.sell_price + 'p         Ducats: ' + element.ducat
             if (((content + str).length > 1800) || (i == sets_list.length-1)) {
                 if (i == sets_list.length-1)
                     content += str + '\n'
@@ -5194,7 +5212,16 @@ async function dc_update_msgs() {
         var content = '`'
         for (var i=0; i<relics_list.length; i++) {
             var element = relics_list[i]
-            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')             ' + element.sell_price + 'p'
+            var vault_status = ''
+            if (element.vault_status) {
+                if (element.vault_status != 'null')
+                    vault_status = ' (' + element.vault_status + ')'
+                else
+                    vault_status = ''
+            }
+            else
+                vault_status = ''
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status + '             ' + element.sell_price + 'p'
             if (((content + str).length > 1800) || (i == relics_list.length-1)) {
                 if (i == relics_list.length-1)
                     content += str + '\n'
