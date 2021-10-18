@@ -3024,7 +3024,7 @@ async function relics(message,args) {
                 part_info = element
         })
         if (part_info.vault_status != 'null')
-            vault_status = '(' + part_info.vault_status + ')'
+            vault_status = ' (' + part_info.vault_status + ')'
         if (!part_info.relics) {
             message.channel.send(`Could not find relic data for item **${arrItemsUrl[i]}**`)
             continue
@@ -4761,8 +4761,7 @@ async function updateDatabasePrices(up_origin) {
     .then(async (db_items_list) => {
         for (var i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
-            if (item.item_url.match('valkyr'))
-            if (item.tags.includes("prime") || item.tags.includes("relic")) { //item.tags.includes("prime") || 
+            if (item.tags.includes("prime") || item.tags.includes("relic")) {
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
                 var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
                 .then(async itemOrders => {
