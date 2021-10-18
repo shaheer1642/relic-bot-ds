@@ -4858,7 +4858,7 @@ async function updateDatabasePrices(up_origin) {
                         .then(async (wikiInfo) => {
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                                 vault_status = 'V'
-                            else if (wikiInfo.data.parse.text["*"].match(/^<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>.*<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>.*<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>$/))
+                            else if (wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g) == 3)
                                 vault_status = 'R'
                             else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
                                 vault_status = 'B'
