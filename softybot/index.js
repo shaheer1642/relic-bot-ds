@@ -2694,7 +2694,7 @@ function uptime(message,args) {
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     //-------------
     message.channel.send({
-        content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime(new Date().getTime()-tickcount + 88200)}\nDatabase update in: ${msToTime(msTill1AM)}`
+        content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime(new Date().getTime()-(tickcount + 88200))}\nDatabase update in: ${msToTime(msTill1AM)}`
     }).catch(err => console.log(err))
     message.react("✅");
     return
