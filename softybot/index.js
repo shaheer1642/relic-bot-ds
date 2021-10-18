@@ -4761,6 +4761,7 @@ async function updateDatabasePrices(up_origin) {
     .then(async (db_items_list) => {
         for (var i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
+            if (item.item_url.match('valkyr'))
             if (item.tags.includes("prime") || item.tags.includes("relic")) { //item.tags.includes("prime") || 
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
                 var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
@@ -4905,7 +4906,7 @@ async function updateDatabasePrices(up_origin) {
                         .then(async (wikiInfo) => {
                             if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
                                 vault_status = 'V'
-                            else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of*being only obtainable through*Railjack*missions/))
+                            else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of\*being only obtainable through\*Railjack\*missions/))
                                 vault_status = 'R'
                             else if (wikiInfo.data.parse.text["*"].match(`has returned from the <a href="/wiki/Prime_Vault" title="Prime Vault">Prime Vault</a> for a limited time`))
                                 vault_status = 'P'
