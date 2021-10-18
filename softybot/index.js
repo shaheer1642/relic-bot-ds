@@ -5157,10 +5157,14 @@ async function dc_update_msgs() {
         for (var i=0; i<parts_list.length; i++) {
             var element = parts_list[i]
             var relics = ''
-            element.relics.forEach(relic => {
-                relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g) + '/'
-            })
-            relics = relics.substring(0, relics.length - 1);
+            if (element.relics) {
+                element.relics.forEach(relic => {
+                    relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g) + '/'
+                })
+                relics = relics.substring(0, relics.length - 1);
+            }
+            else 
+                console.log(element.item_url + 'is missing relics')
             var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + relics
             if (((content + str).length > 1800) || (i == parts_list.length-1)) {
                 if (i == parts_list.length-1)
