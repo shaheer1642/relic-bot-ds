@@ -4906,7 +4906,7 @@ async function updateDatabasePrices(up_origin) {
                         .then(async (wikiInfo) => {
                             if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
                                 vault_status = 'V'
-                            else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of\*being only obtainable through\*Railjack\*missions/))
+                            else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of.*being only obtainable through.*Railjack.*missions/))
                                 vault_status = 'R'
                             else if (wikiInfo.data.parse.text["*"].match(`has returned from the <a href="/wiki/Prime_Vault" title="Prime Vault">Prime Vault</a> for a limited time`))
                                 vault_status = 'P'
