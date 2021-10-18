@@ -5152,19 +5152,19 @@ async function dc_update_msgs() {
         })
         //----prime parts----
         var postdata = []
-        postdata.push({content: '```\nBelow is the full price list of all prime items in the game. Their prices are calcuated from WFM based on the sell orders in past 24 hours. The list will be edited on daily basis. For any concerns, contact MrSofty#7926\nAdditionally, items have symbols next to them for more info. These are described below:\n(V) Vaulted Item\n(B) Baro ki\'teer Exclusive Relic\n(P) Prime unvault Item\n(E) Next vault expected Item\n(R) Railjack obtainable Item\n----------\nLast check: ' + new Date() + '```'})
+        postdata.push({content: '```\nBelow is the full price list of all prime items in the game. Their prices are calculated from WFM based on the sell orders in past 24 hours. The list will be edited on daily basis. For any concerns, contact MrSofty#7926\nAdditionally, items have symbols next to them for more info. These are described below:\n(V) Vaulted Item\n(B) Baro ki\'teer Exclusive Relic\n(P) Prime unvault Item\n(E) Next vault expected Item\n(R) Railjack obtainable Item\n----------\nLast check: ' + new Date() + '```'})
         var content = '`'
         for (var i=0; i<parts_list.length; i++) {
             var element = parts_list[i]
             var relics = ''
             if (element.relics) {
                 element.relics.forEach(relic => {
-                    relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g) + '/'
+                    relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '/'
                 })
                 relics = relics.substring(0, relics.length - 1);
             }
             else 
-                console.log(element.item_url + 'is missing relics')
+                console.log(element.item_url + ' is missing relics')
             var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + relics
             if (((content + str).length > 1800) || (i == parts_list.length-1)) {
                 if (i == parts_list.length-1)
@@ -5205,7 +5205,7 @@ async function dc_update_msgs() {
             content += str + '\n'
         }
         //----primed mods----
-        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n\n`Mod                             Unranked      Max Ranked`'})
+        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n`Mod                             Unranked      Max Ranked`'})
         var content = '`'
         for (var i=0; i<p_mods_list.length; i++) {
             var element = p_mods_list[i]
@@ -5219,7 +5219,6 @@ async function dc_update_msgs() {
             }
             content += str + '\n'
         }
-        console.log(postdata)
         var msg_id_counter = 0
         for (var i=0; i<postdata.length; i++) {
             await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'wfm_update_msgs'`)
