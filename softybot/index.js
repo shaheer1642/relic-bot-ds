@@ -4856,10 +4856,12 @@ async function updateDatabasePrices(up_origin) {
                         //${item.item_url.replace('_relic','')}`)
                         var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
                         .then(async (wikiInfo) => {
+                            var matches = wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g)
+                            var isRailjack = matches && matches.length == 3;
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                                 vault_status = 'V'
-                            else if ((wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g)).length == 3)
-                                vault_status = 'R'
+                            else if (isRailjack)
+                                    vault_status = 'R'
                             else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
                                 vault_status = 'B'
                             else if (vaultExclusiveRelics.includes(item.item_url))
