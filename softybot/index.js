@@ -5157,7 +5157,7 @@ async function dc_update_msgs() {
         for (var i=0; i<parts_list.length; i++) {
             var element = parts_list[i]
             var relics = ''
-            element.relics.map(relic => {
+            element.relics.forEach(relic => {
                 relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g) + '/'
             })
             relics = relics.substring(0, relics.length - 1);
