@@ -687,7 +687,7 @@ client.on('messageCreate', async message => {
             }
             */
             const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
-            if (args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) {
+            if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
                 var ingame_name = ""
                 var status_message = ""
                 var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
