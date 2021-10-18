@@ -2674,7 +2674,28 @@ client.login(config.token).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
-    message.channel.send({content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms`});
+    //--------Set new timer--------
+    var currTime = new Date();
+    var currDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate(), // the current day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    var nextDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate() + 1, // the next day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    if ((currDay.getTime() - currTime.getTime())>0)
+        var msTill1AM = currDay.getTime() - currTime.getTime()
+    else    //its past 12am. do next day
+        var msTill1AM = nextDay.getTime() - currTime.getTime()
+    //-------------
+    message.channel.send({
+        content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime(new Date().getTime()-tickcount + 88200)}\nDatabase update in: ${msToTime(msTill1AM)}`
+    }).catch(err => console.log(err))
     message.react("✅");
     return
 }
@@ -2748,7 +2769,7 @@ async function orders(message,args) {
     })
     if (vault_status) {
         if (vault_status != 'null')
-            vault_status = '(' + vault_status + ')'
+            vault_status = ' (' + vault_status + ')'
         else
             vault_status = ''
     }
@@ -2832,7 +2853,7 @@ async function orders(message,args) {
             })
             console.log(footerText)
             embeds.push({
-                title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' ' + vault_status,
+                title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
                 url: 'https://warframe.market/items/' + item_url,
                 fields: [
                     {name: 'Sellers', value: sellers, inline: true},
@@ -2908,7 +2929,7 @@ async function relics(message,args) {
                 relic_drops = element
         })
         if (relic_drops.vault_status != 'null')
-            vault_status = '(' + relic_drops.vault_status + ')'
+            vault_status = ' (' + relic_drops.vault_status + ')'
         if (!relic_drops) {
             message.channel.send(`Could not find the relic named **${d_item_url}**`).catch(err => console.log(err))
             return
@@ -2959,7 +2980,7 @@ async function relics(message,args) {
         value1 = value1.substring(0, value1.length - 1)
         value2 = value2.substring(0, value2.length - 1)
         var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name + ' ' + vault_status,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
+        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name + vault_status,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
         message.channel.send(postdata).catch(err => console.log(err));
         message.react("✅")
         return
@@ -3009,7 +3030,7 @@ async function relics(message,args) {
             continue
         }
         postdata[X].embeds[j] = {
-            title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' ' + vault_status,
+            title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
             url: "https://warframe.market/items/" + arrItemsUrl[i], 
             fields: [], 
             footer: {
@@ -3034,7 +3055,7 @@ async function relics(message,args) {
                 continue
             }
             if (relic_drops.vault_status != 'null')
-                vault_status = '(' + relic_drops.vault_status + ')'
+                vault_status = ' (' + relic_drops.vault_status + ')'
             var value = ""
             for (var m=0; m < relic_drops.rewards.common.length; m++)
             {
@@ -3096,7 +3117,7 @@ async function relics(message,args) {
                 }
                 postdata[X].embeds[j] = {fields: [],footer: {text: ""}}
             }
-            postdata[X].embeds[j].fields.push({name: "`" + relic_name + ' ' + vault_status + "`", "value": value, inline: true})
+            postdata[X].embeds[j].fields.push({name: "`" + relic_name + vault_status + "`", "value": value, inline: true})
         }
         let tier_names = ["lith", "meso", "neo", "axi"]
         for (var l=0; l < tier_names.length; l++)
