@@ -2072,13 +2072,23 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     prices = "\u200b"
                 }
                 var footerText = ""
+                var vault_status = ''
                 items_list.forEach(element => {
-                    if (element.item_url == item_url)
+                    if (element.item_url == item_url) {
                         footerText = "Yesterday Avg: " + element.sell_price + '\n\u200b'
+                        if (element.vault_status) {
+                            if (element.vault_status != 'null')
+                                vault_status = ' (' + element.vault_status + ')'
+                            else
+                                vault_status = ''
+                        }
+                        else
+                            vault_status = ''
+                    }
                 })
                 console.log(footerText)
                 embeds.push({
-                    title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                    title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
                     url: 'https://warframe.market/items/' + item_url,
                     fields: [
                         {name: 'Sellers', value: sellers, inline: true},
@@ -2757,24 +2767,14 @@ async function orders(message,args) {
         return
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
-    var vault_status = ''
     items_list.forEach(element => {
         if (element.item_url.match('^' + d_item_url + '\W*'))
         {
             if (element.item_url.match("prime"))
                 primeFlag = 1
             arrItemsUrl.push(element.item_url);
-            vault_status = element.vault_status
         }
     })
-    if (vault_status) {
-        if (vault_status != 'null')
-            vault_status = ' (' + vault_status + ')'
-        else
-            vault_status = ''
-    }
-    else
-        vault_status = ''
     if (arrItemsUrl.length==0)
     {
         message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
@@ -2847,9 +2847,19 @@ async function orders(message,args) {
                 prices = "\u200b"
             }
             var footerText = ""
+            var vault_status = ''
             items_list.forEach(element => {
-                if (element.item_url == item_url)
+                if (element.item_url == item_url) {
                     footerText = "Yesterday Avg: " + element.sell_price + '\n\u200b'
+                    if (element.vault_status) {
+                        if (element.vault_status != 'null')
+                            vault_status = ' (' + element.vault_status + ')'
+                        else
+                            vault_status = ''
+                    }
+                    else
+                        vault_status = ''
+                }
             })
             console.log(footerText)
             embeds.push({
