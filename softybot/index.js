@@ -4268,6 +4268,7 @@ async function dc_ducat_update() {
                 }
             }
         }
+        total_items = total_items.sort(dynamicSort("price"))
         var total_quantity = 0
         var total_price = 0
         var whisper = "/w " + all_seller_names[i] + " Hi, WTB"
