@@ -5156,14 +5156,20 @@ async function dc_update_msgs() {
         var content = '`'
         for (var i=0; i<parts_list.length; i++) {
             var element = parts_list[i]
-            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + element.relics.map(relic => {return relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g)})
+            var relics = ''
+            element.relics.map(relic => {
+                relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g) + '/'
+            })
+            relics = relics.substring(0, relics.length - 1);
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + relics
             if (((content + str).length > 1800) || (i == parts_list.length-1)) {
                 if (i == parts_list.length-1)
-                    content += str
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
                 postdata.push({content: content + '`'})
                 content = '`'
             }
-            content += str
+            content += str + '\n'
         }
         //----prime sets----
         var content = '`'
@@ -5172,11 +5178,12 @@ async function dc_update_msgs() {
             var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat
             if (((content + str).length > 1800) || (i == sets_list.length-1)) {
                 if (i == sets_list.length-1)
-                    content += str
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
                 postdata.push({content: content + '`'})
                 content = '`'
             }
-            content += str
+            content += str + '\n'
         }
         //----relics----
         postdata.push({content: '```\nRelic prices are listed below. These prices might not be accurate due to low relic sales and fluctuate from time to time. If no sell orders in past 90 days, it will be marked null.```'})
@@ -5186,11 +5193,12 @@ async function dc_update_msgs() {
             var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')             ' + element.sell_price + 'p'
             if (((content + str).length > 1800) || (i == relics_list.length-1)) {
                 if (i == relics_list.length-1)
-                    content += str
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
                 postdata.push({content: content + '`'})
                 content = '`'
             }
-            content += str
+            content += str + '\n'
         }
         //----primed mods----
         postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n\n`Mod                             Unranked      Max Ranked`'})
@@ -5200,11 +5208,12 @@ async function dc_update_msgs() {
             var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '                    ' + element.sell_price + 'p'
             if (((content + str).length > 1800) || (i == p_mods_list.length-1)) {
                 if (i == p_mods_list.length-1)
-                    content += str
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
                 postdata.push({content: content + '`'})
                 content = '`'
             }
-            content += str
+            content += str + '\n'
         }
         console.log(postdata)
         var msg_id_counter = 0
