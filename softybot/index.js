@@ -5185,6 +5185,7 @@ async function dc_update_msgs() {
             content += str + '\n'
         }
         //----prime sets----
+        postdata.push({content: '```\nSets prices are listed below. If no sell orders in past 90 days, it will be marked null.```'})
         var content = '`'
         for (var i=0; i<sets_list.length; i++) {
             var element = sets_list[i]
@@ -5247,6 +5248,7 @@ async function dc_update_msgs() {
             content += str + '\n'
         }
         var msg_id_counter = 0
+        console.log('Editing discord msgs for wfm_prices channels')
         for (var i=0; i<postdata.length; i++) {
             await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'wfm_update_msgs'`)
             .then(async res => {
@@ -5281,7 +5283,6 @@ async function dc_update_msgs() {
             .catch(err => console.log(err))
             msg_id_counter++
         }
-        console.log(msg_id_counter)
         //----edit remaining ids----
         await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'wfm_update_msgs'`)
         .then(res => {
@@ -5293,6 +5294,8 @@ async function dc_update_msgs() {
             })
         })
         .catch(err => console.log(err))
+        console.log(msg_id_counter)
+        console.log('Finished')
     })
     .catch(err => {
         console.log(err)
