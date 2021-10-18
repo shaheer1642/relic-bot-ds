@@ -4761,7 +4761,7 @@ async function updateDatabasePrices(up_origin) {
     .then(async (db_items_list) => {
         for (var i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
-            if (item.tags.includes("relic")) { //item.tags.includes("prime") || 
+            if (item.tags.includes("prime") || item.tags.includes("relic")) {
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
                 var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
                 .then(async itemOrders => {
@@ -4857,7 +4857,7 @@ async function updateDatabasePrices(up_origin) {
                         var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
                         .then(async (wikiInfo) => {
                             var matches = wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g)
-                            var isRailjack = matches && matches.length == 3;
+                            var isRailjack = matches && matches.length <= 3;
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                                 vault_status = 'V'
                             else if (isRailjack)
