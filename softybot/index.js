@@ -4304,7 +4304,7 @@ async function dc_ducat_update() {
         var total_price = 0
         var whisper = "/w " + all_seller_names[i] + " Hi, WTB"
         for (var j=0; j<total_items.length; j++) {
-            if (j==7)
+            if (j==6)
                 break
             if (whisper.match(total_items[j].item_url)) // For duplicate entries
                 continue
