@@ -4768,7 +4768,7 @@ async function updateDatabasePrices(up_origin) {
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
-        for (var i=0;i<db_items_list.rows.length;i++) {
+        for (var i=0;i>db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic")) {
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
@@ -5132,6 +5132,133 @@ async function updateDatabasePrices(up_origin) {
 }
 
 async function dc_update_msgs() {
+    //----post prime parts/mods/relic prices----
+    db.query(`SELECT * FROM items_list ORDER BY sell_price DESC,item_url`)
+    .then(async res => {
+        var all_items = res.rows
+        var parts_list = []
+        var sets_list = []
+        var relics_list = []
+        var p_mods_list = []
+        all_items.forEach(element => {
+            if (element.tags.includes('prime') && (element.tags.includes('blueprint') || element.tags.includes('component')))
+                parts_list.push(element)
+            if (element.tags.includes('prime') && element.tags.includes('set'))
+                sets_list.push(element)
+            if (element.tags.includes('relic'))
+                relics_list.push(element)
+            if (element.tags.includes('legendary') && element.tags.includes('mod') )
+                p_mods_list.push(element)
+        })
+        //----prime parts----
+        var postdata = []
+        postdata.push({content: '```\nBelow is the full price list of all prime items in the game. Their prices are calcuated from WFM based on the sell orders in past 24 hours. The list will be edited on daily basis. For any concerns, contact MrSofty#7926\nAdditionally, items have symbols next to them for more info. These are described below:\n(V) Vaulted Item\n(B) Baro ki\'teer Exclusive Relic\n(P) Prime unvault Item\n(E) Next vault expected Item\n(R) Railjack obtainable Item\n----------\nLast check: ' + new Date() + '```'})
+        var content = '`'
+        for (var i=0; i<parts_list.length; i++) {
+            var element = parts_list[i]
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + element.relics.map(relic => {return relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g)})
+            if (((content + str).length > 1800) || (i == parts_list.length-1)) {
+                if (i == parts_list.length-1)
+                    content += str
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str
+        }
+        //----prime sets----
+        var content = '`'
+        for (var i=0; i<sets_list.length; i++) {
+            var element = sets_list[i]
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')                        ' + element.sell_price + 'p         Ducats: ' + element.ducat
+            if (((content + str).length > 1800) || (i == sets_list.length-1)) {
+                if (i == sets_list.length-1)
+                    content += str
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str
+        }
+        //----relics----
+        postdata.push({content: '```\nRelic prices are listed below. These prices might not be accurate due to low relic sales and fluctuate from time to time. If no sell orders in past 90 days, it will be marked null.```'})
+        var content = '`'
+        for (var i=0; i<relics_list.length; i++) {
+            var element = relics_list[i]
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + element.vault_status + ')             ' + element.sell_price + 'p'
+            if (((content + str).length > 1800) || (i == relics_list.length-1)) {
+                if (i == relics_list.length-1)
+                    content += str
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str
+        }
+        //----primed mods----
+        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n\n`Mod                             Unranked      Max Ranked`'})
+        var content = '`'
+        for (var i=0; i<p_mods_list.length; i++) {
+            var element = p_mods_list[i]
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '                    ' + element.sell_price + 'p'
+            if (((content + str).length > 1800) || (i == p_mods_list.length-1)) {
+                if (i == p_mods_list.length-1)
+                    content += str
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str
+        }
+        console.log(postdata)
+        var msg_id_counter = 0
+        for (var i=0; i<postdata.length; i++) {
+            await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'wfm_update_msgs'`)
+            .then(async res => {
+                if (res.rows.length == 0) {
+                    await client.channels.cache.get('899752775146172428').send(postdata[i].content).catch(err => console.log(err))
+                    .then(async res => {
+                        await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'wfm_update_msgs')`)
+                        .catch(err => {
+                            console.log(err)
+                            res.delete().catch(err => console.log(err))
+                        })
+                    })
+                    await client.channels.cache.get('899760938318700634').send(postdata[i].content).catch(err => console.log(err))
+                    .then(async res => {
+                        await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'wfm_update_msgs')`)
+                        .catch(err => {
+                            console.log(err)
+                            res.delete().catch(err => console.log(err))
+                        })
+                    })
+                }
+                else {
+                    for (var j=0;j<res.rows.length;j++) {
+                        var element = res.rows[j]
+                        var channel = client.channels.cache.get(element.channel_id)
+                        if (!channel.messages.cache.get(element.message_id))
+                            await channel.messages.fetch()
+                        await channel.messages.cache.get(element.message_id).edit(postdata[i].content).catch(err => console.log(err))
+                    }
+                }
+            })
+            .catch(err => console.log(err))
+            msg_id_counter++
+        }
+        console.log(msg_id_counter)
+        //----edit remaining ids----
+        await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'wfm_update_msgs'`)
+        .then(res => {
+            res.rows.forEach(async element => {
+                var channel = client.channels.cache.get(element.channel_id)
+                if (!channel.messages.cache.get(element.message_id))
+                    await channel.messages.fetch()
+                channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
+            })
+        })
+        .catch(err => console.log(err))
+    })
+    .catch(err => {
+        console.log(err)
+        console.log('Error retreiving items_list')
+    })
     //----post ducats parts main msg----
     db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC,item_url`)
     .then(res => {
