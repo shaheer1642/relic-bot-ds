@@ -4385,7 +4385,7 @@ async function dc_ducat_update() {
     postdata.content = '```diff\nWhisper List (Beta)```'
     var msg_id_counter = 0
     for (var i=0; i<whisperListArr.length; i++) {
-        if ((postdata.content + whisperListArr[i].whisper).length > 1900 || (i == whisperListArr.length-1)) {
+        if ((postdata.content + whisperListArr[i].whisper).length > 1800 || (i == whisperListArr.length-1)) {
             if (i == whisperListArr.length-1)
                 postdata.content += whisperListArr[i].whisper
             await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
@@ -4439,7 +4439,6 @@ async function dc_ducat_update() {
     console.log(user_mentions)
     if (mention_users && user_mentions.length != 0) {
         await client.channels.cache.get('899290597259640853').send({content: user_mentions.toString()}).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
-        await client.channels.cache.get('899291255064920144').send({content: user_mentions.toString()}).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
     }
     //-------------------------------
     setTimeout(dc_ducat_update, 300000)
