@@ -4976,7 +4976,7 @@ async function updateDatabasePrices(up_origin) {
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
                         ducat = ${ducat_value},
-                        relics = NULLIF('${JSON.stringify(relics)}', null),
+                        relics = NULLIF(${JSON.stringify(relics)}, null),
                         icon_url = NULLIF('${icon_url}', null)
                         WHERE id = '${item.id}'`)
                     .then( () => {
