@@ -4096,7 +4096,7 @@ async function bought(message,args) {
                 var whispersArr = m.content.split('\n')
                 var markedSold = 0
                 for (var i=0; i<whispersArr.length; i++) {
-                    if (whispersArr[i].match('\\b' + trader_username + '\\b')) {
+                    if (whispersArr[i].toLowerCase().match('\\b' + trader_username.toLowerCase() + '\\b')) {
                         hasFound1 = 1
                         hasFound2 = 1
                         if (whispersArr[i].match('> ~~')) {
