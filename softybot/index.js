@@ -4781,7 +4781,7 @@ async function updateDatabasePrices(up_origin) {
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
-        for (var i=0;i>db_items_list.rows.length;i++) {
+        for (var i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
