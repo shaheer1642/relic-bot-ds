@@ -4989,7 +4989,7 @@ async function updateDatabasePrices(up_origin) {
                     var status = await db.query(`UPDATE items_list SET 
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
-                        sell_price = ${maxedSellAvgPrice},
+                        maxed_sell_price = ${maxedSellAvgPrice},
                         rank = ${rank},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}',
