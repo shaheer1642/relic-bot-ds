@@ -4794,7 +4794,7 @@ async function updateDatabasePrices(up_origin) {
                     //-------------
                     var ducat_value = null
                     let relics = null
-                    var icon_url = null
+                    var icon_url = ''
                     var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
                         if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
                             if (itemOrders.data.include.item.items_in_set[k].ducats)
@@ -4863,7 +4863,7 @@ async function updateDatabasePrices(up_origin) {
                             }
                         }
                     //----scanning relics vault status
-                    var vault_status = null
+                    var vault_status = ''
                     if (item.tags.includes("relic") && !item.tags.includes("requiem")) {
                         console.log('Retrieving wiki info for relic...')
                         const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
@@ -4885,7 +4885,7 @@ async function updateDatabasePrices(up_origin) {
                                 vault_status = 'E'
                             console.log('Updating DB relic vault status...')
                             var status = await db.query(`UPDATE items_list SET 
-                                vault_status = NULLIF('${vault_status}', null)
+                                vault_status = NULLIF('${vault_status}', '')
                                 WHERE id = '${item.id}'`)
                             .then( () => {
                                 return true
@@ -4931,7 +4931,7 @@ async function updateDatabasePrices(up_origin) {
                             console.log(`Updating DB components vault status...`)
                             for (var j=0;j<components_list.length;j++) {
                                 var status = await db.query(`UPDATE items_list SET 
-                                    vault_status = NULLIF('${vault_status}', null)
+                                    vault_status = NULLIF('${vault_status}', '')
                                     WHERE id = '${components_list[j].id}'`)
                                 .then( () => {
                                     return true
@@ -4947,7 +4947,7 @@ async function updateDatabasePrices(up_origin) {
                                     return false
                             }
                             var status = await db.query(`UPDATE items_list SET 
-                                vault_status = NULLIF('${vault_status}', null)
+                                vault_status = NULLIF('${vault_status}', '')
                                 WHERE id = '${item.id}'`)
                             .then( () => {
                                 return true
@@ -4972,13 +4972,12 @@ async function updateDatabasePrices(up_origin) {
                     }
                     //---------------------
                     console.log(`Updating DB prices...`)
-                    console.log(icon_url)
                     var status = await db.query(`UPDATE items_list SET 
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}',
-                        icon_url = NULLIF('${icon_url}', null)
+                        icon_url = NULLIF('${icon_url}', '')
                         WHERE id = '${item.id}'`)
                     .then( () => {
                         return true
