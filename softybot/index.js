@@ -5279,7 +5279,7 @@ async function dc_update_msgs() {
             while(str.length < 40)
                 str += ' '
             str += element.sell_price + 'p'
-            while(str.length < 50)
+            while(str.length < 55)
                 str += ' '
             str += element.maxed_sell_price + 'p'
             if (((content + str).length > 1800) || (i == p_mods_list.length-1)) {
