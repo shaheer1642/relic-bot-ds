@@ -2043,6 +2043,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
                     }
                 })
+                ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
                 ordersArr = ordersArr.sort(dynamicSort("price"))
                 var sellers = ""
                 var quantities = ""
@@ -2822,6 +2823,7 @@ async function orders(message,args) {
                     ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
                 }
             })
+            ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
             var sellers = ""
             var quantities = ""
