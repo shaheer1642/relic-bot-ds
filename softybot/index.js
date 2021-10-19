@@ -4788,20 +4788,23 @@ async function updateDatabasePrices(up_origin) {
                 var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
                 .then(async itemOrders => {
                     //-----sell avg-----
-                    var sellAvgPrice = 0
-                    sellAvgPrice = itemOrders.data.payload.statistics_closed["90days"][itemOrders.data.payload.statistics_closed["90days"].length-1].median
-                    if (!sellAvgPrice)
-                        sellAvgPrice = null
+                    var sellAvgPrice = null
+                    var maxedSellAvgPrice = null
+                    var rank = null
+                    itemOrders.data.payload.statistics_closed["90days"].forEach(e => {
+                        if (e.mod_rank > 0) {
+                            rank = e.mod_rank
+                            maxedSellAvgPrice = e.median
+                        }
+                        else
+                            sellAvgPrice = e.median
+                    })
                     //-----buy avg-----
-                    var buyAvgPrice = 0
-                    let buyPrices = []
+                    var buyAvgPrice = null
                     itemOrders.data.payload.statistics_live["90days"].forEach(e => {
                         if (e.order_type == "buy")
-                            buyPrices.push(e)
+                            buyAvgPrice = e.median
                     })
-                    buyAvgPrice = buyPrices[buyPrices.length-1].median
-                    if (!buyAvgPrice)
-                        buyAvgPrice = null
                     if (buyAvgPrice > sellAvgPrice)
                         buyAvgPrice = sellAvgPrice
                     //-------------
@@ -4986,6 +4989,8 @@ async function updateDatabasePrices(up_origin) {
                     var status = await db.query(`UPDATE items_list SET 
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
+                        sell_price = ${maxedSellAvgPrice},
+                        rank = ${rank},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}',
                         icon_url = NULLIF('${icon_url}', '')
