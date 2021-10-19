@@ -4794,7 +4794,7 @@ async function updateDatabasePrices(up_origin) {
                     //-------------
                     var ducat_value = null
                     let relics = null
-                    var icon_url = ''
+                    var icon_url = null
                     var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
                         if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
                             if (itemOrders.data.include.item.items_in_set[k].ducats)
@@ -4972,12 +4972,13 @@ async function updateDatabasePrices(up_origin) {
                     }
                     //---------------------
                     console.log(`Updating DB prices...`)
+                    console.log(icon_url)
                     var status = await db.query(`UPDATE items_list SET 
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}' 
-                        icon_url = IF(${icon_url} = '', NULL, '${icon_url}')
+                        icon_url = NULLIF('${icon_url}', null)
                         WHERE id = '${item.id}'`)
                     .then( () => {
                         return true
