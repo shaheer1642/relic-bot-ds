@@ -2043,6 +2043,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
                     }
                 })
+                ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
                 ordersArr = ordersArr.sort(dynamicSort("price"))
                 var sellers = ""
                 var quantities = ""
@@ -2073,6 +2074,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
                 var footerText = ""
                 var vault_status = ''
+                var icon_url = null
                 items_list.forEach(element => {
                     if (element.item_url == item_url) {
                         footerText = "Yesterday Avg: " + element.sell_price + '\n\u200b'
@@ -2084,6 +2086,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         }
                         else
                             vault_status = ''
+                        if (element.icon_url)
+                            icon_url = 'https://warframe.market/static/assets/' + element.icon_url
                     }
                 })
                 console.log(footerText)
@@ -2095,6 +2099,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         {name: 'Quantity', value: quantities, inline: true},
                         {name: 'Price', value: prices, inline: true}
                     ],
+                    thumbnail: {url: icon_url},
                     footer: {text: footerText},
                     timestamp: new Date()
                 })
@@ -2818,6 +2823,7 @@ async function orders(message,args) {
                     ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
                 }
             })
+            ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
             var sellers = ""
             var quantities = ""
