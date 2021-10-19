@@ -4803,9 +4803,12 @@ async function updateDatabasePrices(up_origin) {
                                 if (itemOrders.data.include.item.items_in_set[k].en.drop.length!=0)
                                     relics = itemOrders.data.include.item.items_in_set[k].en.drop
                             }
-                            if (item.tags.includes("set") && item.tags.includes("prime"))
-                                if (itemOrders.data.include.item.items_in_set[k].icon)
-                                    icon_url = itemOrders.data.include.item.items_in_set[k].icon
+                            if (item.tags.includes("component") && item.tags.includes("prime")) {
+                                var temp = item.item_url.split("_")
+                                icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                            }
+                            else if (itemOrders.data.include.item.items_in_set[k].icon)
+                                icon_url = 'https://warframe.market/static/assets/' + itemOrders.data.include.item.items_in_set[k].icon
                             return true
                         }
                     })
@@ -4840,7 +4843,10 @@ async function updateDatabasePrices(up_origin) {
                                     if (!db_items_list.rows[itemIndex].rewards[(rarity)])
                                         db_items_list.rows[itemIndex].rewards[(rarity)] = []
                                     db_items_list.rows[itemIndex].rewards[(rarity)].push(item.item_url)
-                                    var status = await db.query(`UPDATE items_list SET rewards = '${JSON.stringify(db_items_list.rows[itemIndex].rewards)}' WHERE item_url='${relics[j].link}'`)
+                                    var status = await db.query(`
+                                    UPDATE items_list 
+                                    SET rewards = '${JSON.stringify(db_items_list.rows[itemIndex].rewards)}'
+                                    WHERE item_url='${relics[j].link}'`)
                                     .then( () => {
                                         return true
                                     })
@@ -4870,7 +4876,7 @@ async function updateDatabasePrices(up_origin) {
                             if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                                 vault_status = 'V'
                             else if (isRailjack)
-                                    vault_status = 'R'
+                                vault_status = 'R'
                             else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
                                 vault_status = 'B'
                             else if (vaultExclusiveRelics.includes(item.item_url))
@@ -4879,7 +4885,7 @@ async function updateDatabasePrices(up_origin) {
                                 vault_status = 'E'
                             console.log('Updating DB relic vault status...')
                             var status = await db.query(`UPDATE items_list SET 
-                                vault_status = '${vault_status}'
+                                vault_status = NULLIF('${vault_status}', null)
                                 WHERE id = '${item.id}'`)
                             .then( () => {
                                 return true
@@ -4925,7 +4931,7 @@ async function updateDatabasePrices(up_origin) {
                             console.log(`Updating DB components vault status...`)
                             for (var j=0;j<components_list.length;j++) {
                                 var status = await db.query(`UPDATE items_list SET 
-                                    vault_status = '${vault_status}'
+                                    vault_status = NULLIF('${vault_status}', null)
                                     WHERE id = '${components_list[j].id}'`)
                                 .then( () => {
                                     return true
@@ -4941,7 +4947,7 @@ async function updateDatabasePrices(up_origin) {
                                     return false
                             }
                             var status = await db.query(`UPDATE items_list SET 
-                                vault_status = '${vault_status}'
+                                vault_status = NULLIF('${vault_status}', null)
                                 WHERE id = '${item.id}'`)
                             .then( () => {
                                 return true
@@ -4970,8 +4976,8 @@ async function updateDatabasePrices(up_origin) {
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
                         ducat = ${ducat_value},
-                        relics = '${JSON.stringify(relics)}',
-                        icon_url = '${icon_url}'
+                        relics = NULLIF('${JSON.stringify(relics)}', null),
+                        icon_url = NULLIF('${icon_url}', null)
                         WHERE id = '${item.id}'`)
                     .then( () => {
                         return true
