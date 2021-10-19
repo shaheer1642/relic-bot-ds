@@ -4995,6 +4995,7 @@ async function updateDatabasePrices(up_origin) {
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
                         maxed_sell_price = ${maxedSellAvgPrice},
+                        maxed_buy_price = ${maxedBuyAvgPrice},
                         rank = ${rank},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}',
