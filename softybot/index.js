@@ -4171,6 +4171,7 @@ async function dc_ducat_update() {
             if (!status)
                 continue
             all_items[i].orders = []
+            item_orders.payload.orders = item_orders.payload.orders.sort(dynamicSort('quantity'))
             item_orders.payload.orders = item_orders.payload.orders.sort(dynamicSort('platinum'))
             item_orders.payload.orders.forEach(element => {
                 if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1) && (element.platinum <= 15)) {
