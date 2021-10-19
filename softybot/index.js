@@ -4793,7 +4793,7 @@ async function updateDatabasePrices(up_origin) {
                         buyAvgPrice = sellAvgPrice
                     //-------------
                     var ducat_value = null
-                    let relics = null
+                    var relics = null
                     var icon_url = ''
                     var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
                         if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
@@ -4803,10 +4803,8 @@ async function updateDatabasePrices(up_origin) {
                                 if (itemOrders.data.include.item.items_in_set[k].en.drop.length!=0)
                                     relics = itemOrders.data.include.item.items_in_set[k].en.drop
                             }
-                            if (item.tags.includes("component") && item.tags.includes("prime")) {
-                                var temp = item.item_url.split("_")
-                                icon_url = `sub_icons/${temp.pop()}_128x128.png`
-                            }
+                            if (itemOrders.data.include.item.items_in_set[k].sub_icon)
+                                icon_url = itemOrders.data.include.item.items_in_set[k].sub_icon
                             else if (itemOrders.data.include.item.items_in_set[k].icon)
                                 icon_url = itemOrders.data.include.item.items_in_set[k].icon
                             return true
