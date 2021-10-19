@@ -4208,6 +4208,8 @@ async function dc_ducat_update() {
                     value: value3,
                     inline: true
                 }],
+                thumbnail: {url: 'https://warframe.market/static/assets/' + all_items[i].icon_url},
+                footer: {text: 'Yesterday Avg: ' + all_items[i].sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
             if ((postdata.embeds.length == 10) || (i == all_items.length-1)) {
