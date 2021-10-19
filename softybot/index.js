@@ -4977,7 +4977,7 @@ async function updateDatabasePrices(up_origin) {
                         buy_price = ${buyAvgPrice},
                         ducat = ${ducat_value},
                         relics = '${JSON.stringify(relics)}' 
-                        icon_url = IF('${icon_url}' = '', NULL, '${icon_url}')
+                        icon_url = IF(${icon_url} = '', NULL, '${icon_url}')
                         WHERE id = '${item.id}'`)
                     .then( () => {
                         return true
