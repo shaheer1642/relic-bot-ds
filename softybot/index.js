@@ -4793,7 +4793,7 @@ async function updateDatabasePrices(up_origin) {
                         buyAvgPrice = sellAvgPrice
                     //-------------
                     var ducat_value = null
-                    let relics = []
+                    let relics = null
                     var icon_url = null
                     var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
                         if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
@@ -4976,7 +4976,7 @@ async function updateDatabasePrices(up_origin) {
                         sell_price = ${sellAvgPrice},
                         buy_price = ${buyAvgPrice},
                         ducat = ${ducat_value},
-                        relics = NULLIF('${JSON.stringify(relics)}', '[]'),
+                        relics = '${JSON.stringify(relics)}'
                         icon_url = NULLIF('${icon_url}', null)
                         WHERE id = '${item.id}'`)
                     .then( () => {
