@@ -4805,10 +4805,10 @@ async function updateDatabasePrices(up_origin) {
                             }
                             if (item.tags.includes("component") && item.tags.includes("prime")) {
                                 var temp = item.item_url.split("_")
-                                icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
+                                icon_url = `sub_icons/${temp.pop()}_128x128.png`
                             }
                             else if (itemOrders.data.include.item.items_in_set[k].icon)
-                                icon_url = 'https://warframe.market/static/assets/' + itemOrders.data.include.item.items_in_set[k].icon
+                                icon_url = itemOrders.data.include.item.items_in_set[k].icon
                             return true
                         }
                     })
