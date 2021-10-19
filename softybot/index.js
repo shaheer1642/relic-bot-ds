@@ -5268,7 +5268,7 @@ async function dc_update_msgs() {
             content += str + '\n'
         }
         //----primed mods----
-        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n`Mod                                       Unranked      Max Ranked`'})
+        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n`Mod                                  Unranked      Max Ranked`'})
         var content = '`'
         for (var i=0; i<p_mods_list.length; i++) {
             var element = p_mods_list[i]
