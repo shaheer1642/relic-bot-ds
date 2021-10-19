@@ -4339,21 +4339,44 @@ async function dc_ducat_update() {
             continue
         var mentioned_roles = []
         var colorSymbol = "```\n"
-        if ((total_quantity>=6 && avg_price<=10) || (total_quantity>=4 && avg_price<=8)) {
-            var find_role = ""
-            if (total_quantity>=6 && avg_price<=10) {
-                if (!ducat_stacks.role_1.includes(whisper)) {
-                    await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
-                    mention_users = true
-                }
-                find_role = "Ducats-1" 
+        if (total_quantity>=6 && avg_price<=10) {
+            var find_role = "Ducats-1"
+            if (!ducat_stacks.role_1.includes(whisper)) {
+                await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_1')`).catch(err => console.log(err))
+                mention_users = true
             }
-            else {
-                if (!ducat_stacks.role_2.includes(whisper)) {
-                    await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_2')`).catch(err => console.log(err))
-                    mention_users = true
-                }
-                find_role = "Ducats-2"
+            var guild = client.guilds.cache.get(botv_guild_id)
+            var role = guild.roles.cache.find(r => r.name == find_role)
+            await guild.members.fetch()
+            .then(members => {
+                members.map(async member => {
+                    if (member.id != client.user.id) {
+                        if (!mentioned_roles.includes(`<@&${role.id}>`))
+                            mentioned_roles.push(`<@&${role.id}>`)
+                        if (member.roles.cache.find(r => r.id == role.id)) {
+                            if (member.presence) {
+                                if (member.presence.status == 'dnd') {
+                                    if (dnd_filter.includes(member.id))
+                                        if (!user_mentions.includes(`<@${member.id}>`))
+                                            user_mentions.push(`<@${member.id}>`)
+                                }
+                                else if (!user_mentions.includes(`<@${member.id}>`))
+                                    user_mentions.push(`<@${member.id}>`)
+                            }
+                            else if (invis_filter.includes(member.id))
+                                if (!user_mentions.includes(`<@${member.id}>`))
+                                    user_mentions.push(`<@${member.id}>`)
+                        }
+                    }
+                })
+            })
+            .catch(err => console.log(err))
+        }
+        if (total_quantity>=4 && avg_price<=8) {
+            var find_role = "Ducats-2"
+            if (!ducat_stacks.role_2.includes(whisper)) {
+                await db.query(`INSERT INTO ducat_stacks (text,type) VALUES ('${whisper}','role_2')`).catch(err => console.log(err))
+                mention_users = true
             }
             var guild = client.guilds.cache.get(botv_guild_id)
             var role = guild.roles.cache.find(r => r.name == find_role)
