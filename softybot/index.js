@@ -4801,9 +4801,14 @@ async function updateDatabasePrices(up_origin) {
                     })
                     //-----buy avg-----
                     var buyAvgPrice = null
+                    var maxedBuyAvgPrice = null
                     itemOrders.data.payload.statistics_live["90days"].forEach(e => {
-                        if (e.order_type == "buy")
-                            buyAvgPrice = e.median
+                        if (e.order_type == "buy") {
+                            if (e.mod_rank > 0)
+                                maxedBuyAvgPrice = e.median
+                            else
+                                buyAvgPrice = e.median
+                        }
                     })
                     if (buyAvgPrice > sellAvgPrice)
                         buyAvgPrice = sellAvgPrice
