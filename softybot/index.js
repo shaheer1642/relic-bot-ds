@@ -5224,7 +5224,13 @@ async function dc_update_msgs() {
             }
             else
                 vault_status = ''
-            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status + '                        ' + element.sell_price + 'p         Ducats: ' + element.ducat
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status
+            while(str.length < 45)
+                str += ' '
+            str += + element.sell_price + 'p'     
+            while(str.length < 60)
+                str += ' '
+            str += 'Ducats: ' + element.ducat
             if (((content + str).length > 1800) || (i == sets_list.length-1)) {
                 if (i == sets_list.length-1)
                     content += str + '\n'
@@ -5248,7 +5254,10 @@ async function dc_update_msgs() {
             }
             else
                 vault_status = ''
-            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status + '             ' + element.sell_price + 'p'
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status
+            while(str.length < 45)
+                str += ' '
+            str += element.sell_price + 'p'
             if (((content + str).length > 1800) || (i == relics_list.length-1)) {
                 if (i == relics_list.length-1)
                     content += str + '\n'
@@ -5259,11 +5268,14 @@ async function dc_update_msgs() {
             content += str + '\n'
         }
         //----primed mods----
-        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n`Mod                             Unranked      Max Ranked`'})
+        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n`Mod                                          Unranked      Max Ranked`'})
         var content = '`'
         for (var i=0; i<p_mods_list.length; i++) {
             var element = p_mods_list[i]
-            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '                    ' + element.sell_price + 'p'
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+            while(str.length < 45)
+                str += ' '
+            str += element.sell_price + 'p'
             if (((content + str).length > 1800) || (i == p_mods_list.length-1)) {
                 if (i == p_mods_list.length-1)
                     content += str + '\n'
