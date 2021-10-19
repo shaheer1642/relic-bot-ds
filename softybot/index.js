@@ -4781,7 +4781,7 @@ async function updateDatabasePrices(up_origin) {
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
-        for (var i=0;i<db_items_list.rows.length;i++) {
+        for (var i=0;i>db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
                 console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
@@ -5023,8 +5023,6 @@ async function updateDatabasePrices(up_origin) {
         return true
     })
     .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
         console.log(err)
         console.log('Error retrieving DB items list')
     })
@@ -5050,7 +5048,7 @@ async function updateDatabasePrices(up_origin) {
     DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     //-------------
     if (!main) {
-        console.log('Error occurred updating DB prices' + main)
+        console.log('Error occurred updating DB prices')
         inform_dc(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
         if (up_origin)
             up_origin.channel.send('<@253525146923433984> Error updating DB')
@@ -5281,6 +5279,9 @@ async function dc_update_msgs() {
             while(str.length < 40)
                 str += ' '
             str += element.sell_price + 'p'
+            while(str.length < 50)
+                str += ' '
+            str += element.maxed_sell_price + 'p'
             if (((content + str).length > 1800) || (i == p_mods_list.length-1)) {
                 if (i == p_mods_list.length-1)
                     content += str + '\n'
