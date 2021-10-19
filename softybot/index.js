@@ -5192,10 +5192,15 @@ async function dc_update_msgs() {
             else
                 vault_status = ''
             var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status
-            while(str.length < 60) {
+            while(str.length < 45)
                 str += ' '
-            }
-            str += element.sell_price + 'p         Ducats: ' + element.ducat + '         Relics: ' + relics
+            str += element.sell_price + 'p'
+            while(str.length < 60)
+                str += ' '
+            str += 'Ducats: ' + element.ducat 
+            while(str.length < 80)
+                str += ' '
+            str += 'Relics: ' + relics
             if (((content + str).length > 1800) || (i == parts_list.length-1)) {
                 if (i == parts_list.length-1)
                     content += str + '\n'
