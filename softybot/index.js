@@ -4914,8 +4914,9 @@ async function updateDatabasePrices(up_origin) {
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
         for (var i=0;i<db_items_list.rows.length;i++) {
+            const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
-                var status = await updateDatabaseItem(db_items_list,db_items_list.rows[i])
+                var status = await updateDatabaseItem(db_items_list,item)
                 .then(() => {
                     return true
                 })
@@ -4957,7 +4958,7 @@ async function updateDatabasePrices(up_origin) {
         console.log('Error occurred updating DB prices')
         inform_dc(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
         if (up_origin)
-            up_origin.channel.send('<@253525146923433984> Error updating DB')
+            up_origin.channel.send(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
         DB_Updating = false
         return
     }
