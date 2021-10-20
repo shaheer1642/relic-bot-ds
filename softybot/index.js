@@ -2852,7 +2852,9 @@ async function orders(message,args) {
     for (var i=0; i<arrItems.length; i++)
     {
         var item_data = arrItems[i]
+        console.log(item_data)
         if ((new Date().getTime() - item_data.update_timestamp) > 86400000) {
+            console.log(`updating item in db`)
             await updateDatabaseItem(items_list,item_data)
             .then(items_list => {
                 for (var j=0; j<items_list.length; j++) {
@@ -2979,7 +2981,7 @@ async function orders(message,args) {
             }
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
-                console.log(embeds)
+                //console.log(embeds)
                 embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: "React with :up: to update", embeds: embeds}).catch(err => console.log(err))
                 processMessage.react("🆙").catch(err => console.log(err))
