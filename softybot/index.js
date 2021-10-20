@@ -2815,13 +2815,15 @@ async function orders(message,args) {
         .then(async response => {
             var ordersArr = []
             response.data.payload.orders.forEach(element => {
-                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1))
-                    ordersArr.push({
+                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) {
+                    const index = ordersArr.push({
                         seller: element.user.ingame_name,
                         quantity: element.quantity,
-                        price: element.platinum,
-                        mod_rank: element.mod_rank
+                        price: element.platinum
                     });
+                    if (element.mod_rank)
+                        ordersArr[index-1].mod_rank = element.mod_rank
+                }
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
