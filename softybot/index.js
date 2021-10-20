@@ -4819,13 +4819,14 @@ async function updateDatabaseItems(up_origin) {
         console.log('Retrieving WFM items list success.')
         console.log('Retrieving DB items list...')
         var status = await db.query(`SELECT * FROM items_list`)
-        .then(async (db_items_list) => {
+        .then(async res => {
+            db_items_list = res.rows
             console.log('Retrieving DB items list success.')
             console.log('Scanning DB items list...')
             for (var i=0; i<wfm_items_list.data.payload.items.length;i++) {
                 //console.log(`Scanning item ${wfm_items_list.data.payload.items[i].url_name} (${i+1}/${wfm_items_list.data.payload.items.length})`)
-                var exists = Object.keys(db_items_list.rows).some(function(k) {
-                    if (Object.values(db_items_list.rows[k]).includes(wfm_items_list.data.payload.items[i].id))
+                var exists = Object.keys(db_items_list).some(function(k) {
+                    if (Object.values(db_items_list[k]).includes(wfm_items_list.data.payload.items[i].id))
                         return true
                 });
                 if (!exists) {
@@ -4927,9 +4928,10 @@ async function updateDatabasePrices(up_origin) {
     //var status = await db.query(`UPDATE items_list SET rewards = null`)
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
-    .then(async (db_items_list) => {
-        for (var i=0;i<db_items_list.rows.length;i++) {
-            const item = db_items_list.rows[i]
+    .then(async res => {
+        db_items_list = res.rows
+        for (var i=0;i<db_items_list.length;i++) {
+            const item = db_items_list[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
                 var status = await updateDatabaseItem(db_items_list,item,i)
                 .then((db_items_list) => {
@@ -5076,7 +5078,7 @@ async function updateDatabasePrices(up_origin) {
 
 async function updateDatabaseItem(db_items_list,item,index) {
     if (index)
-        console.log(`Retrieving statistics for ${item.item_url} (${index+1}/${db_items_list.rows.length})...`)
+        console.log(`Retrieving statistics for ${item.item_url} (${index+1}/${db_items_list.length})...`)
     var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
     .then(async itemOrders => {
         //-----sell avg-----
@@ -5137,26 +5139,26 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     const rarity = temp.pop().replace("(","").replace(")","").toLowerCase()
                     //----add to DB----
                     let itemIndex = []
-                    var exists = Object.keys(db_items_list.rows).some(function (k) {
-                        if (db_items_list.rows[k].item_url == relics[j].link) {
+                    var exists = Object.keys(db_items_list).some(function (k) {
+                        if (db_items_list[k].item_url == relics[j].link) {
                             itemIndex = k
-                            if (!db_items_list.rows[k].rewards)
+                            if (!db_items_list[k].rewards)
                                 return false
-                            if (JSON.stringify(db_items_list.rows[k].rewards).match(item.item_url))
+                            if (JSON.stringify(db_items_list[k].rewards).match(item.item_url))
                                 return true
                             return false
                         }
                     })
                     if (!exists) {
                         console.log(`Reward does not exist, updating DB...`)
-                        if (!db_items_list.rows[itemIndex].rewards)
-                            db_items_list.rows[itemIndex].rewards = {}
-                        if (!db_items_list.rows[itemIndex].rewards[(rarity)])
-                            db_items_list.rows[itemIndex].rewards[(rarity)] = []
-                        db_items_list.rows[itemIndex].rewards[(rarity)].push(item.item_url)
+                        if (!db_items_list[itemIndex].rewards)
+                            db_items_list[itemIndex].rewards = {}
+                        if (!db_items_list[itemIndex].rewards[(rarity)])
+                            db_items_list[itemIndex].rewards[(rarity)] = []
+                        db_items_list[itemIndex].rewards[(rarity)].push(item.item_url)
                         var status = await db.query(`
                         UPDATE items_list 
-                        SET rewards = '${JSON.stringify(db_items_list.rows[itemIndex].rewards)}'
+                        SET rewards = '${JSON.stringify(db_items_list[itemIndex].rewards)}'
                         WHERE item_url='${relics[j].link}'`)
                         .then( () => {
                             return true
@@ -5210,10 +5212,10 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 });
                 if (!status)
                     return false
-                for (var i=0; i<db_items_list.rows.length; i++) {
-                    element = db_items_list.rows[i]
+                for (var i=0; i<db_items_list.length; i++) {
+                    element = db_items_list[i]
                     if (element.id == item.id) {
-                        db_items_list.rows[i].vault_status = (vault_status == '') ? null:vault_status
+                        db_items_list[i].vault_status = (vault_status == '') ? null:vault_status
                         break
                     }
                 }
@@ -5229,7 +5231,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
         //----scanning sets/components vault status
         else if (item.tags.includes("set") && item.tags.includes("prime") && item.item_url.match('_set')) {
             let components_list = []
-            db_items_list.rows.forEach(e => {
+            db_items_list.forEach(e => {
                 if (e.item_url.match('^'+item.item_url.replace('_set','')) && (e.tags.includes('component') || e.tags.includes('blueprint')) && e.tags.includes('prime'))
                     components_list.push({id: e.id,item_url: e.item_url})
             })
@@ -5263,10 +5265,10 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     });
                     if (!status)
                         return false
-                    for (var i=0; i<db_items_list.rows.length; i++) {
-                        element = db_items_list.rows[i]
+                    for (var i=0; i<db_items_list.length; i++) {
+                        element = db_items_list[i]
                         if (element.id == components_list[j].id) {
-                            db_items_list.rows[i].vault_status = (vault_status == '') ? null:vault_status
+                            db_items_list[i].vault_status = (vault_status == '') ? null:vault_status
                             break
                         }
                     }
@@ -5286,10 +5288,10 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 });
                 if (!status)
                     return false
-                for (var i=0; i<db_items_list.rows.length; i++) {
-                    element = db_items_list.rows[i]
+                for (var i=0; i<db_items_list.length; i++) {
+                    element = db_items_list[i]
                     if (element.id == item.id) {
-                        db_items_list.rows[i].vault_status = (vault_status == '') ? null:vault_status
+                        db_items_list[i].vault_status = (vault_status == '') ? null:vault_status
                         break
                     }
                 }
@@ -5327,18 +5329,18 @@ async function updateDatabaseItem(db_items_list,item,index) {
         });
         if (!status)
             return false
-        for (var i=0; i<db_items_list.rows.length; i++) {
-            element = db_items_list.rows[i]
+        for (var i=0; i<db_items_list.length; i++) {
+            element = db_items_list[i]
             if (element.id == item.id) {
-                db_items_list.rows[i].sell_price = sellAvgPrice
-                db_items_list.rows[i].buy_price = buyAvgPrice
-                db_items_list.rows[i].maxed_sell_price = maxedSellAvgPrice
-                db_items_list.rows[i].maxed_buy_price = maxedBuyAvgPrice
-                db_items_list.rows[i].rank = rank
-                db_items_list.rows[i].ducat = ducat_value
-                db_items_list.rows[i].relics = relics
-                db_items_list.rows[i].icon_url = (icon_url == '') ? null:icon_url
-                db_items_list.rows[i].update_timestamp = new Date().getTime()
+                db_items_list[i].sell_price = sellAvgPrice
+                db_items_list[i].buy_price = buyAvgPrice
+                db_items_list[i].maxed_sell_price = maxedSellAvgPrice
+                db_items_list[i].maxed_buy_price = maxedBuyAvgPrice
+                db_items_list[i].rank = rank
+                db_items_list[i].ducat = ducat_value
+                db_items_list[i].relics = relics
+                db_items_list[i].icon_url = (icon_url == '') ? null:icon_url
+                db_items_list[i].update_timestamp = new Date().getTime()
                 break
             }
         }
