@@ -2814,6 +2814,7 @@ async function orders(message,args) {
         axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
         .then(async response => {
             var ordersArr = []
+            var icon_url = null
             response.data.payload.orders.forEach(element => {
                 if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) { 
                     Object.keys(response.data.include.item.items_in_set).some(function (k) {
@@ -2833,6 +2834,10 @@ async function orders(message,args) {
                                     quantity: element.quantity,
                                     price: element.platinum
                                 });
+                            if (response.data.include.item.items_in_set[k].sub_icon)
+                                icon_url = response.data.include.item.items_in_set[k].sub_icon
+                            else if (response.data.include.item.items_in_set[k].icon)
+                                icon_url = response.data.include.item.items_in_set[k].icon
                         }
                     })
                 }
@@ -2878,7 +2883,7 @@ async function orders(message,args) {
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 ],
-                thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                thumbnail:  {url: 'https://warframe.market/static/assets/' + icon_url},
                 footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
@@ -2914,6 +2919,7 @@ async function orders(message,args) {
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 )
+                embeds[index-1].footer.text += 'Maxed: ' + item_data.maxed_sell_price + '\n\u200b'
             }
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
