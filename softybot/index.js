@@ -2851,7 +2851,22 @@ async function orders(message,args) {
     let embeds = []
     for (var i=0; i<arrItems.length; i++)
     {
-        const item_data = arrItems[i]
+        var item_data = arrItems[i]
+        if ((new Date().getTime() - item_data.update_timestamp) > 86400000) {
+            await updateDatabaseItem(items_list,item_data)
+            .then(items_list => {
+                for (var i=0; i<items_list.length; i++) {
+                    element = items_list[i]
+                    if (element.id == item_data.id) {
+                        item_data = element
+                        break
+                    }
+                }
+            })
+            .catch(() => {
+                console.log("Error updating DB.")
+            })
+        }
         axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
         .then(async response => {
             var ordersArr = []
@@ -5195,6 +5210,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 });
                 if (!status)
                     return false
+                for (var i=0; i<db_items_list.rows.length; i++) {
+                    element = db_items_list.rows[i]
+                    if (element.id == item.id) {
+                        db_items_list.rows[i].vault_status = (vault_status == '') ? null:vault_status
+                        break
+                    }
+                }
                 return true
             })
             .catch (err => {
@@ -5241,8 +5263,15 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     });
                     if (!status)
                         return false
+                    for (var i=0; i<db_items_list.rows.length; i++) {
+                        element = db_items_list.rows[i]
+                        if (element.id == components_list[j].id) {
+                            db_items_list.rows[i].vault_status = (vault_status == '') ? null:vault_status
+                            break
+                        }
+                    }
                 }
-                var status = await db.query(`UPDATE items_list SET 
+                var status = await db.query(`UPDATE items_list SET
                     vault_status = NULLIF('${vault_status}', '')
                     WHERE id = '${item.id}'`)
                 .then( () => {
@@ -5257,6 +5286,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 });
                 if (!status)
                     return false
+                for (var i=0; i<db_items_list.rows.length; i++) {
+                    element = db_items_list.rows[i]
+                    if (element.id == item.id) {
+                        db_items_list.rows[i].vault_status = (vault_status == '') ? null:vault_status
+                        break
+                    }
+                }
                 return true
             })
             .catch (err => {
@@ -5276,7 +5312,8 @@ async function updateDatabaseItem(db_items_list,item,index) {
             rank = ${rank},
             ducat = ${ducat_value},
             relics = '${JSON.stringify(relics)}',
-            icon_url = NULLIF('${icon_url}', '')
+            icon_url = NULLIF('${icon_url}', ''),
+            update_timestamp = ${new Date().getTime()}
             WHERE id = '${item.id}'`)
         .then( () => {
             return true
@@ -5290,6 +5327,21 @@ async function updateDatabaseItem(db_items_list,item,index) {
         });
         if (!status)
             return false
+        for (var i=0; i<db_items_list.rows.length; i++) {
+            element = db_items_list.rows[i]
+            if (element.id == item.id) {
+                db_items_list.rows[i].sell_price = sellAvgPrice
+                db_items_list.rows[i].buy_price = buyAvgPrice
+                db_items_list.rows[i].maxed_sell_price = maxedSellAvgPrice
+                db_items_list.rows[i].maxed_buy_price = maxedBuyAvgPrice
+                db_items_list.rows[i].rank = rank
+                db_items_list.rows[i].ducat = ducat_value
+                db_items_list.rows[i].relics = relics
+                db_items_list.rows[i].icon_url = (icon_url == '') ? null:icon_url
+                db_items_list.rows[i].update_timestamp = new Date().getTime()
+                break
+            }
+        }
         return true
     })
     .catch(err => {
