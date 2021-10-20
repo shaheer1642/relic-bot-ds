@@ -5182,11 +5182,11 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 var vault_timestamp = null
                 if (vault_status == 'V') {
                     var str = wikiInfo.data.parse.text["*"].toLowerCase()
-                    if (wikiInfo.data.parse.text["*"].match(/Latest vaulting.*Hotfix.*\(.*\)/g)) {
+                    if (str.match('latest vaulting')) {
                         console.log('found latest vaulting')
                         var pos1 = str.indexOf('latest vaulting')
                         var pos2 = str.indexOf('(',pos1)
-                        var pos1 = str.indexOf(')',pos2)
+                        pos1 = str.indexOf(')',pos2)
                         vault_timestamp = str.substring(pos2,pos1)
                         console.log(vault_timestamp)
                     }
