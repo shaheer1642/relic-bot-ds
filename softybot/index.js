@@ -3079,7 +3079,13 @@ async function relics(message,args) {
         value1 = value1.substring(0, value1.length - 1)
         value2 = value2.substring(0, value2.length - 1)
         var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-        postdata.embeds.push({footer: {text: "Total drops value: " + drops_value + "p"}, title: relic_name + vault_status,url: "https://warframe.market/items/" + d_item_url,fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]})
+        postdata.embeds.push({ 
+            title: relic_name + vault_status,
+            url: "https://warframe.market/items/" + d_item_url,
+            footer: {text: "Total drops value: " + drops_value + "p"},
+            thumbnail: {url: 'https://warframe.market/static/assets/' + relic_drops.icon_url},
+            fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]
+        })
         message.channel.send(postdata).catch(err => console.log(err));
         message.react("✅")
         return
