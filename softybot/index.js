@@ -3027,7 +3027,7 @@ async function relics(message,args) {
             if (element.item_url == d_item_url.toLowerCase())
                 relic_drops = element
         })
-        if (relic_drops.vault_status != 'null')
+        if (relic_drops.vault_status)
             vault_status = ' (' + relic_drops.vault_status + ')'
         if (!relic_drops) {
             message.channel.send(`Could not find the relic named **${d_item_url}**`).catch(err => console.log(err))
@@ -3122,7 +3122,7 @@ async function relics(message,args) {
             if (element.item_url == arrItemsUrl[i])
                 part_info = element
         })
-        if (part_info.vault_status != 'null')
+        if (part_info.vault_status)
             vault_status = ' (' + part_info.vault_status + ')'
         if (!part_info.relics) {
             message.channel.send(`Could not find relic data for item **${arrItemsUrl[i]}**`)
@@ -3153,7 +3153,7 @@ async function relics(message,args) {
                 message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
                 continue
             }
-            if (relic_drops.vault_status != 'null')
+            if (relic_drops.vault_status)
                 vault_status = ' (' + relic_drops.vault_status + ')'
             var value = ""
             for (var m=0; m < relic_drops.rewards.common.length; m++)
