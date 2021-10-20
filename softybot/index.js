@@ -2811,18 +2811,30 @@ async function orders(message,args) {
     for (var i=0; i<arrItems.length; i++)
     {
         const item_data = arrItems[i]
-        axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders")
+        axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
         .then(async response => {
             var ordersArr = []
             response.data.payload.orders.forEach(element => {
-                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) {
-                    const index = ordersArr.push({
-                        seller: element.user.ingame_name,
-                        quantity: element.quantity,
-                        price: element.platinum
-                    });
-                    if (element.mod_rank)
-                        ordersArr[index-1].mod_rank = element.mod_rank
+                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) { 
+                    Object.keys(response.data.include.item.items_in_set).some(function (k) {
+                        if (response.data.include.item.items_in_set[k].id == item_data.id) {
+                            if (response.data.include.item.items_in_set[k].mod_max_rank) {
+                                if (element.mod_rank == 0 || element.mod_rank == response.data.include.item.items_in_set[k].mod_max_rank)
+                                    ordersArr.push({
+                                        seller: element.user.ingame_name,
+                                        quantity: element.quantity,
+                                        price: element.platinum,
+                                        mod_rank: element.mod_rank
+                                    });
+                            }
+                            else 
+                                ordersArr.push({
+                                    seller: element.user.ingame_name,
+                                    quantity: element.quantity,
+                                    price: element.platinum
+                                });
+                        }
+                    })
                 }
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
