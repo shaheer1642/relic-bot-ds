@@ -5187,8 +5187,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                         var pos1 = str.indexOf('latest vaulting')
                         var pos2 = str.indexOf('(',pos1)
                         pos1 = str.indexOf(')',pos2)
-                        vault_timestamp = str.substring(pos2+1,pos1)
-                        vault_timestamp = vault_timestamp.toISOString()
+                        vault_timestamp = new Date(str.substring(pos2+1,pos1)).getTime()
                         console.log(vault_timestamp)
                     }
                     else
