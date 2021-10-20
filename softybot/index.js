@@ -2034,7 +2034,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         for (var i=0; i<arrItems.length; i++)
         {
             const item_data = arrItems[i]
-            const func = axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
+            axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
             .then(async response => {
                 var ordersArr = []
                 var icon_url = null
@@ -2872,13 +2872,12 @@ async function orders(message,args) {
         .then(async response => {
             var ordersArr = []
             var icon_url = null
-            var all_orders = response.data
-            all_orders.payload.orders.forEach(element => {
+            response.data.payload.orders.forEach(element => {
                 if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) {
-                    Object.keys(all_orders.include.item.items_in_set).some(function (k) {
-                        if (all_orders.include.item.items_in_set[k].id == item_data.id) {
-                            if (all_orders.include.item.items_in_set[k].mod_max_rank) {
-                                if (element.mod_rank == 0 || element.mod_rank == all_orders.include.item.items_in_set[k].mod_max_rank)
+                    Object.keys(response.data.include.item.items_in_set).some(function (k) {
+                        if (response.data.include.item.items_in_set[k].id == item_data.id) {
+                            if (response.data.include.item.items_in_set[k].mod_max_rank) {
+                                if (element.mod_rank == 0 || element.mod_rank == response.data.include.item.items_in_set[k].mod_max_rank)
                                     ordersArr.push({
                                         seller: element.user.ingame_name,
                                         quantity: element.quantity,
@@ -2892,10 +2891,10 @@ async function orders(message,args) {
                                     quantity: element.quantity,
                                     price: element.platinum
                                 });
-                            if (all_orders.include.item.items_in_set[k].sub_icon)
-                                icon_url = all_orders.include.item.items_in_set[k].sub_icon
-                            else if (all_orders.include.item.items_in_set[k].icon)
-                                icon_url = all_orders.include.item.items_in_set[k].icon
+                            if (response.data.include.item.items_in_set[k].sub_icon)
+                                icon_url = response.data.include.item.items_in_set[k].sub_icon
+                            else if (response.data.include.item.items_in_set[k].icon)
+                                icon_url = response.data.include.item.items_in_set[k].icon
                         }
                     })
                 }
@@ -5236,7 +5235,6 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     components_list.push({id: e.id,item_url: e.item_url})
             })
             console.log('Retrieving wiki info for set...')
-            const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
             const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
             var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
             .then(async (wikiInfo) => {
