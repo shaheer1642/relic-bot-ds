@@ -2857,6 +2857,7 @@ async function orders(message,args) {
     {
         var item_data = arrItems[i]
         console.log(item_data)
+        /*
         if ((new Date().getTime() - item_data.update_timestamp) > 86400000) {
             console.log(`updating item in db`)
             await updateDatabaseItem(items_list,item_data)
@@ -2873,6 +2874,7 @@ async function orders(message,args) {
                 console.log("Error updating DB.")
             })
         }
+        */
         axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
         .then(async response => {
             var ordersArr = []
@@ -2906,7 +2908,6 @@ async function orders(message,args) {
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
-            console.log(Object.keys(ordersArr[0]))
             if (Object.keys(ordersArr[0]).includes("mod_rank"))
                 ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
             var sellers = ""
