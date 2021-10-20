@@ -2067,8 +2067,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
                 ordersArr = ordersArr.sort(dynamicSort("price"))
-                console.log(Object.keys(ordersArr[0]))
-                if (Object.keys(ordersArr[0]).includes("mod_rank"))
+                if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank"))
                     ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
                 var sellers = ""
                 var quantities = ""
@@ -2110,7 +2109,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                     timestamp: new Date()
                 })
-                if (Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
+                if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
                     console.log('getting orders for max rank')
                     ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
                     var sellers = ""
