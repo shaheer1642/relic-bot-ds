@@ -2777,6 +2777,10 @@ function help(message,args) {
 }
 
 async function orders(message,args) {
+    if (message.author.id != '253525146923433984') {
+        message.channel.send('Command is disabled right now. Please try again later').catch(err => console.log(err))
+        return
+    }
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}).catch(err => console.log(err));
