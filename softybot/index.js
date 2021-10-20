@@ -5179,6 +5179,18 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     vault_status = 'P'
                 else if (vaultExpectedRelics.includes(item.item_url))
                     vault_status = 'E'
+                var vault_timestamp = null
+                if (vault_status == 'V') {
+                    var str = wikiInfo.data.parse.text["*"].toLowerCase()
+                    if (str.match(/latest vaulting.*hotfix.*\(.*\).*/ + item.item_url.replace('_relic','').replace(/_/g,' '))) {
+                        console.log('found latest vaulting')
+                        var pos1 = str.indexOf('latest vaulting')
+                        var pos2 = str.indexOf('(',pos1)
+                        var pos1 = str.indexOf(')',pos2)
+                        vault_timestamp = str.substring(pos2,pos1)
+                        console.log(vault_timestamp)
+                    }
+                }
                 console.log('Updating DB relic vault status...')
                 var status = await db.query(`UPDATE items_list SET 
                     vault_status = NULLIF('${vault_status}', '')
