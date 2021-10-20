@@ -2880,7 +2880,7 @@ async function orders(message,args) {
             var ordersArr = []
             var icon_url = null
             response.data.payload.orders.forEach(element => {
-                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) { 
+                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) {
                     Object.keys(response.data.include.item.items_in_set).some(function (k) {
                         if (response.data.include.item.items_in_set[k].id == item_data.id) {
                             if (response.data.include.item.items_in_set[k].mod_max_rank) {
@@ -2906,6 +2906,7 @@ async function orders(message,args) {
                     })
                 }
             })
+            console.log(JSON.stringify(ordersArr))
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
             if (Object.keys(ordersArr[0]).includes("mod_rank"))
@@ -2913,7 +2914,6 @@ async function orders(message,args) {
             var sellers = ""
             var quantities = ""
             var prices = ""
-            console.log(JSON.stringify(ordersArr))
             for (var j=0; j<5; j++)
             {
                 if (ordersArr.length==0)
