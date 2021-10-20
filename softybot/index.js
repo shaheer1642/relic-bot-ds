@@ -4917,7 +4917,8 @@ async function updateDatabasePrices(up_origin) {
             const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
                 var status = await updateDatabaseItem(db_items_list,item,i)
-                .then(() => {
+                .then((db_items_list) => {
+                    db_items_list = db_items_list
                     return true
                 })
                 .catch(() => {
@@ -5298,7 +5299,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
     });
     if (!status)
         return Promise.reject()
-    return Promise.resolve()
+    return Promise.resolve(db_items_list)
 }
 
 async function dc_update_msgs() {
