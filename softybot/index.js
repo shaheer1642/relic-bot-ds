@@ -2879,12 +2879,13 @@ async function orders(message,args) {
         .then(async response => {
             var ordersArr = []
             var icon_url = null
-            response.data.payload.orders.forEach(element => {
+            var all_orders = response.data
+            all_orders.payload.orders.forEach(element => {
                 if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) {
-                    Object.keys(response.data.include.item.items_in_set).some(function (k) {
-                        if (response.data.include.item.items_in_set[k].id == item_data.id) {
-                            if (response.data.include.item.items_in_set[k].mod_max_rank) {
-                                if (element.mod_rank == 0 || element.mod_rank == response.data.include.item.items_in_set[k].mod_max_rank)
+                    Object.keys(all_orders.include.item.items_in_set).some(function (k) {
+                        if (all_orders.include.item.items_in_set[k].id == item_data.id) {
+                            if (all_orders.include.item.items_in_set[k].mod_max_rank) {
+                                if (element.mod_rank == 0 || element.mod_rank == all_orders.include.item.items_in_set[k].mod_max_rank)
                                     ordersArr.push({
                                         seller: element.user.ingame_name,
                                         quantity: element.quantity,
@@ -2898,10 +2899,10 @@ async function orders(message,args) {
                                     quantity: element.quantity,
                                     price: element.platinum
                                 });
-                            if (response.data.include.item.items_in_set[k].sub_icon)
-                                icon_url = response.data.include.item.items_in_set[k].sub_icon
-                            else if (response.data.include.item.items_in_set[k].icon)
-                                icon_url = response.data.include.item.items_in_set[k].icon
+                            if (all_orders.include.item.items_in_set[k].sub_icon)
+                                icon_url = all_orders.include.item.items_in_set[k].sub_icon
+                            else if (all_orders.include.item.items_in_set[k].icon)
+                                icon_url = all_orders.include.item.items_in_set[k].icon
                         }
                     })
                 }
@@ -2976,7 +2977,6 @@ async function orders(message,args) {
                     quantities = "\u200b"
                     prices = "\u200b"
                 }
-                console.log('Max ranked sellers: ' + sellers)
                 embeds[index-1].fields.push(
                     {name: 'Sellers (Max ranked)', value: sellers, inline: true},
                     {name: 'Quantity', value: quantities, inline: true},
