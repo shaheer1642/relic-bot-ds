@@ -5300,7 +5300,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
             maxed_buy_price = ${maxedBuyAvgPrice},
             rank = ${rank},
             ducat = ${ducat_value},
-            relics = '${JSON.stringify(relics)}',
+            relics = NULLIF('${JSON.stringify(relics)}', 'null'),
             icon_url = NULLIF('${icon_url}', ''),
             update_timestamp = ${new Date().getTime()}
             WHERE id = '${item.id}'`)
