@@ -2759,7 +2759,6 @@ async function orders(message,args) {
     var status = await db.query(`SELECT * FROM items_list`)
     .then(res => {
         items_list = res.rows
-        console.log('Retrieving Database -> items_list success')
         return true
     })
     .catch (err => {
@@ -2812,6 +2811,9 @@ async function orders(message,args) {
     for (var i=0; i<arrItems.length; i++)
     {
         const item_url = arrItems[i].item_url
+        var vault_status = ''
+        if (arrItems[i].vault_status)
+            vault_status = ' (' + arrItems[i].vault_status + ')'
         let data = []
         const func = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
         .then(async response => {
@@ -2852,9 +2854,6 @@ async function orders(message,args) {
                 quantities = "\u200b"
                 prices = "\u200b"
             }
-            var vault_status = ''
-            if (arrItems[i].vault_status)
-                vault_status = ' (' + arrItems[i].vault_status + ')'
             embeds.push({
                 title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
                 url: 'https://warframe.market/items/' + item_url,
@@ -2876,7 +2875,7 @@ async function orders(message,args) {
             }
         })
         .catch(function (error) {
-            processMessage.edit("Error occured retrieving order. Possibly due to command spam. Please try again.\nError code 501")
+            processMessage.edit("Error occured retrieving order. Please try again.\nError code 501")
             if (error.response)
                 console.log(JSON.stringify(error.response.data))
             else 
