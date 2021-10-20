@@ -1556,17 +1556,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 postdata.timestamp = new Date()
                 postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                 postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
-                //----------
-                var icon_url = ""
-                if (!all_orders[order_rank].item_url.match(/_set$/)) {
-                    var temp = all_orders[order_rank].item_url.split("_")
-                    icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
-                }
-                else {
-                    icon_url = `https://warframe.market/static/assets/${all_orders[order_rank].icon_url}`
-                }
-                //-----------
-                postdata.thumbnail =  {url: icon_url}
+                postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[order_rank].icon_url}
                 postdata.description = `
                     **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
                     **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
@@ -5975,16 +5965,7 @@ async function trading_bot(message,args,command) {
                         postdata.timestamp = new Date()
                         postdata.title = item_name
                         postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
-                        //----------
-                        var icon_url = ""
-                        if (!item_url.match(/_set$/)) {
-                            var temp = item_url.split("_")
-                            icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
-                        }
-                        else
-                            icon_url = `https://warframe.market/static/assets/${all_orders[0].icon_url}`
-                        //-----------
-                        postdata.thumbnail =  {url: icon_url}
+                        postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
                         postdata.description = `
                             **${target_order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
                             **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
@@ -6271,7 +6252,6 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             else {
                 var emb_sellers = ''
                 var emb_prices = ''
-                var icon_url = ''
                 for (var j=0;j<res.rows.length;j++) {
                     if (j==5)
                         break
@@ -6279,24 +6259,9 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
                 }
                 noOfSellers = j
-                if (!item_url.match(/_set$/)) {
-                    var temp = item_url.split("_")
-                    icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
-                }
-                else {
-                    icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
-                }
                 var embed = {
-                    /*
-                    author: {
-                        name: `${item_name}`,
-                        iconURL: icon_url
-                    },
-                    */
                     title: item_name,
-                    thumbnail: {
-                        url: icon_url
-                    },
+                    thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
                     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                     fields: [
                         {
@@ -6339,8 +6304,6 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             else {
                 var emb_buyers = ''
                 var emb_prices = ''
-                var icon_url = ''
-
                 for (var j=0;j<res.rows.length;j++) {
                     if (j==5)
                         break
@@ -6348,25 +6311,10 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
                 }
                 noOfBuyers = j
-                if (!item_url.match(/_set$/)) {
-                    var temp = item_url.split("_")
-                    icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
-                }
-                else {
-                    icon_url = `https://warframe.market/static/assets/${res.rows[0].icon_url}`
-                }
                 var embed = {
-                    /*
-                    author: {
-                        name: `${item_name}`,
-                        iconURL: icon_url
-                    },
-                    */
                     title: item_name,
                     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    thumbnail: {
-                        url: icon_url
-                    },
+                    thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
                     fields: [
                         {
                             name: 'Buyers',
@@ -6886,17 +6834,9 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
         return Promise.reject()
     }
-    var icon_url = ""
-    if (!item_url.match(/_set$/)) {
-        var temp = item_url.split("_")
-        icon_url = `https://warframe.market/static/assets/sub_icons/${temp.pop()}_128x128.png`
-    }
-    else {
-        icon_url = `https://warframe.market/static/assets/${all_orders[0].icon_url}`
-    }
     postdata.embeds[0].title = item_name
     postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    postdata.embeds[0].thumbnail = {url: icon_url}
+    postdata.embeds[0].thumbnail = {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
     console.log(JSON.stringify(postdata))
     if (request_type == 1) {
         message.channel.send(postdata)
