@@ -2794,7 +2794,7 @@ async function orders(message,args) {
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     d_item_url = d_item_url.replace('_p_','_prime_')
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
-    let arrItems = []
+    var arrItems = []
     var primeFlag = 0
     //var WFM_Items_List = require('../WFM_Items_List.json')
     //const filecontent = fs.readFileSync('./WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
@@ -2848,14 +2848,14 @@ async function orders(message,args) {
         message.channel.send("More than 10 search result detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
         return
     }
-    let processMessage = [];
+    var processMessage = [];
     await message.channel.send("Processing").then(response => {
         processMessage = response
     }).catch(err => console.log(err));
-    let embeds = []
+    var embeds = []
     for (var i=0; i<arrItems.length; i++)
     {
-        var item_data = arrItems[i]
+        const item_data = arrItems[i]
         console.log(item_data)
         /*
         if ((new Date().getTime() - item_data.update_timestamp) > 86400000) {
