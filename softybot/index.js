@@ -3132,9 +3132,8 @@ async function relics(message,args) {
             title: arrItemsUrl[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
             url: "https://warframe.market/items/" + arrItemsUrl[i], 
             fields: [], 
-            footer: {
-                text: ""
-            }
+            footer: {text: ""},
+            thumbnail: {url: 'https://warframe.market/static/assets/' + part_info.icon_url}
         }
         //-----
         let best_common = {lith: [],meso: [],neo: [],axi: []}
