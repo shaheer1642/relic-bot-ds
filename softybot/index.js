@@ -5188,15 +5188,12 @@ async function updateDatabaseItem(db_items_list,item,index) {
                         var pos2 = str.indexOf('(',pos1)
                         pos1 = str.indexOf(')',pos2)
                         vault_timestamp = new Date(str.substring(pos2+1,pos1)).getTime()
-                        console.log(vault_timestamp)
-                        console.log(new Date(vault_timestamp).toISOString())
                     }
-                    else
-                        console.log('no latest vaulting')
                 }
                 console.log('Updating DB relic vault status...')
                 var status = await db.query(`UPDATE items_list SET 
-                    vault_status = NULLIF('${vault_status}', '')
+                    vault_status = NULLIF('${vault_status}', ''),
+                    vault_timestamp = ${vault_timestamp}
                     WHERE id = '${item.id}'`)
                 .then( () => {
                     return true
@@ -5214,6 +5211,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     element = db_items_list[i]
                     if (element.id == item.id) {
                         db_items_list[i].vault_status = (vault_status == '') ? null:vault_status
+                        db_items_list[i].vault_timestamp = vault_timestamp
                         break
                     }
                 }
