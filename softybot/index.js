@@ -2825,6 +2825,7 @@ async function orders(message,args) {
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
+            console.log(Object.keys(ordersArr[0]))
             if (Object.keys(ordersArr[0]).includes("mod_rank"))
                 ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
             var sellers = ""
