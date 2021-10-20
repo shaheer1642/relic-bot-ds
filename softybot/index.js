@@ -5183,7 +5183,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 if (vault_status == 'V') {
                     console.log('is vaulted')
                     var str = wikiInfo.data.parse.text["*"].toLowerCase()
-                    if (str.match(/latest vaulting.*hotfix.*(.*)/)) {
+                    if (str.match(/latest vaulting.*hotfix.*\(.*\)/g)) {
                         console.log('found latest vaulting')
                         var pos1 = str.indexOf('latest vaulting')
                         var pos2 = str.indexOf('(',pos1)
