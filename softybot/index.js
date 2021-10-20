@@ -2862,8 +2862,8 @@ async function orders(message,args) {
                 footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
-            console.log(embeds.length + " " + item_data.length)
-            if (embeds.length==item_data.length) {
+            console.log(embeds.length + " " + arrItems.length)
+            if (embeds.length==arrItems.length) {
                 embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: "React with :up: to update", embeds: embeds}).catch(err => console.log(err))
                 processMessage.react("🆙").catch(err => console.log(err))
