@@ -2034,7 +2034,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         for (var i=0; i<arrItems.length; i++)
         {
             const item_data = arrItems[i]
-            const func = axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders")
+            const func = axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
             .then(async response => {
                 var ordersArr = []
                 var icon_url = null
