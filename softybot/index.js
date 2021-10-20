@@ -1999,9 +1999,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.emoji.name == "🆙") {
         if (!reaction.message.author)
             await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+        if (reaction.message.author.id != client.user.id)
             return
-        let items_list = []
+        var items_list = []
         console.log('Retrieving Database -> items_list')
         var status = await db.query(`SELECT * FROM items_list`)
         .then(res => {
