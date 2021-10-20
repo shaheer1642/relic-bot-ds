@@ -4915,6 +4915,7 @@ async function updateDatabasePrices(up_origin) {
     .then(async (db_items_list) => {
         for (var i=0;i<db_items_list.rows.length;i++) {
             const item = db_items_list.rows[i]
+            console.log('checking ' + item.item_url)
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
                 var status = await updateDatabaseItem(db_items_list,item)
                 .then(() => {
