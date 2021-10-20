@@ -2749,7 +2749,7 @@ async function orders(message,args) {
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     d_item_url = d_item_url.replace('_p_','_prime_')
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
-    let arrItemsUrl = []
+    let arrItems = []
     var primeFlag = 0
     //var WFM_Items_List = require('../WFM_Items_List.json')
     //const filecontent = fs.readFileSync('./WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
@@ -2777,10 +2777,10 @@ async function orders(message,args) {
         {
             if (element.item_url.match("prime"))
                 primeFlag = 1
-            arrItemsUrl.push(element.item_url);
+            arrItems.push(element);
         }
     })
-    if (arrItemsUrl.length==0)
+    if (arrItems.length==0)
     {
         message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
         return
@@ -2788,18 +2788,18 @@ async function orders(message,args) {
     if (primeFlag)
     {
         var i = 0
-        var MaxIndex = arrItemsUrl.length
+        var MaxIndex = arrItems.length
         for (var i=0; i <= MaxIndex-1; i++)
         {
-            if (!arrItemsUrl[i].match("prime"))
+            if (!arrItems[i].item_url.match("prime"))
             {
-                arrItemsUrl.splice(i, 1)
+                arrItems.splice(i, 1)
                 i--
             }
-            MaxIndex = arrItemsUrl.length
+            MaxIndex = arrItems.length
         }
     }
-    if (arrItemsUrl.length > 10)
+    if (arrItems.length > 10)
     {
         message.channel.send("More than 10 search result detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
         return
@@ -2809,9 +2809,9 @@ async function orders(message,args) {
         processMessage = response
     }).catch(err => console.log(err));
     let embeds = []
-    for (var i=0; i<arrItemsUrl.length; i++)
+    for (var i=0; i<arrItems.length; i++)
     {
-        const item_url = arrItemsUrl[i]
+        const item_url = arrItems[i].item_url
         let data = []
         const func = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
         .then(async response => {
@@ -2852,25 +2852,9 @@ async function orders(message,args) {
                 quantities = "\u200b"
                 prices = "\u200b"
             }
-            var footerText = ""
             var vault_status = ''
-            var icon_url = null
-            items_list.forEach(element => {
-                if (element.item_url == item_url) {
-                    footerText = "Yesterday Avg: " + element.sell_price + '\n\u200b'
-                    if (element.vault_status) {
-                        if (element.vault_status != 'null')
-                            vault_status = ' (' + element.vault_status + ')'
-                        else
-                            vault_status = ''
-                    }
-                    else
-                        vault_status = ''
-                    if (element.icon_url)
-                        icon_url = 'https://warframe.market/static/assets/' + element.icon_url
-                }
-            })
-            console.log(footerText)
+            if (arrItems[i].vault_status)
+                vault_status = ' (' + arrItems[i].vault_status + ')'
             embeds.push({
                 title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
                 url: 'https://warframe.market/items/' + item_url,
@@ -2879,12 +2863,12 @@ async function orders(message,args) {
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 ],
-                thumbnail:  {url: icon_url},
-                footer: {text: footerText},
+                thumbnail:  {url: 'https://warframe.market/static/assets/' + arrItems[i].icon_url},
+                footer: {text: "Yesterday Avg: " + arrItems[i].sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
-            console.log(embeds.length + " " + arrItemsUrl.length)
-            if (embeds.length==arrItemsUrl.length) {
+            console.log(embeds.length + " " + arrItems.length)
+            if (embeds.length==arrItems.length) {
                 embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: "React with :up: to update", embeds: embeds})
                 processMessage.react("🆙")
