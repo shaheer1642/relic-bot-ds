@@ -2855,8 +2855,8 @@ async function orders(message,args) {
         if ((new Date().getTime() - item_data.update_timestamp) > 86400000) {
             await updateDatabaseItem(items_list,item_data)
             .then(items_list => {
-                for (var i=0; i<items_list.length; i++) {
-                    element = items_list[i]
+                for (var j=0; j<items_list.length; j++) {
+                    element = items_list[j]
                     if (element.id == item_data.id) {
                         item_data = element
                         break
