@@ -2825,20 +2825,16 @@ async function orders(message,args) {
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
-            if (ordersArr[0].mod_rank)
+            if (Object.keys(ordersArr[0]).includes("mod_rank"))
                 ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
             var sellers = ""
             var quantities = ""
             var prices = ""
-            var noSellers = 0
             console.log(JSON.stringify(ordersArr))
             for (var j=0; j<5; j++)
             {
                 if (ordersArr.length==0)
-                {
-                    noSellers = 1
                     break
-                }
                 if (j==ordersArr.length)
                     break
                 if (ordersArr[j].mod_rank > 0)
@@ -2871,7 +2867,8 @@ async function orders(message,args) {
                 footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
-            if (ordersArr[0].mod_rank) {   // get orders for maxed rank
+            if (Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
+                console.log('getting orders for max rank')
                 ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
                 var sellers = ""
                 var quantities = ""
