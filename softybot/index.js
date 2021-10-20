@@ -2804,26 +2804,19 @@ async function orders(message,args) {
         return
     }
     let processMessage = [];
-    const func = await message.channel.send("Processing").then(response => {
+    await message.channel.send("Processing").then(response => {
         processMessage = response
     }).catch(err => console.log(err));
     let embeds = []
     for (var i=0; i<arrItems.length; i++)
     {
-        const item_url = arrItems[i].item_url
-        var vault_status = ''
-        if (arrItems[i].vault_status)
-            vault_status = ' (' + arrItems[i].vault_status + ')'
-        let data = []
-        const func = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
+        const item_data = arrItems[i]
+        axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders")
         .then(async response => {
-            data = response.data
-            let ordersArr = []
-            data.payload.orders.forEach(element => {
+            var ordersArr = []
+            response.data.payload.orders.forEach(element => {
                 if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1))
-                {
                     ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
-                }
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
@@ -2846,7 +2839,7 @@ async function orders(message,args) {
                 prices += ordersArr[j].price + "\n"
             }
             sellers = sellers.replace(/_/g,"\\_")
-            console.log('executed: ' + item_url + "\n")
+            console.log('executed: ' + item_data.item_url + "\n")
             //if (!noSellers)
             if (sellers=="")
             {
@@ -2854,32 +2847,32 @@ async function orders(message,args) {
                 quantities = "\u200b"
                 prices = "\u200b"
             }
+            var vault_status = ''
+            if (item_data.vault_status)
+                vault_status = ' (' + item_data.vault_status + ')'
             embeds.push({
-                title: item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
-                url: 'https://warframe.market/items/' + item_url,
+                title: item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
+                url: 'https://warframe.market/items/' + item_data.item_url,
                 fields: [
                     {name: 'Sellers', value: sellers, inline: true},
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 ],
-                thumbnail:  {url: 'https://warframe.market/static/assets/' + arrItems[i].icon_url},
-                footer: {text: "Yesterday Avg: " + arrItems[i].sell_price + '\n\u200b'},
+                thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
-            console.log(embeds.length + " " + arrItems.length)
-            if (embeds.length==arrItems.length) {
+            console.log(embeds.length + " " + item_data.length)
+            if (embeds.length==item_data.length) {
                 embeds = embeds.sort(dynamicSort("title"))
-                processMessage.edit({content: "React with :up: to update", embeds: embeds})
-                processMessage.react("🆙")
-                message.react("✅")
+                processMessage.edit({content: "React with :up: to update", embeds: embeds}).catch(err => console.log(err))
+                processMessage.react("🆙").catch(err => console.log(err))
+                message.react("✅").catch(err => console.log(err))
             }
         })
-        .catch(function (error) {
+        .catch(error => {
             processMessage.edit("Error occured retrieving order. Please try again.\nError code 501")
-            if (error.response)
-                console.log(JSON.stringify(error.response.data))
-            else 
-                console.log(error)
+            console.log(error)
             return
         });
     }
