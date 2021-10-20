@@ -2902,9 +2902,8 @@ async function orders(message,args) {
             console.log(JSON.stringify(ordersArr))
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
-            if (ordersArr.length != 0)
-                if (Object.keys(ordersArr[0]).includes("mod_rank"))
-                    ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
+            if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank"))
+                ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
             var sellers = ""
             var quantities = ""
             var prices = ""
@@ -2944,7 +2943,7 @@ async function orders(message,args) {
                 footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
-            if (Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
+            if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
                 ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
                 var sellers = ""
                 var quantities = ""
@@ -2986,7 +2985,7 @@ async function orders(message,args) {
             }
         })
         .catch(error => {
-            processMessage.edit("Error occured retrieving order. Please try again.\nError code 501")
+            processMessage.edit("Error occured retrieving orders. Please try again.\nError code 501")
             console.log(error)
             return
         });
