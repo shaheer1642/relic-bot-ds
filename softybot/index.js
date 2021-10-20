@@ -2825,7 +2825,7 @@ async function orders(message,args) {
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
-            if (item_data.mod_rank)
+            if (ordersArr[0].mod_rank)
                 ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
             var sellers = ""
             var quantities = ""
@@ -2871,7 +2871,7 @@ async function orders(message,args) {
                 footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
-            if (item_data.mod_rank) {   // get orders for maxed rank
+            if (ordersArr[0].mod_rank) {   // get orders for maxed rank
                 ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
                 var sellers = ""
                 var quantities = ""
@@ -2896,6 +2896,7 @@ async function orders(message,args) {
                     quantities = "\u200b"
                     prices = "\u200b"
                 }
+                console.log('Max ranked sellers: ' + sellers)
                 embeds[index-1].fields.push(
                     {name: 'Sellers (Max ranked)', value: sellers, inline: true},
                     {name: 'Quantity', value: quantities, inline: true},
