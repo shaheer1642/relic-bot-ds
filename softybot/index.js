@@ -5189,7 +5189,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                         pos1 = str.indexOf(')',pos2)
                         vault_timestamp = new Date(str.substring(pos2+1,pos1)).getTime()
                         console.log(vault_timestamp)
-                        console.log(vault_timestamp.toISOString())
+                        console.log(new Date(vault_timestamp).toISOString())
                     }
                     else
                         console.log('no latest vaulting')
