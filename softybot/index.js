@@ -2816,10 +2816,17 @@ async function orders(message,args) {
             var ordersArr = []
             response.data.payload.orders.forEach(element => {
                 if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1))
-                    ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
+                    ordersArr.push({
+                        seller: element.user.ingame_name,
+                        quantity: element.quantity,
+                        price: element.platinum,
+                        mod_rank: element.mod_rank
+                    });
             })
             ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
             ordersArr = ordersArr.sort(dynamicSort("price"))
+            if (item_data.mod_rank)
+                ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
             var sellers = ""
             var quantities = ""
             var prices = ""
@@ -2834,6 +2841,8 @@ async function orders(message,args) {
                 }
                 if (j==ordersArr.length)
                     break
+                if (ordersArr[j].mod_rank > 0)
+                    continue
                 sellers += ordersArr[j].seller + "\n"
                 quantities += ordersArr[j].quantity + "\n"
                 prices += ordersArr[j].price + "\n"
@@ -2850,7 +2859,7 @@ async function orders(message,args) {
             var vault_status = ''
             if (item_data.vault_status)
                 vault_status = ' (' + item_data.vault_status + ')'
-            embeds.push({
+            const index = embeds.push({
                 title: item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
                 url: 'https://warframe.market/items/' + item_data.item_url,
                 fields: [
@@ -2862,6 +2871,37 @@ async function orders(message,args) {
                 footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
                 timestamp: new Date()
             })
+            if (item_data.mod_rank) {   // get orders for maxed rank
+                ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
+                var sellers = ""
+                var quantities = ""
+                var prices = ""
+                for (var j=0; j<5; j++)
+                {
+                    if (ordersArr.length==0)
+                        break
+                    if (j==ordersArr.length)
+                        break
+                    if (ordersArr[j].mod_rank == 0)
+                        continue
+                    sellers += ordersArr[j].seller + "\n"
+                    quantities += ordersArr[j].quantity + "\n"
+                    prices += ordersArr[j].price + "\n"
+                }
+                sellers = sellers.replace(/_/g,"\\_")
+                console.log('executed: ' + item_data.item_url + "(maxed)\n")
+                if (sellers=="")
+                {
+                    sellers = "No sellers at this moment."
+                    quantities = "\u200b"
+                    prices = "\u200b"
+                }
+                embeds[index-1].fields.push(
+                    {name: 'Sellers (Max ranked)', value: sellers, inline: true},
+                    {name: 'Quantity', value: quantities, inline: true},
+                    {name: 'Price', value: prices, inline: true}
+                )
+            }
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 embeds = embeds.sort(dynamicSort("title"))
