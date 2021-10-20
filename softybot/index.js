@@ -4914,246 +4914,14 @@ async function updateDatabasePrices(up_origin) {
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async (db_items_list) => {
         for (var i=0;i<db_items_list.rows.length;i++) {
-            const item = db_items_list.rows[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
-                console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
-                var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
-                .then(async itemOrders => {
-                    //-----sell avg-----
-                    var sellAvgPrice = null
-                    var maxedSellAvgPrice = null
-                    var rank = null
-                    itemOrders.data.payload.statistics_closed["90days"].forEach(e => {
-                        if (e.mod_rank > 0) {
-                            rank = e.mod_rank
-                            maxedSellAvgPrice = e.median
-                        }
-                        else
-                            sellAvgPrice = e.median
-                    })
-                    //-----buy avg-----
-                    var buyAvgPrice = null
-                    var maxedBuyAvgPrice = null
-                    itemOrders.data.payload.statistics_live["90days"].forEach(e => {
-                        if (e.order_type == "buy") {
-                            if (e.mod_rank > 0)
-                                maxedBuyAvgPrice = e.median
-                            else
-                                buyAvgPrice = e.median
-                        }
-                    })
-                    if (buyAvgPrice > sellAvgPrice)
-                        buyAvgPrice = sellAvgPrice
-                    //-------------
-                    var ducat_value = null
-                    var relics = null
-                    var icon_url = ''
-                    var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
-                        if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
-                            if (itemOrders.data.include.item.items_in_set[k].ducats)
-                                ducat_value = itemOrders.data.include.item.items_in_set[k].ducats
-                            if (itemOrders.data.include.item.items_in_set[k].en.drop) { 
-                                if (itemOrders.data.include.item.items_in_set[k].en.drop.length!=0)
-                                    relics = itemOrders.data.include.item.items_in_set[k].en.drop
-                            }
-                            if (itemOrders.data.include.item.items_in_set[k].sub_icon)
-                                icon_url = itemOrders.data.include.item.items_in_set[k].sub_icon
-                            else if (itemOrders.data.include.item.items_in_set[k].icon)
-                                icon_url = itemOrders.data.include.item.items_in_set[k].icon
-                            return true
-                        }
-                    })
-                    if (!status) {
-                        console.log(`Error retrieving item ducat value and relics.`)
-                        return false
-                    }
-                    console.log(`Sell price: ${sellAvgPrice} Buy price: ${buyAvgPrice} Ducats: ${ducat_value}`)
-                    //----update relic rewards----
-                    if (relics)
-                        if (relics.length != 0) {
-                            console.log(`Scanning relic rewards...`)
-                            for (var j=0;j<relics.length;j++) {
-                                var temp = relics[j].name.split(" ")
-                                const rarity = temp.pop().replace("(","").replace(")","").toLowerCase()
-                                //----add to DB----
-                                let itemIndex = []
-                                var exists = Object.keys(db_items_list.rows).some(function (k) {
-                                    if (db_items_list.rows[k].item_url == relics[j].link) {
-                                        itemIndex = k
-                                        if (!db_items_list.rows[k].rewards)
-                                            return false
-                                        if (JSON.stringify(db_items_list.rows[k].rewards).match(item.item_url))
-                                            return true
-                                        return false
-                                    }
-                                })
-                                if (!exists) {
-                                    console.log(`Reward does not exist, updating DB...`)
-                                    if (!db_items_list.rows[itemIndex].rewards)
-                                        db_items_list.rows[itemIndex].rewards = {}
-                                    if (!db_items_list.rows[itemIndex].rewards[(rarity)])
-                                        db_items_list.rows[itemIndex].rewards[(rarity)] = []
-                                    db_items_list.rows[itemIndex].rewards[(rarity)].push(item.item_url)
-                                    var status = await db.query(`
-                                    UPDATE items_list 
-                                    SET rewards = '${JSON.stringify(db_items_list.rows[itemIndex].rewards)}'
-                                    WHERE item_url='${relics[j].link}'`)
-                                    .then( () => {
-                                        return true
-                                    })
-                                    .catch (err => {
-                                        if (err.response)
-                                            console.log(err.response.data)
-                                        console.log(err)
-                                        console.log('Error updating DB item rewards')
-                                        return false
-                                    });
-                                    if (!status)
-                                        return false
-                                }
-                            }
-                        }
-                    //----scanning relics vault status
-                    var vault_status = ''
-                    if (item.tags.includes("relic") && !item.tags.includes("requiem")) {
-                        console.log('Retrieving wiki info for relic...')
-                        const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
-                        const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
-                        //${item.item_url.replace('_relic','')}`)
-                        var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
-                        .then(async (wikiInfo) => {
-                            var matches = wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g)
-                            var isRailjack = matches && matches.length <= 3;
-                            if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
-                                vault_status = 'V'
-                            else if (isRailjack)
-                                vault_status = 'R'
-                            else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
-                                vault_status = 'B'
-                            else if (vaultExclusiveRelics.includes(item.item_url))
-                                vault_status = 'P'
-                            else if (vaultExpectedRelics.includes(item.item_url))
-                                vault_status = 'E'
-                            console.log('Updating DB relic vault status...')
-                            var status = await db.query(`UPDATE items_list SET 
-                                vault_status = NULLIF('${vault_status}', '')
-                                WHERE id = '${item.id}'`)
-                            .then( () => {
-                                return true
-                            })
-                            .catch (err => {
-                                if (err.response)
-                                    console.log(err.response.data)
-                                console.log(err)
-                                console.log('Error updating DB components vault status.')
-                                return false
-                            });
-                            if (!status)
-                                return false
-                            return true
-                        })
-                        .catch (err => {
-                            console.log(err + '\nError retrieving wiki info')
-                            return false
-                        })
-                        if (!status)
-                            return false
-                    }
-                    //----scanning sets/components vault status
-                    else if (item.tags.includes("set") && item.tags.includes("prime") && item.item_url.match('_set')) {
-                        let components_list = []
-                        db_items_list.rows.forEach(e => {
-                            if (e.item_url.match('^'+item.item_url.replace('_set','')) && (e.tags.includes('component') || e.tags.includes('blueprint')) && e.tags.includes('prime'))
-                                components_list.push({id: e.id,item_url: e.item_url})
-                        })
-                        console.log('Retrieving wiki info for set...')
-                        const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
-                        const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
-                        var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
-                        .then(async (wikiInfo) => {
-                            if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
-                                vault_status = 'V'
-                            else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of.*being only obtainable through.*Railjack.*missions/))
-                                vault_status = 'R'
-                            else if (wikiInfo.data.parse.text["*"].match(`has returned from the <a href="/wiki/Prime_Vault" title="Prime Vault">Prime Vault</a> for a limited time`))
-                                vault_status = 'P'
-                            else if (vaultExpectedRelics.includes(item.item_url.replace('_set','')))
-                                vault_status = 'E'
-                            console.log(`Updating DB components vault status...`)
-                            for (var j=0;j<components_list.length;j++) {
-                                var status = await db.query(`UPDATE items_list SET 
-                                    vault_status = NULLIF('${vault_status}', '')
-                                    WHERE id = '${components_list[j].id}'`)
-                                .then( () => {
-                                    return true
-                                })
-                                .catch (err => {
-                                    if (err.response)
-                                        console.log(err.response.data)
-                                    console.log(err)
-                                    console.log('Error updating DB components vault status.')
-                                    return false
-                                });
-                                if (!status)
-                                    return false
-                            }
-                            var status = await db.query(`UPDATE items_list SET 
-                                vault_status = NULLIF('${vault_status}', '')
-                                WHERE id = '${item.id}'`)
-                            .then( () => {
-                                return true
-                            })
-                            .catch (err => {
-                                if (err.response)
-                                    console.log(err.response.data)
-                                console.log(err)
-                                console.log('Error updating DB components vault status.')
-                                return false
-                            });
-                            if (!status)
-                                return false
-                            return true
-                        })
-                        .catch (err => {
-                            console.log(err + '\nError retrieving wiki info')
-                            return false
-                        })
-                        if (!status)
-                            return false
-                    }
-                    //---------------------
-                    console.log(`Updating DB prices...`)
-                    var status = await db.query(`UPDATE items_list SET 
-                        sell_price = ${sellAvgPrice},
-                        buy_price = ${buyAvgPrice},
-                        maxed_sell_price = ${maxedSellAvgPrice},
-                        maxed_buy_price = ${maxedBuyAvgPrice},
-                        rank = ${rank},
-                        ducat = ${ducat_value},
-                        relics = '${JSON.stringify(relics)}',
-                        icon_url = NULLIF('${icon_url}', '')
-                        WHERE id = '${item.id}'`)
-                    .then( () => {
-                        return true
-                    })
-                    .catch (err => {
-                        if (err.response)
-                            console.log(err.response.data)
-                        console.log(err)
-                        console.log('Error updating DB prices.')
-                        return false
-                    });
-                    if (!status)
-                        return false
+                var status = await updateDatabaseItem(db_items_list,db_items_list.rows[i])
+                .then(() => {
                     return true
                 })
-                .catch(err => {
-                    if (err.response)
-                        console.log(err.response.data)
-                    console.log(err)
-                    console.log('Error retrieving statistics.')
+                .catch(() => {
                     return false
-                });
+                })
                 if (!status)
                     return false
             }
@@ -5287,6 +5055,248 @@ async function updateDatabasePrices(up_origin) {
         }
         return
     }
+}
+
+async function updateDatabaseItem(db_items_list,item) {
+    console.log(`Retrieving statistics for ${item.item_url} (${i+1}/${db_items_list.rows.length})...`)
+    var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
+    .then(async itemOrders => {
+        //-----sell avg-----
+        var sellAvgPrice = null
+        var maxedSellAvgPrice = null
+        var rank = null
+        itemOrders.data.payload.statistics_closed["90days"].forEach(e => {
+            if (e.mod_rank > 0) {
+                rank = e.mod_rank
+                maxedSellAvgPrice = e.median
+            }
+            else
+                sellAvgPrice = e.median
+        })
+        //-----buy avg-----
+        var buyAvgPrice = null
+        var maxedBuyAvgPrice = null
+        itemOrders.data.payload.statistics_live["90days"].forEach(e => {
+            if (e.order_type == "buy") {
+                if (e.mod_rank > 0)
+                    maxedBuyAvgPrice = e.median
+                else
+                    buyAvgPrice = e.median
+            }
+        })
+        if (buyAvgPrice > sellAvgPrice)
+            buyAvgPrice = sellAvgPrice
+        //-------------
+        var ducat_value = null
+        var relics = null
+        var icon_url = ''
+        var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
+            if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
+                if (itemOrders.data.include.item.items_in_set[k].ducats)
+                    ducat_value = itemOrders.data.include.item.items_in_set[k].ducats
+                if (itemOrders.data.include.item.items_in_set[k].en.drop) { 
+                    if (itemOrders.data.include.item.items_in_set[k].en.drop.length!=0)
+                        relics = itemOrders.data.include.item.items_in_set[k].en.drop
+                }
+                if (itemOrders.data.include.item.items_in_set[k].sub_icon)
+                    icon_url = itemOrders.data.include.item.items_in_set[k].sub_icon
+                else if (itemOrders.data.include.item.items_in_set[k].icon)
+                    icon_url = itemOrders.data.include.item.items_in_set[k].icon
+                return true
+            }
+        })
+        if (!status) {
+            console.log(`Error retrieving item ducat value and relics.`)
+            return false
+        }
+        console.log(`Sell price: ${sellAvgPrice} Buy price: ${buyAvgPrice} Ducats: ${ducat_value}`)
+        //----update relic rewards----
+        if (relics)
+            if (relics.length != 0) {
+                console.log(`Scanning relic rewards...`)
+                for (var j=0;j<relics.length;j++) {
+                    var temp = relics[j].name.split(" ")
+                    const rarity = temp.pop().replace("(","").replace(")","").toLowerCase()
+                    //----add to DB----
+                    let itemIndex = []
+                    var exists = Object.keys(db_items_list.rows).some(function (k) {
+                        if (db_items_list.rows[k].item_url == relics[j].link) {
+                            itemIndex = k
+                            if (!db_items_list.rows[k].rewards)
+                                return false
+                            if (JSON.stringify(db_items_list.rows[k].rewards).match(item.item_url))
+                                return true
+                            return false
+                        }
+                    })
+                    if (!exists) {
+                        console.log(`Reward does not exist, updating DB...`)
+                        if (!db_items_list.rows[itemIndex].rewards)
+                            db_items_list.rows[itemIndex].rewards = {}
+                        if (!db_items_list.rows[itemIndex].rewards[(rarity)])
+                            db_items_list.rows[itemIndex].rewards[(rarity)] = []
+                        db_items_list.rows[itemIndex].rewards[(rarity)].push(item.item_url)
+                        var status = await db.query(`
+                        UPDATE items_list 
+                        SET rewards = '${JSON.stringify(db_items_list.rows[itemIndex].rewards)}'
+                        WHERE item_url='${relics[j].link}'`)
+                        .then( () => {
+                            return true
+                        })
+                        .catch (err => {
+                            if (err.response)
+                                console.log(err.response.data)
+                            console.log(err)
+                            console.log('Error updating DB item rewards')
+                            return false
+                        });
+                        if (!status)
+                            return false
+                    }
+                }
+            }
+        //----scanning relics vault status
+        var vault_status = ''
+        if (item.tags.includes("relic") && !item.tags.includes("requiem")) {
+            console.log('Retrieving wiki info for relic...')
+            const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
+            const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
+            //${item.item_url.replace('_relic','')}`)
+            var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
+            .then(async (wikiInfo) => {
+                var matches = wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g)
+                var isRailjack = matches && matches.length <= 3;
+                if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
+                    vault_status = 'V'
+                else if (isRailjack)
+                    vault_status = 'R'
+                else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
+                    vault_status = 'B'
+                else if (vaultExclusiveRelics.includes(item.item_url))
+                    vault_status = 'P'
+                else if (vaultExpectedRelics.includes(item.item_url))
+                    vault_status = 'E'
+                console.log('Updating DB relic vault status...')
+                var status = await db.query(`UPDATE items_list SET 
+                    vault_status = NULLIF('${vault_status}', '')
+                    WHERE id = '${item.id}'`)
+                .then( () => {
+                    return true
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Error updating DB components vault status.')
+                    return false
+                });
+                if (!status)
+                    return false
+                return true
+            })
+            .catch (err => {
+                console.log(err + '\nError retrieving wiki info')
+                return false
+            })
+            if (!status)
+                return false
+        }
+        //----scanning sets/components vault status
+        else if (item.tags.includes("set") && item.tags.includes("prime") && item.item_url.match('_set')) {
+            let components_list = []
+            db_items_list.rows.forEach(e => {
+                if (e.item_url.match('^'+item.item_url.replace('_set','')) && (e.tags.includes('component') || e.tags.includes('blueprint')) && e.tags.includes('prime'))
+                    components_list.push({id: e.id,item_url: e.item_url})
+            })
+            console.log('Retrieving wiki info for set...')
+            const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
+            const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
+            var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
+            .then(async (wikiInfo) => {
+                if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
+                    vault_status = 'V'
+                else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of.*being only obtainable through.*Railjack.*missions/))
+                    vault_status = 'R'
+                else if (wikiInfo.data.parse.text["*"].match(`has returned from the <a href="/wiki/Prime_Vault" title="Prime Vault">Prime Vault</a> for a limited time`))
+                    vault_status = 'P'
+                else if (vaultExpectedRelics.includes(item.item_url.replace('_set','')))
+                    vault_status = 'E'
+                console.log(`Updating DB components vault status...`)
+                for (var j=0;j<components_list.length;j++) {
+                    var status = await db.query(`UPDATE items_list SET 
+                        vault_status = NULLIF('${vault_status}', '')
+                        WHERE id = '${components_list[j].id}'`)
+                    .then( () => {
+                        return true
+                    })
+                    .catch (err => {
+                        if (err.response)
+                            console.log(err.response.data)
+                        console.log(err)
+                        console.log('Error updating DB components vault status.')
+                        return false
+                    });
+                    if (!status)
+                        return false
+                }
+                var status = await db.query(`UPDATE items_list SET 
+                    vault_status = NULLIF('${vault_status}', '')
+                    WHERE id = '${item.id}'`)
+                .then( () => {
+                    return true
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Error updating DB components vault status.')
+                    return false
+                });
+                if (!status)
+                    return false
+                return true
+            })
+            .catch (err => {
+                console.log(err + '\nError retrieving wiki info')
+                return false
+            })
+            if (!status)
+                return false
+        }
+        //---------------------
+        console.log(`Updating DB prices...`)
+        var status = await db.query(`UPDATE items_list SET 
+            sell_price = ${sellAvgPrice},
+            buy_price = ${buyAvgPrice},
+            maxed_sell_price = ${maxedSellAvgPrice},
+            maxed_buy_price = ${maxedBuyAvgPrice},
+            rank = ${rank},
+            ducat = ${ducat_value},
+            relics = '${JSON.stringify(relics)}',
+            icon_url = NULLIF('${icon_url}', '')
+            WHERE id = '${item.id}'`)
+        .then( () => {
+            return true
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Error updating DB prices.')
+            return false
+        });
+        if (!status)
+            return false
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        console.log('Error retrieving statistics.')
+        return false
+    });
+    if (!status)
+        return Promise.reject()
+    return Promise.resolve()
 }
 
 async function dc_update_msgs() {
