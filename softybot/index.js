@@ -2855,17 +2855,14 @@ async function orders(message,args) {
     var embeds = []
     for (var i=0; i<arrItems.length; i++)
     {
-        const item_data = arrItems[i]
-        console.log(item_data)
-        /*
-        if ((new Date().getTime() - item_data.update_timestamp) > 86400000) {
+        if ((new Date().getTime() - arrItems[i].update_timestamp) > 86400000) {
             console.log(`updating item in db`)
-            await updateDatabaseItem(items_list,item_data)
+            await updateDatabaseItem(items_list,arrItems[i])
             .then(items_list => {
                 for (var j=0; j<items_list.length; j++) {
                     element = items_list[j]
-                    if (element.id == item_data.id) {
-                        item_data = element
+                    if (element.id == arrItems[i].id) {
+                        arrItems[i] = element
                         break
                     }
                 }
@@ -2874,7 +2871,7 @@ async function orders(message,args) {
                 console.log("Error updating DB.")
             })
         }
-        */
+        const item_data = arrItems[i]
         axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
         .then(async response => {
             var ordersArr = []
