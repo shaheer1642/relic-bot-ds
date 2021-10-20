@@ -2925,7 +2925,7 @@ async function orders(message,args) {
                 prices += ordersArr[j].price + "\n"
             }
             sellers = sellers.replace(/_/g,"\\_")
-            console.log('executed: ' + item_data.item_url + "\n")
+            console.log('executed: ' + item_data.item_url)
             //if (!noSellers)
             if (sellers=="")
             {
@@ -2949,7 +2949,6 @@ async function orders(message,args) {
                 timestamp: new Date()
             })
             if (Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
-                console.log('getting orders for max rank')
                 ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
                 var sellers = ""
                 var quantities = ""
@@ -2967,7 +2966,7 @@ async function orders(message,args) {
                     prices += ordersArr[j].price + "\n"
                 }
                 sellers = sellers.replace(/_/g,"\\_")
-                console.log('executed: ' + item_data.item_url + "(maxed)\n")
+                console.log('executed: ' + item_data.item_url + "(maxed)")
                 if (sellers=="")
                 {
                     sellers = "No sellers at this moment."
