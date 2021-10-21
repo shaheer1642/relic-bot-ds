@@ -100,7 +100,6 @@ client.on('ready', () => {
 
     //----Ducat updater timeout----
     setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
-    update_wfm_items_list()
 })
 
 client.on('messageCreate', async message => {
@@ -3333,9 +3332,7 @@ async function auctions(message,args) {
         return
     WFM_Lich_List.forEach(element => {
         if (element.url_name.match(d_item_url))
-        {
             arrItemsUrl.push(element.url_name)
-        }
     })
     if (arrItemsUrl.length==0)
     {
@@ -3348,11 +3345,16 @@ async function auctions(message,args) {
         return
     }
     item_url = arrItemsUrl[0]
+    var type = ''
+    if (item_url.match('kuva'))
+        type = 'lich'
+    else if (item_url.match('tenet'))
+        type = 'sister'
     let processMessage = [];
     const func = await message.channel.send("Processing").then(response => {
         processMessage = response
     }).catch(err => console.log(err));
-    const api = axios("https://api.warframe.market/v1/auctions/search?type=lich&weapon_url_name=" + item_url)
+    const api = axios(`https://api.warframe.market/v1/auctions/search?type=${type}&weapon_url_name=${item_url}`)
     .then(response => {
         data = response.data
         console.log(response.data)
