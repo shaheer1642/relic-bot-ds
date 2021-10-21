@@ -5227,21 +5227,37 @@ async function updateDatabaseItem(db_items_list,item,index) {
                         var pos2 = str.indexOf('(',pos1)
                         pos1 = str.indexOf(')',pos2)
                         vault_timestamp = new Date(str.substring(pos2+1,pos1)).getTime()
+                        console.log('Updating DB relic vault timestamp...')
+                        var status = await db.query(`UPDATE items_list SET 
+                            vault_timestamp = ${vault_timestamp}
+                            WHERE id = '${item.id}'`)
+                        .then( () => {
+                            return true
+                        })
+                        .catch (err => {
+                            console.log(err + '\nError updating DB components vault timestamp.')
+                            return false
+                        });
+                        if (!status)
+                            return false
+                        for (var i=0; i<db_items_list.length; i++) {
+                            element = db_items_list[i]
+                            if (element.id == item.id) {
+                                db_items_list[i].vault_timestamp = vault_timestamp
+                                break
+                            }
+                        }
                     }
                 }
                 console.log('Updating DB relic vault status...')
                 var status = await db.query(`UPDATE items_list SET 
-                    vault_status = NULLIF('${vault_status}', ''),
-                    vault_timestamp = ${vault_timestamp}
+                    vault_status = NULLIF('${vault_status}', '')
                     WHERE id = '${item.id}'`)
                 .then( () => {
                     return true
                 })
                 .catch (err => {
-                    if (err.response)
-                        console.log(err.response.data)
-                    console.log(err)
-                    console.log('Error updating DB components vault status.')
+                    console.log(err + '\nError updating DB components vault status.')
                     return false
                 });
                 if (!status)
@@ -5250,7 +5266,6 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     element = db_items_list[i]
                     if (element.id == item.id) {
                         db_items_list[i].vault_status = (vault_status == '') ? null:vault_status
-                        db_items_list[i].vault_timestamp = vault_timestamp
                         break
                     }
                 }
