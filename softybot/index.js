@@ -801,12 +801,13 @@ client.on('messageCreate', async message => {
 
         //parse arguments
         const args = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
+        const args2 = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
 
         //define command
         const command = args.shift().toLowerCase();
 
         //call function if any
-        if (message.guild)
+        if (message.guild) {
             switch(command) {
                 case 'uptime':
                     uptime(message,args)
@@ -859,6 +860,22 @@ client.on('messageCreate', async message => {
                     break
                 -----------------------*/
             }
+            if (args2[1] && (!args2[2] || args2[2]=='relic'))
+                switch(args2[0].toLowerCase()) {
+                    case 'lith':
+                        relics(message,args2)
+                        break
+                    case 'meso':
+                        relics(message,args2)
+                        break
+                    case 'neo':
+                        relics(message,args2)
+                        break
+                    case 'axi':
+                        relics(message,args2)
+                        break
+                }
+        }
 
         //for dms
         else 
