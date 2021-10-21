@@ -3036,12 +3036,12 @@ async function relics(message,args) {
             if (element.item_url == d_item_url.toLowerCase())
                 relic_drops = element
         })
-        if (relic_drops.vault_status)
-            vault_status = ' (' + relic_drops.vault_status + ')'
         if (!relic_drops) {
             message.channel.send(`Could not find the relic named **${d_item_url}**`).catch(err => console.log(err))
             return
         }
+        if (relic_drops.vault_status)
+            vault_status = ' (' + relic_drops.vault_status + ')'
         if (!relic_drops.rewards) {
             message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
             return
