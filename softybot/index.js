@@ -3027,6 +3027,10 @@ async function relics(message,args) {
             message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
             return
         }
+        if (!relic_drops.rewards.common || !relic_drops.rewards.uncommon || !relic_drops.rewards.rare) {
+            message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
+            return
+        }
         //----
         for (var i=0; i < relic_drops.rewards.common.length; i++) {
             var str = relic_drops.rewards.common[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
