@@ -4662,7 +4662,17 @@ function msToFullTime(ms) {
     days %= 30;
     months %= 12;
 
-    return `${years} years ${months} months ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`;
+    var str = ''
+    if (years != 0)
+        str += years + ' years'
+    if (months != 0)
+        str += ' ' + months + ' months'
+    if (days != 0)
+        str += ' ' + days + ' days'
+    if (str == '')
+        str = `${hours} hours ${minutes} minutes ${seconds} seconds`
+        
+    return str;
 }
 
 function dynamicSort(property) {
