@@ -801,7 +801,7 @@ client.on('messageCreate', async message => {
 
         //parse arguments
         const args = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
-        const args2 = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
+        const args2 = commandsArr[commandsArrIndex].replace(/\./g,'').trim().split(/ +/g)
 
         //define command
         const command = args.shift().toLowerCase();
