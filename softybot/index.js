@@ -5158,7 +5158,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                             itemIndex = k
                             if (!db_items_list[k].rewards)
                                 return false
-                            if (JSON.stringify(db_items_list[k].rewards).match(item.item_url))
+                            if (JSON.stringify(db_items_list[k].rewards).match('^' + item.item_url))
                                 return true
                             return false
                         }
