@@ -796,12 +796,29 @@ client.on('messageCreate', async message => {
             }
             continue
         }
+        const args2 = commandsArr[commandsArrIndex].replace(/\./g,'').trim().split(/ +/g)
+        if (message.guild)
+            if (args2[1] && (!args2[2] || args2[2]=='relic'))
+                switch(args2[0].toLowerCase()) {
+                    case 'lith':
+                        relics(message,args2)
+                        break
+                    case 'meso':
+                        relics(message,args2)
+                        break
+                    case 'neo':
+                        relics(message,args2)
+                        break
+                    case 'axi':
+                        relics(message,args2)
+                        break
+                }
+                
         if (commandsArr[commandsArrIndex].indexOf(config.prefix) != 0)
             continue
 
         //parse arguments
         const args = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
-        const args2 = commandsArr[commandsArrIndex].replace(/\./g,'').trim().split(/ +/g)
 
         //define command
         const command = args.shift().toLowerCase();
@@ -860,21 +877,6 @@ client.on('messageCreate', async message => {
                     break
                 -----------------------*/
             }
-            if (args2[1] && (!args2[2] || args2[2]=='relic'))
-                switch(args2[0].toLowerCase()) {
-                    case 'lith':
-                        relics(message,args2)
-                        break
-                    case 'meso':
-                        relics(message,args2)
-                        break
-                    case 'neo':
-                        relics(message,args2)
-                        break
-                    case 'axi':
-                        relics(message,args2)
-                        break
-                }
         }
 
         //for dms
