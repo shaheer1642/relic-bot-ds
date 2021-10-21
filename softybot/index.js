@@ -3077,7 +3077,7 @@ async function relics(message,args) {
             fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]
         })
         if (relic_drops.vault_status == 'V' && relic_drops.vault_timestamp)
-            postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime - relic_drops.vault_timestamp) + ' ago'
+            postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
         message.channel.send(postdata).catch(err => console.log(err));
         message.react("✅")
         return
