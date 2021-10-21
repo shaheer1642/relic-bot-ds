@@ -3076,6 +3076,8 @@ async function relics(message,args) {
             thumbnail: {url: 'https://warframe.market/static/assets/' + relic_drops.icon_url},
             fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]
         })
+        if (relic_drops.vault_status == 'V' && relic_drops.vault_timestamp)
+            postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime - relic_drops.vault_timestamp) + 'ago'
         message.channel.send(postdata).catch(err => console.log(err));
         message.react("✅")
         return
@@ -4624,6 +4626,7 @@ async function ducat_template(message) {
     })
 }
 
+/*
 function msToTime(s) {
 
     // Pad to 2 or 3 digits, default is 2
@@ -4644,6 +4647,22 @@ function msToTime(s) {
     if (mins != 0)
         return pad(mins) + ' minutes ' + pad(secs) + ' seconds';
     return pad(secs) + ' seconds';
+}
+*/
+function msToFullTime(ms) {
+    var seconds = Math.floor(ms / 1000),
+    var minutes = Math.floor(seconds / 60),
+    var hours   = Math.floor(minutes / 60),
+    var days    = Math.floor(hours / 24),
+    var months  = Math.floor(days / 30),
+    var years   = Math.floor(days / 365);
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+    days %= 30;
+    months %= 12;
+
+    return `${years} years ${months} months ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`;
 }
 
 function dynamicSort(property) {
