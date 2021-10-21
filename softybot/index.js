@@ -4672,11 +4672,21 @@ function msToFullTime(ms) {
 
     var str = ''
     if (years != 0)
-        str += years + ' years'
+        if (years > 1)
+            str += years + ' years'
+        else
+            str += years + ' year'
     if (months != 0)
-        str += ' ' + months + ' months'
+        if (months > 1)
+            str += ' ' + months + ' months'
+        else
+            str += ' ' + months + ' month'
     if (days != 0)
-        str += ' ' + days + ' days'
+        if (days > 1)
+            str += ' ' + days + ' days'
+        else
+            str += ' ' + days + ' day'
+            
     if (str == '')
         str = `${hours} hours ${minutes} minutes ${seconds} seconds`
 
