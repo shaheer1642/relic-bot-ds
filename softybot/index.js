@@ -4651,11 +4651,11 @@ function msToTime(s) {
 */
 function msToFullTime(ms) {
     var seconds = Math.floor(ms / 1000),
-    var minutes = Math.floor(seconds / 60),
-    var hours   = Math.floor(minutes / 60),
-    var days    = Math.floor(hours / 24),
-    var months  = Math.floor(days / 30),
-    var years   = Math.floor(days / 365);
+    minutes = Math.floor(seconds / 60),
+    hours   = Math.floor(minutes / 60),
+    days    = Math.floor(hours / 24),
+    months  = Math.floor(days / 30),
+    years   = Math.floor(days / 365);
     seconds %= 60;
     minutes %= 60;
     hours %= 24;
