@@ -4626,7 +4626,6 @@ async function ducat_template(message) {
     })
 }
 
-/*
 function msToTime(s) {
 
     // Pad to 2 or 3 digits, default is 2
@@ -4648,7 +4647,7 @@ function msToTime(s) {
         return pad(mins) + ' minutes ' + pad(secs) + ' seconds';
     return pad(secs) + ' seconds';
 }
-*/
+
 function msToFullTime(ms) {
     var seconds = Math.floor(ms / 1000),
     minutes = Math.floor(seconds / 60),
