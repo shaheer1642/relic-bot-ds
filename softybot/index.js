@@ -100,6 +100,7 @@ client.on('ready', () => {
 
     //----Ducat updater timeout----
     setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
+    update_wfm_items_list()
 })
 
 client.on('messageCreate', async message => {
@@ -4686,7 +4687,7 @@ function msToFullTime(ms) {
             str += ' ' + days + ' days'
         else
             str += ' ' + days + ' day'
-            
+
     if (str == '')
         str = `${hours} hours ${minutes} minutes ${seconds} seconds`
 
@@ -5708,11 +5709,25 @@ async function update_wfm_items_list() {
         console.log(err)
         console.log('Retrieving WFM items list error')
     })
-    console.log('Retrieving WFM lich list')
+    var items = []
+    console.log('Retrieving WFM kuva lich list')
     const func2 = await axios("https://api.warframe.market/v1/lich/weapons")
     .then(async response => {
         console.log('Retrieving WFM lich list success')
-        let items = []
+        response.data.payload.weapons.forEach(e => {
+            items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
+        })
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving WFM lich list error')
+    })
+    console.log('Retrieving WFM sister lich list')
+    const func3 = await axios("https://api.warframe.market/v1/sister/weapons")
+    .then(async response => {
+        console.log('Retrieving WFM sister lich list success')
         response.data.payload.weapons.forEach(e => {
             items.push({id: e.id,url_name: e.url_name}) //${JSON.stringify(items)}
         })
