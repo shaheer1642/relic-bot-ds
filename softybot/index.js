@@ -798,7 +798,7 @@ client.on('messageCreate', async message => {
         }
         const args2 = commandsArr[commandsArrIndex].replace(/\./g,'').trim().split(/ +/g)
         if (message.guild)
-            if (args2[1] && (!args2[2] || args2[2]=='relic')) {
+            if (args2[1] && (!args2[2] || args2[2]=='relic'))
                 switch(args2[0].toLowerCase()) {
                     case 'lith':
                         relics(message,args2)
@@ -813,8 +813,6 @@ client.on('messageCreate', async message => {
                         relics(message,args2)
                         break
                 }
-                continue
-            }
 
         if (commandsArr[commandsArrIndex].indexOf(config.prefix) != 0)
             continue
