@@ -3084,6 +3084,8 @@ async function relics(message,args) {
             postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
         else if (relic_drops.vault_status == 'B' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nLast brought by Baro: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
+        else if (relic_drops.vault_status == 'P' && relic_drops.vault_timestamp)
+            postdata.embeds[0].footer.text += '\nUnvaulted since: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
         message.channel.send(postdata).catch(err => console.log(err));
         message.react("✅")
         return
