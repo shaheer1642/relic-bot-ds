@@ -5903,7 +5903,7 @@ async function trading_bot(message,args,command) {
         return Promise.reject()
     for (var i=0; i<items_list.length; i++) {
         var element = items_list[i]
-        if (element.item_url.match('^' + d_item_url + '\W*')) {
+        if (element.item_url.match('^' + d_item_url + '\W*') && !element.rank) {
             //if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
             if (element.tags.includes("set")) {
                 arrItems = []
@@ -6184,7 +6184,7 @@ async function trading_bot(message,args,command) {
             return false
         })
         if (!status) {
-            message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500 ☠️").catch(err => console.log(err)); 
+            message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500\nContact MrSofty#7926 ☠️").catch(err => console.log(err)); 
             return Promise.reject()
         }
     }
@@ -6204,11 +6204,11 @@ async function trading_bot(message,args,command) {
         return false
     })
     if (!status) {
-        message.channel.send("☠️ Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 500 ☠️").catch(err => console.log(err)); 
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7926 ☠️").catch(err => console.log(err)); 
         return Promise.reject()
     }
     if (avg_price == null || avg_price == "null") {
-        message.channel.send("☠️ Something went wrong retreiving item avg price <:ItsFreeRealEstate:892141191301328896>\nError code: 501 ☠️").catch(err => console.log(err)); 
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7926 ☠️").catch(err => console.log(err)); 
         return Promise.reject()
     }
     if (!price) {
