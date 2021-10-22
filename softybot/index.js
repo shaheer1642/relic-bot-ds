@@ -1547,7 +1547,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
                 // Check if rows exceed the limit
                 var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
-                .then(res => {
+                .then(async res => {
                     if (res.rowCount >= filledOrdersLimit) {
                         await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                     }
@@ -6105,7 +6105,7 @@ async function trading_bot(message,args,command) {
                         }
                         // Check if rows exceed the limit
                         var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
-                        .then(res => {
+                        .then(async res => {
                             if (res.rowCount >= filledOrdersLimit) {
                                 await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                             }
