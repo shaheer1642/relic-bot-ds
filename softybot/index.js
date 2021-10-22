@@ -871,6 +871,9 @@ client.on('messageCreate', async message => {
                 case 'bought':
                     bought(message,args)
                     break
+                case 'baro':
+                    baroArrival(message,args)
+                    break
                 /*----------------------
                 case 'test':
                     test(message,args)
@@ -4243,6 +4246,11 @@ async function bought(message,args) {
         console.log(err)
         return
     })
+    return
+}
+
+async function baroArrival(message,args) {
+    message.channel.send({content: ' ',embeds: [{footer: {text: "Baro arrival time"},timestamp: 1634909403000}]})
     return
 }
 
