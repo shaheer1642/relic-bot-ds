@@ -5914,7 +5914,7 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItems.length==0) {
-        message.channel.send("⚠️ Item " + d_item_url + " either does not exist or is an unsupported item at the moment. ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        message.channel.send("⚠️ Item **" + d_item_url + "** either does not exist or is an unsupported item at the moment. ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
@@ -5937,6 +5937,27 @@ async function trading_bot(message,args,command) {
         message.channel.send("⚠️ More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.resolve()
+    }
+    if ((new Date().getTime() - arrItems[0].update_timestamp) > 86400000) {
+        console.log(`updating item ${arrItems[0].item_url} in db`)
+        var status = await updateDatabaseItem(items_list,arrItems[0])
+        .then(items_list => {
+            for (var j=0; j<items_list.length; j++) {
+                element = items_list[j]
+                if (element.id == arrItems[0].id) {
+                    arrItems[0] = element
+                    break
+                }
+            }
+            return true
+        })
+        .catch(() => {
+            console.log("Error updating DB.")
+            message.channel.send({content: "☠️ Some error occured updating item in db.\nError code:\nContact MrSofty#7926 ☠️"})
+            return false
+        })
+        if (!status)      
+            return Promise.reject()
     }
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].id
