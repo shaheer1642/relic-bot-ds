@@ -13,7 +13,6 @@ const { doesNotMatch } = require('assert');
 const { Console } = require('console');
 const { resolve } = require('path');
 */
-const botID = "832682369831141417"
 const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
 const ducatRolesMessageId = "899402069159608320"
@@ -2426,7 +2425,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
     if (reaction.emoji.name == "⭐") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+        if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.id != ducatRolesMessageId)
             return
@@ -2446,7 +2445,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
     if (reaction.emoji.name == "💎") {
         if (!reaction.message.author)
             var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != botID)
+        if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.id != ducatRolesMessageId)
             return
