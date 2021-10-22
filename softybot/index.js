@@ -18,6 +18,7 @@ const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
+const userOrderLimit = 10
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
@@ -6245,6 +6246,21 @@ async function trading_bot(message,args,command) {
         return Promise.reject()
     }
     //----verify order in DB----
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id}`)
+    .then(async res => {
+        if (res.rowCount >= userOrderLimit) {
+            message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+            return false
+        }
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        return false
+    })
+    if (!status)
+        return Promise.reject()
     var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
@@ -6288,7 +6304,7 @@ async function trading_bot(message,args,command) {
     })
     .catch(err => {
         if (err.code == '23505') {
-            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
             setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
         }
         console.log(err)
