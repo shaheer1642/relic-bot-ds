@@ -18,7 +18,7 @@ const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
-const userOrderLimit = 10
+const userOrderLimit = 50
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
@@ -6251,7 +6251,7 @@ async function trading_bot(message,args,command) {
         if (res.rows.length == 0) {     //----insert order in DB----
             //Check if user has more than limited orders
             var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id}`)
-            .then(async res => {
+            .then(res => {
                 if (res.rowCount >= userOrderLimit) {
                     message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
                     return false
