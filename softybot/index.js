@@ -6246,24 +6246,25 @@ async function trading_bot(message,args,command) {
         return Promise.reject()
     }
     //----verify order in DB----
-    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id}`)
-    .then(async res => {
-        if (res.rowCount >= userOrderLimit) {
-            message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-            return false
-        }
-        return true
-    })
-    .catch(err => {
-        console.log(err)
-        originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-        return false
-    })
-    if (!status)
-        return Promise.reject()
     var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
+            //Check if user has more than limited orders
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id}`)
+            .then(async res => {
+                if (res.rowCount >= userOrderLimit) {
+                    message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    return false
+                }
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+                return false
+            })
+            if (!status)
+                return false
             var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
             .then(res => {
                 return true
