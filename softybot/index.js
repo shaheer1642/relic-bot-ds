@@ -5885,56 +5885,61 @@ async function trading_bot(message,args,command) {
     d_item_url = d_item_url.replace(/_p$/,'_prime')
     d_item_url = d_item_url.replace('_p_','_prime_')
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
-    let arrItemsUrl = []
-    let items_list = []
+    var arrItems = []
+    var items_list = []
     console.log('Retrieving Database -> items_list')
     var status = await db.query(`SELECT * FROM items_list`)
     .then(res => {
         items_list = res.rows
-        console.log('Retrieving Database -> items_list success')
         return true
     })
     .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
         console.log(err)
         console.log('Retrieving Database -> items_list error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 501"})
+        message.channel.send({content: "☠️ Some error occured retrieving database info.\nError code: 501\nContact MrSofty#7926 ☠️"})
         return false
     })
     if (!status)      
         return Promise.reject()
-    items_list.forEach(element => {
+    for (var i=0; i<items_list.length; i++) {
+        var element = items_list[i]
         if (element.item_url.match('^' + d_item_url + '\W*')) {
-            if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
-                arrItemsUrl.push({item_url: element.item_url,item_id: element.id});
-        }
-    })
-    if (JSON.stringify(arrItemsUrl).match("_set")) {
-        var i = 0
-        var MaxIndex = arrItemsUrl.length
-        for (var i=0; i <= MaxIndex-1; i++)
-        {
-            if (!arrItemsUrl[i].item_url.match("_set"))
-            {
-                arrItemsUrl.splice(i, 1)
-                i--
+            //if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
+            if (element.tags.includes("set")) {
+                arrItems = []
+                arrItems.push(element);
+                break
             }
-            MaxIndex = arrItemsUrl.length
+            arrItems.push(element);
         }
     }
-    if (arrItemsUrl.length > 1) {
+    if (arrItems.length==0) {
+        message.channel.send("⚠️ Item " + d_item_url + " either does not exist or is an unsupported item at the moment. ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
+    }
+    /*
+    if (arrItems[i].tags.includes("set")) {
+        var i = 0
+        var MaxIndex = arrItems.length
+        for (var i=0; i <= MaxIndex-1; i++)
+        {
+            if (!arrItems[i].tags.includes("set"))
+            {
+                arrItems.splice(i, 1)
+                i--
+            }
+            MaxIndex = arrItems.length
+        }
+    }
+    */
+    if (arrItems.length > 1) {
         message.channel.send("⚠️ More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.resolve()
     }
-    if (arrItemsUrl.length==0) {
-        message.channel.send("⚠️ Item " + d_item_url + " either does not exist or is not a prime item. ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-        return Promise.resolve()
-    }
-    const item_url = arrItemsUrl[0].item_url
-    const item_id = arrItemsUrl[0].item_id
+    const item_url = arrItems[0].item_url
+    const item_id = arrItems[0].id
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     const originGuild = message.guild.name
     const originMessage = message
