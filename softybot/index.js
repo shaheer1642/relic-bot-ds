@@ -5903,14 +5903,36 @@ async function trading_bot(message,args,command) {
         return Promise.reject()
     for (var i=0; i<items_list.length; i++) {
         var element = items_list[i]
-        if (element.item_url.match('^' + d_item_url + '\W*') && !element.rank) {
-            //if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
-            if (element.tags.includes("set")) {
-                arrItems = []
-                arrItems.push(element);
-                break
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if ((new Date().getTime() - items_list[i].update_timestamp) > 86400000) {
+                console.log(`updating item ${items_list[i].item_url} in db`)
+                var status = await updateDatabaseItem(items_list,items_list[i])
+                .then(items_list => {
+                    for (var j=0; j<items_list.length; j++) {
+                        if (items_list[j].id == items_list[i].id) {
+                            items_list[i] = items_list[j]
+                            element = items_list[j]
+                            break
+                        }
+                    }
+                    return true
+                })
+                .catch(() => {
+                    console.log("Error updating DB.")
+                    message.channel.send({content: "☠️ Some error occured updating item in db.\nError code:\nContact MrSofty#7926 ☠️"})
+                    return false
+                })
+                if (!status)      
+                    return Promise.reject()
             }
-            arrItems.push(element);
+            if (!element.rank) {
+                if (element.tags.includes("set")) {
+                    arrItems = []
+                    arrItems.push(element);
+                    break
+                }
+                arrItems.push(element);
+            }
         }
     }
     if (arrItems.length==0) {
@@ -5934,30 +5956,9 @@ async function trading_bot(message,args,command) {
     }
     */
     if (arrItems.length > 1) {
-        message.channel.send("⚠️ More than one search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        message.channel.send("⚠️ More than one search results detected for the item **" + d_item_url + "**, cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.resolve()
-    }
-    if ((new Date().getTime() - arrItems[0].update_timestamp) > 86400000) {
-        console.log(`updating item ${arrItems[0].item_url} in db`)
-        var status = await updateDatabaseItem(items_list,arrItems[0])
-        .then(items_list => {
-            for (var j=0; j<items_list.length; j++) {
-                element = items_list[j]
-                if (element.id == arrItems[0].id) {
-                    arrItems[0] = element
-                    break
-                }
-            }
-            return true
-        })
-        .catch(() => {
-            console.log("Error updating DB.")
-            message.channel.send({content: "☠️ Some error occured updating item in db.\nError code:\nContact MrSofty#7926 ☠️"})
-            return false
-        })
-        if (!status)      
-            return Promise.reject()
     }
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].id
