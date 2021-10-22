@@ -4253,7 +4253,7 @@ async function baroArrival(message,args) {
     message.channel.send({content: ' ',embeds: [{
         thumbnail: {url: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/ef9f15b4-9e31-4eb2-8c13-ca5b14057c62/dcywiqt-9d884170-ca99-4188-8da6-fa3a32b5dd9a.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2VmOWYxNWI0LTllMzEtNGViMi04YzEzLWNhNWIxNDA1N2M2MlwvZGN5d2lxdC05ZDg4NDE3MC1jYTk5LTQxODgtOGRhNi1mYTNhMzJiNWRkOWEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.ItNd_d0zzu-Uz8cTjHWAePmS_uEG06_RttOPreshcOo'},
         footer: {text: "Next Baro arrival time"},
-        timestamp: 1634909403000}]
+        timestamp: 1634929263000}]
     });
     return
 }
