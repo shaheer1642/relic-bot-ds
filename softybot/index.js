@@ -19,6 +19,7 @@ const relicStocks_guild_id = "765542868265730068"
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
 const userOrderLimit = 50
+const filledOrdersLimit = 30
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
@@ -1543,6 +1544,23 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         })
                         .catch(err => console.log(err))
                     }
+                }
+                // Check if rows exceed the limit
+                var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
+                .then(res => {
+                    if (res.rowCount >= filledOrdersLimit) {
+                        await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                    }
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    return false
+                })
+                if (!status) {
+                    res.delete()
+                    return
                 }
                 var status = await db.query(`
                 INSERT INTO filled_users_orders
@@ -6084,6 +6102,22 @@ async function trading_bot(message,args,command) {
                                 })
                                 .catch(err => console.log(err))
                             }
+                        }
+                        // Check if rows exceed the limit
+                        var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
+                        .then(res => {
+                            if (res.rowCount >= filledOrdersLimit) {
+                                await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            }
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status) {
+                            res.delete()
+                            return Promise.reject()
                         }
                         var status = await db.query(`
                         INSERT INTO filled_users_orders
