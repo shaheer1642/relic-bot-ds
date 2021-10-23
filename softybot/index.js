@@ -4277,12 +4277,15 @@ async function bought(message,args) {
 }
 
 async function baroArrival(message,args) {
-    message.channel.send({content: ' ',embeds: [{
-        description: 'The wait is over, Tenno. Baro Ki\'Teer has arrived.\nOr did he',
-        thumbnail: {url: 'https://cdn.discordapp.com/attachments/864199722676125757/901175987528691712/baro.png'},
-        footer: {text: "Next Baro arrival time"},
-        timestamp: 1636117200000}]
-    });
+    message.channel.send({
+        content: ' ',
+        embeds: [
+            {
+                description: `The wait is over, Tenno. Baro Ki\'Teer has arrived.\nOr did he\n\nNext arrival <t:${Math.round(1636117200000/1000)}:R> (<t:${Math.round(1636117200000/1000)}:f>)`,
+                thumbnail: {url: 'https://cdn.discordapp.com/attachments/864199722676125757/901175987528691712/baro.png'}
+            }
+        ]
+    }).catch(err => console.log(err));
     return
 }
 
