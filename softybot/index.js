@@ -878,6 +878,9 @@ client.on('messageCreate', async message => {
                 case 'getmessage':
                     getMessage(message,args)
                     break
+                case 'launchnuke':
+                    launchNuke(message,args)
+                    break
                 /*----------------------
                 case 'test':
                     test(message,args)
@@ -4300,6 +4303,18 @@ async function getMessage(message,args) {
         console.log('getmessage executed')
     })
     .catch(err => console.log(err))
+    return
+}
+
+async function launchNuke(message,args) {
+    message.channel.send({
+        content: ' ',
+        embeds: [
+            {
+                description: `Nuking VRC in: <t:${new Date().getTime() + 3600000}:R> (<t:${new Date().getTime() + 3600000}:f>)`
+            }
+        ]
+    })
     return
 }
 
