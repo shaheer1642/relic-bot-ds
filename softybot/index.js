@@ -4286,7 +4286,7 @@ async function baroArrival(message,args) {
         content: ' ',
         embeds: [
             {
-                description: `The wait is over, Tenno. Baro Ki\'Teer has arrived.\nOr did he\n\nNext arrival <t:${Math.round(1636117200000/1000)}:R> (<t:${Math.round(1636117200000/1000)}:f>)`,
+                description: `The wait is over, Tenno. Baro Ki\'Teer has arrived.\nOr did he\n\nNext arrival <t:${Math.round(time/1000)}:R> (<t:${Math.round(time/1000)}:f>)`,
                 thumbnail: {url: 'https://cdn.discordapp.com/attachments/864199722676125757/901175987528691712/baro.png'}
             }
         ]
