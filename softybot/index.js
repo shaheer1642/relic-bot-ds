@@ -7151,15 +7151,21 @@ async function trade_tut(message,args) {
             color: "FFFFFF"
         }]
     }
-    var msg = client.channels.cache.get('892160436881993758').messages.cache.get('893138411861446676')
-    console.log(msg)
-    msg.edit(postdata).catch(err => console.log(err))
-    msg = client.channels.cache.get('893133821313187881').messages.cache.get('893138412301860865')
-    console.log(msg)
-    msg.edit(postdata).catch(err => console.log(err))
-    msg = client.channels.cache.get('892108718358007820').messages.cache.get('893138411995689080')
-    console.log(msg)
-    msg.edit(postdata).catch(err => console.log(err))
+    client.channels.cache.get('892160436881993758').messages.fetch('893138411861446676')
+    .then(msg => {
+        msg.edit(postdata).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+    client.channels.cache.get('893133821313187881').messages.fetch('893138412301860865')
+    .then(msg => {
+        msg.edit(postdata).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+    client.channels.cache.get('892108718358007820').messages.fetch('893138411995689080')
+    .then(msg => {
+        msg.edit(postdata).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
 }
 
 async function td_set_orders_timeouts() {
