@@ -3858,6 +3858,7 @@ async function relist(message,args) {
     const func1 = axios("https://api.warframe.market/v1/profile/" + ingame_name + "/orders", {headers:{Authorization: JWT}})
     .then(async response1 => {
         const data1 = response1.data
+        console.log(data1)
         //----Parse profile orders----
         let embed = []
         var value_f1 = []
@@ -3934,7 +3935,7 @@ async function relist(message,args) {
                     }
                 })
                 .then(response3 => {
-                    value_f1.push(item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + visibility + '\n')
+                    value_f1.push(item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' ' + visibility + '\n')
                     value_f3.push(price + 'p\n')
                     console.log(value_f1.length + ' of ' + itemsArr.length)
                     //if (value_f1.length == itemsArr.length) {
