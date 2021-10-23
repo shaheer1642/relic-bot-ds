@@ -4692,10 +4692,7 @@ async function dc_ducat_update() {
             var channel = client.channels.cache.get(element.channel_id)
             if (!channel.messages.cache.get(element.message_id))
                 await channel.messages.fetch()
-            if (i==0)
-                channel.messages.cache.get(element.message_id).edit({content: ' ',embeds: [{description: `Last updated: <t:${Math.round(new Date().getTime()/1000)}:R>`}]}).catch(err => console.log(err))
-            else
-                channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
+            channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
         }
     })
     .catch(err => console.log(err))
