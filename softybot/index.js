@@ -3875,6 +3875,9 @@ async function relist(message,args) {
             const item_url = element1.item_url
             const item_id = element1.item_id
             const order_id = element1.order_id
+            var visibility = ''
+            if (!element1.visible)
+                visibility = '(invisible)'
             //----Retrieve top listing----
             const func2 = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
             .then(response2 => {
@@ -3931,7 +3934,7 @@ async function relist(message,args) {
                     }
                 })
                 .then(response3 => {
-                    value_f1.push(item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '\n')
+                    value_f1.push(item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + visibility + '\n')
                     value_f3.push(price + 'p\n')
                     console.log(value_f1.length + ' of ' + itemsArr.length)
                     //if (value_f1.length == itemsArr.length) {
