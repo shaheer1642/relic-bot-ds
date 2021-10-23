@@ -3821,27 +3821,25 @@ async function relist(message,args) {
     })
     if (!status)
         return
-    if (message.author.id != "253525146923433984") {
-        for (var i=0;i<relist_cd.length;i++) {
-            if (relist_cd[i].discord_id == message.author.id)
-                {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
-        }
-        relist_cd.push({discord_id: message.author.id, timestamp: Date.now()});
-        setTimeout(() => {
-            console.log('executed timout')
-            var i = 0
-            var MaxIndex = relist_cd.length
-            for (var i=0; i <= MaxIndex-1; i++)
-            {
-                if (relist_cd[i].discord_id==message.author.id)
-                {
-                    relist_cd.splice(i, 1)
-                    i--
-                }
-                MaxIndex = relist_cd.length
-            }
-        }, 900000);
+    for (var i=0;i<relist_cd.length;i++) {
+        if (relist_cd[i].discord_id == message.author.id)
+            {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
     }
+    relist_cd.push({discord_id: message.author.id, timestamp: Date.now()});
+    setTimeout(() => {
+        console.log('executed timout')
+        var i = 0
+        var MaxIndex = relist_cd.length
+        for (var i=0; i <= MaxIndex-1; i++)
+        {
+            if (relist_cd[i].discord_id==message.author.id)
+            {
+                relist_cd.splice(i, 1)
+                i--
+            }
+            MaxIndex = relist_cd.length
+        }
+    }, 900000);
     let processMessage = [];
     const process = await message.channel.send("Processing, this might take a minute").then(response => {
         processMessage = response
