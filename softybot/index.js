@@ -872,6 +872,9 @@ client.on('messageCreate', async message => {
                 case 'bought':
                     bought(message,args)
                     break
+                case 'update':
+                    updateDucatForced(message,args)
+                    break
                 case 'baro':
                     baroArrival(message,args)
                     break
@@ -4273,6 +4276,15 @@ async function bought(message,args) {
         console.log(err)
         return
     })
+    return
+}
+
+async function updateDucatForced(message,args) {
+    if (message.channelId != '899290597259640853')
+        return
+    setTimeout(dc_ducat_update, 1)
+    message.channel.send("Updating. Might take a few seconds").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+    message.delete().catch(err => console.log(err))
     return
 }
 
