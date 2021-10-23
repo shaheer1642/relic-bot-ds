@@ -4724,7 +4724,7 @@ async function dc_ducat_update() {
         await client.channels.cache.get('899290597259640853').send({content: user_mentions.toString()}).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
     }
     //-------------------------------
-    setTimeout(dc_ducat_update, 300000)
+    Ducat_Update_Timer = setTimeout(dc_ducat_update, 300000)
 }
 
 function test(message,args) {
