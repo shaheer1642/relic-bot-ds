@@ -2276,8 +2276,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
             .then (response => {
                 console.log(JSON.stringify(response))
                 user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
-                .catch(err => console.log(err))
-                mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                .then(() => {
+                    mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                })
+                .catch(err => {
+                    mod_log(`Error assigning role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                    console.log(err)
+                })
             })
             .catch(function (error) {
                 console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
@@ -2572,7 +2577,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
 });
 
 client.on('guildMemberAdd', async member => {
-    if (member.guild.id == "776804537095684108") {      //For BotV
+    if (member.guild.id == "776804537095684108" && !member.user.bot) {      //For BotV
         const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
         const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
         const embed = new MessageEmbed()
