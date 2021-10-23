@@ -5350,7 +5350,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
         else if (item.tags.includes("set") && item.tags.includes("prime") && item.item_url.match('_set')) {
             let components_list = []
             db_items_list.forEach(e => {
-                if (e.item_url.match('^'+item.item_url.replace('_set','')) && (e.tags.includes('component') || e.tags.includes('blueprint')) && e.tags.includes('prime'))
+                if ((e.item_url.match('^'+item.item_url.replace('_set','')) || (e.tags.includes('kubrow') && !e.tags.includes('set'))) && (e.tags.includes('component') || e.tags.includes('blueprint')) && e.tags.includes('prime'))
                     components_list.push({id: e.id,item_url: e.item_url})
             })
             console.log('Retrieving wiki info for set...')
