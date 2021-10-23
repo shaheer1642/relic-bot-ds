@@ -4314,7 +4314,7 @@ async function launchNuke(message,args) {
                 description: `Nuking VRC in: <t:${new Date().getTime() + 3600000}:R> (<t:${new Date().getTime() + 3600000}:f>)`
             }
         ]
-    })
+    }).catch(err => console.log(err));
     return
 }
 
