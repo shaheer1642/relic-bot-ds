@@ -4687,12 +4687,16 @@ async function dc_ducat_update() {
     //----edit remaining ids----
     await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
     .then(res => {
-        res.rows.forEach(async element => {
+        for (var i=0;i<res.rows.length;i++) {
+            var element = res.rows[i]
             var channel = client.channels.cache.get(element.channel_id)
             if (!channel.messages.cache.get(element.message_id))
                 await channel.messages.fetch()
-            channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
-        })
+            if (i==0)
+                channel.messages.cache.get(element.message_id).edit({content: '`Last updated: <t:' + Math.round(new Date().getTime()/1000) + ':R>`',embeds: []}).catch(err => console.log(err))
+            else
+                channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
+        }
     })
     .catch(err => console.log(err))
     //----mention users----
