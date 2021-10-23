@@ -3858,7 +3858,6 @@ async function relist(message,args) {
     const func1 = axios("https://api.warframe.market/v1/profile/" + ingame_name + "/orders", {headers:{Authorization: JWT}})
     .then(async response1 => {
         const data1 = response1.data
-        console.log(data1)
         //----Parse profile orders----
         //let embed = []
         var value_f1 = []
