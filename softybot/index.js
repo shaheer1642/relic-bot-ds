@@ -4630,7 +4630,7 @@ async function dc_ducat_update() {
     whisperListArr = whisperListArr.sort(dynamicSort("total_price"))
     whisperListArr = whisperListArr.sort(dynamicSort("total_quantity"))
     //----post whisper list to dc----
-    var postdata = {content: ''}
+    var postdata = {content: '',embeds: []}
     postdata.content = '```diff\nWhisper List (Beta)```'
     var msg_id_counter = 0
     for (var i=0; i<whisperListArr.length; i++) {
