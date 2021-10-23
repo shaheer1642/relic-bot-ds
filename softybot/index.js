@@ -7147,13 +7147,13 @@ async function trade_tut(message,args) {
     var postdata = {
         content: " ",
         embeds: [{
-            description: `Posting order\n**wtb volt 160p**\n\nPosting multiple orders\n**wtb loki p systems 100p\nwts loki p bp 15p\nwtb plat 5$**`,
+            description: `Posting order\n**wtb volt 160p**\n\nPosting multiple orders\n**wtb loki p systems 100p\nwts loki p bp 15p\nwtb plat 5$**\n\nPosting previous orders\n**my orders**`,
             color: "FFFFFF"
         }]
     }
-    tradingBotChannels.forEach(c => {
-        client.channels.cache.get(c).send(postdata)
-    })
+    client.channels.cache.get('892160436881993758').messages.cache.get('893138411861446676').edit(postdata)
+    client.channels.cache.get('893133821313187881').messages.cache.get('893138412301860865').edit(postdata)
+    client.channels.cache.get('893138411995689080').messages.cache.get('893138411995689080').edit(postdata)
 }
 
 async function td_set_orders_timeouts() {
