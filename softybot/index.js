@@ -4292,11 +4292,12 @@ async function getMessage(message,args) {
         return
     if (!args[1])
         return
-    if (!args[2])
+    if (args[2])
         return
     client.channels.cache.get(args[0]).messages.fetch(args[1])
     .then(msg => {
         console.log(msg)
+        console.log('getmessage executed')
     })
     .catch(err => console.log(err))
     return
