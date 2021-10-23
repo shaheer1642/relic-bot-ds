@@ -875,6 +875,9 @@ client.on('messageCreate', async message => {
                 case 'baro':
                     baroArrival(message,args)
                     break
+                case 'getmessage':
+                    getMessage(message,args)
+                    break
                 /*----------------------
                 case 'test':
                     test(message,args)
@@ -4277,6 +4280,25 @@ async function baroArrival(message,args) {
         footer: {text: "Next Baro arrival time"},
         timestamp: 1636117200000}]
     });
+    return
+}
+
+async function getMessage(message,args) {
+    if (message.author.id != '253525146923433984') {
+        message.channel.send('You do not have permission to use this command').catch(err => console.log(err))
+        return
+    }
+    if (!args[0])
+        return
+    if (!args[1])
+        return
+    if (!args[2])
+        return
+    client.channels.cache.get(args[0]).messages.fetch(args[1])
+    .then(msg => {
+        console.log(msg)
+    })
+    .catch(err => console.log(err))
     return
 }
 
