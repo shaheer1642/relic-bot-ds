@@ -35,6 +35,7 @@ const tb_invisColor = '#71368A'
 var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
+var Ducat_Update_Timer = null
 const u_order_close_time = 10800000
 
 console.log('Establishing connection to DB...')
@@ -100,7 +101,7 @@ client.on('ready', () => {
     td_set_orders_timeouts().catch(err => console.log(err))
 
     //----Ducat updater timeout----
-    setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
+    Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
 })
 
 client.on('messageCreate', async message => {
@@ -4282,9 +4283,13 @@ async function bought(message,args) {
 async function updateDucatForced(message,args) {
     if (message.channelId != '899290597259640853')
         return
-    setTimeout(dc_ducat_update, 1)
-    message.channel.send("Updating. Might take a few seconds").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-    message.delete().catch(err => console.log(err))
+    clearTimeout(Ducat_Update_Timer)
+    Ducat_Update_Timer = setTimeout(dc_ducat_update, 1)
+    message.channel.send("Updating. Might take a few seconds").then(msg => setTimeout(() => {
+        msg.delete().catch(err => console.log(err))
+        message.delete().catch(err => console.log(err))
+    }
+    , 5000))
     return
 }
 
@@ -4737,7 +4742,7 @@ async function ducat_template(message) {
         return
     }
     var postdata = {content: ''}
-    postdata.content = '```md\nNotes:\nThis data will be updated every 5 mins\n\nColors & filters:\nIf price per part is less than 4, whipser is filtered out (usually troll orders)\nIf quantity is 1, it is filtered out\n<If quantity is 2, it is highlighted yellow>\nIf quantity is 2 but price is greater than 19p, it is filtered out\nIf quantity is 3 but price is greater than 30p, it is filtered out\n[If quantity is equal to 3 but price is lower than 25p, it is highlighted cyan][]\n[If quantity is equal to 4 but price is lower than 48p, it is highlighted cyan][]\n[If quantity is greater than 4, it is highlighted cyan][]\n```\nReact with the following emotes to obtain the given roles below. These roles are mentioned whenever a *new* trader appears with the given criteria. Removing reaction should remove the role. (If any suggestions, dm MrSofty)\n\n:star:   `(Ducats-1) :: Quantity >= 6 AND AvgPrice <= 10.00p`\n:gem:   `(Ducats-2) :: Quantity >= 4 AND AvgPrice <= 8.00p`\n\n:red_circle:   `:: Ping on \'Do not Disturb\'`\n:purple_circle:   `:: Ping on \'Invisible\'/offline`\n\nYou may use the following command in this channel to let your fellow buyers know if you have already bought ducats from a seller\n`.bought seller_name`'
+    postdata.content = '```md\nNotes:\nThis data will be updated every 5 mins\n\nColors & filters:\nIf price per part is less than 4, whipser is filtered out (usually troll orders)\nIf quantity is 1, it is filtered out\n<If quantity is 2, it is highlighted yellow>\nIf quantity is 2 but price is greater than 19p, it is filtered out\nIf quantity is 3 but price is greater than 30p, it is filtered out\n[If quantity is equal to 3 but price is lower than 25p, it is highlighted cyan][]\n[If quantity is equal to 4 but price is lower than 48p, it is highlighted cyan][]\n[If quantity is greater than 4, it is highlighted cyan][]\n```\nReact with the following emotes to obtain the given roles below. These roles are mentioned whenever a *new* trader appears with the given criteria. Removing reaction should remove the role. (If any suggestions, dm MrSofty)\n\n:star:   `(Ducats-1) :: Quantity >= 6 AND AvgPrice <= 10.00p`\n:gem:   `(Ducats-2) :: Quantity >= 4 AND AvgPrice <= 8.00p`\n\n:red_circle:   `:: Ping on \'Do not Disturb\'`\n:purple_circle:   `:: Ping on \'Invisible\'/offline`\n\nYou may use the following command in this channel to let your fellow buyers know if you have already bought ducats from a seller\n`.bought seller_name\nUse the following command to force update if needed\n`.update`'
     const channel = client.channels.cache.get('899290597259640853')
     await channel.messages.fetch()
     channel.messages.cache.get('899402069159608320').edit(postdata).catch(err => console.log(err))
