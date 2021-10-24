@@ -345,6 +345,7 @@ client.on('messageCreate', async message => {
                     continue
                 }
                 const c_args = commandsArr[commandsArrIndex].replace(command,'').toLowerCase().trim().split(/,/g)
+                message.channel.send(`<@${message.author.id} Successfully queued those hosts, it may take a moment for them to show up depending on how many people are currently hosting squads. dont wanna get queued, gotta pay boi\n\nhttps://cdn.discordapp.com/emojis/764518605592330240.gif?size=96>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                 for (var k=0;k<c_args.length;k++) {
                     var func = await trading_bot(message,c_args[k].toLowerCase().trim().split(/ +/g),command).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
                 }
