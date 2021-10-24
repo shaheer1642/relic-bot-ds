@@ -885,6 +885,9 @@ client.on('messageCreate', async message => {
                 case 'launchnuke':
                     launchNuke(message,args)
                     break
+                case 'say':
+                    saySomething(message,args)
+                    break
                 /*----------------------
                 case 'test':
                     test(message,args)
@@ -4343,6 +4346,14 @@ async function launchNuke(message,args) {
                 description: `Nuking VRC <t:${Math.round((new Date().getTime() + 3600000)/1000)}:R> (<t:${Math.round((new Date().getTime() + 3600000)/1000)}:f>)`
             }
         ]
+    }).catch(err => console.log(err));
+    return
+}
+
+async function saySomething(message,args) {
+    message.channel.send({
+        content: message.content.replace('.say '),
+        embeds: []
     }).catch(err => console.log(err));
     return
 }
