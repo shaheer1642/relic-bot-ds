@@ -4352,7 +4352,7 @@ async function launchNuke(message,args) {
 
 async function saySomething(message,args) {
     message.channel.send({
-        content: message.content.replace('.say '),
+        content: message.content.replace('.say ',''),
         embeds: []
     }).catch(err => console.log(err));
     return
