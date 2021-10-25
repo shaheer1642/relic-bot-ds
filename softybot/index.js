@@ -6365,11 +6365,11 @@ async function trading_bot(message,args,command) {
         return false
     })
     if (!status) {
-        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7926 ☠️").catch(err => console.log(err)); 
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
         return Promise.reject()
     }
     if (avg_price == null || avg_price == "null") {
-        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7926 ☠️").catch(err => console.log(err)); 
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
         return Promise.reject()
     }
     if (!price) {
