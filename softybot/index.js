@@ -5948,7 +5948,7 @@ async function trading_bot(message,args,command) {
     }
     var index = 0
     while(index !== -1) {
-        index = args.indexOf('maxed');
+        index = args.indexOf('maxed') || args.indexOf('max');
         if (index !== -1) {
             isMaxed = true
             args.splice(index, 1);
@@ -6344,13 +6344,13 @@ async function trading_bot(message,args,command) {
         if (command == 'wts' && item_rank == 'unranked')
             if (res.rows[0].sell_price) 
                 avg_price = Math.round(Number(res.rows[0].sell_price))
-        else if (command == 'wtb' && item_rank == 'unranked')
+        if (command == 'wtb' && item_rank == 'unranked')
             if (res.rows[0].buy_price)
                 avg_price = Math.round(Number(res.rows[0].buy_price))
-        else if (command == 'wts' && item_rank == 'maxed') 
+        if (command == 'wts' && item_rank == 'maxed') 
             if (res.rows[0].maxed_sell_price) 
                 avg_price = Math.round(Number(res.rows[0].maxed_sell_price))
-        else if (command == 'wtb' && item_rank == 'maxed')
+        if (command == 'wtb' && item_rank == 'maxed')
             if (res.rows[0].maxed_buy_price)
                 avg_price = Math.round(Number(res.rows[0].maxed_buy_price))
         return true
