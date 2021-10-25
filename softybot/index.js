@@ -4504,6 +4504,7 @@ async function dc_ducat_update() {
         })
     })
     .catch(err => console.log(err))
+    console.log(invis_filter)
     await db.query(`SELECT * FROM ducat_stacks`)
     .then(async res => {
         res.rows.forEach(element => {
