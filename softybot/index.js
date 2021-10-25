@@ -6376,12 +6376,12 @@ async function trading_bot(message,args,command) {
         price = avg_price
     }
     if (price > (avg_price*1.2)) {
-        message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.reject()
     }
     else if (price < (avg_price*0.8)) {
-        message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err));
+        message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.reject()
     }
@@ -6393,7 +6393,7 @@ async function trading_bot(message,args,command) {
             var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id}`)
             .then(res => {
                 if (res.rowCount >= userOrderLimit) {
-                    message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     return false
                 }
                 return true
@@ -6411,7 +6411,7 @@ async function trading_bot(message,args,command) {
             })
             .catch(err => {
                 if (err.code == '23505') {
-                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
                 }
                 console.log(err)
