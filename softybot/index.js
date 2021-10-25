@@ -6593,7 +6593,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         SELECT * FROM users_orders 
         JOIN users_list ON users_orders.discord_id=users_list.discord_id 
         JOIN items_list ON users_orders.item_id=items_list.id 
-        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true 
+        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true AND user_rank = '${item_rank}'
         ORDER BY users_orders.user_price DESC,users_orders.update_timestamp`)
         .then(res => {
             if (res.rows.length == 0)
