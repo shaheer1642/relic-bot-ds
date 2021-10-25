@@ -4504,7 +4504,6 @@ async function dc_ducat_update() {
         })
     })
     .catch(err => console.log(err))
-    console.log(invis_filter)
     await db.query(`SELECT * FROM ducat_stacks`)
     .then(async res => {
         res.rows.forEach(element => {
@@ -4577,6 +4576,11 @@ async function dc_ducat_update() {
                             if (member.presence) {
                                 if (member.presence.status == 'dnd') {
                                     if (dnd_filter.includes(member.id))
+                                        if (!user_mentions.includes(`<@${member.id}>`))
+                                            user_mentions.push(`<@${member.id}>`)
+                                }
+                                else if (member.presence.status == 'offline') {
+                                    if (invis_filter.includes(member.id))
                                         if (!user_mentions.includes(`<@${member.id}>`))
                                             user_mentions.push(`<@${member.id}>`)
                                 }
