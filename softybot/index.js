@@ -6400,7 +6400,7 @@ async function trading_bot(message,args,command) {
             })
             if (!status)
                 return false
-            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,user_rank,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},${item_rank},true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,user_rank,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},'${item_rank}',true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
             .then(res => {
                 return true
             })
