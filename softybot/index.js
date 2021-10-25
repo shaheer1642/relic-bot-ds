@@ -5941,7 +5941,8 @@ async function trading_bot(message,args,command) {
         list_low = true
         args.pop()
     }
-    if (args[args.length-1].match(/[0-9]/))
+    args[args.length-1] = args[args.length-1].replace('p','').replace('plat','')
+    if (args[args.length-1].match(/[0-9]/) && !args[args.length-1].match(/[a-zA-Z]/))
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
     if (price < 0) {
         message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
