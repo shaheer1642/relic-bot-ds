@@ -4504,7 +4504,7 @@ async function dc_ducat_update() {
         })
     })
     .catch(err => console.log(err))
-    await db.query(`SELECT * FROM ducat_stacks`)
+    await db.query(`SELECT * FROM ducat_stacks ORDER BY id_no`)
     .then(async res => {
         res.rows.forEach(element => {
             if (element.type == 'role_1')
