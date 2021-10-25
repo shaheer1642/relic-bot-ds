@@ -5938,15 +5938,17 @@ async function trading_bot(message,args,command) {
     var price = 0
     var list_low = false
     var isMaxed = false
+    var index = 0
     while(index !== -1) {
-        var index = args.indexOf('auto');
+        index = args.indexOf('auto');
         if (index !== -1) {
             list_low = true
             args.splice(index, 1);
         }
     }
+    var index = 0
     while(index !== -1) {
-        var index = args.indexOf('maxed');
+        index = args.indexOf('maxed');
         if (index !== -1) {
             isMaxed = true
             args.splice(index, 1);
