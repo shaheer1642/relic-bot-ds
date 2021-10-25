@@ -6069,10 +6069,9 @@ async function trading_bot(message,args,command) {
         message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         return Promise.resolve()
     }
+    var item_rank = 'unranked'
     if (isMaxed)
-        const item_rank = 'maxed'
-    else
-        const item_rank = 'unranked'
+        item_rank = 'maxed'
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     const originGuild = message.guild.name
     const originMessage = message
