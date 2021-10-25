@@ -328,10 +328,10 @@ client.on('messageCreate', async message => {
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
                 return Promise.resolve()
             }
-            const args = commandsArr[commandsArrIndex].toLowerCase().trim().split(/ +/g)
+            const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             const command = args.shift()
     
-            if (command == 'wts' || command == 'wtb') {
+            if (command.toLowerCase() == 'wts' || command.toLowerCase() == 'wtb') {
                 /*
                 if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
                     message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
