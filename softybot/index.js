@@ -5986,11 +5986,9 @@ async function trading_bot(message,args,command) {
     d_item_url = d_item_url.replace(/_p$/,'_prime')
     d_item_url = d_item_url.replace('_p_','_prime_')
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
-    /*
     if (d_item_url.match('lith') || d_item_url.match('meso') || d_item_url.match('neo') || d_item_url.match('axi'))
         if (!d_item_url.match('_relic'))
             d_item_url += '_relic'
-    */
     var arrItems = []
     var items_list = []
     console.log('Retrieving Database -> items_list')
