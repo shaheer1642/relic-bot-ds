@@ -5937,10 +5937,27 @@ axiosRetry(axios, {
 async function trading_bot(message,args,command) {
     var price = 0
     var list_low = false
+    var isMaxed = false
+    while(index !== -1) {
+        var index = args.indexOf('auto');
+        if (index !== -1) {
+            list_low = true
+            args.splice(index, 1);
+        }
+    }
+    while(index !== -1) {
+        var index = args.indexOf('maxed');
+        if (index !== -1) {
+            isMaxed = true
+            args.splice(index, 1);
+        }
+    }
+    /*
     if (args[args.length-1] == 'auto') {
         list_low = true
         args.pop()
     }
+    */
     args[args.length-1] = args[args.length-1].replace('p','').replace('plat','')
     if (args[args.length-1].match(/[0-9]/) && !args[args.length-1].match(/[a-zA-Z]/))
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
@@ -6030,41 +6047,32 @@ async function trading_bot(message,args,command) {
                 if (!status)      
                     return Promise.reject()
             }
-            if (!element.rank) {
-                if (element.tags.includes("set")) {
-                    arrItems = []
-                    arrItems.push(element);
-                    break
-                }
+            if (element.tags.includes("set")) {
+                arrItems = []
                 arrItems.push(element);
+                break
             }
+            arrItems.push(element);
         }
     }
     if (arrItems.length==0) {
         message.channel.send("⚠️ Item **" + d_item_url + "** either does not exist or is an unsupported item at the moment (might be a mod or arcane). ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         return Promise.resolve()
     }
-    /*
-    if (arrItems[i].tags.includes("set")) {
-        var i = 0
-        var MaxIndex = arrItems.length
-        for (var i=0; i <= MaxIndex-1; i++)
-        {
-            if (!arrItems[i].tags.includes("set"))
-            {
-                arrItems.splice(i, 1)
-                i--
-            }
-            MaxIndex = arrItems.length
-        }
-    }
-    */
     if (arrItems.length > 1) {
         message.channel.send("⚠️ More than one search results detected for the item **" + d_item_url + "**, cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         return Promise.resolve()
     }
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].id
+    if (!arrItems[0].rank && isMaxed) {
+        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        return Promise.resolve()
+    }
+    if (isMaxed)
+        const item_rank = 'maxed'
+    else
+        const item_rank = 'unranked'
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     const originGuild = message.guild.name
     const originMessage = message
@@ -6085,7 +6093,7 @@ async function trading_bot(message,args,command) {
                 SELECT * FROM users_orders 
                 JOIN users_list ON users_list.discord_id = users_orders.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wtb'
+                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wtb' AND users_orders.user_rank = '${item_rank}'
                 ORDER BY users_orders.user_price DESC, users_orders.update_timestamp`)
                 .then(res => {
                     if (res.rows.length > 0)
@@ -6116,7 +6124,7 @@ async function trading_bot(message,args,command) {
                 SELECT * FROM users_orders 
                 JOIN users_list ON users_list.discord_id = users_orders.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wts'
+                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wts' AND users_orders.user_rank = '${item_rank}'
                 ORDER BY users_orders.user_price, users_orders.update_timestamp`)
                 .then(res => {
                     if (res.rows.length > 0)
@@ -6143,7 +6151,7 @@ async function trading_bot(message,args,command) {
             if (open_trade) {
                 console.log(all_orders)
                 if (trader.discord_id != tradee.discord_id) {
-                    var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}'`)
+                    var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}' AND user_rank = '${item_rank}'`)
                     .then(res => {
                         return true
                     })
@@ -6306,7 +6314,7 @@ async function trading_bot(message,args,command) {
         }
     }
     if (list_low) {
-        var status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}'`)
+        var status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}' AND user_rank = '${item_rank}'`)
         .then(res => {
             var all_orders = res.rows
             if (res.rows.length > 0) {
@@ -6332,12 +6340,18 @@ async function trading_bot(message,args,command) {
     var avg_price = null
     status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
     .then(async res => {
-        if (command == 'wts')
+        if (command == 'wts' && item_rank == 'unranked')
             if (res.rows[0].sell_price) 
                 avg_price = Math.round(Number(res.rows[0].sell_price))
-        if (command == 'wtb')
+        else if (command == 'wtb' && item_rank == 'unranked')
             if (res.rows[0].buy_price)
                 avg_price = Math.round(Number(res.rows[0].buy_price))
+        else if (command == 'wts' && item_rank == 'maxed') 
+            if (res.rows[0].maxed_sell_price) 
+                avg_price = Math.round(Number(res.rows[0].maxed_sell_price))
+        else if (command == 'wtb' && item_rank == 'maxed')
+            if (res.rows[0].maxed_buy_price)
+                avg_price = Math.round(Number(res.rows[0].maxed_buy_price))
         return true
     })
     .catch(err => {
@@ -6366,7 +6380,7 @@ async function trading_bot(message,args,command) {
         return Promise.reject()
     }
     //----verify order in DB----
-    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
             //Check if user has more than limited orders
@@ -6385,7 +6399,7 @@ async function trading_bot(message,args,command) {
             })
             if (!status)
                 return false
-            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,user_rank,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},${item_rank},true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
             .then(res => {
                 return true
             })
@@ -6406,7 +6420,7 @@ async function trading_bot(message,args,command) {
             return false
         }
         else {     //----update existing order in DB----
-            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}'`)
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
             .then(res => {
                 return true
             })
@@ -6434,10 +6448,10 @@ async function trading_bot(message,args,command) {
     if (!status)
         return Promise.reject()
     //------------------
-    const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1)
+    const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
     .then(res => {
         setTimeout(async () => {
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
@@ -6451,7 +6465,7 @@ async function trading_bot(message,args,command) {
             })
             if (!status)
                 return
-            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
             .then(res => {
                 return true
             })
@@ -6460,15 +6474,15 @@ async function trading_bot(message,args,command) {
                 return false
             })
             if (!status) {
-                console.log(`Error setting timeout for order discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}'`)
+                console.log(`Error setting timeout for order discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
                 return Promise.reject()
             }
-            await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
+            await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
                 var postdata = {}
                 postdata.content = " "
                 postdata.embeds = []
                 postdata.embeds.push({
-                    description: `❕ Order Notification ❕\n\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                    description: `❕ Order Notification ❕\n\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                     footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                     timestamp: new Date()
                 })
@@ -6511,15 +6525,7 @@ async function trading_bot(message,args,command) {
     return Promise.resolve()
 }
 
-async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type) {
-    /*
-    if (update_type==3) {
-        for(i=0;i<tradingBotChannels.length;i++) {
-            multiCid = tradingBotChannels[i]
-            var targetChannel = client.channels.cache.get(multiCid)
-        }
-    }
-    */
+async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type,item_rank = 'unranked') {
     for(var i=0;i<tradingBotChannels.length;i++) {
         var multiCid = tradingBotChannels[i]
         console.log(`editing for channel ${multiCid}`)
@@ -6534,7 +6540,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         SELECT * FROM users_orders 
         JOIN users_list ON users_orders.discord_id=users_list.discord_id 
         JOIN items_list ON users_orders.item_id=items_list.id 
-        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true 
+        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true AND user_rank = '${item_rank}'
         ORDER BY users_orders.user_price ASC,users_orders.update_timestamp`)
         .then(res => {
             if (res.rows.length == 0)
@@ -6550,7 +6556,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 }
                 noOfSellers = j
                 var embed = {
-                    title: item_name,
+                    title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
                     thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
                     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                     fields: [
@@ -6602,7 +6608,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 }
                 noOfBuyers = j
                 var embed = {
-                    title: item_name,
+                    title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
                     url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                     thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
                     fields: [
@@ -6639,7 +6645,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             embeds[1].url = null
             embeds[1].thumbnail = null
         }
-        var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
+        var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item 
                 msg = null
@@ -6662,7 +6668,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                         return true
                     })
                     .catch(async err => {     //maybe message does not exist in discord anymore
-                        await db.query(`DELETE FROM messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
+                        await db.query(`DELETE FROM messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid} AND user_rank = '${item_rank}'`).catch(err => console.log(err))
                         msg = null
                         console.log(err)
                         return true
@@ -6685,7 +6691,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 
         if (msg) {
             if (embeds.length==0) {
-                var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id}`)
+                var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id} AND user_rank = '${item_rank}'`)
                 .then(res => msg.delete().catch(err => console.log(err)))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
             }
@@ -6717,7 +6723,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 return Promise.reject()
             await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
-                var status = await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id) VALUES (${multiCid},'${item_id}',${msg.id})`)
+                var status = await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${msg.id},'${item_rank}')`)
                 .then(res => {
                     return true
                 })
@@ -6727,7 +6733,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     return false
                 })
                 if (!status) {
-                    var status = db.query(`SELECT * from messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}'`)
+                    var status = db.query(`SELECT * from messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
                     .then(async res => {
                         if (res.rows.length == 0) {
                             if (originMessage) {
