@@ -7043,7 +7043,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     const item_id = arrItems[0].item_id
     var item_rank = arrItems[0].user_rank
     if (!arrItems[0].rank && isMaxed) {
-        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").catch(err => console.log(err));
         return Promise.resolve()
     }
     var item_rank = 'unranked'
