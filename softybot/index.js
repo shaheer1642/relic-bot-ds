@@ -1390,6 +1390,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             var tempp = reaction.message.embeds[0].fields[0].name.replace('Buyers','wts').replace('Sellers','wtb')
                             args.push(tempp)
                             args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                            if (item_rank == 'maxed')
+                                args.push(item_rank)
                             trading_bot_item_orders(reaction.message,args,2)
                         }
                         return false
@@ -1493,6 +1495,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         tempp = 'wts'
                     args.push(tempp)
                     args.push(all_orders[order_rank].item_url)
+                    if (item_rank == 'maxed')
+                        args.push(item_rank)
                     trading_bot_item_orders(reaction.message,args,2)
                 }
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
@@ -1533,6 +1537,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     tempp = 'wts'
                 args.push(tempp)
                 args.push(all_orders[order_rank].item_url)
+                if (item_rank == 'maxed')
+                    args.push(item_rank)
                 trading_bot_item_orders(reaction.message,args,2)
             }
             const thread = await reaction.message.channel.threads.create({
