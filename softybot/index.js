@@ -7331,7 +7331,7 @@ async function td_set_orders_timeouts() {
                 return
             var item_url = item_detail.item_url
             var item_name = item_detail.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-            await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
+            await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
                 var postdata = {}
                 postdata.content = " "
                 postdata.embeds = []
