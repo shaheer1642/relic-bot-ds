@@ -1361,10 +1361,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var item_url = reaction.message.embeds[0].title.toLowerCase().replace('(maxed)','').replace(/ /g,'_').trim()
                 var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${item_url}'`)
                 .then(res => {
-                    if (res.rows.length == 0)
+                    if (res.rows.length == 0) {
+                        console.log('found 0 items')
                         return false
-                    if (res.rows.length > 1)
+                    }
+                    if (res.rows.length > 1) {
+                        console.log('found more than one items')
                         return false
+                    }
                     search_item_id = res.rows[0].id
                     return true
                 })
