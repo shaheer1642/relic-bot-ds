@@ -7054,7 +7054,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     SELECT * FROM users_orders
     JOIN items_list ON users_orders.item_id=items_list.id 
     JOIN users_list ON users_orders.discord_id=users_list.discord_id 
-    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
+    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
     ORDER BY users_orders.update_timestamp
     `)
     .then(res => {
