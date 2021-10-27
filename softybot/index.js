@@ -36,7 +36,7 @@ var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
 var Ducat_Update_Timer = null
-const u_order_close_time = 15000 //10800000
+const u_order_close_time = 60000 //10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -7287,8 +7287,9 @@ async function td_set_orders_timeouts() {
     async function set_order_timeout(all_orders,after3h,currTime) {
         setTimeout(async () => {
             var item_id = all_orders.item_id
+            var item_rank = all_orders.user_rank
             var order_type = all_orders.order_type
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}'`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
@@ -7302,7 +7303,7 @@ async function td_set_orders_timeouts() {
             })
             if (!status)
                 return
-            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}'`)
             .then(res => {
                 return true
             })
@@ -7335,7 +7336,7 @@ async function td_set_orders_timeouts() {
                 postdata.content = " "
                 postdata.embeds = []
                 postdata.embeds.push({
-                    description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                    description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                     footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                     timestamp: new Date()
                 })
