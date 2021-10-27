@@ -1621,7 +1621,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var postdata = {}
                 postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                 postdata.timestamp = new Date()
-                postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')
                 postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
                 postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[order_rank].icon_url}
                 postdata.description = `
@@ -6186,7 +6186,7 @@ async function trading_bot(message,args,command) {
                         console.log(`${threadName} thread's name is longer than 99`)
                         threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                     }
-                    trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+                    trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(err => console.log(err))
                     const thread = await message.channel.threads.create({
                         name: threadName,
                         autoArchiveDuration: 60,
@@ -6264,7 +6264,7 @@ async function trading_bot(message,args,command) {
                         var postdata = {}
                         postdata.color = target_order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                         postdata.timestamp = new Date()
-                        postdata.title = item_name
+                        postdata.title = item_name + all_orders[0].user_rank.replace('unranked','').replace('maxed',' (maxed)')
                         postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
                         postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
                         postdata.description = `
