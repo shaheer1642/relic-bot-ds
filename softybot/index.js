@@ -1360,8 +1360,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
             }
             var all_orders = []
             var check_msg_id = reaction.message.id
+            var item_rank = "unranked"
+            if (reaction.message.embeds[0].title.toLowerCase().match('(maxed)'))
+                item_rank = "maxed"
             if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
                 var search_item_id = ""
+                var item_url = reaction.message.embeds[0].title.toLowerCase().replace('(maxed)','').replace(/ /g,'_').trim()
                 var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_')}'`)
                 .then(res => {
                     if (res.rows.length == 0)
@@ -1377,7 +1381,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status)
                     return Promise.resolve()
-                var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = '${search_item_id}'`)
+                var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
@@ -1405,7 +1409,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             JOIN users_orders ON messages_ids.item_id = users_orders.item_id
             JOIN users_list ON users_orders.discord_id = users_list.discord_id
             JOIN items_list ON users_orders.item_id = items_list.id
-            WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}'
+            WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
             ORDER BY users_list.ingame_name`)
             .then(res => {
                 if (res.rows.length == 0) {
