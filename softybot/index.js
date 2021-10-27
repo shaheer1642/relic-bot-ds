@@ -1358,7 +1358,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 item_rank = "maxed"
             if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
                 var search_item_id = ""
-                var item_url = reaction.message.embeds[0].title.toLowerCase().replace('(maxed)','').replace(/ /g,'_').trim()
+                var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
+                console.log(item_url)
                 var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${item_url}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
