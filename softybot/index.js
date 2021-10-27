@@ -977,6 +977,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             var all_orders_names = []
             for (var i=0;i<orders_list.length;i++) {
                 var item_id = orders_list[i].item_id
+                var item_rank = orders_list[i].user_rank
                 console.log(item_id)
                 var item_url = ''
                 var item_name = ''
@@ -991,7 +992,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                         return false
                     }
                     item_url = res.rows[0].item_url
-                    item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                    item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
                     all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ')')
                     return true
                 })
@@ -1001,7 +1002,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 })
                 if (!status)
                     return Promise.resolve()
-                await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+                await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(err => console.log(err))
             }
             var postdata = {}
             postdata.content = " "
