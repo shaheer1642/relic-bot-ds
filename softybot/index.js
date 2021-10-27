@@ -2077,7 +2077,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         reaction.message.embeds.forEach((element,index)=> {
             items_list.forEach(element2 => {
                 if (element.title)
-                    if (element2.item_url == element.title.toLowerCase().replace(' (v)','').replace(' (null)','').replace(' (r)','').replace(' (e)','').replace(' (p)','').replace(/ \(updating\.\.\.\)/g,'').replace(/ /g, "_")) {
+                    if (element2.item_url == element.title.toLowerCase().replace(' (v)','').replace(' (null)','').replace(' (r)','').replace(' (e)','').replace(' (p)','').replace(' (b)','').replace(/ \(updating\.\.\.\)/g,'').replace(/ /g, "_")) {
                         arrItems.push(element2);
                         reaction.message.embeds[index].title += ' (Updating...)'
                     }
