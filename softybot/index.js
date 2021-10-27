@@ -6977,6 +6977,15 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             return Promise.resolve()
         }
     }
+    var isMaxed = false
+    var index = 0
+    while(index !== -1) {
+        index = args.indexOf('maxed') || args.indexOf('max');
+        if (index !== -1) {
+            isMaxed = true
+            args.splice(index, 1);
+        }
+    }
     var order_type = args.shift()
     if (order_type == 'wts')
         order_type = 'wtb'
@@ -7033,6 +7042,13 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].item_id
     var item_rank = arrItems[0].user_rank
+    if (!arrItems[0].rank && isMaxed) {
+        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        return Promise.resolve()
+    }
+    var item_rank = 'unranked'
+    if (isMaxed)
+        item_rank = 'maxed'
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     var all_orders = []
     var status = await db.query(`
@@ -7132,7 +7148,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
         return Promise.reject()
     }
-    postdata.embeds[0].title = item_name
+    postdata.embeds[0].title = item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)')
     postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
     postdata.embeds[0].thumbnail = {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
     console.log(JSON.stringify(postdata))
