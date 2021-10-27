@@ -6860,11 +6860,11 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     var buy_prices = []
     orders.forEach((e,index) => {
         if (e.order_type == 'wts') {
-            sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+            sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
             sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
         }
         if (e.order_type == 'wtb') {
-            buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+            buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
             buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
         }
     })
@@ -7041,7 +7041,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     var all_orders = []
     var status = await db.query(`
-    SELECT * FROM users_orders 
+    SELECT * FROM users_orders
     JOIN items_list ON users_orders.item_id=items_list.id 
     JOIN users_list ON users_orders.discord_id=users_list.discord_id 
     WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
