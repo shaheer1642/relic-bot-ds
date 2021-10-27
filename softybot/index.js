@@ -1376,6 +1376,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     return true
                 })
                 .catch(err => {
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     console.log(err)
                     return false
                 })
@@ -1404,6 +1405,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (!status)
                     return Promise.resolve()
             }
+            console.log('after spam check')
             var status = await db.query(`
             SELECT * FROM messages_ids
             JOIN users_orders ON messages_ids.item_id = users_orders.item_id
