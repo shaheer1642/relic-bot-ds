@@ -7007,6 +7007,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     console.log('Retrieving Database -> items_list')
     var status = await db.query(`SELECT * FROM items_list`)
     .then(res => {
+        console.log('Retrieving Database -> items_list success')
         items_list = res.rows
         return true
     })
@@ -7039,6 +7040,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
+    console.log(arrItems)
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].item_id
     if (!arrItems[0].rank && isMaxed) {
@@ -7054,7 +7056,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     SELECT * FROM users_orders
     JOIN items_list ON users_orders.item_id=items_list.id 
     JOIN users_list ON users_orders.discord_id=users_list.discord_id 
-    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}'
+    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
     ORDER BY users_orders.update_timestamp
     `)
     .then(res => {
