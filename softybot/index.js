@@ -7041,7 +7041,6 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     }
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].item_id
-    var item_rank = arrItems[0].user_rank
     if (!arrItems[0].rank && isMaxed) {
         message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").catch(err => console.log(err));
         return Promise.resolve()
