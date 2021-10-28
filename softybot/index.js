@@ -1590,8 +1590,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
                 var status = await db.query(`
                 INSERT INTO filled_users_orders
-                (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id,trade_timestamp)
-                VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}',${all_orders[order_rank].user_price},${cross_thread_id},${cross_channel_id},${new Date().getTime()})
+                (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
+                VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                 `)
                 .then(res => {
                     return true
@@ -6238,8 +6238,8 @@ async function trading_bot(message,args,command) {
                         }
                         var status = await db.query(`
                         INSERT INTO filled_users_orders
-                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,cross_thread_id,cross_channel_id,trade_timestamp)
-                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},${cross_thread_id},${cross_channel_id},${new Date().getTime()})
+                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
+                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},'${item_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                         `)
                         .then(res => {
                             return true
