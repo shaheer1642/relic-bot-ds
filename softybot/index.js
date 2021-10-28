@@ -36,7 +36,7 @@ var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
 var Ducat_Update_Timer = null
-const u_order_close_time = 10800000
+const u_order_close_time = 15000 //10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -395,6 +395,7 @@ client.on('messageCreate', async message => {
                 for (var items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
                     var item_id = items_ids[items_ids_index].item_id
                     var order_type = items_ids[items_ids_index].order_type
+                    var item_rank = items_ids[items_ids_index].user_rank
                     var item_url = ''
                     var item_name = ''
                     var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}'`)
@@ -419,16 +420,16 @@ client.on('messageCreate', async message => {
                         return Promise.resolve()
                     }
                     console.log(`updating order ${item_name} for ${message.author.username}`)
-                    await InitializeOrdersUpdate(message,item_id,item_url,item_name,1,order_type).catch(err => {
+                    await InitializeOrdersUpdate(message,item_id,item_url,item_name,1,order_type,item_rank).catch(err => {
                         console.log(err)
                         return Promise.resolve()
                     })
-                    async function InitializeOrdersUpdate(message,item_id,item_url,item_name,update_type,order_type) {
-                        var func = await trading_bot_orders_update(message,item_id,item_url,item_name,update_type)
+                    async function InitializeOrdersUpdate(message,item_id,item_url,item_name,update_type,order_type,item_rank) {
+                        var func = await trading_bot_orders_update(message,item_id,item_url,item_name,update_type,item_rank)
                         .then(res => {
                             console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
                             setTimeout(async () => {
-                                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank = '${item_rank}'`)
                                 .then(res => {
                                     if (res.rows.length == 0)
                                         return false
@@ -442,7 +443,7 @@ client.on('messageCreate', async message => {
                                 })
                                 if (!status)
                                     return
-                                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank = '${item_rank}'`)
                                 .then(res => {
                                     return true
                                 })
@@ -455,12 +456,12 @@ client.on('messageCreate', async message => {
                                     return
                                 }
                                 console.log(`Updating orders username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type} (auto-closure)`)
-                                await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(async res => {
+                                await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
                                     var postdata = {}
                                     postdata.content = " "
                                     postdata.embeds = []
                                     postdata.embeds.push({
-                                        description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                                        description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                                         footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                                         timestamp: new Date()
                                     })
