@@ -1105,8 +1105,8 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
-            all_orders.forEach(e => {
-                var func = await trading_bot_orders_update(null,item_id,item_url,item_name,2,e.user_rank).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}`))
+            all_orders.forEach(async e => {
+                await trading_bot_orders_update(null,item_id,item_url,item_name,2,e.user_rank).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}`))
             })
         }
         //----update interaction with new items----
