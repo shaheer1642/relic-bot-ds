@@ -1077,8 +1077,10 @@ client.on('interactionCreate', async interaction => {
             console.log(`removing item order ${item_name}`)
             //----check if order was visible----
             var visibility = false
+            var all_orders = null
             var status = await db.query(`SELECT * FROM users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
             .then(res => {
+                all_orders = res.rows
                 if (res.rows[0])
                     if (res.rows[0].visibility == true)
                         visibility = true
@@ -1103,13 +1105,17 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
-            if (visibility) {
-                var func = await trading_bot_orders_update(null,item_id,item_url,item_name,2).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}`))
-            }
+            all_orders.forEach(e => {
+                var func = await trading_bot_orders_update(null,item_id,item_url,item_name,2,e.user_rank).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}`))
+            })
         }
         //----update interaction with new items----
         let orders = []
-        var status = await db.query(`SELECT * FROM users_orders JOIN items_list ON users_orders.item_id=items_list.id JOIN users_list ON users_orders.discord_id=users_list.discord_id WHERE users_orders.discord_id = ${discord_id}`)
+        var status = await db.query(`
+        SELECT * FROM users_orders 
+        JOIN items_list ON users_orders.item_id=items_list.id 
+        JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+        WHERE users_orders.discord_id = ${discord_id}`)
         .then(async res => {
             if (res.rows.length == 0) {
                 await interaction.editReply({content: 'No more orders found on your profile.',embeds: [],components:[]}).catch(err => console.log(err))
@@ -1135,11 +1141,11 @@ client.on('interactionCreate', async interaction => {
         var buy_prices = []
         orders.forEach((e,index) => {
             if (e.order_type == 'wts') {
-                sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
                 sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
             }
             if (e.order_type == 'wtb') {
-                buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
                 buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
             }
         })
