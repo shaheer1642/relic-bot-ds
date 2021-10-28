@@ -5270,7 +5270,11 @@ async function updateDatabaseItem(db_items_list,item,index) {
         var maxedSellAvgPrice = null
         var rank = null
         itemOrders.data.payload.statistics_closed["90days"].forEach(e => {
-            if (e.mod_rank > 0) {
+            if (item.tags.includes('relic') && e.subtype) {
+                if (e.subtype == 'intact')
+                    sellAvgPrice = e.median
+            }
+            else if (e.mod_rank > 0) {
                 rank = e.mod_rank
                 maxedSellAvgPrice = e.median
             }
