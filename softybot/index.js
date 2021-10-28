@@ -36,7 +36,7 @@ var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
 var Ducat_Update_Timer = null
-const u_order_close_time = 15000 //10800000
+const u_order_close_time = 10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
