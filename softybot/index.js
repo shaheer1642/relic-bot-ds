@@ -2730,7 +2730,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             An order has been filled and thread archived
                             **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
                             **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
-                            **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+                            **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + order_data.user_rank.replace('unranked','').replace('maxed',' (maxed)')}
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                             **Order status:** ${order_status} ${reported_by}
                             **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
