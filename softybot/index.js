@@ -4259,7 +4259,7 @@ async function bought(message,args) {
         var hasFound1 = 0
         ms.forEach(async m => {
             var hasFound2 = 0
-            if ((m.embeds.length == 0) && (m.content.match('Quantity:Price')))
+            if ((m.embeds.length <= 1) && (m.content.match('Quantity:Price')))
             {
                 var whispersArr = m.content.split('\n')
                 var markedSold = 0
