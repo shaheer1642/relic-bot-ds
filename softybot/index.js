@@ -3343,6 +3343,7 @@ async function relics(message,args) {
                 }
             }
         }
+        console.log(relics)
         var relics_timestamps = []
         for (var l=0; l < relics.length; l++) {
             var element = relics[l]
