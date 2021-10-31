@@ -4426,7 +4426,7 @@ async function user_query(message,args) {
                         if (e3.item_url == e2)
                             if (e3.ducat)
                                 if (e3.ducat == args[1])
-                                    relics_list.push(e1)
+                                    relics_list.push({relic: e1.item_url,drop: e3.item_url})
                     }
                 })
             }
@@ -4435,7 +4435,7 @@ async function user_query(message,args) {
     console.log(relics_list)
     var str = ''
     relics_list.forEach(e => {
-        str += e.item_url + '\n'
+        str += e.relic + '(' + e.drop + ')' + '\n'
     })
     str.trimRight()
     message.channel.send({content: ' ',embeds: [{description: `Relics matching your criteria:\n**${str}**`}]})
