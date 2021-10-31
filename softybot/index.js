@@ -4423,10 +4423,10 @@ async function user_query(message,args) {
                 e1.rewards[(args[0])].forEach(e2 => {
                     for (var i=0;i<items_list.length;i++) {
                         var e3 = items_list[i]
-                        if (e3.item_url == e2) {
-                            if (e3.ducat_value == args[1])
-                                relics_list.push(e1)
-                        }
+                        if (e3.item_url == e2)
+                            if (e3.ducat)
+                                if (e3.ducat == args[1])
+                                    relics_list.push(e1)
                     }
                 })
             }
