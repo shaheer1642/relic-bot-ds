@@ -3308,7 +3308,7 @@ async function relics(message,args) {
         console.log(best_rare)
         for (var l=0; l < tier_names.length; l++)
         {
-            if (JSON.stringify(best_common[(tier_names[l])]) != "[]")
+            if (best_common[(tier_names[l])].length != 0)
             {
                 var relics = ""
                 for (var m=0; m < best_common[(tier_names[l])].length; m++)
@@ -3324,7 +3324,7 @@ async function relics(message,args) {
         {
             for (var l=0; l < tier_names.length; l++)
             {
-                if (JSON.stringify(best_uncommon[(tier_names[l])]) != "[]")
+                if (best_uncommon[(tier_names[l])].length != 0)
                 {
                     var relics = ""
                     for (var m=0; m < best_uncommon[(tier_names[l])].length; m++)
@@ -3341,7 +3341,7 @@ async function relics(message,args) {
         {
             for (var l=0; l < tier_names.length; l++)
             {
-                if (JSON.stringify(best_rare[(tier_names[l])]) != "[]")
+                if (best_rare[(tier_names[l])].length != 0)
                 {
                     var relics = ""
                     for (var m=0; m < best_rare[(tier_names[l])].length; m++)
