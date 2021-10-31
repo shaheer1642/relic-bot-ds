@@ -3348,7 +3348,10 @@ async function relics(message,args) {
             var element = relics[l]
             await db.query(`SELECT * from items_list WHERE item_url = '${element}'`)
             .then(res => {
-                relics_timestamps.push({link: element, vault_timestamp: res.rows[0].vault_timestamp})
+                if (res.rows[0].vault_timestamp)
+                    relics_timestamps.push({link: element, vault_timestamp: res.rows[0].vault_timestamp})
+                else
+                    relics_timestamps.push({link: element, vault_timestamp: 0})
             })
             .catch(err => console.log(err))
         }
