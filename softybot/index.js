@@ -3247,12 +3247,7 @@ async function relics(message,args) {
                     str1 = "`" + str1 + "`"
                 value += ":brown_circle: " + str1 + "\n"
                 if (relic_drops.rewards.common[m] == arrItemsUrl[i])
-                {
-                    var relic_name = part_info.relics[l].link
-                    let temp = relic_name.split("_")
-                    var relic_tier = temp[0]
-                    best_common[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                }
+                    best_common[relic_tier].push(part_info.relics[l].link)
             }
             if (relic_drops.rewards.common.length < 3)
                 value += ":brown_circle: Forma Blueprint\n"
@@ -3263,12 +3258,7 @@ async function relics(message,args) {
                     str1 = "`" + str1 + "`"
                 value += ":white_circle: " + str1 + "\n"
                 if (relic_drops.rewards.uncommon[m] == arrItemsUrl[i])
-                {
-                    var relic_name = part_info.relics[l].link
-                    let temp = relic_name.split("_")
-                    var relic_tier = temp[0]
-                    best_uncommon[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                }
+                    best_uncommon[relic_tier].push(part_info.relics[l].link)
             }
             if (relic_drops.rewards.uncommon.length < 2)
                 value += ":white_circle: Forma Blueprint\n"
@@ -3279,12 +3269,7 @@ async function relics(message,args) {
                     str1 = "`" + str1 + "`"
                 value += ":yellow_circle: " + str1 + "\n"
                 if (relic_drops.rewards.rare[m] == arrItemsUrl[i])
-                {
-                    var relic_name = part_info.relics[l].link
-                    let temp = relic_name.split("_")
-                    var relic_tier = temp[0]
-                    best_rare[relic_tier].push(relic_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                }
+                    best_rare[relic_tier].push(part_info.relics[l].link)
             }
             if (relic_drops.rewards.rare.length < 1)
                 value += ":yellow_circle: Forma Blueprint\n"
@@ -3306,20 +3291,19 @@ async function relics(message,args) {
         console.log(best_common)
         console.log(best_uncommon)
         console.log(best_rare)
+        var relics = ""
         for (var l=0; l < tier_names.length; l++)
         {
             if (best_common[(tier_names[l])].length != 0)
             {
-                var relics = ""
                 for (var m=0; m < best_common[(tier_names[l])].length; m++)
                 {
                     relics += best_common[(tier_names[l])][m] + "|"
                 }
-                relics = relics.substring(0, relics.length - 1)
-                postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
-                break
             }
         }
+        relics = relics.substring(0, relics.length - 1)
+        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
         if (postdata[X].embeds[j].footer.text == "")
         {
             for (var l=0; l < tier_names.length; l++)
