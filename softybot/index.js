@@ -3302,7 +3302,7 @@ async function relics(message,args) {
             }
             postdata[X].embeds[j].fields.push({name: "`" + relic_name + vault_status + "`", "value": value, inline: true})
         }
-        let tier_names = ["lith", "meso", "neo", "axi"]
+        var tier_names = ["lith", "meso", "neo", "axi"]
         console.log(best_common)
         console.log(best_uncommon)
         console.log(best_rare)
@@ -3317,10 +3317,7 @@ async function relics(message,args) {
                 }
             }
         }
-        relics = relics.substring(0, relics.length - 1)
-        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
-        var relics = ""
-        if (postdata[X].embeds[j].footer.text == "")
+        if (relics == "")
         {
             for (var l=0; l < tier_names.length; l++)
             {
@@ -3333,10 +3330,7 @@ async function relics(message,args) {
                 }
             }
         }
-        relics = relics.substring(0, relics.length - 1)
-        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
-        var relics = ""
-        if (postdata[X].embeds[j].footer.text == "")
+        if (relics == "")
         {
             for (var l=0; l < tier_names.length; l++)
             {
