@@ -3338,7 +3338,7 @@ async function relics(message,args) {
                 {
                     for (var m=0; m < best_rare[(tier_names[l])].length; m++)
                     {
-                        relics.push(best_rare[(tier_names[l])][m] + "|")
+                        relics.push(best_rare[(tier_names[l])][m])
                     }
                 }
             }
@@ -3358,8 +3358,8 @@ async function relics(message,args) {
             })
             .catch(err => console.log(err))
         }
-        console.log(JSON.stringify(relics_timestamps))
         relics_timestamps = relics_timestamps.sort(dynamicSortDesc("vault_timestamp"))
+        console.log(JSON.stringify(relics_timestamps))
         if (relics_timestamps.length >= 1)
             postdata[X].embeds[j].footer.text = "Best Relic: " + relics_timestamps[0].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
         i++
