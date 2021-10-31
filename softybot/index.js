@@ -4435,7 +4435,7 @@ async function user_query(message,args) {
     console.log(relics_list)
     var str = ''
     relics_list.forEach(e => {
-        str += e.relic + '(' + e.drop + ')' + '\n'
+        str += e.relic + ' (' + e.drop + ')' + '\n'
     })
     str.trimRight()
     message.channel.send({content: ' ',embeds: [{description: `Relics matching your criteria:\n**${str}**`}]})
