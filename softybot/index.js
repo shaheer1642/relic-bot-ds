@@ -4755,7 +4755,7 @@ async function dc_ducat_update() {
     postdata.content = '```diff\nWhisper List (Beta)```'
     var msg_id_counter = 0
     for (var i=0; i<whisperListArr.length; i++) {
-        if ((postdata.content + whisperListArr[i].whisper).length < 2000)
+        if ((postdata.content + whisperListArr[i].whisper).length < 1900)
             postdata.content += whisperListArr[i].whisper
         else {
             await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'ducat_whispers_msg'`)
