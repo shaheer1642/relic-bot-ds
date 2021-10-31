@@ -4438,7 +4438,11 @@ async function user_query(message,args) {
         str += e.item_url + '\n'
     })
     str.trimRight()
-    message.channel.send({content: ' ',embeds: [{description: `Relics matching your criterea:\n**${str}**`}]}).catch(err => console.log(err))
+    message.channel.send({content: ' ',embeds: [{description: `Relics matching your criteria:\n**${str}**`}]})
+    .catch(err => {
+        console.log(err)
+        message.channel.send('Error sending embed. It might be too large').catch(err => console.log(err))
+    })
     return
 }
 
