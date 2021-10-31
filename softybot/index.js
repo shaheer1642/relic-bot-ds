@@ -3353,7 +3353,7 @@ async function relics(message,args) {
                     if (res.rows[0].vault_timestamp)
                         relics_timestamps.push({link: element, vault_timestamp: Number(res.rows[0].vault_timestamp)})
                     else
-                        relics_timestamps.push({link: element, vault_timestamp: 0})
+                        relics_timestamps.push({link: element, vault_timestamp: 2077444382000})
                 }
             })
             .catch(err => console.log(err))
