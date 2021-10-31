@@ -3352,6 +3352,7 @@ async function relics(message,args) {
             })
             .catch(err => console.log(err))
         }
+        console.log(JSON.stringify(relics_timestamps))
         relics_timestamps = relics_timestamps.sort(dynamicSort("vault_timestamp"))
         postdata[X].embeds[j].footer.text = "Best Relic: " + relics_timestamps[0].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
         i++
