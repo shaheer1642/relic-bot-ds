@@ -3304,40 +3304,38 @@ async function relics(message,args) {
         }
         relics = relics.substring(0, relics.length - 1)
         postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
+        var relics = ""
         if (postdata[X].embeds[j].footer.text == "")
         {
             for (var l=0; l < tier_names.length; l++)
             {
                 if (best_uncommon[(tier_names[l])].length != 0)
                 {
-                    var relics = ""
                     for (var m=0; m < best_uncommon[(tier_names[l])].length; m++)
                     {
                         relics += best_uncommon[(tier_names[l])][m] + "|"
                     }
-                    relics = relics.substring(0, relics.length - 1)
-                    postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
-                    break
                 }
             }
         }
+        relics = relics.substring(0, relics.length - 1)
+        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
+        var relics = ""
         if (postdata[X].embeds[j].footer.text == "")
         {
             for (var l=0; l < tier_names.length; l++)
             {
                 if (best_rare[(tier_names[l])].length != 0)
                 {
-                    var relics = ""
                     for (var m=0; m < best_rare[(tier_names[l])].length; m++)
                     {
                         relics += best_rare[(tier_names[l])][m] + "|"
                     }
-                    relics = relics.substring(0, relics.length - 1)
-                    postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
-                    break
                 }
             }
         }
+        relics = relics.substring(0, relics.length - 1)
+        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
         i++
         j++
     }
