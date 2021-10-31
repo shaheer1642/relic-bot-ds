@@ -2833,7 +2833,9 @@ function help(message,args) {
                     {name: ".relics <prime_item> or <relic_name>", value: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}, 
                     {name: ".auctions <kuva_weapon> <element>", value: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}, 
                     {name: ".list <prime_item> <offset>", value: "List a prime item on warframe.market on your profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}, 
-                    {name: ".relist all <offset>", value: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"}
+                    {name: ".relist all <offset>", value: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"},
+                    {name: ".query <rarity> <ducat>", value: "Show relics that contains X rarity drops worth Y amount of ducats.\nUsage example:\n.query common 45"}
+                    
             ]
         }]
     }
@@ -4387,7 +4389,7 @@ async function launchNuke(message,args) {
 
 async function user_query(message,args) {
     if (args.length == 0) {
-        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        message.channel.send('Show relics that contains X rarity drops worth Y amount of ducats.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
         return
     }
     if (!args[0]) {
