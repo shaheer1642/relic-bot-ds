@@ -3303,6 +3303,9 @@ async function relics(message,args) {
             postdata[X].embeds[j].fields.push({name: "`" + relic_name + vault_status + "`", "value": value, inline: true})
         }
         let tier_names = ["lith", "meso", "neo", "axi"]
+        console.log(best_common)
+        console.log(best_uncommon)
+        console.log(best_rare)
         for (var l=0; l < tier_names.length; l++)
         {
             if (JSON.stringify(best_common[(tier_names[l])]) != "[]")
