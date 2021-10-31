@@ -3344,7 +3344,7 @@ async function relics(message,args) {
             }
         }
         var relics_timestamps = []
-        for (var l=0; l < tier_names.length; l++) {
+        for (var l=0; l < relics.length; l++) {
             var element = relics[l]
             await db.query(`SELECT * from items_list WHERE item_url = '${element}'`)
             .then(res => {
