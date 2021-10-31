@@ -3346,12 +3346,14 @@ async function relics(message,args) {
         var relics_timestamps = []
         for (var l=0; l < relics.length; l++) {
             var element = relics[l]
-            await db.query(`SELECT * from items_list WHERE item_url = '${element}'`)
+            await db.query(`SELECT * FROM items_list WHERE item_url = '${element}'`)
             .then(res => {
-                if (res.rows[0].vault_timestamp)
-                    relics_timestamps.push({link: element, vault_timestamp: res.rows[0].vault_timestamp})
-                else
-                    relics_timestamps.push({link: element, vault_timestamp: 0})
+                if (res.rows.length >= 1) {
+                    if (res.rows[0].vault_timestamp)
+                        relics_timestamps.push({link: element, vault_timestamp: Number(res.rows[0].vault_timestamp)})
+                    else
+                        relics_timestamps.push({link: element, vault_timestamp: 0})
+                }
             })
             .catch(err => console.log(err))
         }
