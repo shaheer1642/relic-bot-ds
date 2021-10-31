@@ -3306,18 +3306,18 @@ async function relics(message,args) {
         console.log(best_common)
         console.log(best_uncommon)
         console.log(best_rare)
-        var relics = ""
+        var relics = []
         for (var l=0; l < tier_names.length; l++)
         {
             if (best_common[(tier_names[l])].length != 0)
             {
                 for (var m=0; m < best_common[(tier_names[l])].length; m++)
                 {
-                    relics += best_common[(tier_names[l])][m] + "|"
+                    relics.push(best_common[(tier_names[l])][m])
                 }
             }
         }
-        if (relics == "")
+        if (relics.length == 0)
         {
             for (var l=0; l < tier_names.length; l++)
             {
@@ -3325,12 +3325,12 @@ async function relics(message,args) {
                 {
                     for (var m=0; m < best_uncommon[(tier_names[l])].length; m++)
                     {
-                        relics += best_uncommon[(tier_names[l])][m] + "|"
+                        relics.push(best_uncommon[(tier_names[l])][m])
                     }
                 }
             }
         }
-        if (relics == "")
+        if (relics.length == 0)
         {
             for (var l=0; l < tier_names.length; l++)
             {
@@ -3338,13 +3338,22 @@ async function relics(message,args) {
                 {
                     for (var m=0; m < best_rare[(tier_names[l])].length; m++)
                     {
-                        relics += best_rare[(tier_names[l])][m] + "|"
+                        relics.push(best_rare[(tier_names[l])][m] + "|")
                     }
                 }
             }
         }
-        relics = relics.substring(0, relics.length - 1)
-        postdata[X].embeds[j].footer.text = "Best Relic(s): " + relics
+        var relics_timestamps = []
+        for (var l=0; l < tier_names.length; l++) {
+            var element = relics[l]
+            await db.query(`SELECT * from items_list WHERE item_url = '${element}'`)
+            .then(res => {
+                relics_timestamps.push({link: element, vault_timestamp: res.rows[0].vault_timestamp})
+            })
+            .catch(err => console.log(err))
+        }
+        relics_timestamps = relics_timestamps.sort(dynamicSort("vault_timestamp"))
+        postdata[X].embeds[j].footer.text = "Best Relic: " + relics_timestamps[0].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
         i++
         j++
     }
