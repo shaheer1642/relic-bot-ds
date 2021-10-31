@@ -884,11 +884,14 @@ client.on('messageCreate', async message => {
                 case 'getmessage':
                     getMessage(message,args)
                     break
+                case 'say':
+                    saySomething(message,args)
+                    break
                 case 'launchnuke':
                     launchNuke(message,args)
                     break
-                case 'say':
-                    saySomething(message,args)
+                case 'query':
+                    user_query(message,args)
                     break
                 /*----------------------
                 case 'test':
@@ -4379,6 +4382,63 @@ async function launchNuke(message,args) {
             }
         ]
     }).catch(err => console.log(err));
+    return
+}
+
+async function user_query(message,args) {
+    if (args.length == 0) {
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (!args[0]) {
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (!args[1]) {
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (args[2]) {
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (args[0] != 'common' && args[0] != 'uncommon' && args[0] != 'rare') {
+        message.channel.send('Invalid rarity.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (args[1] != 15 && args[1] != 25 && args[1] != 45 && args[1] != 65 && args[1] != 100) {
+        message.channel.send('Invalid ducat value.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    var items_list = []
+    await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+    })
+    .catch(err => console.log(err))
+    var relics_list = []
+    items_list.forEach(e1 => {
+        if (e1.tags.includes('relic')) {
+            if (e1.rewards) {
+                e1.rewards[(args[0])].forEach(e2 => {
+                    for (var i=0;i<items_list.length;i++) {
+                        var e3 = items_list[i]
+                        if (e3.item_url == e2) {
+                            if (e3.ducat_value == args[1])
+                                relics_list.push(e1)
+                        }
+                    }
+                })
+            }
+        }
+    })
+    console.log(relics_list)
+    var str = ''
+    relics_list.forEach(e => {
+        str += e.item_url + '\n'
+    })
+    str.trimRight()
+    message.channel.send({content: ' ',embeds: [{description: `Relics matching your criterea:\n**${str}**`}]}).catch(err => console.log(err))
     return
 }
 
