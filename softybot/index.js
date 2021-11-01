@@ -5940,16 +5940,18 @@ async function update_wfm_items_list() {
         return false
     })
     var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
-    wh_dbManager.editMessage('904787434942902272', {
-        content: "test", 
+
+    wh_dbManager.send({
+        content: "items_list_id001",
         files: [
-            /*
             {
                 attachment: buffer_items_list,
                 name: 'items_list.json'
             }
-            */
         ]
+    })
+    .then(res => {
+        wh_dbManager.send(res.id).catch(err => console.log(err))
     })
     .catch(err => {
         console.log(err)
