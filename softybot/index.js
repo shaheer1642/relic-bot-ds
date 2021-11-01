@@ -3409,7 +3409,7 @@ async function auctions(message,args) {
     let arrItemsUrl = []
     var WFM_Lich_List = []
     console.log('Retrieving Database -> lich_list')
-    var status = await db.query(`SELECT * lich_list`)
+    var status = await db.query(`SELECT * FROM lich_list`)
     .then(res => {
         WFM_Lich_List = res.rows
         console.log('Retrieving Database -> lich_list success')
