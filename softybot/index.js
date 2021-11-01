@@ -5940,9 +5940,10 @@ async function update_wfm_items_list() {
         return false
     })
     var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
-
+    const message = await wh_dbManager.fetchMessage('904790735499448350').catch(err => console.log(err))
+    wh_dbManager.deleteMessage(message.content).catch(err => console.log(err))
     wh_dbManager.send({
-        content: "items_list_id001",
+        content: " ",
         files: [
             {
                 attachment: buffer_items_list,
@@ -5951,12 +5952,10 @@ async function update_wfm_items_list() {
         ]
     })
     .then(res => {
-        wh_dbManager.send(res.id).catch(err => console.log(err))
-    })
-    .catch(err => {
-        console.log(err)
-        wh_dbManager.send('Some error occured editing message. Please contact MrSofty#7926').catch(err => console.log(err))
-    })
+        wh_dbManager.editMessage('904790735499448350', {
+            content: res.id
+        }).catch(err => console.log(err))
+    }).catch(err => console.log(err))
     //retrieve wfm items list
     console.log('Updating database url')
     const c = client.channels.cache.get('857773009314119710')
