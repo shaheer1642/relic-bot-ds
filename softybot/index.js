@@ -5940,7 +5940,7 @@ async function update_wfm_items_list() {
         return false
     })
     var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
-    wh_dbManager.send({
+    wh_dbManager.editMessage('904787434942902272', {
         content: " ", 
         files: [
             {
@@ -5951,7 +5951,7 @@ async function update_wfm_items_list() {
     })
     .catch(err => {
         console.log(err)
-        wh_dbManager.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
+        wh_dbManager.send('Some error occured editing message. Please contact MrSofty#7926').catch(err => console.log(err))
     })
     //retrieve wfm items list
     console.log('Updating database url')
