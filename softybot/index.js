@@ -13,6 +13,7 @@ const { doesNotMatch } = require('assert');
 const { Console } = require('console');
 const { resolve } = require('path');
 */
+const wh_dbManager = new WebhookClient({url: 'https://discord.com/api/webhooks/904760618857406535/yycp4Q6nehELqLArcZnXNITD8X7vGAeBd-CnQ1EnEwxyh_bg4tuy7V-H5lFGnz0Hrt9P'});
 const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
 const ducatRolesMessageId = "899402069159608320"
@@ -5938,9 +5939,8 @@ async function update_wfm_items_list() {
         console.log(err)
         return false
     })
-    const channel = client.channels.cache.get('857773009314119710')
     var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
-    channel.send({
+    wh_dbManager.send({
         content: " ", 
         files: [
             {
@@ -5951,7 +5951,7 @@ async function update_wfm_items_list() {
     })
     .catch(err => {
         console.log(err)
-        channel.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
+        wh_dbManager.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
     })
     //retrieve wfm items list
     console.log('Updating database url')
