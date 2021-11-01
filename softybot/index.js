@@ -3407,30 +3407,24 @@ async function auctions(message,args) {
     });
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     let arrItemsUrl = []
-    //var WFM_Lich_List = require('../WFM_Lich_List.json')
-    //const filecontent = fs.readFileSync('../WFM_Lich_List.json', 'utf8').replace(/^\uFEFF/, '')
-    //let WFM_Lich_List = JSON.parse(filecontent)
-    let WFM_Lich_List = []
-    console.log('Retrieving Database -> wfm_lich_list')
-    var status = await db.query(`SELECT wfm_lich_list FROM files where id = 1`)
+    var WFM_Lich_List = []
+    console.log('Retrieving Database -> lich_list')
+    var status = await db.query(`SELECT * lich_list`)
     .then(res => {
-        WFM_Lich_List = res.rows[0].wfm_lich_list
-        console.log('Retrieving Database -> wfm_lich_list success')
-        return 1
+        WFM_Lich_List = res.rows
+        console.log('Retrieving Database -> lich_list success')
+        return true
     })
     .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
-        console.log(err)
-        console.log('Retrieving Database -> wfm_lich_list error')
+        console.log(err + 'Retrieving Database -> lich_list error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        return 0
+        return false
     })
     if (!status)
         return
     WFM_Lich_List.forEach(element => {
-        if (element.url_name.match(d_item_url))
-            arrItemsUrl.push(element.url_name)
+        if (element.weapon_url.match(d_item_url))
+            arrItemsUrl.push(element.weapon_url)
     })
     if (arrItemsUrl.length==0)
     {
@@ -5235,11 +5229,11 @@ async function updateDatabaseItems(up_origin) {
                     return false
             }
         }
-        console.log('Scanned DB items list.')
+        console.log('Scanned DB lich list.')
         return true
     })
     .catch (err => {
-        console.log(err + 'Error retrieving DB items list.')
+        console.log(err + 'Error retrieving DB lich list.')
         return false
     })
     if (!status) {
