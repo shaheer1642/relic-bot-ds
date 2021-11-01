@@ -5941,12 +5941,14 @@ async function update_wfm_items_list() {
     })
     var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
     wh_dbManager.editMessage('904787434942902272', {
-        content: " ", 
+        content: "test", 
         files: [
+            /*
             {
                 attachment: buffer_items_list,
                 name: 'items_list.json'
             }
+            */
         ]
     })
     .catch(err => {
