@@ -102,6 +102,8 @@ client.on('ready', () => {
 
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
+
+    update_wfm_items_list()
 })
 
 client.on('messageCreate', async message => {
@@ -5923,6 +5925,34 @@ async function dc_update_msgs() {
 }
 
 async function update_wfm_items_list() {
+    // post items_list on dc
+    var items_list = []
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        items_list = res.rows
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    const channel = client.channels.cache.get('857773009314119710')
+    var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
+    channel.send({
+        content: " ", 
+        files: [
+            {
+                attachment: buffer_items_list,
+                name: 'items_list.json'
+            }
+        ]
+    })
+    .catch(err => {
+        console.log(err)
+        channel.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
+    })
     //retrieve wfm items list
     console.log('Updating database url')
     const c = client.channels.cache.get('857773009314119710')
