@@ -5094,7 +5094,7 @@ async function updateDatabaseItems(up_origin) {
         console.log('Retrieving DB items list...')
         var status = await db.query(`SELECT * FROM items_list`)
         .then(async res => {
-            db_items_list = res.rows
+            var db_items_list = res.rows
             console.log('Retrieving DB items list success.')
             console.log('Scanning DB items list...')
             for (var i=0; i<wfm_items_list.data.payload.items.length;i++) {
@@ -5185,6 +5185,65 @@ async function updateDatabaseItems(up_origin) {
     })
     if (!func1) {
         console.log('Error occurred updating DB items' + func1)
+        inform_dc('DB update failure.')
+        if (up_origin)
+            up_origin.channel.send('<@253525146923433984> DB update failure.')
+        DB_Updating = false
+        return
+    }
+    else
+        console.log('Verified all items in the DB.')
+    var weapons_list = []
+    console.log('Retrieving WFM kuva lich list')
+    await axios("https://api.warframe.market/v1/lich/weapons")
+    .then(async response => {
+        console.log('Retrieving WFM lich list success')
+        response.data.payload.weapons.forEach(e => {
+            weapons_list.push(e)
+        })
+    }).catch(err => console.log(err + 'Retrieving WFM lich list error'))
+    console.log('Retrieving WFM sister lich list')
+    await axios("https://api.warframe.market/v1/sister/weapons")
+    .then(async response => {
+        console.log('Retrieving WFM sister lich list success')
+        response.data.payload.weapons.forEach(e => {
+            weapons_list.push(e)
+        })
+    })
+    .catch (err => console.log(err + 'Retrieving WFM lich list error'))
+    var status = await db.query(`SELECT * FROM lich_list`)
+    .then(async res => {
+        var db_lich_list = res.rows
+        console.log('Scanning DB lich list...')
+        for (var i=0; i<weapons_list.length;i++) {
+            var exists = Object.keys(db_lich_list).some(function(k) {
+                if (Object.values(db_lich_list[k]).includes(weapons_list[i].id))
+                    return true
+            });
+            if (!exists) {
+                console.log(`${weapons_list[i].url_name} is not in the DB. Adding...`)
+                var status = await db.query(`INSERT INTO lich_list (lich_id,weapon_url,icon_url) VALUES ('${weapons_list[i].id}', '${weapons_list[i].url_name}','${weapons_list[i].thumb}')`)
+                .then(() => {
+                    console.log(`Susccessfully inserted ${weapons_list[i].url_name} into DB.`)
+                    return true
+                })
+                .catch (err => {
+                    console.log(err + `Error inserting ${weapons_list[i].url_name} into DB.`)
+                    return false
+                })
+                if (!status)
+                    return false
+            }
+        }
+        console.log('Scanned DB items list.')
+        return true
+    })
+    .catch (err => {
+        console.log(err + 'Error retrieving DB items list.')
+        return false
+    })
+    if (!status) {
+        console.log('Error occurred updating DB items')
         inform_dc('DB update failure.')
         if (up_origin)
             up_origin.channel.send('<@253525146923433984> DB update failure.')
