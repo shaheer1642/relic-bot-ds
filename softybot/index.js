@@ -3566,7 +3566,7 @@ async function auctions(message,args) {
         d_ownerNames = d_ownerNames.replace("_", "\\_")
         postdata.embeds.push(
             {
-                description: "```fix\n(Sorted by weapon damage```", 
+                description: "```fix\n(Sorted by weapon damage)```", 
                 timestamp: new Date(),
                 fields: [
                     {name: "Owner", value: d_ownerNames, inline: true}, 
