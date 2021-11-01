@@ -1,5 +1,5 @@
 const config = require('./config.json')
-const {Client, Intents, MessageEmbed, MessageReaction} = require('discord.js');
+const {Client, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const https = require('https');
