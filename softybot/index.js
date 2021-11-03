@@ -3647,9 +3647,9 @@ async function list(message,args) {
     //let WFM_Items_List = JSON.parse(filecontent)
     let WFM_Items_List = []
     console.log('Retrieving Database -> wfm_items_list')
-    status = await db.query(`SELECT wfm_items_list FROM files where id = 1`)
+    status = await db.query(`SELECT * FROM items_list`)
     .then(res => {
-        WFM_Items_List = res.rows[0].wfm_items_list
+        WFM_Items_List = res.rows
         console.log('Retrieving Database -> wfm_items_list success')
         return 1
     })
@@ -3666,9 +3666,9 @@ async function list(message,args) {
     //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
     //let WFM_Items_List = JSON.parse(filecontent)
     WFM_Items_List.forEach(element => {
-        if (element.url_name.match('^' + d_item_url + '\W*')) {
-            if ((element.url_name.match("prime")) && !(element.url_name.match("primed")))
-                arrItemsUrl.push({item_url: element.url_name,item_id: element.id});
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
+                arrItemsUrl.push({item_url: element.item_url,item_id: element.id});
         }
     })
     if (JSON.stringify(arrItemsUrl).match("_set")) {
