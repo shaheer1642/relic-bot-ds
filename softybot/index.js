@@ -8,6 +8,8 @@ const fs = require('fs')
 const DB = require('pg');
 const { resolve } = require('path');
 const { time } = require('console');
+const readline = require('readline');
+const {google} = require('googleapis');
 /*
 const { doesNotMatch } = require('assert');
 const { Console } = require('console');
@@ -255,12 +257,8 @@ client.on('messageCreate', async message => {
     for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
-            if (((args[0].toLowerCase() == 'set') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'set'))) {
-                if (!args[2]) {
-                    message.channel.send('Please write a username')
-                    continue
-                }
-                trading_bot_registeration(message,args.pop())
+            if (((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
+                trading_bot_registeration(message)
                 continue
             }
             else if (args[0].toLowerCase() == 'notifications' || args[0].toLowerCase() == 'notification') {
@@ -269,7 +267,7 @@ client.on('messageCreate', async message => {
                 .then(res => {
                     if (res.rows.length==0) {
                         message.author.send({content: "⚠️ Your in-game name is not registered with the bot ⚠️"}).catch(err => console.log(err))
-                        message.author.send({content: "Type the following command to register your ign:\nset ign your_username"}).catch(err => console.log(err))
+                        message.author.send({content: "Type the following command to register your ign:\nverify ign"}).catch(err => console.log(err))
                         return false
                     }
                     user_data = res.rows[0]
@@ -585,7 +583,7 @@ client.on('messageCreate', async message => {
                 .then(res => {
                     if (res.rows.length==0) {
                         message.channel.send({content: "⚠️ Your in-game name is not registered with the bot. Please check your dms ⚠️"}).catch(err => console.log(err))
-                        message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                        message.author.send({content: "Type the following command to register your ign:\nverify ign"})
                         .catch(err => {
                             message.channel.send({content: "🛑 Some error occured sending dm. Please make sure you have dms enabled for the bot 🛑"}).catch(err => console.log(err))
                             console.log(err)
@@ -699,7 +697,7 @@ client.on('messageCreate', async message => {
                 .then(res => {
                     if (res.rows.length==0) {
                         status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
-                        message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                        message.author.send({content: "Type the following command to register your ign:\nverify ign"})
                         .catch(err => {
                             console.log(err)
                             message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
@@ -1355,7 +1353,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (!status) {
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                 reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 10000))
-                user.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                user.send({content: "Type the following command to register your ign:\nverify ign"})
                 .catch(err=> {
                     console.log(err)
                     reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 10000))
@@ -6093,7 +6091,7 @@ async function trading_bot(message,args,command) {
     if (!status) {
         message.channel.send({content: `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`}).then(msg => setTimeout(() => msg.delete(), 5000))
         try {
-            message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+            message.author.send({content: "Type the following command to register your ign:\nverify ign"})
         } catch (err) {
             message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         }
@@ -7054,7 +7052,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         .then(res => {
             if (res.rows.length==0) {
                 status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
-                message.author.send({content: "Type the following command to register your ign:\nset ign your_username"})
+                message.author.send({content: "Type the following command to register your ign:\nverify ign"})
                 .catch(err => {
                     console.log(err)
                     message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
@@ -7278,72 +7276,32 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     return Promise.resolve()
 }
 
-async function trading_bot_registeration(message,ingame_name) {
-    var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`).then(res => {
-        if (res.rows.length == 0)
-            return true
-        else
-            return false
-    })
-    .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
-        console.log(err)
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
-        .catch(err => console.log(err + '\nError sending dm to user.'))
-        return false
-    })
-    if (!status) {
-        message.channel.send(`The given ign already exists. If any issue, contact MrSofty#7926`)
-        .catch(err => console.log(err + '\nError sending dm to user.'))
-        return
-    }
-    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = '${message.author.id}'`)
-    .then(res => {
-        if (res.rows.length == 0)   //record does not exist
-            return false
-        else 
-            return true
-    })
-    .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
-        console.log(err)
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 501"})
-        .catch(err => console.log(err + '\nError sending dm to user.'))
-        return false
-    })
-    if (status) {
-        var status = await db.query(`UPDATE users_list SET ingame_name = '${ingame_name}' WHERE discord_id = ${message.author.id}`).then(res => {
-            console.log(res)
-            message.channel.send(`Your ign has been set to **${ingame_name}**`)
-            .catch(err => console.log(err + '\nError sending dm to user.'))
-            return true
-        })
-        .catch (err => {
-            if (err.response)
-                console.log(err.response.data)
-            console.log(err)
-            message.channel.send({content: "Some error occured updating record in the database.\nError code: 502"})
-            .catch(err => console.log(err + '\nError sending dm to user.'))
-            return false
-        })
-        return
-    }
-    var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name) values (${message.author.id},'${ingame_name}')`).then(res => {
-        console.log(res)
-        message.channel.send(`Your ign has been set to **${ingame_name}**`)
-        .catch(err => console.log(err + '\nError sending dm to user.'))
+async function trading_bot_registeration(message) {
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`).then(res => {
+        if (res.rows.length != 0)
+            message.channel.send(`Note: Your ign has already been verified. It will be updated about re-verification`).catch(err => console.log(err))
         return true
     })
     .catch (err => {
-        if (err.response)
-            console.log(err.response.data)
         console.log(err)
-        message.channel.send({content: "Some error occured inserting record into database.\nError code: 503"})
-        .catch(err => console.log(err + '\nError sending dm to user.'))
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"}).catch(err => console.log(err))
         return false
     })
+    if (!status)
+        return
+    const uni_id = generateId()
+    var status = await db.query(`INSERT INTO users_unverified (id,discord_id) VALUES ('${uni_id}',${message.author.id})`)
+    .then(res => {
+        return true
+    }).catch(err => {
+        console.log(err)
+        message.channel.send({content: "Some error occured inserting record into db.\nError code: 501"}).catch(err => console.log(err))
+        return false
+    })
+    if (!status)
+        return
+    message.channel.send(`~~Verification tutorial place-holder~~`)
+    message.channel.send('Your unique id: ' + uni_id)
     return
 }
 
@@ -7487,3 +7445,165 @@ async function td_set_orders_timeouts() {
         }, after3h - currTime);
     }
 }
+
+//==================================== GMAIL API =============================================
+// If modifying these scopes, delete token.json.
+const SCOPES = [
+  'https://www.googleapis.com/auth/gmail.readonly',
+  'https://www.googleapis.com/auth/gmail.modify'
+];
+// The file token.json stores the user's access and refresh tokens, and is
+// created automatically when the authorization flow completes for the first
+const TOKEN_PATH = 'token.json';
+
+async function gmail_check_messages() {
+  // Load client secrets from a local file.
+  fs.readFile('credentials.json', (err, content) => {
+    if (err) return console.log('Error loading client secret file:', err);
+    // Authorize a client with credentials, then call the Gmail API.
+    authorize(JSON.parse(content), gmail_api_call);
+  });
+}
+/**
+ * Create an OAuth2 client with the given credentials, and then execute the
+ * given callback function.
+ * @param {Object} credentials The authorization client credentials.
+ * @param {function} callback The callback to call with the authorized client.
+ */
+function authorize(credentials, callback) {
+  const {client_secret, client_id, redirect_uris} = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(
+      client_id, client_secret, redirect_uris[0]);
+
+  // Check if we have previously stored a token.
+  fs.readFile(TOKEN_PATH, (err, token) => {
+    if (err) return getNewToken(oAuth2Client, callback);
+    oAuth2Client.setCredentials(JSON.parse(token));
+    callback(oAuth2Client);
+  });
+}
+
+/**
+ * Get and store new token after prompting for user authorization, and then
+ * execute the given callback with the authorized OAuth2 client.
+ * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
+ * @param {getEventsCallback} callback The callback for the authorized client.
+ */
+function getNewToken(oAuth2Client, callback) {
+  const authUrl = oAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: SCOPES,
+  });
+  console.log('Authorize this app by visiting this url:', authUrl);
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  rl.question('Enter the code from that page here: ', (code) => {
+    rl.close();
+    oAuth2Client.getToken(code, (err, token) => {
+      if (err) return console.error('Error retrieving access token', err);
+      oAuth2Client.setCredentials(token);
+      // Store the token to disk for later program executions
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+        if (err) return console.error(err);
+        console.log('Token stored to', TOKEN_PATH);
+      });
+      callback(oAuth2Client);
+    });
+  });
+}
+
+/**
+ * Lists the labels in the user's account.
+ *
+ * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
+ */
+async function gmail_api_call(auth) {
+  var gmail = google.gmail({version: 'v1', auth});
+  const msgs = await gmail.users.messages.list({
+    // Include messages from `SPAM` and `TRASH` in the results.
+    //includeSpamTrash: 'placeholder-value',
+    // Only return messages with labels that match all of the specified label IDs.
+    //labelIds: 'placeholder-value',
+    // Maximum number of messages to return. This field defaults to 100. The maximum allowed value for this field is 500.
+    //maxResults: 'placeholder-value',
+    // Page token to retrieve a specific page of results in the list.
+    //pageToken: 'placeholder-value',
+    // Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be used when accessing the api using the gmail.metadata scope.
+    q: `from:noreply@invisioncloudcommunity.com is:unread`,
+    // The user's email address. The special value `me` can be used to indicate the authenticated user.
+    userId: 'me',
+  })
+  if (msgs.data.resultSizeEstimate > 0) {
+    //Read all msgs
+    var ids_list = []
+    await db.query(`SELECT * FROM users_unverified`)
+    .then(res => {
+        ids_list = res.rows
+    })
+    .catch(err => console.log(err))
+    for(var i=0;i<msgs.data.messages.length; i++) {
+      const msg = msgs.data.messages[i]
+      //first mark msg as read
+      await gmail.users.messages.modify({
+        // The ID of the message to modify.
+        id: msg.id,
+        // The user's email address. The special value `me` can be used to indicate the authenticated user.
+        userId: 'me',
+        // Request body metadata
+        requestBody: {
+            removeLabelIds: ['UNREAD']
+        },
+      });
+      const res = await gmail.users.messages.get({
+        // The format to return the message in.
+        //format: 'full',
+        // The ID of the message to retrieve. This ID is usually retrieved using `messages.list`. The ID is also contained in the result when a message is inserted (`messages.insert`) or imported (`messages.import`).
+        id: msg.id,
+        // When given and format is `METADATA`, only include headers specified.
+        //metadataHeaders: 'placeholder-value',
+        // The user's email address. The special value `me` can be used to indicate the authenticated user.
+        userId: 'me',
+      });
+      var part = res.data.payload.parts.filter(function(part) {
+        return part.mimeType == 'text/html';
+      });
+      for (var j=0; j<ids_list.length; j++) {
+        var xx_id = ids_list[j].id
+        var xx_discord = ids_list[j].discord_id
+        if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
+            await db.query(`DELETE FROM users_unverified WHERE id = '${xx_id}'`)
+            const temp = res.data.snippet.split(' ')
+            var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name) values (${xx_discord},'${temp[4]}')`).then(res => {
+                const user = client.users.cache.get(xx_discord)
+                user.send('Welcome **' + temp[4] + '**! Your account has been verified.')
+                .catch(err => console.log(err + '\nError sending dm to user.'))
+                return true
+            })
+            .catch (err => {
+                console.log(err)
+                const user = client.users.cache.get(xx_discord)
+                user.send('Something went wrong verifying your account. Please contact MrSofty#7926')
+                .catch(err => console.log(err + '\nError sending dm to user.'))
+                return false
+            })
+            console.log('Welcome ' + temp[4] + '! Your account has been verified.')
+            break
+        }
+      }
+    }
+  }
+  setTimeout(gmail_check_messages, 1000);
+}
+
+function generateId() {
+  let ID = "";
+  let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  for ( var i = 0; i < 12; i++ ) {
+    ID += characters.charAt(Math.floor(Math.random() * 36));
+  }
+  return ID;
+}
+
+setTimeout(gmail_check_messages, 1000);
