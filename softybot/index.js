@@ -7279,7 +7279,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
 async function trading_bot_registeration(message) {
     var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`).then(res => {
         if (res.rows.length != 0)
-            message.channel.send(`Note: Your ign has already been verified. It will be updated about re-verification`).catch(err => console.log(err))
+            message.channel.send(`Note: Your ign has already been verified. It will be updated upon re-verification`).catch(err => console.log(err))
         return true
     })
     .catch (err => {
