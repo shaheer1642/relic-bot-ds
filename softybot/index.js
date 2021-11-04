@@ -7520,80 +7520,81 @@ function getNewToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function gmail_api_call(auth) {
-  var gmail = google.gmail({version: 'v1', auth});
-  const msgs = await gmail.users.messages.list({
-    // Include messages from `SPAM` and `TRASH` in the results.
-    //includeSpamTrash: 'placeholder-value',
-    // Only return messages with labels that match all of the specified label IDs.
-    //labelIds: 'placeholder-value',
-    // Maximum number of messages to return. This field defaults to 100. The maximum allowed value for this field is 500.
-    //maxResults: 'placeholder-value',
-    // Page token to retrieve a specific page of results in the list.
-    //pageToken: 'placeholder-value',
-    // Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be used when accessing the api using the gmail.metadata scope.
-    q: `from:noreply@invisioncloudcommunity.com is:unread`,
-    // The user's email address. The special value `me` can be used to indicate the authenticated user.
-    userId: 'me',
-  })
-  if (msgs.data.resultSizeEstimate > 0) {
-    //Read all msgs
-    var ids_list = []
-    await db.query(`SELECT * FROM users_unverified`)
-    .then(res => {
-        ids_list = res.rows
-    })
-    .catch(err => console.log(err))
-    for(var i=0;i<msgs.data.messages.length; i++) {
-      const msg = msgs.data.messages[i]
-      //first mark msg as read
-      await gmail.users.messages.modify({
-        // The ID of the message to modify.
-        id: msg.id,
+    var gmail = google.gmail({version: 'v1', auth});
+    const msgs = await gmail.users.messages.list({
+        // Include messages from `SPAM` and `TRASH` in the results.
+        //includeSpamTrash: 'placeholder-value',
+        // Only return messages with labels that match all of the specified label IDs.
+        //labelIds: 'placeholder-value',
+        // Maximum number of messages to return. This field defaults to 100. The maximum allowed value for this field is 500.
+        //maxResults: 'placeholder-value',
+        // Page token to retrieve a specific page of results in the list.
+        //pageToken: 'placeholder-value',
+        // Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be used when accessing the api using the gmail.metadata scope.
+        q: `from:noreply@invisioncloudcommunity.com is:unread`,
         // The user's email address. The special value `me` can be used to indicate the authenticated user.
         userId: 'me',
-        // Request body metadata
-        requestBody: {
-            removeLabelIds: ['UNREAD']
-        },
-      });
-      const res = await gmail.users.messages.get({
-        // The format to return the message in.
-        //format: 'full',
-        // The ID of the message to retrieve. This ID is usually retrieved using `messages.list`. The ID is also contained in the result when a message is inserted (`messages.insert`) or imported (`messages.import`).
-        id: msg.id,
-        // When given and format is `METADATA`, only include headers specified.
-        //metadataHeaders: 'placeholder-value',
-        // The user's email address. The special value `me` can be used to indicate the authenticated user.
-        userId: 'me',
-      });
-      var part = res.data.payload.parts.filter(function(part) {
-        return part.mimeType == 'text/html';
-      });
-      for (var j=0; j<ids_list.length; j++) {
-        var xx_id = ids_list[j].id
-        var xx_discord = ids_list[j].discord_id
-        if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
-            await db.query(`DELETE FROM users_unverified WHERE id = '${xx_id}'`)
-            const temp = res.data.snippet.split(' ')
-            var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name) values (${xx_discord},'${temp[4]}')`).then(res => {
-                const user = client.users.cache.get(xx_discord)
-                user.send('Welcome **' + temp[4] + '**! Your account has been verified.')
-                .catch(err => console.log(err + '\nError sending dm to user.'))
-                return true
-            })
-            .catch (err => {
-                console.log(err)
-                const user = client.users.cache.get(xx_discord)
-                user.send('Something went wrong verifying your account. Please contact MrSofty#7926')
-                .catch(err => console.log(err + '\nError sending dm to user.'))
-                return false
-            })
-            console.log('Welcome ' + temp[4] + '! Your account has been verified.')
-            break
+    });
+    if (msgs.data.resultSizeEstimate > 0) {
+        //Read all msgs
+        var ids_list = []
+        await db.query(`SELECT * FROM users_unverified`)
+        .then(res => {
+            ids_list = res.rows
+        })
+        .catch(err => console.log(err))
+        for(var i=0;i<msgs.data.messages.length; i++) {
+            const msg = msgs.data.messages[i]
+            //first mark msg as read
+            await gmail.users.messages.modify({
+                // The ID of the message to modify.
+                id: msg.id,
+                // The user's email address. The special value `me` can be used to indicate the authenticated user.
+                userId: 'me',
+                // Request body metadata
+                requestBody: {
+                    removeLabelIds: ['UNREAD']
+                },
+            });
+            const res = await gmail.users.messages.get({
+                // The format to return the message in.
+                //format: 'full',
+                // The ID of the message to retrieve. This ID is usually retrieved using `messages.list`. The ID is also contained in the result when a message is inserted (`messages.insert`) or imported (`messages.import`).
+                id: msg.id,
+                // When given and format is `METADATA`, only include headers specified.
+                //metadataHeaders: 'placeholder-value',
+                // The user's email address. The special value `me` can be used to indicate the authenticated user.
+                userId: 'me',
+            });
+            console.log('Received email on google: ' + res.data.snippet)
+            var part = res.data.payload.parts.filter(function(part) {
+                return part.mimeType == 'text/html';
+            });
+            for (var j=0; j<ids_list.length; j++) {
+                var xx_id = ids_list[j].id
+                var xx_discord = ids_list[j].discord_id
+                if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
+                    await db.query(`DELETE FROM users_unverified WHERE id = '${xx_id}'`)
+                    const temp = res.data.snippet.split(' ')
+                    var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name) values (${xx_discord},'${temp[4]}')`).then(res => {
+                        const user = client.users.cache.get(xx_discord)
+                        user.send('Welcome **' + temp[4] + '**! Your account has been verified.')
+                        .catch(err => console.log(err + '\nError sending dm to user.'))
+                        return true
+                    })
+                    .catch (err => {
+                        console.log(err)
+                        const user = client.users.cache.get(xx_discord)
+                        user.send('Something went wrong verifying your account. Please contact MrSofty#7926')
+                        .catch(err => console.log(err + '\nError sending dm to user.'))
+                        return false
+                    })
+                    console.log('Welcome ' + temp[4] + '! Your account has been verified.')
+                    break
+                }
+            }
         }
-      }
     }
-  }
   setTimeout(gmail_check_messages, 1000);
 }
 
