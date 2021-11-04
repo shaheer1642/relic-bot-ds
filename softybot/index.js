@@ -7584,7 +7584,7 @@ async function gmail_api_call(auth) {
                             return false
                         }
                         if (res.rowCount == 1) {
-                            var status = await db.query(`UPDATE users_list set='${temp[4]}'`).then(res => {
+                            var status = await db.query(`UPDATE users_list set='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
                                 user.send('Your ign has been updated to **' + temp[4] + '**!').catch(err => console.log(err + '\nError sending dm to user.'))
                                 return true
                             })
