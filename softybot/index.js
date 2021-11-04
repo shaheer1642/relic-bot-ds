@@ -7300,7 +7300,7 @@ async function trading_bot_registeration(message) {
     })
     if (!status)
         return
-    message.channel.send(`~~Verification tutorial place-holder~~`)
+    message.channel.send(`---Verification tutorial place-holder---`)
     message.channel.send('Your unique id: ' + uni_id)
     return
 }
@@ -7584,7 +7584,7 @@ async function gmail_api_call(auth) {
                             return false
                         }
                         if (res.rowCount == 1) {
-                            var status = await db.query(`UPDATE users_list set='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
+                            var status = await db.query(`UPDATE users_list SET ingame_name='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
                                 user.send('Your ign has been updated to **' + temp[4] + '**!').catch(err => console.log(err + '\nError sending dm to user.'))
                                 return true
                             })
