@@ -7521,14 +7521,6 @@ function getNewToken(oAuth2Client, callback) {
  */
 async function gmail_api_call(auth) {
     var gmail = google.gmail({version: 'v1', auth})
-    .catch(err => {
-        console.log(err)
-        return false
-    });
-    if (!gmail) {
-        setTimeout(gmail_check_messages, 1000);
-        return
-    }
     const msgs = await gmail.users.messages.list({
         // Include messages from `SPAM` and `TRASH` in the results.
         //includeSpamTrash: 'placeholder-value',
