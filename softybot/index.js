@@ -257,7 +257,7 @@ client.on('messageCreate', async message => {
     for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
-            if (((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
+            if ((args[0] && args[1]) && ((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
                 trading_bot_registeration(message)
                 continue
             }
