@@ -4331,7 +4331,7 @@ async function updateDucatForced(message,args) {
 }
 
 async function baroArrival(message,args) {
-    var time = 1636117200000
+    var time = 1637326800
     if (time <= new Date().getTime()) {
         message.channel.send('Time not calculated yet.\n<@253525146923433984> Please calculate next timer daddy').catch(err => console.log(err))
         return
@@ -4340,7 +4340,7 @@ async function baroArrival(message,args) {
         content: ' ',
         embeds: [
             {
-                description: `The wait is over, Tenno. Baro Ki\'Teer has arrived.\nOr did he\n\nNext arrival <t:${Math.round(time/1000)}:R> (<t:${Math.round(time/1000)}:f>)`,
+                description: `The wait is over, Tenno. Baro Ki\'Teer has arrived.\nOr did he\n\nNext arrival <t:${Math.round(time)}:R> (<t:${Math.round(time)}:f>)`,
                 thumbnail: {url: 'https://cdn.discordapp.com/attachments/864199722676125757/901175987528691712/baro.png'}
             }
         ]
