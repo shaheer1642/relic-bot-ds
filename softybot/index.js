@@ -7534,7 +7534,15 @@ async function gmail_api_call(auth) {
         q: `from:noreply@invisioncloudcommunity.com is:unread`,
         // The user's email address. The special value `me` can be used to indicate the authenticated user.
         userId: 'me',
+    })
+    .catch(err => {
+        console.log(err)
+        return false
     });
+    if (!msgs) {
+        setTimeout(gmail_check_messages, 1000);
+        return
+    }
     if (msgs.data.resultSizeEstimate > 0) {
         //Read all msgs
         var ids_list = []
@@ -7620,7 +7628,7 @@ async function gmail_api_call(auth) {
             }
         }
     }
-  setTimeout(gmail_check_messages, 1000);
+    setTimeout(gmail_check_messages, 1000);
 }
 
 function generateId() {
