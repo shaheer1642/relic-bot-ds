@@ -4332,7 +4332,7 @@ async function updateDucatForced(message,args) {
 
 async function baroArrival(message,args) {
     var time = 1637326800
-    if (time <= new Date().getTime()) {
+    if (time <= new Date().getTime()/1000) {
         message.channel.send('Time not calculated yet.\n<@253525146923433984> Please calculate next timer daddy').catch(err => console.log(err))
         return
     }
