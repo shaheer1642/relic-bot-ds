@@ -7520,7 +7520,15 @@ function getNewToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function gmail_api_call(auth) {
-    var gmail = google.gmail({version: 'v1', auth});
+    var gmail = google.gmail({version: 'v1', auth})
+    .catch(err => {
+        console.log(err)
+        return false
+    });
+    if (!gmail) {
+        setTimeout(gmail_check_messages, 1000);
+        return
+    }
     const msgs = await gmail.users.messages.list({
         // Include messages from `SPAM` and `TRASH` in the results.
         //includeSpamTrash: 'placeholder-value',
@@ -7549,8 +7557,7 @@ async function gmail_api_call(auth) {
         await db.query(`SELECT * FROM users_unverified`)
         .then(res => {
             ids_list = res.rows
-        })
-        .catch(err => console.log(err))
+        }).catch(err => console.log(err))
         for(var i=0;i<msgs.data.messages.length; i++) {
             const msg = msgs.data.messages[i]
             //first mark msg as read
@@ -7563,7 +7570,7 @@ async function gmail_api_call(auth) {
                 requestBody: {
                     removeLabelIds: ['UNREAD']
                 },
-            });
+            }).catch(err => console.log(err));
             const res = await gmail.users.messages.get({
                 // The format to return the message in.
                 //format: 'full',
@@ -7573,7 +7580,7 @@ async function gmail_api_call(auth) {
                 //metadataHeaders: 'placeholder-value',
                 // The user's email address. The special value `me` can be used to indicate the authenticated user.
                 userId: 'me',
-            });
+            }).catch(err => console.log(err));
             console.log('Received email on google: ' + res.data.snippet)
             var part = res.data.payload.parts.filter(function(part) {
                 return part.mimeType == 'text/html';
