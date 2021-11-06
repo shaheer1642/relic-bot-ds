@@ -4750,6 +4750,11 @@ async function dc_ducat_update() {
                                         if (!user_mentions.includes(`<@${member.id}>`))
                                             user_mentions.push(`<@${member.id}>`)
                                 }
+                                else if (member.presence.status == 'offline') {
+                                    if (invis_filter.includes(member.id))
+                                        if (!user_mentions.includes(`<@${member.id}>`))
+                                            user_mentions.push(`<@${member.id}>`)
+                                }
                                 else if (!user_mentions.includes(`<@${member.id}>`))
                                     user_mentions.push(`<@${member.id}>`)
                             }
