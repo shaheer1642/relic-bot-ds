@@ -1245,7 +1245,7 @@ client.on('interactionCreate', async interaction => {
         return;
 
     if (interaction.commandName == 'lich') {
-        await trading_lich_bot().then(() => console.log(`Executed lich order for user ${interaction.user.username}`)).catch(err => console.log(err))
+        await trading_lich_bot(interaction).then(() => console.log(`Executed lich order for user ${interaction.user.username}`)).catch(err => console.log(err))
     }
 
     if (interaction.commandName == 'ping') {
@@ -6967,7 +6967,7 @@ async function trading_lich_bot(interaction) {
     }
     if (status == 2)
         return Promise.resolve()
-    
+
     await interaction.reply({
         content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`,
         ephemeral: false
