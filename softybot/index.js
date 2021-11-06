@@ -1244,20 +1244,23 @@ client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) 
         return;
 
-	const command = client.commands.get(interaction.commandName);
+	
 
-	if (!command) 
-        return;
-
-    if (command == 'lich') {
+    if (interaction.commandName == 'lich') {
         console.log(interaction.commands)
 		await interaction.reply({ content: 'Success!', ephemeral: true });
         //await interaction.reply({ content: 'You selected the damage type: ' + interaction., ephemeral: true });
     }
 
-    if (command == 'ping') {
+    if (interaction.commandName == 'ping') {
 		await interaction.reply({ content: 'Pong!', ephemeral: true });
     }
+    
+    /*const command = client.commands.get(interaction.commandName);
+
+	if (!command) 
+        return;
+    */
     
     /*
 	try {
