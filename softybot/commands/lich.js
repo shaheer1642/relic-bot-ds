@@ -14,12 +14,5 @@ module.exports = {
 				.addChoice('electricity', 'dt_electricity')
 				.addChoice('toxin', 'dt_toxin')
 				.addChoice('magnetic', 'dt_magnetic')
-				.addChoice('radiation', 'dt_radiation')),
-
-	async execute(interaction) {
-		console.log(interaction)
-		var postdata = {content: " ", embeds: []}
-		postdata.content = 'You selected a lich with damage type: '
-		await interaction.reply('Success');
-	},
+				.addChoice('radiation', 'dt_radiation'))
 };
