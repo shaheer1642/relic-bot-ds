@@ -1245,51 +1245,7 @@ client.on('interactionCreate', async interaction => {
         return;
 
     if (interaction.commandName == 'lich') {
-        if (!interaction.member.presence) {
-            interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
-            return Promise.resolve()
-        }
-        if (interaction.member.presence.status == `offline`) {
-            interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
-            return Promise.resolve()
-        }
-
-        var ingame_name = ''
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return 0
-            else {
-                ingame_name = res.rows[0].ingame_name
-                return 1
-            }
-        })
-        .catch(err => {
-            console.log(err + 'Retrieving Database -> users_list error')
-            interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: false}).catch(err => console.log(err))
-            return 2
-        })
-        if (status == 0) {
-            interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: false}).catch(err => console.log(err))
-            interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
-            .catch(err => {
-                console.log(err)
-                interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: false}).catch(err => console.log(err))
-            })
-            return Promise.resolve()
-        }
-        if (status == 2)
-            return Promise.resolve()
-
-        await interaction.reply({
-            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`,
-            ephemeral: false
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.reply('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
-        })
-        //await interaction.reply({ content: 'You selected the damage type: ' + interaction., ephemeral: true });
+        await trading_lich_bot().then(() => console.log(`Executed lich order for user ${interaction.user.username}`)).catch(err => console.log(err))
     }
 
     if (interaction.commandName == 'ping') {
@@ -6973,6 +6929,53 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     }
     console.log(`edited for all channels, returning`)
     return Promise.resolve()
+}
+
+async function trading_lich_bot(interaction) {
+    if (!interaction.member.presence) {
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    if (interaction.member.presence.status == `offline`) {
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+
+    var ingame_name = ''
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return 0
+        else {
+            ingame_name = res.rows[0].ingame_name
+            return 1
+        }
+    })
+    .catch(err => {
+        console.log(err + 'Retrieving Database -> users_list error')
+        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: false}).catch(err => console.log(err))
+        return 2
+    })
+    if (status == 0) {
+        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
+        .catch(err => {
+            console.log(err)
+            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: false}).catch(err => console.log(err))
+        })
+        return Promise.resolve()
+    }
+    if (status == 2)
+        return Promise.resolve()
+    
+    await interaction.reply({
+        content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`,
+        ephemeral: false
+    })
+    .catch(err => {
+        console.log(err)
+        interaction.reply('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
+    })
 }
 
 async function trading_bot_user_orders(message,args,ingame_name,request_type) {
