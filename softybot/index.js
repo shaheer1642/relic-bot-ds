@@ -25,6 +25,7 @@ const masteryRolesMessageId = "892084165405716541"
 const userOrderLimit = 50
 const filledOrdersLimit = 500
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {
@@ -6968,14 +6969,25 @@ async function trading_lich_bot(interaction) {
     if (status == 2)
         return Promise.resolve()
 
+    await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
+    
+    return Promise.resolve()
+}
+
+async function trading_lich_orders_update(interaction, ingame_name) {
+    for(var i=0;i<tradingBotChannels.length;i++) {
+        var multiCid = tradingBotChannels[i]
+        await client.channels.cache.get(multiCid).send({
+            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`, 
+            embeds: embeds
+        })
+        .catch(err => console.log(err))
+    }
     await interaction.reply({
-        content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`,
+        content: 'Your order has been posted.',
         ephemeral: false
-    })
-    .catch(err => {
-        console.log(err)
-        interaction.reply('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
-    })
+    }).catch(err => {console.log(err)})
+    return Promise.resolve()
 }
 
 async function trading_bot_user_orders(message,args,ingame_name,request_type) {
