@@ -117,22 +117,6 @@ client.on('ready', () => {
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
     backupItemsList()
-
-    //----Deploy application commands----
-    (async () => {
-        try {
-            console.log('Started refreshing application (/) commands.');
-    
-            await rest.put(
-                Routes.applicationGuildCommands(client.user.id),
-                { body: commands },
-            );
-    
-            console.log('Successfully reloaded application (/) commands.');
-        } catch (error) {
-            console.error(error);
-        }
-    })();
 })
 
 client.on('messageCreate', async message => {
