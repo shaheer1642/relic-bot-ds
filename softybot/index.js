@@ -1249,13 +1249,13 @@ client.on('interactionCreate', async interaction => {
 	if (!command) 
         return;
 
-    if (command = 'lich') {
+    if (command == 'lich') {
         console.log(interaction.commands)
 		await interaction.reply({ content: 'Success!', ephemeral: true });
         //await interaction.reply({ content: 'You selected the damage type: ' + interaction., ephemeral: true });
     }
 
-    if (command = 'ping') {
+    if (command == 'ping') {
 		await interaction.reply({ content: 'Pong!', ephemeral: true });
     }
     
