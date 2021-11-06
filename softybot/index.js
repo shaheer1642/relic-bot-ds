@@ -1245,7 +1245,7 @@ client.on('interactionCreate', async interaction => {
         return;
 
     if (interaction.commandName == 'lich') {
-        console.log(interaction.commands)
+        console.log(interaction)
         var buffer_interaction = Buffer.from(JSON.stringify(interaction), 'utf8');
         await interaction.reply({
             content: " ", 
