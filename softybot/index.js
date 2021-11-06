@@ -6970,7 +6970,7 @@ async function trading_lich_bot(interaction) {
         return Promise.resolve()
 
     await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
-    
+
     return Promise.resolve()
 }
 
@@ -6979,7 +6979,7 @@ async function trading_lich_orders_update(interaction, ingame_name) {
         var multiCid = tradingBotChannels[i]
         await client.channels.cache.get(multiCid).send({
             content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`, 
-            embeds: embeds
+            embeds: []
         })
         .catch(err => console.log(err))
     }
