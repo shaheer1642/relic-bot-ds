@@ -1244,10 +1244,23 @@ client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) 
         return;
 
-	
-
     if (interaction.commandName == 'lich') {
         console.log(interaction.commands)
+        var buffer_interaction = Buffer.from(JSON.stringify(interaction), 'utf8');
+        await interaction.reply({
+            content: " ", 
+            files: [
+                {
+                    attachment: buffer_interaction,
+                    name: 'interaction.json'
+                }
+            ], 
+            ephemeral: true 
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
+        })
 		await interaction.reply({ content: 'Success!', ephemeral: true });
         //await interaction.reply({ content: 'You selected the damage type: ' + interaction., ephemeral: true });
     }
