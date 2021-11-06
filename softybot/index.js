@@ -7300,16 +7300,16 @@ async function trading_bot_registeration(message) {
     })
     if (!status)
         return
-    message.channel.send(`
-        **Please follow these steps to verify your account:**
-        1) First make sure you are signed in on Warframe forums by visiting this link: https://forums.warframe.com/
-        2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
-        3) Write the message body as given below:
-        Subject: ${uni_id}
-        Message: Hi
-        4) Click 'Send' button
-        5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!
-    `)
+    message.channel.send({content: `
+**Please follow these steps to verify your account:**
+1) First make sure you are signed-n on Warframe forums by visiting this link: https://forums.warframe.com/
+2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
+3) Write the message body as given below:
+Subject: **${uni_id}**
+Message: Hi
+4) Click 'Send' button
+5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!
+`, embeds: []})
     return
 }
 
