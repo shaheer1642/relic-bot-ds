@@ -33,6 +33,7 @@ const tradingBotReactions = {
     remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"],
     success: ["<:order_success:894992959177654332>"]
 }
+const checkReaction = '<:check:905884742413582347>'
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
@@ -2843,7 +2844,7 @@ function uptime(message,args) {
     message.channel.send({
         content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${msToTime(msTill1AM)}`
     }).catch(err => console.log(err))
-    message.react("✅");
+    message.react(checkReaction);
     return
 }
 
@@ -2865,7 +2866,7 @@ function help(message,args) {
         }]
     }
     message.channel.send(postdata)
-    message.react("✅")
+    message.react(checkReaction)
     return
 }
 
@@ -2873,7 +2874,7 @@ async function orders(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var d_item_url = ""
@@ -3069,7 +3070,7 @@ async function orders(message,args) {
                 embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: "React with :up: to update", embeds: embeds}).catch(err => console.log(err))
                 processMessage.react("🆙").catch(err => console.log(err))
-                message.react("✅").catch(err => console.log(err))
+                message.react(checkReaction).catch(err => console.log(err))
             }
         })
         .catch(error => {
@@ -3085,7 +3086,7 @@ async function relics(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var d_item_url = ""
@@ -3196,7 +3197,7 @@ async function relics(message,args) {
         else if (relic_drops.vault_status == 'P' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nUnvaulted since: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp)
         message.channel.send(postdata).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var foundItem = 0
@@ -3402,7 +3403,7 @@ async function relics(message,args) {
         else 
             message.channel.send(postdata[k]).catch(err => console.log(err));
     }
-    message.react("✅").catch(err => console.log(err));
+    message.react(checkReaction).catch(err => console.log(err));
     return
 }
 
@@ -3410,7 +3411,7 @@ async function auctions(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var modifier = ""
@@ -3600,7 +3601,7 @@ async function auctions(message,args) {
             }
         )
         processMessage.edit(postdata)
-        message.react("✅")
+        message.react(checkReaction)
         return
     })
     .catch(function (error) {
@@ -3615,7 +3616,7 @@ async function list(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "List a prime item on your warframe.market profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     offset = 0
@@ -3845,7 +3846,7 @@ async function relist(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     if (args[0] != "all")
@@ -4197,7 +4198,7 @@ async function authorize(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     const email = args[0]

@@ -2,5 +2,8 @@
     "token": "ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E",
     "prefix": ".",
     "clientId": "832682369831141417",
-    "guildId": "832677897411493949"
+    "guildId": [
+        "832677897411493949",
+        "865904902941048862"
+    ]
 }
