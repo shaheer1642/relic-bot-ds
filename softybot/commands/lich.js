@@ -26,4 +26,8 @@ module.exports = {
 			option.setName('damage_number')
 				.setDescription('Input damage %')
 				.setRequired(true))
+		.addNumberOption(option => 
+			option.setName('total_price')
+				.setDescription('Input buy price')
+				.setRequired(true))
 };

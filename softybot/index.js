@@ -1246,7 +1246,7 @@ client.on('interactionCreate', async interaction => {
 
     if (interaction.commandName == 'lich') {
         await interaction.reply({
-            content: `You are selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%`,
+            content: `You are selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`,
             ephemeral: false 
         })
         .catch(err => {
