@@ -6062,8 +6062,8 @@ async function trading_bot(message,args,command) {
         args.pop()
     }
     */
-    if (args[args.length-1].match(/[0-9]/) && (!args[args.length-1].match(/[a-zA-Z]/) || args[args.length-1].match(/p$/) || args[args.length-1].match(/plat$/))) {
-        args[args.length-1] = args[args.length-1].replace('p','').replace('plat','')
+    if (args[args.length-1].match(/[0-9]/) && (!args[args.length-1].match(/[a-zA-Z]/) || args[args.length-1].match(/p$/) || args[args.length-1].match(/pl$/) || args[args.length-1].match(/plat$/))) {
+        args[args.length-1] = args[args.length-1].replace('plat','').replace('pl','').replace('p','')
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
     }
     if (price < 0) {
