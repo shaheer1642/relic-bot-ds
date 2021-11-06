@@ -1,5 +1,6 @@
 const config = require('./config.json')
 const {Client, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
+const { REST } = require('@discordjs/rest');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const https = require('https');
@@ -6061,9 +6062,10 @@ async function trading_bot(message,args,command) {
         args.pop()
     }
     */
-    args[args.length-1] = args[args.length-1].replace('p','').replace('plat','')
-    if (args[args.length-1].match(/[0-9]/) && !args[args.length-1].match(/[a-zA-Z]/))
+    if (args[args.length-1].match(/[0-9]/) && (!args[args.length-1].match(/[a-zA-Z]/) || args[args.length-1].match(/$p/) || args[args.length-1].match(/$plat/))) {
+        args[args.length-1] = args[args.length-1].replace('p','').replace('plat','')
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
+    }
     if (price < 0) {
         message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
