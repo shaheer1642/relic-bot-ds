@@ -18,5 +18,5 @@ rest.put(Routes.applicationGuildCommands(clientId, guildId[0]), { body: commands
 	.catch(console.error);
 
 rest.put(Routes.applicationGuildCommands(clientId, guildId[1]), { body: commands })
-.then(() => console.log('Successfully registered application commands for guild: ' + guildId[1]))
-.catch(console.error);
+    .then(() => console.log('Successfully registered application commands for guild: ' + guildId[1]))
+    .catch(console.error);
