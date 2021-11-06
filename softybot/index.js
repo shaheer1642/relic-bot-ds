@@ -1259,9 +1259,8 @@ client.on('interactionCreate', async interaction => {
         })
         .catch(err => {
             console.log(err)
-            message.channel.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
+            interaction.reply('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
         })
-		await interaction.reply({ content: 'Success!', ephemeral: true });
         //await interaction.reply({ content: 'You selected the damage type: ' + interaction., ephemeral: true });
     }
 
