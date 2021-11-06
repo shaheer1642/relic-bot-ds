@@ -1,5 +1,5 @@
 const config = require('./config.json')
-const {Client, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
+const {Client, Collection, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const axios = require('axios');
@@ -17,15 +17,6 @@ const { doesNotMatch } = require('assert');
 const { Console } = require('console');
 const { resolve } = require('path');
 */
-//----Read application commands-------
-const commands = [];
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	commands.push(command.data.toJSON());
-}
-const rest = new REST({ version: '9' }).setToken(config.token);
-//------------------------------
 const wh_dbManager = new WebhookClient({url: 'https://discord.com/api/webhooks/904760618857406535/yycp4Q6nehELqLArcZnXNITD8X7vGAeBd-CnQ1EnEwxyh_bg4tuy7V-H5lFGnz0Hrt9P'});
 const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
@@ -81,7 +72,17 @@ async function e_db_conn() {
 //relic bot "token": "ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E",
 
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
+//----Application commands-----
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	// Set a new item in the Collection
+	// With the key as the command name and the value as the exported module
+	client.commands.set(command.data.name, command);
+}
+//---------------------------
 //const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
 
@@ -1255,7 +1256,21 @@ client.on('interactionCreate', async interaction => {
         console.log(JSON.stringify(postdata.components))
         await interaction.editReply(postdata).catch(err => console.log(err))
     }
-    return Promise.resolve()
+    if (!interaction.isCommand()) 
+        return;
+
+	const command = client.commands.get(interaction.commandName);
+
+	if (!command) 
+        return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+	}
+    return;
 });
 
 client.on('shardError', error => {
