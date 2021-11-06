@@ -1245,10 +1245,8 @@ client.on('interactionCreate', async interaction => {
         return;
 
     if (interaction.commandName == 'lich') {
-        console.log(interaction)
-        var buffer_interaction = Buffer.from(JSON.stringify(interaction), 'utf8');
         await interaction.reply({
-            content: `You are selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getString('damage_number')}%`,
+            content: `You are selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%`,
             ephemeral: false 
         })
         .catch(err => {
