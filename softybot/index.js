@@ -1255,7 +1255,7 @@ client.on('interactionCreate', async interaction => {
                     name: 'interaction.json'
                 }
             ], 
-            ephemeral: true 
+            ephemeral: false 
         })
         .catch(err => {
             console.log(err)
@@ -1265,7 +1265,7 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (interaction.commandName == 'ping') {
-		await interaction.reply({ content: 'Pong!', ephemeral: true });
+		await interaction.reply({ content: 'Pong!', ephemeral: false });
     }
     
     /*const command = client.commands.get(interaction.commandName);
