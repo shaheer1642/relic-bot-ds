@@ -6975,8 +6975,8 @@ async function trading_lich_bot(interaction) {
 }
 
 async function trading_lich_orders_update(interaction, ingame_name) {
-    for(var i=0;i<tradingBotChannels.length;i++) {
-        var multiCid = tradingBotChannels[i]
+    for(var i=0;i<tradingBotLichChannels.length;i++) {
+        var multiCid = tradingBotLichChannels[i]
         await client.channels.cache.get(multiCid).send({
             content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`, 
             embeds: []
