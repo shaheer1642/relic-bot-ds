@@ -1245,6 +1245,15 @@ client.on('interactionCreate', async interaction => {
         return;
 
     if (interaction.commandName == 'lich') {
+        if (!interaction.member.presence) {
+            interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false})
+            return Promise.resolve()
+        }
+        if (interaction.member.presence.status == `offline`) {
+            interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false})
+            return Promise.resolve()
+        }
+
         await interaction.reply({
             content: `You are selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`,
             ephemeral: false 
