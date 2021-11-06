@@ -1,6 +1,7 @@
 const config = require('./config.json')
 const {Client, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
 const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const https = require('https');
@@ -16,6 +17,15 @@ const { doesNotMatch } = require('assert');
 const { Console } = require('console');
 const { resolve } = require('path');
 */
+//----Read application commands-------
+const commands = [];
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	commands.push(command.data.toJSON());
+}
+const rest = new REST({ version: '9' }).setToken(config.token);
+//------------------------------
 const wh_dbManager = new WebhookClient({url: 'https://discord.com/api/webhooks/904760618857406535/yycp4Q6nehELqLArcZnXNITD8X7vGAeBd-CnQ1EnEwxyh_bg4tuy7V-H5lFGnz0Hrt9P'});
 const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
@@ -106,6 +116,22 @@ client.on('ready', () => {
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
     backupItemsList()
+
+    //----Deploy application commands----
+    (async () => {
+        try {
+            console.log('Started refreshing application (/) commands.');
+    
+            await rest.put(
+                Routes.applicationGuildCommands(client.user.id),
+                { body: commands },
+            );
+    
+            console.log('Successfully reloaded application (/) commands.');
+        } catch (error) {
+            console.error(error);
+        }
+    })();
 })
 
 client.on('messageCreate', async message => {
