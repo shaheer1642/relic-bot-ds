@@ -2122,16 +2122,17 @@ client.on('messageReactionAdd', async (reaction, user) => {
     
     if (reaction.emoji.identifier == defaultReactions.auto_update.identifier) {
         var counter = 0;
+        reaction.message.edit({content: 'Auto-update has been turned on!', embeds: reaction.message.embeds})
         var intervalID = setInterval(function () {
         
             orders_update(reaction.message)
         
-           if (++counter === 10) {
+           if (++counter === 120) {
                clearInterval(intervalID);
                reaction.message.react(defaultReactions.update.string).catch(err => console.log(err))
                reaction.message.react(defaultReactions.auto_update.string).catch(err => console.log(err))
            }
-        }, 5000);
+        }, 30000);
         reaction.message.reactions.removeAll().catch(err => console.log(err))
         return
     }
