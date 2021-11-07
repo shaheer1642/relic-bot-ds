@@ -2128,6 +2128,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
         
            if (++counter === 10) {
                clearInterval(intervalID);
+               reaction.message.react(defaultReactions.update.string).catch(err => console.log(err))
+               reaction.message.react(defaultReactions.auto_update.string).catch(err => console.log(err))
            }
         }, 5000);
         reaction.message.reactions.removeAll().catch(err => console.log(err))
