@@ -132,6 +132,33 @@ client.on('ready', () => {
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
     backupItemsList()
+
+    //----Re-define orders timers if any-----
+    db.query(`SELECT * FROM auto_update_items`)
+    .then(res => {
+        if (res.rowCount > 0) {
+            res.rows.forEach(async e => {
+                console.log('Setting order timer for message ' + e.message_id)
+                const message = await client.channels.cache.get(e.channel_id).messages.fetch(e.message_id)
+                var counter = 0;
+                message.edit({content: 'Auto-update has been turned on!'}).catch(err => console.log(err))
+                message.reactions.removeAll().catch(err => console.log(err))
+                var intervalID = setInterval(function () {
+                
+                    orders_update(message)
+                
+                    if (++counter === 120) {
+                        clearInterval(intervalID);
+                        message.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`}).catch(err => console.log(err))
+                        message.react(defaultReactions.update.string).catch(err => console.log(err))
+                        message.react(defaultReactions.auto_update.string).catch(err => console.log(err))
+                        db.query(`DELETE FROM auto_update_items WHERE message_id = ${message.id} AND channel_id = ${message.channel.id}`)
+                        .catch(err => console.log(err))
+                    }
+                }, 30000);
+            })
+        }
+    })
 })
 
 client.on('messageCreate', async message => {
@@ -2121,20 +2148,24 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
     
     if (reaction.emoji.identifier == defaultReactions.auto_update.identifier) {
+        db.query(`INSERT INTO auto_update_items (message_id,channel_id) VALUES (${reaction.message.id},${reaction.message.channelId})`)
+        .catch(err => console.log(err))
         var counter = 0;
-        reaction.message.edit({content: 'Auto-update has been turned on!'})
+        reaction.message.edit({content: 'Auto-update has been turned on!'}).catch(err => console.log(err))
+        reaction.message.reactions.removeAll().catch(err => console.log(err))
         var intervalID = setInterval(function () {
         
             orders_update(reaction.message)
         
-           if (++counter === 120) {
-               clearInterval(intervalID);
-               reaction.message.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`})
-               reaction.message.react(defaultReactions.update.string).catch(err => console.log(err))
-               reaction.message.react(defaultReactions.auto_update.string).catch(err => console.log(err))
-           }
+            if (++counter === 120) {
+                clearInterval(intervalID);
+                reaction.message.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`}).catch(err => console.log(err))
+                reaction.message.react(defaultReactions.update.string).catch(err => console.log(err))
+                reaction.message.react(defaultReactions.auto_update.string).catch(err => console.log(err))
+                db.query(`DELETE FROM auto_update_items WHERE message_id = ${reaction.message.id} AND channel_id = ${reaction.message.channelId}`)
+                .catch(err => console.log(err))
+            }
         }, 30000);
-        reaction.message.reactions.removeAll().catch(err => console.log(err))
         return
     }
 
@@ -3121,7 +3152,7 @@ async function orders_update(message, reaction, user) {
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 embeds = embeds.sort(dynamicSort("title"))
-                message.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`, embeds: embeds})
+                message.edit({embeds: embeds})
             }
         })
         .catch(err => {
