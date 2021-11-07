@@ -2116,7 +2116,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     if (reaction.emoji.identifier == defaultReactions.update.identifier) {
-        orders_update(reaction.message,reaction)
+        orders_update(reaction.message,reaction,user)
         return
     }
 
@@ -2956,7 +2956,7 @@ async function orders(message,args) {
     return
 }
 
-async function orders_update(message, reaction) {
+async function orders_update(message, reaction, user) {
     if (!message.author)
         await message.channel.messages.fetch(message.id)
     if (message.author.id != client.user.id)
