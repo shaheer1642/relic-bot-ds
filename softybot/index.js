@@ -2119,6 +2119,20 @@ client.on('messageReactionAdd', async (reaction, user) => {
         orders_update(reaction.message,reaction,user)
         return
     }
+    
+    if (reaction.emoji.identifier == defaultReactions.auto_update.identifier) {
+        var counter = 0;
+        var intervalID = setInterval(function () {
+        
+            orders_update(reaction.message)
+        
+           if (++counter === 10) {
+               clearInterval(intervalID);
+           }
+        }, 5000);
+        reaction.message.reactions.removeAll().catch(err => console.log(err))
+        return
+    }
 
     if (reaction.emoji.name == "⭐") {
         if (!reaction.message.author)
@@ -2944,6 +2958,7 @@ async function orders(message,args) {
                 embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`, embeds: embeds}).catch(err => console.log(err))
                 processMessage.react(defaultReactions.update.string).catch(err => console.log(err))
+                processMessage.react(defaultReactions.auto_update.string).catch(err => console.log(err))
                 message.react(defaultReactions.check.string).catch(err => console.log(err))
             }
         })
