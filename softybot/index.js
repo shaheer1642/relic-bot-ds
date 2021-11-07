@@ -6983,14 +6983,14 @@ async function trading_lich_orders_update(interaction, ingame_name) {
     for(var i=0;i<tradingBotLichChannels.length;i++) {
         var multiCid = tradingBotLichChannels[i]
         await client.channels.cache.get(multiCid).send({
-            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon_type')}\nDamage type: ${interaction.options.getString('damage_type')}\nDamage: ${interaction.options.getNumber('damage_number')}%\nPrice: ${interaction.options.getNumber('total_price')}p`, 
+            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon')}\nElement: ${interaction.options.getString('element')}\nDamage: ${interaction.options.getNumber('damage')}%\nQuirk: ${interaction.options.getString('quirk')}%\nLich name: ${interaction.options.getString('name')}%\nPrice: ${interaction.options.getNumber('price')}p`, 
             embeds: []
         })
         .catch(err => console.log(err))
     }
     await interaction.reply({
         content: 'Your order has been posted.',
-        ephemeral: false
+        ephemeral: true
     }).catch(err => {console.log(err)})
     return Promise.resolve()
 }
