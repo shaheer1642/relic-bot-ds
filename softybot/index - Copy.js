@@ -1,5 +1,7 @@
 const config = require('./config.json')
-const {Client, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
+const {Client, Collection, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const https = require('https');
@@ -23,6 +25,7 @@ const masteryRolesMessageId = "892084165405716541"
 const userOrderLimit = 50
 const filledOrdersLimit = 500
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {
@@ -31,6 +34,7 @@ const tradingBotReactions = {
     remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"],
     success: ["<:order_success:894992959177654332>"]
 }
+const checkReaction = '<:check:905884742413582347>'
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
@@ -70,7 +74,17 @@ async function e_db_conn() {
 //relic bot "token": "ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E",
 
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
+//----Application commands-----
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	// Set a new item in the Collection
+	// With the key as the command name and the value as the exported module
+	client.commands.set(command.data.name, command);
+}
+//---------------------------
 //const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
 
@@ -257,7 +271,7 @@ client.on('messageCreate', async message => {
     for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
         if (!message.guild) {
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
-            if (((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
+            if ((args[0] && args[1]) && ((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
                 trading_bot_registeration(message)
                 continue
             }
@@ -1228,7 +1242,33 @@ client.on('interactionCreate', async interaction => {
         console.log(JSON.stringify(postdata.components))
         await interaction.editReply(postdata).catch(err => console.log(err))
     }
-    return Promise.resolve()
+    if (!interaction.isCommand()) 
+        return;
+
+    if (interaction.commandName == 'lich') {
+        await trading_lich_bot(interaction).then(() => console.log(`Executed lich order for user ${interaction.user.username}`)).catch(err => console.log(err))
+    }
+
+    if (interaction.commandName == 'ping') {
+		await interaction.reply({ content: 'Pong!', ephemeral: false });
+    }
+    
+    /*const command = client.commands.get(interaction.commandName);
+
+	if (!command) 
+        return;
+    */
+    
+    /*
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+	}
+    */
+
+    return;
 });
 
 client.on('shardError', error => {
@@ -2817,7 +2857,7 @@ function uptime(message,args) {
     message.channel.send({
         content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${msToTime(msTill1AM)}`
     }).catch(err => console.log(err))
-    message.react("✅");
+    message.react(checkReaction);
     return
 }
 
@@ -2839,7 +2879,7 @@ function help(message,args) {
         }]
     }
     message.channel.send(postdata)
-    message.react("✅")
+    message.react(checkReaction)
     return
 }
 
@@ -2847,7 +2887,7 @@ async function orders(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var d_item_url = ""
@@ -3043,7 +3083,7 @@ async function orders(message,args) {
                 embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: "React with :up: to update", embeds: embeds}).catch(err => console.log(err))
                 processMessage.react("🆙").catch(err => console.log(err))
-                message.react("✅").catch(err => console.log(err))
+                message.react(checkReaction).catch(err => console.log(err))
             }
         })
         .catch(error => {
@@ -3059,7 +3099,7 @@ async function relics(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var d_item_url = ""
@@ -3170,7 +3210,7 @@ async function relics(message,args) {
         else if (relic_drops.vault_status == 'P' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nUnvaulted since: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp)
         message.channel.send(postdata).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var foundItem = 0
@@ -3376,7 +3416,7 @@ async function relics(message,args) {
         else 
             message.channel.send(postdata[k]).catch(err => console.log(err));
     }
-    message.react("✅").catch(err => console.log(err));
+    message.react(checkReaction).catch(err => console.log(err));
     return
 }
 
@@ -3384,7 +3424,7 @@ async function auctions(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     var modifier = ""
@@ -3574,7 +3614,7 @@ async function auctions(message,args) {
             }
         )
         processMessage.edit(postdata)
-        message.react("✅")
+        message.react(checkReaction)
         return
     })
     .catch(function (error) {
@@ -3589,7 +3629,7 @@ async function list(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "List a prime item on your warframe.market profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     offset = 0
@@ -3819,7 +3859,7 @@ async function relist(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     if (args[0] != "all")
@@ -4171,7 +4211,7 @@ async function authorize(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
-        message.react("✅")
+        message.react(checkReaction)
         return
     }
     const email = args[0]
@@ -4707,6 +4747,11 @@ async function dc_ducat_update() {
                             if (member.presence) {
                                 if (member.presence.status == 'dnd') {
                                     if (dnd_filter.includes(member.id))
+                                        if (!user_mentions.includes(`<@${member.id}>`))
+                                            user_mentions.push(`<@${member.id}>`)
+                                }
+                                else if (member.presence.status == 'offline') {
+                                    if (invis_filter.includes(member.id))
                                         if (!user_mentions.includes(`<@${member.id}>`))
                                             user_mentions.push(`<@${member.id}>`)
                                 }
@@ -6061,9 +6106,10 @@ async function trading_bot(message,args,command) {
         args.pop()
     }
     */
-    args[args.length-1] = args[args.length-1].replace('p','').replace('plat','')
-    if (args[args.length-1].match(/[0-9]/) && !args[args.length-1].match(/[a-zA-Z]/))
+    if (args[args.length-1].match(/[0-9]/) && (!args[args.length-1].match(/[a-zA-Z]/) || args[args.length-1].match(/p$/) || args[args.length-1].match(/pl$/) || args[args.length-1].match(/plat$/))) {
+        args[args.length-1] = args[args.length-1].replace('plat','').replace('pl','').replace('p','')
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
+    }
     if (price < 0) {
         message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
@@ -6891,6 +6937,64 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     return Promise.resolve()
 }
 
+async function trading_lich_bot(interaction) {
+    if (!interaction.member.presence) {
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    if (interaction.member.presence.status == `offline`) {
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+
+    var ingame_name = ''
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return 0
+        else {
+            ingame_name = res.rows[0].ingame_name
+            return 1
+        }
+    })
+    .catch(err => {
+        console.log(err + 'Retrieving Database -> users_list error')
+        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: false}).catch(err => console.log(err))
+        return 2
+    })
+    if (status == 0) {
+        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
+        .catch(err => {
+            console.log(err)
+            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: false}).catch(err => console.log(err))
+        })
+        return Promise.resolve()
+    }
+    if (status == 2)
+        return Promise.resolve()
+
+    await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
+
+    return Promise.resolve()
+}
+
+async function trading_lich_orders_update(interaction, ingame_name) {
+    for(var i=0;i<tradingBotLichChannels.length;i++) {
+        var multiCid = tradingBotLichChannels[i]
+        await client.channels.cache.get(multiCid).send({
+            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon')}\nElement: ${interaction.options.getString('element')}\nDamage: ${interaction.options.getNumber('damage')}%\nQuirk: ${interaction.options.getString('quirk')}\nLich name: ${interaction.options.getString('name')}\nPrice: ${interaction.options.getInteger('price')}$`, 
+            embeds: []
+        })
+        .catch(err => console.log(err))
+    }
+    await interaction.reply({
+        content: 'Your order has been posted.',
+        ephemeral: true
+    }).catch(err => {console.log(err)})
+    return Promise.resolve()
+}
+
 async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     console.log(ingame_name)
     var discord_id = ""
@@ -7300,8 +7404,20 @@ async function trading_bot_registeration(message) {
     })
     if (!status)
         return
-    message.channel.send(`---Verification tutorial place-holder---`)
-    message.channel.send('Your unique id: ' + uni_id)
+    message.channel.send({content: `
+**Please follow these steps to verify your account:**
+1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
+2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
+3) Write the message body as given below:
+Subject: **${uni_id}**
+Message: Hi
+4) Click 'Send' button
+5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!
+`, embeds: [{
+        title: 'Click to verify!',
+        url: 'https://forums.warframe.com/messenger/compose/?to=6931114'
+    }]
+})
     return
 }
 
@@ -7520,7 +7636,14 @@ function getNewToken(oAuth2Client, callback) {
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
 async function gmail_api_call(auth) {
-    var gmail = google.gmail({version: 'v1', auth});
+    try {
+        var gmail = google.gmail({version: 'v1', auth})
+    }
+    catch(err) {
+        console.log(err)
+        setTimeout(gmail_check_messages, 1000);
+        return
+    }
     const msgs = await gmail.users.messages.list({
         // Include messages from `SPAM` and `TRASH` in the results.
         //includeSpamTrash: 'placeholder-value',
@@ -7534,15 +7657,22 @@ async function gmail_api_call(auth) {
         q: `from:noreply@invisioncloudcommunity.com is:unread`,
         // The user's email address. The special value `me` can be used to indicate the authenticated user.
         userId: 'me',
+    })
+    .catch(err => {
+        console.log(err)
+        return false
     });
+    if (!msgs) {
+        setTimeout(gmail_check_messages, 1000);
+        return
+    }
     if (msgs.data.resultSizeEstimate > 0) {
         //Read all msgs
         var ids_list = []
         await db.query(`SELECT * FROM users_unverified`)
         .then(res => {
             ids_list = res.rows
-        })
-        .catch(err => console.log(err))
+        }).catch(err => console.log(err))
         for(var i=0;i<msgs.data.messages.length; i++) {
             const msg = msgs.data.messages[i]
             //first mark msg as read
@@ -7555,7 +7685,7 @@ async function gmail_api_call(auth) {
                 requestBody: {
                     removeLabelIds: ['UNREAD']
                 },
-            });
+            }).catch(err => console.log(err));
             const res = await gmail.users.messages.get({
                 // The format to return the message in.
                 //format: 'full',
@@ -7565,7 +7695,7 @@ async function gmail_api_call(auth) {
                 //metadataHeaders: 'placeholder-value',
                 // The user's email address. The special value `me` can be used to indicate the authenticated user.
                 userId: 'me',
-            });
+            }).catch(err => console.log(err));
             console.log('Received email on google: ' + res.data.snippet)
             var part = res.data.payload.parts.filter(function(part) {
                 return part.mimeType == 'text/html';
@@ -7620,7 +7750,7 @@ async function gmail_api_call(auth) {
             }
         }
     }
-  setTimeout(gmail_check_messages, 1000);
+    setTimeout(gmail_check_messages, 1000);
 }
 
 function generateId() {

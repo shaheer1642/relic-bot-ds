@@ -34,7 +34,20 @@ const tradingBotReactions = {
     remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"],
     success: ["<:order_success:894992959177654332>"]
 }
-const checkReaction = '<:check:905884742413582347>'
+const defaultReactions = {
+    check: {
+        string: '<:check:905884742413582347>',
+        identifier: 'check:905884742413582347'
+    },
+    update: {
+        string: '<:update:906923981855162398>',
+        identifier: 'update:906923981855162398'
+    },
+    auto_update: {
+        string: '<:auto_update:906923980852715640>',
+        identifier: 'auto_update:906923980852715640'
+    }
+}
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
@@ -2102,160 +2115,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
-    if (reaction.emoji.name == "🆙") {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        var items_list = []
-        console.log('Retrieving Database -> items_list')
-        var status = await db.query(`SELECT * FROM items_list`)
-        .then(res => {
-            items_list = res.rows
-            return true
-        })
-        .catch (err => {
-            console.log(err)
-            console.log('Retrieving Database -> items_list error')
-            reaction.message.channel.send({content: "Some error occured retrieving items from db.\nError code: 500"}).catch(err => console.log(err))
-            return false
-        })
-        if (!status)
-            return
-        var arrItems = []
-        reaction.message.embeds.forEach((element,index)=> {
-            items_list.forEach(element2 => {
-                if (element.title)
-                    if (element2.item_url == element.title.toLowerCase().replace(' (v)','').replace(' (null)','').replace(' (r)','').replace(' (e)','').replace(' (p)','').replace(' (b)','').replace(/ \(updating\.\.\.\)/g,'').replace(/ /g, "_")) {
-                        arrItems.push(element2);
-                        reaction.message.embeds[index].title += ' (Updating...)'
-                    }
-            })
-        });
-        if (arrItems.length == 0)
-            return
-        reaction.users.remove(user.id);
-        reaction.message.edit({embeds: reaction.message.embeds}).catch(err => console.log(err))
-        let embeds = []
-        for (var i=0; i<arrItems.length; i++)
-        {
-            const item_data = arrItems[i]
-            axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
-            .then(async response => {
-                var ordersArr = []
-                response.data.payload.orders.forEach(element => {
-                    if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) { 
-                        Object.keys(response.data.include.item.items_in_set).some(function (k) {
-                            if (response.data.include.item.items_in_set[k].id == item_data.id) {
-                                if (response.data.include.item.items_in_set[k].mod_max_rank) {
-                                    if (element.mod_rank == 0 || element.mod_rank == response.data.include.item.items_in_set[k].mod_max_rank)
-                                        ordersArr.push({
-                                            seller: element.user.ingame_name,
-                                            quantity: element.quantity,
-                                            price: element.platinum,
-                                            mod_rank: element.mod_rank
-                                        });
-                                }
-                                else 
-                                    ordersArr.push({
-                                        seller: element.user.ingame_name,
-                                        quantity: element.quantity,
-                                        price: element.platinum
-                                    });
-                            }
-                        })
-                    }
-                })
-                ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
-                ordersArr = ordersArr.sort(dynamicSort("price"))
-                if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank"))
-                    ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
-                var sellers = ""
-                var quantities = ""
-                var prices = ""
-                console.log(JSON.stringify(ordersArr))
-                for (var j=0; j<5; j++)
-                {
-                    if (ordersArr.length==0)
-                        break
-                    if (j==ordersArr.length)
-                        break
-                    if (ordersArr[j].mod_rank > 0)
-                        continue
-                    sellers += ordersArr[j].seller + "\n"
-                    quantities += ordersArr[j].quantity + "\n"
-                    prices += ordersArr[j].price + "\n"
-                }
-                sellers = sellers.replace(/_/g,"\\_")
-                console.log('executed: ' + item_data.item_url + "\n")
-                //if (!noSellers)
-                if (sellers=="")
-                {
-                    sellers = "No sellers at this moment."
-                    quantities = "\u200b"
-                    prices = "\u200b"
-                }
-                var vault_status = ''
-                if (item_data.vault_status)
-                    vault_status = ' (' + item_data.vault_status + ')'
-                const index = embeds.push({
-                    title: item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
-                    url: 'https://warframe.market/items/' + item_data.item_url,
-                    fields: [
-                        {name: 'Sellers', value: sellers, inline: true},
-                        {name: 'Quantity', value: quantities, inline: true},
-                        {name: 'Price', value: prices, inline: true}
-                    ],
-                    thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
-                    footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
-                    timestamp: new Date()
-                })
-                if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
-                    console.log('getting orders for max rank')
-                    ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
-                    var sellers = ""
-                    var quantities = ""
-                    var prices = ""
-                    for (var j=0; j<5; j++)
-                    {
-                        if (ordersArr.length==0)
-                            break
-                        if (j==ordersArr.length)
-                            break
-                        if (ordersArr[j].mod_rank == 0)
-                            continue
-                        sellers += ordersArr[j].seller + "\n"
-                        quantities += ordersArr[j].quantity + "\n"
-                        prices += ordersArr[j].price + "\n"
-                    }
-                    sellers = sellers.replace(/_/g,"\\_")
-                    console.log('executed: ' + item_data.item_url + "(maxed)\n")
-                    if (sellers=="")
-                    {
-                        sellers = "No sellers at this moment."
-                        quantities = "\u200b"
-                        prices = "\u200b"
-                    }
-                    console.log('Max ranked sellers: ' + sellers)
-                    embeds[index-1].fields.push(
-                        {name: 'Sellers (Max ranked)', value: sellers, inline: true},
-                        {name: 'Quantity', value: quantities, inline: true},
-                        {name: 'Price', value: prices, inline: true}
-                    )
-                    embeds[index-1].footer.text += 'Maxed: ' + item_data.maxed_sell_price + '\n\u200b'
-                }
-                console.log(embeds.length + " " + arrItems.length)
-                if (embeds.length==arrItems.length) {
-                    embeds = embeds.sort(dynamicSort("title"))
-                    reaction.message.edit({content: "React with :up: to update", embeds: embeds})
-                }
-            })
-            .catch(err => {
-                console.log(err)
-                reaction.message.edit('Error occured retrieving prices.')
-                return
-            })
-        }
+    if (reaction.emoji.identifier == defaultReactions.update.identifier) {
+        orders_update(reaction.message,reaction)
         return
     }
 
@@ -2857,7 +2718,7 @@ function uptime(message,args) {
     message.channel.send({
         content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${msToTime(msTill1AM)}`
     }).catch(err => console.log(err))
-    message.react(checkReaction);
+    message.react(defaultReactions.check.string);
     return
 }
 
@@ -2879,7 +2740,7 @@ function help(message,args) {
         }]
     }
     message.channel.send(postdata)
-    message.react(checkReaction)
+    message.react(defaultReactions.check.string)
     return
 }
 
@@ -2887,7 +2748,7 @@ async function orders(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}).catch(err => console.log(err));
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     }
     var d_item_url = ""
@@ -3081,9 +2942,9 @@ async function orders(message,args) {
             if (embeds.length==arrItems.length) {
                 console.log(embeds)
                 embeds = embeds.sort(dynamicSort("title"))
-                processMessage.edit({content: "React with :up: to update", embeds: embeds}).catch(err => console.log(err))
-                processMessage.react("🆙").catch(err => console.log(err))
-                message.react(checkReaction).catch(err => console.log(err))
+                processMessage.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`, embeds: embeds}).catch(err => console.log(err))
+                processMessage.react(defaultReactions.update.string).catch(err => console.log(err))
+                message.react(defaultReactions.check.string).catch(err => console.log(err))
             }
         })
         .catch(error => {
@@ -3095,11 +2956,168 @@ async function orders(message,args) {
     return
 }
 
+async function orders_update(message, reaction) {
+    if (!message.author)
+        await message.channel.messages.fetch(message.id)
+    if (message.author.id != client.user.id)
+        return
+    var items_list = []
+    console.log('Retrieving Database -> items_list')
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "Some error occured retrieving items from db.\nError code: 500"}).catch(err => console.log(err))
+        return false
+    })
+    if (!status)
+        return
+    var arrItems = []
+    message.embeds.forEach((element,index)=> {
+        items_list.forEach(element2 => {
+            if (element.title)
+                if (element2.item_url == element.title.toLowerCase().replace(' (v)','').replace(' (null)','').replace(' (r)','').replace(' (e)','').replace(' (p)','').replace(' (b)','').replace(/ \(updating\.\.\.\)/g,'').replace(/ /g, "_")) {
+                    arrItems.push(element2);
+                    message.embeds[index].title += ' (Updating...)'
+                }
+        })
+    });
+    if (arrItems.length == 0)
+        return
+    if (reaction)
+        reaction.users.remove(user.id);
+    message.edit({embeds: reaction.message.embeds}).catch(err => console.log(err))
+    let embeds = []
+    for (var i=0; i<arrItems.length; i++)
+    {
+        const item_data = arrItems[i]
+        axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
+        .then(async response => {
+            var ordersArr = []
+            response.data.payload.orders.forEach(element => {
+                if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1)) { 
+                    Object.keys(response.data.include.item.items_in_set).some(function (k) {
+                        if (response.data.include.item.items_in_set[k].id == item_data.id) {
+                            if (response.data.include.item.items_in_set[k].mod_max_rank) {
+                                if (element.mod_rank == 0 || element.mod_rank == response.data.include.item.items_in_set[k].mod_max_rank)
+                                    ordersArr.push({
+                                        seller: element.user.ingame_name,
+                                        quantity: element.quantity,
+                                        price: element.platinum,
+                                        mod_rank: element.mod_rank
+                                    });
+                            }
+                            else 
+                                ordersArr.push({
+                                    seller: element.user.ingame_name,
+                                    quantity: element.quantity,
+                                    price: element.platinum
+                                });
+                        }
+                    })
+                }
+            })
+            ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
+            ordersArr = ordersArr.sort(dynamicSort("price"))
+            if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank"))
+                ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
+            var sellers = ""
+            var quantities = ""
+            var prices = ""
+            console.log(JSON.stringify(ordersArr))
+            for (var j=0; j<5; j++)
+            {
+                if (ordersArr.length==0)
+                    break
+                if (j==ordersArr.length)
+                    break
+                if (ordersArr[j].mod_rank > 0)
+                    continue
+                sellers += ordersArr[j].seller + "\n"
+                quantities += ordersArr[j].quantity + "\n"
+                prices += ordersArr[j].price + "\n"
+            }
+            sellers = sellers.replace(/_/g,"\\_")
+            console.log('executed: ' + item_data.item_url + "\n")
+            //if (!noSellers)
+            if (sellers=="")
+            {
+                sellers = "No sellers at this moment."
+                quantities = "\u200b"
+                prices = "\u200b"
+            }
+            var vault_status = ''
+            if (item_data.vault_status)
+                vault_status = ' (' + item_data.vault_status + ')'
+            const index = embeds.push({
+                title: item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status,
+                url: 'https://warframe.market/items/' + item_data.item_url,
+                fields: [
+                    {name: 'Sellers', value: sellers, inline: true},
+                    {name: 'Quantity', value: quantities, inline: true},
+                    {name: 'Price', value: prices, inline: true}
+                ],
+                thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                footer: {text: "Yesterday Avg: " + item_data.sell_price + '\n\u200b'},
+                timestamp: new Date()
+            })
+            if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
+                console.log('getting orders for max rank')
+                ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
+                var sellers = ""
+                var quantities = ""
+                var prices = ""
+                for (var j=0; j<5; j++)
+                {
+                    if (ordersArr.length==0)
+                        break
+                    if (j==ordersArr.length)
+                        break
+                    if (ordersArr[j].mod_rank == 0)
+                        continue
+                    sellers += ordersArr[j].seller + "\n"
+                    quantities += ordersArr[j].quantity + "\n"
+                    prices += ordersArr[j].price + "\n"
+                }
+                sellers = sellers.replace(/_/g,"\\_")
+                console.log('executed: ' + item_data.item_url + "(maxed)\n")
+                if (sellers=="")
+                {
+                    sellers = "No sellers at this moment."
+                    quantities = "\u200b"
+                    prices = "\u200b"
+                }
+                console.log('Max ranked sellers: ' + sellers)
+                embeds[index-1].fields.push(
+                    {name: 'Sellers (Max ranked)', value: sellers, inline: true},
+                    {name: 'Quantity', value: quantities, inline: true},
+                    {name: 'Price', value: prices, inline: true}
+                )
+                embeds[index-1].footer.text += 'Maxed: ' + item_data.maxed_sell_price + '\n\u200b'
+            }
+            console.log(embeds.length + " " + arrItems.length)
+            if (embeds.length==arrItems.length) {
+                embeds = embeds.sort(dynamicSort("title"))
+                message.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`, embeds: embeds})
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            message.edit('Error occured retrieving prices.')
+            return
+        })
+    }
+}
+
 async function relics(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}).catch(err => console.log(err));
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     }
     var d_item_url = ""
@@ -3210,7 +3228,7 @@ async function relics(message,args) {
         else if (relic_drops.vault_status == 'P' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nUnvaulted since: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp)
         message.channel.send(postdata).catch(err => console.log(err));
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     }
     var foundItem = 0
@@ -3416,7 +3434,7 @@ async function relics(message,args) {
         else 
             message.channel.send(postdata[k]).catch(err => console.log(err));
     }
-    message.react(checkReaction).catch(err => console.log(err));
+    message.react(defaultReactions.check.string).catch(err => console.log(err));
     return
 }
 
@@ -3424,7 +3442,7 @@ async function auctions(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}).catch(err => console.log(err));
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     }
     var modifier = ""
@@ -3614,7 +3632,7 @@ async function auctions(message,args) {
             }
         )
         processMessage.edit(postdata)
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     })
     .catch(function (error) {
@@ -3629,7 +3647,7 @@ async function list(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "List a prime item on your warframe.market profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     }
     offset = 0
@@ -3859,7 +3877,7 @@ async function relist(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     }
     if (args[0] != "all")
@@ -4211,7 +4229,7 @@ async function authorize(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
-        message.react(checkReaction)
+        message.react(defaultReactions.check.string)
         return
     }
     const email = args[0]
