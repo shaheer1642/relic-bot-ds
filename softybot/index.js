@@ -3007,7 +3007,7 @@ async function orders_update(message, reaction, user) {
         return
     if (reaction)
         reaction.users.remove(user.id);
-    message.edit({embeds: reaction.message.embeds}).catch(err => console.log(err))
+    message.edit({embeds: message.embeds}).catch(err => console.log(err))
     let embeds = []
     for (var i=0; i<arrItems.length; i++)
     {
