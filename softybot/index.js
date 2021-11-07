@@ -6983,7 +6983,7 @@ async function trading_lich_orders_update(interaction, ingame_name) {
     for(var i=0;i<tradingBotLichChannels.length;i++) {
         var multiCid = tradingBotLichChannels[i]
         await client.channels.cache.get(multiCid).send({
-            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon')}\nElement: ${interaction.options.getString('element')}\nDamage: ${interaction.options.getNumber('damage')}%\nQuirk: ${interaction.options.getString('quirk')}%\nLich name: ${interaction.options.getString('name')}%\nPrice: ${interaction.options.getNumber('price')}p`, 
+            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon')}\nElement: ${interaction.options.getString('element')}\nDamage: ${interaction.options.getNumber('damage')}%\nQuirk: ${interaction.options.getString('quirk')}%\nLich name: ${interaction.options.getString('name')}%\nPrice: ${interaction.options.getInteger('price')}p`, 
             embeds: []
         })
         .catch(err => console.log(err))

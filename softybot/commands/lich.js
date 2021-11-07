@@ -52,7 +52,7 @@ module.exports = {
 			option.setName('name')
 				.setDescription('Input lich name')
 				.setRequired(true))
-		.addNumberOption(option => 
+		.addIntegerOption(option => 
 			option.setName('price')
 				.setDescription('Input buy price')
 				.setRequired(true))
