@@ -946,12 +946,9 @@ client.on('messageCreate', async message => {
                 case 'query':
                     user_query(message,args)
                     break
-                case 'test':
-                    admin_test(message,args)
-                    break
                 /*----------------------
                 case 'test':
-                    test(message,args)
+                    admin_test(message,args)
                     break
                 -----------------------*/
             }
