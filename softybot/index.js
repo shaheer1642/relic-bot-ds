@@ -7642,13 +7642,13 @@ async function admin_test(message,args) {
             },
             color: 39423,
             footer: {
-              text: "Choose an available role to join. <:on:756066695449411606>  <:off:756066941520576522> ",
+              text: `Choose an available role to join. ${tradingBotReactions.remove[0]}`,
             },
             fields: [
               {
                 name: "Role",
                 value:
-                  "<:on:756066695449411606> Chroma :　\n<:off:756066941520576522> Volt :　\n<:off:756066941520576522> Harrow :　\n<:off:756066941520576522> Trinity :　\n",
+                  `<:on:756066695449411606> Chroma :　\n${tradingBotReactions.remove[0]} Volt :　\n${tradingBotReactions.remove[0]} Harrow :　\n<:off:756066941520576522> Trinity :　\n`,
                 inline: true,
               },
               {
