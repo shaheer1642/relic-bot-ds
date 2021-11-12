@@ -7642,7 +7642,7 @@ async function admin_test(message,args) {
             },
             color: 39423,
             footer: {
-              text: "Choose an available role to join.",
+              text: "Choose an available role to join. <:on:756066695449411606>  <:off:756066941520576522> ",
             },
             fields: [
               {
