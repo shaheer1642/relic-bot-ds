@@ -946,6 +946,9 @@ client.on('messageCreate', async message => {
                 case 'query':
                     user_query(message,args)
                     break
+                case 'test':
+                    admin_test(message,args)
+                    break
                 /*----------------------
                 case 'test':
                     test(message,args)
@@ -7628,6 +7631,49 @@ async function td_set_orders_timeouts() {
             .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
         }, after3h - currTime);
     }
+}
+
+async function admin_test(message,args) {
+    message.channel.send({content: " ", embeds: [
+        {
+            title: "Hunts with premade squads.",
+            thumbnail: {
+              url: "https://firebasestorage.googleapis.com/v0/b/relicbot-325715.appspot.com/o/commands%2Feidolon%2Fpremade.png?alt=media&token=414e0827-caeb-4d70-a500-4f279c182e39",
+            },
+            color: 39423,
+            footer: {
+              text: "Choose an available role to join.",
+            },
+            fields: [
+              {
+                name: "Role",
+                value:
+                  "<:on:756066695449411606> Chroma :　\n<:off:756066941520576522> Volt :　\n<:off:756066941520576522> Harrow :　\n<:off:756066941520576522> Trinity :　\n",
+                inline: true,
+              },
+              {
+                name: "Member",
+                value: "Ady88　\n\n\n\n",
+                inline: true,
+              },
+              {
+                name: "Reputation",
+                value: "4　\n\n\n\n",
+                inline: true,
+              },
+              {
+                name: "Hunts",
+                value: "5x3",
+                inline: true,
+              },
+              {
+                name: "Min Captures",
+                value: "200",
+                inline: true,
+              },
+            ],
+          }
+    ]}).catch(err => console.log(err))
 }
 
 //==================================== GMAIL API =============================================
