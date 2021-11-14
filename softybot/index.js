@@ -7257,7 +7257,7 @@ async function trading_lich_orders_update(interaction, lich_info) {
                 interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
             return Promise.reject()
         })
-
+        console.log(JSON.stringify(embeds))
         await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
         .then(msg => {
             msg.reactions.removeAll()
