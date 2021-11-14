@@ -7069,6 +7069,7 @@ async function trading_lich_bot(interaction) {
     })
     console.log(lich_info)
     //----verify order in DB----
+    await db.query(`DELETE FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(err => console.log(err))
     var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
