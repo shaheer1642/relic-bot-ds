@@ -7234,7 +7234,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
                         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                         fields: [],
-                        color: '#7cb45d'
+                        color: '#E74C3C'
                     }
                     embed.fields.push([
                         {name: 'Seller',value: res.rows[j].ingame_name,inline: true},
@@ -7258,8 +7258,11 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             return Promise.reject()
         })
         embeds.forEach((element,index) => {
-            if (index != 0)
+            if (index != 0) {
                 embeds[index].url = null
+                embeds[index].title = null
+                embeds[index].thumbnail = null
+            }
         })
         console.log(JSON.stringify(embeds))
 
