@@ -7164,7 +7164,67 @@ async function trading_lich_bot(interaction) {
         return Promise.reject()
     //----------------
 
-    await trading_lich_orders_update(interaction, lich_info, 1).catch(err => console.log(err))
+    await trading_lich_orders_update(interaction, lich_info, 1)
+    .then(res => {
+        setTimeout(async () => {
+            var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status) {
+                console.log(`Error setting timeout for order discord_id = ${interaction.user.id} AND item_id = '${lich_info.lich_id}'`)
+                return Promise.reject()
+            }
+            await trading_lich_orders_update(null, lich_info, 2)
+            .then(async res => {
+                var postdata = {}
+                postdata.content = " "
+                postdata.embeds = []
+                postdata.embeds.push({
+                    description: `❕ Order Notification ❕\n\nYour **${interaction.options.getString('order_type').replace('wts','Sell').replace('wtb','Buy')}** order for **${lich_info.weapon_url}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                    timestamp: new Date()
+                })
+                if (interaction.options.getString('order_type') == 'wts')
+                    postdata.embeds[0].color = tb_sellColor
+                if (interaction.options.getString('order_type') == 'wtb')
+                    postdata.embeds[0].color = tb_buyColor
+                console.log(postdata)
+                var status = await db.query(`SELECT * from users_list WHERE discord_id = ${interaction.user.id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    if (res.rows.length > 1)
+                        return false
+                    if (res.rows[0].notify_order == true) {
+                        var user_presc = client.guilds.cache.get(interaction.guild.id).presences.cache.find(mem => mem.userId == interaction.user.id)
+                        if (user_presc) {
+                            if (user_presc.status != 'dnd')
+                                interaction.user.send(postdata).catch(err => console.log(err))
+                        }
+                        else
+                            interaction.user.send(postdata).catch(err => console.log(err))
+                        return true
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
+                    return Promise.reject()
+                }
+                return Promise.resolve()
+            })
+            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${interaction.user.id} AND item_id = '${lich_info.lich_id}'`))
+        }, u_order_close_time);
+    })
+    .catch(err => console.log(err))
 
     return Promise.resolve()
 }
