@@ -7203,7 +7203,7 @@ async function trading_lich_orders_update(interaction, lich_info) {
                         {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
                         {name: 'Element',value: res.rows[j].element,inline: true},
                         {name: 'Damage',value: res.rows[j].damage + '%',inline: true},
-                        {name: 'Ephemera',value: res.rows[j].ephemera,inline: true},
+                        {name: 'Ephemera',value: res.rows[j].ephemera.toString(),inline: true},
                         {name: 'Quirk',value: res.rows[j].quirk,inline: true},
                         {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
                     ])
