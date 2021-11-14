@@ -7258,7 +7258,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             return Promise.reject()
         })
         console.log(JSON.stringify(embeds))
-        
+
         await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item
@@ -7274,15 +7274,13 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 var c = client.channels.cache.get(multiCid)
                 var m = c.messages.cache.get(res.rows[0].message_id)
                 if (!m) {
-                    var status = await c.messages.fetch(res.rows[0].message_id).then(mNew => {
+                    await c.messages.fetch(res.rows[0].message_id).then(mNew => {
                         msg = mNew
-                        return true
                     })
                     .catch(async err => {     //maybe message does not exist in discord anymore
                         console.log(err)
                         await db.query(`DELETE FROM lich_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
                         msg = null
-                        return true
                     })
                 }
                 else
