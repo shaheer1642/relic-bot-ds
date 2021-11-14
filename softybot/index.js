@@ -1286,7 +1286,19 @@ client.on('interactionCreate', async interaction => {
         return;
 
     if (interaction.commandName == 'lich') {
-        await trading_lich_bot(interaction).then(() => console.log(`Executed lich order for user ${interaction.user.username}`)).catch(err => console.log(err))
+        await trading_lich_bot(interaction).then(() => {
+            interaction.reply({
+                content: 'Your order has been posted.',
+                ephemeral: true
+            }).catch(err => console.log(err))
+            console.log(`Executed lich order for user ${interaction.user.username}`)
+        }).catch(err => {
+            console.log(err)
+            interaction.reply({
+                content: 'Some error occured posting order. Contact MrSofty#7926',
+                ephemeral: true
+            }).catch(err => console.log(err))
+        })
     }
 
     if (interaction.commandName == 'ping') {
@@ -7146,14 +7158,10 @@ async function trading_lich_bot(interaction) {
     })
     if (!status)
         return Promise.reject()
+    //----------------
 
     //await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
 
-    interaction.reply({
-        content: 'Your order has been posted.',
-        ephemeral: true
-    }).catch(err => {console.log(err)})
-    
     return Promise.resolve()
 }
 
