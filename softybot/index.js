@@ -7109,7 +7109,7 @@ async function trading_lich_bot(interaction) {
                 ${interaction.options.getInteger('price')},
                 true,
                 '${interaction.options.getString('element')}',
-                ${interaction.options.getInteger('damage')},
+                ${interaction.options.getNumber('damage')},
                 ${interaction.options.getBoolean('ephemera')},
                 '${interaction.options.getString('quirk')}',
                 '${interaction.options.getString('name')}',
