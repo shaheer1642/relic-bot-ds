@@ -7169,7 +7169,7 @@ async function trading_lich_bot(interaction) {
 }
 
 async function trading_lich_orders_update(interaction, lich_info, update_type) {
-    for(var i=0;i<tradingBotLichChannels.length;i++) {
+    for (var i=0;i<tradingBotLichChannels.length;i++) {
         var multiCid = tradingBotLichChannels[i]
         console.log(`editing for channel ${multiCid}`)
         var msg = null
@@ -7258,25 +7258,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             return Promise.reject()
         })
         console.log(JSON.stringify(embeds))
-        await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
-        .then(msg => {
-            msg.reactions.removeAll()
-            .then(() => {
-                for (var i=0;i<noOfSellers;i++) {
-                    msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
-                }
-                for (var i=0;i<noOfBuyers;i++) {
-                    msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
-                }
-            })
-            .catch(err => console.log(err))
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
-            return Promise.reject()
-        })
-
+        
         await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item
