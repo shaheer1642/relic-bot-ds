@@ -7022,11 +7022,11 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 
 async function trading_lich_bot(interaction) {
     if (!interaction.member.presence) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: true}).catch(err => console.log(err))
         return Promise.resolve()
     }
     if (interaction.member.presence.status == `offline`) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: true}).catch(err => console.log(err))
         return Promise.resolve()
     }
 
@@ -7042,15 +7042,15 @@ async function trading_lich_bot(interaction) {
     })
     .catch(err => {
         console.log(err + 'Retrieving Database -> users_list error')
-        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: false}).catch(err => console.log(err))
+        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(err => console.log(err))
         return 2
     })
     if (status == 0) {
-        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: false}).catch(err => console.log(err))
+        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: true}).catch(err => console.log(err))
         interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
         .catch(err => {
             console.log(err)
-            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: false}).catch(err => console.log(err))
+            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: true}).catch(err => console.log(err))
         })
         return Promise.resolve()
     }
@@ -7076,13 +7076,13 @@ async function trading_lich_bot(interaction) {
             var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${interaction.user.id}`)
             .then(async tab1 => {
                 if (tab1.rowCount >= userOrderLimit) {
-                    interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: false}).catch(err => console.log(err))
+                    interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
                     return false
                 }
                 var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id}`)
                 .then(tab2 => {
                     if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
-                        interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: false}).catch(err => console.log(err))
+                        interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
                         return false
                     }
                     return true
@@ -7097,7 +7097,7 @@ async function trading_lich_bot(interaction) {
             })
             .catch(err => {
                 console.log(err)
-                interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+                interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
                 return false
             })
             if (!status)
@@ -7124,7 +7124,7 @@ async function trading_lich_bot(interaction) {
             .catch(err => {
                 console.log(err)
                 if (err.code == '23505') {
-                    interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: false}).catch(err => console.log(err))
+                    interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: true}).catch(err => console.log(err))
                 }
                 return false
             })
@@ -7132,18 +7132,18 @@ async function trading_lich_bot(interaction) {
                 return false
         }
         else if (res.rows.length > 1) {
-            interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+            interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
             return false
         }
         else {     //----update existing order in DB----
-            interaction.reply({content: `Order already found in db. right now updation is not implemented`, ephemeral: false}).catch(err => console.log(err))
+            interaction.reply({content: `Order already found in db. right now updation is not implemented`, ephemeral: true}).catch(err => console.log(err))
             return false
             var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
             .then(res => {
                 return true
             })
             .catch(err => {
-                interaction.reply({content: `☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+                interaction.reply({content: `☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
                 console.log(err)
                 return false
             })
@@ -7155,7 +7155,8 @@ async function trading_lich_bot(interaction) {
         return true
     })
     .catch(err => {
-        interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+        console.log(err)
+        interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
         return false
     })
     if (!status)
