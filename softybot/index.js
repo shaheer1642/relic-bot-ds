@@ -1282,7 +1282,7 @@ client.on('interactionCreate', async interaction => {
         console.log(JSON.stringify(postdata.components))
         await interaction.editReply(postdata).catch(err => console.log(err))
     }
-    if (!interaction.isCommand()) 
+    if (!interaction.isCommand())
         return;
 
     if (interaction.commandName == 'lich') {
@@ -3269,7 +3269,10 @@ async function relics(message,args) {
             url: "https://warframe.market/items/" + d_item_url,
             footer: {text: "Total drops value: " + drops_value + "p"},
             thumbnail: {url: 'https://warframe.market/static/assets/' + relic_drops.icon_url},
-            fields: [{name: "`Drops`", value: value1, inline: true},{name: "\u200b", value: "\u200b", inline: true},{name: "\u200b", value: value2, inline: true}]
+            fields: [
+                {name: "`Drops`", value: value1, inline: true},
+                {name: "\u200b", value: "\u200b", inline: true},
+                {name: "\u200b", value: value2, inline: true}]
         })
         if (relic_drops.vault_status == 'V' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
@@ -7042,7 +7045,109 @@ async function trading_lich_bot(interaction) {
     if (status == 2)
         return Promise.resolve()
 
-    await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
+    //----retrieve lich info----
+    var lich_info = []
+    var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
+    .then(res => {
+        lich_info = res.rows[0]
+        return true
+    })
+    .catch(err => {
+        console.log(err); return false
+    })
+    //----verify order in DB----
+    var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
+    .then(async res => {
+        if (res.rows.length == 0) {     //----insert order in DB----
+            //Check if user has more than limited orders
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${interaction.user.id}`)
+            .then(tab1 => {
+                if (tab1.rowCount >= userOrderLimit) {
+                    interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: false}).catch(err => console.log(err))
+                    return false
+                }
+                var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id}`)
+                .then(tab2 => {
+                    if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
+                        interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: false}).catch(err => console.log(err))
+                        return false
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return false
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+                return false
+            })
+            if (!status)
+                return false
+            var status = await db.query(`INSERT INTO users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,quirk,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
+                ${interaction.user.id},
+                '${lich_info.lich_id}',
+                '${interaction.options.getString('order_type')}',
+                ${interaction.options.getInteger('price')},
+                true,
+                '${interaction.options.getString('element')}',
+                ${interaction.options.getInteger('damage')},
+                ${interaction.options.getBoolean('ephemera')},
+                '${interaction.options.getString('quirk')}',
+                '${interaction.options.getString('name')}',
+                ${interaction.channel.id},
+                ${interaction.guild.id},
+                ${new Date().getTime()})`)
+            .then(res => {
+                if (res.rowCount == 1)
+                    return true
+                return false
+            })
+            .catch(err => {
+                console.log(err)
+                if (err.code == '23505') {
+                    interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: false}).catch(err => console.log(err))
+                }
+                return false
+            })
+            if (!status)
+                return false
+        }
+        else if (res.rows.length > 1) {
+            interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+            return false
+        }
+        else {     //----update existing order in DB----
+            interaction.reply({content: `Order already found in db. right now updation is not implemented`, ephemeral: false}).catch(err => console.log(err))
+            return false
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                interaction.reply({content: `☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        if (!status)
+            return false
+        return true
+    })
+    .catch(err => {
+        interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: false}).catch(err => console.log(err))
+        return false
+    })
+    if (!status)
+        return Promise.reject()
+
+    //await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
 
     return Promise.resolve()
 }

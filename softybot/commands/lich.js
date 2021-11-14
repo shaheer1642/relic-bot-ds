@@ -48,12 +48,22 @@ module.exports = {
 				.addChoice('Pyromaniac', 'pyromaniac')
 				.addChoice('Trophy Hunter', 'trophy_hunter')
 				.addChoice('Vain', 'vain'))
+		.addBooleanOption(option =>
+			option.setName('ephemera')
+				.setDescription('Includes ephmera?')
+				.setRequired(true))
 		.addStringOption(option =>
 			option.setName('name')
 				.setDescription('Input lich name')
 				.setRequired(true))
-		.addIntegerOption(option => 
+		.addIntegerOption(option =>
 			option.setName('price')
 				.setDescription('Input buy price')
 				.setRequired(true))
+		.addStringOption(option =>
+			option.setName('order_type')
+				.setDescription('Order type')
+				.setRequired(true)
+				.addChoice('Sell', 'sell')
+				.addChoice('Buy', 'buy'))
 };
