@@ -7257,6 +7257,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
             return Promise.reject()
         })
+        embeds.forEach((element,index) => {
+            if (index != 0)
+                embeds[index].url = null
+        })
         console.log(JSON.stringify(embeds))
 
         await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
