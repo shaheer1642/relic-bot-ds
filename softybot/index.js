@@ -7061,7 +7061,7 @@ async function trading_lich_bot(interaction) {
         if (res.rows.length == 0) {     //----insert order in DB----
             //Check if user has more than limited orders
             var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${interaction.user.id}`)
-            .then(tab1 => {
+            .then(async tab1 => {
                 if (tab1.rowCount >= userOrderLimit) {
                     interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: false}).catch(err => console.log(err))
                     return false
