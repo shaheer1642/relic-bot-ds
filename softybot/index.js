@@ -7182,7 +7182,7 @@ async function trading_lich_orders_update(interaction, lich_info) {
         await db.query(`
         SELECT * FROM users_lich_orders 
         JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
-        JOIN lich_list ON users_lich_orders.lich_id=lich_list.id 
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
         WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
         ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
         .then(res => {
@@ -7221,7 +7221,7 @@ async function trading_lich_orders_update(interaction, lich_info) {
         var status = await db.query(`
         SELECT * FROM users_lich_orders 
         JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
-        JOIN lich_list ON users_lich_orders.lich_id=lich_list.id 
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
         WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
         ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
         .then(res => {
