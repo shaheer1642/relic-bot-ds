@@ -7163,12 +7163,12 @@ async function trading_lich_bot(interaction) {
         return Promise.reject()
     //----------------
 
-    await trading_lich_orders_update(interaction, lich_info).catch(err => console.log(err))
+    await trading_lich_orders_update(interaction, lich_info, 1).catch(err => console.log(err))
 
     return Promise.resolve()
 }
 
-async function trading_lich_orders_update(interaction, lich_info) {
+async function trading_lich_orders_update(interaction, lich_info, update_type) {
     for(var i=0;i<tradingBotLichChannels.length;i++) {
         var multiCid = tradingBotLichChannels[i]
         console.log(`editing for channel ${multiCid}`)
