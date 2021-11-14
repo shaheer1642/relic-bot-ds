@@ -56,7 +56,7 @@ var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
 var Ducat_Update_Timer = null
-const u_order_close_time = 10000 //10800000
+const u_order_close_time = 10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -7259,7 +7259,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         color: '#7cb45d'
                     }
                     embed.fields.push([
-                        {name: 'Seller',value: res.rows[j].ingame_name,inline: true},
+                        {name: `Seller ${tradingBotReactions.sell[j]}`,value: res.rows[j].ingame_name,inline: true},
                         {name: 'Order type',value: res.rows[j].order_type,inline: true},
                         {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
                         {name: 'Element',value: res.rows[j].element,inline: true},
@@ -7298,7 +7298,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         color: '#E74C3C'
                     }
                     embed.fields.push([
-                        {name: 'Seller',value: res.rows[j].ingame_name,inline: true},
+                        {name: `Buyer ${tradingBotReactions.buy[j]}`,value: res.rows[j].ingame_name,inline: true},
                         {name: 'Order type',value: res.rows[j].order_type,inline: true},
                         {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
                         {name: 'Element',value: res.rows[j].element,inline: true},
