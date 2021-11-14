@@ -7149,6 +7149,11 @@ async function trading_lich_bot(interaction) {
 
     //await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
 
+    interaction.reply({
+        content: 'Your order has been posted.',
+        ephemeral: true
+    }).catch(err => {console.log(err)})
+    
     return Promise.resolve()
 }
 
@@ -7161,7 +7166,7 @@ async function trading_lich_orders_update(interaction, ingame_name) {
         })
         .catch(err => console.log(err))
     }
-    await interaction.reply({
+    interaction.reply({
         content: 'Your order has been posted.',
         ephemeral: true
     }).catch(err => {console.log(err)})
