@@ -7067,6 +7067,7 @@ async function trading_lich_bot(interaction) {
     .catch(err => {
         console.log(err); return false
     })
+    console.log(lich_info)
     //----verify order in DB----
     var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
     .then(async res => {
