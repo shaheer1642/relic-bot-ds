@@ -7260,13 +7260,16 @@ async function trading_lich_orders_update(interaction, lich_info) {
 
         await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
         .then(msg => {
-            await msg.reactions.removeAll().catch(err => console.log(err))
-            for (var i=0;i<noOfSellers;i++) {
-                msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
-            }
-            for (var i=0;i<noOfBuyers;i++) {
-                msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
-            }
+            msg.reactions.removeAll()
+            .then(() => {
+                for (var i=0;i<noOfSellers;i++) {
+                    msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                }
+                for (var i=0;i<noOfBuyers;i++) {
+                    msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                }
+            })
+            .catch(err => console.log(err))
         })
         .catch(err => {
             console.log(err)
