@@ -7085,6 +7085,7 @@ async function trading_lich_bot(interaction) {
                         interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: false}).catch(err => console.log(err))
                         return false
                     }
+                    return true
                 })
                 .catch(err => {
                     console.log(err)
