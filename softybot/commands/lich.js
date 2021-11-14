@@ -64,6 +64,6 @@ module.exports = {
 			option.setName('order_type')
 				.setDescription('Order type')
 				.setRequired(true)
-				.addChoice('Sell', 'sell')
-				.addChoice('Buy', 'buy'))
+				.addChoice('Sell order', 'wts')
+				.addChoice('Buy order', 'wtb'))
 };

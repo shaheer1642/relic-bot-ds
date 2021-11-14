@@ -7163,24 +7163,257 @@ async function trading_lich_bot(interaction) {
         return Promise.reject()
     //----------------
 
-    //await trading_lich_orders_update(interaction, ingame_name).catch(err => console.log(err))
+    await trading_lich_orders_update(interaction, lich_info).catch(err => console.log(err))
 
     return Promise.resolve()
 }
 
-async function trading_lich_orders_update(interaction, ingame_name) {
+async function trading_lich_orders_update(interaction, lich_info) {
     for(var i=0;i<tradingBotLichChannels.length;i++) {
         var multiCid = tradingBotLichChannels[i]
-        await client.channels.cache.get(multiCid).send({
-            content: `User ${ingame_name} is selling a lich with the following properties:\nWeapon: ${interaction.options.getString('weapon')}\nElement: ${interaction.options.getString('element')}\nDamage: ${interaction.options.getNumber('damage')}%\nQuirk: ${interaction.options.getString('quirk')}\nLich name: ${interaction.options.getString('name')}\nPrice: ${interaction.options.getInteger('price')}$`, 
-            embeds: []
+        console.log(`editing for channel ${multiCid}`)
+        var msg = null
+        var embeds = []
+        var noOfSellers = 0
+        var noOfBuyers = 0
+        //var targetChannel = client.channels.cache.get(multiCid)
+
+        //----construct embed----
+        await db.query(`
+        SELECT * FROM users_lich_orders 
+        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.id 
+        WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
+        ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
+        .then(res => {
+            if (res.rows.length != 0) {
+                for (var j=0;j<res.rows.length;j++) {
+                    if (j==5)
+                        break
+                    var embed = {
+                        title: lich_info.weapon_url,
+                        thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
+                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                        fields: [],
+                        color: '#7cb45d'
+                    }
+                    embed.fields.push([
+                        {name: 'Seller',value: res.rows[j].ingame_name,inline: true},
+                        {name: 'Order type',value: res.rows[j].order_type,inline: true},
+                        {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
+                        {name: 'Element',value: res.rows[j].element,inline: true},
+                        {name: 'Damage',value: res.rows[j].damage + '%',inline: true},
+                        {name: 'Ephemera',value: res.rows[j].ephemera,inline: true},
+                        {name: 'Quirk',value: res.rows[j].quirk,inline: true},
+                        {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
+                    ])
+                    embeds.push(embed)
+                }
+                noOfSellers = j
+            }
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            console.log(err)
+            if (interaction)
+                interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            return Promise.reject()
+        })
+        var status = await db.query(`
+        SELECT * FROM users_lich_orders 
+        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.id 
+        WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
+        ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
+        .then(res => {
+            if (res.rows.length != 0) {
+                for (var j=0;j<res.rows.length;j++) {
+                    if (j==5)
+                        break
+                    var embed = {
+                        title: lich_info.weapon_url,
+                        thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
+                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                        fields: [],
+                        color: '#7cb45d'
+                    }
+                    embed.fields.push([
+                        {name: 'Seller',value: res.rows[j].ingame_name,inline: true},
+                        {name: 'Order type',value: res.rows[j].order_type,inline: true},
+                        {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
+                        {name: 'Element',value: res.rows[j].element,inline: true},
+                        {name: 'Damage',value: res.rows[j].damage + '%',inline: true},
+                        {name: 'Ephemera',value: res.rows[j].ephemera,inline: true},
+                        {name: 'Quirk',value: res.rows[j].quirk,inline: true},
+                        {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
+                    ])
+                    embeds.push(embed)
+                }
+                noOfBuyers = j
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            if (interaction)
+                interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            return Promise.reject()
+        })
+
+        await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
+        .then(msg => {
+            await msg.reactions.removeAll().catch(err => console.log(err))
+            for (var i=0;i<noOfSellers;i++) {
+                msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+            }
+            for (var i=0;i<noOfBuyers;i++) {
+                msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            return Promise.reject()
+        })
+
+        /*
+        var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+        .then(async res => {
+            if (res.rows.length == 0) {  //no message for this item
+                msg = null
+                return true
+            }
+            else if (res.rows.length > 1) {
+                console.log(`Detected more than one message for item ${item_name} in channel ${multiCid}`)
+                if (originMessage) {
+                    originMessage.channel.send(`☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    //setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                }
+                return false
+            }
+            else {
+                var c = client.channels.cache.get(multiCid)
+                var m = c.messages.cache.get(res.rows[0].message_id)
+                if (!m) {
+                    var status = await c.messages.fetch(res.rows[0].message_id).then(mNew => {
+                        msg = mNew
+                        return true
+                    })
+                    .catch(async err => {     //maybe message does not exist in discord anymore
+                        await db.query(`DELETE FROM messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid} AND user_rank = '${item_rank}'`).catch(err => console.log(err))
+                        msg = null
+                        console.log(err)
+                        return true
+                    })
+                    if (!status)
+                        return false
+                }
+                else {
+                    msg = m
+                }
+                return true
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            return Promise.reject()
+        })
+        if (msg) {
+            if (embeds.length==0) {
+                var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id} AND user_rank = '${item_rank}'`)
+                .then(res => msg.delete().catch(err => console.log(err)))
+                .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
+            }
+            else {
+                msg.edit({content: ' ',embeds: embeds})
+                .then(async msg => {
+                    await msg.reactions.removeAll().catch(err => console.log(err))
+                    for (var i=0;i<noOfSellers;i++) {
+                        msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                    }
+                    for (var i=0;i<noOfBuyers;i++) {
+                        msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                    }
+                })
+                .catch(err => {
+                    if (originMessage) {
+                        originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                    }
+                    console.log(err)
+                    return
+                })
+            }
+        }
+        else {
+            if (update_type != 1)
+                continue
+            if (embeds.length == 0)
+                return Promise.reject()
+            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
+            .then(async msg => {
+                var status = await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${msg.id},'${item_rank}')`)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {     //might be a dublicate message
+                    console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`)
+                    setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
+                    return false
+                })
+                if (!status) {
+                    var status = db.query(`SELECT * from messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+                    .then(async res => {
+                        if (res.rows.length == 0) {
+                            if (originMessage) {
+                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                            }
+                            return false
+                        }
+                        var msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
+                        var status = await msg.edit({content: ' ', embeds: embeds}).then(async () => {
+                            await msg.reactions.removeAll().catch(err => console.log(err))
+                            for (var i=0;i<noOfSellers;i++) {
+                                msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                            }
+                            for (var i=0;i<noOfBuyers;i++) {
+                                msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                            }
+                            return true
+                        })
+                        .catch(err => {
+                            if (originMessage) {
+                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                            }
+                            console.log(err)
+                            return false
+                        })
+                        if (!status)
+                            return false
+                    })
+                    if (!status)
+                        return Promise.reject()
+                }
+                await msg.reactions.removeAll().catch(err => console.log(err))
+                for (var i=0;i<noOfSellers;i++) {
+                    msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                }
+                for (var i=0;i<noOfBuyers;i++) {
+                    msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                if (originMessage) {
+                    originMessage.channel.send(`☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
+                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                }
+                return Promise.reject()
+            })
+        }
+        */
     }
-    interaction.reply({
-        content: 'Your order has been posted.',
-        ephemeral: true
-    }).catch(err => {console.log(err)})
+    console.log(`edited for all channels, returning`)
     return Promise.resolve()
 }
 
