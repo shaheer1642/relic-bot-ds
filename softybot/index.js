@@ -1552,8 +1552,8 @@ client.on('interactionCreate', async interaction => {
             var index = postdata.components.push({type:1,components:[]})
             index--
             postdata.components[index].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
-            item_orders.forEach((e,index) => {
-                if (index < 25) {
+            item_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
                     if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
                         postdata.components[index].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
                 }
@@ -1564,8 +1564,8 @@ client.on('interactionCreate', async interaction => {
             var index = postdata.components.push({type:1,components:[]})
             index--
             postdata.components[index].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
-            lich_orders.forEach((e,index) => {
-                if (index < 25) {
+            lich_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
                     if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
                         postdata.components[index].components[0].options.push({label: e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.lich_id})
                 }
@@ -8550,8 +8550,8 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             var index = postdata.components.push({type:1,components:[]})
             index--
             postdata.components[index].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
-            item_orders.forEach((e,index) => {
-                if (index < 25) {
+            item_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
                     if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
                         postdata.components[index].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
                 }
@@ -8562,8 +8562,8 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             var index = postdata.components.push({type:1,components:[]})
             index--
             postdata.components[index].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
-            lich_orders.forEach((e,index) => {
-                if (index < 25) {
+            lich_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
                     if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
                         postdata.components[index].components[0].options.push({label: e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.lich_id})
                 }
