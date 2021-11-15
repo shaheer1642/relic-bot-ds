@@ -3180,7 +3180,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
     if (newThread.archived) {
         if (newThread.ownerId != client.user.id)
             return Promise.resolve()
-        if (!tradingBotChannels.includes(newThread.parentId) && !tradingBotSpamChannels.includes(newThread.parentId))
+        if (!tradingBotChannels.includes(newThread.parentId) && !tradingBotLichChannels.includes(newThread.parentId) && !tradingBotSpamChannels.includes(newThread.parentId))
             return Promise.resolve()
         var order_data = null
         var isLich = false
@@ -3216,10 +3216,8 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                 console.log(err)
                 return false
             })
-            if (!status) {
-                console.log('returning')
+            if (!status)
                 return Promise.resolve()
-            }
         }
         var trader_ign = ''
         var tradee_ign = ''
@@ -3249,15 +3247,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         })
         if (!status)
             return Promise.resolve()
-        //------
-        /*
-        var chat_log = ''
-        order_data.messages_log.forEach(e => {
-            chat_log += `**${e.ingame_name}:** ${e.content}\n`
-        })
-        chat_log = chat_log.substring(0, chat_log.length - 1);
-        */
-        //------
+            
         var order_status = ""
         if (order_data.order_status == 'unsuccessful')
             order_status = `unsuccessful ⚠️ (React with ${tradingBotReactions.success[0]} or 🛑 after staff verification)`
