@@ -7881,7 +7881,6 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     }
                     embed.fields.push([
                         {name: `Seller ${tradingBotReactions.sell[j]}`,value: res.rows[j].ingame_name,inline: true},
-                        {name: 'Order type',value: res.rows[j].order_type,inline: true},
                         {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
                         {name: 'Element',value: res.rows[j].element,inline: true},
                         {name: 'Damage',value: res.rows[j].damage + '%',inline: true},
