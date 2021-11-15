@@ -1373,7 +1373,7 @@ client.on('interactionCreate', async interaction => {
         }
         await interaction.deferUpdate()
         for (var interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
-            const lich_info = {lich_id: interaction.values[interactionIndex],weapon_url: ''}
+            var lich_info = {lich_id: interaction.values[interactionIndex],weapon_url: ''}
             var status = await db.query(`SELECT * FROM lich_list WHERE lich_id='${lich_info.lich_id}'`)
             .then(async res => {
                 lich_info = res.rows[0]
