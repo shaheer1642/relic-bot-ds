@@ -201,7 +201,7 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        if (!tradingBotChannels.includes(message.channel.parentId) && !tradingBotSpamChannels.includes(message.channel.parentId))
+        if (!tradingBotChannels.includes(message.channel.parentId) && !tradingBotLichChannels.includes(message.channel.parentId) && !tradingBotSpamChannels.includes(message.channel.parentId))
             return Promise.resolve()
         if (message.channel.ownerId != client.user.id)
             return Promise.resolve()
@@ -212,6 +212,7 @@ client.on('messageCreate', async message => {
         console.log(`message sent in an active thread`)
         var order_data = null
         var from_cross = false
+        var isLich = false
         var status = await db.query(`
         SELECT * FROM filled_users_orders
         WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
@@ -242,8 +243,43 @@ client.on('messageCreate', async message => {
                 console.log(err)
                 return false
             })
-            if (!status2)
-                return Promise.resolve()
+            if (!status2) {
+                var status = await db.query(`
+                SELECT * FROM filled_users_lich_orders
+                WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
+                `)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    order_data = res.rows[0]
+                    isLich = true
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    var status2 = await db.query(`
+                    SELECT * FROM filled_users_lich_orders
+                    WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
+                    `)
+                    .then(res => {
+                        if (res.rows.length == 0)
+                            return false
+                        isLich = true
+                        from_cross = true
+                        order_data = res.rows[0]
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status2)
+                        return Promise.resolve()
+                }
+            }
         }
         if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
             message.delete().catch(err => console.log(err))
@@ -277,24 +313,44 @@ client.on('messageCreate', async message => {
         })
         order_data.messages_log += `**${ingame_name}:** ${sentMessage}`
         if (!from_cross) {
-            var status = await db.query(`
-            UPDATE filled_users_orders
-            SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
-            WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
-            `)
-            .catch(err => {
-                console.log(err)
-            })
+            if (isLich) {
+                var status = await db.query(`
+                UPDATE filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+                WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
+                `)
+                .catch(err => {
+                    console.log(err)
+                })
+            }
+            else {
+                var status = await db.query(`
+                UPDATE filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+                WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
+                `)
+                .catch(err => {
+                    console.log(err)
+                })
+            }
         }
         else {
-            var status = await db.query(`
-            UPDATE filled_users_orders
-            SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
-            WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
-            `)
-            .catch(err => {
-                console.log(err)
-            })
+            if (isLich) {
+                var status = await db.query(`
+                UPDATE filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+                WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
+                `)
+                .catch(err => {
+                    console.log(err)
+                })
+            }
+            else {
+                var status = await db.query(`
+                UPDATE filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+                WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
+                `)
+                .catch(err => {
+                    console.log(err)
+                })
+            }
         }
         if (from_cross) {
             const thread = client.channels.cache.get(order_data.thread_id)
