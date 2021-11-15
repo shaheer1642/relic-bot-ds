@@ -2148,9 +2148,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                         console.log(err)
                                         return false
                                     })
-                                    console.log('returning')
-                                    if (!status2)
+                                    if (!status2) {
+                                        reaction.users.remove(user.id).catch(err => console.log(err))
                                         return Promise.resolve()
+                                    }
                                 }
                                 if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
                                     reaction.users.remove(user.id).catch(err => console.log(err))
@@ -2159,7 +2160,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
                                     if (!from_cross) {
                                         var status = await db.query(`
-                                        UPDATE filled_users_lich_orders SET order_status = 'successful',order_rating = 5
+                                        UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = 5
                                         WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
                                         `)
                                         .then(res => {
@@ -3215,8 +3216,10 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                 console.log(err)
                 return false
             })
-            if (!status)
+            if (!status) {
+                console.log('returning')
                 return Promise.resolve()
+            }
         }
         var trader_ign = ''
         var tradee_ign = ''
