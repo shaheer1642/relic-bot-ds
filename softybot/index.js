@@ -1549,7 +1549,8 @@ client.on('interactionCreate', async interaction => {
             postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
         postdata.components = []
         if (item_orders.length > 0) {
-            var index = --postdata.components.push({type:1,components:[]})
+            var index = postdata.components.push({type:1,components:[]})
+            index--
             postdata.components[index].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
             item_orders.forEach((e,index) => {
                 if (index < 25) {
@@ -1560,7 +1561,8 @@ client.on('interactionCreate', async interaction => {
             postdata.components[index].components[0].max_values = postdata.components[index].components[0].options.length
         }
         if (lich_orders.length > 0) {
-            var index = --postdata.components.push({type:1,components:[]})
+            var index = postdata.components.push({type:1,components:[]})
+            index--
             postdata.components[index].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
             lich_orders.forEach((e,index) => {
                 if (index < 25) {
@@ -8545,7 +8547,8 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     if (request_type == 1) {
         postdata.components = []
         if (item_orders.length > 0) {
-            var index = --postdata.components.push({type:1,components:[]})
+            var index = postdata.components.push({type:1,components:[]})
+            index--
             postdata.components[index].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
             item_orders.forEach((e,index) => {
                 if (index < 25) {
@@ -8556,7 +8559,8 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             postdata.components[index].components[0].max_values = postdata.components[index].components[0].options.length
         }
         if (lich_orders.length > 0) {
-            var index = --postdata.components.push({type:1,components:[]})
+            var index = postdata.components.push({type:1,components:[]})
+            index--
             postdata.components[index].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
             lich_orders.forEach((e,index) => {
                 if (index < 25) {
