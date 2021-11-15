@@ -8170,31 +8170,48 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
         return Promise.resolve()
     }
-    var orders = null
+    var item_orders = null
+    var lich_orders = null
     var status = await db.query(`SELECT * FROM users_orders 
     JOIN items_list ON users_orders.item_id=items_list.id 
     JOIN users_list ON users_orders.discord_id=users_list.discord_id 
     WHERE users_orders.discord_id = ${discord_id}`)
     .then(res => {
-        if (res.rows.length == 0) {
-            if (request_type == 1)
-                message.channel.send(`❕ <@${message.author.id}> No orders found on your profile ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-            else if (request_type == 2)
-                message.channel.send(`❕ <@${message.author.id}> No orders found for user ${ingame_name} ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-            return false
-        }
-        else {
-            orders = res.rows
-            return true
-        }
+        item_orders = res.rows
+        return true
     })
     .catch (err => {
         console.log(err)
         return false
     })
-    if (!status)
+    if (!status) {
+        message.channel.send(`Sorry error occured retrieving db records`).catch(err => console.log(err))
         return Promise.resolve()
+    }
+    var status = await db.query(`SELECT * FROM users_lich_orders 
+    JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+    JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+    WHERE users_lich_orders.discord_id = ${discord_id}`)
+    .then(res => {
+        lich_orders = res.rows
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send(`Sorry error occured retrieving db records`).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    if (item_orders.length == 0 && lich_orders.length == 0) {
+        if (request_type == 1)
+            message.channel.send(`❕ <@${message.author.id}> No orders found on your profile ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+        else if (request_type == 2)
+            message.channel.send(`❕ <@${message.author.id}> No orders found for user ${ingame_name} ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+        return Promise.resolve()
+    }
     let postdata = {}
     postdata.content = ' '
     postdata.embeds = []
@@ -8202,13 +8219,23 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     var sell_prices = []
     var buy_items = []
     var buy_prices = []
-    orders.forEach((e,index) => {
+    item_orders.forEach((e,index) => {
         if (e.order_type == 'wts') {
             sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
             sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
         }
         if (e.order_type == 'wtb') {
             buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
+            buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+    })
+    lich_orders.forEach((e,index) => {
+        if (e.order_type == 'wts') {
+            sell_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+            sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+        if (e.order_type == 'wtb') {
+            buy_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
             buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
         }
     })
@@ -8248,6 +8275,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         return Promise.resolve()
     }
     console.log(user_rating)
+    //--------------------
     var member = await client.users.fetch(discord_id)
     postdata.embeds.push({
         author: {
@@ -8257,7 +8285,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         title: 'Profile',
         fields: [{
             name: 'Plat gained <:profit:896079718955233301>',
-            value: orders[0].plat_gained + '<:platinum:881692607791648778>',
+            value: item_orders[0].plat_gained + '<:platinum:881692607791648778>',
             inline: true
         },{
             name: '\u200b',
@@ -8265,7 +8293,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             inline: true
         },{
             name: 'Plat spent <:loss:896079691755180103>',
-            value: orders[0].plat_spent + '<:platinum:881692607791648778>',
+            value: item_orders[0].plat_spent + '<:platinum:881692607791648778>',
             inline: true
         },{
             name: '⭐ User rating',
@@ -8280,18 +8308,32 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
     if (request_type == 1) {
         postdata.components = []
-        postdata.components.push({type:1,components:[]})
-        postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
-        orders.forEach((e,index) => {
-            if (index < 25) {
-                if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
-                    postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
-            }
-        })
-        postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+        if (item_orders.length > 0) {
+            postdata.components.push({type:1,components:[]})
+            postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
+            item_orders.forEach((e,index) => {
+                if (index < 25) {
+                    if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                        postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
+                }
+            })
+            postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+        }
+        if (lich_orders.length > 0) {
+            postdata.components.push({type:1,components:[]})
+            postdata.components[0].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
+            lich_orders.forEach((e,index) => {
+                if (index < 25) {
+                    if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                        postdata.components[0].components[0].options.push({label: e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.lich_id})
+                }
+            })
+            postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+        }
         console.log(JSON.stringify(postdata.components))
     }
     message.channel.send(postdata).catch(err => console.log(err))
+    return Promise.resolve()
 }
 
 async function trading_bot_item_orders(message,args,request_type = 1) {
