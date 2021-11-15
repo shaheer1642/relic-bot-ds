@@ -2118,7 +2118,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         var from_cross = false
                         if (reaction.message.embeds[0]) {
                             if (reaction.message.embeds[0].description.match(/\*\*Trade type:\*\* Lich/)) {
-                                console.log('hi')
                                 var status = await db.query(`
                                 SELECT * FROM filled_users_lich_orders
                                 WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId} AND trade_open_message = ${reaction.message.id} AND archived = false
@@ -2149,6 +2148,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                         console.log(err)
                                         return false
                                     })
+                                    console.log('returning')
                                     if (!status2)
                                         return Promise.resolve()
                                 }
