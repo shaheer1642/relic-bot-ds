@@ -2043,6 +2043,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                         **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
                         **Trade type:** Lich
+                        **Element:** ${all_orders[order_rank].element}
+                        **Damage:** ${all_orders[order_rank].damage}
+                        **Ephemera:** ${all_orders[order_rank].ephemera}
+                        **Quirk:** ${all_orders[order_rank].quirk}
+                        **Lich name:** ${all_orders[order_rank].lich_name}
 
                         /invite ${trader.ingame_name}
                         /invite ${tradee.ingame_name}
