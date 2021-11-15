@@ -1476,8 +1476,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
             console.log('someone reacted with emoji 2')
             if (!reaction.message.author)
                 await reaction.message.channel.messages.fetch(reaction.message.id)
-            if (reaction.message.author.id != client.user.id)
+            if (reaction.message.author.id != client.user.id) {
+                console.log('message author is not bot')
                 return Promise.resolve()
+            }
             var tradee = {}
             tradee.discord_id = null
             tradee.ingame_name = null
@@ -1564,7 +1566,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-
+                console.log('break test')
                 var status = await db.query(`
                 SELECT * FROM messages_ids
                 JOIN users_orders ON messages_ids.item_id = users_orders.item_id
