@@ -2099,11 +2099,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                         **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
                         **Trade type:** Lich
-                        **Element:** ${all_orders[order_rank].element}
+                        **Element:** ${all_orders[order_rank].element.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                         **Damage:** ${all_orders[order_rank].damage}%
                         **Ephemera:** ${all_orders[order_rank].ephemera}
-                        **Quirk:** ${all_orders[order_rank].quirk}
-                        **Lich name:** ${all_orders[order_rank].lich_name}
+                        **Quirk:** ${all_orders[order_rank].quirk.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+                        **Lich name:** ${all_orders[order_rank].lich_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
 
                         /invite ${trader.ingame_name}
                         /invite ${tradee.ingame_name}
@@ -3334,11 +3334,11 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                             **Order status:** ${order_status} ${reported_by}
                             **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
-                            **Element:** ${order_data.element}
+                            **Element:** ${order_data.element.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Damage:** ${order_data.damage}%
                             **Ephemera:** ${order_data.ephemera}
-                            **Quirk:** ${order_data.quirk}
-                            **Lich name:** ${order_data.lich_name}
+                            **Quirk:** ${order_data.quirk.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+                            **Lich name:** ${order_data.lich_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Thread:** <#${newThread.id}>
                             **Server:** ${newThread.guild.name}
                             **-----Chat Log-----**
