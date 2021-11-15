@@ -2004,8 +2004,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     }
                     var status = await db.query(`
                     INSERT INTO filled_users_lich_orders
-                    (thread_id,channel_id,order_owner,order_filler,lich_id,order_type,user_price,cross_thread_id,cross_channel_id,trade_timestamp)
-                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].lich_id}','${order_type}',${all_orders[order_rank].user_price},${cross_thread_id},${cross_channel_id},${new Date().getTime()})
+                    (thread_id,channel_id,order_owner,order_filler,lich_id,order_type,user_price,element,damage,ephemera,quirk,lich_name,cross_thread_id,cross_channel_id,trade_timestamp)
+                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].lich_id}','${order_type}',${all_orders[order_rank].user_price},'${all_orders[order_rank].element}',${all_orders[order_rank].damage},${all_orders[order_rank].ephemera},'${all_orders[order_rank].quirk}','${all_orders[order_rank].lich_name}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                     `)
                     .then(res => {
                         return true
