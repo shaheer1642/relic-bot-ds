@@ -2044,7 +2044,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
                         **Trade type:** Lich
                         **Element:** ${all_orders[order_rank].element}
-                        **Damage:** ${all_orders[order_rank].damage}
+                        **Damage:** ${all_orders[order_rank].damage}%
                         **Ephemera:** ${all_orders[order_rank].ephemera}
                         **Quirk:** ${all_orders[order_rank].quirk}
                         **Lich name:** ${all_orders[order_rank].lich_name}
@@ -3279,7 +3279,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Order status:** ${order_status} ${reported_by}
                             **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
                             **Element:** ${order_data.element}
-                            **Damage:** ${order_data.damage}
+                            **Damage:** ${order_data.damage}%
                             **Ephemera:** ${order_data.ephemera}
                             **Quirk:** ${order_data.quirk}
                             **Lich name:** ${order_data.lich_name}
