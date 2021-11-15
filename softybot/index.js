@@ -8321,14 +8321,14 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         }
         if (lich_orders.length > 0) {
             postdata.components.push({type:1,components:[]})
-            postdata.components[0].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
+            postdata.components[1].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
             lich_orders.forEach((e,index) => {
                 if (index < 25) {
-                    if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
-                        postdata.components[0].components[0].options.push({label: e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.lich_id})
+                    if (!(JSON.stringify(postdata.components[1].components[0].options)).match(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                        postdata.components[1].components[0].options.push({label: e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.lich_id})
                 }
             })
-            postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+            postdata.components[1].components[0].max_values = postdata.components[1].components[0].options.length
         }
         console.log(JSON.stringify(postdata.components))
     }
