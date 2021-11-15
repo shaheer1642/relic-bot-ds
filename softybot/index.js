@@ -1821,8 +1821,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             var tempp = reaction.message.embeds[0].fields[0].name.replace('Buyers','wts').replace('Sellers','wtb')
                             args.push(tempp)
                             args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                            if (item_rank == 'maxed')
-                                args.push(item_rank)
                             trading_bot_item_orders(reaction.message,args,2)
                         }
                         return false
@@ -1840,11 +1838,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
 
                 var status = await db.query(`
-                SELECT * FROM messages_ids
-                JOIN users_orders ON messages_ids.item_id = users_orders.item_id
-                JOIN users_list ON users_orders.discord_id = users_list.discord_id
-                JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
+                SELECT * FROM lich_messages_ids
+                JOIN users_lich_orders ON lich_messages_ids.lich_id = users_lich_orders.lich_id
+                JOIN users_list ON users_lich_orders.discord_id = users_list.discord_id
+                JOIN lich_list ON users_lich_orders.lich_id = lich_list.lich_id
+                WHERE lich_messages_ids.message_id = ${check_msg_id} AND users_lich_orders.visibility = true AND users_lich_orders.order_type = '${order_type}'
                 ORDER BY users_list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
@@ -1896,24 +1894,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(trader.ingame_name + ' ' + trader.discord_id)
                 //----verify trader on discord side-----
                 var match_trade = false
-                if (reaction.message.embeds[0]) {
-                    console.log('has embed 0')
-                    console.log(reaction.message.embeds[0].fields[0].name)
-                    if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
+                reaction.message.embeds.forEach(e => {
+                    if (e.fields[0].value == trader.ingame_name)
+                        if (e.fields[0].name.match(reaction.emoji.identifier))
                             match_trade = true
-                    }
-                    else {
-                        if (reaction.message.embeds[1]) {
-                            console.log('has embed 1')
-                            console.log(reaction.message.embeds[1].fields[0].name)
-                            if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                                if (reaction.message.embeds[1].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
-                                    match_trade = true
-                            }
-                        }
-                    }
-                }
+                })
                 if (!match_trade) {
                     console.log('that trader does not exist in db check #2')
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
@@ -1940,7 +1925,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
+                var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
                 .then(res => {
                     return true
                 })
@@ -1953,12 +1938,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var threadName = `${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
+                var threadName = `${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
                 if (threadName.length > 99) {
                     console.log(`${threadName} thread's name is longer than 99`)
                     threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                 }
-                trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                trading_lich_orders_update(null,all_orders[order_rank],2).catch(err => console.log(err))
                 if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
                     var args = []
                     var tempp = all_orders[order_rank].order_type
@@ -1967,9 +1952,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     else 
                         tempp = 'wts'
                     args.push(tempp)
-                    args.push(all_orders[order_rank].item_url)
-                    if (item_rank == 'maxed')
-                        args.push(item_rank)
+                    args.push(all_orders[order_rank].weapon_url)
                     trading_bot_item_orders(reaction.message,args,2)
                 }
                 const thread = await reaction.message.channel.threads.create({
@@ -2003,10 +1986,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         }
                     }
                     // Check if rows exceed the limit
-                    var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
+                    var status = await db.query(`SELECT * FROM filled_users_lich_orders ORDER BY trade_timestamp`)
                     .then(async res => {
                         if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            await db.query(`DELETE FROM filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                         }
                         return true
                     })
@@ -2020,9 +2003,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         return
                     }
                     var status = await db.query(`
-                    INSERT INTO filled_users_orders
-                    (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
-                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
+                    INSERT INTO filled_users_lich_orders
+                    (thread_id,channel_id,order_owner,order_filler,lich_id,order_type,user_price,cross_thread_id,cross_channel_id,trade_timestamp)
+                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].lich_id}','${order_type}',${all_orders[order_rank].user_price},${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                     `)
                     .then(res => {
                         return true
@@ -2046,13 +2029,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     var owner_refer = res.id
                     if (cross_thread)
                         owner_refer = cross_thread.id
-                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
+                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
                     client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     var postdata = {}
                     postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                     postdata.timestamp = new Date()
-                    postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')
+                    postdata.title = all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                     postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
                     postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[order_rank].icon_url}
                     postdata.description = `
@@ -2069,7 +2052,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     res.send({content: ' ',embeds: [postdata]})
                     .then(open_message => {
                         var status = db.query(`
-                        UPDATE filled_users_orders set trade_open_message = ${open_message.id}
+                        UPDATE filled_users_lich_orders SET trade_open_message = ${open_message.id}
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
                         .catch(err => console.log(err))
@@ -2083,7 +2066,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         cross_thread.send({content: ' ',embeds: [postdata]})
                         .then(c_open_message => {
                             var status = db.query(`
-                            UPDATE filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                            UPDATE filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
@@ -2099,7 +2082,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     }
                     , 900000)
                     setTimeout(() => {
-                        db.query(`SELECT * FROM filled_users_orders
+                        db.query(`SELECT * FROM filled_users_lich_orders
                         WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
                         `)
                         .then(foundThread => {
