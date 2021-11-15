@@ -1510,12 +1510,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 return Promise.resolve()
             }
+            console.log('pass test 1')
             var all_orders = []
             var check_msg_id = reaction.message.id
             var item_rank = "unranked"
             if (reaction.message.embeds[0].title.toLowerCase().match('(maxed)'))
                 item_rank = "maxed"
             if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+                console.log('pass test 2')
                 var search_item_id = ""
                 var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
                 console.log(item_url)
