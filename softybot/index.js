@@ -8380,6 +8380,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
 
 async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     console.log(ingame_name)
+    var user_profile = []
     var discord_id = ""
     var status_msg = ""
     var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
@@ -8395,6 +8396,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         else {
             discord_id = res.rows[0].discord_id
             ingame_name = res.rows[0].ingame_name
+            user_profile = res.rows[0]
             return true
         }
     })
@@ -8523,7 +8525,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         title: 'Profile',
         fields: [{
             name: 'Plat gained <:profit:896079718955233301>',
-            value: item_orders[0].plat_gained + '<:platinum:881692607791648778>',
+            value: user_profile.plat_gained + '<:platinum:881692607791648778>',
             inline: true
         },{
             name: '\u200b',
@@ -8531,7 +8533,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             inline: true
         },{
             name: 'Plat spent <:loss:896079691755180103>',
-            value: item_orders[0].plat_spent + '<:platinum:881692607791648778>',
+            value: user_profile.plat_spent + '<:platinum:881692607791648778>',
             inline: true
         },{
             name: '⭐ User rating',
