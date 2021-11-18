@@ -1602,10 +1602,11 @@ client.on('interactionCreate', async interaction => {
                 var embed = []
                 embed.push({
                     title: 'Prime sets >= ' + interaction.options.getNumber('threshold'),
+                    description: 'something',
                     fields: [
-                        {name: 'Set', value: res.rows.map(e => {return e.item_url + '\n'}), inline: true},
-                        {name: 'Price', value: res.rows.map(e => {return e.sell_price + '\n'}), inline: true},
-                        {name: 'Ducat', value: res.rows.map(e => {return e.ducat + '\n'}), inline: true}
+                        {name: 'Set', value: res.rows.map(e => {return e.item_url + '\n'}).toString(), inline: true},
+                        {name: 'Price', value: res.rows.map(e => {return e.sell_price + '\n'}).toString(), inline: true},
+                        {name: 'Ducat', value: res.rows.map(e => {return e.ducat + '\n'}).toString(), inline: true}
                     ],
                     timestamp: new Date()
                 })
