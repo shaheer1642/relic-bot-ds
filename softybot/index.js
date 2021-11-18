@@ -1602,7 +1602,6 @@ client.on('interactionCreate', async interaction => {
                 var embed = []
                 embed.push({
                     title: 'Prime sets >= ' + interaction.options.getNumber('threshold'),
-                    description: 'something',
                     fields: [
                         {name: 'Set', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
                         {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
@@ -1611,7 +1610,44 @@ client.on('interactionCreate', async interaction => {
                     timestamp: new Date()
                 })
                 console.log(JSON.stringify(embed))
-                interaction.reply({ content: ' ', embeds: embed,ephemeral: false }).catch(err => console.log(err))
+                interaction.reply({ content: ' ', embeds: embed,ephemeral: false })
+                .catch(err => {
+                    console.log(err)
+                    if (err.response)
+                        if (response.data.code == 50035)
+                            interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
+                        else 
+                            interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                interaction.reply({ content: 'Sorry some error occured.', ephemeral: false })
+            })
+        }
+		else if (interaction.options.getSubcommand() === 'parts') {
+            db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND (tags ? 'component' OR tags ? 'blueprint') AND (tags ? 'warframe' OR tags ? 'weapon' OR tags ? 'sentinel' OR tags ? 'kubrow') AND sell_price >= ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
+            .then(res => {
+                var embed = []
+                embed.push({
+                    title: 'Prime parts >= ' + interaction.options.getNumber('threshold'),
+                    fields: [
+                        {name: 'Part', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
+                        {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
+                        {name: 'Ducat', value: res.rows.map(e => {return e.ducat}).toString().replace(/,/g, '\n'), inline: true}
+                    ],
+                    timestamp: new Date()
+                })
+                console.log(JSON.stringify(embed))
+                interaction.reply({ content: ' ', embeds: embed,ephemeral: false })
+                .catch(err => {
+                    console.log(err)
+                    if (err.response)
+                        if (response.data.code == 50035)
+                            interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
+                        else 
+                            interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
+                })
             })
             .catch(err => {
                 console.log(err)
