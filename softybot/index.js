@@ -1597,9 +1597,20 @@ client.on('interactionCreate', async interaction => {
 
     else if (interaction.commandName == 'query') {
 		if (interaction.options.getSubcommand() === 'sets') {
-            db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon') AND sell_price > ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
+            db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon') AND sell_price >= ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
             .then(res => {
-                interaction.reply({ content: JSON.stringify(res.rows), ephemeral: false }).catch(err => console.log(err))
+                var embed = []
+                embed.push({
+                    title: 'Prime sets >= ' + interaction.options.getNumber('threshold'),
+                    fields: [
+                        {name: 'Set', value: res.rows.forEach(e => {return e.item_url + '\n'})},
+                        {name: 'Price', value: res.rows.forEach(e => {return e.sell_price + '\n'})},
+                        {name: 'Ducat', value: res.rows.forEach(e => {return e.ducat + '\n'})}
+                    ],
+                    timestamp: new Date()
+                })
+                console.log(JSON.stringify(embed))
+                interaction.reply({ content: ' ', embeds: [embed],ephemeral: false }).catch(err => console.log(err))
             })
             .catch(err => {
                 console.log(err)
