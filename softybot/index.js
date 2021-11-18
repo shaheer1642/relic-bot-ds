@@ -1601,7 +1601,7 @@ client.on('interactionCreate', async interaction => {
             .then(res => {
                 var embed = []
                 embed.push({
-                    title: 'Prime sets >= ' + interaction.options.getNumber('threshold'),
+                    title: 'Prime sets >= ' + interaction.options.getNumber('threshold') + 'p',
                     fields: [
                         {name: 'Set', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
                         {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
@@ -1629,7 +1629,7 @@ client.on('interactionCreate', async interaction => {
             .then(res => {
                 var embed = []
                 embed.push({
-                    title: 'Prime parts >= ' + interaction.options.getNumber('threshold'),
+                    title: 'Prime parts >= ' + interaction.options.getNumber('threshold') + 'p',
                     fields: [
                         {name: 'Part', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
                         {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
