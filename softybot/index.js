@@ -1603,9 +1603,9 @@ client.on('interactionCreate', async interaction => {
                 embed.push({
                     title: 'Prime sets >= ' + interaction.options.getNumber('threshold'),
                     fields: [
-                        {name: 'Set', value: res.rows.forEach(e => {return e.item_url + '\n'})},
-                        {name: 'Price', value: res.rows.forEach(e => {return e.sell_price + '\n'})},
-                        {name: 'Ducat', value: res.rows.forEach(e => {return e.ducat + '\n'})}
+                        {name: 'Set', value: res.rows.map(e => {return e.item_url + '\n'}), inline: true},
+                        {name: 'Price', value: res.rows.map(e => {return e.sell_price + '\n'}), inline: true},
+                        {name: 'Ducat', value: res.rows.map(e => {return e.ducat + '\n'}), inline: true}
                     ],
                     timestamp: new Date()
                 })
