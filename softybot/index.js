@@ -1599,7 +1599,7 @@ client.on('interactionCreate', async interaction => {
 		if (interaction.options.getSubcommand() === 'sets') {
             db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon') AND sell_price > ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
             .then(res => {
-                interaction.reply({ content: JSON.stringify(res.rows), ephemeral: false })
+                interaction.reply({ content: JSON.stringify(res.rows), ephemeral: false }).catch(err => console.log(err))
             })
             .catch(err => {
                 console.log(err)
