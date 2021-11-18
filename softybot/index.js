@@ -1595,7 +1595,20 @@ client.on('interactionCreate', async interaction => {
         })
     }
 
-    if (interaction.commandName == 'ping') {
+    else if (interaction.commandName == 'query') {
+		if (interaction.options.getSubcommand() === 'sets') {
+            db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon') AND sell_price > ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
+            .then(res => {
+                interaction.reply({ content: JSON.stringify(res.rows), ephemeral: false })
+            })
+            .catch(err => {
+                console.log(err)
+                interaction.reply({ content: 'Sorry some error occured.', ephemeral: false })
+            })
+        }
+    }
+
+    else if (interaction.commandName == 'ping') {
 		await interaction.reply({ content: 'Pong!', ephemeral: false });
     }
     
