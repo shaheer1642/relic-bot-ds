@@ -1613,11 +1613,10 @@ client.on('interactionCreate', async interaction => {
                 interaction.reply({ content: ' ', embeds: embed,ephemeral: false })
                 .catch(err => {
                     console.log(err)
-                    if (err.response)
-                        if (response.data.code == 50035)
-                            interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
-                        else 
-                            interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
+                    if (err.code == 50035)
+                        interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
+                    else 
+                        interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
                 })
             })
             .catch(err => {
@@ -1642,11 +1641,10 @@ client.on('interactionCreate', async interaction => {
                 interaction.reply({ content: ' ', embeds: embed,ephemeral: false })
                 .catch(err => {
                     console.log(err)
-                    if (err.response)
-                        if (response.data.code == 50035)
-                            interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
-                        else 
-                            interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
+                    if (err.code == 50035)
+                        interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
+                    else 
+                        interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
                 })
             })
             .catch(err => {
