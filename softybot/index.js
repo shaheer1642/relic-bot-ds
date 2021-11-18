@@ -1604,8 +1604,8 @@ client.on('interactionCreate', async interaction => {
                     title: 'Prime sets >= ' + interaction.options.getNumber('threshold'),
                     description: 'something',
                     fields: [
-                        {name: 'Set', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\n'), inline: true},
-                        {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\n'), inline: true},
+                        {name: 'Set', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u200b\u200b\u200b\u200b\u200b\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
+                        {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u200b\u200b\u200b\u200b\u200b\n'), inline: true},
                         {name: 'Ducat', value: res.rows.map(e => {return e.ducat}).toString().replace(/,/g, '\n'), inline: true}
                     ],
                     timestamp: new Date()
