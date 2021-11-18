@@ -1604,14 +1604,14 @@ client.on('interactionCreate', async interaction => {
                     title: 'Prime sets >= ' + interaction.options.getNumber('threshold'),
                     description: 'something',
                     fields: [
-                        {name: 'Set', value: res.rows.map(e => {return e.item_url + '\n'}).toString(), inline: true},
-                        {name: 'Price', value: res.rows.map(e => {return e.sell_price + '\n'}).toString(), inline: true},
-                        {name: 'Ducat', value: res.rows.map(e => {return e.ducat + '\n'}).toString(), inline: true}
+                        {name: 'Set', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\n'), inline: true},
+                        {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\n'), inline: true},
+                        {name: 'Ducat', value: res.rows.map(e => {return e.ducat}).toString().replace(/,/g, '\n'), inline: true}
                     ],
                     timestamp: new Date()
                 })
                 console.log(JSON.stringify(embed))
-                interaction.reply({ content: ' ', embeds: [embed],ephemeral: false }).catch(err => console.log(err))
+                interaction.reply({ content: ' ', embeds: embed,ephemeral: false }).catch(err => console.log(err))
             })
             .catch(err => {
                 console.log(err)
