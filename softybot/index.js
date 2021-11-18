@@ -3917,7 +3917,7 @@ async function orders(message,args) {
                 if (ordersArr[j].mod_rank > 0)
                     continue
                 sellers += ordersArr[j].seller + "\u205F\u205F\u205F\u205F\u205F\n"
-                quantities += ordersArr[j].quantity + "\u205F\u205F\u205F\u205F\u205F\n"
+                quantities += ordersArr[j].quantity + "\n"
                 prices += ordersArr[j].price + "\n"
             }
             sellers = sellers.replace(/_/g,"\\_")
@@ -3937,7 +3937,7 @@ async function orders(message,args) {
                 url: 'https://warframe.market/items/' + item_data.item_url,
                 fields: [
                     {name: 'Sellers', value: sellers, inline: true},
-                    {name: 'Quantity', value: quantities, inline: true},
+                    {name: 'Quantity\u205F\u205F\u205F\u205F\u205F', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 ],
                 thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
@@ -4077,7 +4077,7 @@ async function orders_update(message, reaction, user) {
                 if (ordersArr[j].mod_rank > 0)
                     continue
                 sellers += ordersArr[j].seller + "\u205F\u205F\u205F\u205F\u205F\n"
-                quantities += ordersArr[j].quantity + "\u205F\u205F\u205F\u205F\u205F\n"
+                quantities += ordersArr[j].quantity + "\n"
                 prices += ordersArr[j].price + "\n"
             }
             sellers = sellers.replace(/_/g,"\\_")
@@ -4097,7 +4097,7 @@ async function orders_update(message, reaction, user) {
                 url: 'https://warframe.market/items/' + item_data.item_url,
                 fields: [
                     {name: 'Sellers', value: sellers, inline: true},
-                    {name: 'Quantity', value: quantities, inline: true},
+                    {name: 'Quantity\u205F\u205F\u205F\u205F\u205F', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 ],
                 thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
