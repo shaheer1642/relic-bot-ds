@@ -1,3 +1,3 @@
 function changeColor() {
-    document.getElementById("demo").innerHTML = "red";
+    document.getElementById("demo").style.color = "red";
 }
