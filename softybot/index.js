@@ -14,7 +14,16 @@ const readline = require('readline');
 const {google} = require('googleapis');
 //----gpt3----
 const got = require('got');
-var gpt3chatLog = 'Human: Hello there, I need some help.\nAI: Hi, what can I help you with?';
+//var gpt3chatLog = 'Human: Hello there, I need some help.\nAI: Hi, what can I help you with?';
+var gpt3chatLog = `English: I do not speak French.
+French: Je ne parle pas français.
+English: See you later!
+French: À tout à l'heure!
+English: Where is a good restaurant?
+French: Où est un bon restaurant?
+English: What rooms do you have available?
+French: Quelles chambres avez-vous de disponible?
+English:`
 //-----------
 /*
 const { doesNotMatch } = require('assert');
@@ -5171,7 +5180,8 @@ async function gpt3_answer(message,args) {
         'max_tokens': 150,
         'temperature': 0.9,
         'frequency_penalty': 0,
-        'presence_penalty': 0.6
+        'presence_penalty': 0.6,
+        'stop': '\nHuman'
     };
     const headers = {
         'Authorization': `Bearer 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`,
