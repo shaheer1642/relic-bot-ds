@@ -5186,6 +5186,8 @@ async function gpt3_answer(message,args) {
             output += e.text;
         })
         gpt3chatLog += output
+        if (output == '')
+            output = 'Empty response.'
         console.log(output);
         message.channel.send(output).catch(err => console.log(err))
     } catch (err) {
