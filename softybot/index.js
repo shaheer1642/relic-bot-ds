@@ -5171,8 +5171,7 @@ async function gpt3_answer(message,args) {
         'max_tokens': 150,
         'temperature': 0.9,
         'frequency_penalty': 0,
-        'presence_penalty': 0.6,
-        'stop': '\nHuman'
+        'presence_penalty': 0.6
     };
     const headers = {
         'Authorization': `Bearer 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`,
