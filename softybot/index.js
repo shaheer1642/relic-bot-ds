@@ -5,13 +5,17 @@ const { Routes } = require('discord-api-types/v9');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const https = require('https');
-const request = require('request');
+//const request = require('request');
 const fs = require('fs')
 const DB = require('pg');
 const { resolve } = require('path');
 const { time } = require('console');
 const readline = require('readline');
 const {google} = require('googleapis');
+//----gpt3----
+const got = require('got');
+var gpt3chatLog = 'Human: Hello there, I need some help.\nAI: Hi, what can I help you with?';
+//-----------
 /*
 const { doesNotMatch } = require('assert');
 const { Console } = require('console');
@@ -1001,6 +1005,12 @@ client.on('messageCreate', async message => {
                     break
                 case 'query':
                     user_query(message,args)
+                    break
+                case 'gpt3':
+                    gpt3_answer(message,args)
+                    break
+                case 'gpt3reset':
+                    gpt3_reset(message,args)
                     break
                 /*----------------------
                 case 'test':
@@ -5142,6 +5152,45 @@ async function relist(message,args) {
     });
     return
 }
+
+//------------gpt-3----------------
+async function gpt3_reset(message,args) {
+    gpt3chatLog = 'Human: Hello there, I need some help.\nAI: Hi, what can I help you with?'
+    message.channel.send('Flushed chat log.')
+    return
+}
+async function gpt3_answer(message,args) {
+    console.log(args)
+    // The new question asked by the user.
+    gpt3chatLog += '\nHuman: ' + args.toString().replace(/,/g, " ");
+    console.log(gpt3chatLog)
+    
+    const url = 'https://api.openai.com/v1/engines/davinci/completions';
+    const params = {
+        'prompt': gpt3chatLog,
+        'max_tokens': 150,
+        'temperature': 0.9,
+        'frequency_penalty': 0,
+        'presence_penalty': 0.6,
+        'stop': '\nHuman'
+    };
+    const headers = {
+        'Authorization': `Bearer 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`,
+    };
+    
+    try {
+        const response = await got.post(url, { json: params, headers: headers }).json();
+        output = `${response.choices[0].text}`;
+        gpt3chatLog += output
+        console.log(output);
+        message.channel.send(output).catch(err => console.log(err))
+    } catch (err) {
+        message.channel.send(err).catch(err => console.log(err))
+        console.log(err);
+    }
+    return
+}
+//-----------------------------
 
 async function updateDB(message,args) {
     if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
