@@ -22,8 +22,7 @@ French: À tout à l'heure!
 English: Where is a good restaurant?
 French: Où est un bon restaurant?
 English: What rooms do you have available?
-French: Quelles chambres avez-vous de disponible?
-English:`
+French: Quelles chambres avez-vous de disponible?`
 //-----------
 /*
 const { doesNotMatch } = require('assert');
@@ -5171,7 +5170,7 @@ async function gpt3_reset(message,args) {
 async function gpt3_answer(message,args) {
     console.log(args)
     // The new question asked by the user.
-    gpt3chatLog += '\nHuman: ' + args.toString().replace(/,/g, " ");
+    gpt3chatLog += '\nEnglish: ' + args.toString().replace(/,/g, " ");
     console.log(gpt3chatLog)
     
     const url = 'https://api.openai.com/v1/engines/davinci/completions';
@@ -5181,7 +5180,7 @@ async function gpt3_answer(message,args) {
         'temperature': 0.9,
         'frequency_penalty': 0,
         'presence_penalty': 0.6,
-        'stop': '\nHuman'
+        'stop': '\nEnglish'
     };
     const headers = {
         'Authorization': `Bearer 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`,
