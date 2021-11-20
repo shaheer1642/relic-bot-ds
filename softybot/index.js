@@ -5180,6 +5180,7 @@ async function gpt3_answer(message,args) {
     
     try {
         const response = await got.post(url, { json: params, headers: headers }).json();
+        console.log(response)
         output = `${response.choices[0].text}`;
         gpt3chatLog += output
         console.log(output);
