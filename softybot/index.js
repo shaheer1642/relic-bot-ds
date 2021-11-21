@@ -1007,6 +1007,9 @@ client.on('messageCreate', async message => {
                     user_query(message,args)
                     break
                 case 'gpt3':
+                    gpt3_completion(message,args)
+                    break
+                case 'gpt3ans':
                     gpt3_answer(message,args)
                     break
                 case 'gpt3reset':
@@ -5159,7 +5162,7 @@ async function gpt3_reset(message,args) {
     message.channel.send('Flushed chat log.')
     return
 }
-async function gpt3_answer(message,args) {
+async function gpt3_completion(message,args) {
     console.log(args)
     // The new question asked by the user.
     gpt3chatLog += '\nHuman: ' + args.toString().replace(/,/g, " ");
@@ -5173,6 +5176,46 @@ async function gpt3_answer(message,args) {
         'frequency_penalty': 0,
         'presence_penalty': 0.6,
         'stop': '\nHuman'
+    };
+    const headers = {
+        'Authorization': `Bearer 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`,
+    };
+    
+    try {
+        const response = await got.post(url, { json: params, headers: headers }).json();
+        console.log(response)
+        var output = ''
+        response.choices.forEach(e => {
+            output += e.text;
+        })
+        gpt3chatLog += output
+        if (output == '')
+            output = 'Empty response.'
+        console.log(output);
+        message.channel.send(output).catch(err => console.log(err))
+    } catch (err) {
+        message.channel.send(err).catch(err => console.log(err))
+        console.log(err);
+    }
+    return
+}
+
+async function gpt3_answer(message,args) {
+    console.log(args)
+    // The new question asked by the user.
+    gpt3chatLog += '\nHuman: ' + args.toString().replace(/,/g, " ");
+    console.log(gpt3chatLog)
+    
+    const url = 'https://api.openai.com/v1/engines/davinci/answers';
+    const params = {
+        examples: [
+            ['A happy moment', 'Positive'],
+            ['I am sad.', 'Negative'],
+            ['I am feeling awesome', 'Positive']
+        ],
+        question: gpt3chatLog,
+        examples_context: 'In 2017, U.S. life expectancy was 78.6 years.',
+        documents: ['Puppy A is happy.', 'Puppy B is sad.'],
     };
     const headers = {
         'Authorization': `Bearer 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`,
