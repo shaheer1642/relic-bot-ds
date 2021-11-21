@@ -5187,7 +5187,8 @@ async function gpt3_completion(message,args) {
         console.log(response)
         var output = ''
         response.choices.forEach(e => {
-            output += e.text;
+            if (!output.match(e.text))
+                output += e.text;
         })
         gpt3chatLog += output
         if (output == '')
