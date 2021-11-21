@@ -1,15 +1,15 @@
 const config = require('./config.json')
 const {Client, Collection, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+//const { REST } = require('@discordjs/rest');
+//const { Routes } = require('discord-api-types/v9');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
-const https = require('https');
+//const https = require('https');
 //const request = require('request');
 const fs = require('fs')
 const DB = require('pg');
-const { resolve } = require('path');
-const { time } = require('console');
+//const { resolve } = require('path');
+//const { time } = require('console');
 const readline = require('readline');
 const {google} = require('googleapis');
 //----gpt3----
