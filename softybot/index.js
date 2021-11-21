@@ -1017,7 +1017,7 @@ client.on('messageCreate', async message => {
                     gpt3_reset(message,args)
                     break
                 case 'graphic':
-                    cavasTest(message,args)
+                    canvasTest(message,args)
                     break
                 /*----------------------
                 case 'test':
@@ -5160,8 +5160,8 @@ async function relist(message,args) {
     return
 }
 
-async function cavasTest(message,args) {
-    canvas = new Canvas.createCanvas(200,200)
+async function canvasTest(message,args) {
+    var canvas = new Canvas.createCanvas(200,200)
     , ctx = canvas.getContext('2d');
 
     ctx.font = '30px Impact';
