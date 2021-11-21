@@ -5203,8 +5203,6 @@ async function gpt3_completion(message,args) {
 async function gpt3_answer(message,args) {
     console.log(args)
     // The new question asked by the user.
-    gpt3chatLog += '\nHuman: ' + args.toString().replace(/,/g, " ");
-    console.log(gpt3chatLog)
     
     const url = 'https://api.openai.com/v1/engines/davinci/answers';
     const params = {
@@ -5213,7 +5211,7 @@ async function gpt3_answer(message,args) {
             ['I am sad.', 'Negative'],
             ['I am feeling awesome', 'Positive']
         ],
-        question: gpt3chatLog,
+        question: args.toString().replace(/,/g, " "),
         examples_context: 'In 2017, U.S. life expectancy was 78.6 years.',
         documents: ['Puppy A is happy.', 'Puppy B is sad.'],
     };
@@ -5228,7 +5226,6 @@ async function gpt3_answer(message,args) {
         response.choices.forEach(e => {
             output += e.text;
         })
-        gpt3chatLog += output
         if (output == '')
             output = 'Empty response.'
         console.log(output);
