@@ -5164,7 +5164,7 @@ async function canvasTest(message,args) {
     var canvas = new Canvas.createCanvas(200,200)
     , ctx = canvas.getContext('2d');
 
-    ctx.font = '30px Impact';
+    ctx.font = '30px Arial';
     ctx.rotate(-0.1);
     ctx.fillText(`${args.toString().replace(/,/g, " ")}!`, 50, 100);
 
