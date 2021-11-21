@@ -5206,15 +5206,14 @@ async function gpt3_answer(message,args) {
     
     const url = 'https://api.openai.com/v1/answers';
     const params = {
-        engineId: 'davinci',
-        examples: [
-            ['A happy moment', 'Positive'],
-            ['I am sad.', 'Negative'],
-            ['I am feeling awesome', 'Positive']
-        ],
-        question: args.toString().replace(/,/g, " "),
-        examples_context: 'In 2017, U.S. life expectancy was 78.6 years.',
-        documents: ['Puppy A is happy.', 'Puppy B is sad.'],
+        search_model="ada", 
+        model="curie", 
+        question=args.toString().replace(/,/g, " "), 
+        examples_context="In 2017, U.S. life expectancy was 78.6 years.", 
+        examples=[["What is human life expectancy in the United States?", "78 years."]], 
+        max_rerank=10,
+        max_tokens=5,
+        stop=["\n", "<|endoftext|>"]
     };
     const headers = {
         'Authorization': `Bearer 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`,
