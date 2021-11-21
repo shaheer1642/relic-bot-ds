@@ -5204,8 +5204,9 @@ async function gpt3_answer(message,args) {
     console.log(args)
     // The new question asked by the user.
     
-    const url = 'https://api.openai.com/v1/engines/davinci/answers';
+    const url = 'https://api.openai.com/v1/answers';
     const params = {
+        engineId: 'davinci',
         examples: [
             ['A happy moment', 'Positive'],
             ['I am sad.', 'Negative'],
