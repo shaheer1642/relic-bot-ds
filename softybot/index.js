@@ -6,6 +6,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 //const https = require('https');
 //const request = require('request');
+const Canvas = require('canvas')
 const fs = require('fs')
 const DB = require('pg');
 //const { resolve } = require('path');
@@ -1014,6 +1015,9 @@ client.on('messageCreate', async message => {
                     break
                 case 'gpt3reset':
                     gpt3_reset(message,args)
+                    break
+                case 'graphic':
+                    cavasTest(message,args)
                     break
                 /*----------------------
                 case 'test':
@@ -5154,6 +5158,32 @@ async function relist(message,args) {
         return
     });
     return
+}
+
+async function cavasTest(message,args) {
+    canvas = new Canvas.createCanvas(200,200)
+    , ctx = canvas.getContext('2d');
+
+    ctx.font = '30px Impact';
+    ctx.rotate(-0.1);
+    ctx.fillText(`${args.toString().replace(/,/g, " ")}!`, 50, 100);
+
+    var te = ctx.measureText(`${args.toString().replace(/,/g, " ")}!`);
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.beginPath();
+    ctx.lineTo(50, 102);
+    ctx.lineTo(50 + te.width, 102);
+    ctx.stroke();
+
+    message.channel.send({
+        content: " ", 
+        files: [
+            {
+                attachment: canvas.toBuffer(),
+                name: 'canvas.png'
+            }
+        ]
+    }).catch(err => console.log(err))
 }
 
 //------------gpt-3----------------
