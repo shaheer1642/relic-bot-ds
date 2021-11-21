@@ -5170,14 +5170,13 @@ async function gpt3_completion(message,args) {
     
     const url = 'https://api.openai.com/v1/engines/davinci/completions';
     const params = {
-        engine: "davinci",
         prompt: gpt3chatLog,
         temperature: 0,
         max_tokens: 100,
         top_p: 1,
         frequency_penalty: 0.0,
         presence_penalty: 0.0,
-        stop: ["\n"]
+        stop: ["\nQ:"]
     };
     const headers = {
         'Authorization': `Bearer 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`,
