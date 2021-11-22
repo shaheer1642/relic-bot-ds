@@ -8412,7 +8412,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                             }]
                         }).then(res => {
-                            return res.attachment[0].url
+                            return res.attachments[0].url
                         }).catch(err => console.log(err))
                         
                         embed.image.url = attachment_url
@@ -8499,7 +8499,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                             }]
                         }).then(res => {
-                            return res.attachment[0].url
+                            return res.attachments[0].url
                         }).catch(err => console.log(err))
                         
                         embed.image.url = attachment_url
