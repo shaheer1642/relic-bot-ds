@@ -8339,7 +8339,6 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         console.log(`editing for channel ${multiCid}`)
         var msg = null
         var embeds = []
-        var files = []
         var noOfSellers = 0
         var noOfBuyers = 0
         //var targetChannel = client.channels.cache.get(multiCid)
@@ -8406,21 +8405,17 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
 
-                        await client.channels.cache.get('912395290701602866').send({
+                        var attachment_url = await client.channels.cache.get('912395290701602866').send({
                             content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
                             files: [{
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                             }]
                         }).then(res => {
-                            console.log(res)
+                            return res.attachment[0].url
                         }).catch(err => console.log(err))
                         
-                        embed.image.url = `attachment://canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                        files.push({
-                                attachment: canvas.toBuffer(),
-                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                        })
+                        embed.image.url = attachment_url
                     }).catch(err => console.log(err))
                     //================
                     embeds.push(embed)
@@ -8497,21 +8492,17 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
 
-                        await client.channels.cache.get('912395290701602866').send({
+                        var attachment_url = await client.channels.cache.get('912395290701602866').send({
                             content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
                             files: [{
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                             }]
                         }).then(res => {
-                            console.log(res)
+                            return res.attachment[0].url
                         }).catch(err => console.log(err))
                         
-                        embed.image.url = `attachment://canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                        files.push({
-                                attachment: canvas.toBuffer(),
-                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                        })
+                        embed.image.url = attachment_url
                     }).catch(err => console.log(err))
                     //================
                     embeds.push(embed)
@@ -8573,7 +8564,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
             }
             else {
-                var status = msg.edit({content: ' ',embeds: embeds, files: files})
+                var status = msg.edit({content: ' ',embeds: embeds})
                 .then(msg => {
                     msg.reactions.removeAll()
                     .then(() => {
@@ -8602,7 +8593,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 continue
             if (embeds.length == 0)
                 return Promise.reject()
-            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds, files: files})
+            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
             .then(async msg => {
                 var status = await db.query(`INSERT INTO lich_messages_ids (channel_id,lich_id,message_id) VALUES (${multiCid},'${lich_info.lich_id}',${msg.id})`)
                 .then(res => {
@@ -8631,7 +8622,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             return Promise.reject()
                         }
                         var msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
-                        await msg.edit({content: ' ', embeds: embeds, files: files}).then(async () => {
+                        await msg.edit({content: ' ', embeds: embeds}).then(async () => {
                             msg.reactions.removeAll()
                             .then(() => {
                                 for (var i=0;i<noOfSellers;i++) {
