@@ -8379,7 +8379,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     , ctx = canvas.getContext('2d');
                 
                     await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
-                    .then(img1 => {
+                    .then(async img1 => {
                         var x=0
                         var y=img1.height + 20;
                         var y_diff = 20
@@ -8405,6 +8405,16 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                                 y += y_diff
                             }
                         }
+
+                        await client.channels.cache.get('912395290701602866').send({
+                            content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
+                            files: {
+                                attachment: canvas.toBuffer(),
+                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
+                            }
+                        }).then(res => {
+                            console.log(res)
+                        }).catch(err => console.log(err))
                         
                         embed.image.url = `attachment://canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                         files.push({
@@ -8459,7 +8469,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     , ctx = canvas.getContext('2d');
                 
                     await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
-                    .then(img1 => {
+                    .then(async img1 => {
                         var x=0
                         var y=img1.height + 20;
                         var y_diff = 20
