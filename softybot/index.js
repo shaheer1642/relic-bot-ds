@@ -8339,6 +8339,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         console.log(`editing for channel ${multiCid}`)
         var msg = null
         var embeds = []
+        var files = []
         var noOfSellers = 0
         var noOfBuyers = 0
         //var targetChannel = client.channels.cache.get(multiCid)
@@ -8350,17 +8351,19 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
         WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
         ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
-        .then(res => {
+        .then(async res => {
             if (res.rows.length != 0) {
                 for (var j=0;j<res.rows.length;j++) {
                     if (j==5)
                         break
                     var embed = {
                         title: lich_info.weapon_url,
+                        description: `Note: the image(s) format below is subject to change. For now it's for testing purposes.`,
                         thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
                         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                         fields: [],
-                        color: '#7cb45d'
+                        color: '#7cb45d',
+                        image: {url: ''}
                     }
                     embed.fields.push([
                         {name: `Seller ${tradingBotReactions.sell[j]}`,value: res.rows[j].ingame_name,inline: true},
@@ -8371,6 +8374,46 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         {name: 'Quirk',value: res.rows[j].quirk,inline: true},
                         {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
                     ])
+                    // Create image on canvas
+                    var canvas = new Canvas.createCanvas(200,200)
+                    , ctx = canvas.getContext('2d');
+                
+                    await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+                    .then(img1 => {
+                        var x=0
+                        var y=img1.height + 20;
+                        var y_diff = 20
+                        canvas.width = 10;
+                        canvas.height = y + y_diff*embed.fields.length;
+                      
+                        draw()
+                      
+                        function draw() {
+                            var y=img1.height + 20;
+                            ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
+                            ctx.font = '15px Arial';
+                            ctx.fillStyle = "#FF0000";
+                        
+                            for (var i=0;i<embed.fields.length;i++) {
+                                var e = embed.fields[i]
+                                var te = ctx.measureText(`${e.name}: ${e.value}`);
+                                if (te.width>canvas.width) {
+                                    canvas.width = te.width + x;
+                                draw()
+                                return
+                                }
+                                ctx.fillText(`${e.name}: ${e.value}`, x, y);
+                                y += y_diff
+                            }
+                        }
+                        
+                        embed.image.url = 'attachment://canvas.png'
+                        files.push({
+                                attachment: canvas.toBuffer(),
+                                name: `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
+                        })
+                    }).catch(err => console.log(err))
+                    //================
                     embeds.push(embed)
                 }
                 noOfSellers = j
@@ -8388,7 +8431,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
         WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
         ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
-        .then(res => {
+        .then(async res => {
             if (res.rows.length != 0) {
                 for (var j=0;j<res.rows.length;j++) {
                     if (j==5)
@@ -8410,6 +8453,46 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         {name: 'Quirk',value: res.rows[j].quirk,inline: true},
                         {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
                     ])
+                    // Create image on canvas
+                    var canvas = new Canvas.createCanvas(200,200)
+                    , ctx = canvas.getContext('2d');
+                
+                    await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+                    .then(img1 => {
+                        var x=0
+                        var y=img1.height + 20;
+                        var y_diff = 20
+                        canvas.width = 10;
+                        canvas.height = y + y_diff*embed.fields.length;
+                      
+                        draw()
+                      
+                        function draw() {
+                            var y=img1.height + 20;
+                            ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
+                            ctx.font = '15px Arial';
+                            ctx.fillStyle = "#FF0000";
+                        
+                            for (var i=0;i<embed.fields.length;i++) {
+                                var e = embed.fields[i]
+                                var te = ctx.measureText(`${e.name}: ${e.value}`);
+                                if (te.width>canvas.width) {
+                                    canvas.width = te.width + x;
+                                draw()
+                                return
+                                }
+                                ctx.fillText(`${e.name}: ${e.value}`, x, y);
+                                y += y_diff
+                            }
+                        }
+                        
+                        embed.image.url = 'attachment://canvas.png'
+                        files.push({
+                                attachment: canvas.toBuffer(),
+                                name: `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
+                        })
+                    }).catch(err => console.log(err))
+                    //================
                     embeds.push(embed)
                 }
                 noOfBuyers = j
@@ -8469,7 +8552,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
             }
             else {
-                msg.edit({content: ' ',embeds: embeds})
+                msg.edit({content: ' ',embeds: embeds, files: files})
                 .then(async msg => {
                     msg.reactions.removeAll()
                     .then(() => {
@@ -8495,7 +8578,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 continue
             if (embeds.length == 0)
                 return Promise.reject()
-            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
+            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds, files: files})
             .then(async msg => {
                 var status = await db.query(`INSERT INTO lich_messages_ids (channel_id,lich_id,message_id) VALUES (${multiCid},'${lich_info.lich_id}',${msg.id})`)
                 .then(res => {
@@ -8524,7 +8607,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             return Promise.reject()
                         }
                         var msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
-                        await msg.edit({content: ' ', embeds: embeds}).then(async () => {
+                        await msg.edit({content: ' ', embeds: embeds, files: files}).then(async () => {
                             msg.reactions.removeAll()
                             .then(() => {
                                 for (var i=0;i<noOfSellers;i++) {
