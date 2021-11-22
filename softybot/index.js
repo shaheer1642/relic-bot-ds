@@ -8554,8 +8554,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
             }
             else {
-                msg.edit({content: ' ',embeds: embeds, files: files})
-                .then(async msg => {
+                var status = msg.edit({content: ' ',embeds: embeds, files: files})
+                .then(msg => {
                     msg.reactions.removeAll()
                     .then(() => {
                         for (var i=0;i<noOfSellers;i++) {
@@ -8566,13 +8566,16 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         }
                     })
                     .catch(err => console.log(err))
+                    return true
                 })
                 .catch(err => {
                     if (interaction)
                         interaction.reply({content: `☠️ Error editing existing orders in channel <#${multiCid}>.\nError code: 505\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
                     console.log(err)
-                    return Promise.reject()
+                    return false
                 })
+                if (!status)
+                    return Promise.reject()
             }
         }
         else {
