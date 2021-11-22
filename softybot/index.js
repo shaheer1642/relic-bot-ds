@@ -8357,7 +8357,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     if (j==5)
                         break
                     var embed = {
-                        title: lich_info.weapon_url,
+                        title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
                         description: `Note: the image(s) format below is subject to change. For now it's for testing purposes.`,
                         thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
                         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -8407,7 +8407,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
                         
-                        embed.image.url = 'attachment://canvas.png'
+                        embed.image.url = `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
                         files.push({
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
@@ -8437,12 +8437,13 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     if (j==5)
                         break
                     var embed = {
-                        title: lich_info.weapon_url,
+                        title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
                         description: `Note: the image(s) format below is subject to change. For now it's for testing purposes.`,
                         thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
                         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                         fields: [],
-                        color: '#E74C3C'
+                        color: '#E74C3C',
+                        image: {url: ''}
                     }
                     embed.fields.push([
                         {name: `Buyer ${tradingBotReactions.buy[j]}`,value: res.rows[j].ingame_name,inline: true},
@@ -8487,7 +8488,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
                         
-                        embed.image.url = 'attachment://canvas.png'
+                        embed.image.url = `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
                         files.push({
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
