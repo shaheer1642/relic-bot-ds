@@ -8385,6 +8385,9 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         var y_diff = 20
                         canvas.width = 10;
                         canvas.height = y + y_diff*embed.fields.length;
+                        console.log(img1.height)
+                        console.log(embed.fields.length)
+                        console.log(y + y_diff*embed.fields.length)
                         console.log(canvas.width + 'x' + canvas.height)
                         draw()
                       
