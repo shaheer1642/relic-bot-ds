@@ -8467,7 +8467,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         canvas.height = y + y_diff*embed.fields[0].length;
                       
                         draw()
-                      
+                        
                         function draw() {
                             var y=img1.height + 20;
                             ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
@@ -8486,6 +8486,16 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                                 y += y_diff
                             }
                         }
+
+                        await client.channels.cache.get('912395290701602866').send({
+                            content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
+                            files: {
+                                attachment: canvas.toBuffer(),
+                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
+                            }
+                        }).then(res => {
+                            console.log(res)
+                        }).catch(err => console.log(err))
                         
                         embed.image.url = `attachment://canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                         files.push({
