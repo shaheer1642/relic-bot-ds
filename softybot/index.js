@@ -8438,6 +8438,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         break
                     var embed = {
                         title: lich_info.weapon_url,
+                        description: `Note: the image(s) format below is subject to change. For now it's for testing purposes.`,
                         thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
                         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                         fields: [],
