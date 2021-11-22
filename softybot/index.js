@@ -8405,14 +8405,17 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
 
-                        var attachment_url = await client.channels.cache.get('912395290701602866').send({
+                        var attachment_url = ''
+                        await client.channels.cache.get('912395290701602866').send({
                             content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
                             files: [{
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                             }]
                         }).then(res => {
-                            return res.attachments[0].url
+                            res.attachments.map(attachment => {
+                                attachment_url = attachment.url
+                            })
                         }).catch(err => console.log(err))
                         
                         embed.image.url = attachment_url
@@ -8492,14 +8495,17 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
 
-                        var attachment_url = await client.channels.cache.get('912395290701602866').send({
+                        var attachment_url = ''
+                        await client.channels.cache.get('912395290701602866').send({
                             content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
                             files: [{
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                             }]
                         }).then(res => {
-                            return res.attachments[0].url
+                            res.attachments.map(attachment => {
+                                attachment_url = attachment.url
+                            })
                         }).catch(err => console.log(err))
                         
                         embed.image.url = attachment_url
