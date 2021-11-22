@@ -8406,17 +8406,23 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         }
 
                         var attachment_url = ''
-                        await client.channels.cache.get('912395290701602866').send({
-                            content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
-                            files: [{
-                                attachment: canvas.toBuffer(),
-                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                            }]
-                        }).then(res => {
-                            res.attachments.map(attachment => {
-                                attachment_url = attachment.url
-                            })
-                        }).catch(err => console.log(err))
+                        if (res.rows[j].lich_image_url) {
+                            attachment_url = res.rows[j].lich_image_url
+                        }
+                        else {
+                            await client.channels.cache.get('912395290701602866').send({
+                                content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
+                                files: [{
+                                    attachment: canvas.toBuffer(),
+                                    name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
+                                }]
+                            }).then(res => {
+                                res.attachments.map(attachment => {
+                                    attachment_url = attachment.url
+                                })
+                            }).catch(err => console.log(err))
+                            await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                        }
                         
                         embed.image.url = attachment_url
                     }).catch(err => console.log(err))
