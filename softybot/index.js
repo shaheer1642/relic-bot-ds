@@ -8408,10 +8408,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
 
                         await client.channels.cache.get('912395290701602866').send({
                             content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
-                            files: {
+                            files: [{
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                            }
+                            }]
                         }).then(res => {
                             console.log(res)
                         }).catch(err => console.log(err))
@@ -8499,10 +8499,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
 
                         await client.channels.cache.get('912395290701602866').send({
                             content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
-                            files: {
+                            files: [{
                                 attachment: canvas.toBuffer(),
                                 name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                            }
+                            }]
                         }).then(res => {
                             console.log(res)
                         }).catch(err => console.log(err))
