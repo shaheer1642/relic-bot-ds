@@ -8384,11 +8384,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         var y=img1.height + 20;
                         var y_diff = 20
                         canvas.width = 10;
-                        canvas.height = y + y_diff*embed.fields.length;
-                        console.log(img1.height)
-                        console.log(embed.fields.length)
-                        console.log(y + y_diff*embed.fields.length)
-                        console.log(canvas.width + 'x' + canvas.height)
+                        canvas.height = y + y_diff*embed.fields[0].length;
                         draw()
                       
                         function draw() {
@@ -8397,8 +8393,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             ctx.font = '15px Arial';
                             ctx.fillStyle = "#FF0000";
                         
-                            for (var k=0;k<embed.fields.length;k++) {
-                                var e = embed.fields[k]
+                            for (var k=0;k<embed.fields[0].length;k++) {
+                                var e = embed.fields[0][k]
                                 var te = ctx.measureText(`${e.name}: ${e.value}`);
                                 if (te.width>canvas.width) {
                                     canvas.width = te.width + x;
@@ -8468,7 +8464,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         var y=img1.height + 20;
                         var y_diff = 20
                         canvas.width = 10;
-                        canvas.height = y + y_diff*embed.fields.length;
+                        canvas.height = y + y_diff*embed.fields[0].length;
                       
                         draw()
                       
@@ -8478,8 +8474,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             ctx.font = '15px Arial';
                             ctx.fillStyle = "#FF0000";
                         
-                            for (var k=0;k<embed.fields.length;k++) {
-                                var e = embed.fields[k]
+                            for (var k=0;k<embed.fields[0].length;k++) {
+                                var e = embed.fields[0][k]
                                 var te = ctx.measureText(`${e.name}: ${e.value}`);
                                 if (te.width>canvas.width) {
                                     canvas.width = te.width + x;
