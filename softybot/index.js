@@ -8407,10 +8407,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
                         
-                        embed.image.url = `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
+                        embed.image.url = `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                         files.push({
                                 attachment: canvas.toBuffer(),
-                                name: `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
+                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                         })
                     }).catch(err => console.log(err))
                     //================
@@ -8488,10 +8488,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             }
                         }
                         
-                        embed.image.url = `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
+                        embed.image.url = `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                         files.push({
                                 attachment: canvas.toBuffer(),
-                                name: `canvas_t${res.rows[j].ingame_name}_p${res.rows[j].user_price}.png`
+                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                         })
                     }).catch(err => console.log(err))
                     //================
