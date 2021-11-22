@@ -8385,7 +8385,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         var y_diff = 20
                         canvas.width = 10;
                         canvas.height = y + y_diff*embed.fields.length;
-                      
+                        console.log(canvas.width + 'x' + canvas.height)
                         draw()
                       
                         function draw() {
@@ -8396,12 +8396,11 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         
                             for (var k=0;k<embed.fields.length;k++) {
                                 var e = embed.fields[k]
-                                console.log(e)
                                 var te = ctx.measureText(`${e.name}: ${e.value}`);
                                 if (te.width>canvas.width) {
                                     canvas.width = te.width + x;
-                                draw()
-                                return
+                                    draw()
+                                    return
                                 }
                                 ctx.fillText(`${e.name}: ${e.value}`, x, y);
                                 y += y_diff
