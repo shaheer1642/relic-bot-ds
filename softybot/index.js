@@ -8387,8 +8387,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         , thc = 0
                         , nc = {x: 0, y: 20};
 
-                        //---draw kuva image---
-                        ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
+                        //---reserve space for kuva image---
                         twc += img1.width
                         thc += img1.height
                         nc = {x: 0, y: img1.height+10};
@@ -8404,6 +8403,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         let tempctx = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height)
                         ctx.canvas.width = twc
                         ctx.canvas.height = thc
+                        ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
                         ctx.putImageData(tempctx,0,0)
                         
                         function draw(text, x, y, hls = 10, vls = 10, nl = false, font = '15px Arial', color = '#ffffff') {
