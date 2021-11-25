@@ -8394,7 +8394,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         //---draw texts----
                         
                         nc = draw(`Seller: ${res.rows[j].ingame_name}`, nc.x, nc.y)
-                        nc = draw(`Price: ${res.rows[j].user_price}`, nc.x, nc.y,10,10,true)
+                        nc = draw(`Price: ${res.rows[j].user_price}p`, nc.x, nc.y,10,10,true)
                         nc = draw(`Damage: ${res.rows[j].damage}% ${res.rows[j].element}`, nc.x, nc.y,10,10,true)
                         nc = draw(`Ephemera: ${res.rows[j].ephemera}`, nc.x, nc.y)
                         nc = draw(`Quirk: ${res.rows[j].quirk}`, nc.x, nc.y,10,10,true)
@@ -8403,8 +8403,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         let tempctx = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height)
                         ctx.canvas.width = twc
                         ctx.canvas.height = thc
-                        ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
                         ctx.putImageData(tempctx,0,0)
+                        ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
                         
                         function draw(text, x, y, hls = 10, vls = 10, nl = false, font = '15px Arial', color = '#ffffff') {
                           ctx.font = font;
