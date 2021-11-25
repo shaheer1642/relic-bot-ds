@@ -8411,6 +8411,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           ctx.fillStyle = color;
                         
                           var cords1 = ctx.measureText(text)
+                          console.log(cords1)
                           var cords2 = ctx.measureText('M')
                           
                           if (x+cords1.width > twc)
