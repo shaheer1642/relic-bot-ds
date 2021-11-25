@@ -8358,7 +8358,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     var embed = {
                         title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
                         description: `Note: the image(s) format below is subject to change. For now it's for testing purposes.`,
-                        thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
+                        //thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
                         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                         fields: [],
                         color: '#7cb45d',
@@ -8384,16 +8384,13 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
 
                         ctx.drawImage(img1, 90, 70);
                       
-                        ctx.font = '15px Arial';
-                        ctx.fillStyle = '#ffffff';
-                      
                         var twc = 0
                         
-                        draw(`${res.rows[j].ingame_name}`, 0, 40);
-                        draw(`${res.rows[j].user_price}p`, 180, 20);
-                        draw(`${res.rows[j].damage}% ${res.rows[j].element}`, 250, 60);
+                        draw(`${res.rows[j].ingame_name}`, 15, 40, 20, 'green');
+                        draw(`${res.rows[j].user_price}p`, 180, 20, 25);
+                        draw(`${res.rows[j].damage}% ${res.rows[j].element}`, 250, 60, 20);
                         draw(`${res.rows[j].lich_name}`, 250, 150);
-                        draw(`${res.rows[j].quirk}`, 100, 170);
+                        draw(`${res.rows[j].quirk}`, 100, 170, 7);
                         draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, 10, 130);
                       
                         let tempctx = ctx.getImageData(0,0,twc,190)
@@ -8401,11 +8398,13 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         ctx.canvas.height = 190
                         ctx.putImageData(tempctx,0,0)
                       
-                        function draw(text, x, y) {
-                          ctx.fillText(text, x, y);
-                          var cords = ctx.measureText(text)
-                          if (x+cords.width > twc)
-                            twc = x+cords.width
+                        function draw(text, x, y, size=10, color = '#ffffff') {
+                            ctx.font = size + 'px Arial';
+                            ctx.fillStyle = color;
+                            ctx.fillText(text, x, y);
+                            var cords = ctx.measureText(text)
+                            if (x+cords.width > twc)
+                                twc = x+cords.width
                         }
 
                         var attachment_url = ''
