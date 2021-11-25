@@ -8388,7 +8388,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         , nc = {x: 0, y: 20};
 
                         //---draw kuva image---
-                        ctx.drawImage(img1, 0, 0);
+                        ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
                         twc += img1.width
                         thc += img1.height
                         nc = {x: 0, y: img1.height+10};
