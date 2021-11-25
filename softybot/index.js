@@ -8364,6 +8364,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         color: '#7cb45d',
                         image: {url: ''}
                     }
+                    /*
                     embed.fields.push([
                         {name: `Seller ${tradingBotReactions.sell[j]}`,value: res.rows[j].ingame_name,inline: true},
                         {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
@@ -8373,6 +8374,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         {name: 'Quirk',value: res.rows[j].quirk,inline: true},
                         {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
                     ])
+                    */
                 
                     await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
                     .then(async img1 => {
