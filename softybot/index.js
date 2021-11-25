@@ -8374,7 +8374,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
                     ])
                     // Create image on canvas
-                    var canvas = new Canvas.createCanvas(200,200)
+                    var canvas = new Canvas.createCanvas(1000,1000)
                     , ctx = canvas.getContext('2d');
                 
                     await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
@@ -8388,11 +8388,9 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         , nc = {x: 0, y: 20};
 
                         //---reserve space for kuva image---
-                        /*
                         twc += img1.width
                         thc += img1.height
                         nc = {x: 0, y: img1.height+10};
-                        */
                         //---draw texts----
                         
                         nc = draw(`Seller: ${res.rows[j].ingame_name}`, nc.x, nc.y)
@@ -8400,12 +8398,12 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         nc = draw(`Damage: ${res.rows[j].damage}% ${res.rows[j].element}`, nc.x, nc.y,10,10,true)
                         nc = draw(`Quirk: ${res.rows[j].quirk}`, nc.x, nc.y,10,10,true)
                         nc = draw(`Ephemera: ${res.rows[j].ephemera}`, nc.x, nc.y)
-                        nc = draw(`Lich Name: ${res.rows[j].lich_name}`, nc.x, nc.y)
+                        nc = draw(`Lich Name: ${res.rows[j].lich_name}`, nc.x, nc.y,10,10,true)
                         
                         let tempctx = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height)
                         ctx.canvas.width = twc
                         ctx.canvas.height = thc
-                        //ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
+                        ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
                         ctx.putImageData(tempctx,0,0)
                         
                         function draw(text, x, y, hls = 10, vls = 10, nl = false, font = '15px Arial', color = '#ffffff') {
