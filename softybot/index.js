@@ -8373,68 +8373,37 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         {name: 'Quirk',value: res.rows[j].quirk,inline: true},
                         {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
                     ])
-                    // Create image on canvas
-                    var canvas = new Canvas.createCanvas(1000,1000)
-                    , ctx = canvas.getContext('2d');
                 
                     await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
                     .then(async img1 => {
-                        //vls = vertical_line_spacing
-                        //thc = total_height_counter
-                        //twc = total_width_counter
-                        //nc = new_cords
+                        // Create image on canvas
+                        var canvas = new Canvas.createCanvas(1000,1000)
+                        , ctx = canvas.getContext('2d');
+                        
+                        ctx.drawImage(img1, 90, 70);
+                      
+                        ctx.font = '15px Arial';
+                        ctx.fillStyle = '#ffffff';
+                      
                         var twc = 0
-                        , thc = 0
-                        , nc = {x: 0, y: 20};
-
-                        //---reserve space for kuva image---
-                        twc += img1.width
-                        thc += img1.height + 10
-                        nc = {x: 0, y: img1.height+10};
-                        //---draw texts----
                         
-                        nc = draw(`Seller: ${res.rows[j].ingame_name}`, nc.x, nc.y)
-                        nc = draw(`Price: ${res.rows[j].user_price}p`, nc.x, nc.y)
-                        nc = draw(`Damage: ${res.rows[j].damage}% ${res.rows[j].element}`, 0, nc.y,10,10,true)
-                        nc = draw(`Ephemera: ${res.rows[j].ephemera}`, nc.x, nc.y)
-                        nc = draw(`Quirk: ${res.rows[j].quirk}`, 0, nc.y,10,10,true)
-                        nc = draw(`Lich Name: ${res.rows[j].lich_name}`, 0, nc.y,10,10,true)
-                        
-                        thc += 10
-                        let tempctx = ctx.getImageData(0,0,twc,thc)
+                        draw(`${lich_arr[0].value}`, 0, 40);
+                        draw(`${lich_arr[1].value}p`, 180, 20);
+                        draw(`${lich_arr[2].value}% ${lich_arr[3].value}`, 250, 60);
+                        draw(`${lich_arr[6].value}`, 250, 150);
+                        draw(`${lich_arr[5].value}`, 100, 170);
+                        draw(`${lich_arr[4].value.toString().replace('false','w/o').replace('true','with')} Eph.`, 10, 130);
+                      
+                        let tempctx = ctx.getImageData(0,0,twc,190)
                         ctx.canvas.width = twc
-                        ctx.canvas.height = thc
+                        ctx.canvas.height = 190
                         ctx.putImageData(tempctx,0,0)
-                        ctx.drawImage(img1, ctx.canvas.width/2 - img1.width/2, 0);
-                        
-                        function draw(text, x, y, hls = 10, vls = 10, nl = false, font = '15px Arial', color = '#ffffff') {
-                          ctx.font = font;
-                          ctx.fillStyle = color;
-                        
-                          var cords1 = ctx.measureText(text)
-                          console.log(cords1)
-                          var cords2 = ctx.measureText('M')
-                          
-                          if (x+cords1.width > twc)
-                            twc += hls+cords1.width
-                          if (y+cords2.width > thc)
-                            thc += vls+cords2.width
-                          
-                          if (nl)
-                            ctx.fillText(text, 0, thc);
-                          else {
-                            if (x != 0)
-                              ctx.fillText(text, x+hls, y);
-                            else
-                              ctx.fillText(text, x, y);
-                          }
-                        
-                          console.log(twc + ' ' + thc)
-                        
-                          if (nl)
-                            return {x: cords1.width, y: thc}
-                          else
-                            return {x: x+cords1.width+hls, y: y}
+                      
+                        function draw(text, x, y) {
+                          ctx.fillText(text, x, y);
+                          var cords = ctx.measureText(text)
+                          if (x+cords.width > twc)
+                            twc = x+cords.width
                         }
 
                         var attachment_url = ''
