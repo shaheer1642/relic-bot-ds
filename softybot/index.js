@@ -8389,7 +8389,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
 
                         //---reserve space for kuva image---
                         twc += img1.width
-                        thc += img1.height
+                        thc += img1.height + 10
                         nc = {x: 0, y: img1.height+10};
                         //---draw texts----
                         
@@ -8400,7 +8400,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         nc = draw(`Quirk: ${res.rows[j].quirk}`, nc.x, nc.y,10,10,true)
                         nc = draw(`Lich Name: ${res.rows[j].lich_name}`, nc.x, nc.y,10,10,true)
                         
-                        let tempctx = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height)
+                        let tempctx = ctx.getImageData(0,0,twc,thc)
                         ctx.canvas.width = twc
                         ctx.canvas.height = thc
                         ctx.putImageData(tempctx,0,0)
