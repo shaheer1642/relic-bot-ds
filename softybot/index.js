@@ -8400,6 +8400,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         nc = draw(`Quirk: ${res.rows[j].quirk}`, 0, nc.y,10,10,true)
                         nc = draw(`Lich Name: ${res.rows[j].lich_name}`, 0, nc.y,10,10,true)
                         
+                        thc += 10
                         let tempctx = ctx.getImageData(0,0,twc,thc)
                         ctx.canvas.width = twc
                         ctx.canvas.height = thc
