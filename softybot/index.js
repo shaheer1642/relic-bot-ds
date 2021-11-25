@@ -8379,7 +8379,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         // Create image on canvas
                         var canvas = new Canvas.createCanvas(1000,1000)
                         , ctx = canvas.getContext('2d');
-                        
+
                         ctx.drawImage(img1, 90, 70);
                       
                         ctx.font = '15px Arial';
@@ -8387,12 +8387,12 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                       
                         var twc = 0
                         
-                        draw(`${lich_arr[0].value}`, 0, 40);
-                        draw(`${lich_arr[1].value}p`, 180, 20);
-                        draw(`${lich_arr[2].value}% ${lich_arr[3].value}`, 250, 60);
-                        draw(`${lich_arr[6].value}`, 250, 150);
-                        draw(`${lich_arr[5].value}`, 100, 170);
-                        draw(`${lich_arr[4].value.toString().replace('false','w/o').replace('true','with')} Eph.`, 10, 130);
+                        draw(`${res.rows[j].ingame_name}`, 0, 40);
+                        draw(`${res.rows[j].user_price}p`, 180, 20);
+                        draw(`${res.rows[j].damage}% ${res.rows[j].element}`, 250, 60);
+                        draw(`${res.rows[j].lich_name}`, 250, 150);
+                        draw(`${res.rows[j].quirk}`, 100, 170);
+                        draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, 10, 130);
                       
                         let tempctx = ctx.getImageData(0,0,twc,190)
                         ctx.canvas.width = twc
