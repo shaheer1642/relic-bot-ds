@@ -8390,8 +8390,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         draw(`${res.rows[j].user_price}p`, 180, 20, 25);
                         draw(`${res.rows[j].damage}% ${res.rows[j].element}`, 250, 60, 20);
                         draw(`${res.rows[j].lich_name}`, 250, 150);
-                        draw(`${res.rows[j].quirk}`, 100, 170, 7);
-                        draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, 10, 130);
+                        draw(`${res.rows[j].quirk}`, 100, 170, 11);
+                        draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, 10, 130, 10);
                       
                         let tempctx = ctx.getImageData(0,0,twc,190)
                         ctx.canvas.width = twc
