@@ -8391,7 +8391,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         ctx.drawImage(img1, 0, 0);
                         twc += img1.width
                         thc += img1.height
-                        nc = {x: img1.width, y: img1.height+10};
+                        nc = {x: 0, y: img1.height+10};
                         //---draw texts----
                         
                         nc = draw(`Seller: ${res.rows[j].ingame_name}`, nc.x, nc.y)
