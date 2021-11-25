@@ -8404,7 +8404,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         ctx.canvas.width = twc
                         ctx.canvas.height = thc
                         ctx.putImageData(tempctx,0,0)
-                        ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
+                        ctx.drawImage(img1, ctx.canvas.width/2 - img1.width/2, 0);
                         
                         function draw(text, x, y, hls = 10, vls = 10, nl = false, font = '15px Arial', color = '#ffffff') {
                           ctx.font = font;
@@ -8443,7 +8443,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             await client.channels.cache.get('912395290701602866').send({
                                 content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
                                 files: [{
-                                    attachment: canvas.toBuffer(),
+                                    attachment: ctx.canvas.toBuffer(),
                                     name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
                                 }]
                             }).then(res => {
