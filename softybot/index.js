@@ -8379,30 +8379,60 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 
                     await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
                     .then(async img1 => {
-                        var x=0
-                        var y=img1.height + 20;
-                        var y_diff = 20
-                        canvas.width = 10;
-                        canvas.height = y + y_diff*embed.fields[0].length;
-                        draw()
-                      
-                        function draw() {
-                            var y=img1.height + 20;
-                            ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
-                            ctx.font = '15px Arial';
-                            ctx.fillStyle = "#FF0000";
+                        //vls = vertical_line_spacing
+                        //thc = total_height_counter
+                        //twc = total_width_counter
+                        //nc = new_cords
+                        var twc = 0
+                        , thc = 0
+                        , nc = {x: 0, y: 20};
+
+                        //---draw kuva image---
+                        ctx.drawImage(img1, 0, 0);
+                        twc += img1.width
+                        thc += img1.height
+                        nc = {x: img1.width, y: img1.height+10};
+                        //---draw texts----
                         
-                            for (var k=0;k<embed.fields[0].length;k++) {
-                                var e = embed.fields[0][k]
-                                var te = ctx.measureText(`${e.name}: ${e.value}`);
-                                if (te.width>canvas.width) {
-                                    canvas.width = te.width + x;
-                                    draw()
-                                    return
-                                }
-                                ctx.fillText(`${e.name}: ${e.value}`, x, y);
-                                y += y_diff
-                            }
+                        nc = draw(`Seller: ${res.rows[j].ingame_name}`, nc.x, nc.y)
+                        nc = draw(`Price: ${res.rows[j].user_price}`, nc.x, nc.y,10,10,true)
+                        nc = draw(`Damage: ${res.rows[j].damage}% ${res.rows[j].element}`, nc.x, nc.y,10,10,true)
+                        nc = draw(`Quirk: ${res.rows[j].quirk}`, nc.x, nc.y,10,10,true)
+                        nc = draw(`Ephemera: ${res.rows[j].ephemera}`, nc.x, nc.y)
+                        nc = draw(`Lich Name: ${res.rows[j].lich_name}`, nc.x, nc.y)
+                        
+                        let tempctx = ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height)
+                        ctx.canvas.width = twc
+                        ctx.canvas.height = thc
+                        ctx.putImageData(tempctx,0,0)
+                        
+                        function draw(text, x, y, hls = 10, vls = 10, nl = false, font = '15px Arial', color = '#ffffff') {
+                          ctx.font = font;
+                          ctx.fillStyle = color;
+                        
+                          var cords1 = ctx.measureText(text)
+                          var cords2 = ctx.measureText('M')
+                          
+                          if (x+cords1.width > twc)
+                            twc += hls+cords1.width
+                          if (y+cords2.width > thc)
+                            thc += vls+cords2.width
+                          
+                          if (nl)
+                            ctx.fillText(text, 0, thc);
+                          else {
+                            if (x != 0)
+                              ctx.fillText(text, x+hls, y);
+                            else
+                              ctx.fillText(text, x, y);
+                          }
+                        
+                          console.log(twc + ' ' + thc)
+                        
+                          if (nl)
+                            return {x: cords1.width, y: thc}
+                          else
+                            return {x: x+cords1.width+hls, y: y}
                         }
 
                         var attachment_url = ''
