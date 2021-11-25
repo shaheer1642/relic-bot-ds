@@ -8395,10 +8395,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         
                         nc = draw(`Seller: ${res.rows[j].ingame_name}`, nc.x, nc.y)
                         nc = draw(`Price: ${res.rows[j].user_price}p`, nc.x, nc.y,10,10,true)
-                        nc = draw(`Damage: ${res.rows[j].damage}% ${res.rows[j].element}`, nc.x, nc.y,10,10,true)
+                        nc = draw(`Damage: ${res.rows[j].damage}% ${res.rows[j].element}`, 0, nc.y,10,10,true)
                         nc = draw(`Ephemera: ${res.rows[j].ephemera}`, nc.x, nc.y)
-                        nc = draw(`Quirk: ${res.rows[j].quirk}`, nc.x, nc.y,10,10,true)
-                        nc = draw(`Lich Name: ${res.rows[j].lich_name}`, nc.x, nc.y,10,10,true)
+                        nc = draw(`Quirk: ${res.rows[j].quirk}`, 0, nc.y,10,10,true)
+                        nc = draw(`Lich Name: ${res.rows[j].lich_name}`, 0, nc.y,10,10,true)
                         
                         let tempctx = ctx.getImageData(0,0,twc,thc)
                         ctx.canvas.width = twc
