@@ -8378,24 +8378,41 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 
                     await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
                     .then(async img1 => {
+                        var tlX = 90
+                        , tlY = 70
+                      
+                        , trX = tlX + img1.width
+                        , trY = tlY
+                      
+                        , blX = tlX
+                        , blY = tlY + img1.height
+                      
+                        , brX = blX + img1.width
+                        , brY = blY
+                      
+                        , twc = 0
+                      
                         // Create image on canvas
                         var canvas = new Canvas.createCanvas(1000,1000)
                         , ctx = canvas.getContext('2d');
-
-                        ctx.drawImage(img1, 90, 70);
                       
-                        var twc = 0
+                        ctx.drawImage(img1, tlX, tlY);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(tlX,tlY,5,5);
+                        ctx.fillRect(trX,trY,5,5);
+                        ctx.fillRect(blX,blY,5,5);
+                        ctx.fillRect(brX,brY,5,5);
                         
-                        draw(`${res.rows[j].ingame_name}`, 15, 40, 20, '#83eb34');
-                        draw(`${res.rows[j].user_price}p`, 180, 20, 25);
-                        draw(`${res.rows[j].damage}% ${res.rows[j].element}`, 250, 60, 20);
-                        draw(`${res.rows[j].lich_name}`, 250, 150);
-                        draw(`${res.rows[j].quirk}`, 100, 170, 15);
-                        draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, 10, 130, 12);
+                        draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#83eb34');
+                        draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
+                        draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
+                        draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
+                        draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
+                        draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
                       
-                        let tempctx = ctx.getImageData(0,0,twc,190)
+                        let tempctx = ctx.getImageData(0,0,twc,blY+70)
                         ctx.canvas.width = twc
-                        ctx.canvas.height = 190
+                        ctx.canvas.height = blY+70
                         ctx.putImageData(tempctx,0,0)
                       
                         function draw(text, x, y, size=10, color = '#ffffff') {
