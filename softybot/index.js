@@ -8398,10 +8398,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                       
                         ctx.drawImage(img1, tlX, tlY);
                         ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(tlX,tlY,5,5);
-                        ctx.fillRect(trX,trY,5,5);
-                        ctx.fillRect(blX,blY,5,5);
-                        ctx.fillRect(brX,brY,5,5);
+                        //ctx.fillRect(tlX,tlY,5,5);
+                        //ctx.fillRect(trX,trY,5,5);
+                        //ctx.fillRect(blX,blY,5,5);
+                        //ctx.fillRect(brX,brY,5,5);
                         
                         textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#83eb34');
                         drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
@@ -8441,10 +8441,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                               brY: y
                             }
                             //console.log(cordss.tlX + 'x' + cordss.tlY)
-                            ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
-                            ctx.fillRect(cordss.trX,cordss.trY,3,3);
-                            ctx.fillRect(cordss.blX,cordss.blY,3,3);
-                            ctx.fillRect(cordss.brX,cordss.brY,3,3);
+                            //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
+                            //ctx.fillRect(cordss.trX,cordss.trY,3,3);
+                            //ctx.fillRect(cordss.blX,cordss.blY,3,3);
+                            //ctx.fillRect(cordss.brX,cordss.brY,3,3);
                       
                             return cordss
                         }
