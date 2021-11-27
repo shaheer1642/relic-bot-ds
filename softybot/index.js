@@ -8422,6 +8422,23 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             var cords = ctx.measureText(text)
                             if (x+cords.width > twc)
                                 twc = x+cords.width
+                                
+                            //note that the filltext uses bottom left as reference for drawing text
+                            var cordss = {
+                                tlX: x,
+                                tlY: y-cordsH.width,
+                                trX: x+cords.width,
+                                trY: y-cordsH.width,
+                                blX: x, 
+                                blY: y,
+                                brX: x+cords.width,
+                                brY: y
+                            }
+                            //console.log(cordss.tlX + 'x' + cordss.tlY)
+                            ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
+                            ctx.fillRect(cordss.trX,cordss.trY,3,3);
+                            ctx.fillRect(cordss.blX,cordss.blY,3,3);
+                            ctx.fillRect(cordss.brX,cordss.brY,3,3);
                         }
 
                         var attachment_url = ''
