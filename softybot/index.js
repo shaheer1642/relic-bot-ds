@@ -8457,6 +8457,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           ctx.strokeStyle = '#ffffff';
                           ctx.lineWidth = 2;
                           ctx.stroke();
+                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
                         }
                       
                         function drawLineStr(x1,y1,x2,y2) {
@@ -8466,6 +8467,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           ctx.strokeStyle = '#ffffff';
                           ctx.lineWidth = 2;
                           ctx.stroke();
+                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
                         }
 
                         var attachment_url = ''
