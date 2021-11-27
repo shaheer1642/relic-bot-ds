@@ -8403,12 +8403,18 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         ctx.fillRect(blX,blY,5,5);
                         ctx.fillRect(brX,brY,5,5);
                         
-                        draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#83eb34');
-                        draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
-                        draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
-                        draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
-                        draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
-                        draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#83eb34');
+                        drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
+                        textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
+                        drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
+                        textC = draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
+                        drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
+                        textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
+                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
+                        textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
+                        drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
+                        textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                       
                         let tempctx = ctx.getImageData(0,0,twc,blY+70)
                         ctx.canvas.width = twc
@@ -8423,23 +8429,43 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             var cordsH = ctx.measureText('M')
                             if (x+cords.width > twc)
                                 twc = x+cords.width
-
                             //note that the filltext uses bottom left as reference for drawing text
                             var cordss = {
-                                tlX: x,
-                                tlY: y-cordsH.width,
-                                trX: x+cords.width,
-                                trY: y-cordsH.width,
-                                blX: x, 
-                                blY: y,
-                                brX: x+cords.width,
-                                brY: y
+                              tlX: x,
+                              tlY: y-cordsH.width,
+                              trX: x+cords.width,
+                              trY: y-cordsH.width,
+                              blX: x, 
+                              blY: y,
+                              brX: x+cords.width,
+                              brY: y
                             }
                             //console.log(cordss.tlX + 'x' + cordss.tlY)
                             ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
                             ctx.fillRect(cordss.trX,cordss.trY,3,3);
                             ctx.fillRect(cordss.blX,cordss.blY,3,3);
                             ctx.fillRect(cordss.brX,cordss.brY,3,3);
+                      
+                            return cordss
+                        }
+                      
+                        function drawLineCurve(x1,y1,x2,y2,x3,y3) {
+                          ctx.beginPath();
+                          ctx.moveTo(x1,y1);
+                          ctx.lineTo(x2,y2);
+                          ctx.lineTo(x3,y3);
+                          ctx.strokeStyle = '#ffffff';
+                          ctx.lineWidth = 2;
+                          ctx.stroke();
+                        }
+                      
+                        function drawLineStr(x1,y1,x2,y2) {
+                          ctx.beginPath();
+                          ctx.moveTo(x1,y1);
+                          ctx.lineTo(x2,y2);
+                          ctx.strokeStyle = '#ffffff';
+                          ctx.lineWidth = 2;
+                          ctx.stroke();
                         }
 
                         var attachment_url = ''
