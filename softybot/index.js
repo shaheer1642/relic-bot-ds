@@ -8420,9 +8420,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             ctx.fillStyle = color;
                             ctx.fillText(text, x, y);
                             var cords = ctx.measureText(text)
+                            var cordsH = ctx.measureText('M')
                             if (x+cords.width > twc)
                                 twc = x+cords.width
-                                
+
                             //note that the filltext uses bottom left as reference for drawing text
                             var cordss = {
                                 tlX: x,
