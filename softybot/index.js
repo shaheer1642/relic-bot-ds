@@ -8445,7 +8445,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             //ctx.fillRect(cordss.trX,cordss.trY,3,3);
                             //ctx.fillRect(cordss.blX,cordss.blY,3,3);
                             //ctx.fillRect(cordss.brX,cordss.brY,3,3);
-                      
+                            
                             return cordss
                         }
                       
