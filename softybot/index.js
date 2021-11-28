@@ -1031,7 +1031,7 @@ client.on('messageCreate', async message => {
         else 
             switch(command) {
                 case 'authorize':
-                    authorize(message,args)
+                    WFMauthorize(message,args)
                     break
             }
         continue
@@ -5394,7 +5394,7 @@ async function getDB(message,args) {
     }
 }
 
-async function authorize(message,args) {
+async function WFMauthorize(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
