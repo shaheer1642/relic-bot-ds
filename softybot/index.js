@@ -8296,6 +8296,23 @@ async function trading_lich_bot(interaction) {
 
     await trading_lich_orders_update(interaction, lich_info, 1)
     .then(res => {
+        var user_order = null
+        db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false 
+            user_order = res.rows
+            var currTime = new Date().getTime()
+            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
+            console.log(after3h - currTime)
+            set_order_timeout(user_order[0],after3h,currTime,true,lich_info)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
+        /*
+        set_order_timeout(all_orders,after3h,currTime,isLich = false,lich_info = {})
         setTimeout(async () => {
             var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
             .then(res => {
@@ -8353,6 +8370,7 @@ async function trading_lich_bot(interaction) {
             })
             .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${interaction.user.id} AND item_id = '${lich_info.lich_id}'`))
         }, u_order_close_time);
+        */
     })
     .catch(err => console.log(err))
 
@@ -9285,9 +9303,68 @@ async function td_set_orders_timeouts() {
     }
 }
 
-async function set_order_timeout(all_orders,after3h,currTime,isLich = false) {
+async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich_info = {}) {
     if (isLich) {
-        //do something
+        setTimeout(async () => {
+            var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND visibility=true`)
+            .then(res => {
+                if (res.rowCount != 1)
+                    return false
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status) {
+                console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}'`)
+                return
+            }
+            trading_lich_orders_update(null, lich_info, 2)
+            .then(async res2 => {
+                    var postdata = {}
+                    postdata.content = " "
+                    postdata.embeds = []
+                    postdata.embeds.push({
+                        description: `❕ Order Notification ❕\n\nYour **${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${lich_info.weapon_url}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                        timestamp: new Date()
+                    })
+                    if (all_orders.order_type == 'wts')
+                        postdata.embeds[0].color = tb_sellColor
+                    if (all_orders.order_type == 'wtb')
+                        postdata.embeds[0].color = tb_buyColor
+                    console.log(postdata)
+                    var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
+                    .then(res => {
+                        if (res.rows.length == 0)
+                            return false
+                        if (res.rows.length > 1)
+                            return false
+                        const user = client.users.cache.get(all_orders.discord_id)
+                        if (res.rows[0].notify_order == true) {
+                            var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
+                            if (user_presc) {
+                                if (user_presc.status != 'dnd')
+                                    user.send(postdata).catch(err => console.log(err))
+                            }
+                            else
+                                user.send(postdata).catch(err => console.log(err))
+                            return true
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND order_type = '${all_orders.order_type}'`)
+                        return
+                    }
+                    return 
+            })
+            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND order_type = '${all_orders.order_type}''`))
+        }, after3h - currTime);
     }
     else {
         setTimeout(async () => {
@@ -9372,9 +9449,9 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false) {
                 })
                 if (!status) {
                     console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
-                    return Promise.reject()
+                    return
                 }
-                return Promise.resolve()
+                return 
             })
             .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
         }, after3h - currTime);
