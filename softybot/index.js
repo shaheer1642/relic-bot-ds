@@ -9318,6 +9318,26 @@ async function td_set_orders_timeouts() {
             set_order_timeout(all_orders[i],after3h,currTime)
         }
     }
+    var status = await db.query(`SELECT * FROM users_lich_orders WHERE visibility = true`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false 
+        all_orders = res.rows
+        return true 
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (status) {
+        var currTime = new Date().getTime()
+        for (var i=0;i<all_orders.length;i++) {
+            var lich_info = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${all_orders[i].lich_id}'`)
+            var after3h = currTime + (u_order_close_time - (currTime - all_orders[i].update_timestamp))
+            console.log(after3h - currTime)
+            set_order_timeout(all_orders[i],after3h,currTime,true,lich_info.rows[0])
+        }
+    }
 }
 
 async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich_info = {}) {
