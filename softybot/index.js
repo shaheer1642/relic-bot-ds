@@ -1092,80 +1092,116 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             if (!status)
                 return Promise.resolve()
             var orders_list = []
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+            db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
             .then(res => {
                 if (res.rows.length == 0) {     //no visible orders at the time
-                    console.log('No visible orders at the time')
-                    return false
+                    console.log('No visible items orders at the time')
+                    return
                 }
-                if (res.rows.length > 0) {     //visible orders found
+                else if (res.rows.length > 0) {     //visible orders found
                     orders_list = res.rows
-                    return true
+                    db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                    .then(res => {
+                        if (res.rowCount == 0)
+                            return
+                        var all_orders_names = []
+                        for (var i=0;i<orders_list.length;i++) {
+                            var item_id = orders_list[i].item_id
+                            var item_rank = orders_list[i].user_rank
+                            console.log(item_id)
+                            var item_url = ''
+                            var item_name = ''
+                            db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+                            .then(res => {
+                                if (res.rows.length==0) { //unexpected response 
+                                    console.log('Unexpected db response fetching item info')
+                                    return false
+                                }
+                                if (res.rows.length>1) { //unexpected response
+                                    console.log('Unexpected db response fetching item info')
+                                    return false
+                                }
+                                item_url = res.rows[0].item_url
+                                item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
+                                all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ')')
+                                trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank)
+                                .then(() => {
+                                    var postdata = {}
+                                    postdata.content = " "
+                                    postdata.embeds = []
+                                    postdata.embeds.push({
+                                        description: `
+                                        ❕ Offline Notification ❕\n
+                                        You have been detected offline. Following orders have been set invisible for you:\n
+                                        ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
+                                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                                        timestamp: new Date(),
+                                        color: '#FFFFFF'
+                                    })
+                                    if (user_data.notify_offline)
+                                        newMember.user.send(postdata).catch(err => console.log(err))
+                                })
+                                .catch(err => console.log(err))
+                            })
+                            .catch(err => console.log(err))
+                        }
+                    })
+                    .catch(err => console.log(err))
                 }
             })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return Promise.resolve()
-            var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+            .catch(err => console.log(err))
+            db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
             .then(res => {
-                if (res.rowCount == 0)
-                    return false
-                return true
+                if (res.rows.length == 0) {     //no visible orders at the time
+                    console.log('No visible lich orders at the time')
+                    return
+                }
+                else if (res.rows.length > 0) {     //visible orders found
+                    orders_list = res.rows
+                    db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                    .then(res => {
+                        if (res.rowCount == 0)
+                            return
+                        var all_orders_names = []
+                        for (var i=0;i<orders_list.length;i++) {
+                            db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
+                            .then(res => {
+                                if (res.rows.length==0) { //unexpected response 
+                                    console.log('Unexpected db response fetching lich info')
+                                    return
+                                }
+                                if (res.rows.length>1) { //unexpected response
+                                    console.log('Unexpected db response fetching lich info')
+                                    return
+                                }
+                                lich_info = res.rows[0]
+                                all_orders_names.push(res.rows[0].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
+                                trading_lich_orders_update(null,lich_info,2)
+                                .then(() => {
+                                    var postdata = {}
+                                    postdata.content = " "
+                                    postdata.embeds = []
+                                    postdata.embeds.push({
+                                        description: `
+                                        ❕ Offline Notification ❕\n
+                                        You have been detected offline. Following orders have been set invisible for you:\n
+                                        ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
+                                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                                        timestamp: new Date(),
+                                        color: '#FFFFFF'
+                                    })
+                                    if (user_data.notify_offline)
+                                        newMember.user.send(postdata).catch(err => console.log(err))
+                                })
+                                .catch(err => console.log(err))
+                            })
+                            .catch(err => console.log(err))
+                        }
+                    })
+                    .catch(err => console.log(err))
+                }
             })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return Promise.resolve()
-            var all_orders_names = []
-            for (var i=0;i<orders_list.length;i++) {
-                var item_id = orders_list[i].item_id
-                var item_rank = orders_list[i].user_rank
-                console.log(item_id)
-                var item_url = ''
-                var item_name = ''
-                var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-                .then(res => {
-                    if (res.rows.length==0) { //unexpected response 
-                        console.log('Unexpected db response fetching item info')
-                        return false
-                    }
-                    if (res.rows.length>1) { //unexpected response
-                        console.log('Unexpected db response fetching item info')
-                        return false
-                    }
-                    item_url = res.rows[0].item_url
-                    item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
-                    all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ')')
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    return Promise.resolve()
-                await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(err => console.log(err))
-            }
-            var postdata = {}
-            postdata.content = " "
-            postdata.embeds = []
-            postdata.embeds.push({
-                description: `
-                ❕ Offline Notification ❕\n
-                You have been detected offline. Following orders have been set invisible for you:\n
-                ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                timestamp: new Date(),
-                color: '#FFFFFF'
-            })
-            if (user_data.notify_offline)
-                newMember.user.send(postdata).catch(err => console.log(err))
-            return Promise.resolve()
+            .catch(err => console.log(err))
         }
     }
     return Promise.resolve()
