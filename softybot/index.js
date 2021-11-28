@@ -1120,34 +1120,33 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                                 }
                                 var item_url = res.rows[0].item_url
                                 var item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
-                                all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
                                 await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank)
                                 .then(() => {
-                                    var postdata = {}
-                                    postdata.content = " "
-                                    postdata.embeds = []
-                                    postdata.embeds.push({
-                                        description: `
-                                        ❕ Offline Notification ❕\n
-                                        You have been detected offline. Following orders have been set invisible for you:\n
-                                        ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                                        timestamp: new Date(),
-                                        color: '#FFFFFF'
-                                    })
-                                    if (user_data.notify_offline)
-                                        newMember.user.send(postdata).catch(err => console.log(err))
+                                    all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
                                 })
                                 .catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                         }
+                        var postdata = {}
+                        postdata.content = " "
+                        postdata.embeds = []
+                        postdata.embeds.push({
+                            description: `
+                            ❕ Offline Notification ❕\n
+                            You have been detected offline. Following orders have been set invisible for you:\n
+                            ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
+                            footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                            timestamp: new Date(),
+                            color: '#FFFFFF'
+                        })
+                        if (user_data.notify_offline)
+                            newMember.user.send(postdata).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
                 }
             })
             .catch(err => console.log(err))
-            /*
             db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
             .then(res => {
                 if (res.rows.length == 0) {     //no visible orders at the time
@@ -1155,14 +1154,14 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     return
                 }
                 else if (res.rows.length > 0) {     //visible orders found
-                    orders_list = res.rows
+                    var orders_list = res.rows
                     db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                    .then(res => {
+                    .then(async res => {
                         if (res.rowCount == 0)
                             return
                         var all_orders_names = []
                         for (var i=0;i<orders_list.length;i++) {
-                            db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
+                            await db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
                             .then(res => {
                                 if (res.rows.length==0) { //unexpected response 
                                     console.log('Unexpected db response fetching lich info')
@@ -1173,34 +1172,33 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                                     return
                                 }
                                 lich_info = res.rows[0]
-                                all_orders_names.push(res.rows[0].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
-                                trading_lich_orders_update(null,lich_info,2)
+                                await trading_lich_orders_update(null,lich_info,2)
                                 .then(() => {
-                                    var postdata = {}
-                                    postdata.content = " "
-                                    postdata.embeds = []
-                                    postdata.embeds.push({
-                                        description: `
-                                        ❕ Offline Notification ❕\n
-                                        You have been detected offline. Following orders have been set invisible for you:\n
-                                        ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                                        timestamp: new Date(),
-                                        color: '#FFFFFF'
-                                    })
-                                    if (user_data.notify_offline)
-                                        newMember.user.send(postdata).catch(err => console.log(err))
+                                    all_orders_names.push(res.rows[0].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
                                 })
                                 .catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                         }
+                        var postdata = {}
+                        postdata.content = " "
+                        postdata.embeds = []
+                        postdata.embeds.push({
+                            description: `
+                            ❕ Offline Notification ❕\n
+                            You have been detected offline. Following orders have been set invisible for you:\n
+                            ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
+                            footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                            timestamp: new Date(),
+                            color: '#FFFFFF'
+                        })
+                        if (user_data.notify_offline)
+                            newMember.user.send(postdata).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
                 }
             })
             .catch(err => console.log(err))
-            */
         }
     }
     return Promise.resolve()
