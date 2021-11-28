@@ -1150,6 +1150,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 }
             })
             .catch(err => console.log(err))
+            /*
             db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
             .then(res => {
                 if (res.rows.length == 0) {     //no visible orders at the time
@@ -1202,6 +1203,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 }
             })
             .catch(err => console.log(err))
+            */
         }
     }
     return Promise.resolve()
