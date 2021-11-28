@@ -1162,7 +1162,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                         var all_orders_names = []
                         for (var i=0;i<orders_list.length;i++) {
                             await db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
-                            .then(res => {
+                            .then(async res => {
                                 if (res.rows.length==0) { //unexpected response 
                                     console.log('Unexpected db response fetching lich info')
                                     return
