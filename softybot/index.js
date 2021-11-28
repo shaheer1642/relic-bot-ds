@@ -9349,8 +9349,8 @@ async function lich_tut(message,args) {
             color: "FFFFFF"
         }]
     }
-    client.channels.cache.get('892160436881993758').send(postdata)
-    client.channels.cache.get('906555131254956042').send(postdata)
+    client.channels.cache.get('892003772698611723').send(postdata).catch(err => console.log(err))
+    client.channels.cache.get('906555131254956042').send(postdata).catch(err => console.log(err))
     return
     client.channels.cache.get('892160436881993758').messages.fetch('893138411861446676')
     .then(msg => {
