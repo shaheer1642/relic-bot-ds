@@ -1107,7 +1107,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                         for (var i=0;i<orders_list.length;i++) {
                             var item_id = orders_list[i].item_id
                             var item_rank = orders_list[i].user_rank
-                            console.log(orders_list)
+                            console.log(JSON.stringify(orders_list))
                             db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
                             .then(res => {
                                 if (res.rows.length==0) { //unexpected response 
