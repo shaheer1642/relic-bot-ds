@@ -5440,8 +5440,18 @@ async function WFMauthorize(message,args) {
                 })
             }
             else {
-                processMessage.edit("Already authorized. If any issue, Contact MrSofty#7926")
-                return 1
+                await db.query(`UPDATE discord_users SET jwt = '${JWT}' WHERE discord_id = '${discord_id}'`).then(res => {
+                    processMessage.edit("Re-authorized.")
+                    return 1
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> pricesDB error')
+                    processMessage.edit({content: "Some error occured updating record in database.\nError code: 504"})
+                    return 0
+                })
             }
         })
         .catch (err => {
