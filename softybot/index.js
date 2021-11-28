@@ -9349,7 +9349,7 @@ async function lich_tut(message,args) {
             color: "FFFFFF"
         }]
     }
-    client.channels.cache.get('892160436881993758').messages.fetch('914453068978978842')
+    client.channels.cache.get('892003772698611723').messages.fetch('914453068978978842')
     .then(msg => {
         msg.edit(postdata).catch(err => console.log(err))
     })
