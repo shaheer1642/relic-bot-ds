@@ -1091,7 +1091,6 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
             })
             if (!status)
                 return Promise.resolve()
-            var orders_list = []
             db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
             .then(res => {
                 if (res.rows.length == 0) {     //no visible orders at the time
@@ -1099,7 +1098,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     return
                 }
                 else if (res.rows.length > 0) {     //visible orders found
-                    orders_list = res.rows
+                    var orders_list = res.rows
                     db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
                     .then(res => {
                         if (res.rowCount == 0)
