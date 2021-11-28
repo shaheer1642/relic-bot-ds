@@ -7796,25 +7796,19 @@ async function trading_bot(message,args,command) {
     const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
     .then(res => {
         var user_order = null
-        var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
+        db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
         .then(res => {
             if (res.rows.length == 0)
                 return false 
             user_order = res.rows
-            return true 
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (status) {
             var currTime = new Date().getTime()
             var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
             console.log(after3h - currTime)
             set_order_timeout(user_order[0],after3h,currTime)
-        }
-
-
+        })
+        .catch(err => {
+            console.log(err)
+        })
         /*
         setTimeout(async () => {
             var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
