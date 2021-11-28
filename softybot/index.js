@@ -541,6 +541,22 @@ client.on('messageCreate', async message => {
                     async function InitializeOrdersUpdate(message,item_id,item_url,item_name,update_type,order_type,item_rank) {
                         var func = await trading_bot_orders_update(message,item_id,item_url,item_name,update_type,item_rank)
                         .then(res => {
+                            var user_order = null
+                            db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
+                            .then(res => {
+                                if (res.rows.length == 0)
+                                    return false 
+                                user_order = res.rows
+                                var currTime = new Date().getTime()
+                                var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
+                                console.log(after3h - currTime)
+                                set_order_timeout(user_order[0],after3h,currTime)
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
+
+                            /*
                             console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
                             setTimeout(async () => {
                                 var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank = '${item_rank}'`)
@@ -612,7 +628,8 @@ client.on('messageCreate', async message => {
                                 })
                                 .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
                             }, u_order_close_time);
-                            return Promise.resolve()
+                            */
+                            return
                         })
                         .catch(err => {
                             console.log(`Error occured midway of updating orders in my orders command`)
