@@ -994,6 +994,9 @@ client.on('messageCreate', async message => {
                 case 'trade_tut':
                     trade_tut(message,args)
                     break
+                case 'lich_tut':
+                    lich_tut(message,args)
+                    break
                 case 'relic':
                     relics(message,args)
                     break
@@ -9324,6 +9327,37 @@ async function trade_tut(message,args) {
     })
     .catch(err => console.log(err))
     client.channels.cache.get('892108718358007820').messages.fetch('893138411995689080')
+    .then(msg => {
+        msg.edit(postdata).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+}
+
+async function lich_tut(message,args) {
+    var postdata = {
+        content: " ",
+        embeds: [{
+            description: `
+            Posting new lich
+            **/lich**
+
+            Editing existing lich
+            (under dev.)
+
+            Posting existing orders
+            **my orders** (under dev.)`,
+            color: "FFFFFF"
+        }]
+    }
+    client.channels.cache.get('892160436881993758').send(postdata)
+    client.channels.cache.get('906555131254956042').send(postdata)
+    return
+    client.channels.cache.get('892160436881993758').messages.fetch('893138411861446676')
+    .then(msg => {
+        msg.edit(postdata).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+    client.channels.cache.get('906555131254956042').messages.fetch('893138412301860865')
     .then(msg => {
         msg.edit(postdata).catch(err => console.log(err))
     })
