@@ -1108,7 +1108,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                             var item_id = orders_list[i].item_id
                             var item_rank = orders_list[i].user_rank
                             console.log(JSON.stringify(orders_list))
-                            db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+                            await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
                             .then(res => {
                                 if (res.rows.length==0) { //unexpected response 
                                     console.log('Unexpected db response fetching item info')
@@ -1121,7 +1121,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                                 var item_url = res.rows[0].item_url
                                 var item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
                                 all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
-                                trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank)
+                                await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank)
                                 .then(() => {
                                     var postdata = {}
                                     postdata.content = " "
