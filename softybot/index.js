@@ -7795,6 +7795,27 @@ async function trading_bot(message,args,command) {
     //------------------
     const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
     .then(res => {
+        var user_order = null
+        var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false 
+            user_order = res.rows
+            return true 
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (status) {
+            var currTime = new Date().getTime()
+            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
+            console.log(after3h - currTime)
+            set_order_timeout(user_order[0],after3h,currTime)
+        }
+
+
+        /*
         setTimeout(async () => {
             var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
             .then(res => {
@@ -7865,6 +7886,7 @@ async function trading_bot(message,args,command) {
             })
             .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}`))
         }, u_order_close_time);
+        */
     })
     .catch(err => console.log('Error occured midway of updating orders'))
     return Promise.resolve()
@@ -9267,17 +9289,20 @@ async function td_set_orders_timeouts() {
             set_order_timeout(all_orders[i],after3h,currTime)
         }
     }
+}
 
-    async function set_order_timeout(all_orders,after3h,currTime) {
+async function set_order_timeout(all_orders,after3h,currTime,isLich = false) {
+    if (isLich) {
+        //do something
+    }
+    else {
         setTimeout(async () => {
             var item_id = all_orders.item_id
             var item_rank = all_orders.user_rank
             var order_type = all_orders.order_type
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}'`)
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}' AND visibility=true`)
             .then(res => {
                 if (res.rows.length == 0)
-                    return false
-                if (res.rows[0].visibility == false)
                     return false
                 return true
             })
