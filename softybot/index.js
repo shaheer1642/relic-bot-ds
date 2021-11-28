@@ -5041,7 +5041,7 @@ async function relist(message,args) {
                 ordersArr = ordersArr.sort(dynamicSort("price"))
                 if (ordersArr.length == 0) {
                     value_f1.push('No sellers found for ' + item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '\n')
-                    value_f3.push('\n')
+                    value_f3.push('\u200b\n')
                     console.log(value_f1.length + ' of ' + itemsArr.length)
                     //if (value_f1.length == itemsArr.length) {
                         const postdata = {
