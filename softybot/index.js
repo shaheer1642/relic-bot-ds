@@ -1100,7 +1100,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                 else if (res.rows.length > 0) {     //visible orders found
                     var orders_list = res.rows
                     db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                    .then(res => {
+                    .then(async res => {
                         if (res.rowCount == 0)
                             return
                         var all_orders_names = []
@@ -1109,14 +1109,14 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                             var item_rank = orders_list[i].user_rank
                             console.log(JSON.stringify(orders_list))
                             await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-                            .then(res => {
+                            .then(async res => {
                                 if (res.rows.length==0) { //unexpected response 
                                     console.log('Unexpected db response fetching item info')
-                                    return false
+                                    return
                                 }
                                 if (res.rows.length>1) { //unexpected response
                                     console.log('Unexpected db response fetching item info')
-                                    return false
+                                    return
                                 }
                                 var item_url = res.rows[0].item_url
                                 var item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
