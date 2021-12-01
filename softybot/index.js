@@ -3804,7 +3804,7 @@ client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
 })
 */
 
-client.login(process.env.DISCORD-BOT-TOKEN).catch(err => console.log(err));
+client.login(process.env.DISCORD_BOT_TOKEN).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
