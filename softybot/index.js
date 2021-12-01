@@ -5270,7 +5270,7 @@ async function gpt3_completion(message,args) {
         stop: ["\nQ:"]
     };
     const headers = {
-        'Authorization': `Bearer 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`,
+        'Authorization': process.env.OPEN_AI_KEY,
     };
     
     try {
@@ -5309,7 +5309,7 @@ async function gpt3_answer(message,args) {
         stop: ["\n", "<|endoftext|>"]
     };
     const headers = {
-        'Authorization': `Bearer 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`,
+        'Authorization': process.env.OPEN_AI_KEY,
     };
     
     try {
