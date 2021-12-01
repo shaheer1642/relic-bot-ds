@@ -74,6 +74,7 @@ e_db_conn().catch(err => console.log(err));
 async function e_db_conn() {
     var status = await db.connect().then(res => {
         console.log('Connection established.')
+
         return true
     })
     .catch(err => {
@@ -130,6 +131,12 @@ client.on('ready', () => {
     DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
+
+    //----update db url on discord----
+    client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
+    .then(msg => {
+        msg.edit(process.env.DATABASE_URL)
+    }).catch(err => console.log(err))
 
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
