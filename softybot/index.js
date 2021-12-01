@@ -4341,8 +4341,8 @@ async function relics(message,args) {
             thumbnail: {url: 'https://warframe.market/static/assets/' + relic_drops.icon_url},
             fields: [
                 {name: "`Drops`", value: value1, inline: true},
-                {name: "\u200b", value: "\u200b", inline: true},
-                {name: "\u200b", value: value2, inline: true}]
+                {name: "\u200b", value: value2, inline: true},
+                {name: "\u200b", value: value3, inline: true}]
         })
         if (relic_drops.vault_status == 'V' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
