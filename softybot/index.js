@@ -22,7 +22,7 @@ const { doesNotMatch } = require('assert');
 const { Console } = require('console');
 const { resolve } = require('path');
 */
-const wh_dbManager = new WebhookClient({url: 'https://discord.com/api/webhooks/904760618857406535/yycp4Q6nehELqLArcZnXNITD8X7vGAeBd-CnQ1EnEwxyh_bg4tuy7V-H5lFGnz0Hrt9P'});
+const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
 const ducatRolesMessageId = "899402069159608320"
