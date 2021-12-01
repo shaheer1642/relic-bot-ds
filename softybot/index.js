@@ -4245,7 +4245,7 @@ async function relics(message,args) {
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
     let items_list = []
     console.log('Retrieving Database -> items_list')
-    var status = await db.query(`SELECT * FROM items_list`)
+    var status = await db.query(`SELECT * FROM items_list ORDER BY item_url`)
     .then(res => {
         items_list = res.rows
         console.log('Retrieving Database -> items_list success')
