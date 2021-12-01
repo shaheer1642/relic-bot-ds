@@ -1674,7 +1674,7 @@ client.on('interactionCreate', async interaction => {
 
     else if (interaction.commandName == 'query') {
 		if (interaction.options.getSubcommand() === 'sets') {
-            db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon') AND sell_price >= ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
+            db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon' OR tags ? 'companion' OR tags ? 'sentinel') AND sell_price >= ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
             .then(res => {
                 var embed = []
                 embed.push({
