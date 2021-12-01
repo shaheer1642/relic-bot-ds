@@ -89,9 +89,6 @@ async function e_db_conn() {
 //setTimeout(trades_update, 5000);
 /*---------------*/
 
-//test bot "token": "ODc4MDE3NjU1MDI4NzIzODAz.YR7DqQ.a7OfA7NICFyLUU3s3oy6Z6KdbuM",
-//relic bot "token": "ODMyNjgyMzY5ODMxMTQxNDE3.YHnV4w.G7e4szgIo8LcErz0w_aTVqvs57E",
-
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
 //----Application commands-----
 client.commands = new Collection();
@@ -3807,7 +3804,7 @@ client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
 })
 */
 
-client.login(config.token).catch(err => console.log(err));
+client.login(process.env.DISCORD-BOT-TOKEN).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
