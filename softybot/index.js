@@ -1,5 +1,8 @@
 const config = require('./config.json')
 const {Client, Collection, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 //const { REST } = require('@discordjs/rest');
 //const { Routes } = require('discord-api-types/v9');
 const axios = require('axios');
@@ -105,6 +108,10 @@ for (const file of commandFiles) {
 var tickcount = new Date().getTime();
 
 client.on('ready', () => {
+    //----Bounty timers---
+    setImmediate(bounty_check,-1)
+    setImmediate(update_bounties,-1)
+
     client.user.setActivity('.help', { type: 2 })
 
     console.log(process.env.DEBUG_MODE)
@@ -142,6 +149,7 @@ client.on('ready', () => {
 
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
+
 
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
@@ -1435,7 +1443,6 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 })
 
 client.on('interactionCreate', async interaction => {
-
     if (process.env.DEBUG_MODE==1 && interaction.member.user.id != '253525146923433984')
         return
     if (process.env.DEBUG_MODE==2 && interaction.member.user.id == '253525146923433984')
@@ -1879,6 +1886,25 @@ client.on('interactionCreate', async interaction => {
         await interaction.editReply(postdata).catch(err => console.log(err))
     }
 
+    if (interaction.isAutocomplete()) {
+        var mission_type = interaction.options.getString('mission_type')
+        var bounties_list = []
+        await db.query(`SELECT * FROM bounties_list WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' ORDER BY type ASC`)
+        .then(res => {
+            bounties_list = res.rows
+        })
+        .catch(err => console.log(err))
+        var postdata = []
+        for (var i=0; i<bounties_list.length; i++) {
+            var bounty = bounties_list[i]
+            if (bounty.type.toLowerCase().match(mission_type.toLowerCase()))
+                postdata.push({name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g,'_')})
+        }
+        interaction.respond(postdata).catch(err => console.log(err))
+        console.log('autocomplete')
+        return
+    }
+
     if (!interaction.isCommand())
         return;
 
@@ -1952,7 +1978,56 @@ client.on('interactionCreate', async interaction => {
             })
             .catch(err => {
                 console.log(err)
-                interaction.reply({ content: 'Sorry some error occured.', ephemeral: false })
+                interaction.reply({ content: 'Sorry some error occured.', ephemeral: false }).catch(err => console.log(err))
+            })
+        }
+    }
+
+    else if (interaction.commandName == 'track') {
+		if (interaction.options.getSubcommand() === 'bounties') {
+            //SET users = users || '[${interaction.member.user.id}]'::jsonb
+            await db.query(`
+            SELECT * FROM bounties_list
+            WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
+            `)
+            .then(async res => {
+                if (res.rowCount == 0) {
+                    await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false});
+                    return
+                }
+                if (res.rows[0].users) {
+                    var users = res.rows[0].users.split(' ')
+                    var hasValue = 0
+                    for (var i=0; i<users.length; i++) {
+                        if (users[i] == interaction.member.user.id) {
+                            hasValue = 1
+                            break
+                        }
+                    }
+                    if (!hasValue)
+                        res.rows[0].users += ' ' + interaction.member.user.id
+                    else {
+                        await interaction.reply({ content: 'You are already tracking this bounty.', ephemeral: true});
+                        return
+                    }
+                    
+                }
+                else 
+                    res.rows[0].users =  interaction.member.user.id
+                res.rows[0].users = res.rows[0].users.trimLeft()
+                await db.query(`
+                UPDATE bounties_list
+                SET users = '${res.rows[0].users}'
+                WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
+                `)
+                .then(async res => {
+                    console.log(res)
+                    if (res.rowCount == 0)
+                        await interaction.reply({ content: 'Some error occured. Please contact softy.  Code 501', ephemeral: false});
+                    else
+                        await interaction.reply({ content: 'Added tracker.', ephemeral: true});
+                })
+                .catch(err => console.log(err))
             })
         }
     }
@@ -9835,6 +9910,107 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
             .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
         }, after3h - currTime);
     }
+}
+
+async function bounty_check() {
+    console.log('hi')
+    axios('https://api.warframestat.us/pc')
+    .then(async res => {
+        //get db bounties list
+        var bounties_list = await db.query(`SELECT * FROM bounties_list`)
+        .then(res => {return res.rows})
+        .catch(err => console.log(err))
+        for (var i=0; i<res.data.syndicateMissions.length; i++) {
+            var syndicate = res.data.syndicateMissions[i]
+            for (var j=0; j<syndicate.jobs.length; j++) {
+                var job = syndicate.jobs[j]
+                var hasBounty = 0
+                for (var k=0; k<bounties_list.length; k++) {
+                    if (bounties_list[k].type == job.type) {
+                        hasBounty = 1
+                        break
+                    }
+                }
+                if (!hasBounty) {
+                    console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
+                    await db.query(`INSERT INTO bounties_list (syndicate,type) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`).catch(err => console.log(err))
+                }
+            }
+        }
+        console.log('done')
+        setTimeout(bounty_check,60000)
+    })
+    .catch(err => {
+        console.log(err)
+        setTimeout(bounty_check,60000)
+    })
+}
+
+async function update_bounties() {
+    
+    var postdata = {
+        "name": "track",
+        "description": "Track bounties",
+        "options": [
+            {
+                "type": 1,
+                "name": "bounties",
+                "description": "Track bounties",
+                "options": [
+                    {
+                        "type": 3,
+                        "name": "syndicate",
+                        "description": "Select syndicate type",
+                        "required": true,
+                        "choices": [
+                            {
+                                "name": "Entrati",
+                                "value": "entrati"
+                            },
+                            {
+                                "name": "Ostrons",
+                                "value": "ostrons"
+                            },
+                            {
+                                "name": "Solaris United",
+                                "value": "solaris_united"
+                            }
+                        ]
+                    },
+                    {
+                        "type": 3,
+                        "name": "mission_type",
+                        "description": "Select mission type",
+                        "required": true,
+                        "autocomplete": true
+                    }
+                ]
+            }
+        ]
+    }
+
+    var url = `https://discord.com/api/v8/applications/${client.user.id}/guilds/832677897411493949/commands`
+    var headers = {
+        "Authorization": `Bot ${process.env.DISCORD_BOT_TOKEN}`
+    }
+
+    axios({
+        method: 'POST',
+        url: url,
+        data: postdata,
+        headers: headers
+    }).catch(err => console.log(err))
+
+    var url = `https://discord.com/api/v8/applications/${client.user.id}/guilds/865904902941048862/commands`
+
+    axios({
+        method: 'POST',
+        url: url,
+        data: postdata,
+        headers: headers
+    }).catch(err => console.log(err))
+    
+    setTimeout(update_bounties,3600000)
 }
 
 async function admin_test(message,args) {
