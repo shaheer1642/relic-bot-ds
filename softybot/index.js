@@ -9564,7 +9564,7 @@ async function trade_tut(message,args) {
     var postdata = {
         content: " ",
         embeds: [{
-            description: `Posting new/existing order\n**wtb volt 160p**\n\nPosting existing orders\n**my orders**\n\nPosting multiple orders\n**wtb loki p systems 100p, limbo, nekros prime bp**\n\nMatching top price\n**wts ash auto**`,
+            description: `Posting new/existing order\n**wtb volt 160p**\n\nPosting existing orders\n**my orders**\n\nPosting multiple orders\n**wtb loki p systems 100p, limbo, nekros prime bp**\n\nMatching top price\n**wts ash auto**\n\nClosing all orders\n**close all**`,
             color: "FFFFFF"
         }]
     }
