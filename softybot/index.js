@@ -183,8 +183,12 @@ client.on('messageCreate', async message => {
     if (process.env.DEBUG_MODE==1 && message.author.id != '253525146923433984')
         return
 
-    if (process.env.DEBUG_MODE==2 && message.author.id == '253525146923433984')
+    if (process.env.DEBUG_MODE==2 && message.author.id == '253525146923433984') {
+        message.channel.send('cannot listen to your messages. debug mode is turned on').then(msg => {
+            setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
+        })
         return
+    }
         
     if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
