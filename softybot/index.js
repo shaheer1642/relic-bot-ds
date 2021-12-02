@@ -186,7 +186,7 @@ client.on('messageCreate', async message => {
     if (process.env.DEBUG_MODE==2 && message.author.id == '253525146923433984') {
         message.react('❎').catch(err => console.log(err))
         .then(() => {
-            setTimeout(() => message.reactions.removeAll().catch(err => console.log(err)), 5000)
+            setTimeout(() => message.reactions.resolve('❎').users.remove(client.user.id).catch(err => console.log(err)), 5000)
         })
         return
     }
