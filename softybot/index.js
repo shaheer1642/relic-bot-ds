@@ -105,7 +105,12 @@ for (const file of commandFiles) {
 var tickcount = new Date().getTime();
 
 client.on('ready', () => {
+    console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
+    inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
     client.user.setActivity('.help', { type: 2 })
+
+    if (process.env.DEBUG_MODE)
+        return
     //--------Set new timer--------
     var currTime = new Date();
     var currDay = new Date(
@@ -126,8 +131,6 @@ client.on('ready', () => {
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     //-------------
     DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
-    console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
-    inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 
     //----update db url on discord----
     client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
@@ -174,6 +177,9 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
+
+    if (process.env.DEBUG_MODE && message.author.id != '253525146923433984')
+        return
         
     if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
@@ -1349,6 +1355,9 @@ client.on('messageCreate', async message => {
 })
 
 client.on('presenceUpdate', async (oldMember,newMember) => {
+    if (process.env.DEBUG_MODE)
+        return
+
     if (tradingBotGuilds.includes(newMember.member.guild.id)) {
         let username = newMember.user.username;
         if (!newMember.member.presence.status) {
@@ -1497,6 +1506,10 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 })
 
 client.on('interactionCreate', async interaction => {
+
+    if (process.env.DEBUG_MODE && interaction.member.user.id != '253525146923433984')
+        return
+
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         const discord_id = interaction.member.user.id
         var user_profile = null
@@ -2049,6 +2062,10 @@ client.on('shardError', error => {
 client.on('messageDelete', async message => {
     if (!message.author)
         return Promise.resolve()
+
+    if (process.env.DEBUG_MODE)
+        return
+
     if (message.author.id == client.user.id) {
         if (tradingBotChannels.includes(message.channelId)) {
             console.log(`an order message was deleted from the bot`)
@@ -2119,6 +2136,9 @@ client.on('messageDelete', async message => {
 client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
+
+    if (process.env.DEBUG_MODE && user.id != '253525146923433984')
+    return
 
     if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
@@ -3644,6 +3664,9 @@ client.on('messageReactionRemove', async (reaction, user) => {
     if (user.bot)
         return
 
+    if (process.env.DEBUG_MODE && user.id != '253525146923433984')
+    return
+
     if (!reaction.message.guildId) {
         if (!reaction.message.author)
             await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -3862,6 +3885,9 @@ client.on('messageReactionRemove', async (reaction, user) => {
 });
 
 client.on('guildMemberAdd', async member => {
+    if (process.env.DEBUG_MODE)
+        return
+
     if (member.guild.id == "776804537095684108" && !member.user.bot) {      //For BotV
         const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
         const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
@@ -3898,6 +3924,9 @@ client.on('guildMemberAdd', async member => {
 });
 
 client.on('threadUpdate', async (oldThread,newThread) => {
+    if (process.env.DEBUG_MODE)
+        return
+
     if (newThread.archived) {
         if (newThread.ownerId != client.user.id)
             return Promise.resolve()
