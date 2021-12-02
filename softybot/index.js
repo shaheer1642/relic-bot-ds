@@ -908,7 +908,7 @@ client.on('messageCreate', async message => {
                     await trading_lich_orders_update(null,lich_info, 1)
                     .then(async () => {
                         await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${message.author.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
-                        .then(res => {
+                        .then(async res => {
                             if (res.rows.length == 0)
                                 return false 
                             var user_order = res.rows
