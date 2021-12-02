@@ -107,7 +107,9 @@ var tickcount = new Date().getTime();
 client.on('ready', () => {
     client.user.setActivity('.help', { type: 2 })
 
-    if (process.env.DEBUG_MODE)
+    console.log(process.env.DEBUG_MODE)
+
+    if (process.env.DEBUG_MODE==1)
         return
     //--------Set new timer--------
     var currTime = new Date();
@@ -178,7 +180,10 @@ client.on('messageCreate', async message => {
     if (message.author.bot)
         return Promise.resolve()
 
-    if (process.env.DEBUG_MODE && message.author.id != '253525146923433984')
+    if (process.env.DEBUG_MODE==1 && message.author.id != '253525146923433984')
+        return
+
+    if (process.env.DEBUG_MODE==2 && message.author.id == '253525146923433984')
         return
         
     if (message.guild) {
@@ -1355,7 +1360,7 @@ client.on('messageCreate', async message => {
 })
 
 client.on('presenceUpdate', async (oldMember,newMember) => {
-    if (process.env.DEBUG_MODE)
+    if (process.env.DEBUG_MODE==1)
         return
 
     if (tradingBotGuilds.includes(newMember.member.guild.id)) {
@@ -1507,7 +1512,9 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 
 client.on('interactionCreate', async interaction => {
 
-    if (process.env.DEBUG_MODE && interaction.member.user.id != '253525146923433984')
+    if (process.env.DEBUG_MODE==1 && interaction.member.user.id != '253525146923433984')
+        return
+    if (process.env.DEBUG_MODE==2 && interaction.member.user.id == '253525146923433984')
         return
 
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
@@ -2063,7 +2070,7 @@ client.on('messageDelete', async message => {
     if (!message.author)
         return Promise.resolve()
 
-    if (process.env.DEBUG_MODE)
+    if (process.env.DEBUG_MODE==1)
         return
 
     if (message.author.id == client.user.id) {
@@ -2137,8 +2144,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-    if (process.env.DEBUG_MODE && user.id != '253525146923433984')
-    return
+    if (process.env.DEBUG_MODE==1 && user.id != '253525146923433984')
+        return
+    if (process.env.DEBUG_MODE==2 && user.id == '253525146923433984')
+        return
 
     if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
@@ -3664,7 +3673,9 @@ client.on('messageReactionRemove', async (reaction, user) => {
     if (user.bot)
         return
 
-    if (process.env.DEBUG_MODE && user.id != '253525146923433984')
+    if (process.env.DEBUG_MODE==1 && user.id != '253525146923433984')
+    return
+    if (process.env.DEBUG_MODE==2 && user.id == '253525146923433984')
     return
 
     if (!reaction.message.guildId) {
@@ -3885,7 +3896,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
 });
 
 client.on('guildMemberAdd', async member => {
-    if (process.env.DEBUG_MODE)
+    if (process.env.DEBUG_MODE==1)
         return
 
     if (member.guild.id == "776804537095684108" && !member.user.bot) {      //For BotV
@@ -3924,7 +3935,7 @@ client.on('guildMemberAdd', async member => {
 });
 
 client.on('threadUpdate', async (oldThread,newThread) => {
-    if (process.env.DEBUG_MODE)
+    if (process.env.DEBUG_MODE==1)
         return
 
     if (newThread.archived) {
