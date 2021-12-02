@@ -912,11 +912,11 @@ client.on('messageCreate', async message => {
                         .then(res => {
                             if (res.rows.length == 0)
                                 return false 
-                            user_order = res.rows
+                            var user_order = res.rows
                             var currTime = new Date().getTime()
                             var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
                             console.log(after3h - currTime)
-                            set_order_timeout(user_order[0],after3h,currTime)
+                            set_order_timeout(user_order[0],after3h,currTime,true,lich_info)
                         })
                         .catch(err => {
                             console.log(err)
