@@ -884,7 +884,7 @@ client.on('messageCreate', async message => {
                 }
                 for (var i=0;i<user_orders.length;i++) {
                     var lich_info = []
-                    var status = await db.query(`SELECT * FROM lich_list WHERE id='${user_orders[i].lich_id}'`)
+                    var status = await db.query(`SELECT * FROM lich_list WHERE lich_id='${user_orders[i].lich_id}'`)
                     .then(res => {
                         if (res.rows.length==0)
                             return false
