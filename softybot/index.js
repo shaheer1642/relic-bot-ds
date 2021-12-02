@@ -807,6 +807,292 @@ client.on('messageCreate', async message => {
             }
             continue
         }
+        if (tradingBotLichChannels.includes(message.channelId)) {
+            if (!message.member.presence) {
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                return Promise.resolve()
+            }
+            if (message.member.presence.status == `offline`) {
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                return Promise.resolve()
+            }
+            const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
+            const command = args.shift()
+    
+            if (command.toLowerCase() == 'wts' || command.toLowerCase() == 'wtb') {
+                /*
+                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
+                    message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return
+                }
+                */
+                if (!args[0]) {
+                    message.channel.send('⚠️ Please provide an item name ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                    continue
+                }
+                const c_args = commandsArr[commandsArrIndex].replace(command,'').toLowerCase().trim().split(/,/g)
+                message.channel.send(`<@${message.author.id}> Successfully queued those hosts, it may take a moment for them to show up depending on how many people are currently hosting squads. dont wanna get queued, gotta pay boi\n\nhttps://cdn.discordapp.com/emojis/764518605592330240.gif?size=96>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                for (var k=0;k<c_args.length;k++) {
+                    var func = await trading_bot(message,c_args[k].toLowerCase().trim().split(/ +/g),command.toLowerCase()).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
+                }
+                console.log(`commandsArrIndex = ${commandsArrIndex}`)
+                if (commandsArrIndex == (commandsArr.length-1)) {
+                    console.log(`All requests executed for user ${message.author.username}`)
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                }
+            }
+            else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
+                //continue
+                var user_orders = []
+                var status_msg = ''
+                var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id=${message.author.id}`)
+                .then(res => {
+                    if (res.rows.length==0) {
+                        status_msg = `❕ <@${message.author.id}> No lich orders found on your profile. ❕`
+                        return false
+                    }
+                    user_orders = res.rows
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    status_msg = `☠️ Error fetching your lich orders from db. Please contact MrSofty#7926\nError code: 500 ☠️`
+                    return false
+                })
+                if (!status) {
+                    message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return Promise.resolve()
+                }
+                //set all orders as visible for this user
+                var status = await db.query(`UPDATE users_lich_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${message.author.id}`)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return Promise.resolve()
+                }
+                for (var i=0;i<user_orders.length;i++) {
+                    var lich_info = []
+                    var status = await db.query(`SELECT * FROM lich_list WHERE id='${user_orders[i].lich_id}'`)
+                    .then(res => {
+                        if (res.rows.length==0)
+                            return false
+                        if (res.rows.length>1) {
+                            console.log(res.rows)
+                            return false
+                        }
+                        lich_info = res.rows[0]
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                        return Promise.resolve()
+                    }
+                    console.log(`updating lich order ${lich_info.weapon_url} for ${message.author.username}`)
+                    await trading_lich_orders_update(null,lich_info, 1)
+                    .then(() => {
+                        var user_order = null
+                        db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${message.author.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
+                        .then(res => {
+                            if (res.rows.length == 0)
+                                return false 
+                            user_order = res.rows
+                            var currTime = new Date().getTime()
+                            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
+                            console.log(after3h - currTime)
+                            set_order_timeout(user_order[0],after3h,currTime)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
+                        return
+                    })
+                    .catch(err => {
+                        console.log(`Error occured midway of updating lich orders in my orders command`)
+                        return Promise.resolve()
+                    })
+                }
+                message.delete().catch(err => console.log(err))
+                return Promise.resolve()
+            }
+            else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
+                if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
+                    var active_orders = []
+                    var status =  await db.query(`SELECT * FROM messages_ids`)
+                    .then(res => {
+                        if (res.rows.length == 0) {
+                            message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+                            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                            return false
+                        }
+                        active_orders = res.rows
+                        db.query(`DELETE FROM messages_ids`)
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                        return false
+                    })
+                    if (!status)
+                        return Promise.resolve()
+                    var status = await db.query(`UPDATE users_orders set visibility=false`)
+                    .then(res => {
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                        return false
+                    })
+                    if (!status)
+                        return Promise.resolve()
+                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg =>{
+                        return msg
+                    }).catch(err => console.log(err))
+                    
+                    for (var i=0;i<active_orders.length;i++) {
+                        var item_id = active_orders[i].item_id
+                        var c = client.channels.cache.get(active_orders[i].channel_id)
+                        var msg = c.messages.cache.get(active_orders[i].message_id)
+                        if (!msg) {
+                            var status = await c.messages.fetch(active_orders[i].message_id).then(mNew => {
+                                msg = mNew
+                                return true
+                            })
+                            .catch(err => {     //maybe message does not exist in discord anymore, so continue
+                                console.log(err)
+                                return false
+                            })
+                            if (!status)
+                                continue
+                        }
+                        msg.delete().catch(err => console.log(err))
+                    }
+                    message.delete().catch(err => console.log(err))
+                    purgeMessage.delete().catch(err => console.log(err))
+                    return Promise.resolve()
+                    async function func(msg,multiCid,item_id) {
+                    }
+                }
+                else {
+                    message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                    return Promise.resolve()
+                }
+            }
+            else if (command=='close' && (args[0]=='all')) {
+                var user_data = null
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                .then(res => {
+                    if (res.rows.length==0) {
+                        message.channel.send({content: "⚠️ Your in-game name is not registered with the bot. Please check your dms ⚠️"}).catch(err => console.log(err))
+                        message.author.send({content: "Type the following command to register your ign:\nverify ign"})
+                        .catch(err => {
+                            message.channel.send({content: "🛑 Some error occured sending dm. Please make sure you have dms enabled for the bot 🛑"}).catch(err => console.log(err))
+                            console.log(err)
+                        })
+                        return false
+                    }
+                    user_data = res.rows[0]
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                    return
+                }
+                var orders_list = []
+                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND visibility = true`)
+                .then(res => {
+                    if (res.rows.length == 0) {     //no visible orders at the time
+                        console.log('No visible orders at the time')
+                        return false
+                    }
+                    if (res.rows.length > 0) {     //visible orders found
+                        orders_list = res.rows
+                        return true
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                    return
+                }
+                var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${message.author.id} AND visibility = true`)
+                .then(res => {
+                    if (res.rowCount == 0)
+                        return false
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                    return
+                }
+                for (var i=0;i<orders_list.length;i++) {
+                    var item_id = orders_list[i].item_id
+                    console.log(item_id)
+                    var item_url = ''
+                    var item_name = ''
+                    var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+                    .then(res => {
+                        if (res.rows.length==0) { //unexpected response 
+                            console.log('Unexpected db response fetching item info')
+                            return false
+                        }
+                        if (res.rows.length>1) { //unexpected response
+                            console.log('Unexpected db response fetching item info')
+                            return false
+                        }
+                        item_url = res.rows[0].item_url
+                        item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return Promise.resolve()
+                    await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+                }
+                setTimeout(() => message.delete().catch(err => console.log(err)), 500)
+                return
+            }
+            else {
+                message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            }
+            continue
+        }
         if (tradingBotSpamChannels.includes(message.channelId)) {
             if (!message.member.presence) {
                 message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
