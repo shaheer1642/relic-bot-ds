@@ -172,7 +172,7 @@ client.on('ready', () => {
                 }, 30000);
             })
         }
-    })
+    }).catch(err => console.log(err))
 })
 
 client.on('messageCreate', async message => {
@@ -182,14 +182,15 @@ client.on('messageCreate', async message => {
 
     if (process.env.DEBUG_MODE==1 && message.author.id != '253525146923433984')
         return
-
+        
     if (process.env.DEBUG_MODE==2 && message.author.id == '253525146923433984') {
-        message.channel.send('cannot listen to your messages. debug mode is turned on').then(msg => {
-            setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
+        message.react('❎').catch(err => console.log(err))
+        .then(() => {
+            setTimeout(() => message.reactions.removeAll().catch(err => console.log(err)), 5000)
         })
         return
     }
-        
+
     if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
