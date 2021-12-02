@@ -9925,15 +9925,40 @@ async function bounty_check() {
             for (var j=0; j<syndicate.jobs.length; j++) {
                 var job = syndicate.jobs[j]
                 var hasBounty = 0
+                var bountyDB = {}
                 for (var k=0; k<bounties_list.length; k++) {
                     if (bounties_list[k].type == job.type) {
                         hasBounty = 1
+                        bountyDB = bounties_list[k]
                         break
                     }
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
                     await db.query(`INSERT INTO bounties_list (syndicate,type) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`).catch(err => console.log(err))
+                    continue
+                }
+                if (Number(bountyDB.last_expiry) < new Date().getTime()) {
+                    //discord stuff
+                    await db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime()} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                    if (bountyDB.users) {
+                        var users = bountyDB.users.split(' ')
+                        var list = ''
+                        users.forEach(e => {
+                            list += '<@' + e + '> '
+                        })
+                        var postdata = {content: list,embeds: []}
+                        postdata.embeds.push({
+                            description: 'A bounty you are tracking has appeared!',
+                            fields: [
+                                {name: 'Syndicate', value: syndicate.syndicate, inline: true},
+                                {name: 'Mission', value: job.type, inline: true},
+                                {name: 'Rewards', value: job.rewardPool.toString().replace(/,/g,'\n'), inline: false},
+                                {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
+                            ]
+                        })
+                        client.channels.cache.get('892003813786017822').send(postdata).catch(err => console.log(err))
+                    }
                 }
             }
         }
