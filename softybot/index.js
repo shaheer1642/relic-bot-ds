@@ -61,7 +61,7 @@ var DB_Updating = false
 const relist_cd = [];
 var DB_Update_Timer = null
 var Ducat_Update_Timer = null
-const u_order_close_time = 10000 //10800000
+const u_order_close_time = 10800000
 
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
@@ -571,79 +571,6 @@ client.on('messageCreate', async message => {
                                 console.log(err)
                             })
 
-                            /*
-                            console.log(`Setting auto-closure for username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type}`)
-                            setTimeout(async () => {
-                                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank = '${item_rank}'`)
-                                .then(res => {
-                                    if (res.rows.length == 0)
-                                        return false
-                                    if (res.rows[0].visibility == false)
-                                        return false
-                                    return true
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return false
-                                })
-                                if (!status)
-                                    return
-                                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank = '${item_rank}'`)
-                                .then(res => {
-                                    return true
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return false
-                                })
-                                if (!status) {
-                                    console.log(`Error setting timeout for order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-                                    return
-                                }
-                                console.log(`Updating orders username = ${message.author.username} AND item_name = '${item_name}' AND order_type = '${order_type} (auto-closure)`)
-                                await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
-                                    var postdata = {}
-                                    postdata.content = " "
-                                    postdata.embeds = []
-                                    postdata.embeds.push({
-                                        description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                                        timestamp: new Date()
-                                    })
-                                    if (order_type == 'wts')
-                                        postdata.embeds[0].color = tb_sellColor
-                                    if (order_type == 'wtb')
-                                        postdata.embeds[0].color = tb_buyColor
-                                    var status = await db.query(`SELECT * from users_list WHERE discord_id = ${message.author.id}`)
-                                    .then(res => {
-                                        if (res.rows.length == 0)
-                                            return false
-                                        if (res.rows.length > 1)
-                                            return false
-                                        if (res.rows[0].notify_order == true) {
-                                            var user_presc = client.guilds.cache.get(message.guild.id).presences.cache.find(mem => mem.userId == message.author.id)
-                                            if (user_presc) {
-                                                if (user_presc.status != 'dnd')
-                                                    message.author.send(postdata).catch(err => console.log(err))
-                                            }
-                                            else
-                                                message.author.send(postdata).catch(err => console.log(err))
-                                            return true
-                                        }
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                        return false
-                                    })
-                                    if (!status) {
-                                        console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
-                                        return
-                                    }
-                                    return
-                                })
-                                .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${message.author.id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
-                            }, u_order_close_time);
-                            */
                             return
                         })
                         .catch(err => {
@@ -1034,7 +961,7 @@ client.on('messageCreate', async message => {
                     return
                 }
                 var orders_list = []
-                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND visibility = true`)
+                var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${message.author.id} AND visibility = true`)
                 .then(res => {
                     if (res.rows.length == 0) {     //no visible orders at the time
                         console.log('No visible orders at the time')
@@ -1053,7 +980,7 @@ client.on('messageCreate', async message => {
                     setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
                     return
                 }
-                var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${message.author.id} AND visibility = true`)
+                var status = await db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${message.author.id}`)
                 .then(res => {
                     if (res.rowCount == 0)
                         return false
@@ -1068,12 +995,8 @@ client.on('messageCreate', async message => {
                     return
                 }
                 for (var i=0;i<orders_list.length;i++) {
-                    var item_id = orders_list[i].item_id
-                    console.log(item_id)
-                    var item_url = ''
-                    var item_name = ''
-                    var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-                    .then(res => {
+                    var status = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
+                    .then(async res => {
                         if (res.rows.length==0) { //unexpected response 
                             console.log('Unexpected db response fetching item info')
                             return false
@@ -1082,17 +1005,13 @@ client.on('messageCreate', async message => {
                             console.log('Unexpected db response fetching item info')
                             return false
                         }
-                        item_url = res.rows[0].item_url
-                        item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                        await trading_lich_orders_update(null,res.rows[0], 2)
                         return true
                     })
                     .catch(err => {
                         console.log(err)
                         return false
                     })
-                    if (!status)
-                        return Promise.resolve()
-                    await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
                 }
                 setTimeout(() => message.delete().catch(err => console.log(err)), 500)
                 return
