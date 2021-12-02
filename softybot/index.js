@@ -906,9 +906,8 @@ client.on('messageCreate', async message => {
                     }
                     console.log(`updating lich order ${lich_info.weapon_url} for ${message.author.username}`)
                     await trading_lich_orders_update(null,lich_info, 1)
-                    .then(() => {
-                        var user_order = null
-                        db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${message.author.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
+                    .then(async () => {
+                        await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${message.author.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
                         .then(res => {
                             if (res.rows.length == 0)
                                 return false 
@@ -916,7 +915,7 @@ client.on('messageCreate', async message => {
                             var currTime = new Date().getTime()
                             var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
                             console.log(after3h - currTime)
-                            set_order_timeout(user_order[0],after3h,currTime,true,lich_info)
+                            await set_order_timeout(user_order[0],after3h,currTime,true,lich_info).catch(err => console.log(err))
                         })
                         .catch(err => {
                             console.log(err)
@@ -924,7 +923,7 @@ client.on('messageCreate', async message => {
                         return
                     })
                     .catch(err => {
-                        console.log(`Error occured midway of updating lich orders in my orders command`)
+                        console.log(`Error occured midway of updating lich orders in my orders command\n` + err)
                         return Promise.resolve()
                     })
                 }
