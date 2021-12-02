@@ -9589,15 +9589,20 @@ async function lich_tut(message,args) {
     var postdata = {
         content: " ",
         embeds: [{
-            description: `
-            Posting new lich
-            **/lich**
+            description: 
+`
+Posting new lich
+**/lich**
 
-            Editing existing lich
-            (under dev.)
+Editing existing lich
+(under dev.)
 
-            Posting existing orders
-            **my orders** (under dev.)`,
+Posting existing orders
+**my orders**
+
+Close all orders
+**close all**
+`,
             color: "FFFFFF"
         }]
     }
