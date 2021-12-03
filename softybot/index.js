@@ -1897,8 +1897,13 @@ client.on('interactionCreate', async interaction => {
         var postdata = []
         for (var i=0; i<bounties_list.length; i++) {
             var bounty = bounties_list[i]
-            if (bounty.type.toLowerCase().match(mission_type.toLowerCase()))
-                postdata.push({name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g,'_')})
+            console.log(bounty)
+            if (bounty.type.toLowerCase().match(mission_type.toLowerCase())) {
+                if (bounty.users && bounty.users.match(interaction.member.id))
+                    postdata.push({name: bounty.type + ' (Remove)', value: bounty.type.toLowerCase().replace(/ /g,'_')})
+                else
+                    postdata.push({name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g,'_')})
+            }
         }
         interaction.respond(postdata).catch(err => console.log(err))
         console.log('autocomplete')
@@ -1992,7 +1997,7 @@ client.on('interactionCreate', async interaction => {
             `)
             .then(async res => {
                 if (res.rowCount == 0) {
-                    await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false});
+                    await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
                     return
                 }
                 if (res.rows[0].users) {
@@ -2007,7 +2012,18 @@ client.on('interactionCreate', async interaction => {
                     if (!hasValue)
                         res.rows[0].users += ' ' + interaction.member.user.id
                     else {
-                        await interaction.reply({ content: 'You are already tracking this bounty.', ephemeral: true});
+                        res.rows[0].users = res.rows[0].users.replace(interaction.member.id, '').trim()
+                        await db.query(`UPDATE bounties_list SET users = NULLIF('${res.rows[0].users}', '')
+                        WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'`)
+                        .then(async res => {
+                            if (res.rowCount == 1)
+                                await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
+                            else 
+                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: true}).catch(err => console.log(err));
+                        }).catch(async err => {
+                            console.log(err)
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 503', ephemeral: true}).catch(err => console.log(err));
+                        })
                         return
                     }
                     
@@ -2023,9 +2039,9 @@ client.on('interactionCreate', async interaction => {
                 .then(async res => {
                     console.log(res)
                     if (res.rowCount == 0)
-                        await interaction.reply({ content: 'Some error occured. Please contact softy.  Code 501', ephemeral: false});
+                        await interaction.reply({ content: 'Some error occured. Please contact softy.  Code 501', ephemeral: false}).catch(err => console.log(err));
                     else
-                        await interaction.reply({ content: 'Added tracker.', ephemeral: true});
+                        await interaction.reply({ content: 'Added tracker.', ephemeral: true}).catch(err => console.log(err));
                 })
                 .catch(err => console.log(err))
             })
