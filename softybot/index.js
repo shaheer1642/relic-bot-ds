@@ -9913,7 +9913,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
 }
 
 async function bounty_check() {
-    console.log('hi')
+    console.log('bounty check')
     axios('https://api.warframestat.us/pc')
     .then(async res => {
         //get db bounties list
@@ -9935,8 +9935,8 @@ async function bounty_check() {
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
-                    const randomColor = Math.floor(Math.random()*16777215).toString(16);
-                    await db.query(`INSERT INTO bounties_list (syndicate,type) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`).catch(err => console.log(err))
+                    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+                    await db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${randomColor}')`).catch(err => console.log(err))
                     continue
                 }
                 if (Number(bountyDB.last_expiry) < new Date().getTime()) {
@@ -9963,7 +9963,7 @@ async function bounty_check() {
                 }
             }
         }
-        console.log('done')
+        console.log('check complete')
         setTimeout(bounty_check,60000)
     })
     .catch(err => {
