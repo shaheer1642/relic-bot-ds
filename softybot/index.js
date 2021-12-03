@@ -2019,10 +2019,10 @@ client.on('interactionCreate', async interaction => {
                             if (res.rowCount == 1)
                                 await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
                             else 
-                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: true}).catch(err => console.log(err));
+                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false}).catch(err => console.log(err));
                         }).catch(async err => {
                             console.log(err)
-                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 503', ephemeral: true}).catch(err => console.log(err));
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 503', ephemeral: false}).catch(err => console.log(err));
                         })
                         return
                     }
