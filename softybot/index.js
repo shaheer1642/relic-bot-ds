@@ -9954,11 +9954,7 @@ async function bounty_check() {
                             fields: [
                                 {name: 'Syndicate', value: syndicate.syndicate, inline: true},
                                 {name: 'Mission', value: job.type, inline: true},
-                                {name: 'Rewards', value: job.rewardPool.toString(string => {
-                                        if (string.match(','))
-                                            string = string.replace(/,/g,'')
-                                        return string
-                                }).replace(/,/g,'\n'), inline: false},
+                                {name: 'Rewards', value: job.rewardPool.join('\n'), inline: false},
                                 {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
                             ],
                             color: bountyDB.color
