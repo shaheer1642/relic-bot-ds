@@ -9935,6 +9935,7 @@ async function bounty_check() {
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
+                    const randomColor = Math.floor(Math.random()*16777215).toString(16);
                     await db.query(`INSERT INTO bounties_list (syndicate,type) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`).catch(err => console.log(err))
                     continue
                 }
@@ -9957,7 +9958,7 @@ async function bounty_check() {
                                 {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
                             ]
                         })
-                        client.channels.cache.get('892003813786017822').send(postdata).catch(err => console.log(err))
+                        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
                     }
                 }
             }
