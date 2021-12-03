@@ -9940,7 +9940,7 @@ async function bounty_check() {
                 }
                 if (Number(bountyDB.last_expiry) < new Date().getTime()) {
                     //discord stuff
-                    await db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime()} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                    await db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime() + 60000} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
                     if (bountyDB.users) {
                         var users = bountyDB.users.split(' ')
                         var list = ''
