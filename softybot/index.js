@@ -9971,13 +9971,13 @@ async function bounty_check() {
                             fields: [
                                 {name: 'Syndicate', value: syndicate.syndicate, inline: true},
                                 {name: 'Mission', value: job.type, inline: true},
-                                {name: 'Rewards', value: job.rewardPool.join('\n'), inline: false},
                                 {name: 'Level', value: job.enemyLevels.join('-'), inline: true},
+                                {name: 'Rewards', value: job.rewardPool.join('\n'), inline: false},
                                 {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
                             ],
                             color: bountyDB.color
                         })
-                        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
+                        client.channels.cache.get('892003813786017822').send(postdata).catch(err => console.log(err))
                     }
                 }
             }
