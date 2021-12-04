@@ -10065,7 +10065,7 @@ function getRandomColor() {
       color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
-  }
+}
 
 async function admin_test(message,args) {
     message.channel.send({content: " ", embeds: [
