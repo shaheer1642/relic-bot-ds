@@ -110,7 +110,7 @@ var tickcount = new Date().getTime();
 client.on('ready', () => {
     //----Bounty timers---
     setImmediate(bounty_check,-1)
-    setImmediate(update_bounties,-1)
+    //setImmediate(update_bounties,-1)
 
     client.user.setActivity('.help', { type: 2 })
 
@@ -9940,6 +9940,8 @@ async function bounty_check() {
             var syndicate = res.data.syndicateMissions[i]
             for (var j=0; j<syndicate.jobs.length; j++) {
                 var job = syndicate.jobs[j]
+                if (job.enemyLevels.includes(100))
+                    job.type += ' [Steel Path]'
                 var hasBounty = 0
                 var bountyDB = {}
                 for (var k=0; k<bounties_list.length; k++) {
@@ -9971,6 +9973,7 @@ async function bounty_check() {
                                 {name: 'Syndicate', value: syndicate.syndicate, inline: true},
                                 {name: 'Mission', value: job.type, inline: true},
                                 {name: 'Rewards', value: job.rewardPool.join('\n'), inline: false},
+                                {name: 'Level', value: job.enemyLevels.join('-'), inline: true},
                                 {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
                             ],
                             color: bountyDB.color
