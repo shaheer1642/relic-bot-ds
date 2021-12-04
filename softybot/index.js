@@ -9953,8 +9953,7 @@ async function bounty_check() {
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
-                    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-                    await db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${randomColor}')`).catch(err => console.log(err))
+                    await db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${getRandomColor()}')`).catch(err => console.log(err))
                     continue
                 }
                 if (Number(bountyDB.last_expiry) < new Date().getTime()) {
@@ -10058,6 +10057,15 @@ async function update_bounties() {
     
     setTimeout(update_bounties,3600000)
 }
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
 
 async function admin_test(message,args) {
     message.channel.send({content: " ", embeds: [
