@@ -10059,7 +10059,7 @@ async function update_bounties() {
 }
 
 function getRandomColor() {
-    var letters = '0123456789ABCDEF';
+    var letters = '0123456789abcdef';
     var color = '#';
     for (var i = 0; i < 6; i++) {
       color += letters[Math.floor(Math.random() * 16)];
