@@ -9976,7 +9976,7 @@ async function bounty_check() {
                             ],
                             color: bountyDB.color
                         })
-                        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
+                        client.channels.cache.get('892003813786017822').send(postdata).catch(err => console.log(err))
                     }
                 }
             }
