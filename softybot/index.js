@@ -2798,17 +2798,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     postdata.timestamp = new Date()
                     postdata.title = all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                     postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
-                    postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[order_rank].icon_url}
+                    postdata.image = {url: all_orders[order_rank].lich_image_url}
                     postdata.description = `
                         **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
                         **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                         **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
                         **Trade type:** Lich
-                        **Element:** ${all_orders[order_rank].element.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
-                        **Damage:** ${all_orders[order_rank].damage}%
-                        **Ephemera:** ${all_orders[order_rank].ephemera}
-                        **Quirk:** ${all_orders[order_rank].quirk.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
-                        **Lich name:** ${all_orders[order_rank].lich_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
 
                         /invite ${trader.ingame_name}
                         /invite ${tradee.ingame_name}
