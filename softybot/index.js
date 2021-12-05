@@ -2804,6 +2804,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                         **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
                         **Trade type:** Lich
+                        **Weapon:** ${order_data.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
 
                         /invite ${trader.ingame_name}
                         /invite ${tradee.ingame_name}
