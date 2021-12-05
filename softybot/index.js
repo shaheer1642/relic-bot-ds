@@ -8778,7 +8778,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         //ctx.fillRect(blX,blY,5,5);
                         //ctx.fillRect(brX,brY,5,5);
                         
-                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#83eb34');
+                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#7cb45d');
                         drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
                         textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
                         drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
@@ -8998,7 +8998,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         //ctx.fillRect(blX,blY,5,5);
                         //ctx.fillRect(brX,brY,5,5);
                         
-                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#83eb34');
+                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#E74C3C');
                         drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
                         textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
                         drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
