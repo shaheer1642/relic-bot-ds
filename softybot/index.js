@@ -4045,11 +4045,6 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                             **Order status:** ${order_status} ${reported_by}
                             **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
-                            **Element:** ${order_data.element.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
-                            **Damage:** ${order_data.damage}%
-                            **Ephemera:** ${order_data.ephemera}
-                            **Quirk:** ${order_data.quirk.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
-                            **Lich name:** ${order_data.lich_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                             **Thread:** <#${newThread.id}>
                             **Server:** ${newThread.guild.name}
                             **-----Chat Log-----**
