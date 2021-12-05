@@ -4055,6 +4055,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                             **-----Chat Log-----**
                             ${order_data.messages_log}
                         `,
+                        image: {url: order_data.lich_image_url},
                         timestamp: new Date(), 
                         color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
                     }]
