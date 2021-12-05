@@ -8889,78 +8889,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 for (var j=0;j<res.rows.length;j++) {
                     if (j==5)
                         break
-                    /*
-                    var embed = {
-                        title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
-                        description: `Note: the image(s) format below is subject to change. For now it's for testing purposes.`,
-                        thumbnail: {url: 'https://warframe.market/static/assets/' + lich_info.icon_url},
-                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                        fields: [],
-                        color: '#E74C3C',
-                        image: {url: ''}
-                    }
-                    embed.fields.push([
-                        {name: `Buyer ${tradingBotReactions.buy[j]}`,value: res.rows[j].ingame_name,inline: true},
-                        {name: 'Order type',value: res.rows[j].order_type,inline: true},
-                        {name: 'Price',value: res.rows[j].user_price + '<:platinum:881692607791648778>',inline: true},
-                        {name: 'Element',value: res.rows[j].element,inline: true},
-                        {name: 'Damage',value: res.rows[j].damage + '%',inline: true},
-                        {name: 'Ephemera',value: res.rows[j].ephemera.toString(),inline: true},
-                        {name: 'Quirk',value: res.rows[j].quirk,inline: true},
-                        {name: 'Lich Name',value: res.rows[j].lich_name,inline: true},
-                    ])
-                    // Create image on canvas
-                    var canvas = new Canvas.createCanvas(200,200)
-                    , ctx = canvas.getContext('2d');
-                
-                    await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
-                    .then(async img1 => {
-                        var x=0
-                        var y=img1.height + 20;
-                        var y_diff = 20
-                        canvas.width = 10;
-                        canvas.height = y + y_diff*embed.fields[0].length;
-                      
-                        draw()
-                        
-                        function draw() {
-                            var y=img1.height + 20;
-                            ctx.drawImage(img1, canvas.width/2 - img1.width/2, 0);
-                            ctx.font = '15px Arial';
-                            ctx.fillStyle = "#FF0000";
-                        
-                            for (var k=0;k<embed.fields[0].length;k++) {
-                                var e = embed.fields[0][k]
-                                var te = ctx.measureText(`${e.name}: ${e.value}`);
-                                if (te.width>canvas.width) {
-                                    canvas.width = te.width + x;
-                                draw()
-                                return
-                                }
-                                ctx.fillText(`${e.name}: ${e.value}`, x, y);
-                                y += y_diff
-                            }
-                        }
-
-                        var attachment_url = ''
-                        await client.channels.cache.get('912395290701602866').send({
-                            content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
-                            files: [{
-                                attachment: canvas.toBuffer(),
-                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                            }]
-                        }).then(res => {
-                            res.attachments.map(attachment => {
-                                attachment_url = attachment.url
-                            })
-                        }).catch(err => console.log(err))
-                        
-                        embed.image.url = attachment_url
-                    }).catch(err => console.log(err))
-                    //================
-                    embeds.push(embed)
-                    */
-                   
+                    
                     var embed = {
                         title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
                         description: `Note: the image(s) format below is subject to change. For now it's for testing purposes.`,
@@ -9232,9 +9161,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             })
             .catch(err => {
                 console.log(err)
-                if (originMessage) {
-                    originMessage.channel.send(`☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                if (interaction) {
+                    interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
                 }
                 return Promise.reject()
             })
