@@ -8695,6 +8695,17 @@ async function trading_lich_bot(interaction) {
         return Promise.reject()
     //----------------
 
+    if (!message.member.presence) {
+        message.channel.send(`⚠️ Your discord status must be online to use the bot. Use the command ``my orders`` in <#892003772698611723> to post your lich order ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
+    }
+    if (message.member.presence.status == `offline`) {
+        message.channel.send(`⚠️ Your discord status must be online to use the bot. Use the command ``my orders`` in <#892003772698611723> to post your lich order  ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
+    }
+
     await trading_lich_orders_update(interaction, lich_info, 1)
     .then(res => {
         var user_order = null
