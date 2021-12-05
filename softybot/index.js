@@ -3227,7 +3227,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (!status)
                 return Promise.resolve()
             if (reaction.message.embeds[0])
-                if (reaction.message.embeds[0].description.match(/\*\*Lich name:\*\*/)) {
+                if (reaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
                     var status = await db.query(`
                     UPDATE filled_users_lich_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','denied').replace('order_success','successful')}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
                     WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
