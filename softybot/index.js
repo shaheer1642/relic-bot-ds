@@ -8891,7 +8891,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     
                     var embed = {
                         title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
-                        description: tradingBotReactions.sell[j],
+                        description: tradingBotReactions.buy[j],
                         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
                         fields: [],
                         color: '#E74C3C',
