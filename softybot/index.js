@@ -2217,7 +2217,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             var item_rank = "unranked"
             if (reaction.message.embeds[0].title.toLowerCase().match('(maxed)'))
                 item_rank = "maxed"
-            if (tradingBotChannels.includes(reaction.message.channelId)) {
+            if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
                 console.log('pass test 2')
                 var search_item_id = ""
                 var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
@@ -2655,20 +2655,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(trader.ingame_name + ' ' + trader.discord_id)
                 //----verify trader on discord side-----
                 var match_trade = false
-                if (tradingBotChannels.includes(reaction.message.channelId)) {
-                    reaction.message.embeds.forEach(e => {
-                        if (e.fields[0].value == trader.ingame_name)
-                            if (e.fields[0].name.match(reaction.emoji.identifier))
-                                match_trade = true
-                    })
-                }
-                else if (tradingBotLichChannels.includes(reaction.message.channelId)) {
-                    reaction.message.embeds.forEach(e => {
-                        if (e.image.url.match(trader.discord_id))
-                            if (e.description.match(reaction.emoji.identifier))
-                                match_trade = true
-                    })
-                }
+                reaction.message.embeds.forEach(e => {
+                    if (e.image.url.match(trader.discord_id))
+                        if (e.description.match(reaction.emoji.identifier))
+                            match_trade = true
+                })
                 if (!match_trade) {
                     console.log('that trader does not exist in db check #2')
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
