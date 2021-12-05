@@ -8552,15 +8552,6 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 }
 
 async function trading_lich_bot(interaction) {
-    if (!interaction.member.presence) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: true}).catch(err => console.log(err))
-        return Promise.resolve()
-    }
-    if (interaction.member.presence.status == `offline`) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot ⚠️`, ephemeral: true}).catch(err => console.log(err))
-        return Promise.resolve()
-    }
-
     var ingame_name = ''
     var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
     .then(res => {
