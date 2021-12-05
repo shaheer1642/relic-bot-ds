@@ -4243,7 +4243,7 @@ async function orders(message,args) {
     })
     if (arrItems.length==0)
     {
-        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
+        message.channel.send("Item **" + d_item_url + "** does not exist.").catch(err => console.log(err));
         return
     }
     if (primeFlag)
