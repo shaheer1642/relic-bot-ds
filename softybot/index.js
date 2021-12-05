@@ -1897,7 +1897,6 @@ client.on('interactionCreate', async interaction => {
         var postdata = []
         for (var i=0; i<25; i++) {
             var bounty = bounties_list[i]
-            console.log(bounty)
             if (bounty.type.toLowerCase().match(mission_type.toLowerCase())) {
                 if (bounty.users && bounty.users.match(interaction.member.id))
                     postdata.push({name: bounty.type + ' (Remove)', value: bounty.type.toLowerCase().replace(/ /g,'_')})
