@@ -1895,7 +1895,7 @@ client.on('interactionCreate', async interaction => {
         })
         .catch(err => console.log(err))
         var postdata = []
-        for (var i=0; i<bounties_list.length; i++) {
+        for (var i=0; i<25; i++) {
             var bounty = bounties_list[i]
             console.log(bounty)
             if (bounty.type.toLowerCase().match(mission_type.toLowerCase())) {
