@@ -7,10 +7,7 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('weapon')
 				.setDescription('Select weapon')
-				.setRequired(true)
-				.addChoice('Kuva hek', 'kuva_hek')
-				.addChoice('Tenet cycron', 'tenet_cycron')
-				.addChoice('Kuva kohm', 'kuva_kohm'))
+				.setRequired(true))
 		.addStringOption(option =>
 			option.setName('element')
 				.setDescription('Select damage element')

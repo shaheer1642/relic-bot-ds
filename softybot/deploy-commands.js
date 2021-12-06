@@ -10,7 +10,10 @@ for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	commands.push(command.data.toJSON());
 }
-
+for (var e of commands) {
+	if (e.name	== 'lich')
+		e.options[0].autocomplete = true
+}
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
 rest.put(Routes.applicationGuildCommands(clientId, guildId[0]), { body: commands })
