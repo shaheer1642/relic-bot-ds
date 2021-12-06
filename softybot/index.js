@@ -6897,6 +6897,40 @@ async function updateDatabaseItems(up_origin) {
         })
     })
     .catch (err => console.log(err + 'Retrieving WFM lich list error'))
+    //----slash command update for lich----
+    var postdata = new SlashCommandBuilder()
+		.setName('lich')
+		.setDescription('Post a new lich order')
+	postdata.addStringOption(option => {
+        option.setName('weapon')
+            .setDescription('Select weapon')
+            .setRequired(true)
+        weapons_list.forEach(e => {
+            option.addChoice(e.url_name.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), e.url_name)
+        })
+    })
+    var url = `https://discord.com/api/v8/applications/${client.user.id}/guilds/832677897411493949/commands`
+    var headers = {
+        "Authorization": `Bot ${process.env.DISCORD_BOT_TOKEN}`
+    }
+
+    axios({
+        method: 'POST',
+        url: url,
+        data: postdata,
+        headers: headers
+    }).catch(err => console.log(err))
+/*
+    var url = `https://discord.com/api/v8/applications/${client.user.id}/guilds/865904902941048862/commands`
+
+    axios({
+        method: 'POST',
+        url: url,
+        data: postdata,
+        headers: headers
+    }).catch(err => console.log(err))
+    */
+    //-------------------------------------
     var status = await db.query(`SELECT * FROM lich_list`)
     .then(async res => {
         var db_lich_list = res.rows
@@ -6949,7 +6983,7 @@ async function updateDatabasePrices(up_origin) {
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async res => {
         db_items_list = res.rows
-        for (var i=0;i<db_items_list.length;i++) {
+        for (var i=0;i>db_items_list.length;i++) {
             const item = db_items_list[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
                 var status = await updateDatabaseItem(db_items_list,item,i)
