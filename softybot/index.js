@@ -2169,7 +2169,7 @@ client.on('messageDelete', async message => {
                 else {
                     lich_id = res.rows[0].lich_id
                     channel_id = res.rows[0].channel_id
-                    var status = await db.query(`DELETE FROM messages_ids WHERE message_id = ${message.id}`)
+                    var status = await db.query(`DELETE FROM lich_messages_ids WHERE message_id = ${message.id}`)
                     .then(res => {
                         return true
                     })
