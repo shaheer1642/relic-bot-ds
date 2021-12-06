@@ -1929,6 +1929,7 @@ client.on('interactionCreate', async interaction => {
                 if (lich.weapon_url.toLowerCase().replace(/_/g,' ').match(weapon.toLowerCase()))
                         postdata.push({name: lich.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), value: lich.weapon_url})
             }
+            console.log(postdata)
             interaction.respond(postdata).catch(err => console.log(err))
             console.log('autocomplete (lich)')
             return
@@ -8694,12 +8695,18 @@ async function trading_lich_bot(interaction) {
     var lich_info = []
     var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
     .then(res => {
+        if (res.rowCount != 1) {
+            interaction.reply({content: `☠️ Error retrieving lich info from DB.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            return false
+        }
         lich_info = res.rows[0]
         return true
     })
     .catch(err => {
         console.log(err); return false
     })
+    if (!status)
+        return Promise.reject()
     console.log(lich_info)
     //----verify order in DB----
     await db.query(`DELETE FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(err => console.log(err))
