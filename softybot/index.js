@@ -9619,8 +9619,10 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         postdata.embeds = []
         var vis_traders_names = []
         var vis_traders_prices = []
+        var vis_traders_detail = []
         var invis_traders_names = []
         var invis_traders_prices = []
+        var invis_traders_detail = []
         var noOfTraders = 0
         for (var i=0;i<all_orders.length;i++) {
             if (all_orders[i].visibility) {
@@ -9631,11 +9633,13 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 text += all_orders[i].ingame_name
                 vis_traders_names.push(text)
                 vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+                vis_traders_detail.push(`(Lich detail)[${all_orders[i].lich_image_url}]`)
                 noOfTraders++
             }
             else {
                 invis_traders_names.push(all_orders[i].ingame_name)
                 invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+                invis_traders_detail.push(`(Lich detail)[${all_orders[i].lich_image_url}]`)
             }
         }
         if (vis_traders_names.length != 0) {
@@ -9643,12 +9647,17 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 fields: [
                     {
                         name: order_type.replace('wts','Sellers').replace('wtb','Buyers'),
-                        value: vis_traders_names.toString().replace(/,/g,'\n'),
+                        value: vis_traders_names.join('\n'),
                         inline: true
-                    },{name: '\u200b',value: '\u200b', inline: true},
+                    },
+                    {
+                        name: 'Detail',
+                        value: vis_traders_detail.join('\n'), 
+                        inline: true
+                    },
                     {
                         name: `Prices`,
-                        value: vis_traders_prices.toString().replace(/,/g,'\n'),
+                        value: vis_traders_prices.join('\n'),
                         inline: true
                     }
                 ],
@@ -9660,12 +9669,17 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 fields: [
                     {
                         name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
-                        value: invis_traders_names.toString().replace(/,/g,'\n'),
+                        value: invis_traders_names.join('\n'),
                         inline: true
-                    },{name: '\u200b',value: '\u200b', inline: true},
+                    },
+                    {
+                        name: 'Detail',
+                        value: invis_traders_detail.join('\n'),
+                        inline: true
+                    },
                     {
                         name: `Price`,
-                        value: invis_traders_prices.toString().replace(/,/g,'\n'),
+                        value: invis_traders_prices.join('\n'),
                         inline: true
                     }
                 ],
