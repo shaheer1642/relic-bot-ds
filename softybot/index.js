@@ -1889,7 +1889,6 @@ client.on('interactionCreate', async interaction => {
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'track') {
             if (interaction.options.getSubcommand() == 'bounties') {
-                console.log(interaction)
                 var mission_type = interaction.options.getString('mission_type')
                 var bounties_list = []
                 await db.query(`SELECT * FROM bounties_list WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' ORDER BY type ASC`)
@@ -1910,9 +1909,29 @@ client.on('interactionCreate', async interaction => {
                     }
                 }
                 interaction.respond(postdata).catch(err => console.log(err))
-                console.log('autocomplete')
+                console.log('autocomplete (track bounties)')
                 return
             }
+        }
+        else if (interaction.commandName == 'lich') {
+            var weapon = interaction.options.getString('weapon')
+            var lich_list = []
+            await db.query(`SELECT * FROM lich_list ORDER BY weapon_url ASC`)
+            .then(res => {
+                lich_list = res.rows
+            })
+            .catch(err => console.log(err))
+            var postdata = []
+            for (var i=0; i<lich_list.length; i++) {
+                if (i==25)
+                    break
+                var lich = lich_list[i]
+                if (lich.weapon_url.toLowerCase().replace(/_/g,' ').match(weapon.toLowerCase()))
+                        postdata.push({name: lich.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), value: lich.weapon_url})
+            }
+            interaction.respond(postdata).catch(err => console.log(err))
+            console.log('autocomplete (lich)')
+            return
         }
     }
 
