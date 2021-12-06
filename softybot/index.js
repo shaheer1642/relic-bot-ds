@@ -9550,9 +9550,9 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         .then(res => {
             for (var e in res.rows) {
                 console.log(e)
-                if (e.weapon_url.match('^' + d_item_url + '\W*')) {
+                if (e.weapon_url.match(d_item_url)) {
                     isLich = true
-                    arrItems.push(element);
+                    arrItems.push(e);
                     break
                 }
             }
