@@ -1002,7 +1002,7 @@ client.on('messageCreate', async message => {
                 return
             }
             else {
-                message.channel.send('Invalid command. List of commands:\n`/lich` `my orders` `close all`').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                message.channel.send('Invalid command. List of commands:\n`/lich`\n`my orders`\n`close all`').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
             continue
