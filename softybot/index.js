@@ -9549,7 +9549,6 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         var status = await db.query(`SELECT * from lich_list`)
         .then(res => {
             for (var e of res.rows) {
-                console.log(e)
                 if (e.weapon_url.match(d_item_url)) {
                     isLich = true
                     arrItems.push(e);
@@ -9573,11 +9572,142 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             return Promise.resolve()
         }
     }
+    console.log(arrItems)
     if (isLich) {
         message.channel.send(`Item is a lich. This command is under dev.\n${JSON.stringify(arrItems)}`).catch(err => console.log(err));
+        const weapon_url = arrItems[0].item_url
+        const lich_id = arrItems[0].id
+        const weapon_name = weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+        var all_orders = []
+        var status = await db.query(`
+        SELECT * FROM users_lich_orders
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        WHERE users_lich_orders.lich_id = '${lich_id}' AND users_lich_orders.order_type = '${order_type}'
+        ORDER BY users_lich_orders.update_timestamp
+        `)
+        .then(res => {
+            if (res.rows.length == 0) {
+                message.channel.send(`❕ <@${message.author.id}> No orders found for that lich at this moment. ❕`).catch(err => console.log(err))
+                return false
+            }
+            else {
+                all_orders = res.rows
+                return true
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
+            return false
+        })
+        if (!status)
+            return Promise.reject()
+        var color = ""
+        if (order_type == 'wts') {
+            all_orders = all_orders.sort(dynamicSort("user_price"))
+            color = tb_sellColor
+        }
+        if (order_type == 'wtb') {
+            all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+            color = tb_buyColor
+        }
+        all_orders.sort(function(a,b){return b.visibility-a.visibility});
+        console.log(all_orders)
+        var postdata = {}
+        postdata.content = " "
+        postdata.embeds = []
+        var vis_traders_names = []
+        var vis_traders_prices = []
+        var invis_traders_names = []
+        var invis_traders_prices = []
+        var noOfTraders = 0
+        for (var i=0;i<all_orders.length;i++) {
+            if (all_orders[i].visibility) {
+                var text = ""
+                if (tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
+                    text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i] + ' '
+                }
+                text += all_orders[i].ingame_name
+                vis_traders_names.push(text)
+                vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+                noOfTraders++
+            }
+            else {
+                invis_traders_names.push(all_orders[i].ingame_name)
+                invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+            }
+        }
+        if (vis_traders_names.length != 0) {
+            postdata.embeds.push({
+                fields: [
+                    {
+                        name: order_type.replace('wts','Sellers').replace('wtb','Buyers'),
+                        value: vis_traders_names.toString().replace(/,/g,'\n'),
+                        inline: true
+                    },{name: '\u200b',value: '\u200b', inline: true},
+                    {
+                        name: `Prices`,
+                        value: vis_traders_prices.toString().replace(/,/g,'\n'),
+                        inline: true
+                    }
+                ],
+                color: color
+            })
+        }
+        if (invis_traders_names.length != 0) {
+            postdata.embeds.push({
+                fields: [
+                    {
+                        name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
+                        value: invis_traders_names.toString().replace(/,/g,'\n'),
+                        inline: true
+                    },{name: '\u200b',value: '\u200b', inline: true},
+                    {
+                        name: `Price`,
+                        value: invis_traders_prices.toString().replace(/,/g,'\n'),
+                        inline: true
+                    }
+                ],
+                color: tb_invisColor
+            })
+        }
+        if (postdata.embeds.length == 0) {
+            message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
+            return Promise.reject()
+        }
+        postdata.embeds[0].title = weapon_name
+        postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        postdata.embeds[0].thumbnail = {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
+        console.log(JSON.stringify(postdata))
+        if (request_type == 1) {
+            message.channel.send(postdata)
+            .then(msg => {
+                for (var j=0;j<noOfTraders;j++) {
+                    msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
+            })
+        }
+        else if (request_type == 2) {
+            message.edit(postdata)
+            .then(res => {
+                message.reactions.removeAll()
+                for (var j=0;j<noOfTraders;j++) {
+                    message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(err => console.log(err))
+            })
+        }
         return Promise.resolve()
+        //===============================================
     }
-    console.log(arrItems)
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].id
     if (!arrItems[0].rank && isMaxed) {
