@@ -2152,6 +2152,66 @@ client.on('messageDelete', async message => {
                 return Promise.resolve()
             await trading_bot_orders_update(null,item_id,item_url,item_name,1).catch(err => console.log(err))
         }
+        else if (tradingBotLichChannels.includes(message.channelId)) {
+            console.log(`a lich order message was deleted from the bot`)
+            var lich_id = ""
+            var channel_id = ""
+            var status = await db.query(`SELECT * FROM lich_messages_ids WHERE message_id = ${message.id}`)
+            .then(async res => {
+                if (res.rows.length==0) {
+                    console.log(`no message id found in db`)
+                    return false
+                }
+                else if (res.rows.length>1) {
+                    console.log(`more than one message id found in db`)
+                    return false
+                }
+                else {
+                    lich_id = res.rows[0].lich_id
+                    channel_id = res.rows[0].channel_id
+                    var status = await db.query(`DELETE FROM messages_ids WHERE message_id = ${message.id}`)
+                    .then(res => {
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(`error deleting message id from db`)
+                        return false
+                    })
+                    if (!status)
+                        return false
+                    return true
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return Promise.resolve()
+            var lich_info = {}
+            var status = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${lich_id}'`)
+            .then(res => {
+                if (res.rows.length==0) {
+                    console.log(`no lich info found in db`)
+                    return false
+                }
+                else if (res.rows.length>1) {
+                    console.log(`more than one lich info found in db`)
+                    return false
+                }
+                else {
+                    lich_info = res.rows[0]
+                    return true
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return Promise.resolve()
+            await trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
+        }
     }
     return Promise.resolve()
 })
