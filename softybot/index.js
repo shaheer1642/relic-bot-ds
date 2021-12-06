@@ -1927,9 +1927,8 @@ client.on('interactionCreate', async interaction => {
                     break
                 var lich = lich_list[i]
                 if (lich.weapon_url.toLowerCase().replace(/_/g,' ').match(weapon.toLowerCase()))
-                        postdata.push({name: lich.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), value: lich.weapon_url})
+                    postdata.push({name: lich.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), value: lich.weapon_url})
             }
-            console.log(postdata)
             interaction.respond(postdata).catch(err => console.log(err))
             console.log('autocomplete (lich)')
             return
