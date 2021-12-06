@@ -655,8 +655,6 @@ client.on('messageCreate', async message => {
                     message.delete().catch(err => console.log(err))
                     purgeMessage.delete().catch(err => console.log(err))
                     return Promise.resolve()
-                    async function func(msg,multiCid,item_id) {
-                    }
                 }
                 else {
                     message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
@@ -884,7 +882,7 @@ client.on('messageCreate', async message => {
             else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
                 if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
                     var active_orders = []
-                    var status =  await db.query(`SELECT * FROM messages_ids`)
+                    var status =  await db.query(`SELECT * FROM lich_messages_ids`)
                     .then(res => {
                         if (res.rows.length == 0) {
                             message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
@@ -892,30 +890,30 @@ client.on('messageCreate', async message => {
                             return false
                         }
                         active_orders = res.rows
-                        db.query(`DELETE FROM messages_ids`)
+                        db.query(`DELETE FROM lich_messages_ids`).catch(err => console.log(err))
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                        message.channel.send(`☠️ Error fetching active lich orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
                         setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
                         return false
                     })
                     if (!status)
                         return Promise.resolve()
-                    var status = await db.query(`UPDATE users_orders set visibility=false`)
+                    var status = await db.query(`UPDATE users_lich_orders set visibility=false`)
                     .then(res => {
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                        message.channel.send(`☠️ Error updating lich orders info in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
                         setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
                         return false
                     })
                     if (!status)
                         return Promise.resolve()
-                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg =>{
+                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg => {
                         return msg
                     }).catch(err => console.log(err))
                     
@@ -940,8 +938,6 @@ client.on('messageCreate', async message => {
                     message.delete().catch(err => console.log(err))
                     purgeMessage.delete().catch(err => console.log(err))
                     return Promise.resolve()
-                    async function func(msg,multiCid,item_id) {
-                    }
                 }
                 else {
                     message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
