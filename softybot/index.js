@@ -1888,29 +1888,31 @@ client.on('interactionCreate', async interaction => {
 
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'track') {
-            console.log(interaction)
-            var mission_type = interaction.options.getString('mission_type')
-            var bounties_list = []
-            await db.query(`SELECT * FROM bounties_list WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' ORDER BY type ASC`)
-            .then(res => {
-                bounties_list = res.rows
-            })
-            .catch(err => console.log(err))
-            var postdata = []
-            for (var i=0; i<bounties_list.length; i++) {
-                if (i==25)
-                    break
-                var bounty = bounties_list[i]
-                if (bounty.type.toLowerCase().match(mission_type.toLowerCase())) {
-                    if (bounty.users && bounty.users.match(interaction.member.id))
-                        postdata.push({name: bounty.type + ' (Remove)', value: bounty.type.toLowerCase().replace(/ /g,'_')})
-                    else
-                        postdata.push({name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g,'_')})
+            if (interaction.options.getSubcommand() == 'bounties') {
+                console.log(interaction)
+                var mission_type = interaction.options.getString('mission_type')
+                var bounties_list = []
+                await db.query(`SELECT * FROM bounties_list WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' ORDER BY type ASC`)
+                .then(res => {
+                    bounties_list = res.rows
+                })
+                .catch(err => console.log(err))
+                var postdata = []
+                for (var i=0; i<bounties_list.length; i++) {
+                    if (i==25)
+                        break
+                    var bounty = bounties_list[i]
+                    if (bounty.type.toLowerCase().match(mission_type.toLowerCase())) {
+                        if (bounty.users && bounty.users.match(interaction.member.id))
+                            postdata.push({name: bounty.type + ' (Remove)', value: bounty.type.toLowerCase().replace(/ /g,'_')})
+                        else
+                            postdata.push({name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g,'_')})
+                    }
                 }
+                interaction.respond(postdata).catch(err => console.log(err))
+                console.log('autocomplete')
+                return
             }
-            interaction.respond(postdata).catch(err => console.log(err))
-            console.log('autocomplete')
-            return
         }
     }
 
