@@ -770,31 +770,7 @@ client.on('messageCreate', async message => {
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             const command = args.shift()
     
-            if (command.toLowerCase() == 'wts' || command.toLowerCase() == 'wtb') {
-                /*
-                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
-                    message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return
-                }
-                */
-                if (!args[0]) {
-                    message.channel.send('⚠️ Please provide an item name ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                    continue
-                }
-                const c_args = commandsArr[commandsArrIndex].replace(command,'').toLowerCase().trim().split(/,/g)
-                message.channel.send(`<@${message.author.id}> Successfully queued those hosts, it may take a moment for them to show up depending on how many people are currently hosting squads. dont wanna get queued, gotta pay boi\n\nhttps://cdn.discordapp.com/emojis/764518605592330240.gif?size=96>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                for (var k=0;k<c_args.length;k++) {
-                    var func = await trading_bot(message,c_args[k].toLowerCase().trim().split(/ +/g),command.toLowerCase()).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
-                }
-                console.log(`commandsArrIndex = ${commandsArrIndex}`)
-                if (commandsArrIndex == (commandsArr.length-1)) {
-                    console.log(`All requests executed for user ${message.author.username}`)
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                }
-            }
-            else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
+            if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
                 //continue
                 var user_orders = []
                 var status_msg = ''
@@ -1026,7 +1002,7 @@ client.on('messageCreate', async message => {
                 return
             }
             else {
-                message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                message.channel.send('Invalid command. List of commands:\n`/lich` `my orders` `close all`').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
                 setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
             }
             continue
