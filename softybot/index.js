@@ -8883,7 +8883,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         ctx.canvas.height = blY+70
                         ctx.putImageData(tempctx,0,0)
                       
-                        function draw(text, x, y, size=10, color = '#ffffff') {
+                        function draw(text, x, y, size=10, color = '#71368A') {
                             ctx.font = size + 'px Arial';
                             ctx.fillStyle = color;
                             ctx.fillText(text, x, y);
@@ -8916,7 +8916,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           ctx.moveTo(x1,y1);
                           ctx.lineTo(x2,y2);
                           ctx.lineTo(x3,y3);
-                          ctx.strokeStyle = '#ffffff';
+                          ctx.strokeStyle = '#71368A';
                           ctx.lineWidth = 2;
                           ctx.stroke();
                           ctx.fillRect(x1-2.5,y1-2.5,5,5);
@@ -8926,7 +8926,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           ctx.beginPath();
                           ctx.moveTo(x1,y1);
                           ctx.lineTo(x2,y2);
-                          ctx.strokeStyle = '#ffffff';
+                          ctx.strokeStyle = '#71368A';
                           ctx.lineWidth = 2;
                           ctx.stroke();
                           ctx.fillRect(x1-2.5,y1-2.5,5,5);
@@ -9031,7 +9031,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         ctx.canvas.height = blY+70
                         ctx.putImageData(tempctx,0,0)
                       
-                        function draw(text, x, y, size=10, color = '#ffffff') {
+                        function draw(text, x, y, size=10, color = '#71368A') {
                             ctx.font = size + 'px Arial';
                             ctx.fillStyle = color;
                             ctx.fillText(text, x, y);
@@ -9064,7 +9064,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           ctx.moveTo(x1,y1);
                           ctx.lineTo(x2,y2);
                           ctx.lineTo(x3,y3);
-                          ctx.strokeStyle = '#ffffff';
+                          ctx.strokeStyle = '#71368A';
                           ctx.lineWidth = 2;
                           ctx.stroke();
                           ctx.fillRect(x1-2.5,y1-2.5,5,5);
@@ -9074,7 +9074,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           ctx.beginPath();
                           ctx.moveTo(x1,y1);
                           ctx.lineTo(x2,y2);
-                          ctx.strokeStyle = '#ffffff';
+                          ctx.strokeStyle = '#71368A';
                           ctx.lineWidth = 2;
                           ctx.stroke();
                           ctx.fillRect(x1-2.5,y1-2.5,5,5);
