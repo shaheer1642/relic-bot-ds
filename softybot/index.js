@@ -9538,14 +9538,42 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             arrItems.push(element);
         }
     }
+    var isLich = false
     if (arrItems.length > 1) {
         message.channel.send(`❕ More than one search results detected for the item **${d_item_url}**, cannot process this request. Please provide a valid item name ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
         //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
         return Promise.resolve()
     }
     if (arrItems.length==0) {
-        message.channel.send(`❕ Item **${d_item_url}** either does not exist or is not a prime item. ❕`).catch(err => console.log(err));
-        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        //-----check if lich weapon-----
+        var status = await db.query(`SELECT * from lich_list`)
+        .then(res => {
+            for (var e in res.rows) {
+                if (e.weapon_url.match('^' + d_item_url + '\W*')) {
+                    isLich = true
+                    arrItems.push(element);
+                    break
+                }
+            }
+            if (arrItems.length==0)
+                return 2
+            return 0
+        }).catch(err => {
+            console.log(err)
+            return 1
+        })
+        //------------------------------
+        if (status == 1) {
+            message.channel.send({content: "☠️ Some error occured retrieving lich list from db.\nError code: 501.2\nContact MrSofty#7926 ☠️"})
+            return Promise.reject()
+        }
+        if (status == 2) {
+            message.channel.send(`❕ Item **${d_item_url}** either does not exist or is not a tradable item. ❕`).catch(err => console.log(err));
+            return Promise.resolve()
+        }
+    }
+    if (isLich) {
+        message.channel.send(`Item is a lich. This command is under dev.\n${JSON.stringify(arrItems)}`).catch(err => console.log(err));
         return Promise.resolve()
     }
     console.log(arrItems)
