@@ -9548,7 +9548,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         //-----check if lich weapon-----
         var status = await db.query(`SELECT * from lich_list`)
         .then(res => {
-            for (var e in res.rows) {
+            for (var e of res.rows) {
                 console.log(e)
                 if (e.weapon_url.match(d_item_url)) {
                     isLich = true
