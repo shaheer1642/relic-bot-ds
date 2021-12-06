@@ -9633,13 +9633,13 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 text += all_orders[i].ingame_name
                 vis_traders_names.push(text)
                 vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
-                vis_traders_detail.push(`(Lich detail)[${all_orders[i].lich_image_url}]`)
+                vis_traders_detail.push(`[Lich detail](${all_orders[i].lich_image_url})`)
                 noOfTraders++
             }
             else {
                 invis_traders_names.push(all_orders[i].ingame_name)
                 invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
-                invis_traders_detail.push(`(Lich detail)[${all_orders[i].lich_image_url}]`)
+                invis_traders_detail.push(`[Lich detail](${all_orders[i].lich_image_url})`)
             }
         }
         if (vis_traders_names.length != 0) {
@@ -9651,13 +9651,13 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                         inline: true
                     },
                     {
-                        name: 'Detail',
-                        value: vis_traders_detail.join('\n'), 
+                        name: `Prices`,
+                        value: vis_traders_prices.join('\n'),
                         inline: true
                     },
                     {
-                        name: `Prices`,
-                        value: vis_traders_prices.join('\n'),
+                        name: 'Detail',
+                        value: vis_traders_detail.join('\n'), 
                         inline: true
                     }
                 ],
@@ -9673,13 +9673,13 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                         inline: true
                     },
                     {
-                        name: 'Detail',
-                        value: invis_traders_detail.join('\n'),
+                        name: `Price`,
+                        value: invis_traders_prices.join('\n'),
                         inline: true
                     },
                     {
-                        name: `Price`,
-                        value: invis_traders_prices.join('\n'),
+                        name: 'Detail',
+                        value: invis_traders_detail.join('\n'),
                         inline: true
                     }
                 ],
