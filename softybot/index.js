@@ -1887,8 +1887,8 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (interaction.isAutocomplete()) {
-        console.log(interaction.commandName)
         if (interaction.commandName == 'track') {
+            console.log(interaction)
             var mission_type = interaction.options.getString('mission_type')
             var bounties_list = []
             await db.query(`SELECT * FROM bounties_list WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' ORDER BY type ASC`)

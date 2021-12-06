@@ -13,7 +13,11 @@ for (const file of commandFiles) {
 for (var e of commands) {
 	if (e.name	== 'lich')
 		e.options[0].autocomplete = true
+	if (e.name == 'track')
+		if (e.options[0].name == 'bounties')
+			e.options[0].options[1].autocomplete = true
 }
+
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
 rest.put(Routes.applicationGuildCommands(clientId, guildId[0]), { body: commands })
