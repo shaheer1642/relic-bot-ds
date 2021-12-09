@@ -10280,6 +10280,8 @@ function getRandomColor() {
 }
 
 async function admin_test(message,args) {
+    if (message.author.id != '253525146923433984')
+        return
     client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')
     .then(msg => {
         msg.react('<:four2:918420407097364480>').catch(err => console.log(err))
