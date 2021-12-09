@@ -1243,11 +1243,11 @@ client.on('messageCreate', async message => {
                 case 'graphic':
                     canvasTest(message,args)
                     break
-                /*----------------------
+                ///*----------------------
                 case 'test':
                     admin_test(message,args)
                     break
-                -----------------------*/
+                //-----------------------*/
             }
         }
 
@@ -10280,46 +10280,14 @@ function getRandomColor() {
 }
 
 async function admin_test(message,args) {
-    message.channel.send({content: " ", embeds: [
-        {
-            title: "Hunts with premade squads.",
-            thumbnail: {
-              url: "https://firebasestorage.googleapis.com/v0/b/relicbot-325715.appspot.com/o/commands%2Feidolon%2Fpremade.png?alt=media&token=414e0827-caeb-4d70-a500-4f279c182e39",
-            },
-            color: 39423,
-            footer: {
-              text: `Choose an available role to join. ${tradingBotReactions.remove[0]}`,
-            },
-            fields: [
-              {
-                name: "Role",
-                value:
-                  `<:on:756066695449411606> Chroma :　\n${tradingBotReactions.remove[0]} Volt :　\n${tradingBotReactions.remove[0]} Harrow :　\n<:off:756066941520576522> Trinity :　\n`,
-                inline: true,
-              },
-              {
-                name: "Member",
-                value: "Ady88　\n\n\n\n",
-                inline: true,
-              },
-              {
-                name: "Reputation",
-                value: "4　\n\n\n\n",
-                inline: true,
-              },
-              {
-                name: "Hunts",
-                value: "5x3",
-                inline: true,
-              },
-              {
-                name: "Min Captures",
-                value: "200",
-                inline: true,
-              },
-            ],
-          }
-    ]}).catch(err => console.log(err))
+    client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')
+    .then(msg => {
+        msg.react('<:four2:918420407097364480>').catch(err => console.log(err))
+    }).catch(err => console.log(err))
+    client.channels.cache.get('793207311891562556').messages.fetch('915914251066015774')
+    .then(msg => {
+        msg.react('<:five2:918420406472421387>').catch(err => console.log(err))
+    }).catch(err => console.log(err))
 }
 
 //==================================== GMAIL API =============================================
