@@ -1,3 +1,5 @@
+const {db} = require('./../index.js');
+
 async function orders(message,args) {
     if (args.length == 0)
     {

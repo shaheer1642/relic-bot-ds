@@ -74,11 +74,12 @@ const db = new DB.Pool({
       rejectUnauthorized: false
     }
 });
+
 e_db_conn().catch(err => console.log(err));
+
 async function e_db_conn() {
     var status = await db.connect().then(res => {
         console.log('Connection established.')
-
         return true
     })
     .catch(err => {
@@ -88,25 +89,12 @@ async function e_db_conn() {
     if (!status)
         return Promise.reject()
 }
-/*----timers-----*/
-//setTimeout(verify_roles, 5000);
-//setTimeout(trades_update, 5000);
-/*---------------*/
 
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
-//----Application commands-----
-client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	// Set a new item in the Collection
-	// With the key as the command name and the value as the exported module
-	client.commands.set(command.data.name, command);
-}
-//---------------------------
-//const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "DIRECT_MESSAGES"] });
 var tickcount = new Date().getTime();
+
+module.exports = {db};
 
 client.on('ready', () => {
     //----Bounty timers---
@@ -1173,10 +1161,10 @@ client.on('messageCreate', async message => {
                     help(message,args)
                     break
                 case 'orders':
-                    wfm_api.orders(message,args)
+                    orders(message,args)
                     break
                 case 'order':
-                    wfm_api.orders(message,args)
+                    orders(message,args)
                     break
                 case 'auctions':
                     auctions(message,args)
