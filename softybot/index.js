@@ -1169,10 +1169,10 @@ client.on('messageCreate', async message => {
                     help(message,args)
                     break
                 case 'orders':
-                    wfm_api.orders(message,args,db)
+                    wfm_api.orders(message,args)
                     break
                 case 'order':
-                    wfm_api.orders(message,args,db)
+                    wfm_api.orders(message,args)
                     break
                 case 'auctions':
                     auctions(message,args)
