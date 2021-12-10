@@ -1,4 +1,23 @@
-const {db} = require('./../index.js');
+const axios = require('axios');
+const axiosRetry = require('axios-retry');
+const extras = require('./extras.js');
+const db_modules = require('./db_modules.js');
+const {db} = require('./db_connection.js');
+
+const defaultReactions = {
+    check: {
+        string: '<:check:905884742413582347>',
+        identifier: 'check:905884742413582347'
+    },
+    update: {
+        string: '<:update:906923981855162398>',
+        identifier: 'update:906923981855162398'
+    },
+    auto_update: {
+        string: '<:auto_update:906923980852715640>',
+        identifier: 'auto_update:906923980852715640'
+    }
+}
 
 async function orders(message,args) {
     if (args.length == 0)
@@ -74,7 +93,7 @@ async function orders(message,args) {
     {
         if ((new Date().getTime() - arrItems[i].update_timestamp) > 86400000) {
             console.log(`updating item in db`)
-            await updateDatabaseItem(items_list,arrItems[i])
+            await db_modules.updateDatabaseItem(items_list,arrItems[i],0,db)
             .then(items_list => {
                 for (var j=0; j<items_list.length; j++) {
                     element = items_list[j]
@@ -116,10 +135,10 @@ async function orders(message,args) {
                 }
             })
             console.log(JSON.stringify(ordersArr))
-            ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
-            ordersArr = ordersArr.sort(dynamicSort("price"))
+            ordersArr = ordersArr.sort(extras.dynamicSortDesc("quantity"))
+            ordersArr = ordersArr.sort(extras.dynamicSort("price"))
             if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank"))
-                ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
+                ordersArr = ordersArr.sort(extras.dynamicSort("mod_rank"))
             var sellers = ""
             var quantities = ""
             var prices = ""
@@ -160,7 +179,7 @@ async function orders(message,args) {
                 timestamp: new Date()
             })
             if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
-                ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
+                ordersArr = ordersArr.sort(extras.dynamicSortDesc("mod_rank"))
                 var sellers = ""
                 var quantities = ""
                 var prices = ""
@@ -194,7 +213,7 @@ async function orders(message,args) {
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 console.log(embeds)
-                embeds = embeds.sort(dynamicSort("title"))
+                embeds = embeds.sort(extras.dynamicSort("title"))
                 processMessage.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`, embeds: embeds}).catch(err => console.log(err))
                 processMessage.react(defaultReactions.update.string).catch(err => console.log(err))
                 processMessage.react(defaultReactions.auto_update.string).catch(err => console.log(err))
@@ -209,5 +228,20 @@ async function orders(message,args) {
     }
     return
 }
+
+axiosRetry(axios, {
+    retries: 50, // number of retries
+    retryDelay: (retryCount) => {
+      console.log(`retry attempt: ${retryCount}`);
+      return retryCount * 1000; // time interval between retries
+    },
+    retryCondition: (error) => {
+        // if retry condition is not specified, by default idempotent requests are retried
+        if (error.response)
+            return error.response.status > 499;
+        else
+            return error
+    },
+});
 
 module.exports = {orders};

@@ -12,7 +12,8 @@ const axiosRetry = require('axios-retry');
 const wfm_api = require('./modules/wfm_api.js');
 const Canvas = require('canvas')
 const fs = require('fs')
-const DB = require('pg');
+const {db} = require('./modules/db_connection.js');
+const {client} = require('./modules/discord_client.js');
 //const { resolve } = require('path');
 //const { time } = require('console');
 const readline = require('readline');
@@ -67,6 +68,7 @@ var DB_Update_Timer = null
 var Ducat_Update_Timer = null
 const u_order_close_time = 10800000
 
+/*
 console.log('Establishing connection to DB...')
 const db = new DB.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -89,21 +91,27 @@ async function e_db_conn() {
     if (!status)
         return Promise.reject()
 }
+*/
 
+/*
 const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER']}) //{ intents: 14095 })
+
+client.login(process.env.DISCORD_BOT_TOKEN).catch(err => console.log(err));
+
+module.exports = {client};
+*/
 
 var tickcount = new Date().getTime();
 
-module.exports = {db};
-
 client.on('ready', () => {
+    console.log('bot started')
     //----Bounty timers---
     setImmediate(bounty_check,-1)
     //setImmediate(update_bounties,-1)
 
     client.user.setActivity('.help', { type: 2 })
 
-    console.log(process.env.DEBUG_MODE)
+    console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
 
     if (process.env.DEBUG_MODE==1)
         return
@@ -1161,10 +1169,10 @@ client.on('messageCreate', async message => {
                     help(message,args)
                     break
                 case 'orders':
-                    orders(message,args)
+                    wfm_api.orders(message,args,db)
                     break
                 case 'order':
-                    orders(message,args)
+                    wfm_api.orders(message,args,db)
                     break
                 case 'auctions':
                     auctions(message,args)
@@ -4181,8 +4189,6 @@ client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
     })
 })
 */
-
-client.login(process.env.DISCORD_BOT_TOKEN).catch(err => console.log(err));
 
 //------------Command functions---------------
 function uptime(message,args) {
