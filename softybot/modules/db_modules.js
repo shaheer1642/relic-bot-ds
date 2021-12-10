@@ -2,7 +2,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
-const extras = require('extras.js');
+const extras = require('./extras.js');
 
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
