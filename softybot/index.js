@@ -9,6 +9,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 //const https = require('https');
 //const request = require('request');
+const wfm_api = require('./modules/wfm_api.js');
 const Canvas = require('canvas')
 const fs = require('fs')
 const DB = require('pg');
@@ -1172,10 +1173,10 @@ client.on('messageCreate', async message => {
                     help(message,args)
                     break
                 case 'orders':
-                    orders(message,args)
+                    wfm_api.orders(message,args)
                     break
                 case 'order':
-                    orders(message,args)
+                    wfm_api.orders(message,args)
                     break
                 case 'auctions':
                     auctions(message,args)
