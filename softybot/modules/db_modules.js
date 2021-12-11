@@ -37,6 +37,7 @@ const vaultExpectedRelics = [
 
 var DB_Updating = false
 var DB_Update_Timer = null
+const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
