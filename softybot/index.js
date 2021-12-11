@@ -1027,6 +1027,7 @@ client.on('messageCreate', async message => {
             if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
                 trade_bot_modules.check_user(message)
                 .then(res => {
+                    console.log(res)
                     trading_bot_user_orders(message,args,res.ingame_name,1).catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
