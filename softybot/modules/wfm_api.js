@@ -869,7 +869,7 @@ async function relist(message,args) {
         return
     for (var i=0;i<relist_cd.length;i++) {
         if (relist_cd[i].discord_id == message.author.id)
-            {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
+            {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + extras.msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
     }
     relist_cd.push({discord_id: message.author.id, timestamp: Date.now()});
     setTimeout(() => {
