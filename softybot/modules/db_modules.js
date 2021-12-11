@@ -3,6 +3,7 @@ const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 const {client,tickcount} = require('./discord_client.js');
+const fs = require('fs')
 
 var DB_Updating = false
 var DB_Update_Timer = null
