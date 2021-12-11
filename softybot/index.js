@@ -1163,7 +1163,7 @@ client.on('messageCreate', async message => {
         if (message.guild) {
             switch(command) {
                 case 'uptime':
-                    uptime(message,args)
+                    wfm_api.uptime(message,args)
                     break
                 case 'help':
                     wfm_api.help(message,args)

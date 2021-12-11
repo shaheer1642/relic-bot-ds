@@ -790,6 +790,32 @@ function help(message,args) {
     return
 }
 
+function uptime(message,args) {
+    //--------Set new timer--------
+    var currTime = new Date();
+    var currDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate(), // the current day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    var nextDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate() + 1, // the next day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    if ((currDay.getTime() - currTime.getTime())>0)
+        var msTill1AM = currDay.getTime() - currTime.getTime()
+    else    //its past 12am. do next day
+        var msTill1AM = nextDay.getTime() - currTime.getTime()
+    //-------------
+    message.channel.send({
+        content: `Current uptime: ${extras.msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${extras.msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${extras.msToTime(msTill1AM)}`
+    }).catch(err => console.log(err))
+    message.react(defaultReactions.check.string);
+    return
+}
 
 axiosRetry(axios, {
     retries: 50, // number of retries
@@ -806,4 +832,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {orders,relics,auctions,help};
+module.exports = {orders,relics,auctions,help,uptime};

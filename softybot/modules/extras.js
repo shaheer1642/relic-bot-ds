@@ -42,6 +42,28 @@ async function mod_log (str,color='RANDOM') {
     await client.channels.cache.get('892072612002418718').send({content: " ", embeds: [embed]}).catch(err => console.log(err+'\nError posting moderation update.'))
 }
 
+function msToTime(s) {
+
+    // Pad to 2 or 3 digits, default is 2
+    function pad(n, z) {
+      z = z || 2;
+      return ('00' + n).slice(-z);
+    }
+  
+    var ms = s % 1000;
+    s = (s - ms) / 1000;
+    var secs = s % 60;
+    s = (s - secs) / 60;
+    var mins = s % 60;
+    var hrs = (s - mins) / 60;
+  
+    if (hrs != 0)
+        return pad(hrs) + ' hours ' + pad(mins) + ' minutes ' + pad(secs) + ' seconds';
+    if (mins != 0)
+        return pad(mins) + ' minutes ' + pad(secs) + ' seconds';
+    return pad(secs) + ' seconds';
+}
+
 function msToFullTime(ms) {
     console.log(ms)
     var seconds = Math.floor(ms / 1000),
@@ -80,4 +102,4 @@ function msToFullTime(ms) {
 }
 
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToFullTime};
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime};
