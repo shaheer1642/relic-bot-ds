@@ -1025,32 +1025,11 @@ client.on('messageCreate', async message => {
             */
             const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
             if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
-                var ingame_name = ""
-                var status_message = ""
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                trade_bot_modules.check_user(message)
                 .then(res => {
-                    if (res.rows.length==0) {
-                        status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
-                        message.author.send({content: "Type the following command to register your ign:\nverify ign"})
-                        .catch(err => {
-                            console.log(err)
-                            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
-                        })
-                        return false
-                    }
-                    ingame_name = res.rows[0].ingame_name
-                    return true
+                    trading_bot_user_orders(message,args,res.ingame_name,1).catch(err => console.log(err))
                 })
-                .catch(err => {
-                    console.log(err)
-                    status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`
-                    return false
-                })
-                if (!status) {
-                    message.channel.send(status_message).catch(err => console.log(err))
-                    return Promise.resolve()
-                }
-                trading_bot_user_orders(message,args,ingame_name,1).catch(err => console.log(err))
+                .catch(err => console.log(err))
             }
             else if (args[0] == "user" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile" )) {
                 var ingame_name = args[2]

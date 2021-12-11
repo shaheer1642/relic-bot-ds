@@ -34,6 +34,26 @@ const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
+async function check_user(message) {
+    db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rowCount==0) {
+            message.channel.send(`⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`).catch(err => console.log(err))
+            message.author.send({content: "Type the following command to register your ign:\nverify ign"})
+            .catch(err => {
+                console.log(err)
+                message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
+            })
+            return Promise.reject()
+        }
+        return Promise.resolve(res.rows[0])
+    })
+    .catch(err => {
+        message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`).catch(err => console.log(err))
+        return Promise.reject(err)
+    })
+}
+
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type,item_rank = 'unranked') {
     for(var i=0;i<tradingBotChannels.length;i++) {
         var multiCid = tradingBotChannels[i]
@@ -366,4 +386,4 @@ async function leaderboard(message) {
     return
 }
 
-module.exports = {trading_bot_orders_update,leaderboard}
+module.exports = {check_user,trading_bot_orders_update,leaderboard}
