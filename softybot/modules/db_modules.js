@@ -4,8 +4,35 @@ const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 const {client,tickcount} = require('./discord_client.js');
 const fs = require('fs')
-const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
-const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
+const vaultExclusiveRelics = [
+    "neo_r1_relic",
+    "lith_b4_relic",
+    "meso_n6_relic",
+    "axi_s3_relic"
+]
+const vaultExpectedRelics = [
+    "lith_a4_relic",
+    "lith_i1_relic",
+    "lith_k7_relic",
+    "lith_n7_relic",
+    "lith_n8_relic",
+    "lith_t7_relic",
+    "meso_b5_relic",
+    "meso_b6_relic",
+    "meso_c6_relic",
+    "meso_s10_relic",
+    "neo_p2_relic",
+    "neo_t4_relic",
+    "neo_t5_relic",
+    "axi_a13_relic",
+    "axi_a14_relic",
+    "axi_c6_relic",
+    "axi_g6_relic",
+    "axi_i2_relic",
+    "ivara_prime_set",
+    "baza_prime_set",
+    "aksomati_prime_set"
+]
 
 var DB_Updating = false
 var DB_Update_Timer = null
