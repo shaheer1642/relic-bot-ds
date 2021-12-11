@@ -1175,10 +1175,10 @@ client.on('messageCreate', async message => {
                     wfm_api.orders(message,args)
                     break
                 case 'auctions':
-                    auctions(message,args)
+                    wfm_api.auctions(message,args)
                     break
                 case 'auction':
-                    auctions(message,args)
+                    wfm_api.auctions(message,args)
                     break
                 case 'relist':
                     relist(message,args)

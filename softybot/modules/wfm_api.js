@@ -543,7 +543,7 @@ async function relics(message,args) {
             })
             .catch(err => console.log(err))
         }
-        relics_timestamps = relics_timestamps.sort(dynamicSortDesc("vault_timestamp"))
+        relics_timestamps = relics_timestamps.sort(extras.dynamicSortDesc("vault_timestamp"))
         console.log(JSON.stringify(relics_timestamps))
         if (relics_timestamps.length >= 1)
             postdata[X].embeds[j].footer.text = "Best Relic: " + relics_timestamps[0].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(" Relic",'')
@@ -561,6 +561,213 @@ async function relics(message,args) {
     return
 }
 
+async function auctions(message,args) {
+    if (args.length == 0)
+    {
+        message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}).catch(err => console.log(err));
+        message.react(defaultReactions.check.string)
+        return
+    }
+    var modifier = ""
+    if ((args[args.length-1]=="impact") || (args[args.length-1]=="heat") || (args[args.length-1]=="cold") || (args[args.length-1]=="electricity") || (args[args.length-1]=="toxin") || (args[args.length-1]=="magnetic") || (args[args.length-1]=="radiation"))
+    {
+        modifier = args.pop()
+    }
+    else if ((args[args.length-1]=="slash") || (args[args.length-1]=="puncture") || (args[args.length-1]=="viral") || (args[args.length-1]=="blast") || (args[args.length-1]=="corrosive"))
+    {
+        message.channel.send({content: args[args.length-1] + " is not a valid modifier."}).catch(err => console.log(err));
+        return
+    }
+    var d_item_url = ""
+    args.forEach(element => {
+        d_item_url = d_item_url + element.toLowerCase() + "_"
+    });
+    d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    let arrItemsUrl = []
+    var WFM_Lich_List = []
+    console.log('Retrieving Database -> lich_list')
+    var status = await db.query(`SELECT * FROM lich_list`)
+    .then(res => {
+        WFM_Lich_List = res.rows
+        console.log('Retrieving Database -> lich_list success')
+        return true
+    })
+    .catch (err => {
+        console.log(err + 'Retrieving Database -> lich_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return false
+    })
+    if (!status)
+        return
+    WFM_Lich_List.forEach(element => {
+        if (element.weapon_url.match(d_item_url))
+            arrItemsUrl.push(element.weapon_url)
+    })
+    if (arrItemsUrl.length==0)
+    {
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
+        return
+    }
+    if (arrItemsUrl.length>1)
+    {
+        message.channel.send("Too many search results for the item " + d_item_url + ". Please provide full weapon name").catch(err => console.log(err));
+        return
+    }
+    var item_url = arrItemsUrl[0]
+    var type = ''
+    if (item_url.match('kuva'))
+        type = 'lich'
+    else if (item_url.match('tenet'))
+        type = 'sister'
+    let processMessage = [];
+    const func = await message.channel.send("Processing").then(response => {
+        processMessage = response
+    }).catch(err => console.log(err));
+    const api = axios(`https://api.warframe.market/v1/auctions/search?type=${type}&weapon_url_name=${item_url}`)
+    .then(response => {
+        data = response.data
+        console.log(response.data)
+        let auctionsArr = []
+        data.payload.auctions.forEach(element => {
+            if ((element.owner.status == "ingame") && (element.owner.region == "en") && (element.visible == 1) && (element.private == 0) && (element.closed == 0))
+            {
+                auctionsArr.push(
+                    {
+                        owner: element.owner.ingame_name,
+                        auction_id: element.id,
+                        damage: element.item.damage,
+                        element: element.item.element,
+                        ephemera: element.item.having_ephemera,
+                        buyout_price: element.buyout_price,
+                        starting_price: element.starting_price,
+                        top_bid: element.top_bid
+                    }
+                )
+            }
+        })
+        let postdata = {content: " ", embeds: []}
+        //----Sort by buyout_price low->high----
+        auctionsArr = auctionsArr.sort(extras.dynamicSort("buyout_price"))
+        var d_ownerNames = ""
+        var d_weaponDetails = ""
+        var d_prices = ""
+        var i=0
+        for (var j=0; j<auctionsArr.length; j++)
+        {
+            if (i==5)
+                break
+            if (auctionsArr[j].buyout_price==null)
+                continue
+            if (modifier!="")
+                if (auctionsArr[j].element != modifier)
+                    continue
+            d_ownerNames += "[" + auctionsArr[j].owner + "](https://warframe.market/auction/" + auctionsArr[j].auction_id + ")\n\n\n"
+            d_weaponDetails += auctionsArr[j].damage + "% " + auctionsArr[j].element + " "
+            if (auctionsArr[j].ephemera)
+                d_weaponDetails += "\nhas Ephemera\n\n"
+            else
+                d_weaponDetails += "\nno Ephemera\n\n"
+            d_prices += "`Price: " + auctionsArr[j].buyout_price + "`\n`St. bid: " + auctionsArr[j].starting_price + "` `Top bid: " + auctionsArr[j].top_bid + "`\n\n"
+            i++
+        }
+        d_ownerNames = d_ownerNames.replace("_", "\\_")
+        var d_partName = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+        postdata.embeds.push(
+            {
+                title: d_partName, 
+                description: "```fix\n(Sorted by buyout price)```", 
+                timestamp: new Date(),
+                fields: [
+                    {name: "Owner", value: d_ownerNames, inline: true}, 
+                    {name: "Weapon Detail", value: d_weaponDetails, inline: true}, 
+                    {name: "Price(s)", value: d_prices, inline: true}
+                ]
+            }
+        )
+        //----Sort by weapon damage incl. buyout price high->low----
+        auctionsArr = auctionsArr.sort(extras.dynamicSortDesc("damage"))
+        var d_ownerNames = ""
+        var d_weaponDetails = ""
+        var d_prices = ""
+        var i=0
+        for (var j=0; j<auctionsArr.length; j++)
+        {
+            if (i==5)
+                break
+            if (auctionsArr[j].buyout_price==null)
+                continue
+            if (modifier!="")
+                if (auctionsArr[j].element != modifier)
+                    continue
+            d_ownerNames += "[" + auctionsArr[j].owner + "](https://warframe.market/auction/" + auctionsArr[j].auction_id + ")\n\n\n"
+            d_weaponDetails += auctionsArr[j].damage + "% " + auctionsArr[j].element + " "
+            if (auctionsArr[j].ephemera)
+                d_weaponDetails += "\nhas Ephemera\n\n"
+            else
+                d_weaponDetails += "\nno Ephemera\n\n"
+            d_prices += "`Price: " + auctionsArr[j].buyout_price + "`\n`St. bid: " + auctionsArr[j].starting_price + "` `Top bid: " + auctionsArr[j].top_bid + "`\n\n"
+            i++
+        }
+        d_ownerNames = d_ownerNames.replace("_", "\\_")
+        postdata.embeds.push(
+            {
+                description: "```fix\n(Sorted by weapon damage incl. buyout price)```", 
+                timestamp: new Date(),
+                fields: [
+                    {name: "Owner", value: d_ownerNames, inline: true}, 
+                    {name: "Weapon Detail", value: d_weaponDetails, inline: true}, 
+                    {name: "Price(s)", value: d_prices, inline: true}
+                ]
+            }
+        )
+        //----Sort by weapon damage high->low----
+        auctionsArr = auctionsArr.sort(extras.dynamicSortDesc("damage"))
+        var d_ownerNames = ""
+        var d_weaponDetails = ""
+        var d_prices = ""
+        var i=0
+        for (var j=0; j<auctionsArr.length; j++)
+        {
+            if (i==5)
+                break
+            if (modifier!="")
+                if (auctionsArr[j].element != modifier)
+                    continue
+            d_ownerNames += "[" + auctionsArr[j].owner + "](https://warframe.market/auction/" + auctionsArr[j].auction_id + ")\n\n\n"
+            d_weaponDetails += auctionsArr[j].damage + "% " + auctionsArr[j].element + " "
+            if (auctionsArr[j].ephemera)
+                d_weaponDetails += "\nhas Ephemera\n\n"
+            else
+                d_weaponDetails += "\nno Ephemera\n\n"
+            d_prices += "`Price: " + auctionsArr[j].buyout_price + "`\n`St. bid: " + auctionsArr[j].starting_price + "` `Top bid: " + auctionsArr[j].top_bid + "`\n\n"
+            i++
+        }
+        d_ownerNames = d_ownerNames.replace("_", "\\_")
+        postdata.embeds.push(
+            {
+                description: "```fix\n(Sorted by weapon damage)```", 
+                timestamp: new Date(),
+                fields: [
+                    {name: "Owner", value: d_ownerNames, inline: true}, 
+                    {name: "Weapon Detail", value: d_weaponDetails, inline: true}, 
+                    {name: "Price(s)", value: d_prices, inline: true}
+                ]
+            }
+        )
+        processMessage.edit(postdata)
+        message.react(defaultReactions.check.string)
+        return
+    })
+    .catch(function (error) {
+        processMessage.edit("Error occured retrieving auctions.\nError code 501")
+        if (error.response)
+            console.log(JSON.stringify(error.response.data))
+        else
+            console.log(error)
+        return
+    });
+}
+
 axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
@@ -576,4 +783,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {orders,relics};
+module.exports = {orders,relics,auctions};
