@@ -162,7 +162,7 @@ client.on('ready', () => {
                 message.reactions.removeAll().catch(err => console.log(err))
                 var intervalID = setInterval(function () {
                 
-                    orders_update(message)
+                    wfm_api.orders_update(message)
                 
                     if (++counter === 120) {
                         clearInterval(intervalID);
@@ -3534,7 +3534,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     if (reaction.emoji.identifier == defaultReactions.update.identifier) {
-        orders_update(reaction.message,reaction,user)
+        wfm_api.orders_update(reaction.message,reaction,user)
         return
     }
     
@@ -3546,7 +3546,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         reaction.message.reactions.removeAll().catch(err => console.log(err))
         var intervalID = setInterval(function () {
         
-            orders_update(reaction.message)
+            wfm_api.orders_update(reaction.message)
         
             if (++counter === 120) {
                 clearInterval(intervalID);
@@ -4189,6 +4189,7 @@ client.on('threadMembersUpdate', async (oldMembers,newMembers) => {
 */
 
 //------------Command functions---------------
+/*
 function uptime(message,args) {
     //--------Set new timer--------
     var currTime = new Date();
@@ -5602,6 +5603,7 @@ async function relist(message,args) {
     });
     return
 }
+*/
 
 async function canvasTest(message,args) {
     var canvas = new Canvas.createCanvas(200,200)
@@ -5712,7 +5714,7 @@ async function gpt3_answer(message,args) {
     return
 }
 //-----------------------------
-
+/*
 async function updateDB(message,args) {
     if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
         if (DB_Updating) {
@@ -5836,7 +5838,7 @@ async function getDB(message,args) {
         return
     }
 }
-
+*/
 async function WFMauthorize(message,args) {
     if (args.length == 0)
     {
