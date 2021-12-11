@@ -35,7 +35,8 @@ const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
 async function check_user(message) {
-    await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    var user_info = {}
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
     .then(res => {
         if (res.rowCount==0) {
             message.channel.send(`⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`).catch(err => console.log(err))
@@ -44,14 +45,21 @@ async function check_user(message) {
                 console.log(err)
                 message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
             })
-            return Promise.reject()
+            return false
         }
-        return Promise.resolve(res.rows[0])
+        user_info = res.rows[0]
+        return true
     })
     .catch(err => {
+        console.log(err)
         message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`).catch(err => console.log(err))
-        return Promise.reject(err)
+        return false
     })
+    if (!status) {
+        message.channel.send(status_message).catch(err => console.log(err))
+        return Promise.reject()
+    }
+    return Promise.resolve(user_info)
 }
 
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type,item_rank = 'unranked') {
@@ -386,4 +394,4 @@ async function leaderboard(message) {
     return
 }
 
-module.exports = {check_user,trading_bot_orders_update,leaderboard}
+module.exports = {trading_bot_orders_update,leaderboard}
