@@ -3,6 +3,7 @@ const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const trade_bot_modules = require('./trade_bot_modules.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
+const {WebhookClient} = require('discord.js');
 const {client,tickcount} = require('./discord_client.js');
 const fs = require('fs')
 const vaultExclusiveRelics = [
