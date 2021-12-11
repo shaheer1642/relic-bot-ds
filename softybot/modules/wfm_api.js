@@ -818,6 +818,236 @@ async function auctions(message,args) {
     });
 }
 
+async function list(message,args) {
+    if (args.length == 0)
+    {
+        message.channel.send({content: "List a prime item on your warframe.market profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
+        message.react(defaultReactions.check.string)
+        return
+    }
+    offset = 0
+    if (args[args.length-1].match(/\d+$/))
+    {
+        if (!(args[args.length-1].match(/-?\d+/g).map(Number)))
+        {
+            message.channel.send({content: "Invalid offset. Usage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"})
+            return
+        }
+        offset = Number(args.pop())
+    }
+    //var filecontent = fs.readFileSync('../JWT_Stack/jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
+    //let jwt_stack = JSON.parse(filecontent)
+    var JWT = ""
+    var ingame_name = ""
+    var status = await db.query(`SELECT * FROM discord_users WHERE discord_id=${message.author.id}`).then(async res => {
+        if (res.rows.length == 0) {
+            message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
+            try {
+                message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
+            } catch (err) {
+                message.channel.send({content: "🛑 Error occured sending DM. Make sure you have DMs turned on for the bot 🛑"}).catch(err => console.log(err));
+            }
+            return 0
+        }
+        else {
+            JWT = res.rows[0].jwt
+            ingame_name = res.rows[0].ingame_name
+            return 1
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        message.channel.send('Error occured retrieving database info. Please try again.')
+        return 0
+    })
+    if (!status)
+        return
+    var d_item_url = ""
+    args.forEach(element => {
+        d_item_url = d_item_url + element.toLowerCase() + "_"
+    });
+    d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    if (!d_item_url.match("prime"))
+    {
+        message.channel.send("This command is only limited to prime items for now.").catch(err => console.log(err));
+        return
+    }
+    let arrItemsUrl = []
+    //var WFM_Items_List = require('../WFM_Items_List.json')
+    //var filecontent = fs.readFileSync('../WFM_Items_List.json', 'utf8').replace(/^\uFEFF/, '')
+    //let WFM_Items_List = JSON.parse(filecontent)
+    let WFM_Items_List = []
+    console.log('Retrieving Database -> wfm_items_list')
+    status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        WFM_Items_List = res.rows
+        console.log('Retrieving Database -> wfm_items_list success')
+        return 1
+    })
+    .catch (err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> wfm_items_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return 0
+    })
+    if (!status)
+        return
+    //var filecontent = fs.readFileSync('../WFM_Items_List.json').toString()
+    //let WFM_Items_List = JSON.parse(filecontent)
+    WFM_Items_List.forEach(element => {
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if ((element.item_url.match("prime")) && !(element.item_url.match("primed")))
+                arrItemsUrl.push({item_url: element.item_url,item_id: element.id});
+        }
+    })
+    if (JSON.stringify(arrItemsUrl).match("_set")) {
+        var i = 0
+        var MaxIndex = arrItemsUrl.length
+        for (var i=0; i <= MaxIndex-1; i++)
+        {
+            if (!arrItemsUrl[i].item_url.match("_set"))
+            {
+                arrItemsUrl.splice(i, 1)
+                i--
+            }
+            MaxIndex = arrItemsUrl.length
+        }
+    }
+    if (arrItemsUrl.length > 1) {
+        message.channel.send("Something went wrong. Please try again.\nError code: 500").catch(err => console.log(err));
+        return
+    }
+    if (arrItemsUrl.length==0) {
+        message.channel.send("Item " + d_item_url + " does not exist.").catch(err => console.log(err));
+        return
+    }
+    if (arrItemsUrl.length > 10) {
+        message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
+        return
+    }
+    const item_url = arrItemsUrl[0].item_url
+    const item_id = arrItemsUrl[0].item_id
+    let processMessage = [];
+    const process = await message.channel.send("Processing").then(response => {
+        processMessage = response
+    }).catch(err => console.log(err));
+    //----Retrieve top listing----
+    const func1 = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
+    .then(response => {
+        data = response.data
+        let ordersArr = []
+        data.payload.orders.forEach(element => {
+            if ((element.user.status == "ingame") && (element.order_type == "sell") && (element.user.region == "en") && (element.visible == 1))
+            {
+                ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
+            }
+        })
+        ordersArr = ordersArr.sort(extras.dynamicSort("price"))
+        if (ordersArr.length == 0)
+        {
+            processMessage.edit("No orders active found for this item. No changes were made to your profile")
+            return
+        }
+        var price = ordersArr[0].price
+        if ((price + offset) > 0)
+            price = price + offset
+        //----Retrieve current orders for the item on their own profile----
+        const func2 = axios("https://api.warframe.market/v1/profile/" + ingame_name + "/orders", {headers:{Authorization: JWT}})
+        .then(response => {
+            data = response.data
+            for (var i=0; i<data.payload.sell_orders.length;i++)
+            {
+                //----Edit existing order----
+                if (data.payload.sell_orders[i].item.url_name==item_url)
+                {
+                    axios({
+                        method: 'PUT',
+                        url: "https://api.warframe.market/v1/profile/orders/" + data.payload.sell_orders[i].id,
+                        data: {
+                            item_id: item_id,
+                            platinum: price
+                        },
+                        headers: {
+                            Authorization: JWT
+                        }
+                    })
+                    .then(response => {
+                        console.log(JSON.stringify(response.data))
+                        const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                        const postdata = {
+                            content: "Successfully edited the following item:", 
+                            embeds: [{
+                                title: ingame_name,
+                                url: "https://warframe.market/profile/" + ingame_name,
+                                fields: [
+                                    {name: 'Item', value: item_name, inline: true},
+                                    {name: 'Price', value: price + "p", inline: true}
+                                ]
+                            }]
+                        }
+                        processMessage.edit(postdata)
+                    })
+                    .catch(function (error) {
+                        processMessage.edit("Error occured editing existing order. Possibly due to command spam. Please try again.\nError code 502")
+                        return
+                    });
+                    break
+                }
+            }
+            if (i == data.payload.sell_orders.length)   // No current order
+            {
+                //----Post new order---- 
+                axios({
+                    method: 'post',
+                    url: 'https://api.warframe.market/v1/profile/orders',
+                    data: {
+                        item_id: item_id,
+                        order_type: 'sell',
+                        platinum: price,
+                        quantity: 1,
+                        visible: true
+                    },
+                    headers: {
+                        Authorization: JWT
+                    }
+                })
+                .then(response => {
+                    console.log(JSON.stringify(response.data))
+                    const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                    const postdata = {
+                        content: "Successfully posted the following item:", 
+                        embeds: [{
+                            title: ingame_name,
+                            url: "https://warframe.market/profile/" + ingame_name,
+                            fields: [
+                                {name: 'Item', value: item_name, inline: true},
+                                {name: 'Price', value: price + "p", inline: true}
+                            ]
+                        }]
+                    }
+                    processMessage.edit(postdata)
+                })
+                .catch(function (error) {
+                    processMessage.edit("Error occured posting new order. Possibly duplicate order. Please try again.\nError code 503")
+                    return
+                });
+            }
+            })
+            .catch(function (error) {
+                processMessage.edit("Error occured retrieving profile orders. Please try again.\nError code 501")
+                return
+            });
+            return
+    })
+    .catch(function (error) {
+        processMessage.edit("Error occured retrieving item orders. Please try again.\nError code 500")
+        return
+    });
+    return
+}
+
 async function relist(message,args) {
     if (args.length == 0)
     {
@@ -1061,4 +1291,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {orders,relics,auctions,relist,help,uptime};
+module.exports = {orders,relics,auctions,list,relist,help,uptime};

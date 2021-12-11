@@ -1183,7 +1183,7 @@ client.on('messageCreate', async message => {
                     wfm_api.relist(message,args)
                     break
                 case 'list':
-                    list(message,args)
+                    wfm_api.list(message,args)
                     break
                 case 'updatedb':
                     updateDB(message,args)
