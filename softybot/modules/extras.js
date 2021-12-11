@@ -42,4 +42,42 @@ async function mod_log (str,color='RANDOM') {
     await client.channels.cache.get('892072612002418718').send({content: " ", embeds: [embed]}).catch(err => console.log(err+'\nError posting moderation update.'))
 }
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log};
+function msToFullTime(ms) {
+    console.log(ms)
+    var seconds = Math.floor(ms / 1000),
+    minutes = Math.floor(seconds / 60),
+    hours   = Math.floor(minutes / 60),
+    days    = Math.floor(hours / 24),
+    months  = Math.floor(days / 30),
+    years   = Math.floor(days / 365);
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+    days %= 30;
+    months %= 12;
+
+    var str = ''
+    if (years != 0)
+        if (years > 1)
+            str += years + ' years'
+        else
+            str += years + ' year'
+    if (months != 0)
+        if (months > 1)
+            str += ' ' + months + ' months'
+        else
+            str += ' ' + months + ' month'
+    if (days != 0)
+        if (days > 1)
+            str += ' ' + days + ' days'
+        else
+            str += ' ' + days + ' day'
+
+    if (str == '')
+        str = `${hours} hours ${minutes} minutes ${seconds} seconds`
+
+    return str;
+}
+
+
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToFullTime};

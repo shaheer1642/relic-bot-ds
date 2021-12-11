@@ -1137,16 +1137,16 @@ client.on('messageCreate', async message => {
             if (args2[1] && !args2[1].match(/\?/g) && (!args2[2] || args2[2]=='relic') && !args2[3])
                 switch(args2[0].toLowerCase()) {
                     case 'lith':
-                        relics(message,args2)
+                        wfm_api.relics(message,args2)
                         break
                     case 'meso':
-                        relics(message,args2)
+                        wfm_api.relics(message,args2)
                         break
                     case 'neo':
-                        relics(message,args2)
+                        wfm_api.relics(message,args2)
                         break
                     case 'axi':
-                        relics(message,args2)
+                        wfm_api.relics(message,args2)
                         break
                 }
 
@@ -1199,10 +1199,10 @@ client.on('messageCreate', async message => {
                     lich_tut(message,args)
                     break
                 case 'relic':
-                    relics(message,args)
+                    wfm_api.relics(message,args)
                     break
                 case 'relics':
-                    relics(message,args)
+                    wfm_api.relics(message,args)
                     break
                 case 'ducat_template':
                     ducat_template(message)
