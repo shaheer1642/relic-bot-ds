@@ -1238,7 +1238,7 @@ client.on('messageCreate', async message => {
                     gpt3_reset(message,args)
                     break
                 case 'graphic':
-                    canvasTest(message,args)
+                    test_modules.canvasTest(message,args)
                     break
                 ///*----------------------
                 case 'test':
