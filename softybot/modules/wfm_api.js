@@ -1,6 +1,7 @@
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
+const {client} = require('./discord_client.js');
 const db_modules = require('./db_modules.js');
 const {db} = require('./db_connection.js');
 
