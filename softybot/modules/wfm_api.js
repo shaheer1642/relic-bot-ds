@@ -979,9 +979,9 @@ async function relist(message,args) {
                                 title: ingame_name,
                                 url: "https://warframe.market/profile/" + ingame_name,
                                 fields: [
-                                    {name: 'Item', value: value_f1.join(), inline: true},
+                                    {name: 'Item', value: value_f1.join(''), inline: true},
                                     {name: '\u200b', value: '\u200b', inline: true},
-                                    {name: 'Price', value: value_f3.join(), inline: true}
+                                    {name: 'Price', value: value_f3.join(''), inline: true}
                                 ]
                             }]
                         }
@@ -998,9 +998,9 @@ async function relist(message,args) {
                             title: ingame_name,
                             url: "https://warframe.market/profile/" + ingame_name,
                             fields: [
-                                {name: 'Item', value: value_f1.join(), inline: true},
+                                {name: 'Item', value: value_f1.join(''), inline: true},
                                 {name: '\u200b', value: '\u200b', inline: true},
-                                {name: 'Price', value: value_f3.join(), inline: true}
+                                {name: 'Price', value: value_f3.join(''), inline: true}
                             ]
                         }]
                     }
@@ -1021,9 +1021,9 @@ async function relist(message,args) {
                         title: ingame_name,
                         url: "https://warframe.market/profile/" + ingame_name,
                         fields: [
-                            {name: 'Item', value: value_f1.join(), inline: true},
+                            {name: 'Item', value: value_f1.join(''), inline: true},
                             {name: '\u200b', value: '\u200b', inline: true},
-                            {name: 'Price', value: value_f3.join(), inline: true}
+                            {name: 'Price', value: value_f3.join(''), inline: true}
                         ]
                     }]
                 }
