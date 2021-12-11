@@ -298,4 +298,72 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     return Promise.resolve()
 }
 
-module.exports = {trading_bot_orders_update}
+async function leaderboard(message) {
+    var all_users = null
+    var status = await db.query(`SELECT * FROM users_list ORDER BY plat_gained DESC,plat_spent DESC,ingame_name`)
+    .then(res => {
+        if (res.rows.length == 0) {
+            message.channel.send('No users found in the DB currently')
+            return false
+        }
+        all_users = res.rows
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        message.channel.send('☠️ Error fetching users info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️')
+        return false
+    })
+    if (!status)
+        return
+    postdata = {}
+    postdata.content = " "
+    postdata.embeds = []
+    postdata.embeds.push({
+        title: 'All-time Leaderboard',
+        fields: [{
+            name: 'User',
+            value: '\u200b',
+            inline: true
+        },{
+            name: 'Plat gained <:profit:896079718955233301>',
+            value: '\u200b',
+            inline: true
+        },{
+            name: 'Plat spent <:loss:896079691755180103>',
+            value: '\u200b',
+            inline: true
+        }],
+        color: tb_invisColor,
+        timestamp: new Date()
+    })
+    var x = 0
+    for (var i=0;i<all_users.length;i++) {
+        if (postdata.embeds[0].fields[x].value.length > 950) {
+            x += 3
+            postdata.embeds[0].fields.push({
+                name: 'User',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Plat gained <:profit:896079718955233301>',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Plat spent <:loss:896079691755180103>',
+                value: '\u200b',
+                inline: true
+            })
+        }
+        postdata.embeds[0].fields[x].value += i+1 + '. ' + all_users[i].ingame_name + '\n'
+        postdata.embeds[0].fields[x+1].value += all_users[i].plat_gained + '\n'
+        postdata.embeds[0].fields[x+2].value += all_users[i].plat_spent + '\n'
+    }
+    message.channel.send(postdata).catch(err => {
+        console.log(err)
+        message.channel.send('Some error sending embed. Please contact MrSofty#7926')
+    })
+    return
+}
+
+module.exports = {trading_bot_orders_update,leaderboard}
