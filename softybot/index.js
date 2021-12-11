@@ -14,7 +14,7 @@ const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
 const db_modules = require('./modules/db_modules.js');
-const {client} = require('./modules/discord_client.js');
+const {client,tickcount} = require('./modules/discord_client.js');
 //const { resolve } = require('path');
 //const { time } = require('console');
 const readline = require('readline');
@@ -100,8 +100,6 @@ client.login(process.env.DISCORD_BOT_TOKEN).catch(err => console.log(err));
 
 module.exports = {client};
 */
-
-var tickcount = new Date().getTime();
 
 client.on('ready', () => {
     console.log('bot started')

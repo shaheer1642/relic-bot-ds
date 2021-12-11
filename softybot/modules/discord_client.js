@@ -6,4 +6,6 @@ const client = new Client({ intents: 14095, partials: ['REACTION', 'MESSAGE', 'C
 
 client.login(process.env.DISCORD_BOT_TOKEN).catch(err => console.log(err));
 
-module.exports = {client};
+const tickcount = new Date().getTime();
+
+module.exports = {client,tickcount};
