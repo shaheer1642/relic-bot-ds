@@ -35,7 +35,7 @@ const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
 async function check_user(message) {
-    db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
     .then(res => {
         if (res.rowCount==0) {
             message.channel.send(`⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`).catch(err => console.log(err))
