@@ -63,7 +63,6 @@ const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
 var DB_Updating = false
-const relist_cd = [];
 var DB_Update_Timer = null
 var Ducat_Update_Timer = null
 const u_order_close_time = 10800000
@@ -1181,7 +1180,7 @@ client.on('messageCreate', async message => {
                     wfm_api.auctions(message,args)
                     break
                 case 'relist':
-                    relist(message,args)
+                    wfm_api.relist(message,args)
                     break
                 case 'list':
                     list(message,args)

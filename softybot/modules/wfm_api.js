@@ -4,6 +4,7 @@ const extras = require('./extras.js');
 const db_modules = require('./db_modules.js');
 const {db} = require('./db_connection.js');
 
+const relist_cd = [];
 const defaultReactions = {
     check: {
         string: '<:check:905884742413582347>',
@@ -17,6 +18,55 @@ const defaultReactions = {
         string: '<:auto_update:906923980852715640>',
         identifier: 'auto_update:906923980852715640'
     }
+}
+
+function help(message,args) {
+    var postdata = {
+        content: " ",
+        embeds: [{
+            color: 5225082,
+            fields: [
+                    {name: ".uptime", value: "Reports current uptime\nUsage example:\n.uptime"},
+                    {name: ".orders <item_name>", value: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}, 
+                    {name: ".relics <prime_item> or <relic_name>", value: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}, 
+                    {name: ".auctions <kuva_weapon> <element>", value: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}, 
+                    {name: ".list <prime_item> <offset>", value: "List a prime item on warframe.market on your profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}, 
+                    {name: ".relist all <offset>", value: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"},
+                    {name: ".query <rarity> <ducat>", value: "Show relics that contain X rarity drops worth Y amount of ducats.\nUsage example:\n.query common 45"}
+                    
+            ]
+        }]
+    }
+    message.channel.send(postdata)
+    message.react(defaultReactions.check.string)
+    return
+}
+
+function uptime(message,args) {
+    //--------Set new timer--------
+    var currTime = new Date();
+    var currDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate(), // the current day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    var nextDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate() + 1, // the next day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    if ((currDay.getTime() - currTime.getTime())>0)
+        var msTill1AM = currDay.getTime() - currTime.getTime()
+    else    //its past 12am. do next day
+        var msTill1AM = nextDay.getTime() - currTime.getTime()
+    //-------------
+    message.channel.send({
+        content: `Current uptime: ${extras.msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${extras.msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${extras.msToTime(msTill1AM)}`
+    }).catch(err => console.log(err))
+    message.react(defaultReactions.check.string);
+    return
 }
 
 async function orders(message,args) {
@@ -768,52 +818,231 @@ async function auctions(message,args) {
     });
 }
 
-function help(message,args) {
-    var postdata = {
-        content: " ",
-        embeds: [{
-            color: 5225082,
-            fields: [
-                    {name: ".uptime", value: "Reports current uptime\nUsage example:\n.uptime"},
-                    {name: ".orders <item_name>", value: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}, 
-                    {name: ".relics <prime_item> or <relic_name>", value: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}, 
-                    {name: ".auctions <kuva_weapon> <element>", value: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}, 
-                    {name: ".list <prime_item> <offset>", value: "List a prime item on warframe.market on your profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}, 
-                    {name: ".relist all <offset>", value: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"},
-                    {name: ".query <rarity> <ducat>", value: "Show relics that contain X rarity drops worth Y amount of ducats.\nUsage example:\n.query common 45"}
-                    
-            ]
-        }]
+async function relist(message,args) {
+    if (args.length == 0)
+    {
+        message.channel.send({content: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
+        message.react(defaultReactions.check.string)
+        return
     }
-    message.channel.send(postdata)
-    message.react(defaultReactions.check.string)
-    return
-}
-
-function uptime(message,args) {
-    //--------Set new timer--------
-    var currTime = new Date();
-    var currDay = new Date(
-        currTime.getFullYear(),
-        currTime.getMonth(),
-        currTime.getDate(), // the current day, ...
-        0, 15, 0 // ...at 00:15:00 hours
-    );
-    var nextDay = new Date(
-        currTime.getFullYear(),
-        currTime.getMonth(),
-        currTime.getDate() + 1, // the next day, ...
-        0, 15, 0 // ...at 00:15:00 hours
-    );
-    if ((currDay.getTime() - currTime.getTime())>0)
-        var msTill1AM = currDay.getTime() - currTime.getTime()
-    else    //its past 12am. do next day
-        var msTill1AM = nextDay.getTime() - currTime.getTime()
-    //-------------
-    message.channel.send({
-        content: `Current uptime: ${extras.msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${extras.msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${extras.msToTime(msTill1AM)}`
-    }).catch(err => console.log(err))
-    message.react(defaultReactions.check.string);
+    if (args[0] != "all")
+    {
+        message.channel.send({content: "Incorrect command. Usage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
+        return
+    }
+    var offset = 0
+    if (args[args.length-1].match(/\d+$/))
+    {
+        if (!(args[args.length-1].match(/-?\d+/g).map(Number)))
+        {
+            message.channel.send({content: "Invalid offset. Usage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
+            return
+        }
+        offset = Number(args.pop())
+    }
+    //var filecontent = fs.readFileSync('./jwt_stack.json', 'utf8').replace(/^\uFEFF/, '')
+    //let jwt_stack = JSON.parse(filecontent)
+    var JWT = ""
+    var ingame_name = ""
+    var status = await db.query(`SELECT * FROM discord_users WHERE discord_id=${message.author.id}`).then(async res => {
+        if (res.rows.length == 0) {
+            message.channel.send({content: "Unauthorized. Please check your DMs"}).catch(err => console.log(err));
+            try {
+                message.author.send({content: "Please authorize your account with the following command. Your email and password is not saved, only a token is stored for future requests\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err));
+            } catch (err) {
+                message.channel.send({content: "🛑 Error occured sending DM. Make sure you have DMs turned on for the bot 🛑"}).catch(err => console.log(err));
+            }
+            return 0
+        }
+        else {
+            JWT = res.rows[0].jwt
+            ingame_name = res.rows[0].ingame_name
+            return 1
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        message.channel.send('Error occured retrieving database info. Please try again.')
+        return 0
+    })
+    if (!status)
+        return
+    for (var i=0;i<relist_cd.length;i++) {
+        if (relist_cd[i].discord_id == message.author.id)
+            {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
+    }
+    relist_cd.push({discord_id: message.author.id, timestamp: Date.now()});
+    setTimeout(() => {
+        console.log('executed timout relist_cd')
+        var i = 0
+        var MaxIndex = relist_cd.length
+        for (var i=0; i <= MaxIndex-1; i++) {
+            if (relist_cd[i].discord_id==message.author.id) {
+                relist_cd.splice(i, 1)
+                i--
+            }
+            MaxIndex = relist_cd.length
+        }
+    }, 900000);
+    let processMessage = [];
+    const process = await message.channel.send("Processing, this might take a minute").then(response => {
+        processMessage = response
+    }).catch(err => console.log(err));
+    //----Retrieve current orders for the item on their own profile----
+    const func1 = axios("https://api.warframe.market/v1/profile/" + ingame_name + "/orders", {headers:{Authorization: JWT}})
+    .then(async response1 => {
+        const data1 = response1.data
+        //----Parse profile orders----
+        //let embed = []
+        var value_f1 = []
+        var value_f3 = []
+        let itemsArr = []
+        for (var i=0;i<data1.payload.sell_orders.length;i++) {
+            const item_url = data1.payload.sell_orders[i].item.url_name
+            const item_id = data1.payload.sell_orders[i].item.item_id
+            const order_id = data1.payload.sell_orders[i].id
+            var visible = data1.payload.sell_orders[i].visible
+            if (item_url.match("prime") && !item_url.match("primed")) {
+                itemsArr.push({item_url: item_url,item_id: item_id,order_id: order_id,visibility: visible})
+            }
+        }
+        itemsArr.forEach(element1 => {
+            const item_url = element1.item_url
+            const item_id = element1.item_id
+            const order_id = element1.order_id
+            var visible = ''
+            if (!element1.visibility)
+                visible = '(invisible)'
+            //----Retrieve top listing----
+            const func2 = axios("https://api.warframe.market/v1/items/" + item_url + "/orders")
+            .then(response2 => {
+                const data2 = response2.data
+                let ordersArr = []
+                data2.payload.orders.forEach(element2 => {
+                    if ((element2.user.status == "ingame") && (element2.order_type == "sell") && (element2.user.region == "en") && (element2.visible == 1))
+                        ordersArr.push({seller: element2.user.ingame_name,quantity: element2.quantity,price: element2.platinum})
+                })
+                ordersArr = ordersArr.sort(extras.dynamicSort("price"))
+                if (ordersArr.length == 0) {
+                    value_f1.push('No sellers found for ' + item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '\n')
+                    value_f3.push('\u200b\n')
+                    console.log(value_f1.length + ' of ' + itemsArr.length)
+                    //if (value_f1.length == itemsArr.length) {
+                        const postdata = {
+                            content: "Successfully edited the following items:", 
+                            embeds: [{
+                                title: ingame_name,
+                                url: "https://warframe.market/profile/" + ingame_name,
+                                fields: [
+                                    {name: 'Item', value: value_f1.toString().replace(/,/g, " "), inline: true},
+                                    {name: '\u200b', value: '\u200b', inline: true},
+                                    {name: 'Price', value: value_f3.toString().replace(/,/g, " "), inline: true}
+                                ]
+                            }]
+                        }
+                        processMessage.edit(postdata)
+                    //}
+                    return
+                }
+                var sumArr = []
+                for (var i=0; i<ordersArr.length;i++)
+                {
+                    if (i==5)
+                        break
+                    sumArr.push(ordersArr[i].price)
+                }
+                var price = Math.round(sumArr.reduce((a, b) => a + b, 0) / sumArr.length)
+                if ((price + offset) > 0)
+                    price = price + offset
+                price = Math.ceil(price / 10) * 10;
+                console.log(item_url + "   " + price + "p   [" + sumArr.toString() + "]")
+                //----Edit order----
+                axios({
+                    method: 'PUT',
+                    url: "https://api.warframe.market/v1/profile/orders/" + order_id,
+                    data: {
+                        item_id: item_id,
+                        platinum: price
+                    },
+                    headers: {
+                        Authorization: JWT
+                    }
+                })
+                .then(response3 => {
+                    value_f1.push(item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' ' + visible + '\n')
+                    value_f3.push(price + 'p\n')
+                    console.log(value_f1.length + ' of ' + itemsArr.length)
+                    //if (value_f1.length == itemsArr.length) {
+                        const postdata = {
+                            content: "Successfully edited the following items:", 
+                            embeds: [{
+                                title: ingame_name,
+                                url: "https://warframe.market/profile/" + ingame_name,
+                                fields: [
+                                    {name: 'Item', value: value_f1.join('\n'), inline: true},
+                                    {name: '\u200b', value: '\u200b', inline: true},
+                                    {name: 'Price', value: value_f3.join('\n'), inline: true}
+                                ]
+                            }]
+                        }
+                        processMessage.edit(postdata)
+                    //}
+                })
+                .catch(function (error) {
+                    value_f1.push('Error occured editing price for ' + item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '\n')
+                    value_f3.push('\n')
+                    console.log(value_f1.length + ' of ' + itemsArr.length + '(error)')
+                    const postdata = {
+                        content: "Successfully edited the following items:", 
+                        embeds: [{
+                            title: ingame_name,
+                            url: "https://warframe.market/profile/" + ingame_name,
+                            fields: [
+                                {name: 'Item', value: value_f1.join('\n'), inline: true},
+                                {name: '\u200b', value: '\u200b', inline: true},
+                                {name: 'Price', value: value_f3.join('\n'), inline: true}
+                            ]
+                        }]
+                    }
+                    processMessage.edit(postdata)
+                    if (error.response)
+                        console.log(JSON.stringify(error.response.data))
+                    else 
+                        console.log(error)
+                });
+            })
+            .catch(function (error) {
+                value_f1.push('Error occured retrieving price for ' + item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '\n')
+                value_f3.push('\n')
+                console.log(value_f1.length + ' of ' + itemsArr.length + '(error)')
+                const postdata = {
+                    content: "Successfully edited the following items:", 
+                    embeds: [{
+                        title: ingame_name,
+                        url: "https://warframe.market/profile/" + ingame_name,
+                        fields: [
+                            {name: 'Item', value: value_f1.join('\n'), inline: true},
+                            {name: '\u200b', value: '\u200b', inline: true},
+                            {name: 'Price', value: value_f3.join('\n'), inline: true}
+                        ]
+                    }]
+                }
+                processMessage.edit(postdata)
+                if (error.response)
+                    console.log(JSON.stringify(error.response.data))
+                else 
+                    console.log(error)
+            });
+        })
+    })
+    .catch(function (error) {
+        processMessage.edit("Error occured retrieving profile orders. Please try again.\nError code 500")
+        if (error.response)
+            console.log(JSON.stringify(error.response.data))
+        else
+            console.log(error)
+        return
+    });
     return
 }
 
@@ -832,4 +1061,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {orders,relics,auctions,help,uptime};
+module.exports = {orders,relics,auctions,relist,help,uptime};
