@@ -1,6 +1,7 @@
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
+const trade_bot_modules = require('./trade_bot_modules.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 const {client,tickcount} = require('./discord_client.js');
 const fs = require('fs')
@@ -320,7 +321,7 @@ async function updateDatabasePrices(up_origin) {
                     if (!status)
                         continue
                     if (all_orders[i].visibility)
-                        trading_bot_orders_update(null,item_data.id,item_data.item_url,item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,all_orders[i].user_rank).catch(err => console.log(err))
+                        trade_bot_modules.trading_bot_orders_update(null,item_data.id,item_data.item_url,item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,all_orders[i].user_rank).catch(err => console.log(err))
                     var user_data = null
                     var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${all_orders[i].discord_id}`)
                     .then(res => {

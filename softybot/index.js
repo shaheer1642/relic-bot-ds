@@ -63,9 +63,9 @@ const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
-var DB_Updating = false
+//var DB_Updating = false
 //var DB_Update_Timer = null
-//var Ducat_Update_Timer = null
+var Ducat_Update_Timer = null
 const u_order_close_time = 10800000
 
 /*
@@ -148,7 +148,7 @@ client.on('ready', () => {
 
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
-    backupItemsList()
+    db_modules.backupItemsList()
 
     //----Re-define orders timers if any-----
     db.query(`SELECT * FROM auto_update_items`)
