@@ -1166,7 +1166,7 @@ client.on('messageCreate', async message => {
                     uptime(message,args)
                     break
                 case 'help':
-                    help(message,args)
+                    wfm_api.help(message,args)
                     break
                 case 'orders':
                     wfm_api.orders(message,args)
