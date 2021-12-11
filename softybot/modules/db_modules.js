@@ -4,6 +4,8 @@ const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 const {client,tickcount} = require('./discord_client.js');
 const fs = require('fs')
+const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
+const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
 
 var DB_Updating = false
 var DB_Update_Timer = null
@@ -450,8 +452,6 @@ async function updateDatabaseItem(db_items_list,item,index) {
         var vault_status = ''
         if (item.tags.includes("relic") && !item.tags.includes("requiem")) {
             console.log('Retrieving wiki info for relic...')
-            const vaultExclusiveRelics = fs.readFileSync("./vaultExclusiveRelics.json", 'utf8').replace(/^\uFEFF/, '')
-            const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
             //${item.item_url.replace('_relic','')}`)
             var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
             .then(async (wikiInfo) => {
@@ -535,7 +535,6 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     components_list.push({id: e.id,item_url: e.item_url})
             })
             console.log('Retrieving wiki info for set...')
-            const vaultExpectedRelics = fs.readFileSync("./vaultExpectedRelics.json", 'utf8').replace(/^\uFEFF/, '')
             var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
             .then(async (wikiInfo) => {
                 if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
