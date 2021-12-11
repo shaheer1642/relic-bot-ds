@@ -281,6 +281,7 @@ async function updateDatabasePrices(up_origin) {
             up_origin.channel.send(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
         DB_Updating = false
         //----verify user orders prices----
+        console.log('verifying user orders')
         var all_orders = null
         var status = await db.query(`SELECT * FROM users_orders`)
         .then(res => {
@@ -365,6 +366,7 @@ async function updateDatabasePrices(up_origin) {
                 }
             }
         }
+        console.log('verified orders.')
         return
     }
 }
