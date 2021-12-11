@@ -1028,7 +1028,8 @@ client.on('messageCreate', async message => {
                 trade_bot_modules.check_user(message)
                 .then(res => {
                     console.log(res)
-                    trading_bot_user_orders(message,args,res.ingame_name,1).catch(err => console.log(err))
+                    console.log('user orders function')
+                    //trading_bot_user_orders(message,args,res.ingame_name,1).catch(err => console.log(err))
                 })
                 .catch(err => console.log(err))
             }
