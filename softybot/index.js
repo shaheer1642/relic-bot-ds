@@ -13,6 +13,7 @@ const wfm_api = require('./modules/wfm_api.js');
 const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
+const db_modules = require('./modules/db_modules.js');
 const {client} = require('./modules/discord_client.js');
 //const { resolve } = require('path');
 //const { time } = require('console');
@@ -63,8 +64,8 @@ const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
 var DB_Updating = false
-var DB_Update_Timer = null
-var Ducat_Update_Timer = null
+//var DB_Update_Timer = null
+//var Ducat_Update_Timer = null
 const u_order_close_time = 10800000
 
 /*
@@ -133,7 +134,7 @@ client.on('ready', () => {
     else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     //-------------
-    DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    db_modules.DB_Update_Timer = setTimeout(db_modules.updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
     inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
 
@@ -1186,10 +1187,10 @@ client.on('messageCreate', async message => {
                     wfm_api.list(message,args)
                     break
                 case 'updatedb':
-                    updateDB(message,args)
+                    db_modules.updateDB(message,args)
                     break
                 case 'getdb':
-                    getDB(message,args)
+                    db_modules.getDB(message,args)
                     break
                 case 'trade_tut':
                     trade_tut(message,args)
@@ -4316,7 +4317,7 @@ async function orders(message,args) {
     {
         if ((new Date().getTime() - arrItems[i].update_timestamp) > 86400000) {
             console.log(`updating item in db`)
-            await updateDatabaseItem(items_list,arrItems[i])
+            await db_modules.updateDatabaseItem(items_list,arrItems[i])
             .then(items_list => {
                 for (var j=0; j<items_list.length; j++) {
                     element = items_list[j]
@@ -5720,10 +5721,10 @@ async function updateDB(message,args) {
             message.channel.send(`An update is already in progress.`)
             return
         }
-        clearTimeout(DB_Update_Timer)
+        clearTimeout(db_modules.DB_Update_Timer)
         inform_dc('(Forced) DB update launching in 10 seconds...')
         message.channel.send(`(Forced) DB update launching in 10 seconds...`)
-        DB_Update_Timer = setTimeout(updateDatabaseItems, 10000, message);
+        db_modules.DB_Update_Timer = setTimeout(db_modules.updateDatabaseItems, 10000, message);
     }
     else {
         message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`)
@@ -6756,7 +6757,7 @@ function trades_update() {
     })
     setTimeout(trades_update, 600000);
 }
-
+/*
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
     console.log(up_origin)
@@ -6979,7 +6980,7 @@ async function updateDatabasePrices(up_origin) {
     else    //its past 12am. do next day
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     console.log(`Next DB update launching in: ${msToTime(msTill1AM)}`)
-    DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    db_modules.DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices')
@@ -7400,6 +7401,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
         return Promise.reject()
     return Promise.resolve(db_items_list)
 }
+*/
 
 async function dc_update_msgs() {
     //----post prime parts/mods/relic prices----
@@ -7818,7 +7820,7 @@ async function trading_bot(message,args,command) {
         if (element.item_url.match('^' + d_item_url + '\W*')) {
             if ((new Date().getTime() - items_list[i].update_timestamp) > 86400000) {
                 console.log(`updating item ${items_list[i].item_url} in db`)
-                var status = await updateDatabaseItem(items_list,items_list[i])
+                var status = await db_modules.updateDatabaseItem(items_list,items_list[i])
                 .then(items_list => {
                     for (var j=0; j<items_list.length; j++) {
                         if (items_list[j].id == items_list[i].id) {

@@ -3,6 +3,8 @@ const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const extras = require('./extras.js');
+var DB_Updating = false
+var DB_Update_Timer = null
 
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
@@ -650,4 +652,128 @@ async function updateDatabaseItem(db_items_list,item,index) {
     return Promise.resolve(db_items_list)
 }
 
-module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem};
+async function updateDB(message,args) {
+    if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
+        if (DB_Updating) {
+            message.channel.send(`An update is already in progress.`)
+            return
+        }
+        clearTimeout(DB_Update_Timer)
+        inform_dc('(Forced) DB update launching in 10 seconds...')
+        message.channel.send(`(Forced) DB update launching in 10 seconds...`)
+        DB_Update_Timer = setTimeout(updateDatabaseItems, 10000, message);
+    }
+    else {
+        message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`)
+        return
+    }
+}
+
+async function getDB(message,args) {
+    if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
+        var items_list = []
+        var users_list = []
+        var users_orders = []
+        var filled_users_orders = []
+        var status = await db.query(`SELECT * FROM items_list`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            items_list = res.rows
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            message.channel.send(`Some error occured compiling 'items_list'. Please contact MrSofty#7926`).catch(err => console.log(err))
+            return
+        }
+        var status = await db.query(`SELECT * FROM users_list`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            users_list = res.rows
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            message.channel.send(`Some error occured compiling 'users_list'. Please contact MrSofty#7926`).catch(err => console.log(err))
+            return
+        }
+        var status = await db.query(`
+        SELECT * FROM users_orders 
+        JOIN items_list ON users_orders.item_id=items_list.id 
+        JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+        ORDER BY users_orders.visibility DESC
+        `)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            users_orders = res.rows
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            message.channel.send(`Some error occured compiling 'users_orders'. Please contact MrSofty#7926`)
+            return
+        }
+        var status = await db.query(`SELECT * FROM filled_users_orders`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            filled_users_orders = res.rows
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            message.channel.send(`Some error occured compiling 'filled_users_orders'. Please contact MrSofty#7926`)
+            return
+        }
+        var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
+        var buffer_users_list = Buffer.from(JSON.stringify(users_list), 'utf8');
+        var buffer_users_orders = Buffer.from(JSON.stringify(users_orders), 'utf8');
+        var buffer_filled_users_orders = Buffer.from(JSON.stringify(filled_users_orders), 'utf8');
+        message.channel.send({
+            content: " ", 
+            files: [
+                {
+                    attachment: buffer_items_list,
+                    name: 'items_list.json'
+                },
+                {
+                    attachment: buffer_users_list,
+                    name: 'users_list.json'
+                },
+                {
+                    attachment: buffer_users_orders,
+                    name: 'users_orders.json'
+                },
+                {
+                    attachment: buffer_filled_users_orders,
+                    name: 'filled_users_orders.json'
+                },
+            ]
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
+        })
+    }
+    else {
+        message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`).catch(err => console.log(err))
+        return
+    }
+}
+
+module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem,updateDB,getDB,DB_Update_Timer};
