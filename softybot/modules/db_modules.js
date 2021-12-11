@@ -220,7 +220,7 @@ async function updateDatabasePrices(up_origin) {
     var main = await db.query(`SELECT * FROM items_list`)
     .then(async res => {
         db_items_list = res.rows
-        for (var i=0;i<db_items_list.length;i++) {
+        for (var i=0;i>db_items_list.length;i++) {
             const item = db_items_list[i]
             if (item.tags.includes("prime") || item.tags.includes("relic") || (item.tags.includes("mod") && item.tags.includes("legendary"))) {
                 var status = await updateDatabaseItem(db_items_list,item,i)
@@ -805,6 +805,39 @@ async function getDB(message,args) {
     }
 }
 
+async function backupItemsList() {
+    // post items_list on dc
+    var items_list = []
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        items_list = res.rows
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
+    const message = await wh_dbManager.fetchMessage('904790735499448350').catch(err => console.log(err))
+    wh_dbManager.deleteMessage(message.content).catch(err => console.log(err))
+    wh_dbManager.send({
+        content: " ",
+        files: [
+            {
+                attachment: buffer_items_list,
+                name: 'items_list.json'
+            }
+        ]
+    })
+    .then(res => {
+        wh_dbManager.editMessage('904790735499448350', {
+            content: res.id
+        }).catch(err => console.log(err))
+    }).catch(err => console.log(err))
+}
+
 async function dc_update_msgs() {
     //----post prime parts/mods/relic prices----
     db.query(`SELECT * FROM items_list ORDER BY sell_price DESC,item_url`)
@@ -1065,4 +1098,4 @@ async function dc_update_msgs() {
     })
 }
 
-module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem,updateDB,getDB,DB_Update_Timer};
+module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem,backupItemsList,updateDB,getDB,DB_Update_Timer};
