@@ -38,7 +38,7 @@ async function check_user(message) {
     return new Promise((resolve, reject) => {
         db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
         .then(res => {
-            if (res.rowCount!=0) {
+            if (res.rowCount==0) {
                 message.channel.send(`⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`).catch(err => console.log(err))
                 message.author.send({content: "Type the following command to register your ign:\nverify ign"})
                 .catch(err => {
