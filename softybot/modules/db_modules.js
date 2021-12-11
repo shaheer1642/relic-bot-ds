@@ -2,14 +2,16 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
-const extras = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
+const {client} = require('./discord_client.js');
+
 var DB_Updating = false
 var DB_Update_Timer = null
 
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
     console.log(up_origin)
-    extras.inform_dc('Updating DB...')
+    inform_dc('Updating DB...')
     if (up_origin)
         up_origin.channel.send('Updating DB...')
     console.log('Retrieving WFM items list...')
@@ -110,7 +112,7 @@ async function updateDatabaseItems(up_origin) {
     })
     if (!func1) {
         console.log('Error occurred updating DB items' + func1)
-        extras.inform_dc('DB update failure.')
+        inform_dc('DB update failure.')
         if (up_origin)
             up_origin.channel.send('<@253525146923433984> DB update failure.')
         DB_Updating = false
@@ -169,7 +171,7 @@ async function updateDatabaseItems(up_origin) {
     })
     if (!status) {
         console.log('Error occurred updating DB items')
-        extras.inform_dc('DB update failure.')
+        inform_dc('DB update failure.')
         if (up_origin)
             up_origin.channel.send('<@253525146923433984> DB update failure.')
         DB_Updating = false
@@ -232,7 +234,7 @@ async function updateDatabasePrices(up_origin) {
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices')
-        extras.inform_dc(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
+        inform_dc(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
         if (up_origin)
             up_origin.channel.send(`Error updating DB.\nNext update in: ${msToTime(msTill1AM)}`)
         DB_Updating = false
@@ -242,7 +244,7 @@ async function updateDatabasePrices(up_origin) {
         dc_update_msgs()
         backupItemsList()
         console.log(`Updated all prices in the DB.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}`)
-        extras.inform_dc(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
+        inform_dc(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
         if (up_origin)
             up_origin.channel.send(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
         DB_Updating = false
@@ -774,6 +776,266 @@ async function getDB(message,args) {
         message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`).catch(err => console.log(err))
         return
     }
+}
+
+async function dc_update_msgs() {
+    //----post prime parts/mods/relic prices----
+    db.query(`SELECT * FROM items_list ORDER BY sell_price DESC,item_url`)
+    .then(async res => {
+        var all_items = res.rows
+        var parts_list = []
+        var sets_list = []
+        var relics_list = []
+        var p_mods_list = []
+        all_items.forEach(element => {
+            if (element.tags.includes('prime') && (element.tags.includes('blueprint') || element.tags.includes('component')))
+                parts_list.push(element)
+            if (element.tags.includes('prime') && element.tags.includes('set'))
+                sets_list.push(element)
+            if (element.tags.includes('relic'))
+                relics_list.push(element)
+            if (element.tags.includes('legendary') && element.tags.includes('mod') )
+                p_mods_list.push(element)
+        })
+        //----prime parts----
+        var postdata = []
+        postdata.push({content: '```\nBelow is the full price list of all prime items in the game. Their prices are calculated from WFM based on the sell orders in past 24 hours. The list will be edited on daily basis. For any concerns, contact MrSofty#7926\nAdditionally, items have symbols next to them for more info. These are described below:\n(V) Vaulted Item\n(B) Baro ki\'teer Exclusive Relic\n(P) Prime unvault Item\n(E) Next vault expected Item\n(R) Railjack obtainable Item\n----------\nLast check: ' + new Date() + '```'})
+        var content = '`'
+        for (var i=0; i<parts_list.length; i++) {
+            var element = parts_list[i]
+            var relics = ''
+            if (element.relics) {
+                element.relics.forEach(relic => {
+                    relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '/'
+                })
+                relics = relics.substring(0, relics.length - 1);
+            }
+            else 
+                console.log(element.item_url + ' is missing relics')
+            var vault_status = ''
+            if (element.vault_status) {
+                if (element.vault_status != 'null')
+                    vault_status = ' (' + element.vault_status + ')'
+                else
+                    vault_status = ''
+            }
+            else
+                vault_status = ''
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status
+            while(str.length < 45)
+                str += ' '
+            str += element.sell_price + 'p'
+            while(str.length < 60)
+                str += ' '
+            str += 'Ducats: ' + element.ducat 
+            while(str.length < 80)
+                str += ' '
+            str += 'Relics: ' + relics
+            if (((content + str).length > 1800) || (i == parts_list.length-1)) {
+                if (i == parts_list.length-1)
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str + '\n'
+        }
+        //----prime sets----
+        postdata.push({content: '```\nSets prices are listed below. If no sell orders in past 90 days, it will be marked null.```'})
+        var content = '`'
+        for (var i=0; i<sets_list.length; i++) {
+            var element = sets_list[i]
+            var vault_status = ''
+            if (element.vault_status) {
+                if (element.vault_status != 'null')
+                    vault_status = ' (' + element.vault_status + ')'
+                else
+                    vault_status = ''
+            }
+            else
+                vault_status = ''
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status
+            while(str.length < 45)
+                str += ' '
+            str += + element.sell_price + 'p'     
+            while(str.length < 60)
+                str += ' '
+            str += 'Ducats: ' + element.ducat
+            if (((content + str).length > 1800) || (i == sets_list.length-1)) {
+                if (i == sets_list.length-1)
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str + '\n'
+        }
+        //----relics----
+        postdata.push({content: '```\nRelic prices are listed below. These prices might not be accurate due to low relic sales and fluctuate from time to time. If no sell orders in past 90 days, it will be marked null.```'})
+        var content = '`'
+        for (var i=0; i<relics_list.length; i++) {
+            var element = relics_list[i]
+            var vault_status = ''
+            if (element.vault_status) {
+                if (element.vault_status != 'null')
+                    vault_status = ' (' + element.vault_status + ')'
+                else
+                    vault_status = ''
+            }
+            else
+                vault_status = ''
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + vault_status
+            while(str.length < 30)
+                str += ' '
+            str += element.sell_price + 'p'
+            if (((content + str).length > 1800) || (i == relics_list.length-1)) {
+                if (i == relics_list.length-1)
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str + '\n'
+        }
+        //----primed mods----
+        postdata.push({content: '```\nPrimed Mods are listed below. If no sell orders in past 90 days, it will be marked null.```\n`Mod                                   Unranked      Max Ranked`'})
+        var content = '`'
+        for (var i=0; i<p_mods_list.length; i++) {
+            var element = p_mods_list[i]
+            var str = element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+            while(str.length < 40)
+                str += ' '
+            str += element.sell_price + 'p'
+            while(str.length < 55)
+                str += ' '
+            str += element.maxed_sell_price + 'p'
+            if (((content + str).length > 1800) || (i == p_mods_list.length-1)) {
+                if (i == p_mods_list.length-1)
+                    content += str + '\n'
+                content = content.substring(0, content.length - 1);
+                postdata.push({content: content + '`'})
+                content = '`'
+            }
+            content += str + '\n'
+        }
+        var msg_id_counter = 0
+        console.log('Editing discord msgs for wfm_prices channels')
+        for (var i=0; i<postdata.length; i++) {
+            await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id = ${msg_id_counter} AND type = 'wfm_update_msgs'`)
+            .then(async res => {
+                if (res.rows.length == 0) {
+                    await client.channels.cache.get('899752775146172428').send(postdata[i].content).catch(err => console.log(err))
+                    .then(async res => {
+                        await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'wfm_update_msgs')`)
+                        .catch(err => {
+                            console.log(err)
+                            res.delete().catch(err => console.log(err))
+                        })
+                    })
+                    await client.channels.cache.get('899760938318700634').send(postdata[i].content).catch(err => console.log(err))
+                    .then(async res => {
+                        await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (${msg_id_counter},${res.guild.id},${res.channel.id},${res.id},'wfm_update_msgs')`)
+                        .catch(err => {
+                            console.log(err)
+                            res.delete().catch(err => console.log(err))
+                        })
+                    })
+                }
+                else {
+                    for (var j=0;j<res.rows.length;j++) {
+                        var element = res.rows[j]
+                        var channel = client.channels.cache.get(element.channel_id)
+                        if (!channel.messages.cache.get(element.message_id))
+                            await channel.messages.fetch()
+                        await channel.messages.cache.get(element.message_id).edit(postdata[i].content).catch(err => console.log(err))
+                    }
+                }
+            })
+            .catch(err => console.log(err))
+            msg_id_counter++
+        }
+        //----edit remaining ids----
+        await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'wfm_update_msgs'`)
+        .then(res => {
+            res.rows.forEach(async element => {
+                var channel = client.channels.cache.get(element.channel_id)
+                if (!channel.messages.cache.get(element.message_id))
+                    await channel.messages.fetch()
+                channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
+            })
+        })
+        .catch(err => console.log(err))
+        console.log(msg_id_counter)
+        console.log('Finished')
+    })
+    .catch(err => {
+        console.log(err)
+        console.log('Error retreiving items_list')
+    })
+    //----post ducats parts main msg----
+    db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC,item_url`)
+    .then(res => {
+        var all_items = res.rows
+        var postdata = {}
+        postdata.content = " "
+        postdata.embeds = []
+        postdata.embeds.push({fields: [],timestamp: new Date()})
+        var field_id = 0
+        postdata.embeds[0].fields.push({name: 'Prime Part',value: '',inline: true},{name: 'Price',value: '',inline: true},{name: 'Ducats',value: '',inline: true})
+        for (var i=0; i<all_items.length; i++) {
+            var element = all_items[i]
+            if (element.tags.includes('prime') && !element.tags.includes('set')) {
+                var item_name = '[' + element.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '](' + "https://warframe.market/items/" + element.item_url + ')'
+                if ((postdata.embeds[0].fields[field_id].value + item_name).length > 1000) {
+                    field_id += 3
+                    postdata.embeds[0].fields.push({name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true},{name: '\u200b',value: '',inline: true})
+                }
+                postdata.embeds[0].fields[field_id].value += item_name + '\n'
+                postdata.embeds[0].fields[field_id+1].value += Math.round(element.sell_price) + '\n'
+                postdata.embeds[0].fields[field_id+2].value += element.ducat + '\n'
+            }
+        }
+        db.query(`SELECT * FROM bot_updates_msg_ids WHERE type = 'ducat_main_msg'`)
+        .then(async res => {
+            if (res.rows.length == 0) {
+                client.channels.cache.get('899290597259640853').send(postdata)
+                .then(async res => {
+                    await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_main_msg')`)
+                    .catch(err => {
+                        console.log(err)
+                        res.delete()
+                    })
+                })
+                .catch(err => console.log(err))
+                client.channels.cache.get('899291255064920144').send(postdata)
+                .then(async res => {
+                    await db.query(`INSERT INTO bot_updates_msg_ids (id,guild_id,channel_id,message_id,type) VALUES (0,${res.guild.id},${res.channel.id},${res.id},'ducat_main_msg')`)
+                    .catch(err => {
+                        console.log(err)
+                        res.delete()
+                    })
+                })
+                .catch(err => console.log(err))
+            }
+            else {
+                for (var j=0;j<res.rows.length;j++) {
+                    element = res.rows[j]
+                    var channel = client.channels.cache.get(element.channel_id)
+                    if (!channel.messages.cache.get(element.message_id))
+                        await channel.messages.fetch()
+                    await channel.messages.cache.get(element.message_id).edit(postdata).catch(err => console.log(err))
+                }
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            console.log('Error retreiving db msg_id for ducats parts main')
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        console.log('Error retreiving ducats parts main')
+    })
 }
 
 module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem,updateDB,getDB,DB_Update_Timer};

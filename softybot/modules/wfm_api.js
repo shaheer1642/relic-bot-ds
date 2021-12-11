@@ -1,6 +1,6 @@
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
-const extras = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 const db_modules = require('./db_modules.js');
 const {db} = require('./db_connection.js');
 
@@ -63,7 +63,7 @@ function uptime(message,args) {
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     //-------------
     message.channel.send({
-        content: `Current uptime: ${extras.msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${extras.msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${extras.msToTime(msTill1AM)}`
+        content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${msToTime(msTill1AM)}`
     }).catch(err => console.log(err))
     message.react(defaultReactions.check.string);
     return
@@ -185,10 +185,10 @@ async function orders(message,args) {
                 }
             })
             console.log(JSON.stringify(ordersArr))
-            ordersArr = ordersArr.sort(extras.dynamicSortDesc("quantity"))
-            ordersArr = ordersArr.sort(extras.dynamicSort("price"))
+            ordersArr = ordersArr.sort(dynamicSortDesc("quantity"))
+            ordersArr = ordersArr.sort(dynamicSort("price"))
             if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank"))
-                ordersArr = ordersArr.sort(extras.dynamicSort("mod_rank"))
+                ordersArr = ordersArr.sort(dynamicSort("mod_rank"))
             var sellers = ""
             var quantities = ""
             var prices = ""
@@ -229,7 +229,7 @@ async function orders(message,args) {
                 timestamp: new Date()
             })
             if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
-                ordersArr = ordersArr.sort(extras.dynamicSortDesc("mod_rank"))
+                ordersArr = ordersArr.sort(dynamicSortDesc("mod_rank"))
                 var sellers = ""
                 var quantities = ""
                 var prices = ""
@@ -263,7 +263,7 @@ async function orders(message,args) {
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 console.log(embeds)
-                embeds = embeds.sort(extras.dynamicSort("title"))
+                embeds = embeds.sort(dynamicSort("title"))
                 processMessage.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`, embeds: embeds}).catch(err => console.log(err))
                 processMessage.react(defaultReactions.update.string).catch(err => console.log(err))
                 processMessage.react(defaultReactions.auto_update.string).catch(err => console.log(err))
@@ -395,11 +395,11 @@ async function relics(message,args) {
                 {name: "`Ducat`", value: value3, inline: true}]
         })
         if (relic_drops.vault_status == 'V' && relic_drops.vault_timestamp)
-            postdata.embeds[0].footer.text += '\nLast vaulted: ' + extras.msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
+            postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
         else if (relic_drops.vault_status == 'B' && relic_drops.vault_timestamp)
-            postdata.embeds[0].footer.text += '\nLast brought by Baro: ' + extras.msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
+            postdata.embeds[0].footer.text += '\nLast brought by Baro: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
         else if (relic_drops.vault_status == 'P' && relic_drops.vault_timestamp)
-            postdata.embeds[0].footer.text += '\nUnvaulted since: ' + extras.msToFullTime(new Date().getTime() - relic_drops.vault_timestamp)
+            postdata.embeds[0].footer.text += '\nUnvaulted since: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp)
         message.channel.send(postdata).catch(err => console.log(err));
         message.react(defaultReactions.check.string)
         return
@@ -593,7 +593,7 @@ async function relics(message,args) {
             })
             .catch(err => console.log(err))
         }
-        relics_timestamps = relics_timestamps.sort(extras.dynamicSortDesc("vault_timestamp"))
+        relics_timestamps = relics_timestamps.sort(dynamicSortDesc("vault_timestamp"))
         console.log(JSON.stringify(relics_timestamps))
         if (relics_timestamps.length >= 1)
             postdata[X].embeds[j].footer.text = "Best Relic: " + relics_timestamps[0].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(" Relic",'')
@@ -697,7 +697,7 @@ async function auctions(message,args) {
         })
         let postdata = {content: " ", embeds: []}
         //----Sort by buyout_price low->high----
-        auctionsArr = auctionsArr.sort(extras.dynamicSort("buyout_price"))
+        auctionsArr = auctionsArr.sort(dynamicSort("buyout_price"))
         var d_ownerNames = ""
         var d_weaponDetails = ""
         var d_prices = ""
@@ -735,7 +735,7 @@ async function auctions(message,args) {
             }
         )
         //----Sort by weapon damage incl. buyout price high->low----
-        auctionsArr = auctionsArr.sort(extras.dynamicSortDesc("damage"))
+        auctionsArr = auctionsArr.sort(dynamicSortDesc("damage"))
         var d_ownerNames = ""
         var d_weaponDetails = ""
         var d_prices = ""
@@ -771,7 +771,7 @@ async function auctions(message,args) {
             }
         )
         //----Sort by weapon damage high->low----
-        auctionsArr = auctionsArr.sort(extras.dynamicSortDesc("damage"))
+        auctionsArr = auctionsArr.sort(dynamicSortDesc("damage"))
         var d_ownerNames = ""
         var d_weaponDetails = ""
         var d_prices = ""
@@ -944,7 +944,7 @@ async function list(message,args) {
                 ordersArr.push({seller: element.user.ingame_name,quantity: element.quantity,price: element.platinum})
             }
         })
-        ordersArr = ordersArr.sort(extras.dynamicSort("price"))
+        ordersArr = ordersArr.sort(dynamicSort("price"))
         if (ordersArr.length == 0)
         {
             processMessage.edit("No orders active found for this item. No changes were made to your profile")
@@ -1099,7 +1099,7 @@ async function relist(message,args) {
         return
     for (var i=0;i<relist_cd.length;i++) {
         if (relist_cd[i].discord_id == message.author.id)
-            {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + extras.msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
+            {message.channel.send("This command is currently on cooldown for you.\nYou can reuse in " + msToTime(900000-(Date.now() - relist_cd[i].timestamp))).catch(err => console.log(err));;return}
     }
     relist_cd.push({discord_id: message.author.id, timestamp: Date.now()});
     setTimeout(() => {
@@ -1152,7 +1152,7 @@ async function relist(message,args) {
                     if ((element2.user.status == "ingame") && (element2.order_type == "sell") && (element2.user.region == "en") && (element2.visible == 1))
                         ordersArr.push({seller: element2.user.ingame_name,quantity: element2.quantity,price: element2.platinum})
                 })
-                ordersArr = ordersArr.sort(extras.dynamicSort("price"))
+                ordersArr = ordersArr.sort(dynamicSort("price"))
                 if (ordersArr.length == 0) {
                     value_f1.push('No sellers found for ' + item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '\n')
                     value_f3.push('\u200b\n')
