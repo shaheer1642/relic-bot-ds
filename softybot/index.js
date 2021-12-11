@@ -10,6 +10,8 @@ const axiosRetry = require('axios-retry');
 //const https = require('https');
 //const request = require('request');
 const wfm_api = require('./modules/wfm_api.js');
+const test_modules = require('./modules/test_modules.js');
+const extras = require('./modules/extras.js');
 const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
@@ -1184,26 +1186,17 @@ client.on('messageCreate', async message => {
                 case 'list':
                     wfm_api.list(message,args)
                     break
-                case 'updatedb':
-                    db_modules.updateDB(message,args)
-                    break
-                case 'getdb':
-                    db_modules.getDB(message,args)
-                    break
-                case 'trade_tut':
-                    trade_tut(message,args)
-                    break
-                case 'lich_tut':
-                    lich_tut(message,args)
-                    break
                 case 'relic':
                     wfm_api.relics(message,args)
                     break
                 case 'relics':
                     wfm_api.relics(message,args)
                     break
-                case 'ducat_template':
-                    ducat_template(message)
+                case 'updatedb':
+                    db_modules.updateDB(message,args)
+                    break
+                case 'getdb':
+                    db_modules.getDB(message,args)
                     break
                 case 'bought':
                     bought(message,args)
@@ -1214,14 +1207,23 @@ client.on('messageCreate', async message => {
                 case 'baro':
                     baroArrival(message,args)
                     break
+                case 'trade_tut':
+                    test_modules.trade_tut(message,args)
+                    break
+                case 'lich_tut':
+                    test_modules.lich_tut(message,args)
+                    break
+                case 'ducat_template':
+                    test_modules.ducat_template(message)
+                    break
                 case 'getmessage':
-                    getMessage(message,args)
+                    test_modules.getMessage(message,args)
                     break
                 case 'say':
-                    saySomething(message,args)
+                    test_modules.saySomething(message,args)
                     break
                 case 'launchnuke':
-                    launchNuke(message,args)
+                    test_modules.launchNuke(message,args)
                     break
                 case 'query':
                     user_query(message,args)
@@ -1240,7 +1242,7 @@ client.on('messageCreate', async message => {
                     break
                 ///*----------------------
                 case 'test':
-                    admin_test(message,args)
+                    test_modules.admin_test(message,args)
                     break
                 //-----------------------*/
             }
@@ -5605,31 +5607,6 @@ async function relist(message,args) {
 }
 */
 
-async function canvasTest(message,args) {
-    var canvas = new Canvas.createCanvas(200,200)
-    , ctx = canvas.getContext('2d');
-
-    ctx.font = '30px Arial';
-    ctx.rotate(-0.1);
-    ctx.fillText(`${args.toString().replace(/,/g, " ")}!`, 50, 100);
-
-    var te = ctx.measureText(`${args.toString().replace(/,/g, " ")}!`);
-    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-    ctx.beginPath();
-    ctx.lineTo(50, 102);
-    ctx.lineTo(50 + te.width, 102);
-    ctx.stroke();
-
-    message.channel.send({
-        content: " ", 
-        files: [
-            {
-                attachment: canvas.toBuffer(),
-                name: 'canvas.png'
-            }
-        ]
-    }).catch(err => console.log(err))
-}
 
 //------------gpt-3----------------
 async function gpt3_reset(message,args) {
@@ -6030,38 +6007,6 @@ async function baroArrival(message,args) {
     return
 }
 
-async function getMessage(message,args) {
-    if (message.author.id != '253525146923433984') {
-        message.channel.send('You do not have permission to use this command').catch(err => console.log(err))
-        return
-    }
-    if (!args[0])
-        return
-    if (!args[1])
-        return
-    if (args[2])
-        return
-    client.channels.cache.get(args[0]).messages.fetch(args[1])
-    .then(msg => {
-        console.log(msg)
-        console.log('getmessage executed')
-    })
-    .catch(err => console.log(err))
-    return
-}
-
-async function launchNuke(message,args) {
-    message.channel.send({
-        content: ' ',
-        embeds: [
-            {
-                description: `Nuking VRC <t:${Math.round((new Date().getTime() + 3600000)/1000)}:R> (<t:${Math.round((new Date().getTime() + 3600000)/1000)}:f>)`
-            }
-        ]
-    }).catch(err => console.log(err));
-    return
-}
-
 async function user_query(message,args) {
     if (args.length == 0) {
         message.channel.send('Show relics that contain X rarity drops worth Y amount of ducats.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
@@ -6123,14 +6068,6 @@ async function user_query(message,args) {
         console.log(err)
         message.channel.send('Error sending embed. It might be too large').catch(err => console.log(err))
     })
-    return
-}
-
-async function saySomething(message,args) {
-    message.channel.send({
-        content: message.content.replace('.say ',''),
-        embeds: []
-    }).catch(err => console.log(err));
     return
 }
 
@@ -6527,33 +6464,7 @@ async function dc_ducat_update() {
     //-------------------------------
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 300000)
 }
-
-function test(message,args) {
-    console.log('function called')
-        request('https://api.warframe.market/v1/items/loki_prime_set/orders', { json: true }, (err, res, body) => {
-            if (err) { return console.log(err); }
-            console.log(body);
-          });
-          return
-}
 //-------------------------------------------
-async function ducat_template(message) {
-    if (message.author.id != '253525146923433984') {
-        message.channel.send(`You do not have permission to use this command`).catch(err => console.log(err))
-        return
-    }
-    var postdata = {content: ''}
-    postdata.content = '```md\nNotes:\nThis data will be updated every 5 mins\n\nColors & filters:\nIf price per part is less than 4, whipser is filtered out (usually troll orders)\nIf quantity is 1, it is filtered out\n<If quantity is 2, it is highlighted yellow>\nIf quantity is 2 but price is greater than 19p, it is filtered out\nIf quantity is 3 but price is greater than 30p, it is filtered out\n[If quantity is equal to 3 but price is lower than 25p, it is highlighted cyan][]\n[If quantity is equal to 4 but price is lower than 48p, it is highlighted cyan][]\n[If quantity is greater than 4, it is highlighted cyan][]\n```\nReact with the following emotes to obtain the given roles below. These roles are mentioned whenever a *new* trader appears with the given criteria. Removing reaction should remove the role. (If any suggestions, dm MrSofty)\n\n:star:   `(Ducats-1) :: Quantity >= 6 AND AvgPrice <= 10.00p`\n:gem:   `(Ducats-2) :: Quantity >= 4 AND AvgPrice <= 8.00p`\n\n:red_circle:   `:: Ping on \'Do not Disturb\'`\n:purple_circle:   `:: Ping on \'Invisible\'/offline`\n\nUse the following command to let your fellow buyers know if you have already bought ducats from a seller\n`.bought seller_name`\nUse the following command to force update if needed\n`.update`'
-    const channel = client.channels.cache.get('899290597259640853')
-    await channel.messages.fetch()
-    channel.messages.cache.get('899402069159608320').edit(postdata).catch(err => console.log(err))
-    .then(res => {
-        res.react('⭐').catch(err => console.log(err))
-        res.react('💎').catch(err => console.log(err))
-        res.react('🔴').catch(err => console.log(err))
-        res.react('🟣').catch(err => console.log(err))
-    })
-}
 
 function msToTime(s) {
 
@@ -7401,7 +7312,6 @@ async function updateDatabaseItem(db_items_list,item,index) {
         return Promise.reject()
     return Promise.resolve(db_items_list)
 }
-*/
 
 async function dc_update_msgs() {
     //----post prime parts/mods/relic prices----
@@ -7662,7 +7572,8 @@ async function dc_update_msgs() {
         console.log('Error retreiving ducats parts main')
     })
 }
-
+*/
+/*
 async function backupItemsList() {
     // post items_list on dc
     var items_list = []
@@ -7695,7 +7606,7 @@ async function backupItemsList() {
         }).catch(err => console.log(err))
     }).catch(err => console.log(err))
 }
-
+*/
 async function inform_dc (str) {
     await client.channels.cache.get('891756819045826621').send(str).catch(err => console.log(err+'\nError posting bot update.'))
 }
@@ -9865,80 +9776,6 @@ Message: Hi
     return
 }
 
-async function trade_tut(message,args) {
-    var postdata = {
-        content: " ",
-        embeds: [{
-            description: 
-`
-Posting new/existing order
-**wtb volt 160p**
-
-Posting existing orders
-**my orders**
-
-Posting multiple orders
-**wtb loki p systems 100p, limbo, nekros prime bp**
-
-Matching top price
-**wts ash auto**
-
-Closing all orders
-**close all**
-`,
-            color: "FFFFFF"
-        }]
-    }
-    client.channels.cache.get('892160436881993758').messages.fetch('893138411861446676')
-    .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
-    client.channels.cache.get('893133821313187881').messages.fetch('893138412301860865')
-    .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
-    client.channels.cache.get('892108718358007820').messages.fetch('893138411995689080')
-    .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
-}
-
-async function lich_tut(message,args) {
-    var postdata = {
-        content: " ",
-        embeds: [{
-            description: 
-`
-Posting new lich
-**/lich**
-
-Editing existing lich
-(under dev.)
-
-Posting existing orders
-**my orders**
-
-Close all orders
-**close all**
-`,
-            color: "FFFFFF"
-        }]
-    }
-    client.channels.cache.get('892003772698611723').messages.fetch('914453068978978842')
-    .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
-    client.channels.cache.get('906555131254956042').messages.fetch('914453068983201884')
-    .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
-}
-
 async function td_set_orders_timeouts() {
     var all_orders = null
     var status = await db.query(`SELECT * FROM users_orders WHERE visibility = true`)
@@ -10162,7 +9999,7 @@ async function bounty_check() {
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
-                    await db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${getRandomColor()}')`).catch(err => console.log(err))
+                    await db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${extras.getRandomColor()}')`).catch(err => console.log(err))
                     continue
                 }
                 if (Number(bountyDB.last_expiry) < new Date().getTime()) {
@@ -10197,95 +10034,6 @@ async function bounty_check() {
         console.log(err)
         setTimeout(bounty_check,60000)
     })
-}
-
-async function update_bounties() {
-    
-    var postdata = {
-        "name": "track",
-        "description": "Track bounties",
-        "options": [
-            {
-                "type": 1,
-                "name": "bounties",
-                "description": "Track bounties",
-                "options": [
-                    {
-                        "type": 3,
-                        "name": "syndicate",
-                        "description": "Select syndicate type",
-                        "required": true,
-                        "choices": [
-                            {
-                                "name": "Entrati",
-                                "value": "entrati"
-                            },
-                            {
-                                "name": "Ostrons",
-                                "value": "ostrons"
-                            },
-                            {
-                                "name": "Solaris United",
-                                "value": "solaris_united"
-                            }
-                        ]
-                    },
-                    {
-                        "type": 3,
-                        "name": "mission_type",
-                        "description": "Select mission type",
-                        "required": true,
-                        "autocomplete": true
-                    }
-                ]
-            }
-        ]
-    }
-
-    var url = `https://discord.com/api/v8/applications/${client.user.id}/guilds/832677897411493949/commands`
-    var headers = {
-        "Authorization": `Bot ${process.env.DISCORD_BOT_TOKEN}`
-    }
-
-    axios({
-        method: 'POST',
-        url: url,
-        data: postdata,
-        headers: headers
-    }).catch(err => console.log(err))
-
-    var url = `https://discord.com/api/v8/applications/${client.user.id}/guilds/865904902941048862/commands`
-
-    axios({
-        method: 'POST',
-        url: url,
-        data: postdata,
-        headers: headers
-    }).catch(err => console.log(err))
-    
-    setTimeout(update_bounties,3600000)
-}
-
-function getRandomColor() {
-    var letters = '0123456789abcdef';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-async function admin_test(message,args) {
-    if (message.author.id != '253525146923433984')
-        return
-    client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')
-    .then(msg => {
-        msg.react('<:four2:918420407097364480>').catch(err => console.log(err))
-    }).catch(err => console.log(err))
-    client.channels.cache.get('793207311891562556').messages.fetch('915914251066015774')
-    .then(msg => {
-        msg.react('<:five2:918420406472421387>').catch(err => console.log(err))
-    }).catch(err => console.log(err))
 }
 
 //==================================== GMAIL API =============================================

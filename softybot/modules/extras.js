@@ -101,5 +101,13 @@ function msToFullTime(ms) {
     return str;
 }
 
+function getRandomColor() {
+    var letters = '0123456789abcdef';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime};
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor};
