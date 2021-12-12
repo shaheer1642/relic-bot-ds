@@ -115,6 +115,9 @@ client.on('ready', () => {
 
     console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
 
+    //----Bounty timers---
+    setImmediate(bounty_tracker.bounty_check,-1)
+    
     if (process.env.DEBUG_MODE==1)
         return
     //--------Set new timer--------
@@ -148,9 +151,6 @@ client.on('ready', () => {
 
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
-
-    //----Bounty timers---
-    setImmediate(bounty_tracker.bounty_check,-1)
 
     //----Ducat updater timeout----
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
