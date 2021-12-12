@@ -94,7 +94,7 @@ async function gmail_api_call(auth) {
         // Page token to retrieve a specific page of results in the list.
         //pageToken: 'placeholder-value',
         // Only return messages matching the specified query. Supports the same query format as the Gmail search box. For example, `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be used when accessing the api using the gmail.metadata scope.
-        q: `is:unread`, //from:noreply@invisioncloudcommunity.com 
+        q: `from:noreply@invisioncloudcommunity.com is:unread`,
         // The user's email address. The special value `me` can be used to indicate the authenticated user.
         userId: 'me',
     })
