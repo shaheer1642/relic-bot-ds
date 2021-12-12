@@ -1521,6 +1521,70 @@ async function WFMauthorize(message,args) {
     });
 }
 
+async function user_query(message,args) {
+    if (args.length == 0) {
+        message.channel.send('Show relics that contain X rarity drops worth Y amount of ducats.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (!args[0]) {
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (!args[1]) {
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (args[2]) {
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (args[0] != 'common' && args[0] != 'uncommon' && args[0] != 'rare') {
+        message.channel.send('Invalid rarity.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    if (args[1] != 15 && args[1] != 25 && args[1] != 45 && args[1] != 65 && args[1] != 100) {
+        message.channel.send('Invalid ducat value.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        return
+    }
+    var items_list = []
+    await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+    })
+    .catch(err => console.log(err))
+    var relics_list = []
+    items_list.forEach(e1 => {
+        if (e1.tags.includes('relic')) {
+            if (e1.rewards) {
+                if (e1.rewards[(args[0])]) {
+                    if (e1.rewards[(args[0])].length >= 1) {
+                        e1.rewards[(args[0])].forEach(e2 => {
+                            for (var i=0;i<items_list.length;i++) {
+                                var e3 = items_list[i]
+                                if (e3.item_url == e2)
+                                    if (e3.ducat)
+                                        if (e3.ducat == args[1])
+                                            relics_list.push({relic: e1,drop: e3.item_url})
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    })
+    var str = ''
+    relics_list.forEach(e => {
+        str += '**' + e.relic.item_url + '** (' + e.relic.vault_status + ') [' + e.drop + ']' + '\n'
+    })
+    str.trimRight()
+    message.channel.send({content: ' ',embeds: [{description: `Relics matching your criteria:\n${str}`}]})
+    .catch(err => {
+        console.log(err)
+        message.channel.send('Error sending embed. It might be too large').catch(err => console.log(err))
+    })
+    return
+}
+
 axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
@@ -1536,4 +1600,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {orders,orders_update,relics,auctions,list,relist,WFMauthorize,help,uptime};
+module.exports = {orders,orders_update,relics,auctions,list,relist,WFMauthorize,user_query,help,uptime};

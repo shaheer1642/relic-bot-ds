@@ -16,6 +16,7 @@ const extras = require('./modules/extras.js');
 const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
+const gpt3 = require('./modules/gpt3.js');
 const db_modules = require('./modules/db_modules.js');
 const {client,tickcount} = require('./modules/discord_client.js');
 //const { resolve } = require('path');
@@ -23,8 +24,10 @@ const {client,tickcount} = require('./modules/discord_client.js');
 const readline = require('readline');
 const {google} = require('googleapis');
 //----gpt3----
+/*
 const got = require('got');
 var gpt3chatLog = 'I am a highly intelligent question answering bot. If you ask me a question that is rooted in truth, I will give you the answer. If you ask me a question that is nonsense, trickery, or has no clear answer, I will respond with \"Unknown\".\n\nQ: What is human life expectancy in the United States?\nA: Human life expectancy in the United States is 78 years.\n\nQ: Who was president of the United States in 1955?\nA: Dwight D. Eisenhower was president of the United States in 1955.\n\nQ: Which party did he belong to?\nA: He belonged to the Republican Party.\n\nQ: What is the square root of banana?\nA: Unknown\n\nQ: How does a telescope work?\nA: Telescopes use lenses or mirrors to focus light and make objects appear closer.\n\nQ: Where were the 1992 Olympics held?\nA: The 1992 Olympics were held in Barcelona, Spain.\n\nQ: How many squigs are in a bonk?\nA: Unknown';
+*/
 //-----------
 /*
 const { doesNotMatch } = require('assert');
@@ -1148,16 +1151,16 @@ client.on('messageCreate', async message => {
                     test_modules.launchNuke(message,args)
                     break
                 case 'query':
-                    user_query(message,args)
+                    wfm_api.user_query(message,args)
                     break
                 case 'gpt3':
-                    gpt3_completion(message,args)
+                    gpt3.completion(message,args)
                     break
                 case 'gpt3ans':
-                    gpt3_answer(message,args)
+                    gpt3.answer(message,args)
                     break
                 case 'gpt3reset':
-                    gpt3_reset(message,args)
+                    gpt3.reset(message,args)
                     break
                 case 'graphic':
                     test_modules.canvasTest(message,args)
@@ -5531,6 +5534,7 @@ async function relist(message,args) {
 
 
 //------------gpt-3----------------
+/*
 async function gpt3_reset(message,args) {
     gpt3chatLog = 'I am a highly intelligent question answering bot. If you ask me a question that is rooted in truth, I will give you the answer. If you ask me a question that is nonsense, trickery, or has no clear answer, I will respond with \"Unknown\".\n\nQ: What is human life expectancy in the United States?\nA: Human life expectancy in the United States is 78 years.\n\nQ: Who was president of the United States in 1955?\nA: Dwight D. Eisenhower was president of the United States in 1955.\n\nQ: Which party did he belong to?\nA: He belonged to the Republican Party.\n\nQ: What is the square root of banana?\nA: Unknown\n\nQ: How does a telescope work?\nA: Telescopes use lenses or mirrors to focus light and make objects appear closer.\n\nQ: Where were the 1992 Olympics held?\nA: The 1992 Olympics were held in Barcelona, Spain.\n\nQ: How many squigs are in a bonk?\nA: Unknown'
     message.channel.send('Flushed chat log.')
@@ -5575,7 +5579,6 @@ async function gpt3_completion(message,args) {
     }
     return
 }
-
 async function gpt3_answer(message,args) {
     console.log(args)
     // The new question asked by the user.
@@ -5612,6 +5615,7 @@ async function gpt3_answer(message,args) {
     }
     return
 }
+*/
 //-----------------------------
 /*
 async function updateDB(message,args) {
