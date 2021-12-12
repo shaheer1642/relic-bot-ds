@@ -1,7 +1,6 @@
-
-
 const {client} = require('./discord_client.js');
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 
 const bountyHints = [
@@ -22,7 +21,7 @@ async function bounty_check() {
         for (var k=0; k<bounties_list.length; k++) {
             bountyDB = bounties_list[k]
             if (bountyDB.msg_id && (Number(bountyDB.last_expiry) < new Date().getTime())) {
-                await client.channels.cache.get('892003813786017822').messages.fetch(msg_id)
+                await client.channels.cache.get('892003813786017822').messages.fetch(bountyDB.msg_id)
                 .then(async msg => {
                     await msg.unpin()
                     .then(async res => {
@@ -94,5 +93,20 @@ async function bounty_check() {
         setTimeout(bounty_check,60000)
     })
 }
+
+axiosRetry(axios, {
+    retries: 50, // number of retries
+    retryDelay: (retryCount) => {
+      console.log(`retry attempt: ${retryCount}`);
+      return retryCount * 1000; // time interval between retries
+    },
+    retryCondition: (error) => {
+        // if retry condition is not specified, by default idempotent requests are retried
+        if (error.response)
+            return error.response.status > 499;
+        else
+            return error
+    },
+});
 
 module.exports = {bounty_check};

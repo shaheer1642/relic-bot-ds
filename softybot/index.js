@@ -12,6 +12,7 @@ const axiosRetry = require('axios-retry');
 const wfm_api = require('./modules/wfm_api.js');
 const test_modules = require('./modules/test_modules.js');
 const trade_bot_modules = require('./modules/trade_bot_modules.js');
+const ducat_updater = require('./modules/ducat_updater.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log} = require('./modules/extras.js');
 const Canvas = require('canvas')
 const fs = require('fs')
@@ -72,7 +73,7 @@ const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
 //var DB_Updating = false
 //var DB_Update_Timer = null
-var Ducat_Update_Timer = null
+//var Ducat_Update_Timer = null
 const u_order_close_time = 10800000
 
 /*
@@ -153,7 +154,7 @@ client.on('ready', () => {
     setImmediate(bounty_tracker.bounty_check,-1)
 
     //----Ducat updater timeout----
-    Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
+    ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
     db_modules.backupItemsList()
 
     //----Re-define orders timers if any-----
@@ -1120,10 +1121,10 @@ client.on('messageCreate', async message => {
                     db_modules.getDB(message,args)
                     break
                 case 'bought':
-                    bought(message,args)
+                    ducat_updater.bought(message,args)
                     break
                 case 'update':
-                    updateDucatForced(message,args)
+                    ducat_updater.updateDucatForced(message,args)
                     break
                 case 'baro':
                     baroArrival(message,args)
@@ -5903,7 +5904,7 @@ async function updateDucatForced(message,args) {
     if (message.channelId != '899290597259640853')
         return
     clearTimeout(Ducat_Update_Timer)
-    Ducat_Update_Timer = setTimeout(dc_ducat_update, 1)
+    Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1)
     message.channel.send("Updating. Might take a few seconds").then(msg => setTimeout(() => {
         msg.delete().catch(err => console.log(err))
         message.delete().catch(err => console.log(err))
@@ -5929,7 +5930,7 @@ async function baroArrival(message,args) {
     }).catch(err => console.log(err));
     return
 }
-
+/*
 async function user_query(message,args) {
     if (args.length == 0) {
         message.channel.send('Show relics that contain X rarity drops worth Y amount of ducats.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
@@ -5993,7 +5994,8 @@ async function user_query(message,args) {
     })
     return
 }
-
+*/
+/*
 async function dc_ducat_update() {
     var all_items = []
     var status = await db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC, item_url`)
@@ -6387,6 +6389,7 @@ async function dc_ducat_update() {
     //-------------------------------
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 300000)
 }
+*/
 //-------------------------------------------
 
 function trades_update() {
@@ -6502,6 +6505,7 @@ function trades_update() {
     })
     setTimeout(trades_update, 600000);
 }
+
 /*
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
@@ -7407,6 +7411,7 @@ async function dc_update_msgs() {
     })
 }
 */
+
 /*
 async function backupItemsList() {
     // post items_list on dc
