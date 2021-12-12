@@ -1161,7 +1161,7 @@ client.on('messageCreate', async message => {
                 case 'graphic':
                     test_modules.canvasTest(message,args)
                     break
-                case 'sendMessage':
+                case 'sendMsg':
                     test_modules.sendMessage(message,args)
                     break
                 ///*----------------------

@@ -163,37 +163,13 @@ async function admin_test(message,args) {
     }).catch(err => console.log(err))
 }
 
-async function admin_test(message,args) {
+async function sendMessage(message,args) {
     if (message.author.id != '253525146923433984')
         return
     var channel = args[0]
     const msg = args.shift().join(' ')
     client.channels.cache.get(channel).send(msg).catch(err => console.log(err))
     return
-    message.channel.send({
-        content: ' ',
-        embeds: [{
-            fields: [{
-                name: 'field1',value: 'smth'
-            }],
-            description: '*smth*',
-            footer: {
-                text: '*smth*'
-            }
-        }]
-    })
-    .catch(err => console.log(err))
-    return
-    if (message.author.id != '253525146923433984')
-        return
-    client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')
-    .then(msg => {
-        msg.react('<:four2:918420407097364480>').catch(err => console.log(err))
-    }).catch(err => console.log(err))
-    client.channels.cache.get('793207311891562556').messages.fetch('915914251066015774')
-    .then(msg => {
-        msg.react('<:five2:918420406472421387>').catch(err => console.log(err))
-    }).catch(err => console.log(err))
 }
 
 async function canvasTest(message,args) {
