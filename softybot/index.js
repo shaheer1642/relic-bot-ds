@@ -9899,6 +9899,20 @@ async function bounty_check() {
         var bounties_list = await db.query(`SELECT * FROM bounties_list`)
         .then(res => {return res.rows})
         .catch(err => console.log(err))
+        //remove pinned msgs if any
+        for (var k=0; k<bounties_list.length; k++) {
+            bountyDB = bounties_list[k]
+            if (bountyDB.msg_id && (Number(bountyDB.last_expiry) < new Date().getTime())) {
+                await client.channels.cache.get('892003813786017822').messages.fetch(msg_id)
+                .then(async msg => {
+                    await msg.unpin()
+                    .then(async res => {
+                        await db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                    })
+                    .catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }
+        }
         for (var i=0; i<res.data.syndicateMissions.length; i++) {
             var syndicate = res.data.syndicateMissions[i]
             for (var j=0; j<syndicate.jobs.length; j++) {
@@ -9909,19 +9923,10 @@ async function bounty_check() {
                 var bountyDB = {}
                 for (var k=0; k<bounties_list.length; k++) {
                     bountyDB = bounties_list[k]
-                    //remove pinned msg if any
-                    if (bountyDB.msg_id && (Number(bountyDB.last_expiry) < new Date().getTime())) {
-                        await client.channels.cache.get('892003813786017822').messages.fetch(msg_id)
-                        .then(async msg => {
-                            await msg.unpin()
-                            .then(async res => {
-                                await db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
-                            })
-                            .catch(err => console.log(err))
-                        }).catch(err => console.log(err))
-                    }
-                    if (bountyDB.type == job.type)
+                    if (bountyDB.type == job.type) {
                         hasBounty = 1
+                        break
+                    }
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
