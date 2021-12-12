@@ -17,6 +17,7 @@ const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
 const gpt3 = require('./modules/gpt3.js');
+const bounty_tracker = require('./modules/bounty_tracker.js');
 const db_modules = require('./modules/db_modules.js');
 const {client,tickcount} = require('./modules/discord_client.js');
 //const { resolve } = require('path');
@@ -65,11 +66,6 @@ const defaultReactions = {
         identifier: 'auto_update:906923980852715640'
     }
 }
-const bountyHints = [
-    'Consider donating to poor softy!',
-    'You can track or remove bounties using /track command!',
-    'Check pinned messages for currently active bounties you are tracking!'
-]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
@@ -154,7 +150,7 @@ client.on('ready', () => {
     td_set_orders_timeouts().catch(err => console.log(err))
 
     //----Bounty timers---
-    setImmediate(bounty_check,-1)
+    setImmediate(bounty_tracker.bounty_check,-1)
 
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
@@ -9900,7 +9896,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
         }, after3h - currTime);
     }
 }
-
+/*
 async function bounty_check() {
     console.log('bounty check')
     axios('https://api.warframestat.us/pc')
@@ -9985,6 +9981,7 @@ async function bounty_check() {
         setTimeout(bounty_check,60000)
     })
 }
+*/
 
 //==================================== GMAIL API =============================================
 // If modifying these scopes, delete token.json.
