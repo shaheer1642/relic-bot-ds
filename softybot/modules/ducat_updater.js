@@ -500,4 +500,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = (dc_ducat_update,bought,updateDucatForced)
+module.exports = {dc_ducat_update,bought,updateDucatForced}
