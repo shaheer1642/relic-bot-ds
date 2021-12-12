@@ -24,7 +24,8 @@ const {client,tickcount} = require('./modules/discord_client.js');
 //const { resolve } = require('path');
 //const { time } = require('console');
 const readline = require('readline');
-const {google} = require('googleapis');
+require('./modules/gmail_client.js');
+//const {google} = require('googleapis');
 //----gpt3----
 /*
 const got = require('got');
@@ -5825,6 +5826,7 @@ async function WFMauthorize(message,args) {
     });
 }
 */
+/*
 async function bought(message,args) {
     if (message.channelId != '899290597259640853')
         return
@@ -5910,7 +5912,7 @@ async function updateDucatForced(message,args) {
     , 5000)).catch(err => console.log(err))
     return
 }
-
+*/
 async function baroArrival(message,args) {
     var time = 1637326800
     if (time <= new Date().getTime()/1000) {
@@ -6389,7 +6391,7 @@ async function dc_ducat_update() {
 }
 */
 //-------------------------------------------
-
+/*
 function trades_update() {
     console.log('Executing trades_update')
     let relicsArr = []
@@ -6503,7 +6505,7 @@ function trades_update() {
     })
     setTimeout(trades_update, 600000);
 }
-
+*/
 /*
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
@@ -6679,7 +6681,8 @@ async function updateDatabaseItems(up_origin) {
         setTimeout(updateDatabasePrices, 3000, up_origin);
     }
 }
-
+*/
+/*
 async function updateDatabasePrices(up_origin) {
     var updateTickcount = new Date().getTime();
     //var status = await db.query(`UPDATE items_list SET rewards = null`)
@@ -6833,7 +6836,8 @@ async function updateDatabasePrices(up_origin) {
         return
     }
 }
-
+*/
+/*
 async function updateDatabaseItem(db_items_list,item,index) {
     if (index)
         console.log(`Retrieving statistics for ${item.item_url} (${index+1}/${db_items_list.length})...`)
@@ -7148,7 +7152,8 @@ async function updateDatabaseItem(db_items_list,item,index) {
         return Promise.reject()
     return Promise.resolve(db_items_list)
 }
-
+*/
+/*
 async function dc_update_msgs() {
     //----post prime parts/mods/relic prices----
     db.query(`SELECT * FROM items_list ORDER BY sell_price DESC,item_url`)
@@ -9885,9 +9890,10 @@ async function bounty_check() {
     })
 }
 */
-
+/*
 //==================================== GMAIL API =============================================
 // If modifying these scopes, delete token.json.
+
 const SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/gmail.modify'
@@ -9904,12 +9910,6 @@ async function gmail_check_messages() {
     authorize(JSON.parse(content), gmail_api_call);
   });
 }
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
 function authorize(credentials, callback) {
   const {client_secret, client_id, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
@@ -9923,12 +9923,6 @@ function authorize(credentials, callback) {
   });
 }
 
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
 function getNewToken(oAuth2Client, callback) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
@@ -9954,11 +9948,6 @@ function getNewToken(oAuth2Client, callback) {
   });
 }
 
-/**
- * Lists the labels in the user's account.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
 async function gmail_api_call(auth) {
     try {
         var gmail = google.gmail({version: 'v1', auth})
@@ -10087,3 +10076,4 @@ function generateId() {
 }
 
 setTimeout(gmail_check_messages, 1000);
+*/
