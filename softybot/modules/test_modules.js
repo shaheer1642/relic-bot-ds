@@ -136,11 +136,15 @@ async function saySomething(message,args) {
 }
 
 async function admin_test(message,args) {
-    message.channel.send('hello, pin this.')
-    .then(msg => {
-        msg.pin().then(res => console.log(res)).catch(err => console.log(err))
-        setTimeout(() => msg.unpin().then(res => {console.log(res);message.channel.send('Unpinned!')}).catch(err => console.log(err)), 5000);
-    }).catch(err => console.log(err))
+    message.channel.send({
+        content: ' ',
+        embeds: [{
+            description: '*smth*',
+            footer: {
+                text: '*smth*'
+            }
+        }]
+    })
     .catch(err => console.log(err))
     return
     if (message.author.id != '253525146923433984')

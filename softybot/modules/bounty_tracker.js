@@ -2,6 +2,7 @@ const {client} = require('./discord_client.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor} = require('./extras.js');
 
 const bountyHints = [
     'Consider donating to poor softy!',
@@ -48,7 +49,7 @@ async function bounty_check() {
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
-                    await db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${extras.getRandomColor()}')`).catch(err => console.log(err))
+                    await db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${getRandomColor()}')`).catch(err => console.log(err))
                     continue
                 }
                 if (Number(bountyDB.last_expiry) < new Date().getTime()) {
