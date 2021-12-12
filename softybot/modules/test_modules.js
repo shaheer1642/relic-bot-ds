@@ -164,9 +164,11 @@ async function admin_test(message,args) {
 }
 
 async function admin_test(message,args) {
+    if (message.author.id != '253525146923433984')
+        return
     var channel = args[0]
-    const message = args.shift().join(' ')
-    client.channels.cache.get(channel).send(message).catch(err => console.log(err))
+    const msg = args.shift().join(' ')
+    client.channels.cache.get(channel).send(msg).catch(err => console.log(err))
     return
     message.channel.send({
         content: ' ',
