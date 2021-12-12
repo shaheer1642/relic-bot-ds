@@ -65,7 +65,7 @@ const defaultReactions = {
 const bountyHints = [
     'Consider donating to poor softy!',
     'You can track or remove bounties using /track command!',
-    'Check pinned messages for currently active bounties!'
+    'Check pinned messages for currently active bounties you are tracking!'
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
