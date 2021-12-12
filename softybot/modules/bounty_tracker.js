@@ -25,7 +25,7 @@ async function bounty_check() {
                 .then(async msg => {
                     await msg.unpin()
                     .then(async res => {
-                        await db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                        await db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${bountyDB.syndicate}' AND type = '${bountyDB.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
                 }).catch(err => console.log(err))
