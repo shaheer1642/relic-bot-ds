@@ -37,8 +37,6 @@ const { Console } = require('console');
 const { resolve } = require('path');
 */
 const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
-const botv_guild_id = "776804537095684108"
-const relicStocks_guild_id = "765542868265730068"
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
 const userOrderLimit = 50

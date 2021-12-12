@@ -4,6 +4,8 @@ const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 var Ducat_Update_Timer = null
+const botv_guild_id = "776804537095684108"
+const relicStocks_guild_id = "765542868265730068"
 
 async function dc_ducat_update() {
     var all_items = []
