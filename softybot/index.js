@@ -9942,7 +9942,7 @@ async function bounty_check() {
                         client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
                             db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
                             .then(res => {
-                                msg.pin(true).catch(err => console.log(err))
+                                msg.pin().catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                         }).catch(err => console.log(err))
@@ -9951,7 +9951,7 @@ async function bounty_check() {
                 else if (bountyDB.msg_id) {
                     client.channels.cache.get('892003813786017822').messages.fetch(msg_id)
                     .then(msg => {
-                        msg.pin(false)
+                        msg.unpin()
                         .then(res => {
                             db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
                         })
