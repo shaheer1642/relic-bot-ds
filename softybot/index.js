@@ -62,6 +62,11 @@ const defaultReactions = {
         identifier: 'auto_update:906923980852715640'
     }
 }
+const bountyHints = [
+    'Consider donating to poor softy!',
+    'You can track or remove bounties using /track command!',
+    'Check pinned messages for currently active bounties!'
+]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
@@ -191,7 +196,7 @@ client.on('messageCreate', async message => {
     if (process.env.DEBUG_MODE==2 && message.author.id == '253525146923433984') {
         message.react('❎').catch(err => console.log(err))
         .then(() => {
-            setTimeout(() => message.reactions.resolve('❎').users.remove(client.user.id).catch(err => console.log(err)), 5000)
+            setImmediate(() => message.reactions.resolve('❎').users.remove(client.user.id).catch(err => console.log(err)), 5000)
         })
         return
     }
@@ -9952,6 +9957,9 @@ async function bounty_check() {
                                 {name: 'Rewards', value: job.rewardPool.join('\n'), inline: false},
                                 {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
                             ],
+                            footer: {
+                                text: '*' + bountyHints[Math.floor(Math.random() * bountyHints.length)] + '*'
+                            },
                             color: bountyDB.color
                         })
                         client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
