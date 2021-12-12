@@ -136,6 +136,10 @@ async function saySomething(message,args) {
 }
 
 async function admin_test(message,args) {
+    message.channel.send('hello, pin this.')
+    .then(msg => msg.pin(true).then(res => console.log(res.id)).catch(err => console.log(err)))
+    .catch(err => console.log(err))
+    return
     if (message.author.id != '253525146923433984')
         return
     client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')

@@ -9940,8 +9940,11 @@ async function bounty_check() {
                             color: bountyDB.color
                         })
                         client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
-                            await db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
-                            msg.pin(true).catch(err => console.log(err))
+                            db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
+                            .then(res => {
+                                msg.pin(true).catch(err => console.log(err))
+                            })
+                            .catch(err => console.log(err))
                         }).catch(err => console.log(err))
                     }
                 }
