@@ -1169,7 +1169,7 @@ client.on('messageCreate', async message => {
         else 
             switch(command) {
                 case 'authorize':
-                    WFMauthorize(message,args)
+                    wfm_api.WFMauthorize(message,args)
                     break
             }
         continue
@@ -5733,6 +5733,7 @@ async function getDB(message,args) {
     }
 }
 */
+/*
 async function WFMauthorize(message,args) {
     if (args.length == 0)
     {
@@ -5819,7 +5820,7 @@ async function WFMauthorize(message,args) {
         return
     });
 }
-
+*/
 async function bought(message,args) {
     if (message.channelId != '899290597259640853')
         return

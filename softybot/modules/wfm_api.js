@@ -1434,6 +1434,93 @@ async function relist(message,args) {
     return
 }
 
+async function WFMauthorize(message,args) {
+    if (args.length == 0)
+    {
+        message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
+        message.react(defaultReactions.check.string)
+        return
+    }
+    const email = args[0]
+    const password = args[1]
+    let processMessage = [];
+    await message.channel.send("Processing").then(response => {
+        processMessage = response
+    }).catch(err => console.log(err))
+    axios({
+        method: 'POST',
+        url: "https://api.warframe.market/v1/auth/signin",
+        data: {
+            auth_type: 'header',
+            email: email,
+            password: password
+        },
+        headers: {
+            Authorization: 'JWT'
+        }
+    })
+    .then(async response => {
+        const JWT = response.headers.authorization
+        const ingame_name = response.data.payload.user.ingame_name
+        const discord_id = message.author.id
+        var status = await db.query(`SELECT * FROM discord_users WHERE discord_id=${discord_id}`).then(async res => {
+            if (res.rows.length == 0) {   //id does not exist
+                await db.query(`INSERT INTO discord_users (discord_id,jwt,ingame_name) values ('${discord_id}','${JWT}','${ingame_name}')`).then(res => {
+                    console.log(res)
+                    processMessage.edit("Authorization successful.")
+                    return 1
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> pricesDB error')
+                    processMessage.edit({content: "Some error occured inserting record into database.\nError code: 503"})
+                    return 0
+                })
+            }
+            else {
+                await db.query(`UPDATE discord_users SET jwt = '${JWT}' WHERE discord_id = '${discord_id}'`).then(res => {
+                    processMessage.edit("Re-authorized.")
+                    return 1
+                })
+                .catch (err => {
+                    if (err.response)
+                        console.log(err.response.data)
+                    console.log(err)
+                    console.log('Retrieving Database -> pricesDB error')
+                    processMessage.edit({content: "Some error occured updating record in database.\nError code: 504"})
+                    return 0
+                })
+            }
+        })
+        .catch (err => {
+            if (err.response)
+                console.log(err.response.data)
+            console.log(err)
+            console.log('Retrieving Database -> pricesDB error')
+            processMessage.edit({content: "Some error occured retrieving database info.\nError code: 502"})
+            return
+        })
+        if (!status)
+            return
+    })
+    .catch(function (error) {
+        if (error.response)
+        {
+            const response = JSON.stringify(error.response.data)
+            if (response.match('app.account.email_not_exist'))
+                {processMessage.edit("Invalid email. Could not sign you in"); return}
+            else if (response.match('app.account.password_invalid'))
+                {processMessage.edit("Invalid password. Could not sign you in"); return}
+            else
+                {processMessage.edit("Error occured sending sign-in request. Please try again.\nError code: 500\nServer response: " + response); return}
+        }
+        processMessage.edit("Error occured processing sign-in request. Please try again.\nError code: 501")
+        return
+    });
+}
+
 axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
@@ -1449,4 +1536,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {orders,orders_update,relics,auctions,list,relist,help,uptime};
+module.exports = {orders,orders_update,relics,auctions,list,relist,WFMauthorize,help,uptime};
