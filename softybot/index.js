@@ -9908,11 +9908,20 @@ async function bounty_check() {
                 var hasBounty = 0
                 var bountyDB = {}
                 for (var k=0; k<bounties_list.length; k++) {
-                    if (bounties_list[k].type == job.type) {
-                        hasBounty = 1
-                        bountyDB = bounties_list[k]
-                        break
+                    bountyDB = bounties_list[k]
+                    //remove pinned msg if any
+                    if (bountyDB.msg_id && (Number(bountyDB.last_expiry) < new Date().getTime())) {
+                        await client.channels.cache.get('892003813786017822').messages.fetch(msg_id)
+                        .then(async msg => {
+                            await msg.unpin()
+                            .then(async res => {
+                                await db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                            })
+                            .catch(err => console.log(err))
+                        }).catch(err => console.log(err))
                     }
+                    if (bountyDB.type == job.type)
+                        hasBounty = 1
                 }
                 if (!hasBounty) {
                     console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
@@ -9921,7 +9930,7 @@ async function bounty_check() {
                 }
                 if (Number(bountyDB.last_expiry) < new Date().getTime()) {
                     //discord stuff
-                    await db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime() + 60000} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                    await db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime() + 60000}, appeared = ${new Date().getTime()} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
                     if (bountyDB.users) {
                         var users = bountyDB.users.split(' ')
                         var list = ''
@@ -9947,16 +9956,6 @@ async function bounty_check() {
                             .catch(err => console.log(err))
                         }).catch(err => console.log(err))
                     }
-                }
-                else if (bountyDB.msg_id) {
-                    client.channels.cache.get('892003813786017822').messages.fetch(msg_id)
-                    .then(msg => {
-                        msg.unpin()
-                        .then(res => {
-                            db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
-                        })
-                        .catch(err => console.log(err))
-                    }).catch(err => console.log(err))
                 }
             }
         }
