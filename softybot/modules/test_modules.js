@@ -139,6 +139,9 @@ async function admin_test(message,args) {
     message.channel.send({
         content: ' ',
         embeds: [{
+            fields: [{
+                name: 'field1',value: 'smth'
+            }],
             description: '*smth*',
             footer: {
                 text: '*smth*'

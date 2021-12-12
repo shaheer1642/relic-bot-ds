@@ -71,7 +71,7 @@ async function bounty_check() {
                                 {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
                             ],
                             footer: {
-                                text: '*' + bountyHints[Math.floor(Math.random() * bountyHints.length)] + '*'
+                                text: bountyHints[Math.floor(Math.random() * bountyHints.length)]
                             },
                             color: bountyDB.color
                         })
