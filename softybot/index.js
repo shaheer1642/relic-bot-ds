@@ -106,9 +106,6 @@ module.exports = {client};
 
 client.on('ready', () => {
     console.log('bot started')
-    //----Bounty timers---
-    setImmediate(bounty_check,-1)
-    //setImmediate(update_bounties,-1)
 
     client.user.setActivity('.help', { type: 2 })
 
@@ -148,6 +145,8 @@ client.on('ready', () => {
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
 
+    //----Bounty timers---
+    setImmediate(bounty_check,-1)
 
     //----Ducat updater timeout----
     Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
@@ -185,7 +184,7 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
-
+    
     if (process.env.DEBUG_MODE==1 && message.author.id != '253525146923433984')
         return
         
@@ -9940,8 +9939,21 @@ async function bounty_check() {
                             ],
                             color: bountyDB.color
                         })
-                        client.channels.cache.get('892003813786017822').send(postdata).catch(err => console.log(err))
+                        client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
+                            await db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                            msg.pin(true)
+                        }).catch(err => console.log(err))
                     }
+                }
+                else if (bountyDB.msg_id) {
+                    client.channels.cache.get('892003813786017822').messages.fetch(msg_id)
+                    .then(msg => {
+                        msg.pin(false)
+                        .then(res => {
+                            db.query(`UPDATE bounties_list SET msg_id = NULL WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`).catch(err => console.log(err))
+                        })
+                        .catch(err => console.log(err))
+                    }).catch(err => console.log(err))
                 }
             }
         }
