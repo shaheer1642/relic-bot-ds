@@ -75,7 +75,6 @@ Close all orders
     .catch(err => console.log(err))
 }
 
-
 async function ducat_template(message) {
     if (message.author.id != '253525146923433984') {
         message.channel.send(`You do not have permission to use this command`).catch(err => console.log(err))
@@ -93,7 +92,6 @@ async function ducat_template(message) {
         res.react('🟣').catch(err => console.log(err))
     })
 }
-
 
 async function getMessage(message,args) {
     if (message.author.id != '253525146923433984') {
@@ -166,6 +164,7 @@ async function admin_test(message,args) {
 async function sendMessage(message,args) {
     if (message.author.id != '253525146923433984')
         return
+    console.log(args)
     var channel = args[0]
     const msg = args.shift().join(' ')
     client.channels.cache.get(channel).send(msg).catch(err => console.log(err))
