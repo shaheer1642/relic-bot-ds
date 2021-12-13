@@ -190,7 +190,7 @@ client.on('messageCreate', async message => {
         pins_handler(message)
         return
     }
-
+    
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
@@ -1169,6 +1169,15 @@ client.on('messageCreate', async message => {
                     break
                 case 'sendmsg':
                     test_modules.sendMessage(message,args)
+                    break
+                case 'qnafaq':
+                    test_modules.qnaFaq(message,args)
+                    break
+                case 'tbcommands':
+                    test_modules.tbcommandslist(message,args)
+                    break
+                case 'tbcommandstut':
+                    test_modules.posttbcommandtut(message,args)
                     break
                 ///*----------------------
                 case 'test':
