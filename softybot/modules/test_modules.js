@@ -134,23 +134,17 @@ async function saySomething(message,args) {
 }
 
 async function admin_test(message,args) {
-    client.channels.cache.get('919293912089260052').send('softy good boi').catch(err => console.log(err))
-    message.channel.send({
-        content: ' ',
-        embeds: [{
-            fields: [{
-                name: 'field1',value: 'smth'
-            }],
-            description: '*smth*',
-            footer: {
-                text: '*smth*'
-            }
-        }]
-    })
-    .catch(err => console.log(err))
-    return
     if (message.author.id != '253525146923433984')
         return
+    message.channel.send('pin this!').then(msg => {
+        msg.pin().then(res => {
+            res.reactions.map(react => {
+                console.log(react)
+            })
+            //res.delete()
+        }).catch(err => console.log(err))
+    }).catch(err => console.log(err))
+    return
     client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')
     .then(msg => {
         msg.react('<:four2:918420407097364480>').catch(err => console.log(err))
