@@ -9611,8 +9611,7 @@ Message: Hi
 4) Click 'Send' button
 5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!
 `, embeds: [{
-        title: 'Click to verify!',
-        url: 'https://forums.warframe.com/messenger/compose/?to=6931114'
+        description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
     }]
 })
     return
