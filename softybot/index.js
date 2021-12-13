@@ -5940,6 +5940,7 @@ async function baroArrival(message,args) {
     }).catch(err => console.log(err));
     return
 }
+
 /*
 async function user_query(message,args) {
     if (args.length == 0) {
@@ -10075,6 +10076,7 @@ async function gmail_api_call(auth) {
     }
     setTimeout(gmail_check_messages, 1000);
 }
+*/
 
 function generateId() {
   let ID = "";
@@ -10085,5 +10087,4 @@ function generateId() {
   return ID;
 }
 
-setTimeout(gmail_check_messages, 1000);
-*/
+//setTimeout(gmail_check_messages, 1000);
