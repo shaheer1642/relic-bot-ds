@@ -137,12 +137,7 @@ async function admin_test(message,args) {
     if (message.author.id != '253525146923433984')
         return
     message.channel.send('pin this!').then(msg => {
-        msg.pin().then(res => {
-            res.reactions.map(react => {
-                console.log(react)
-            })
-            //res.delete()
-        }).catch(err => console.log(err))
+        msg.pin().catch(err => console.log(err))
     }).catch(err => console.log(err))
     return
     client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')

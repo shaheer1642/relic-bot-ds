@@ -18,6 +18,7 @@ const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
 const gpt3 = require('./modules/gpt3.js');
+const {pins_handler} = require('./modules/pins_handler.js');
 const bounty_tracker = require('./modules/bounty_tracker.js');
 const db_modules = require('./modules/db_modules.js');
 const {client,tickcount} = require('./modules/discord_client.js');
@@ -114,9 +115,6 @@ client.on('ready', () => {
     client.user.setActivity('.help', { type: 2 })
 
     console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
-
-    //----Bounty timers---
-    setImmediate(bounty_tracker.bounty_check,-1)
     
     if (process.env.DEBUG_MODE==1)
         return
@@ -152,6 +150,9 @@ client.on('ready', () => {
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
 
+    //----Bounty timers---
+    setImmediate(bounty_tracker.bounty_check,-1)
+
     //----Ducat updater timeout----
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
     db_modules.backupItemsList()
@@ -185,10 +186,15 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', async message => {
+    if (message.author.id == client.user.id && message.type === 'CHANNEL_PINNED_MESSAGE') {
+        pins_handler(message)
+        return
+    }
+
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
-    
+
     if (process.env.DEBUG_MODE==1 && message.author.id != '253525146923433984')
         return
         
@@ -199,6 +205,7 @@ client.on('messageCreate', async message => {
         }).catch(err => console.log(err))
         return
     }
+
 
     if (message.guild) {
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
