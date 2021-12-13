@@ -35,10 +35,11 @@ async function inform_dc (str) {
 }
 
 async function mod_log (str,color='RANDOM') {
-    const embed = new MessageEmbed()
-        .setColor(color)
-        .setDescription(str)
-        .setTimestamp()
+    const embed = {
+        description: str,
+        color: color,
+        timestamp: new Date()
+    }
     await client.channels.cache.get('892072612002418718').send({content: " ", embeds: [embed]}).catch(err => console.log(err+'\nError posting moderation update.'))
 }
 
