@@ -313,6 +313,8 @@ message.channel.send(`_ _
                                                                                         .then(res => {
                                                                                             message.channel.send('https://cdn.discordapp.com/attachments/864199722676125757/919975034720763904/screen_6.PNG')
                                                                                             .then(res => {
+                                                                                                message.channel.send('https://cdn.discordapp.com/attachments/912395290701602866/919978179458908160/qna_faq.png')
+                                                                                                .then(res => {
 message.channel.send({
     content: ' ',
     embeds: [{
@@ -339,9 +341,9 @@ A: Please directly contact MrSofty#7926
         color: '#fcd303'
     }]
 })
-                                                                                                .then(res => {
-                                                                                                    message.channel.send('https://cdn.discordapp.com/attachments/912395290701602866/919982233777995816/list_of_commands.png')
                                                                                                     .then(res => {
+                                                                                                        message.channel.send('https://cdn.discordapp.com/attachments/912395290701602866/919982233777995816/list_of_commands.png')
+                                                                                                        .then(res => {
 message.channel.send({
     content: ' ',
     embeds: [{
@@ -365,8 +367,9 @@ message.channel.send({
         color: '#fcd303'
     }]
 })
-                                                                                                        .then(res => {
-                                                                                                            message.channel.send('finished.')
+                                                                                                            .then(res => {
+                                                                                                                message.channel.send('finished.')
+                                                                                                            })
                                                                                                         })
                                                                                                     })
                                                                                                 })
