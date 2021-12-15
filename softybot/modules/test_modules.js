@@ -468,4 +468,4 @@ async function canvasTest(message,args) {
     }).catch(err => console.log(err))
 }
 
-module.exports = {trade_tut,lich_tut,ducat_template,getMessage,launchNuke,saySomething,admin_test,canvasTest,sendMessage,qnaFaq,tbcommandslist,posttbcommandtut};
+module.exports = {trade_tut,lich_tut,ducat_template,getMessage,launchNuke,saySomething,admin_test,canvasTest,sendMessage,qnaFaq,tbcommandslist,posttbcommandtut,sendUet};
