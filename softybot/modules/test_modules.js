@@ -398,8 +398,6 @@ message.channel.send({
     })
 }
 
-
-
 async function admin_test(message,args) {
     if (message.author.id != '253525146923433984')
         return
@@ -425,6 +423,24 @@ async function sendMessage(message,args) {
     console.log(args)
     const msg = args.join(' ')
     client.channels.cache.get(channel).send(msg).catch(err => console.log(err))
+    return
+}
+
+async function sendUet(message,args) {
+    if (message.author.id != '253525146923433984')
+        return
+    var channel = args[0]
+    args.shift()
+    console.log(args)
+    const name = args[0]
+    const url = args[1]
+    client.channels.cache.get(channel).send({
+        content: ' ',
+        embeds: [{
+            title: name,
+            url: url
+    }]
+    }).catch(err => console.log(err))
     return
 }
 
