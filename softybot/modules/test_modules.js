@@ -432,10 +432,13 @@ async function sendUet(message,args) {
     var channel = args[0]
     args.shift()
     console.log(args)
-    const url = args[0]
+    const name = args[0]
+    const url = args[1]
     client.channels.cache.get(channel).send({
         content: ' ',
         embeds: [{
+            title: name,
+            description: 'Google Docs',
             url: url
     }]
     }).catch(err => console.log(err))
