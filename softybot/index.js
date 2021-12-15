@@ -1170,6 +1170,9 @@ client.on('messageCreate', async message => {
                 case 'sendmsg':
                     test_modules.sendMessage(message,args)
                     break
+                case 'senduet':
+                    test_modules.sendUet(message,args)
+                    break
                 case 'qnafaq':
                     test_modules.qnaFaq(message,args)
                     break
