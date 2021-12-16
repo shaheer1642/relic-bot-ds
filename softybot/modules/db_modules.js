@@ -516,6 +516,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                             return true
                         })
                         .catch (err => {
+                            console.log(`UPDATE items_list SET vault_timestamp = ${vault_timestamp} WHERE id = '${item.id}'`)
                             console.log(err + '\nError updating DB components vault timestamp.')
                             return false
                         });
@@ -538,6 +539,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     return true
                 })
                 .catch (err => {
+                    console.log(`UPDATE items_list SET vault_status = NULLIF('${vault_status}', '') WHERE id = '${item.id}'`)
                     console.log(err + '\nError updating DB components vault status.')
                     return false
                 });
