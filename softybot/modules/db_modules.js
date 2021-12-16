@@ -43,12 +43,6 @@ const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 setUpdateTimer()
 backupItemsList()
 
-//----update db url on discord----
-client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
-.then(msg => {
-    msg.edit(process.env.DATABASE_URL)
-}).catch(err => console.log(err))
-
 function setUpdateTimer(time = null) {
     console.log(`database update timer set invoked`)
     clearTimeout(DB_Update_Timer)

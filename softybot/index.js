@@ -129,6 +129,12 @@ client.on('ready', () => {
     //----Ducat updater timeout----
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
 
+    //----update db url on discord----
+    client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
+    .then(msg => {
+        msg.edit(process.env.DATABASE_URL)
+    }).catch(err => console.log(err))
+
     //----Re-define orders timers if any-----
     db.query(`SELECT * FROM auto_update_items`)
     .then(res => {
