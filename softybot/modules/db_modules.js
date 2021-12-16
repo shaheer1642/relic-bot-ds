@@ -43,11 +43,14 @@ const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 setUpdateTimer()
 backupItemsList()
 
-function setUpdateTimer(time = null) {
+function setUpdateTimer(time = null,message = null) {
     console.log(`database update timer set invoked`)
     clearTimeout(DB_Update_Timer)
     if (time) {
-        DB_Update_Timer = setTimeout(updateDatabaseItems, time);  //execute every 12am (cloud time. 5am for me)
+        if (message)
+            DB_Update_Timer = setTimeout(updateDatabaseItems, time, message);  
+        else
+            DB_Update_Timer = setTimeout(updateDatabaseItems, time);
         return
     }
     //--------Set new timer--------
@@ -74,8 +77,12 @@ function setUpdateTimer(time = null) {
 }
 
 async function updateDatabaseItems(up_origin) {
+    if (DB_Updating) {
+        console.log(`An update is already in progress.`)
+        return
+    }
     DB_Updating = true
-    console.log(up_origin)
+    //console.log(up_origin)
     inform_dc('Updating DB...')
     if (up_origin)
         up_origin.channel.send('Updating DB...')
@@ -296,92 +303,7 @@ async function updateDatabasePrices(up_origin) {
             up_origin.channel.send(`DB successfully updated.\nUpdate duration: ${msToTime(new Date().getTime()-updateTickcount)}\nNext update in: ${msToTime(msTill1AM)}`)
         DB_Updating = false
         //----verify user orders prices----
-        console.log('verifying user orders')
-        var all_orders = null
-        var status = await db.query(`SELECT * FROM users_orders`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false
-            all_orders = res.rows
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (status) {
-            for (var i=0;i<all_orders.length;i++) {
-                var item_data
-                var status = await db.query(`SELECT * FROM items_list WHERE id='${all_orders[i].item_id}'`)
-                .then(res => {
-                    if (res.rows.length == 0)
-                        return false
-                    if (res.rows.length > 1)
-                        return false
-                    item_data = res.rows[0]
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    continue
-                if ((all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.sell_price*0.8 || all_orders[i].user_price > item_data.sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.buy_price*0.8 || all_orders[i].user_price > item_data.buy_price*1.2)) || (all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_sell_price*0.8 || all_orders[i].user_price > item_data.maxed_sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_buy_price*0.8 || all_orders[i].user_price > item_data.maxed_buy_price*1.2))) {
-                    var status = await db.query(`DELETE FROM users_orders WHERE item_id='${all_orders[i].item_id}' AND discord_id=${all_orders[i].discord_id}`)
-                    .then(res => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status)
-                        continue
-                    if (all_orders[i].visibility)
-                        trade_bot_modules.trading_bot_orders_update(null,item_data.id,item_data.item_url,item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,all_orders[i].user_rank).catch(err => console.log(err))
-                    var user_data = null
-                    var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${all_orders[i].discord_id}`)
-                    .then(res => {
-                        if (res.rows.length == 0)
-                            return false
-                        if (res.rows.length > 1)
-                            return false
-                        user_data = res.rows[0]
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status)
-                        continue
-                    var postdata = {}
-                    postdata.content = " "
-                    postdata.embeds = []
-                    postdata.embeds.push({
-                        description: `❕ Order Remove Notification ❕\n\nYour **${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been removed as its price is out of range of the average item price.`,
-                        footer: {text: `Type 'notifications' to disable these notifications in the future.\n\u200b`},
-                        timestamp: new Date()
-                    })
-                    if (all_orders[i].order_type == 'wts')
-                        postdata.embeds[0].color = tb_sellColor
-                    if (all_orders[i].order_type == 'wtb')
-                        postdata.embeds[0].color = tb_buyColor
-                    const user = client.users.cache.get(all_orders[i].discord_id)
-                    if (user_data.notify_remove) {
-                        var user_presc = client.guilds.cache.get(all_orders[i].origin_guild_id).presences.cache.find(mem => mem.userId == all_orders[i].discord_id)
-                        if (user_presc) {
-                            if (user_presc.status != 'dnd')
-                                user.send(postdata).catch(err => console.log(err))
-                        }
-                        else
-                            user.send(postdata).catch(err => console.log(err))
-                    }
-                }
-            }
-        }
-        console.log('verified orders.')
+        trade_bot_modules.verifyUserOrders()
         return
     }
 }
@@ -710,10 +632,9 @@ async function updateDB(message,args) {
             message.channel.send(`An update is already in progress.`)
             return
         }
-        clearTimeout(DB_Update_Timer)
+        setUpdateTimer(10000,message)
         inform_dc('(Forced) DB update launching in 10 seconds...')
         message.channel.send(`(Forced) DB update launching in 10 seconds...`)
-        DB_Update_Timer = setTimeout(updateDatabaseItems, 10000, message);
     }
     else {
         message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`)
