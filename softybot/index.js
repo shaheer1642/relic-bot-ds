@@ -110,7 +110,8 @@ module.exports = {client};
 */
 
 client.on('ready', () => {
-    console.log('bot started')
+    console.log(`Bot has started.`)
+    inform_dc(`Bot has started.`)
 
     client.user.setActivity('.help', { type: 2 })
 
@@ -118,34 +119,6 @@ client.on('ready', () => {
     
     if (process.env.DEBUG_MODE==1)
         return
-    //--------Set new timer--------
-    var currTime = new Date();
-    var currDay = new Date(
-        currTime.getFullYear(),
-        currTime.getMonth(),
-        currTime.getDate(), // the current day, ...
-        0, 15, 0 // ...at 00:15:00 hours
-    );
-    var nextDay = new Date(
-        currTime.getFullYear(),
-        currTime.getMonth(),
-        currTime.getDate() + 1, // the next day, ...
-        0, 15, 0 // ...at 00:15:00 hours
-    );
-    if ((currDay.getTime() - currTime.getTime())>0)
-        var msTill1AM = currDay.getTime() - currTime.getTime()
-    else    //its past 12am. do next day
-        var msTill1AM = nextDay.getTime() - currTime.getTime()
-    //-------------
-    db_modules.DB_Update_Timer = setTimeout(db_modules.updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
-    console.log(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
-    inform_dc(`Bot has started.\nDB update launching in: ${msToTime(msTill1AM)}`)
-
-    //----update db url on discord----
-    client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
-    .then(msg => {
-        msg.edit(process.env.DATABASE_URL)
-    }).catch(err => console.log(err))
 
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
@@ -155,7 +128,6 @@ client.on('ready', () => {
 
     //----Ducat updater timeout----
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
-    db_modules.backupItemsList()
 
     //----Re-define orders timers if any-----
     db.query(`SELECT * FROM auto_update_items`)

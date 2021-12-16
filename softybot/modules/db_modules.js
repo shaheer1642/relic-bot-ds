@@ -40,6 +40,44 @@ var DB_Updating = false
 var DB_Update_Timer = null
 const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 
+setUpdateTimer()
+backupItemsList()
+
+//----update db url on discord----
+client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
+.then(msg => {
+    msg.edit(process.env.DATABASE_URL)
+}).catch(err => console.log(err))
+
+function setUpdateTimer(time = null) {
+    console.log(`database update timer set invoked`)
+    clearTimeout(DB_Update_Timer)
+    if (time) {
+        DB_Update_Timer = setTimeout(updateDatabaseItems, time);  //execute every 12am (cloud time. 5am for me)
+        return
+    }
+    //--------Set new timer--------
+    var currTime = new Date();
+    var currDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate(), // the current day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    var nextDay = new Date(
+        currTime.getFullYear(),
+        currTime.getMonth(),
+        currTime.getDate() + 1, // the next day, ...
+        0, 15, 0 // ...at 00:15:00 hours
+    );
+    if ((currDay.getTime() - currTime.getTime())>0)
+        var msTill1AM = currDay.getTime() - currTime.getTime()
+    else    //its past 12am. do next day
+        var msTill1AM = nextDay.getTime() - currTime.getTime()
+    DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    console.log(`Next DB update launching in: ${msToTime(msTill1AM)}`)
+}
+
 async function updateDatabaseItems(up_origin) {
     DB_Updating = true
     console.log(up_origin)
@@ -244,25 +282,7 @@ async function updateDatabasePrices(up_origin) {
         console.log('Error retrieving DB items list')
     })
     //--------Set new timer--------
-    var currTime = new Date();
-    var currDay = new Date(
-        currTime.getFullYear(),
-        currTime.getMonth(),
-        currTime.getDate(), // the current day, ...
-        0, 15, 0 // ...at 00:15:00 hours
-    );
-    var nextDay = new Date(
-        currTime.getFullYear(),
-        currTime.getMonth(),
-        currTime.getDate() + 1, // the next day, ...
-        0, 15, 0 // ...at 00:15:00 hours
-    );
-    if ((currDay.getTime() - currTime.getTime())>0)
-        var msTill1AM = currDay.getTime() - currTime.getTime()
-    else    //its past 12am. do next day
-        var msTill1AM = nextDay.getTime() - currTime.getTime()
-    console.log(`Next DB update launching in: ${msToTime(msTill1AM)}`)
-    DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
+    setUpdateTimer()
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices')
@@ -1106,4 +1126,4 @@ async function dc_update_msgs() {
     })
 }
 
-module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem,backupItemsList,updateDB,getDB,DB_Update_Timer};
+module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem,backupItemsList,updateDB,getDB,setUpdateTimer};
