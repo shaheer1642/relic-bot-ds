@@ -508,7 +508,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                         var pos2 = str.indexOf('(',pos1)
                         pos1 = str.indexOf(')',pos2)
                         vault_timestamp = new Date(str.substring(pos2+1,pos1)).getTime()
-                        if (vault_timestamp == NaN)
+                        if (Number.isNaN(vault_timestamp))
                             vault_timestamp = 0
                         console.log('Updating DB relic vault timestamp...')
                         var status = await db.query(`UPDATE items_list SET 
