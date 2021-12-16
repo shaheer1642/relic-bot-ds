@@ -76,6 +76,7 @@ function setUpdateTimer(time = null) {
         var msTill1AM = nextDay.getTime() - currTime.getTime()
     DB_Update_Timer = setTimeout(updateDatabaseItems, msTill1AM);  //execute every 12am (cloud time. 5am for me)
     console.log(`Next DB update launching in: ${msToTime(msTill1AM)}`)
+    return msTill1AM
 }
 
 async function updateDatabaseItems(up_origin) {
@@ -282,7 +283,7 @@ async function updateDatabasePrices(up_origin) {
         console.log('Error retrieving DB items list')
     })
     //--------Set new timer--------
-    setUpdateTimer()
+    const msTill1AM = setUpdateTimer()
     //-------------
     if (!main) {
         console.log('Error occurred updating DB prices')
