@@ -1918,7 +1918,15 @@ client.on('interactionCreate', async interaction => {
                     await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
                     return
                 }
-                res.rows[0].users2[interaction.user.id] = {levels: [5-15,10-20]}
+                var replyInteract = 'Empty.'
+                if (res.rows[0].users2.hasOwnProperty(interaction.user.id)) {
+                    delete res.rows[0].users2[interaction.user.id]
+                    replyInteract = 'Removed tracker.'
+                }
+                else {
+                    res.rows[0].users2[interaction.user.id] = {levels: [5-15,10-20]}
+                    replyInteract = 'Added tracker.'
+                }
                 await db.query(`
                 UPDATE bounties_list
                 SET users2 = '${JSON.stringify(res.rows[0].users2)}'
@@ -1967,7 +1975,7 @@ client.on('interactionCreate', async interaction => {
                     if (res.rowCount == 0)
                         await interaction.reply({ content: 'Some error occured. Please contact softy.  Code 501', ephemeral: false}).catch(err => console.log(err));
                     else
-                        await interaction.reply({ content: 'Added tracker.', ephemeral: true}).catch(err => console.log(err));
+                        await interaction.reply({ content: replyInteract, ephemeral: true}).catch(err => console.log(err));
                 })
                 .catch(err => console.log(err))
             })
