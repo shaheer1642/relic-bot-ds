@@ -18,5 +18,15 @@ module.exports = {
                 option.setName('mission_type')
                     .setDescription('Select mission type')
                     .setRequired(true))
+            .addStringOption(option =>
+                option.setName('level')
+                    .setDescription('Select preferred level')
+                    .setRequired(false)
+                    .addChoice('Lvl 1 (5-15)', '5-15')
+                    .addChoice('Ostrons', '10-30')
+                    .addChoice('Solaris United', '20-40')
+                    .addChoice('Entrati', '30-50')
+                    .addChoice('Ostrons', '40-60')
+                    .addChoice('Solaris United', 'lvl6'))
         )
 };

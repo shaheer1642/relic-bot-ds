@@ -1904,16 +1904,27 @@ client.on('interactionCreate', async interaction => {
 
     else if (interaction.commandName == 'track') {
 		if (interaction.options.getSubcommand() === 'bounties') {
+            if (interaction.user.id != '253525146923433984') {
+                await interaction.reply({ content: 'This command is under maintenance. Please try again later', ephemeral: true}).catch(err => console.log(err));
+                return
+            }
             //SET users = users || '[${interaction.member.user.id}]'::jsonb
             await db.query(`
             SELECT * FROM bounties_list
             WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
             `)
             .then(async res => {
-                if (res.rowCount == 0) {
+                if (res.rowCount == 0 || res.rowCount > 1) {
                     await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
                     return
                 }
+                res.rows[0].users2[interaction.user.id] = {levels: [5-15,10-20]}
+                await db.query(`
+                UPDATE bounties_list
+                SET users2 = '${JSON.stringify(res.rows[0].users2)}'
+                WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
+                `)
+                /*
                 if (res.rows[0].users) {
                     var users = res.rows[0].users.split(' ')
                     var hasValue = 0
@@ -1950,6 +1961,7 @@ client.on('interactionCreate', async interaction => {
                 SET users = '${res.rows[0].users}'
                 WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
                 `)
+                */
                 .then(async res => {
                     console.log(res)
                     if (res.rowCount == 0)
