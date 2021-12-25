@@ -53,12 +53,12 @@ async function bounty_check() {
                     //discord stuff
                     db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime() + 60000}, appeared = ${new Date().getTime()} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
                     .then(() => {
-                        var list = ''
+                        var list = []
                         for (var user in bountyDB.users2) {
                             if (bountyDB.users2[user].levels.includes(job.enemyLevels.join('-')))
-                                list += '<@' + user + '> '
+                                list.push('<@' + user + '> ')
                         }
-                        var postdata = {content: list,embeds: []}
+                        var postdata = {content: list.join(', '),embeds: []}
                         postdata.embeds.push({
                             description: 'A bounty you are tracking has appeared!',
                             fields: [
@@ -72,7 +72,7 @@ async function bounty_check() {
                             },
                             color: bountyDB.color
                         })
-                        client.channels.cache.get('864199722676125757').send(postdata).then(msg => {
+                        client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
                             console.log(msg.id)
                             db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
                             .then(res => {
