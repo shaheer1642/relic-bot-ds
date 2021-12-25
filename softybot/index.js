@@ -1936,10 +1936,6 @@ client.on('interactionCreate', async interaction => {
 
     else if (interaction.commandName == 'track') {
 		if (interaction.options.getSubcommand() === 'bounties') {
-            if (interaction.user.id != '253525146923433984') {
-                await interaction.reply({ content: 'This command is under maintenance. Please try again later', ephemeral: true}).catch(err => console.log(err));
-                return
-            }
             //SET users = users || '[${interaction.member.user.id}]'::jsonb
             await db.query(`
             SELECT * FROM bounties_list
