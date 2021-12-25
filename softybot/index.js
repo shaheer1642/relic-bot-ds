@@ -1918,20 +1918,65 @@ client.on('interactionCreate', async interaction => {
                     await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
                     return
                 }
-                var replyInteract = 'Empty.'
                 if (res.rows[0].users2.hasOwnProperty(interaction.user.id)) {
                     delete res.rows[0].users2[interaction.user.id]
-                    replyInteract = 'Removed tracker.'
+                    await db.query(`
+                    UPDATE bounties_list
+                    SET users2 = '${JSON.stringify(res.rows[0].users2)}'
+                    WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
+                    `)
+                    .then(async res => {
+                        console.log(res)
+                        if (res.rowCount == 0)
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false}).catch(err => console.log(err));
+                        else
+                            await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
+                    })
+                    .catch(err => console.log(err))
+                    return
                 }
                 else {
-                    res.rows[0].users2[interaction.user.id] = {levels: [5-15,10-20]}
-                    replyInteract = 'Added tracker.'
+                    postdata = {content: `Syndicate: ${interaction.options.getString('syndicate')}\nBounty: ${interaction.options.getString('mission_type')}`, embeds: [], ephemeral: true}
+                    postdata.components = []
+                    postdata.components.push({
+                        type:1,
+                        components: [{
+                            type:3,
+                            placeholder: 'Choose bounty levels',
+                            custom_id: 'bounty_lvl',
+                            min_values: 1,
+                            max_values: 6,
+                            options: [
+                                {
+                                    label: "Level 1 (5-15)",
+                                    value: "5-15"
+                                },
+                                {
+                                    label: "Level 2 (10-30)",
+                                    value: "10-30"
+                                },
+                                {
+                                    label: "Level 3 (20-40)",
+                                    value: "20-40"
+                                },
+                                {
+                                    label: "Level 4 (30-50)",
+                                    value: "30-50"
+                                },
+                                {
+                                    label: "Level 5 (40-60)",
+                                    value: "40-60"
+                                },
+                                {
+                                    label: "Steel Path (100-100)",
+                                    value: "100-100"
+                                },
+                            ]
+                        }]
+                    })
+                    await interaction.reply(postdata).catch(err => console.log(err));
+                    return
                 }
-                await db.query(`
-                UPDATE bounties_list
-                SET users2 = '${JSON.stringify(res.rows[0].users2)}'
-                WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
-                `)
                 /*
                 if (res.rows[0].users) {
                     var users = res.rows[0].users.split(' ')
@@ -1970,14 +2015,6 @@ client.on('interactionCreate', async interaction => {
                 WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
                 `)
                 */
-                .then(async res => {
-                    console.log(res)
-                    if (res.rowCount == 0)
-                        await interaction.reply({ content: 'Some error occured. Please contact softy.  Code 501', ephemeral: false}).catch(err => console.log(err));
-                    else
-                        await interaction.reply({ content: replyInteract, ephemeral: true}).catch(err => console.log(err));
-                })
-                .catch(err => console.log(err))
             })
         }
     }
