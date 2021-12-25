@@ -1,5 +1,8 @@
-var json = {165561651: {levels: [1,2,3]},123: []}
+var json = {
+    165561651: {levels: [1,2,3]},
+    123: {levels: [1,2,3]}
+}
 
-delete json[123]
-
-console.log(JSON.stringify(json))
+for (var user in json) {
+    console.log(json[user].levels)
+}
