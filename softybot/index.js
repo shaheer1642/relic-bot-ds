@@ -1823,7 +1823,8 @@ client.on('interactionCreate', async interaction => {
                         break
                     var bounty = bounties_list[i]
                     if (bounty.type.toLowerCase().match(mission_type.toLowerCase())) {
-                        if (bounty.user2.hasOwnProperty(interaction.member.id))
+                        console.log(bounty)
+                        if (bounty.users2.hasOwnProperty(interaction.member.id))
                             postdata.push({name: bounty.type + ' (Remove)', value: bounty.type.toLowerCase().replace(/ /g,'_')})
                         else
                             postdata.push({name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g,'_')})
