@@ -1776,6 +1776,7 @@ client.on('interactionCreate', async interaction => {
     }
 
     else if (interaction.customId == 'bounty_lvl' && interaction.componentType == 'SELECT_MENU') {
+        await interaction.deferUpdate()
         var msg = interaction.message.content.split('\n')
         var syndicate = msg[0].replace('Syndicate:','').replace(/_/g,' ').trim()
         var bounty_type = msg[1].replace('Bounty:','').replace(/_/g,' ').trim()
