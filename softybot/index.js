@@ -1775,6 +1775,37 @@ client.on('interactionCreate', async interaction => {
         await interaction.editReply(postdata).catch(err => console.log(err))
     }
 
+    else if (interaction.customId == 'bounty_lvl' && interaction.componentType == 'SELECT_MENU') {
+        var msg = interaction.message.content.split('\n')
+        var syndicate = msg[0].replace('Syndicate:','').replace(/_/g,' ').trim()
+        var bounty_type = msg[1].replace('Bounty:','').replace(/_/g,' ').trim()
+        await db.query(`
+        SELECT * FROM bounties_list
+        WHERE LOWER(syndicate) = '${syndicate}' AND LOWER(type) = '${bounty_type}'
+        `)
+        .then(async res => {
+            if (res.rowCount == 0 || res.rowCount > 1) {
+                await interaction.editReply({ content: 'Some error occured. Please contact softy. Code 500',embeds: [],components:[] }).catch(err => console.log(err));
+                return
+            }
+            res.rows[0].users2[interaction.user.id] = {levels: interaction.values}
+            await db.query(`
+            UPDATE bounties_list
+            SET users2 = '${JSON.stringify(res.rows[0].users2)}'
+            WHERE LOWER(syndicate) = '${syndicate}' AND LOWER(type) = '${bounty_type}'
+            `)
+            .then(async res => {
+                if (res.rowCount == 0)
+                    await interaction.editReply({ content: 'Some error occured. Please contact softy. Code 501',embeds: [],components:[] }).catch(err => console.log(err));
+                else
+                    await interaction.editReply({ content: 'Added tracker.',embeds: [],components:[] }).catch(err => console.log(err));
+            })
+            .catch(err => console.log(err))
+            return
+        })
+        .catch(err => console.log(err))
+    }
+
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'track') {
             if (interaction.options.getSubcommand() == 'bounties') {
@@ -1977,44 +2008,6 @@ client.on('interactionCreate', async interaction => {
                     await interaction.reply(postdata).catch(err => console.log(err));
                     return
                 }
-                /*
-                if (res.rows[0].users) {
-                    var users = res.rows[0].users.split(' ')
-                    var hasValue = 0
-                    for (var i=0; i<users.length; i++) {
-                        if (users[i] == interaction.member.user.id) {
-                            hasValue = 1
-                            break
-                        }
-                    }
-                    if (!hasValue)
-                        res.rows[0].users += ' ' + interaction.member.user.id
-                    else {
-                        res.rows[0].users = res.rows[0].users.replace(interaction.member.id, '').trim()
-                        await db.query(`UPDATE bounties_list SET users = NULLIF('${res.rows[0].users}', '')
-                        WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'`)
-                        .then(async res => {
-                            if (res.rowCount == 1)
-                                await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
-                            else 
-                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false}).catch(err => console.log(err));
-                        }).catch(async err => {
-                            console.log(err)
-                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 503', ephemeral: false}).catch(err => console.log(err));
-                        })
-                        return
-                    }
-                    
-                }
-                else 
-                    res.rows[0].users =  interaction.member.user.id
-                res.rows[0].users = res.rows[0].users.trimLeft()
-                await db.query(`
-                UPDATE bounties_list
-                SET users = '${res.rows[0].users}'
-                WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
-                `)
-                */
             })
         }
     }
