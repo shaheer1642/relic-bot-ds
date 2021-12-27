@@ -13,27 +13,35 @@ const vaultExclusiveRelics = [
     "axi_s3_relic"
 ]
 const vaultExpectedRelics = [
-    "lith_a4_relic",
-    "lith_i1_relic",
-    "lith_k7_relic",
-    "lith_n7_relic",
-    "lith_n8_relic",
-    "lith_t7_relic",
-    "meso_b5_relic",
-    "meso_b6_relic",
-    "meso_c6_relic",
-    "meso_s10_relic",
-    "neo_p2_relic",
-    "neo_t4_relic",
-    "neo_t5_relic",
-    "axi_a13_relic",
-    "axi_a14_relic",
-    "axi_c6_relic",
-    "axi_g6_relic",
-    "axi_i2_relic",
-    "ivara_prime_set",
-    "baza_prime_set",
-    "aksomati_prime_set"
+    "lith_h3_relic",
+    "lith_g4_relic",
+    "lith_t8_relic",
+    "lith_c9_relic",
+    "lith_s11_relic",
+    "meso_z4_relic",
+    "meso_p4_relic",
+    "meso_s11_relic",
+    "neo_n18_relic",
+    "neo_p3_relic",
+    "neo_n17_relic",
+    "axi_m2_relic",
+    "axi_s9_relic",
+    "axi_c7_relic",
+    "axi_p4_relic",
+    "titania_prime_neuroptics",
+    "titania_prime_set",
+    "titania_prime_chassis",
+    "titania_prime_systems",
+    "titania_prime_blueprint",
+    "corinth_prime_set",
+    "corinth_prime_blueprint",
+    "corinth_prime_stock",
+    "corinth_prime_barrel",
+    "corinth_prime_receiver",
+    "pangolin_prime_handle",
+    "pangolin_prime_blade",
+    "pangolin_prime_set",
+    "pangolin_prime_blueprint"
 ]
 
 var DB_Updating = false
@@ -510,13 +518,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
             console.log('Retrieving wiki info for set...')
             var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_set','').replace(/_and_/g,'_%26_').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
             .then(async (wikiInfo) => {
-                if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a> at this time and are no longer farmable`))
+                if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a>`))
                     vault_status = 'V'
                 else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of.*being only obtainable through.*Railjack.*missions/))
                     vault_status = 'R'
                 else if (wikiInfo.data.parse.text["*"].match(`has returned from the <a href="/wiki/Prime_Vault" title="Prime Vault">Prime Vault</a> for a limited time`))
                     vault_status = 'P'
-                else if (vaultExpectedRelics.includes(item.item_url.replace('_set','')))
+                else if (vaultExpectedRelics.includes(item.item_url))
                     vault_status = 'E'
                 console.log(`Updating DB components vault status...`)
                 for (var j=0;j<components_list.length;j++) {
