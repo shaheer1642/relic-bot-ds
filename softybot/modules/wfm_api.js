@@ -542,7 +542,8 @@ async function relics(message,args) {
         value1 = value1.substring(0, value1.length - 1)
         value2 = value2.substring(0, value2.length - 1)
         var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-        postdata.embeds.push({ 
+
+        var ind = postdata.embeds.push({
             title: relic_name + vault_status,
             url: "https://warframe.market/items/" + d_item_url,
             footer: {text: "Total drops value: " + drops_value + "p"},
@@ -552,6 +553,8 @@ async function relics(message,args) {
                 {name: "`Price`", value: value2, inline: true},
                 {name: "`Ducat`", value: value3, inline: true}]
         })
+        if (relic_drops.extras)
+            postdata.embeds[ind].description = relic_drops.extras
         if (relic_drops.vault_status == 'V' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
         else if (relic_drops.vault_status == 'B' && relic_drops.vault_timestamp)
