@@ -1810,7 +1810,7 @@ client.on('interactionCreate', async interaction => {
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'track') {
             if (interaction.options.getSubcommand() == 'bounties') {
-                if (!interaction.options.getString('mission_type'))
+                if (!interaction.options.getString('syndicate'))
                     return
                 var mission_type = interaction.options.getString('mission_type')
                 var bounties_list = []
