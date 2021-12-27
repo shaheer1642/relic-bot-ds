@@ -554,7 +554,7 @@ async function relics(message,args) {
                 {name: "`Ducat`", value: value3, inline: true}]
         })
         if (relic_drops.extras)
-            postdata.embeds[ind].description = relic_drops.extras
+            postdata.embeds[ind-1].description = relic_drops.extras
         if (relic_drops.vault_status == 'V' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nLast vaulted: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp) + ' ago'
         else if (relic_drops.vault_status == 'B' && relic_drops.vault_timestamp)
