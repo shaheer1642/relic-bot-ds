@@ -1057,7 +1057,7 @@ client.on('messageCreate', async message => {
                     ducat_updater.updateDucatForced(message,args)
                     break
                 case 'baro':
-                    baroArrival(message,args)
+                    test_modules.baroArrival(message,args)
                     break
                 case 'trade_tut':
                     test_modules.trade_tut(message,args)
@@ -4085,24 +4085,6 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         return Promise.resolve()
     }
 })
-
-async function baroArrival(message,args) {
-    var time = 1637326800
-    if (time <= new Date().getTime()/1000) {
-        message.channel.send('Time not calculated yet.\n<@253525146923433984> Please calculate next timer daddy').catch(err => console.log(err))
-        return
-    }
-    message.channel.send({
-        content: ' ',
-        embeds: [
-            {
-                description: `The wait is over, Tenno. Baro Ki\'Teer has arrived.\nOr did he\n\nNext arrival <t:${Math.round(time)}:R> (<t:${Math.round(time)}:f>)`,
-                thumbnail: {url: 'https://cdn.discordapp.com/attachments/864199722676125757/901175987528691712/baro.png'}
-            }
-        ]
-    }).catch(err => console.log(err));
-    return
-}
 
 axiosRetry(axios, {
     retries: 50, // number of retries
