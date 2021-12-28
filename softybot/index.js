@@ -2974,7 +2974,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                         WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
                                         RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                                         `)
-                                        .then(res => {
+                                        .then(async res => {
                                             if (res[1].rowCount == 1) {
                                                 await db.query(`
                                                 UPDATE users_list
@@ -3003,7 +3003,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                         WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
                                         RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                                         `)
-                                        .then(res => {
+                                        .then(async res => {
                                             if (res[1].rowCount == 1) {
                                                 await db.query(`
                                                 UPDATE users_list
@@ -3160,7 +3160,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
                                 RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
                                 `)
-                                .then(res => {
+                                .then(async res => {
                                     if (res[1].rowCount == 1) {
                                         await db.query(`
                                         UPDATE users_list
@@ -3189,7 +3189,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
                                 RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
                                 `)
-                                .then(res => {
+                                .then(async res => {
                                     if (res[1].rowCount == 1) {
                                         await db.query(`
                                         UPDATE users_list
