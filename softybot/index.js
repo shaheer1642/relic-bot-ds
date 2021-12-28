@@ -3063,14 +3063,25 @@ client.on('messageReactionAdd', async (reaction, user) => {
             })
             if (!status)
                 return Promise.resolve()
-            if (reaction.message.embeds[0])
+            if (reaction.message.embeds[0]) {
                 if (reaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
                     var status = await db.query(`
                     UPDATE filled_users_lich_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','denied').replace('order_success','successful')}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
                     WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+                    RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                     `)
                     .then(res => {
-                        console.log(res)
+                        if (res.rowCount==1) {
+                            await db.query(`
+                            UPDATE users_list
+                            SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res.rows[0])}', true)
+                            WHERE discord_id = ${(res.rows[0].order_owner)} 
+                            OR discord_id = ${(res.rows[0].order_filler)}
+                            `)
+                            .catch(err => {
+                                console.log(err)
+                            })
+                        }
                         return true
                     })
                     .catch(err => {
@@ -3156,12 +3167,24 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     }
                     return Promise.resolve()
                 }
+            }
             var status = await db.query(`
             UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','denied').replace('order_success','successful')}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
             WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+            RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
             `)
             .then(res => {
-                console.log(res)
+                if (res.rowCount==1) {
+                    await db.query(`
+                    UPDATE users_list
+                    SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res.rows[0])}', true)
+                    WHERE discord_id = ${(res.rows[0].order_owner)} 
+                    OR discord_id = ${(res.rows[0].order_filler)}
+                    `)
+                    .catch(err => {
+                        console.log(err)
+                    })
+                }
                 return true
             })
             .catch(err => {
