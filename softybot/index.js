@@ -2969,9 +2969,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                     var order_data = {}
                                     if (!from_cross) {
                                         var status = await db.query(`
-                                        UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{"${order_data.order_owner}": '5'}', true)
+                                        UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
                                         WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId};
-                                        UPDATE filled_users_lich_orders SET order_rating = jsonb_set(order_rating,'{"${order_data.order_filler}": '5'}', true)
+                                        UPDATE filled_users_lich_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
                                         WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
                                         RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                                         `)
@@ -2988,9 +2988,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                     }
                                     else {
                                         var status = await db.query(`
-                                        UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{"${order_data.order_owner}": '5'}', true)
+                                        UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
                                         WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId};
-                                        UPDATE filled_users_lich_orders SET order_rating = jsonb_set(order_rating,'{"${order_data.order_filler}": '5'}', true)
+                                        UPDATE filled_users_lich_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
                                         WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
                                         RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                                         `)
