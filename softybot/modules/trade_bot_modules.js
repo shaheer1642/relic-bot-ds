@@ -213,7 +213,7 @@ async function verifyUserOrders() {
     }
     console.log('verified orders.')
 }
-//==================================
+
 async function trading_bot(message,args,command) {
     var price = 0
     var list_low = false
@@ -2552,7 +2552,167 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
         }, after3h - currTime);
     }
 }
-//==================================
+
+async function tb_threadHandler(message) {
+    if (message.channel.ownerId != client.user.id)
+        return Promise.resolve()
+    if (message.channel.archived)
+        return Promise.resolve()
+    if (message.author.id == client.user.id)
+        return Promise.resolve()
+    console.log(`message sent in an active thread`)
+    var order_data = null
+    var from_cross = false
+    var isLich = false
+    var status = await db.query(`
+    SELECT * FROM filled_users_orders
+    WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
+    `)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        order_data = res.rows[0]
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        var status2 = await db.query(`
+        SELECT * FROM filled_users_orders
+        WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
+        `)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            from_cross = true
+            order_data = res.rows[0]
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status2) {
+            var status = await db.query(`
+            SELECT * FROM filled_users_lich_orders
+            WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
+            `)
+            .then(res => {
+                if (res.rows.length == 0)
+                    return false
+                order_data = res.rows[0]
+                isLich = true
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status) {
+                var status2 = await db.query(`
+                SELECT * FROM filled_users_lich_orders
+                WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
+                `)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    isLich = true
+                    from_cross = true
+                    order_data = res.rows[0]
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status2)
+                    return Promise.resolve()
+            }
+        }
+    }
+    if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
+        message.delete().catch(err => console.log(err))
+        client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(err => console.log(err))
+        //message.channel.members.remove(message.author.id).then(res => console.log(res)).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    if (!order_data.messages_log)
+        order_data.messages_log = []
+    var ingame_name = ""
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        if (res.rows.length > 1)
+            return false
+        ingame_name = res.rows[0].ingame_name
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status)
+        return Promise.resolve()
+    //order_data.messages_log = JSON.parse(order_data.messages_log)
+    var sentMessage = ''
+    sentMessage += message.content + '\n'
+    message.attachments.map(attachment => {
+        sentMessage += attachment.url + '\n'
+    })
+    order_data.messages_log += `**${ingame_name}:** ${sentMessage}`
+    if (!from_cross) {
+        if (isLich) {
+            var status = await db.query(`
+            UPDATE filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
+            `)
+            .catch(err => {
+                console.log(err)
+            })
+        }
+        else {
+            var status = await db.query(`
+            UPDATE filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
+            `)
+            .catch(err => {
+                console.log(err)
+            })
+        }
+    }
+    else {
+        if (isLich) {
+            var status = await db.query(`
+            UPDATE filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
+            `)
+            .catch(err => {
+                console.log(err)
+            })
+        }
+        else {
+            var status = await db.query(`
+            UPDATE filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
+            `)
+            .catch(err => {
+                console.log(err)
+            })
+        }
+    }
+    if (from_cross) {
+        const thread = client.channels.cache.get(order_data.thread_id)
+        thread.send(`**${ingame_name}:** ${sentMessage}`).catch(err => console.log(err))
+    }
+    else if (order_data.cross_thread_id) {
+        const thread = client.channels.cache.get(order_data.cross_thread_id)
+        thread.send(`**${ingame_name}:** ${sentMessage}`).catch(err => console.log(err))
+    }
+}
+
 function generateId() {
     let ID = "";
     let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -2575,5 +2735,6 @@ module.exports = {
     trading_bot_item_orders,
     trading_bot_registeration,
     td_set_orders_timeouts,
-    set_order_timeout
+    set_order_timeout,
+    tb_threadHandler
 }
