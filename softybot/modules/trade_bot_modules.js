@@ -57,6 +57,772 @@ async function check_user(message) {
     })
 }
 
+async function leaderboard(message) {
+    var all_users = null
+    var status = await db.query(`SELECT * FROM users_list ORDER BY plat_gained DESC,plat_spent DESC,ingame_name`)
+    .then(res => {
+        if (res.rows.length == 0) {
+            message.channel.send('No users found in the DB currently')
+            return false
+        }
+        all_users = res.rows
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        message.channel.send('☠️ Error fetching users info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️')
+        return false
+    })
+    if (!status)
+        return
+    postdata = {}
+    postdata.content = " "
+    postdata.embeds = []
+    postdata.embeds.push({
+        title: 'All-time Leaderboard',
+        fields: [{
+            name: 'User',
+            value: '\u200b',
+            inline: true
+        },{
+            name: 'Plat gained <:profit:896079718955233301>',
+            value: '\u200b',
+            inline: true
+        },{
+            name: 'Plat spent <:loss:896079691755180103>',
+            value: '\u200b',
+            inline: true
+        }],
+        color: tb_invisColor,
+        timestamp: new Date()
+    })
+    var x = 0
+    for (var i=0;i<all_users.length;i++) {
+        if (postdata.embeds[0].fields[x].value.length > 950) {
+            x += 3
+            postdata.embeds[0].fields.push({
+                name: 'User',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Plat gained <:profit:896079718955233301>',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Plat spent <:loss:896079691755180103>',
+                value: '\u200b',
+                inline: true
+            })
+        }
+        postdata.embeds[0].fields[x].value += i+1 + '. ' + all_users[i].ingame_name + '\n'
+        postdata.embeds[0].fields[x+1].value += all_users[i].plat_gained + '\n'
+        postdata.embeds[0].fields[x+2].value += all_users[i].plat_spent + '\n'
+    }
+    message.channel.send(postdata).catch(err => {
+        console.log(err)
+        message.channel.send('Some error sending embed. Please contact MrSofty#7926')
+    })
+    return
+}
+
+async function verifyUserOrders() {
+    console.log('verifying user orders')
+    var all_orders = null
+    var status = await db.query(`SELECT * FROM users_orders`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        all_orders = res.rows
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (status) {
+        for (var i=0;i<all_orders.length;i++) {
+            var item_data
+            var status = await db.query(`SELECT * FROM items_list WHERE id='${all_orders[i].item_id}'`)
+            .then(res => {
+                if (res.rows.length == 0)
+                    return false
+                if (res.rows.length > 1)
+                    return false
+                item_data = res.rows[0]
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                continue
+            if ((all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.sell_price*0.8 || all_orders[i].user_price > item_data.sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.buy_price*0.8 || all_orders[i].user_price > item_data.buy_price*1.2)) || (all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_sell_price*0.8 || all_orders[i].user_price > item_data.maxed_sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_buy_price*0.8 || all_orders[i].user_price > item_data.maxed_buy_price*1.2))) {
+                var status = await db.query(`DELETE FROM users_orders WHERE item_id='${all_orders[i].item_id}' AND discord_id=${all_orders[i].discord_id}`)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    continue
+                if (all_orders[i].visibility)
+                    trade_bot_modules.trading_bot_orders_update(null,item_data.id,item_data.item_url,item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,all_orders[i].user_rank).catch(err => console.log(err))
+                var user_data = null
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${all_orders[i].discord_id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    if (res.rows.length > 1)
+                        return false
+                    user_data = res.rows[0]
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    continue
+                var postdata = {}
+                postdata.content = " "
+                postdata.embeds = []
+                postdata.embeds.push({
+                    description: `❕ Order Remove Notification ❕\n\nYour **${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been removed as its price is out of range of the average item price.`,
+                    footer: {text: `Type 'notifications' to disable these notifications in the future.\n\u200b`},
+                    timestamp: new Date()
+                })
+                if (all_orders[i].order_type == 'wts')
+                    postdata.embeds[0].color = tb_sellColor
+                if (all_orders[i].order_type == 'wtb')
+                    postdata.embeds[0].color = tb_buyColor
+                const user = client.users.cache.get(all_orders[i].discord_id)
+                if (user_data.notify_remove) {
+                    var user_presc = client.guilds.cache.get(all_orders[i].origin_guild_id).presences.cache.find(mem => mem.userId == all_orders[i].discord_id)
+                    if (user_presc) {
+                        if (user_presc.status != 'dnd')
+                            user.send(postdata).catch(err => console.log(err))
+                    }
+                    else
+                        user.send(postdata).catch(err => console.log(err))
+                }
+            }
+        }
+    }
+    console.log('verified orders.')
+}
+//==================================
+async function trading_bot(message,args,command) {
+    var price = 0
+    var list_low = false
+    var isMaxed = false
+    var index = 0
+    while(index !== -1) {
+        index = args.indexOf('auto');
+        if (index !== -1) {
+            list_low = true
+            args.splice(index, 1);
+        }
+    }
+    var index = 0
+    while(index !== -1) {
+        index = args.indexOf('maxed') || args.indexOf('max');
+        if (index !== -1) {
+            isMaxed = true
+            args.splice(index, 1);
+        }
+    }
+    /*
+    if (args[args.length-1] == 'auto') {
+        list_low = true
+        args.pop()
+    }
+    */
+    if (args[args.length-1].match(/[0-9]/) && (!args[args.length-1].match(/[a-zA-Z]/) || args[args.length-1].match(/p$/) || args[args.length-1].match(/pl$/) || args[args.length-1].match(/plat$/))) {
+        args[args.length-1] = args[args.length-1].replace('plat','').replace('pl','').replace('p','')
+        var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
+    }
+    if (price < 0) {
+        message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
+    }
+    console.log(price)
+    var ingame_name = ''
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false
+        else {
+            ingame_name = res.rows[0].ingame_name
+            return true
+        }
+    })
+    .catch(err => {
+        if (err.response)
+            console.log(err.response.data)
+        console.log(err)
+        console.log('Retrieving Database -> users_list error')
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        return false
+    })
+    if (!status) {
+        message.channel.send({content: `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`}).then(msg => setTimeout(() => msg.delete(), 5000))
+        try {
+            message.author.send({content: "Type the following command to register your ign:\nverify ign"})
+        } catch (err) {
+            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+        }
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
+    }
+    //---------------
+    var d_item_url = ""
+    args.forEach(element => {
+        d_item_url = d_item_url + element + "_"
+    });
+    d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    d_item_url = d_item_url.replace(/_p$/,'_prime')
+    d_item_url = d_item_url.replace('_p_','_prime_')
+    d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
+    if (d_item_url.match('lith') || d_item_url.match('meso') || d_item_url.match('neo') || d_item_url.match('axi'))
+        if (!d_item_url.match('_relic'))
+            d_item_url += '_relic'
+    var arrItems = []
+    var items_list = []
+    console.log('Retrieving Database -> items_list')
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        items_list = res.rows
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "☠️ Some error occured retrieving database info.\nError code: 501\nContact MrSofty#7926 ☠️"})
+        return false
+    })
+    if (!status)      
+        return Promise.reject()
+    for (var i=0; i<items_list.length; i++) {
+        var element = items_list[i]
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if ((new Date().getTime() - items_list[i].update_timestamp) > 86400000) {
+                console.log(`updating item ${items_list[i].item_url} in db`)
+                var status = await db_modules.updateDatabaseItem(items_list,items_list[i])
+                .then(items_list => {
+                    for (var j=0; j<items_list.length; j++) {
+                        if (items_list[j].id == items_list[i].id) {
+                            items_list[i] = items_list[j]
+                            element = items_list[j]
+                            break
+                        }
+                    }
+                    return true
+                })
+                .catch(() => {
+                    console.log("Error updating DB.")
+                    message.channel.send({content: "☠️ Some error occured updating item in db.\nError code:\nContact MrSofty#7926 ☠️"})
+                    return false
+                })
+                if (!status)      
+                    return Promise.reject()
+            }
+            if (element.tags.includes("set")) {
+                arrItems = []
+                arrItems.push(element);
+                break
+            }
+            arrItems.push(element);
+        }
+    }
+    if (arrItems.length==0) {
+        message.channel.send("⚠️ Item **" + d_item_url + "** either does not exist or is an unsupported item at the moment (might be a mod or arcane). ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        return Promise.resolve()
+    }
+    if (arrItems.length > 1) {
+        message.channel.send("⚠️ More than one search results detected for the item **" + d_item_url + "**, cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        return Promise.resolve()
+    }
+    const item_url = arrItems[0].item_url
+    const item_id = arrItems[0].id
+    if (!arrItems[0].rank && isMaxed) {
+        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        return Promise.resolve()
+    }
+    var item_rank = 'unranked'
+    if (isMaxed)
+        item_rank = 'maxed'
+    const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    const originGuild = message.guild.name
+    const originMessage = message
+    if (price) {
+        if (price != 0) {
+            var open_trade = false
+            var target_order_type = null
+            var tradee = {}
+            tradee.discord_id = message.author.id
+            tradee.ingame_name = ingame_name
+            var trader = {}
+            trader.discord_id = null
+            trader.ingame_name = null
+            var all_orders = null
+            if (command == 'wts') {
+                //----check if wts price is lower than active buy order
+                var status = await db.query(`
+                SELECT * FROM users_orders 
+                JOIN users_list ON users_list.discord_id = users_orders.discord_id
+                JOIN items_list ON users_orders.item_id = items_list.id
+                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wtb' AND users_orders.user_rank = '${item_rank}'
+                ORDER BY users_orders.user_price DESC, users_orders.update_timestamp`)
+                .then(res => {
+                    if (res.rows.length > 0)
+                        all_orders = res.rows
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(err => console.log(err)); 
+                    return Promise.reject()
+                }
+                if (all_orders) {
+                    if (price <= all_orders[0].user_price) {
+                        open_trade = true
+                        target_order_type = 'wtb'
+                        trader.discord_id = all_orders[0].discord_id
+                        trader.ingame_name = all_orders[0].ingame_name
+                    }
+                }
+            }
+            if (command == 'wtb') {
+                //----check if wtb price is higher than active sell order
+                var all_orders = null
+                var status = await db.query(`
+                SELECT * FROM users_orders 
+                JOIN users_list ON users_list.discord_id = users_orders.discord_id
+                JOIN items_list ON users_orders.item_id = items_list.id
+                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wts' AND users_orders.user_rank = '${item_rank}'
+                ORDER BY users_orders.user_price, users_orders.update_timestamp`)
+                .then(res => {
+                    if (res.rows.length > 0)
+                        all_orders = res.rows
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(err => console.log(err)); 
+                    return Promise.reject()
+                }
+                if (all_orders) {
+                    if (price >= all_orders[0].user_price) {
+                        open_trade = true
+                        target_order_type = 'wts'
+                        trader.discord_id = all_orders[0].discord_id
+                        trader.ingame_name = all_orders[0].ingame_name
+                    }
+                }
+            }
+            if (open_trade) {
+                console.log(all_orders)
+                if (trader.discord_id != tradee.discord_id) {
+                    var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}' AND user_rank = '${item_rank}'`)
+                    .then(res => {
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        return Promise.resolve()
+                    }
+                    var threadName = `${item_name} (${trader.ingame_name})x(${tradee.ingame_name})`
+                    if (threadName.length > 99) {
+                        console.log(`${threadName} thread's name is longer than 99`)
+                        threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
+                    }
+                    trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(err => console.log(err))
+                    const thread = await message.channel.threads.create({
+                        name: threadName,
+                        autoArchiveDuration: 60,
+                        reason: 'Trade opened.'
+                    })
+                    .then(async res => {
+                        setTimeout(() => message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+                        var cross_thread = null
+                        var cross_channel = null
+                        var cross_thread_id = null
+                        var cross_channel_id = null
+                        if (message.guild.id != all_orders[0].origin_guild_id) {
+                            const guild = client.guilds.cache.get(message.guild.id)
+                            if (!guild.members.cache.find(member => member.id == all_orders[0].discord_id)) {
+                                cross_channel =  client.channels.cache.get(all_orders[0].origin_channel_id)
+                                await cross_channel.threads.create({
+                                    name: threadName,
+                                    autoArchiveDuration: 60,
+                                    reason: 'Trade opened.'
+                                })
+                                .then(async crossRes => {
+                                    cross_thread = crossRes
+                                    cross_thread_id = crossRes.id
+                                    cross_channel_id = crossRes.parentId
+                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
+                                })
+                                .catch(err => console.log(err))
+                            }
+                        }
+                        // Check if rows exceed the limit
+                        var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
+                        .then(async res => {
+                            if (res.rowCount >= filledOrdersLimit) {
+                                await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            }
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status) {
+                            res.delete()
+                            return Promise.reject()
+                        }
+                        var status = await db.query(`
+                        INSERT INTO filled_users_orders
+                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
+                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},'${item_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
+                        `)
+                        .then(res => {
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status) {
+                            res.delete()
+                            return Promise.reject()
+                        }
+                        console.log('thread created')
+                        await res.members.add(trader.discord_id).catch(err => console.log(err))
+                        await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                        if (cross_thread) {
+                            await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
+                            await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
+                        }
+                        var owner_refer = res.id
+                        if (cross_thread)
+                            owner_refer = cross_thread.id
+                        client.users.cache.get(trader.discord_id).send(`You have received a **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${item_name + all_orders[0].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
+                        client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                        client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                        var postdata = {}
+                        postdata.color = target_order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                        postdata.timestamp = new Date()
+                        postdata.title = item_name + all_orders[0].user_rank.replace('unranked','').replace('maxed',' (maxed)')
+                        postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
+                        postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
+                        postdata.description = `
+                            **${target_order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
+                            **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
+                            **Price:** ${price}<:platinum:881692607791648778>
+
+                            /invite ${trader.ingame_name}
+                            /invite ${tradee.ingame_name}
+
+                            React with ${tradingBotReactions.success[0]} to finish this trade.
+                            React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
+                        `
+                        res.send({content: ' ',embeds: [postdata]})
+                        .then(open_message => {
+                            var status = db.query(`
+                            UPDATE filled_users_orders set trade_open_message = ${open_message.id}
+                            WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
+                            `)
+                            .catch(err => console.log(err))
+                            open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                            open_message.react('⚠️').catch(err => console.log(err))
+                            if (cross_thread)
+                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                        })
+                        .catch(err => console.log(err))
+                        if (cross_thread) {
+                            cross_thread.send({content: ' ',embeds: [postdata]})
+                            .then(c_open_message => {
+                                var status = db.query(`
+                                UPDATE filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                                WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
+                                `)
+                                .catch(err => console.log(err))
+                                c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                                c_open_message.react('⚠️').catch(err => console.log(err))
+                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                            })
+                        }
+                        setTimeout(() => {
+                            res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                            if (cross_thread) 
+                                cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                        }
+                        , 900000)
+                        setTimeout(() => {
+                            db.query(`SELECT * FROM filled_users_orders
+                            WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
+                            `)
+                            .then(foundThread => {
+                                if (foundThread.rows.length == 0)
+                                    return
+                                if (foundThread.rows.length > 1)
+                                    return
+                                res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
+                                .catch(err => console.log(err))
+                                if (cross_thread)
+                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
+                            })
+                        }, 720000)
+                    })
+                    .catch(err => console.log(err))
+                    return Promise.resolve()
+                }
+            }
+        }
+    }
+    if (list_low) {
+        var status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}' AND user_rank = '${item_rank}'`)
+        .then(res => {
+            var all_orders = res.rows
+            if (res.rows.length > 0) {
+                if (command == 'wts')
+                    all_orders = all_orders.sort(dynamicSort("user_price"))
+                else if (command == 'wtb')
+                    all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+                price = all_orders[0].user_price
+                console.log(all_orders)
+                console.log('auto price is ' + price)
+            }
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500\nContact MrSofty#7926 ☠️").catch(err => console.log(err)); 
+            return Promise.reject()
+        }
+    }
+    var avg_price = null
+    status = await db.query(`SELECT * from items_list WHERE id = '${item_id}'`)
+    .then(async res => {
+        if (command == 'wts' && item_rank == 'unranked')
+            if (res.rows[0].sell_price) 
+                avg_price = Math.round(Number(res.rows[0].sell_price))
+        if (command == 'wtb' && item_rank == 'unranked')
+            if (res.rows[0].buy_price)
+                avg_price = Math.round(Number(res.rows[0].buy_price))
+        if (command == 'wts' && item_rank == 'maxed') 
+            if (res.rows[0].maxed_sell_price) 
+                avg_price = Math.round(Number(res.rows[0].maxed_sell_price))
+        if (command == 'wtb' && item_rank == 'maxed')
+            if (res.rows[0].maxed_buy_price)
+                avg_price = Math.round(Number(res.rows[0].maxed_buy_price))
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+        return Promise.reject()
+    }
+    if (avg_price == null || avg_price == "null") {
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+        return Promise.reject()
+    }
+    if (!price) {
+        price = avg_price
+    }
+    if (price > (avg_price*1.2)) {
+        message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.reject()
+    }
+    else if (price < (avg_price*0.8)) {
+        message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.reject()
+    }
+    //----verify order in DB----
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+    .then(async res => {
+        if (res.rows.length == 0) {     //----insert order in DB----
+            //Check if user has more than limited orders
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id}`)
+            .then(res => {
+                if (res.rowCount >= userOrderLimit) {
+                    message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    return false
+                }
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+                return false
+            })
+            if (!status)
+                return false
+            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,user_rank,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},'${item_rank}',true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                if (err.code == '23505') {
+                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                }
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        else if (res.rows.length > 1) {
+            originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            return false
+        }
+        else {     //----update existing order in DB----
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        if (!status)
+            return false
+        return true
+    })
+    .catch(err => {
+        if (err.code == '23505') {
+            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+        }
+        console.log(err)
+        return false
+    })
+    if (!status)
+        return Promise.reject()
+    //------------------
+    const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
+    .then(res => {
+        var user_order = null
+        db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false 
+            user_order = res.rows
+            var currTime = new Date().getTime()
+            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
+            console.log(after3h - currTime)
+            set_order_timeout(user_order[0],after3h,currTime)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+        /*
+        setTimeout(async () => {
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
+            .then(res => {
+                if (res.rows.length == 0)
+                    return false
+                if (res.rows[0].visibility == false)
+                    return false
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return
+            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status) {
+                console.log(`Error setting timeout for order discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
+                return Promise.reject()
+            }
+            await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
+                var postdata = {}
+                postdata.content = " "
+                postdata.embeds = []
+                postdata.embeds.push({
+                    description: `❕ Order Notification ❕\n\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                    timestamp: new Date()
+                })
+                if (command == 'wts')
+                    postdata.embeds[0].color = tb_sellColor
+                if (command == 'wtb')
+                    postdata.embeds[0].color = tb_buyColor
+                console.log(postdata)
+                var status = await db.query(`SELECT * from users_list WHERE discord_id = ${originMessage.author.id}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    if (res.rows.length > 1)
+                        return false
+                    if (res.rows[0].notify_order == true) {
+                        var user_presc = client.guilds.cache.get(originMessage.guild.id).presences.cache.find(mem => mem.userId == originMessage.author.id)
+                        if (user_presc) {
+                            if (user_presc.status != 'dnd')
+                                originMessage.author.send(postdata).catch(err => console.log(err))
+                        }
+                        else
+                            originMessage.author.send(postdata).catch(err => console.log(err))
+                        return true
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status) {
+                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}`)
+                    return Promise.reject()
+                }
+                return Promise.resolve()
+            })
+            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}`))
+        }, u_order_close_time);
+        */
+    })
+    .catch(err => console.log('Error occured midway of updating orders'))
+    return Promise.resolve()
+}
+
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type,item_rank = 'unranked') {
     for(var i=0;i<tradingBotChannels.length;i++) {
         var multiCid = tradingBotChannels[i]
@@ -321,98 +1087,1389 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     return Promise.resolve()
 }
 
-async function leaderboard(message) {
-    var all_users = null
-    var status = await db.query(`SELECT * FROM users_list ORDER BY plat_gained DESC,plat_spent DESC,ingame_name`)
+async function trading_lich_bot(interaction) {
+    var ingame_name = ''
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
     .then(res => {
-        if (res.rows.length == 0) {
-            message.channel.send('No users found in the DB currently')
+        if (res.rows.length == 0)
+            return 0
+        else {
+            ingame_name = res.rows[0].ingame_name
+            return 1
+        }
+    })
+    .catch(err => {
+        console.log(err + 'Retrieving Database -> users_list error')
+        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(err => console.log(err))
+        return 2
+    })
+    if (status == 0) {
+        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: true}).catch(err => console.log(err))
+        interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
+        .catch(err => {
+            console.log(err)
+            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: true}).catch(err => console.log(err))
+        })
+        return Promise.resolve()
+    }
+    if (status == 2)
+        return Promise.resolve()
+
+    //----retrieve lich info----
+    var lich_info = []
+    var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
+    .then(res => {
+        if (res.rowCount != 1) {
+            interaction.reply({content: `☠️ Error retrieving lich info from DB.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
             return false
         }
-        all_users = res.rows
+        lich_info = res.rows[0]
+        return true
+    })
+    .catch(err => {
+        console.log(err); return false
+    })
+    if (!status)
+        return Promise.reject()
+    console.log(lich_info)
+    //----verify order in DB----
+    await db.query(`DELETE FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(err => console.log(err))
+    var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
+    .then(async res => {
+        if (res.rows.length == 0) {     //----insert order in DB----
+            //Check if user has more than limited orders
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${interaction.user.id}`)
+            .then(async tab1 => {
+                if (tab1.rowCount >= userOrderLimit) {
+                    interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                    return false
+                }
+                var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id}`)
+                .then(tab2 => {
+                    if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
+                        interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                        return false
+                    }
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return false
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                return false
+            })
+            if (!status)
+                return false
+            var status = await db.query(`INSERT INTO users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,quirk,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
+                ${interaction.user.id},
+                '${lich_info.lich_id}',
+                '${interaction.options.getString('order_type')}',
+                ${interaction.options.getInteger('price')},
+                true,
+                '${interaction.options.getString('element')}',
+                ${interaction.options.getNumber('damage')},
+                ${interaction.options.getBoolean('ephemera')},
+                '${interaction.options.getString('quirk').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}',
+                '${interaction.options.getString('name')}',
+                ${interaction.channel.id},
+                ${interaction.guild.id},
+                ${new Date().getTime()})`)
+            .then(res => {
+                if (res.rowCount == 1)
+                    return true
+                return false
+            })
+            .catch(err => {
+                console.log(err)
+                if (err.code == '23505') {
+                    interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                }
+                return false
+            })
+            if (!status)
+                return false
+        }
+        else if (res.rows.length > 1) {
+            interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            return false
+        }
+        else {     //----update existing order in DB----
+            interaction.reply({content: `Order already found in db. right now updation is not implemented`, ephemeral: true}).catch(err => console.log(err))
+            return false
+            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                interaction.reply({content: `☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return false
+        }
+        if (!status)
+            return false
         return true
     })
     .catch(err => {
         console.log(err)
-        message.channel.send('☠️ Error fetching users info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️')
+        interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
         return false
     })
     if (!status)
-        return
-    postdata = {}
-    postdata.content = " "
+        return Promise.reject()
+    //----------------
+
+    if (!interaction.member.presence) {
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order ⚠️`, ephemeral: true}).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    if (interaction.member.presence.status == `offline`) {
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order  ⚠️`, ephemeral: true}).catch(err => console.log(err))
+        return Promise.resolve()
+        //test
+    }
+
+    await trading_lich_orders_update(interaction, lich_info, 1)
+    .then(res => {
+        var user_order = null
+        db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false 
+            user_order = res.rows
+            var currTime = new Date().getTime()
+            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
+            console.log(after3h - currTime)
+            set_order_timeout(user_order[0],after3h,currTime,true,lich_info)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    })
+    .catch(err => console.log(err))
+
+    return Promise.resolve()
+}
+
+async function trading_lich_orders_update(interaction, lich_info, update_type) {
+    for (var i=0;i<tradingBotLichChannels.length;i++) {
+        var multiCid = tradingBotLichChannels[i]
+        console.log(`editing for channel ${multiCid}`)
+        var msg = null
+        var embeds = []
+        var noOfSellers = 0
+        var noOfBuyers = 0
+        //var targetChannel = client.channels.cache.get(multiCid)
+
+        //----construct embed----
+        await db.query(`
+        SELECT * FROM users_lich_orders 
+        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+        WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
+        ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
+        .then(async res => {
+            if (res.rows.length != 0) {
+                for (var j=0;j<res.rows.length;j++) {
+                    if (j==5)
+                        break
+                    var embed = {
+                        title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                        description: tradingBotReactions.sell[j],
+                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                        fields: [],
+                        color: '#7cb45d',
+                        image: {url: ''}
+                    }
+                
+                    await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+                    .then(async img1 => {
+                        var tlX = 90
+                        , tlY = 70
+                      
+                        , trX = tlX + img1.width
+                        , trY = tlY
+                      
+                        , blX = tlX
+                        , blY = tlY + img1.height
+                      
+                        , brX = blX + img1.width
+                        , brY = blY
+                      
+                        , twc = 0
+                      
+                        // Create image on canvas
+                        var canvas = new Canvas.createCanvas(1000,1000)
+                        , ctx = canvas.getContext('2d');
+                      
+                        ctx.drawImage(img1, tlX, tlY);
+                        ctx.fillStyle = '#ffffff';
+                        //ctx.fillRect(tlX,tlY,5,5);
+                        //ctx.fillRect(trX,trY,5,5);
+                        //ctx.fillRect(blX,blY,5,5);
+                        //ctx.fillRect(brX,brY,5,5);
+                        
+                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#7cb45d');
+                        drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
+                        textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
+                        drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
+                        textC = draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
+                        drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
+                        textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
+                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
+                        textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
+                        drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
+                        textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
+                      
+                        let tempctx = ctx.getImageData(0,0,twc,blY+70)
+                        ctx.canvas.width = twc
+                        ctx.canvas.height = blY+70
+                        ctx.putImageData(tempctx,0,0)
+                      
+                        function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
+                            ctx.font = size + 'px Arial';
+                            ctx.fillStyle = color;
+                            ctx.fillText(text, x, y);
+                            var cords = ctx.measureText(text)
+                            var cordsH = ctx.measureText('M')
+                            if (x+cords.width > twc)
+                                twc = x+cords.width
+                            //note that the filltext uses bottom left as reference for drawing text
+                            var cordss = {
+                              tlX: x,
+                              tlY: y-cordsH.width,
+                              trX: x+cords.width,
+                              trY: y-cordsH.width,
+                              blX: x, 
+                              blY: y,
+                              brX: x+cords.width,
+                              brY: y
+                            }
+                            //console.log(cordss.tlX + 'x' + cordss.tlY)
+                            //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
+                            //ctx.fillRect(cordss.trX,cordss.trY,3,3);
+                            //ctx.fillRect(cordss.blX,cordss.blY,3,3);
+                            //ctx.fillRect(cordss.brX,cordss.brY,3,3);
+                            
+                            return cordss
+                        }
+                      
+                        function drawLineCurve(x1,y1,x2,y2,x3,y3) {
+                          ctx.beginPath();
+                          ctx.moveTo(x1,y1);
+                          ctx.lineTo(x2,y2);
+                          ctx.lineTo(x3,y3);
+                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                          ctx.lineWidth = 2;
+                          ctx.stroke();
+                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                        }
+                      
+                        function drawLineStr(x1,y1,x2,y2) {
+                          ctx.beginPath();
+                          ctx.moveTo(x1,y1);
+                          ctx.lineTo(x2,y2);
+                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                          ctx.lineWidth = 2;
+                          ctx.stroke();
+                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                        }
+
+                        var attachment_url = ''
+                        if (res.rows[j].lich_image_url) {
+                            attachment_url = res.rows[j].lich_image_url
+                        }
+                        else {
+                            await client.channels.cache.get('912395290701602866').send({
+                                content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
+                                files: [{
+                                    attachment: ctx.canvas.toBuffer(),
+                                    name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
+                                }]
+                            }).then(res => {
+                                res.attachments.map(attachment => {
+                                    attachment_url = attachment.url
+                                })
+                            }).catch(err => console.log(err))
+                            await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                        }
+                        
+                        embed.image.url = attachment_url
+                    }).catch(err => console.log(err))
+                    //================
+                    embeds.push(embed)
+                }
+                noOfSellers = j
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            if (interaction)
+                interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            return Promise.reject()
+        })
+        await db.query(`
+        SELECT * FROM users_lich_orders 
+        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+        WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
+        ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
+        .then(async res => {
+            if (res.rows.length != 0) {
+                for (var j=0;j<res.rows.length;j++) {
+                    if (j==5)
+                        break
+                    
+                    var embed = {
+                        title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                        description: tradingBotReactions.buy[j],
+                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                        fields: [],
+                        color: '#E74C3C',
+                        image: {url: ''}
+                    }
+                
+                    await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+                    .then(async img1 => {
+                        var tlX = 90
+                        , tlY = 70
+                      
+                        , trX = tlX + img1.width
+                        , trY = tlY
+                      
+                        , blX = tlX
+                        , blY = tlY + img1.height
+                      
+                        , brX = blX + img1.width
+                        , brY = blY
+                      
+                        , twc = 0
+                      
+                        // Create image on canvas
+                        var canvas = new Canvas.createCanvas(1000,1000)
+                        , ctx = canvas.getContext('2d');
+                      
+                        ctx.drawImage(img1, tlX, tlY);
+                        ctx.fillStyle = '#ffffff';
+                        //ctx.fillRect(tlX,tlY,5,5);
+                        //ctx.fillRect(trX,trY,5,5);
+                        //ctx.fillRect(blX,blY,5,5);
+                        //ctx.fillRect(brX,brY,5,5);
+                        
+                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#E74C3C');
+                        drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
+                        textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
+                        drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
+                        textC = draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
+                        drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
+                        textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
+                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
+                        textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
+                        drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
+                        textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
+                      
+                        let tempctx = ctx.getImageData(0,0,twc,blY+70)
+                        ctx.canvas.width = twc
+                        ctx.canvas.height = blY+70
+                        ctx.putImageData(tempctx,0,0)
+                      
+                        function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
+                            ctx.font = size + 'px Arial';
+                            ctx.fillStyle = color;
+                            ctx.fillText(text, x, y);
+                            var cords = ctx.measureText(text)
+                            var cordsH = ctx.measureText('M')
+                            if (x+cords.width > twc)
+                                twc = x+cords.width
+                            //note that the filltext uses bottom left as reference for drawing text
+                            var cordss = {
+                              tlX: x,
+                              tlY: y-cordsH.width,
+                              trX: x+cords.width,
+                              trY: y-cordsH.width,
+                              blX: x, 
+                              blY: y,
+                              brX: x+cords.width,
+                              brY: y
+                            }
+                            //console.log(cordss.tlX + 'x' + cordss.tlY)
+                            //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
+                            //ctx.fillRect(cordss.trX,cordss.trY,3,3);
+                            //ctx.fillRect(cordss.blX,cordss.blY,3,3);
+                            //ctx.fillRect(cordss.brX,cordss.brY,3,3);
+                            
+                            return cordss
+                        }
+                      
+                        function drawLineCurve(x1,y1,x2,y2,x3,y3) {
+                          ctx.beginPath();
+                          ctx.moveTo(x1,y1);
+                          ctx.lineTo(x2,y2);
+                          ctx.lineTo(x3,y3);
+                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                          ctx.lineWidth = 2;
+                          ctx.stroke();
+                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                        }
+                      
+                        function drawLineStr(x1,y1,x2,y2) {
+                          ctx.beginPath();
+                          ctx.moveTo(x1,y1);
+                          ctx.lineTo(x2,y2);
+                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                          ctx.lineWidth = 2;
+                          ctx.stroke();
+                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                        }
+
+                        var attachment_url = ''
+                        if (res.rows[j].lich_image_url) {
+                            attachment_url = res.rows[j].lich_image_url
+                        }
+                        else {
+                            await client.channels.cache.get('912395290701602866').send({
+                                content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
+                                files: [{
+                                    attachment: ctx.canvas.toBuffer(),
+                                    name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
+                                }]
+                            }).then(res => {
+                                res.attachments.map(attachment => {
+                                    attachment_url = attachment.url
+                                })
+                            }).catch(err => console.log(err))
+                            await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                        }
+                        
+                        embed.image.url = attachment_url
+                    }).catch(err => console.log(err))
+                    //================
+                    embeds.push(embed)
+                }
+                noOfBuyers = j
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            if (interaction)
+                interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            return Promise.reject()
+        })
+        embeds.forEach((element,index) => {
+            if (index != 0) {
+                embeds[index].url = null
+                embeds[index].title = null
+                embeds[index].thumbnail = null
+            }
+        })
+        console.log(JSON.stringify(embeds))
+
+        await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
+        .then(async res => {
+            if (res.rows.length == 0) {  //no message for this item
+                msg = null
+            }
+            else if (res.rows.length > 1) {
+                console.log(`Detected more than one message for lich ${lich_info.weapon_url} in channel ${multiCid}`)
+                if (interaction)
+                    interaction.reply({content: `☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                return Promise.reject()
+            }
+            else {
+                var c = client.channels.cache.get(multiCid)
+                var m = c.messages.cache.get(res.rows[0].message_id)
+                if (!m) {
+                    await c.messages.fetch(res.rows[0].message_id).then(mNew => {
+                        msg = mNew
+                    })
+                    .catch(async err => {     //maybe message does not exist in discord anymore
+                        console.log(err)
+                        await db.query(`DELETE FROM lich_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
+                        msg = null
+                    })
+                }
+                else
+                    msg = m
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            return Promise.reject()
+        })
+        if (msg) {
+            if (embeds.length==0) {
+                await db.query(`DELETE FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}' AND message_id = ${msg.id}`)
+                .then(res => msg.delete().catch(err => console.log(err)))
+                .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
+            }
+            else {
+                var status = msg.edit({content: ' ',embeds: embeds})
+                .then(msg => {
+                    msg.reactions.removeAll()
+                    .then(() => {
+                        for (var i=0;i<noOfSellers;i++) {
+                            msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                        }
+                        for (var i=0;i<noOfBuyers;i++) {
+                            msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                        }
+                    })
+                    .catch(err => console.log(err))
+                    return true
+                })
+                .catch(err => {
+                    if (interaction)
+                        interaction.reply({content: `☠️ Error editing existing orders in channel <#${multiCid}>.\nError code: 505\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    return Promise.reject()
+            }
+        }
+        else {
+            if (update_type != 1)
+                continue
+            if (embeds.length == 0)
+                return Promise.reject()
+            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
+            .then(async msg => {
+                var status = await db.query(`INSERT INTO lich_messages_ids (channel_id,lich_id,message_id) VALUES (${multiCid},'${lich_info.lich_id}',${msg.id})`)
+                .then(res => {
+                    if (res.rowCount != 1) {
+                        setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
+                        return Promise.reject('Unexpected error inserting message id into db during lich command')
+                    }
+                    msg.reactions.removeAll()
+                    .then(() => {
+                        for (var i=0;i<noOfSellers;i++) {
+                            msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                        }
+                        for (var i=0;i<noOfBuyers;i++) {
+                            msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                        }
+                    }).catch(err => console.log(err))
+                })
+                .catch(async err => {     //might be a dublicate message
+                    console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${lich_info.lich_id}`)
+                    setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
+                    await db.query(`SELECT * from lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
+                    .then(async res => {
+                        if (res.rows.length == 0) {
+                            if (interaction)
+                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                            return Promise.reject()
+                        }
+                        var msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
+                        await msg.edit({content: ' ', embeds: embeds}).then(async () => {
+                            msg.reactions.removeAll()
+                            .then(() => {
+                                for (var i=0;i<noOfSellers;i++) {
+                                    msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                                }
+                                for (var i=0;i<noOfBuyers;i++) {
+                                    msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                                }
+                            }).catch(err => console.log(err))
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            if (interaction)
+                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                            return Promise.reject()
+                        })
+                    })
+                    .catch(err => {
+                        if (interaction)
+                            interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                        console.log(err)
+                        return Promise.reject()
+                    })
+                })
+            })
+            .catch(err => {
+                console.log(err)
+                if (interaction) {
+                    interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                }
+                return Promise.reject()
+            })
+        }
+    }
+    console.log(`edited for all channels, returning`)
+    return Promise.resolve()
+}
+
+async function trading_bot_user_orders(message,args,ingame_name,request_type) {
+    console.log(ingame_name)
+    var user_profile = []
+    var discord_id = ""
+    var status_msg = ""
+    var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
+    .then(res => {
+        if (res.rows.length == 0) {
+            status_msg = `⚠️ <@${message.author.id}> The given user is not registered with the bot. ⚠️`
+            return false
+        }
+        else if (res.rows.length > 1) {
+            status_msg = `<@${message.author.id}> More than one search result for that username.`
+            return false
+        }
+        else {
+            discord_id = res.rows[0].discord_id
+            ingame_name = res.rows[0].ingame_name
+            user_profile = res.rows[0]
+            return true
+        }
+    })
+    .catch (err => {
+        console.log(err)
+        status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500`
+        return false
+    })
+    if (!status) {
+        message.channel.send({content: status_msg}).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        return Promise.resolve()
+    }
+    var item_orders = null
+    var lich_orders = null
+    var status = await db.query(`SELECT * FROM users_orders 
+    JOIN items_list ON users_orders.item_id=items_list.id 
+    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    WHERE users_orders.discord_id = ${discord_id}`)
+    .then(res => {
+        item_orders = res.rows
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send(`Sorry error occured retrieving db records`).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    var status = await db.query(`SELECT * FROM users_lich_orders 
+    JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+    JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+    WHERE users_lich_orders.discord_id = ${discord_id}`)
+    .then(res => {
+        lich_orders = res.rows
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send(`Sorry error occured retrieving db records`).catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    if (item_orders.length == 0 && lich_orders.length == 0) {
+        if (request_type == 1)
+            message.channel.send(`❕ <@${message.author.id}> No orders found on your profile ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+        else if (request_type == 2)
+            message.channel.send(`❕ <@${message.author.id}> No orders found for user ${ingame_name} ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+        return Promise.resolve()
+    }
+    let postdata = {}
+    postdata.content = ' '
     postdata.embeds = []
+    var sell_items = []
+    var sell_prices = []
+    var buy_items = []
+    var buy_prices = []
+    item_orders.forEach((e,index) => {
+        if (e.order_type == 'wts') {
+            sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
+            sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+        if (e.order_type == 'wtb') {
+            buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
+            buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+    })
+    lich_orders.forEach((e,index) => {
+        if (e.order_type == 'wts') {
+            sell_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+            sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+        if (e.order_type == 'wtb') {
+            buy_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+            buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+        }
+    })
+    //----retrieve user rating----
+    var user_rating = 0
+    var status = await db.query(`
+    SELECT * FROM filled_users_orders
+    WHERE order_owner = ${discord_id} OR order_filler = ${discord_id}`)
+    .then(res => {
+        if (res.rows.length > 0) {
+            var total_rating = 0
+            var total_orders = 0
+            for (var i=0; i<res.rows.length; i++) {
+                if (res.rows[i].order_rating) {
+                    total_orders++
+                    if (res.rows[i].reporter_id) {
+                        if (res.rows[i].reporter_id == discord_id)
+                            total_rating += 5
+                        else
+                            total_rating += res.rows[i].order_rating
+                    }
+                    else {
+                        total_rating += res.rows[i].order_rating
+                    }
+                }
+            }
+            user_rating = (total_rating / total_orders).toFixed(2)
+        }
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        message.channel.send('☠️ Error retrieving user rating\nPlease contact MrSofty#7926 ☠️').catch(err => console.log(err))
+        return Promise.resolve()
+    }
+    console.log(user_rating)
+    //--------------------
+    var member = await client.users.fetch(discord_id)
     postdata.embeds.push({
-        title: 'All-time Leaderboard',
+        author: {
+            name: ingame_name,
+            iconURL: member.displayAvatarURL()
+        },
+        title: 'Profile',
         fields: [{
-            name: 'User',
-            value: '\u200b',
+            name: 'Plat gained <:profit:896079718955233301>',
+            value: user_profile.plat_gained + '<:platinum:881692607791648778>',
             inline: true
         },{
-            name: 'Plat gained <:profit:896079718955233301>',
+            name: '\u200b',
             value: '\u200b',
             inline: true
         },{
             name: 'Plat spent <:loss:896079691755180103>',
-            value: '\u200b',
+            value: user_profile.plat_spent + '<:platinum:881692607791648778>',
+            inline: true
+        },{
+            name: '⭐ User rating',
+            value: user_rating.toString() + ' out of 5',
             inline: true
         }],
-        color: tb_invisColor,
-        timestamp: new Date()
+        color: tb_invisColor
     })
-    var x = 0
-    for (var i=0;i<all_users.length;i++) {
-        if (postdata.embeds[0].fields[x].value.length > 950) {
-            x += 3
-            postdata.embeds[0].fields.push({
-                name: 'User',
-                value: '\u200b',
-                inline: true
-            },{
-                name: 'Plat gained <:profit:896079718955233301>',
-                value: '\u200b',
-                inline: true
-            },{
-                name: 'Plat spent <:loss:896079691755180103>',
-                value: '\u200b',
-                inline: true
+    if (sell_items.length != 0)
+        postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
+    if (buy_items.length != 0)
+        postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+    if (request_type == 1) {
+        postdata.components = []
+        if (item_orders.length > 0) {
+            var index = postdata.components.push({type:1,components:[]})
+            index--
+            postdata.components[index].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
+            item_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
+                    if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                        postdata.components[index].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
+                }
+            })
+            postdata.components[index].components[0].max_values = postdata.components[index].components[0].options.length
+        }
+        if (lich_orders.length > 0) {
+            var index = postdata.components.push({type:1,components:[]})
+            index--
+            postdata.components[index].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
+            lich_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
+                    if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                        postdata.components[index].components[0].options.push({label: e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.lich_id})
+                }
+            })
+            postdata.components[index].components[0].max_values = postdata.components[index].components[0].options.length
+        }
+        console.log(JSON.stringify(postdata.components))
+    }
+    message.channel.send(postdata).catch(err => console.log(err))
+    return Promise.resolve()
+}
+
+async function trading_bot_item_orders(message,args,request_type = 1) {
+    if (request_type == 1) {
+        var ingame_name = ""
+        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+        .then(res => {
+            if (res.rows.length==0) {
+                status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
+                message.author.send({content: "Type the following command to register your ign:\nverify ign"})
+                .catch(err => {
+                    console.log(err)
+                    message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
+                })
+                return false
+            }
+            ingame_name = res.rows[0].ingame_name
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`
+            return false
+        })
+        if (!status) {
+            message.channel.send(status_message).catch(err => console.log(err))
+            return Promise.resolve()
+        }
+    }
+    var isMaxed = false
+    var index = 0
+    while(index !== -1) {
+        index = args.indexOf('maxed') || args.indexOf('max');
+        if (index !== -1) {
+            isMaxed = true
+            args.splice(index, 1);
+        }
+    }
+    var order_type = args.shift()
+    if (order_type == 'wts')
+        order_type = 'wtb'
+    else
+        order_type = 'wts'
+    var d_item_url = ""
+    args.forEach(element => {
+        d_item_url = d_item_url + element + "_"
+    });
+    d_item_url = d_item_url.substring(0, d_item_url.length - 1);
+    d_item_url = d_item_url.replace(/_p$/,'_prime')
+    d_item_url = d_item_url.replace('_p_','_prime_')
+    d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
+    if (d_item_url.match('lith') || d_item_url.match('meso') || d_item_url.match('neo') || d_item_url.match('axi'))
+        if (!d_item_url.match('_relic'))
+            d_item_url += '_relic'
+    var arrItems = []
+    var items_list = []
+    console.log('Retrieving Database -> items_list')
+    var status = await db.query(`SELECT * FROM items_list`)
+    .then(res => {
+        console.log('Retrieving Database -> items_list success')
+        items_list = res.rows
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        console.log('Retrieving Database -> items_list error')
+        message.channel.send({content: "☠️ Some error occured retrieving database info.\nError code: 501\nContact MrSofty#7926 ☠️"})
+        return false
+    })
+    if (!status)      
+        return Promise.reject()
+    for (var i=0; i<items_list.length; i++) {
+        var element = items_list[i]
+        if (element.item_url.match('^' + d_item_url + '\W*')) {
+            if (element.tags.includes("set")) {
+                arrItems = []
+                arrItems.push(element);
+                break
+            }
+            arrItems.push(element);
+        }
+    }
+    var isLich = false
+    if (arrItems.length > 1) {
+        message.channel.send(`❕ More than one search results detected for the item **${d_item_url}**, cannot process this request. Please provide a valid item name ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
+        return Promise.resolve()
+    }
+    if (arrItems.length==0) {
+        //-----check if lich weapon-----
+        var status = await db.query(`SELECT * from lich_list`)
+        .then(res => {
+            for (var e of res.rows) {
+                if (e.weapon_url.match(d_item_url)) {
+                    isLich = true
+                    arrItems.push(e);
+                    break
+                }
+            }
+            if (arrItems.length==0)
+                return 2
+            return 0
+        }).catch(err => {
+            console.log(err)
+            return 1
+        })
+        //------------------------------
+        if (status == 1) {
+            message.channel.send({content: "☠️ Some error occured retrieving lich list from db.\nError code: 501.2\nContact MrSofty#7926 ☠️"})
+            return Promise.reject()
+        }
+        if (status == 2) {
+            message.channel.send(`❕ Item **${d_item_url}** either does not exist or is not a tradable item. ❕`).catch(err => console.log(err));
+            return Promise.resolve()
+        }
+    }
+    console.log(arrItems)
+    if (isLich) {
+        message.channel.send(`Item is a lich. This command is under dev.\n${JSON.stringify(arrItems)}`).catch(err => console.log(err));
+        const weapon_url = arrItems[0].weapon_url
+        const lich_id = arrItems[0].lich_id
+        const weapon_name = weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+        var all_orders = []
+        var status = await db.query(`
+        SELECT * FROM users_lich_orders
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        WHERE users_lich_orders.lich_id = '${lich_id}' AND users_lich_orders.order_type = '${order_type}'
+        ORDER BY users_lich_orders.update_timestamp
+        `)
+        .then(res => {
+            if (res.rows.length == 0) {
+                message.channel.send(`❕ <@${message.author.id}> No orders found for that lich at this moment. ❕`).catch(err => console.log(err))
+                return false
+            }
+            else {
+                all_orders = res.rows
+                return true
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
+            return false
+        })
+        if (!status)
+            return Promise.reject()
+        var color = ""
+        if (order_type == 'wts') {
+            all_orders = all_orders.sort(dynamicSort("user_price"))
+            color = tb_sellColor
+        }
+        if (order_type == 'wtb') {
+            all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+            color = tb_buyColor
+        }
+        all_orders.sort(function(a,b){return b.visibility-a.visibility});
+        console.log(all_orders)
+        var postdata = {}
+        postdata.content = " "
+        postdata.embeds = []
+        var vis_traders_names = []
+        var vis_traders_prices = []
+        var vis_traders_detail = []
+        var invis_traders_names = []
+        var invis_traders_prices = []
+        var invis_traders_detail = []
+        var noOfTraders = 0
+        for (var i=0;i<all_orders.length;i++) {
+            if (all_orders[i].visibility) {
+                var text = ""
+                if (tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
+                    text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i] + ' '
+                }
+                text += all_orders[i].ingame_name
+                vis_traders_names.push(text)
+                vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+                vis_traders_detail.push(`[Lich detail](${all_orders[i].lich_image_url})`)
+                noOfTraders++
+            }
+            else {
+                invis_traders_names.push(all_orders[i].ingame_name)
+                invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+                invis_traders_detail.push(`[Lich detail](${all_orders[i].lich_image_url})`)
+            }
+        }
+        if (vis_traders_names.length != 0) {
+            postdata.embeds.push({
+                fields: [
+                    {
+                        name: order_type.replace('wts','Sellers').replace('wtb','Buyers'),
+                        value: vis_traders_names.join('\n'),
+                        inline: true
+                    },
+                    {
+                        name: `Prices`,
+                        value: vis_traders_prices.join('\n'),
+                        inline: true
+                    },
+                    {
+                        name: 'Detail',
+                        value: vis_traders_detail.join('\n'), 
+                        inline: true
+                    }
+                ],
+                color: color
             })
         }
-        postdata.embeds[0].fields[x].value += i+1 + '. ' + all_users[i].ingame_name + '\n'
-        postdata.embeds[0].fields[x+1].value += all_users[i].plat_gained + '\n'
-        postdata.embeds[0].fields[x+2].value += all_users[i].plat_spent + '\n'
+        if (invis_traders_names.length != 0) {
+            postdata.embeds.push({
+                fields: [
+                    {
+                        name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
+                        value: invis_traders_names.join('\n'),
+                        inline: true
+                    },
+                    {
+                        name: `Price`,
+                        value: invis_traders_prices.join('\n'),
+                        inline: true
+                    },
+                    {
+                        name: 'Detail',
+                        value: invis_traders_detail.join('\n'),
+                        inline: true
+                    }
+                ],
+                color: tb_invisColor
+            })
+        }
+        if (postdata.embeds.length == 0) {
+            message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
+            return Promise.reject()
+        }
+        postdata.embeds[0].title = weapon_name
+        postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        postdata.embeds[0].thumbnail = {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
+        console.log(JSON.stringify(postdata))
+        if (request_type == 1) {
+            message.channel.send(postdata)
+            .then(msg => {
+                for (var j=0;j<noOfTraders;j++) {
+                    msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
+            })
+        }
+        else if (request_type == 2) {
+            message.edit(postdata)
+            .then(res => {
+                message.reactions.removeAll()
+                for (var j=0;j<noOfTraders;j++) {
+                    message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(err => console.log(err))
+            })
+        }
+        return Promise.resolve()
+        //===============================================
     }
-    message.channel.send(postdata).catch(err => {
-        console.log(err)
-        message.channel.send('Some error sending embed. Please contact MrSofty#7926')
+    const item_url = arrItems[0].item_url
+    const item_id = arrItems[0].id
+    if (!arrItems[0].rank && isMaxed) {
+        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").catch(err => console.log(err));
+        return Promise.resolve()
+    }
+    var item_rank = 'unranked'
+    if (isMaxed)
+        item_rank = 'maxed'
+    const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    var all_orders = []
+    var status = await db.query(`
+    SELECT * FROM users_orders
+    JOIN items_list ON users_orders.item_id=items_list.id 
+    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
+    ORDER BY users_orders.update_timestamp
+    `)
+    .then(res => {
+        if (res.rows.length == 0) {
+            message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
+            return false
+        }
+        else {
+            all_orders = res.rows
+            return true
+        }
     })
+    .catch(err => {
+        console.log(err)
+        message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
+        return false
+    })
+    if (!status)
+        return Promise.reject()
+    var color = ""
+    if (order_type == 'wts') {
+        all_orders = all_orders.sort(dynamicSort("user_price"))
+        color = tb_sellColor
+    }
+    if (order_type == 'wtb') {
+        all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+        color = tb_buyColor
+    }
+    all_orders.sort(function(a,b){return b.visibility-a.visibility});
+    console.log(all_orders)
+    var postdata = {}
+    postdata.content = " "
+    postdata.embeds = []
+    var vis_traders_names = []
+    var vis_traders_prices = []
+    var invis_traders_names = []
+    var invis_traders_prices = []
+    var noOfTraders = 0
+    for (var i=0;i<all_orders.length;i++) {
+        if (all_orders[i].visibility) {
+            var text = ""
+            if (tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i]) {
+                text += tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][i] + ' '
+            }
+            text += all_orders[i].ingame_name
+            vis_traders_names.push(text)
+            vis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+            noOfTraders++
+        }
+        else {
+            invis_traders_names.push(all_orders[i].ingame_name)
+            invis_traders_prices.push(all_orders[i].user_price + '<:platinum:881692607791648778>')
+        }
+    }
+    if (vis_traders_names.length != 0) {
+        postdata.embeds.push({
+            fields: [
+                {
+                    name: order_type.replace('wts','Sellers').replace('wtb','Buyers'),
+                    value: vis_traders_names.toString().replace(/,/g,'\n'),
+                    inline: true
+                },{name: '\u200b',value: '\u200b', inline: true},
+                {
+                    name: `Prices`,
+                    value: vis_traders_prices.toString().replace(/,/g,'\n'),
+                    inline: true
+                }
+            ],
+            color: color
+        })
+    }
+    if (invis_traders_names.length != 0) {
+        postdata.embeds.push({
+            fields: [
+                {
+                    name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
+                    value: invis_traders_names.toString().replace(/,/g,'\n'),
+                    inline: true
+                },{name: '\u200b',value: '\u200b', inline: true},
+                {
+                    name: `Price`,
+                    value: invis_traders_prices.toString().replace(/,/g,'\n'),
+                    inline: true
+                }
+            ],
+            color: tb_invisColor
+        })
+    }
+    if (postdata.embeds.length == 0) {
+        message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
+        return Promise.reject()
+    }
+    postdata.embeds[0].title = item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)')
+    postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    postdata.embeds[0].thumbnail = {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
+    console.log(JSON.stringify(postdata))
+    if (request_type == 1) {
+        message.channel.send(postdata)
+        .then(msg => {
+            for (var j=0;j<noOfTraders;j++) {
+                msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
+        })
+    }
+    else if (request_type == 2) {
+        message.edit(postdata)
+        .then(res => {
+            message.reactions.removeAll()
+            for (var j=0;j<noOfTraders;j++) {
+                message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(err => console.log(err))
+        })
+    }
+    return Promise.resolve()
+}
+
+async function trading_bot_registeration(message) {
+    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`).then(res => {
+        if (res.rows.length != 0)
+            message.channel.send(`Note: Your ign has already been verified. It will be updated upon re-verification`).catch(err => console.log(err))
+        return true
+    })
+    .catch (err => {
+        console.log(err)
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"}).catch(err => console.log(err))
+        return false
+    })
+    if (!status)
+        return
+    const uni_id = trade_bot_modules.generateId()
+    var status = await db.query(`INSERT INTO users_unverified (id,discord_id) VALUES ('${uni_id}',${message.author.id})`)
+    .then(res => {
+        return true
+    }).catch(err => {
+        console.log(err)
+        message.channel.send({content: "Some error occured inserting record into db.\nError code: 501"}).catch(err => console.log(err))
+        return false
+    })
+    if (!status)
+        return
+    message.channel.send({content: `
+**Please follow these steps to verify your account:**
+1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
+2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
+3) Write the message body as given below:
+Subject: **${uni_id}**
+Message: Hi
+4) Click 'Send' button
+5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!
+`, embeds: [{
+        description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
+    }]
+})
     return
 }
 
-async function verifyUserOrders() {
-    console.log('verifying user orders')
+async function td_set_orders_timeouts() {
     var all_orders = null
-    var status = await db.query(`SELECT * FROM users_orders`)
+    var status = await db.query(`SELECT * FROM users_orders WHERE visibility = true`)
     .then(res => {
         if (res.rows.length == 0)
-            return false
+            return false 
         all_orders = res.rows
-        return true
+        return true 
     })
     .catch(err => {
         console.log(err)
         return false
     })
     if (status) {
+        var currTime = new Date().getTime()
         for (var i=0;i<all_orders.length;i++) {
-            var item_data
-            var status = await db.query(`SELECT * FROM items_list WHERE id='${all_orders[i].item_id}'`)
+            var after3h = currTime + (u_order_close_time - (currTime - all_orders[i].update_timestamp))
+            console.log(after3h - currTime)
+            set_order_timeout(all_orders[i],after3h,currTime)
+        }
+    }
+    var status = await db.query(`SELECT * FROM users_lich_orders WHERE visibility = true`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return false 
+        all_orders = res.rows
+        return true 
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (status) {
+        var currTime = new Date().getTime()
+        for (var i=0;i<all_orders.length;i++) {
+            var lich_info = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${all_orders[i].lich_id}'`)
+            var after3h = currTime + (u_order_close_time - (currTime - all_orders[i].update_timestamp))
+            console.log(after3h - currTime)
+            set_order_timeout(all_orders[i],after3h,currTime,true,lich_info.rows[0])
+        }
+    }
+}
+
+async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich_info = {}) {
+    if (isLich) {
+        setTimeout(async () => {
+            var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND visibility=true`)
+            .then(res => {
+                if (res.rowCount != 1)
+                    return false
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status) {
+                console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}'`)
+                return
+            }
+            trading_lich_orders_update(null, lich_info, 2)
+            .then(async res2 => {
+                    var postdata = {}
+                    postdata.content = " "
+                    postdata.embeds = []
+                    postdata.embeds.push({
+                        description: `❕ Order Notification ❕\n\nYour **${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${lich_info.weapon_url}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                        timestamp: new Date()
+                    })
+                    if (all_orders.order_type == 'wts')
+                        postdata.embeds[0].color = tb_sellColor
+                    if (all_orders.order_type == 'wtb')
+                        postdata.embeds[0].color = tb_buyColor
+                    console.log(postdata)
+                    var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
+                    .then(res => {
+                        if (res.rows.length == 0)
+                            return false
+                        if (res.rows.length > 1)
+                            return false
+                        const user = client.users.cache.get(all_orders.discord_id)
+                        if (res.rows[0].notify_order == true) {
+                            var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
+                            if (user_presc) {
+                                if (user_presc.status != 'dnd')
+                                    user.send(postdata).catch(err => console.log(err))
+                            }
+                            else
+                                user.send(postdata).catch(err => console.log(err))
+                            return true
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND order_type = '${all_orders.order_type}'`)
+                        return
+                    }
+                    return 
+            })
+            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND order_type = '${all_orders.order_type}''`))
+        }, after3h - currTime);
+    }
+    else {
+        setTimeout(async () => {
+            var item_id = all_orders.item_id
+            var item_rank = all_orders.user_rank
+            var order_type = all_orders.order_type
+            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}' AND visibility=true`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
-                if (res.rows.length > 1)
-                    return false
-                item_data = res.rows[0]
                 return true
             })
             .catch(err => {
@@ -420,64 +2477,82 @@ async function verifyUserOrders() {
                 return false
             })
             if (!status)
-                continue
-            if ((all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.sell_price*0.8 || all_orders[i].user_price > item_data.sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.buy_price*0.8 || all_orders[i].user_price > item_data.buy_price*1.2)) || (all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_sell_price*0.8 || all_orders[i].user_price > item_data.maxed_sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_buy_price*0.8 || all_orders[i].user_price > item_data.maxed_buy_price*1.2))) {
-                var status = await db.query(`DELETE FROM users_orders WHERE item_id='${all_orders[i].item_id}' AND discord_id=${all_orders[i].discord_id}`)
-                .then(res => {
-                    return true
+                return
+            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}'`)
+            .then(res => {
+                return true
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status) {
+                console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+                return Promise.reject()
+            }
+            var item_detail = null
+            var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+            .then(res => {
+                if (res.rows.length == 0)
+                    return false 
+                item_detail =res.rows[0]
+                return true 
+            })
+            .catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status)
+                return
+            var item_url = item_detail.item_url
+            var item_name = item_detail.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+            await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
+                var postdata = {}
+                postdata.content = " "
+                postdata.embeds = []
+                postdata.embeds.push({
+                    description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                    timestamp: new Date()
                 })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    continue
-                if (all_orders[i].visibility)
-                    trade_bot_modules.trading_bot_orders_update(null,item_data.id,item_data.item_url,item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,all_orders[i].user_rank).catch(err => console.log(err))
-                var user_data = null
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${all_orders[i].discord_id}`)
+                if (order_type == 'wts')
+                    postdata.embeds[0].color = tb_sellColor
+                if (order_type == 'wtb')
+                    postdata.embeds[0].color = tb_buyColor
+                console.log(postdata)
+                var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
                 .then(res => {
                     if (res.rows.length == 0)
                         return false
                     if (res.rows.length > 1)
                         return false
-                    user_data = res.rows[0]
-                    return true
+                    const user = client.users.cache.get(all_orders.discord_id)
+                    if (res.rows[0].notify_order == true) {
+                        var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
+                        if (user_presc) {
+                            if (user_presc.status != 'dnd')
+                                user.send(postdata).catch(err => console.log(err))
+                        }
+                        else
+                            user.send(postdata).catch(err => console.log(err))
+                        return true
+                    }
                 })
                 .catch(err => {
                     console.log(err)
                     return false
                 })
-                if (!status)
-                    continue
-                var postdata = {}
-                postdata.content = " "
-                postdata.embeds = []
-                postdata.embeds.push({
-                    description: `❕ Order Remove Notification ❕\n\nYour **${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been removed as its price is out of range of the average item price.`,
-                    footer: {text: `Type 'notifications' to disable these notifications in the future.\n\u200b`},
-                    timestamp: new Date()
-                })
-                if (all_orders[i].order_type == 'wts')
-                    postdata.embeds[0].color = tb_sellColor
-                if (all_orders[i].order_type == 'wtb')
-                    postdata.embeds[0].color = tb_buyColor
-                const user = client.users.cache.get(all_orders[i].discord_id)
-                if (user_data.notify_remove) {
-                    var user_presc = client.guilds.cache.get(all_orders[i].origin_guild_id).presences.cache.find(mem => mem.userId == all_orders[i].discord_id)
-                    if (user_presc) {
-                        if (user_presc.status != 'dnd')
-                            user.send(postdata).catch(err => console.log(err))
-                    }
-                    else
-                        user.send(postdata).catch(err => console.log(err))
+                if (!status) {
+                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
+                    return
                 }
-            }
-        }
+                return 
+            })
+            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
+        }, after3h - currTime);
     }
-    console.log('verified orders.')
 }
-
+//==================================
 function generateId() {
     let ID = "";
     let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -487,4 +2562,18 @@ function generateId() {
     return ID;
 }
 
-module.exports = {check_user,trading_bot_orders_update,leaderboard,verifyUserOrders,generateId}
+module.exports = {
+    check_user,
+    leaderboard,
+    verifyUserOrders,
+    generateId,
+    trading_bot,
+    trading_bot_orders_update,
+    trading_lich_bot,
+    trading_lich_orders_update,
+    trading_bot_user_orders,
+    trading_bot_item_orders,
+    trading_bot_registeration,
+    td_set_orders_timeouts,
+    set_order_timeout
+}
