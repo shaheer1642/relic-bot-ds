@@ -3145,12 +3145,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             var order_data = {}
                             if (!from_cross) {
                                 var status = await db.query(`
-                                UPDATE filled_users_orders SET order_status = 'successful',order_rating = 5
+                                UPDATE filled_users_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
+                                WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId};
+                                UPDATE filled_users_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
                                 WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
                                 RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
                                 `)
                                 .then(res => {
-                                    order_data = res.rows[0]
+                                    order_data = res[1].rows[0]
                                     return true
                                 })
                                 .catch(err => {
@@ -3162,12 +3164,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             }
                             else {
                                 var status = await db.query(`
-                                UPDATE filled_users_orders SET order_status = 'successful',order_rating = 5
+                                UPDATE filled_users_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
+                                WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId};
+                                UPDATE filled_users_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
                                 WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
                                 RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
                                 `)
                                 .then(res => {
-                                    order_data = res.rows[0]
+                                    order_data = res[1].rows[0]
                                     return true
                                 })
                                 .catch(err => {
