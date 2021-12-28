@@ -3070,7 +3070,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
                     RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                     `)
-                    .then(res => {
+                    .then(async res => {
                         if (res.rowCount==1) {
                             await db.query(`
                             UPDATE users_list
@@ -3173,7 +3173,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
             RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
             `)
-            .then(res => {
+            .then(async res => {
                 if (res.rowCount==1) {
                     await db.query(`
                     UPDATE users_list
