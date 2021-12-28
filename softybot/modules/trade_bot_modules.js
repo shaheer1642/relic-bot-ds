@@ -340,7 +340,7 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItems.length==0) {
-        message.channel.send("⚠️ Item **" + d_item_url + "** either does not exist or is an unsupported item at the moment (might be a mod or arcane). ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        message.channel.send("⚠️ Item **" + d_item_url + "** either does not exist or is an unsupported item at the moment. ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
         return Promise.resolve()
     }
     if (arrItems.length > 1) {
