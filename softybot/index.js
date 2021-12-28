@@ -2729,12 +2729,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                     return Promise.resolve()
                                 }
                                 if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
+                                    var order_data = {}
                                     if (!from_cross) {
                                         var status = await db.query(`
                                         UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = 5
                                         WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
+                                        RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                                         `)
                                         .then(res => {
+                                            order_data = res.rows[0]
                                             return true
                                         })
                                         .catch(err => {
@@ -2748,8 +2751,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                         var status = await db.query(`
                                         UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = 5
                                         WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
+                                        RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                                         `)
                                         .then(res => {
+                                            order_data = res.rows[0]
                                             return true
                                         })
                                         .catch(err => {
@@ -2759,6 +2764,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                         if (!status)
                                             return Promise.resolve()
                                     }
+                                    await db.query(`
+                                    UPDATE users_list
+                                    SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(order_data)}', true)
+                                    WHERE discord_id = ${(order_data.order_owner)} 
+                                    OR discord_id = ${(order_data.order_filler)}
+                                    `)
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
                                     //update plat balance for users
                                     if (order_data.order_type == 'wts') {
                                         var status = db.query(`
