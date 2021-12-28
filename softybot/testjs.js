@@ -4,16 +4,15 @@ const axios = require('axios');
 
 db.query(`
 update test_table
-SET json = jsonb_set(json, '{name1}', '10', true)
-where id = 1
-returning *;
+SET json = jsonb_set(json, '{name1}', '15', true)
+where id = 1;
 update test_table
-SET json = jsonb_set(json, '{name2}', '12', true)
+SET json = jsonb_set(json, '{name2}', '16', true)
 where id = 1
-returning *;
+returning *
 `)
 .then(res => {
-    console.log(res.rows)
+    console.log(res[1].rows)
     return true
 })
 .catch(err => {
