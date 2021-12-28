@@ -3178,7 +3178,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     await db.query(`
                     UPDATE users_list
                     SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res.rows[0])}', true)
-                    WHERE discord_id = ${(res.rows[0].order_owner)} 
+                    WHERE discord_id = ${(res.rows[0].order_owner)}
                     OR discord_id = ${(res.rows[0].order_filler)}
                     `)
                     .catch(err => {
