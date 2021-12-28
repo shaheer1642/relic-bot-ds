@@ -1,5 +1,6 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
+const Canvas = require('canvas')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 
 const userOrderLimit = 50
