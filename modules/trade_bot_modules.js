@@ -1918,7 +1918,6 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     }
     console.log(arrItems)
     if (isLich) {
-        message.channel.send(`Item is a lich. This command is under dev.\n${JSON.stringify(arrItems)}`).catch(err => console.log(err));
         const weapon_url = arrItems[0].weapon_url
         const lich_id = arrItems[0].lich_id
         const weapon_name = weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
