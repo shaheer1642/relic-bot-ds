@@ -2219,7 +2219,7 @@ async function trading_bot_registeration(message) {
     })
     if (!status)
         return
-    const uni_id = trade_bot_modules.generateId()
+    const uni_id = generateId()
     var status = await db.query(`INSERT INTO users_unverified (id,discord_id) VALUES ('${uni_id}',${message.author.id})`)
     .then(res => {
         return true
