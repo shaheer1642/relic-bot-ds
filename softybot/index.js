@@ -1770,7 +1770,7 @@ client.on('interactionCreate', async interaction => {
         })
         .catch(err => {
             console.log(err)
-            reaction.message.channel.send(`<@${user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
+            interaction.message.channel.send(`<@${user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
             return false
         })
         if (!status)
