@@ -3956,7 +3956,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                                 value: order_data.order_filler
                             },
                             {
-                                label: ":order_success: None. All clear",
+                                label: "<:order_success:894992959177654332> None. All clear",
                                 value: "None"
                             }
                         ]
@@ -4019,7 +4019,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                                 value: order_data.order_filler
                             },
                             {
-                                label: ":order_success: None. All clear",
+                                label: "<:order_success:894992959177654332> None. All clear",
                                 value: "None"
                             }
                         ]
