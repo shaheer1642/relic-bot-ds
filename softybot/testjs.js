@@ -1,7 +1,7 @@
 const {db} = require('./modules/db_connection.js')
 const axios = require('axios');
 
-
+//test
 db.query(`
 update test_table
 SET json = jsonb_set(json, '{name1}', '15', true)
