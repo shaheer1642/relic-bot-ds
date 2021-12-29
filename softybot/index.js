@@ -1596,147 +1596,44 @@ client.on('interactionCreate', async interaction => {
 
     else if (interaction.customId == 'staff_trade_verification' && interaction.componentType == 'SELECT_MENU') {
         await interaction.deferUpdate()
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
-                .then(res => {
-                    if (res.rows.length == 0)
-                        return false
-                    if (!res.rows[0].is_staff)
-                        return false 
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    interaction.message.channel.send(`<@${user.id}> Error retrieving ur info from db please contact softy`).catch(err => console.log(err))
-                    return false
-                })
-                if (!status)
-                    return Promise.resolve()
-                var order_status = ''
-                var order_rating = 0
-                if (interaction.values[0] == 'None') {
-                    order_status = 'successful'
-                    order_rating = 5
-                }
-                else {
-                    order_status = 'denied'
-                    order_rating = 1
-                }
-                if (interaction.message.embeds[0]) {
-                    if (interaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
-                        var status = await db.query(`
-                        UPDATE filled_users_lich_orders SET verification_staff = ${interaction.user.id}, order_status = '${order_status}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
-                        WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
-                        RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
-                        `)
-                        .then(async res => {
-                            if (res.rowCount==1) {
-                                await db.query(`
-                                UPDATE users_list
-                                SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res.rows[0])}', true)
-                                WHERE discord_id = ${(res.rows[0].order_owner)} 
-                                OR discord_id = ${(res.rows[0].order_filler)}
-                                `)
-                                .catch(err => {
-                                    console.log(err)
-                                })
-                            }
-                            return true
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            reaction.message.channel.send(`<@${user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
-                            return false
-                        })
-                        if (!status)
-                            return Promise.resolve()
-                        var order_data = null
-                        var status = await db.query(`
-                        SELECT * FROM filled_users_lich_orders
-                        WHERE trade_log_message = ${reaction.message.id} AND archived = true AND  verification_staff = ${user.id}
-                        `)
-                        .then(res => {
-                            if (res.rows.length == 0)
-                                return false
-                            order_data = res.rows[0]
-                            return true
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            reaction.message.channel.send(`<@${user.id}> Error retrieving order info from db please contact softy`).catch(err => console.log(err))
-                            return false
-                        })
-                        if (!status)
-                            return Promise.resolve()
-                        var postdata = reaction.message.embeds[0]
-                        var desc = postdata.description.split('\n')
-                        if (reaction.emoji.name == '🛑') {
-                            postdata.color = null
-                            desc[5] = `**Order status:** denied 🛑 (Verified by <@${user.id}>)`
-                            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** No` : desc[7] = `**Users balance changed:** No`
-                        }
-                        else if (reaction.emoji.name == 'order_success') {
-                            postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
-                            desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${user.id}>)`
-                            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** Yes` : desc[7] = `**Users balance changed:** Yes`
-                        }
-                        postdata.description = ''
-                        desc.forEach(e => {
-                            postdata.description += e + '\n'
-                        })
-                        postdata.timestamp = new Date()
-                        reaction.message.edit({content: ' ',embeds: [postdata]})
-                        .then(res => {
-                            reaction.message.reactions.removeAll().catch(err => console.log(err))
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            reaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
-                        })
-                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {   
-                            //update plat balance for users
-                            if (order_data.order_type == 'wts') {
-                                var status = db.query(`
-                                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_owner)}
-                                `)
-                                .then(res => console.log(`updated plat balance for seller`))
-                                .catch(err => console.log(err))
-                                var status = db.query(`
-                                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_filler)}
-                                `)
-                                .then(res => console.log(`updated plat balance for buyer`))
-                                .catch(err => console.log(err))
-                            }
-                            else if (order_data.order_type == 'wtb') {
-                                var status = db.query(`
-                                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_owner)}
-                                `)
-                                .then(res => console.log(`updated plat balance for buyer`))
-                                .catch(err => console.log(err))
-                                var status = db.query(`
-                                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_filler)}
-                                `)
-                                .then(res => console.log(`updated plat balance for seller`))
-                                .catch(err => console.log(err))
-                            }
-                        }
-                        return Promise.resolve()
-                    }
-                }
+        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false
+            if (!res.rows[0].is_staff)
+                return false 
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            interaction.message.channel.send(`<@${user.id}> Error retrieving ur info from db please contact softy`).catch(err => console.log(err))
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        var order_status = ''
+        var order_rating = 0
+        if (interaction.values[0] == 'None') {
+            order_status = 'successful'
+            order_rating = 5
+        }
+        else {
+            order_status = 'denied'
+            order_rating = 1
+        }
+        if (interaction.message.embeds[0]) {
+            if (interaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
                 var status = await db.query(`
-                UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','denied').replace('order_success','successful')}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
-                WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
-                RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
+                UPDATE filled_users_lich_orders SET verification_staff = ${interaction.user.id}, order_status = '${order_status}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
+                WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+                RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
                 `)
                 .then(async res => {
                     if (res.rowCount==1) {
                         await db.query(`
                         UPDATE users_list
                         SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res.rows[0])}', true)
-                        WHERE discord_id = ${(res.rows[0].order_owner)}
+                        WHERE discord_id = ${(res.rows[0].order_owner)} 
                         OR discord_id = ${(res.rows[0].order_filler)}
                         `)
                         .catch(err => {
@@ -1754,14 +1651,12 @@ client.on('interactionCreate', async interaction => {
                     return Promise.resolve()
                 var order_data = null
                 var status = await db.query(`
-                SELECT * FROM filled_users_orders
+                SELECT * FROM filled_users_lich_orders
                 WHERE trade_log_message = ${reaction.message.id} AND archived = true AND  verification_staff = ${user.id}
                 `)
                 .then(res => {
-                    if (res.rows.length == 0) {
-                        //reaction.message.channel.send(`<@${user.id}> Could not find the order verifier please contact softy`).catch(err => console.log(err))
+                    if (res.rows.length == 0)
                         return false
-                    }
                     order_data = res.rows[0]
                     return true
                 })
@@ -1829,6 +1724,111 @@ client.on('interactionCreate', async interaction => {
                     }
                 }
                 return Promise.resolve()
+            }
+        }
+        var status = await db.query(`
+        UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','denied').replace('order_success','successful')}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
+        WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+        RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
+        `)
+        .then(async res => {
+            if (res.rowCount==1) {
+                await db.query(`
+                UPDATE users_list
+                SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res.rows[0])}', true)
+                WHERE discord_id = ${(res.rows[0].order_owner)}
+                OR discord_id = ${(res.rows[0].order_filler)}
+                `)
+                .catch(err => {
+                    console.log(err)
+                })
+            }
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            reaction.message.channel.send(`<@${user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        var order_data = null
+        var status = await db.query(`
+        SELECT * FROM filled_users_orders
+        WHERE trade_log_message = ${reaction.message.id} AND archived = true AND  verification_staff = ${user.id}
+        `)
+        .then(res => {
+            if (res.rows.length == 0) {
+                //reaction.message.channel.send(`<@${user.id}> Could not find the order verifier please contact softy`).catch(err => console.log(err))
+                return false
+            }
+            order_data = res.rows[0]
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            reaction.message.channel.send(`<@${user.id}> Error retrieving order info from db please contact softy`).catch(err => console.log(err))
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        var postdata = reaction.message.embeds[0]
+        var desc = postdata.description.split('\n')
+        if (reaction.emoji.name == '🛑') {
+            postdata.color = null
+            desc[5] = `**Order status:** denied 🛑 (Verified by <@${user.id}>)`
+            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** No` : desc[7] = `**Users balance changed:** No`
+        }
+        else if (reaction.emoji.name == 'order_success') {
+            postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+            desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${user.id}>)`
+            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** Yes` : desc[7] = `**Users balance changed:** Yes`
+        }
+        postdata.description = ''
+        desc.forEach(e => {
+            postdata.description += e + '\n'
+        })
+        postdata.timestamp = new Date()
+        reaction.message.edit({content: ' ',embeds: [postdata]})
+        .then(res => {
+            reaction.message.reactions.removeAll().catch(err => console.log(err))
+        })
+        .catch(err => {
+            console.log(err)
+            reaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
+        })
+        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {   
+            //update plat balance for users
+            if (order_data.order_type == 'wts') {
+                var status = db.query(`
+                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+                WHERE discord_id = ${(order_data.order_owner)}
+                `)
+                .then(res => console.log(`updated plat balance for seller`))
+                .catch(err => console.log(err))
+                var status = db.query(`
+                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+                WHERE discord_id = ${(order_data.order_filler)}
+                `)
+                .then(res => console.log(`updated plat balance for buyer`))
+                .catch(err => console.log(err))
+            }
+            else if (order_data.order_type == 'wtb') {
+                var status = db.query(`
+                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+                WHERE discord_id = ${(order_data.order_owner)}
+                `)
+                .then(res => console.log(`updated plat balance for buyer`))
+                .catch(err => console.log(err))
+                var status = db.query(`
+                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+                WHERE discord_id = ${(order_data.order_filler)}
+                `)
+                .then(res => console.log(`updated plat balance for seller`))
+                .catch(err => console.log(err))
+            }
+        }
+        return Promise.resolve()
     }
 
     if (interaction.isAutocomplete()) {
@@ -3920,56 +3920,58 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         if (order_data.reporter_id)
             reported_by = `\n**Reported by:** <@${order_data.reporter_id}>`
         if (isLich) {
+            var postdata = {}
+            postdata.content = ' '
+            postdata.embeds = [{
+                description: `
+                    A lich order has been filled and thread archived
+                    **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
+                    **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
+                    **Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+                    **Price:** ${order_data.user_price}<:platinum:881692607791648778>
+                    **Order status:** ${order_status} ${reported_by}
+                    **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
+                    **Thread:** <#${newThread.id}>
+                    **Server:** ${newThread.guild.name}
+                    **-----Chat Log-----**
+                    ${order_data.messages_log}
+                `,
+                image: {url: order_data.lich_image_url},
+                timestamp: new Date(), 
+                color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
+            }]
+            if (order_data.order_status == 'unsuccessful') {
+                postdata.components = [{
+                    type: 1,
+                    components: [{
+                        type: 3,
+                        placeholder: 'Select the troublemaker',
+                        custom_id: 'staff_trade_verification',
+                        min_values: 1,
+                        max_values: 1,
+                        options: [
+                            {
+                                label: trader_ign,
+                                value: order_data.order_owner
+                            },
+                            {
+                                label: tradee_ign,
+                                value: order_data.order_filler
+                            },
+                            {
+                                label: "None. All clear",
+                                value: "None"
+                            }
+                        ]
+                    }]
+                }]
+            }
             var status = await db.query(`
             UPDATE filled_users_lich_orders SET archived = true
             WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
             `)
             .then(res => {
-                client.channels.cache.get(ordersFillLogChannel).send({
-                    content: " ", 
-                    embeds: [{
-                        description: `
-                            A lich order has been filled and thread archived
-                            **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
-                            **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
-                            **Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
-                            **Price:** ${order_data.user_price}<:platinum:881692607791648778>
-                            **Order status:** ${order_status} ${reported_by}
-                            **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
-                            **Thread:** <#${newThread.id}>
-                            **Server:** ${newThread.guild.name}
-                            **-----Chat Log-----**
-                            ${order_data.messages_log}
-                        `,
-                        image: {url: order_data.lich_image_url},
-                        timestamp: new Date(), 
-                        color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
-                    }],
-                    components: [{
-                        type: 1,
-                        components: [{
-                            type: 3,
-                            placeholder: 'Select the troublemaker',
-                            custom_id: 'staff_trade_verification',
-                            min_values: 1,
-                            max_values: 1,
-                            options: [
-                                {
-                                    label: trader_ign,
-                                    value: order_data.order_owner
-                                },
-                                {
-                                    label: tradee_ign,
-                                    value: order_data.order_filler
-                                },
-                                {
-                                    label: "None. All clear",
-                                    value: "None"
-                                }
-                            ]
-                        }]
-                    }]
-                }).then(log_message => {
+                client.channels.cache.get(ordersFillLogChannel).send(postdata).then(log_message => {
                     var status = db.query(`
                     UPDATE filled_users_lich_orders
                     SET trade_log_message = ${log_message.id}
@@ -3982,65 +3984,63 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             })
         }
         else {
+            var postdata = {}
+            postdata.content = " "
+            postdata.embeds = [{
+                description: `
+                    An order has been filled and thread archived
+                    **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
+                    **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
+                    **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + order_data.user_rank.replace('unranked','').replace('maxed',' (maxed)')}
+                    **Price:** ${order_data.user_price}<:platinum:881692607791648778>
+                    **Order status:** ${order_status} ${reported_by}
+                    **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
+                    **Thread:** <#${newThread.id}>
+                    **Server:** ${newThread.guild.name}
+                    **-----Chat Log-----**
+                    ${order_data.messages_log}
+                `,
+                timestamp: new Date(), 
+                color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
+            }]
+            if (order_data.order_status == 'unsuccessful') {
+                postdata.components = [{
+                    type: 1,
+                    components: [{
+                        type: 3,
+                        placeholder: 'Select the troublemaker',
+                        custom_id: 'staff_trade_verification',
+                        min_values: 1,
+                        max_values: 1,
+                        options: [
+                            {
+                                label: trader_ign,
+                                value: order_data.order_owner
+                            },
+                            {
+                                label: tradee_ign,
+                                value: order_data.order_filler
+                            },
+                            {
+                                label: "None. All clear",
+                                value: "None"
+                            }
+                        ]
+                    }]
+                }]
+            }
             var status = await db.query(`
             UPDATE filled_users_orders
             SET archived = true
             WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
             `)
             .then(res => {
-                client.channels.cache.get(ordersFillLogChannel).send({
-                    content: " ", 
-                    embeds: [{
-                        description: `
-                            An order has been filled and thread archived
-                            **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
-                            **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
-                            **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + order_data.user_rank.replace('unranked','').replace('maxed',' (maxed)')}
-                            **Price:** ${order_data.user_price}<:platinum:881692607791648778>
-                            **Order status:** ${order_status} ${reported_by}
-                            **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
-                            **Thread:** <#${newThread.id}>
-                            **Server:** ${newThread.guild.name}
-                            **-----Chat Log-----**
-                            ${order_data.messages_log}
-                        `,
-                        timestamp: new Date(), 
-                        color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
-                    }],
-                    components: [{
-                        type: 1,
-                        components: [{
-                            type: 3,
-                            placeholder: 'Select the troublemaker',
-                            custom_id: 'staff_trade_verification',
-                            min_values: 1,
-                            max_values: 1,
-                            options: [
-                                {
-                                    label: trader_ign,
-                                    value: order_data.order_owner
-                                },
-                                {
-                                    label: tradee_ign,
-                                    value: order_data.order_filler
-                                },
-                                {
-                                    label: "None. All clear",
-                                    value: "None"
-                                }
-                            ]
-                        }]
-                    }]
-                }).then(log_message => {
+                client.channels.cache.get(ordersFillLogChannel).send(postdata).then(log_message => {
                     var status = db.query(`
                     UPDATE filled_users_orders
                     SET trade_log_message = ${log_message.id}
                     WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
-                    `)
-                    if (order_data.order_status == 'unsuccessful') {
-                        log_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                        log_message.react('🛑').catch(err => console.log(err))
-                    }
+                    `).catch(err => console.log(err))
                 }).catch(err => console.log(err))
             })
             .catch(err => {
