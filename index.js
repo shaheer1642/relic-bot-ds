@@ -2743,7 +2743,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var isLich = false
                 var lich_info = {}
                 var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${item_url}'`)
-                .then(res => {
+                .then(async res => {
                     if (res.rows.length == 0) {
                         var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${item_url}'`)
                         .then(res => {
