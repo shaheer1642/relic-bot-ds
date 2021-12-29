@@ -3948,15 +3948,15 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                         max_values: 1,
                         options: [
                             {
-                                label: trader_ign,
+                                label: '🛑' + trader_ign,
                                 value: order_data.order_owner
                             },
                             {
-                                label: tradee_ign,
+                                label: '🛑' + tradee_ign,
                                 value: order_data.order_filler
                             },
                             {
-                                label: "None. All clear",
+                                label: ":order_success: None. All clear",
                                 value: "None"
                             }
                         ]
