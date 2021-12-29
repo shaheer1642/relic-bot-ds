@@ -1209,21 +1209,16 @@ client.on('interactionCreate', async interaction => {
             })
         }
         //----update interaction with new items----
-        let orders = []
+        let item_orders = []
+        let lich_orders = []
         var status = await db.query(`
         SELECT * FROM users_orders 
         JOIN items_list ON users_orders.item_id=items_list.id 
         JOIN users_list ON users_orders.discord_id=users_list.discord_id 
         WHERE users_orders.discord_id = ${discord_id}`)
         .then(async res => {
-            if (res.rows.length == 0) {
-                await interaction.editReply({content: 'No more orders found on your profile.',embeds: [],components:[]}).catch(err => console.log(err))
-                return false
-            }
-            else {
-                orders = res.rows
-                return true
-            }
+            item_orders = res.rows
+            return true
         })
         .catch (err => {
             console.log(err)
@@ -1231,6 +1226,25 @@ client.on('interactionCreate', async interaction => {
         })
         if (!status)
             return
+        var status = await db.query(`
+        SELECT * FROM users_lich_orders 
+        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        WHERE users_lich_orders.discord_id = ${discord_id}`)
+        .then(async res => {
+            lich_orders = res.rows
+            return true
+        })
+        .catch (err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return
+        if (item_orders.length == 0 && lich_orders.length == 0) {
+            await interaction.editReply({content: 'No more orders found on your profile.',embeds: [],components:[]}).catch(err => console.log(err))
+            return
+        }
         let postdata = {}
         postdata.content = ' '
         postdata.embeds = []
@@ -1238,13 +1252,23 @@ client.on('interactionCreate', async interaction => {
         var sell_prices = []
         var buy_items = []
         var buy_prices = []
-        orders.forEach((e,index) => {
+        item_orders.forEach((e,index) => {
             if (e.order_type == 'wts') {
                 sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
                 sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
             }
             if (e.order_type == 'wtb') {
                 buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
+                buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+            }
+        })
+        lich_orders.forEach((e,index) => {
+            if (e.order_type == 'wts') {
+                sell_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
+                sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+            }
+            if (e.order_type == 'wtb') {
+                buy_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
                 buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
             }
         })
@@ -1293,15 +1317,30 @@ client.on('interactionCreate', async interaction => {
         if (buy_items.length != 0)
             postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
         postdata.components = []
-        postdata.components.push({type:1,components:[]})
-        postdata.components[0].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
-        orders.forEach((e,index) => {
-            if (index < 25) {
-                if (!(JSON.stringify(postdata.components[0].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
-                    postdata.components[0].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
-            }
-        })
-        postdata.components[0].components[0].max_values = postdata.components[0].components[0].options.length
+        if (item_orders.length > 0) {
+            var index = postdata.components.push({type:1,components:[]})
+            index--
+            postdata.components[index].components.push({type:3,placeholder:'Select orders to remove',custom_id:'user_orders',min_values:1,options:[]})
+            item_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
+                    if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                        postdata.components[index].components[0].options.push({label: e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.item_id})
+                }
+            })
+            postdata.components[index].components[0].max_values = postdata.components[index].components[0].options.length
+        }
+        if (lich_orders.length > 0) {
+            var index = postdata.components.push({type:1,components:[]})
+            index--
+            postdata.components[index].components.push({type:3,placeholder:'Select lich orders to remove',custom_id:'lich_orders',min_values:1,options:[]})
+            lich_orders.forEach((e,i_index) => {
+                if (i_index < 25) {
+                    if (!(JSON.stringify(postdata.components[index].components[0].options)).match(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())))
+                        postdata.components[index].components[0].options.push({label: e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),value: e.lich_id})
+                }
+            })
+            postdata.components[index].components[0].max_values = postdata.components[index].components[0].options.length
+        }
         console.log(JSON.stringify(postdata.components))
         await interaction.editReply(postdata).catch(err => console.log(err))
     }
