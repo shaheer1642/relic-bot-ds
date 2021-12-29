@@ -1611,16 +1611,6 @@ client.on('interactionCreate', async interaction => {
         })
         if (!status)
             return Promise.resolve()
-        var order_status = ''
-        var order_rating = 0
-        if (interaction.values[0] == 'None') {
-            order_status = 'successful'
-            order_rating = 5
-        }
-        else {
-            order_status = 'denied'
-            order_rating = 1
-        }
         if (interaction.message.embeds[0]) {
             if (interaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
                 var status = await db.query(`
@@ -1726,9 +1716,42 @@ client.on('interactionCreate', async interaction => {
                 return Promise.resolve()
             }
         }
+        var order_data = {}
         var status = await db.query(`
-        UPDATE filled_users_orders SET verification_staff = ${user.id}, order_status = '${reaction.emoji.name.replace('🛑','denied').replace('order_success','successful')}', order_rating = ${reaction.emoji.name.replace('🛑',1).replace('order_success',5)}
-        WHERE trade_log_message = ${reaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+        SELECT * FROM filled_users_orders
+        WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+        `)
+        .then(res => {
+            if (res.rows.length != 1)
+                return false
+            order_data = res.rows[0]
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            interaction.message.channel.send(`<@${user.id}> Error retrieving order info from db please contact softy`).catch(err => console.log(err))
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        var order_status = ''
+        var order_rating = ''
+        if (interaction.values[0] == 'None') {
+            order_status = 'successful'
+            order_rating = `{"${order_data.order_owner}": '5',"${order_data.order_filler}": '5'}`
+        }
+        else {
+            order_status = 'denied'
+            if (interaction.values[0] == order_data.order_owner)
+                order_rating = `{"${order_data.order_owner}": '1',"${order_data.order_filler}": '5'}`
+            else if (interaction.values[0] == order_data.order_filler)
+                order_rating = `{"${order_data.order_owner}": '5',"${order_data.order_filler}": '1'}`
+            else
+                order_rating = `{}`
+        }
+        var status = await db.query(`
+        UPDATE filled_users_orders SET verification_staff = ${interaction.user.id}, order_status = '${order_status}', order_rating = '${order_rating}'
+        WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
         RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
         `)
         .then(async res => {
@@ -1736,8 +1759,8 @@ client.on('interactionCreate', async interaction => {
                 await db.query(`
                 UPDATE users_list
                 SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res.rows[0])}', true)
-                WHERE discord_id = ${(res.rows[0].order_owner)}
-                OR discord_id = ${(res.rows[0].order_filler)}
+                WHERE discord_id = ${(order_data.order_owner)}
+                OR discord_id = ${(order_data.order_filler)}
                 `)
                 .catch(err => {
                     console.log(err)
@@ -1752,52 +1775,26 @@ client.on('interactionCreate', async interaction => {
         })
         if (!status)
             return Promise.resolve()
-        var order_data = null
-        var status = await db.query(`
-        SELECT * FROM filled_users_orders
-        WHERE trade_log_message = ${reaction.message.id} AND archived = true AND  verification_staff = ${user.id}
-        `)
-        .then(res => {
-            if (res.rows.length == 0) {
-                //reaction.message.channel.send(`<@${user.id}> Could not find the order verifier please contact softy`).catch(err => console.log(err))
-                return false
-            }
-            order_data = res.rows[0]
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            reaction.message.channel.send(`<@${user.id}> Error retrieving order info from db please contact softy`).catch(err => console.log(err))
-            return false
-        })
-        if (!status)
-            return Promise.resolve()
-        var postdata = reaction.message.embeds[0]
+        var postdata = interaction.message.embeds[0]
         var desc = postdata.description.split('\n')
-        if (reaction.emoji.name == '🛑') {
+        if (order_status == 'denied') {
             postdata.color = null
-            desc[5] = `**Order status:** denied 🛑 (Verified by <@${user.id}>)`
+            desc[5] = `**Order status:** denied for <@${interaction.values[0]}> 🛑 (Verified by <@${interaction.user.id}>)`
             desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** No` : desc[7] = `**Users balance changed:** No`
         }
-        else if (reaction.emoji.name == 'order_success') {
+        else if (order_status == 'successful') {
             postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
-            desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${user.id}>)`
+            desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${interaction.user.id}>)`
             desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** Yes` : desc[7] = `**Users balance changed:** Yes`
         }
-        postdata.description = ''
-        desc.forEach(e => {
-            postdata.description += e + '\n'
-        })
+        postdata.description = desc.join('\n')
         postdata.timestamp = new Date()
-        reaction.message.edit({content: ' ',embeds: [postdata]})
-        .then(res => {
-            reaction.message.reactions.removeAll().catch(err => console.log(err))
-        })
+        interaction.message.edit({content: ' ',embeds: [postdata],components: []})
         .catch(err => {
             console.log(err)
-            reaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
+            interaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
         })
-        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {   
+        if (order_status == 'successful') {
             //update plat balance for users
             if (order_data.order_type == 'wts') {
                 var status = db.query(`
