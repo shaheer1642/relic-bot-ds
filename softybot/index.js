@@ -1738,14 +1738,14 @@ client.on('interactionCreate', async interaction => {
         var order_rating = ''
         if (interaction.values[0] == 'None') {
             order_status = 'successful'
-            order_rating = `{"${order_data.order_owner}": '5',"${order_data.order_filler}": '5'}`
+            order_rating = `{"${order_data.order_owner}": "5","${order_data.order_filler}": "5"}`
         }
         else {
             order_status = 'denied'
             if (interaction.values[0] == order_data.order_owner)
-                order_rating = `{"${order_data.order_owner}": '1',"${order_data.order_filler}": '5'}`
+                order_rating = `{"${order_data.order_owner}": "1","${order_data.order_filler}": "5"}`
             else if (interaction.values[0] == order_data.order_filler)
-                order_rating = `{"${order_data.order_owner}": '5',"${order_data.order_filler}": '1'}`
+                order_rating = `{"${order_data.order_owner}": "5","${order_data.order_filler}": "1"}`
             else
                 order_rating = `{}`
         }
@@ -1770,7 +1770,7 @@ client.on('interactionCreate', async interaction => {
         })
         .catch(err => {
             console.log(err)
-            interaction.message.channel.send(`<@${user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
+            interaction.message.channel.send(`<@${interaction.user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
             return false
         })
         if (!status)
