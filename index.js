@@ -2862,11 +2862,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     console.log(trader.ingame_name + ' ' + trader.discord_id)
                     //----verify trader on discord side-----
                     var match_trade = false
-                    reaction.message.embeds.forEach(e => {
-                        if (e.image.url.match(trader.discord_id))
-                            if (e.description.match(reaction.emoji.identifier))
-                                match_trade = true
-                    })
+                    if (reaction.message.embeds[0].fields[2].value.match(trader.discord_id))
+                        match_trade = true
                     if (!match_trade) {
                         console.log('that trader does not exist in db check #2')
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
