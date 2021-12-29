@@ -1250,38 +1250,19 @@ client.on('interactionCreate', async interaction => {
         })
         //----retrieve user rating----
         var user_rating = 0
-        var status = await db.query(`
-        SELECT * FROM filled_users_orders
-        WHERE order_owner = ${discord_id} OR order_filler = ${discord_id}`)
-        .then(res => {
-            if (res.rows.length > 0) {
-                var total_rating = 0
-                var total_orders = 0
-                for (var i=0; i<res.rows.length; i++) {
-                    if (res.rows[i].order_rating) {
-                        total_orders++
-                        if (res.rows[i].reporter_id) {
-                            if (res.rows[i].reporter_id == discord_id)
-                                total_rating += 5
-                            else
-                                total_rating += res.rows[i].order_rating
-                        }
-                        else {
-                            total_rating += res.rows[i].order_rating
-                        }
-                    }
-                }
-                user_rating = (total_rating / total_orders).toFixed(2)
-            }
-            return true
-        })
-        .catch (err => {
-            console.log(err)
-            return false
-        })
-        if (!status) {
-            return
+        var total_rating = 0
+        var total_orders = user_profile.orders_history.payload.length
+        var success_orders = 0
+        for (var i=0; i<user_profile.orders_history.payload.length; i++) {
+            var order_history = user_profile.orders_history.payload[i]
+            var order_rating = order_history.order_rating[user_profile.discord_id]
+            total_rating += order_rating
+            if (order_rating == 5)
+                success_orders++
         }
+        user_rating = (total_rating / total_orders).toFixed(2)
+        console.log(user_rating)
+        //--------------------
         postdata.embeds.push({
             author: {
                 name: ingame_name,
@@ -1302,7 +1283,7 @@ client.on('interactionCreate', async interaction => {
                 inline: true
             },{
                 name: '⭐ User rating',
-                value: user_rating.toString() + ' out of 5',
+                value: user_rating.toString() + ` (${success_orders}/${total_orders})`,
                 inline: true
             }],
             color: tb_invisColor
@@ -1472,38 +1453,19 @@ client.on('interactionCreate', async interaction => {
         })
         //----retrieve user rating----
         var user_rating = 0
-        var status = await db.query(`
-        SELECT * FROM filled_users_orders
-        WHERE order_owner = ${discord_id} OR order_filler = ${discord_id}`)
-        .then(res => {
-            if (res.rows.length > 0) {
-                var total_rating = 0
-                var total_orders = 0
-                for (var i=0; i<res.rows.length; i++) {
-                    if (res.rows[i].order_rating) {
-                        total_orders++
-                        if (res.rows[i].reporter_id) {
-                            if (res.rows[i].reporter_id == discord_id)
-                                total_rating += 5
-                            else
-                                total_rating += res.rows[i].order_rating
-                        }
-                        else {
-                            total_rating += res.rows[i].order_rating
-                        }
-                    }
-                }
-                user_rating = (total_rating / total_orders).toFixed(2)
-            }
-            return true
-        })
-        .catch (err => {
-            console.log(err)
-            return false
-        })
-        if (!status) {
-            return
+        var total_rating = 0
+        var total_orders = user_profile.orders_history.payload.length
+        var success_orders = 0
+        for (var i=0; i<user_profile.orders_history.payload.length; i++) {
+            var order_history = user_profile.orders_history.payload[i]
+            var order_rating = order_history.order_rating[user_profile.discord_id]
+            total_rating += order_rating
+            if (order_rating == 5)
+                success_orders++
         }
+        user_rating = (total_rating / total_orders).toFixed(2)
+        console.log(user_rating)
+        //--------------------
         postdata.embeds.push({
             author: {
                 name: ingame_name,
@@ -1524,7 +1486,7 @@ client.on('interactionCreate', async interaction => {
                 inline: true
             },{
                 name: '⭐ User rating',
-                value: user_rating.toString() + ' out of 5',
+                value: user_rating.toString() + ` (${success_orders}/${total_orders})`,
                 inline: true
             }],
             color: tb_invisColor
