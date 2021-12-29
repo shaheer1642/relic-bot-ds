@@ -3062,7 +3062,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                     if (res[1].rowCount == 1) {
                                         await db.query(`
                                         UPDATE users_list
-                                        SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res[1].rows[0])}', true)
+                                        SET orders_history = jsonb_set(orders_history, '{payload}', '${JSON.stringify(res[1].rows[0])}', true)
                                         WHERE discord_id = ${(order_data.order_owner)} 
                                         OR discord_id = ${(order_data.order_filler)}
                                         `)
@@ -3091,7 +3091,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                     if (res[1].rowCount == 1) {
                                         await db.query(`
                                         UPDATE users_list
-                                        SET orders_history = jsonb_set(orders_history, '{payload, 2}', '${JSON.stringify(res[1].rows[0])}', true)
+                                        SET orders_history = jsonb_set(orders_history, '{payload}', '${JSON.stringify(res[1].rows[0])}', true)
                                         WHERE discord_id = ${(order_data.order_owner)} 
                                         OR discord_id = ${(order_data.order_filler)}
                                         `)
