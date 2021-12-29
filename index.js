@@ -2916,9 +2916,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             .then(res => console.log(`updated plat balance for seller and buyer`))
                             .catch(err => console.log(err))
                             //remove order from owner profile
-                            var query = `DELETE FROM users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = ${order_data.item_id}`
+                            var query = `DELETE FROM users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
                             if (q_filledOrderTable == 'filled_users_lich_orders')
-                                query = `DELETE FROM users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = ${order_data.lich_id}`
+                                query = `DELETE FROM users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
                             db.query(query)
                             .then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`))
                             .catch(err => console.log(err))
