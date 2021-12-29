@@ -2822,202 +2822,20 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             return Promise.resolve()
                         var order_data = null
                         var from_cross = false
+                        var q_filledOrderTable = 'filled_users_orders'
+                        var q_return = 'order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp'
                         if (reaction.message.embeds[0]) {
                             if (reaction.message.embeds[0].description.match(/\*\*Trade type:\*\* Lich/)) {
-                                var status = await db.query(`
-                                SELECT * FROM filled_users_lich_orders
-                                WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId} AND trade_open_message = ${reaction.message.id} AND archived = false
-                                `)
-                                .then(res => {
-                                    if (res.rows.length == 0)
-                                        return false
-                                    order_data = res.rows[0]
-                                    return true
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return false
-                                })
-                                if (!status) {
-                                    var status2 = await db.query(`
-                                    SELECT * FROM filled_users_lich_orders
-                                    WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId} AND cross_trade_open_message = ${reaction.message.id} AND archived = false
-                                    `)
-                                    .then(res => {
-                                        if (res.rows.length == 0)
-                                            return false
-                                        from_cross = true
-                                        order_data = res.rows[0]
-                                        return true
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                        return false
-                                    })
-                                    if (!status2) {
-                                        reaction.users.remove(user.id).catch(err => console.log(err))
-                                        return Promise.resolve()
-                                    }
-                                }
-                                if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
-                                    reaction.users.remove(user.id).catch(err => console.log(err))
-                                    return Promise.resolve()
-                                }
-                                if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
-                                    if (!from_cross) {
-                                        var status = await db.query(`
-                                        UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
-                                        WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId};
-                                        UPDATE filled_users_lich_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
-                                        WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
-                                        RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
-                                        `)
-                                        .then(async res => {
-                                            if (res[1].rowCount == 1) {
-                                                await db.query(`
-                                                UPDATE users_list
-                                                SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
-                                                WHERE discord_id = ${(order_data.order_owner)} 
-                                                OR discord_id = ${(order_data.order_filler)}
-                                                `)
-                                                .catch(err => {
-                                                    console.log(err)
-                                                })
-                                            }
-                                            return true
-                                        })
-                                        .catch(err => {
-                                            console.log(err)
-                                            return false
-                                        })
-                                        if (!status)
-                                            return Promise.resolve()
-                                    }
-                                    else {
-                                        var status = await db.query(`
-                                        UPDATE filled_users_lich_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
-                                        WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId};
-                                        UPDATE filled_users_lich_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
-                                        WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
-                                        RETURNING order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp
-                                        `)
-                                        .then(async res => {
-                                            if (res[1].rowCount == 1) {
-                                                await db.query(`
-                                                UPDATE users_list
-                                                SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
-                                                WHERE discord_id = ${(order_data.order_owner)} 
-                                                OR discord_id = ${(order_data.order_filler)}
-                                                `)
-                                                .catch(err => {
-                                                    console.log(err)
-                                                })
-                                            }
-                                            return true
-                                        })
-                                        .catch(err => {
-                                            console.log(err)
-                                            return false
-                                        })
-                                        if (!status)
-                                            return Promise.resolve()
-                                    }
-                                    //update plat balance for users
-                                    if (order_data.order_type == 'wts') {
-                                        var status = db.query(`
-                                        UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                                        WHERE discord_id = ${(order_data.order_owner)}
-                                        `)
-                                        .then(res => console.log(`updated plat balance for seller`))
-                                        .catch(err => console.log(err))
-                                        var status = db.query(`
-                                        UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                                        WHERE discord_id = ${(order_data.order_filler)}
-                                        `)
-                                        .then(res => console.log(`updated plat balance for buyer`))
-                                        .catch(err => console.log(err))
-                                    }
-                                    else if (order_data.order_type == 'wtb') {
-                                        var status = db.query(`
-                                        UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                                        WHERE discord_id = ${(order_data.order_owner)}
-                                        `)
-                                        .then(res => console.log(`updated plat balance for buyer`))
-                                        .catch(err => console.log(err))
-                                        var status = db.query(`
-                                        UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                                        WHERE discord_id = ${(order_data.order_filler)}
-                                        `)
-                                        .then(res => console.log(`updated plat balance for seller`))
-                                        .catch(err => console.log(err))
-                                    }
-                                    //-------
-                                    if (!from_cross) {
-                                        reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                        if (order_data.cross_thread_id) {
-                                            const channel = client.channels.cache.get(order_data.cross_thread_id)
-                                            channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                        }
-                                    }
-                                    else {
-                                        reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                        const channel = client.channels.cache.get(order_data.thread_id)
-                                        channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                    }
-                                }
-                                else if (reaction.emoji.name == '⚠️') {
-                                    if (!from_cross) {
-                                        var status = await db.query(`
-                                        UPDATE filled_users_lich_orders SET reporter_id = ${user.id}
-                                        WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
-                                        `)
-                                        .then(res => {
-                                            return true
-                                        })
-                                        .catch(err => {
-                                            console.log(err)
-                                            return false
-                                        })
-                                        if (!status)
-                                            return Promise.resolve()
-                                    }
-                                    else {
-                                        var status = await db.query(`
-                                        UPDATE filled_users_lich_orders SET reporter_id = ${user.id}
-                                        WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
-                                        `)
-                                        .then(res => {
-                                            return true
-                                        })
-                                        .catch(err => {
-                                            console.log(err)
-                                            return false
-                                        })
-                                        if (!status)
-                                            return Promise.resolve()
-                                    }
-                                    if (!from_cross) {
-                                        reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                        if (order_data.cross_thread_id) {
-                                            const channel = client.channels.cache.get(order_data.cross_thread_id)
-                                            channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                        }
-                                    }
-                                    else {
-                                        reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                        const channel = client.channels.cache.get(order_data.thread_id)
-                                        channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                    }
-                                }
-                                return Promise.resolve()
+                                var q_filledOrderTable = 'filled_users_lich_orders'
+                                var q_return = 'order_owner,order_filler,lich_id,element,damage,ephemera,quirk,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp'
                             }
                         }
                         var status = await db.query(`
-                        SELECT * FROM filled_users_orders
+                        SELECT * FROM ${q_filledOrderTable}
                         WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId} AND trade_open_message = ${reaction.message.id} AND archived = false
                         `)
                         .then(res => {
-                            if (res.rows.length == 0)
+                            if (res.rows.length != 1)
                                 return false
                             order_data = res.rows[0]
                             return true
@@ -3028,11 +2846,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         })
                         if (!status) {
                             var status2 = await db.query(`
-                            SELECT * FROM filled_users_orders
+                            SELECT * FROM ${q_filledOrderTable}
                             WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId} AND cross_trade_open_message = ${reaction.message.id} AND archived = false
                             `)
                             .then(res => {
-                                if (res.rows.length == 0)
+                                if (res.rows.length != 1)
                                     return false
                                 from_cross = true
                                 order_data = res.rows[0]
@@ -3049,94 +2867,54 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             reaction.users.remove(user.id).catch(err => console.log(err))
                             return Promise.resolve()
                         }
+                        var q_threadId = 'thread_id'
+                        var q_channelId = 'channel_id'
+                        if (from_cross) {
+                            var q_threadId = 'cross_thread_id'
+                            var q_channelId = 'cross_channel_id'
+                        }
                         if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
-                            if (!from_cross) {
-                                var status = await db.query(`
-                                UPDATE filled_users_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
-                                WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId};
-                                UPDATE filled_users_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
-                                WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
-                                RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
-                                `)
-                                .then(async res => {
-                                    if (res[1].rowCount == 1) {
-                                        await db.query(`
-                                        UPDATE users_list
-                                        SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
-                                        WHERE discord_id = ${(order_data.order_owner)} 
-                                        OR discord_id = ${(order_data.order_filler)}
-                                        `)
-                                        .catch(err => {
-                                            console.log(err)
-                                        })
-                                    }
-                                    return true
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return false
-                                })
-                                if (!status)
-                                    return Promise.resolve()
-                            }
-                            else {
-                                var status = await db.query(`
-                                UPDATE filled_users_orders SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
-                                WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId};
-                                UPDATE filled_users_orders SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
-                                WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
-                                RETURNING order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp
-                                `)
-                                .then(async res => {
-                                    if (res[1].rowCount == 1) {
-                                        await db.query(`
-                                        UPDATE users_list
-                                        SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
-                                        WHERE discord_id = ${(order_data.order_owner)} 
-                                        OR discord_id = ${(order_data.order_filler)}
-                                        `)
-                                        .catch(err => {
-                                            console.log(err)
-                                        })
-                                    }
-                                    return true
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return false
-                                })
-                                if (!status)
-                                    return Promise.resolve()
-                            }
+                            var status = await db.query(`
+                            UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
+                            WHERE ${q_threadId} = ${reaction.message.channel.id} AND ${q_channelId} = ${reaction.message.channel.parentId};
+                            UPDATE ${q_filledOrderTable} SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
+                            WHERE ${q_threadId} = ${reaction.message.channel.id} AND ${q_channelId} = ${reaction.message.channel.parentId}
+                            RETURNING ${q_return}
+                            `)
+                            .then(async res => {
+                                if (res[1].rowCount == 1) {
+                                    await db.query(`
+                                    UPDATE users_list
+                                    SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
+                                    WHERE discord_id = ${(order_data.order_owner)} OR discord_id = ${(order_data.order_filler)}
+                                    `)
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                }
+                                return true
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                return false
+                            })
+                            if (!status)
+                                return Promise.resolve()
                             //update plat balance for users
-                            if (order_data.order_type == 'wts') {
-                                var status = db.query(`
-                                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_owner)}
-                                `)
-                                .then(res => console.log(`updated plat balance for seller`))
-                                .catch(err => console.log(err))
-                                var status = db.query(`
-                                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_filler)}
-                                `)
-                                .then(res => console.log(`updated plat balance for buyer`))
-                                .catch(err => console.log(err))
+                            var q_ownerPlat = 'plat_gained'
+                            var q_fillerPlat = 'plat_spent'
+                            if (order_data.order_type == 'wtb') {
+                                var q_ownerPlat = 'plat_spent'
+                                var q_fillerPlat = 'plat_gained'
                             }
-                            else if (order_data.order_type == 'wtb') {
-                                var status = db.query(`
-                                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_owner)}
-                                `)
-                                .then(res => console.log(`updated plat balance for buyer`))
-                                .catch(err => console.log(err))
-                                var status = db.query(`
-                                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_filler)}
-                                `)
-                                .then(res => console.log(`updated plat balance for seller`))
-                                .catch(err => console.log(err))
-                            }
+                            var status = db.query(`
+                            UPDATE users_list SET ${q_ownerPlat} = ${q_ownerPlat} + ${Number(order_data.user_price)}
+                            WHERE discord_id = ${(order_data.order_owner)};
+                            UPDATE users_list SET ${q_fillerPlat} = ${q_fillerPlat} + ${Number(order_data.user_price)}
+                            WHERE discord_id = ${(order_data.order_filler)};
+                            `)
+                            .then(res => console.log(`updated plat balance for seller and buyer`))
+                            .catch(err => console.log(err))
                             //-------
                             if (!from_cross) {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
@@ -3152,36 +2930,19 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             }
                         }
                         else if (reaction.emoji.name == '⚠️') {
-                            if (!from_cross) {
-                                var status = await db.query(`
-                                UPDATE filled_users_orders SET reporter_id = ${user.id}
-                                WHERE thread_id = ${reaction.message.channel.id} AND channel_id = ${reaction.message.channel.parentId}
-                                `)
-                                .then(res => {
-                                    return true
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return false
-                                })
-                                if (!status)
-                                    return Promise.resolve()
-                            }
-                            else {
-                                var status = await db.query(`
-                                UPDATE filled_users_orders SET reporter_id = ${user.id}
-                                WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_channel_id = ${reaction.message.channel.parentId}
-                                `)
-                                .then(res => {
-                                    return true
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    return false
-                                })
-                                if (!status)
-                                    return Promise.resolve()
-                            }
+                            var status = await db.query(`
+                            UPDATE ${q_filledOrderTable} SET reporter_id = ${user.id}
+                            WHERE ${q_threadId} = ${reaction.message.channel.id} AND ${q_channelId} = ${reaction.message.channel.parentId}
+                            `)
+                            .then(res => {
+                                return true
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                return false
+                            })
+                            if (!status)
+                                return Promise.resolve()
                             if (!from_cross) {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
                                 if (order_data.cross_thread_id) {
