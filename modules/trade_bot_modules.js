@@ -737,125 +737,127 @@ async function trading_bot(message,args,command) {
 }
 
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type,item_rank = 'unranked') {
+    var embeds = []
+    var noOfSellers = 0
+    var noOfBuyers = 0
+
+    //----construct embed----
+    var status = await db.query(`
+    SELECT * FROM users_orders 
+    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    JOIN items_list ON users_orders.item_id=items_list.id 
+    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true AND user_rank = '${item_rank}'
+    ORDER BY users_orders.user_price ASC,users_orders.update_timestamp`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return true
+        else {
+            var emb_sellers = ''
+            var emb_prices = ''
+            for (var j=0;j<res.rows.length;j++) {
+                if (j==5)
+                    break
+                emb_sellers += tradingBotReactions.sell[j] + ' ' + res.rows[j].ingame_name + '\n'
+                emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
+            }
+            noOfSellers = j
+            var embed = {
+                title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
+                url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                fields: [
+                    {
+                        name: 'Sellers',
+                        value: emb_sellers,
+                        inline: true
+                    },{name: '\u200b',value:'\u200b',inline:true},
+                    {
+                        name: 'Prices',
+                        value: emb_prices,
+                        inline: true
+                    },
+                ],
+                color: '#7cb45d'
+            }
+            embeds.push(embed)
+        }
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        if (originMessage) {
+            originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+        }
+        console.log(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
+        return false
+    })
+    if (!status)
+        return Promise.reject()
+    var status = await db.query(`
+    SELECT * FROM users_orders 
+    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    JOIN items_list ON users_orders.item_id=items_list.id 
+    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true AND user_rank = '${item_rank}'
+    ORDER BY users_orders.user_price DESC,users_orders.update_timestamp`)
+    .then(res => {
+        if (res.rows.length == 0)
+            return true
+        else {
+            var emb_buyers = ''
+            var emb_prices = ''
+            for (var j=0;j<res.rows.length;j++) {
+                if (j==5)
+                    break
+                emb_buyers += tradingBotReactions.buy[j] + ' ' + res.rows[j].ingame_name + '\n'
+                emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
+            }
+            noOfBuyers = j
+            var embed = {
+                title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
+                fields: [
+                    {
+                        name: 'Buyers',
+                        value: emb_buyers,
+                        inline: true
+                    },{name: '\u200b',value:'\u200b',inline:true},
+                    {
+                        name: 'Prices',
+                        value: emb_prices,
+                        inline: true
+                    },
+                ],
+                color: '#E74C3C'
+            }
+            embeds.push(embed)
+        }
+        return true
+    })
+    .catch(err => {
+        if (originMessage) {
+            originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+        }
+        console.log(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
+        console.log(err)
+        return false
+    })
+    if (!status)
+        return Promise.reject()
+    if (embeds[1]) {
+        embeds[1].title = null
+        embeds[1].url = null
+        embeds[1].thumbnail = null
+    }
+
+    //update msgs
     for(var i=0;i<tradingBotChannels.length;i++) {
         var multiCid = tradingBotChannels[i]
         console.log(`editing for channel ${multiCid}`)
         var msg = null
-        var embeds = []
-        var noOfSellers = 0
-        var noOfBuyers = 0
-        //var targetChannel = client.channels.cache.get(multiCid)
 
-        //----construct embed----
-        var status = await db.query(`
-        SELECT * FROM users_orders 
-        JOIN users_list ON users_orders.discord_id=users_list.discord_id 
-        JOIN items_list ON users_orders.item_id=items_list.id 
-        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true AND user_rank = '${item_rank}'
-        ORDER BY users_orders.user_price ASC,users_orders.update_timestamp`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return true
-            else {
-                var emb_sellers = ''
-                var emb_prices = ''
-                for (var j=0;j<res.rows.length;j++) {
-                    if (j==5)
-                        break
-                    emb_sellers += tradingBotReactions.sell[j] + ' ' + res.rows[j].ingame_name + '\n'
-                    emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
-                }
-                noOfSellers = j
-                var embed = {
-                    title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
-                    thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    fields: [
-                        {
-                            name: 'Sellers',
-                            value: emb_sellers,
-                            inline: true
-                        },{name: '\u200b',value:'\u200b',inline:true},
-                        {
-                            name: 'Prices',
-                            value: emb_prices,
-                            inline: true
-                        },
-                    ],
-                    color: '#7cb45d'
-                }
-                embeds.push(embed)
-            }
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            if (originMessage) {
-                originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-            }
-            console.log(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
-            return false
-        })
-        if (!status)
-            return Promise.reject()
-        var status = await db.query(`
-        SELECT * FROM users_orders 
-        JOIN users_list ON users_orders.discord_id=users_list.discord_id 
-        JOIN items_list ON users_orders.item_id=items_list.id 
-        WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true AND user_rank = '${item_rank}'
-        ORDER BY users_orders.user_price DESC,users_orders.update_timestamp`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return true
-            else {
-                var emb_buyers = ''
-                var emb_prices = ''
-                for (var j=0;j<res.rows.length;j++) {
-                    if (j==5)
-                        break
-                    emb_buyers += tradingBotReactions.buy[j] + ' ' + res.rows[j].ingame_name + '\n'
-                    emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
-                }
-                noOfBuyers = j
-                var embed = {
-                    title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
-                    fields: [
-                        {
-                            name: 'Buyers',
-                            value: emb_buyers,
-                            inline: true
-                        },{name: '\u200b',value:'\u200b',inline:true},
-                        {
-                            name: 'Prices',
-                            value: emb_prices,
-                            inline: true
-                        },
-                    ],
-                    color: '#E74C3C'
-                }
-                embeds.push(embed)
-            }
-            return true
-        })
-        .catch(err => {
-            if (originMessage) {
-                originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
-            }
-            console.log(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
-            console.log(err)
-            return false
-        })
-        if (!status)
-            return Promise.reject()
-        if (embeds[1]) {
-            embeds[1].title = null
-            embeds[1].url = null
-            embeds[1].thumbnail = null
-        }
         var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item 
@@ -1486,8 +1488,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             embeds[index].thumbnail = null
         }
     })
-    console.log(JSON.stringify(embeds))
 
+    //update msgs
     for (var i=0;i<tradingBotLichChannels.length;i++) {
         var multiCid = tradingBotLichChannels[i]
         console.log(`editing for channel ${multiCid}`)
