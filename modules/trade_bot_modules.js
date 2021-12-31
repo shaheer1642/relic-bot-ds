@@ -1389,6 +1389,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
                     drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
                     textC = draw(`${res.rows[j].damage}%+ `, trX+20, trY-10, 20);
+                    console.log(`./icons/d_${res.rows[j].element}.png`)
                     const img2 = await Canvas.loadImage(`./icons/d_${res.rows[j].element}.png`)
                     ctx.drawImage(img2, textC.trX, textC.trY, 20, 20);
                     twc += 20
