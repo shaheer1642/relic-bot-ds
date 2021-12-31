@@ -1180,319 +1180,318 @@ async function trading_lich_bot(interaction) {
 }
 
 async function trading_lich_orders_update(interaction, lich_info, update_type) {
+    var embeds = []
+    var noOfSellers = 0
+    var noOfBuyers = 0
+    //----construct embed----
+    await db.query(`
+    SELECT * FROM users_lich_orders 
+    JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+    JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+    WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
+    ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
+    .then(async res => {
+        if (res.rows.length != 0) {
+            for (var j=0;j<res.rows.length;j++) {
+                if (j==5)
+                    break
+                var embed = {
+                    title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                    description: tradingBotReactions.sell[j],
+                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    fields: [],
+                    color: '#7cb45d',
+                    image: {url: ''}
+                }
+            
+                await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+                .then(async img1 => {
+                    var tlX = 90
+                    , tlY = 70
+                  
+                    , trX = tlX + img1.width
+                    , trY = tlY
+                  
+                    , blX = tlX
+                    , blY = tlY + img1.height
+                  
+                    , brX = blX + img1.width
+                    , brY = blY
+                  
+                    , twc = 0
+                  
+                    // Create image on canvas
+                    var canvas = new Canvas.createCanvas(1000,1000)
+                    , ctx = canvas.getContext('2d');
+                  
+                    ctx.drawImage(img1, tlX, tlY);
+                    ctx.fillStyle = '#ffffff';
+                    //ctx.fillRect(tlX,tlY,5,5);
+                    //ctx.fillRect(trX,trY,5,5);
+                    //ctx.fillRect(blX,blY,5,5);
+                    //ctx.fillRect(brX,brY,5,5);
+                    
+                    textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#7cb45d');
+                    drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
+                    textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
+                    drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
+                    textC = draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
+                    drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
+                    textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
+                    drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
+                    textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
+                    drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
+                    textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                    drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
+                  
+                    let tempctx = ctx.getImageData(0,0,twc,blY+70)
+                    ctx.canvas.width = twc
+                    ctx.canvas.height = blY+70
+                    ctx.putImageData(tempctx,0,0)
+                  
+                    function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
+                        ctx.font = size + 'px Arial';
+                        ctx.fillStyle = color;
+                        ctx.fillText(text, x, y);
+                        var cords = ctx.measureText(text)
+                        var cordsH = ctx.measureText('M')
+                        if (x+cords.width > twc)
+                            twc = x+cords.width
+                        //note that the filltext uses bottom left as reference for drawing text
+                        var cordss = {
+                          tlX: x,
+                          tlY: y-cordsH.width,
+                          trX: x+cords.width,
+                          trY: y-cordsH.width,
+                          blX: x, 
+                          blY: y,
+                          brX: x+cords.width,
+                          brY: y
+                        }
+                        //console.log(cordss.tlX + 'x' + cordss.tlY)
+                        //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
+                        //ctx.fillRect(cordss.trX,cordss.trY,3,3);
+                        //ctx.fillRect(cordss.blX,cordss.blY,3,3);
+                        //ctx.fillRect(cordss.brX,cordss.brY,3,3);
+                        
+                        return cordss
+                    }
+                  
+                    function drawLineCurve(x1,y1,x2,y2,x3,y3) {
+                      ctx.beginPath();
+                      ctx.moveTo(x1,y1);
+                      ctx.lineTo(x2,y2);
+                      ctx.lineTo(x3,y3);
+                      ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                      ctx.lineWidth = 2;
+                      ctx.stroke();
+                      ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                    }
+                  
+                    function drawLineStr(x1,y1,x2,y2) {
+                      ctx.beginPath();
+                      ctx.moveTo(x1,y1);
+                      ctx.lineTo(x2,y2);
+                      ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                      ctx.lineWidth = 2;
+                      ctx.stroke();
+                      ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                    }
+
+                    var attachment_url = ''
+                    if (res.rows[j].lich_image_url) {
+                        attachment_url = res.rows[j].lich_image_url
+                    }
+                    else {
+                        await client.channels.cache.get('912395290701602866').send({
+                            content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
+                            files: [{
+                                attachment: ctx.canvas.toBuffer(),
+                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
+                            }]
+                        }).then(res => {
+                            res.attachments.map(attachment => {
+                                attachment_url = attachment.url
+                            })
+                        }).catch(err => console.log(err))
+                        await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                    }
+                    
+                    embed.image.url = attachment_url
+                }).catch(err => console.log(err))
+                //================
+                embeds.push(embed)
+            }
+            noOfSellers = j
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        if (interaction)
+            interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+        return Promise.reject()
+    })
+    await db.query(`
+    SELECT * FROM users_lich_orders 
+    JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+    JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
+    WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
+    ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
+    .then(async res => {
+        if (res.rows.length != 0) {
+            for (var j=0;j<res.rows.length;j++) {
+                if (j==5)
+                    break
+                
+                var embed = {
+                    title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
+                    description: tradingBotReactions.buy[j],
+                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    fields: [],
+                    color: '#E74C3C',
+                    image: {url: ''}
+                }
+            
+                await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+                .then(async img1 => {
+                    var tlX = 90
+                    , tlY = 70
+                  
+                    , trX = tlX + img1.width
+                    , trY = tlY
+                  
+                    , blX = tlX
+                    , blY = tlY + img1.height
+                  
+                    , brX = blX + img1.width
+                    , brY = blY
+                  
+                    , twc = 0
+                  
+                    // Create image on canvas
+                    var canvas = new Canvas.createCanvas(1000,1000)
+                    , ctx = canvas.getContext('2d');
+                  
+                    ctx.drawImage(img1, tlX, tlY);
+                    ctx.fillStyle = '#ffffff';
+                    //ctx.fillRect(tlX,tlY,5,5);
+                    //ctx.fillRect(trX,trY,5,5);
+                    //ctx.fillRect(blX,blY,5,5);
+                    //ctx.fillRect(brX,brY,5,5);
+                    
+                    textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#E74C3C');
+                    drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
+                    textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
+                    drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
+                    textC = draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
+                    drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
+                    //textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
+                    //drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
+                    //textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
+                    //drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
+                    textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                    drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
+                  
+                    let tempctx = ctx.getImageData(0,0,twc,blY+70)
+                    ctx.canvas.width = twc
+                    ctx.canvas.height = blY+70
+                    ctx.putImageData(tempctx,0,0)
+                  
+                    function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
+                        ctx.font = size + 'px Arial';
+                        ctx.fillStyle = color;
+                        ctx.fillText(text, x, y);
+                        var cords = ctx.measureText(text)
+                        var cordsH = ctx.measureText('M')
+                        if (x+cords.width > twc)
+                            twc = x+cords.width
+                        //note that the filltext uses bottom left as reference for drawing text
+                        var cordss = {
+                          tlX: x,
+                          tlY: y-cordsH.width,
+                          trX: x+cords.width,
+                          trY: y-cordsH.width,
+                          blX: x, 
+                          blY: y,
+                          brX: x+cords.width,
+                          brY: y
+                        }
+                        //console.log(cordss.tlX + 'x' + cordss.tlY)
+                        //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
+                        //ctx.fillRect(cordss.trX,cordss.trY,3,3);
+                        //ctx.fillRect(cordss.blX,cordss.blY,3,3);
+                        //ctx.fillRect(cordss.brX,cordss.brY,3,3);
+                        
+                        return cordss
+                    }
+                  
+                    function drawLineCurve(x1,y1,x2,y2,x3,y3) {
+                      ctx.beginPath();
+                      ctx.moveTo(x1,y1);
+                      ctx.lineTo(x2,y2);
+                      ctx.lineTo(x3,y3);
+                      ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                      ctx.lineWidth = 2;
+                      ctx.stroke();
+                      ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                    }
+                  
+                    function drawLineStr(x1,y1,x2,y2) {
+                      ctx.beginPath();
+                      ctx.moveTo(x1,y1);
+                      ctx.lineTo(x2,y2);
+                      ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+                      ctx.lineWidth = 2;
+                      ctx.stroke();
+                      ctx.fillRect(x1-2.5,y1-2.5,5,5);
+                    }
+
+                    var attachment_url = ''
+                    if (res.rows[j].lich_image_url) {
+                        attachment_url = res.rows[j].lich_image_url
+                    }
+                    else {
+                        await client.channels.cache.get('912395290701602866').send({
+                            content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
+                            files: [{
+                                attachment: ctx.canvas.toBuffer(),
+                                name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
+                            }]
+                        }).then(res => {
+                            res.attachments.map(attachment => {
+                                attachment_url = attachment.url
+                            })
+                        }).catch(err => console.log(err))
+                        await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                    }
+                    
+                    embed.image.url = attachment_url
+                }).catch(err => console.log(err))
+                //================
+                embeds.push(embed)
+            }
+            noOfBuyers = j
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        if (interaction)
+            interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+        return Promise.reject()
+    })
+    embeds.forEach((element,index) => {
+        if (index != 0) {
+            embeds[index].url = null
+            embeds[index].title = null
+            embeds[index].thumbnail = null
+        }
+    })
+    console.log(JSON.stringify(embeds))
+
     for (var i=0;i<tradingBotLichChannels.length;i++) {
         var multiCid = tradingBotLichChannels[i]
         console.log(`editing for channel ${multiCid}`)
         var msg = null
-        var embeds = []
-        var noOfSellers = 0
-        var noOfBuyers = 0
-        //var targetChannel = client.channels.cache.get(multiCid)
-
-        //----construct embed----
-        await db.query(`
-        SELECT * FROM users_lich_orders 
-        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
-        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-        WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
-        ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
-        .then(async res => {
-            if (res.rows.length != 0) {
-                for (var j=0;j<res.rows.length;j++) {
-                    if (j==5)
-                        break
-                    var embed = {
-                        title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
-                        description: tradingBotReactions.sell[j],
-                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                        fields: [],
-                        color: '#7cb45d',
-                        image: {url: ''}
-                    }
-                
-                    await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
-                    .then(async img1 => {
-                        var tlX = 90
-                        , tlY = 70
-                      
-                        , trX = tlX + img1.width
-                        , trY = tlY
-                      
-                        , blX = tlX
-                        , blY = tlY + img1.height
-                      
-                        , brX = blX + img1.width
-                        , brY = blY
-                      
-                        , twc = 0
-                      
-                        // Create image on canvas
-                        var canvas = new Canvas.createCanvas(1000,1000)
-                        , ctx = canvas.getContext('2d');
-                      
-                        ctx.drawImage(img1, tlX, tlY);
-                        ctx.fillStyle = '#ffffff';
-                        //ctx.fillRect(tlX,tlY,5,5);
-                        //ctx.fillRect(trX,trY,5,5);
-                        //ctx.fillRect(blX,blY,5,5);
-                        //ctx.fillRect(brX,brY,5,5);
-                        
-                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#7cb45d');
-                        drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
-                        textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
-                        drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
-                        textC = draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
-                        drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
-                        textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
-                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
-                        textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
-                        drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
-                        textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
-                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
-                      
-                        let tempctx = ctx.getImageData(0,0,twc,blY+70)
-                        ctx.canvas.width = twc
-                        ctx.canvas.height = blY+70
-                        ctx.putImageData(tempctx,0,0)
-                      
-                        function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
-                            ctx.font = size + 'px Arial';
-                            ctx.fillStyle = color;
-                            ctx.fillText(text, x, y);
-                            var cords = ctx.measureText(text)
-                            var cordsH = ctx.measureText('M')
-                            if (x+cords.width > twc)
-                                twc = x+cords.width
-                            //note that the filltext uses bottom left as reference for drawing text
-                            var cordss = {
-                              tlX: x,
-                              tlY: y-cordsH.width,
-                              trX: x+cords.width,
-                              trY: y-cordsH.width,
-                              blX: x, 
-                              blY: y,
-                              brX: x+cords.width,
-                              brY: y
-                            }
-                            //console.log(cordss.tlX + 'x' + cordss.tlY)
-                            //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
-                            //ctx.fillRect(cordss.trX,cordss.trY,3,3);
-                            //ctx.fillRect(cordss.blX,cordss.blY,3,3);
-                            //ctx.fillRect(cordss.brX,cordss.brY,3,3);
-                            
-                            return cordss
-                        }
-                      
-                        function drawLineCurve(x1,y1,x2,y2,x3,y3) {
-                          ctx.beginPath();
-                          ctx.moveTo(x1,y1);
-                          ctx.lineTo(x2,y2);
-                          ctx.lineTo(x3,y3);
-                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
-                          ctx.lineWidth = 2;
-                          ctx.stroke();
-                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
-                        }
-                      
-                        function drawLineStr(x1,y1,x2,y2) {
-                          ctx.beginPath();
-                          ctx.moveTo(x1,y1);
-                          ctx.lineTo(x2,y2);
-                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
-                          ctx.lineWidth = 2;
-                          ctx.stroke();
-                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
-                        }
-
-                        var attachment_url = ''
-                        if (res.rows[j].lich_image_url) {
-                            attachment_url = res.rows[j].lich_image_url
-                        }
-                        else {
-                            await client.channels.cache.get('912395290701602866').send({
-                                content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
-                                files: [{
-                                    attachment: ctx.canvas.toBuffer(),
-                                    name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                                }]
-                            }).then(res => {
-                                res.attachments.map(attachment => {
-                                    attachment_url = attachment.url
-                                })
-                            }).catch(err => console.log(err))
-                            await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
-                        }
-                        
-                        embed.image.url = attachment_url
-                    }).catch(err => console.log(err))
-                    //================
-                    embeds.push(embed)
-                }
-                noOfSellers = j
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            if (interaction)
-                interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
-            return Promise.reject()
-        })
-        await db.query(`
-        SELECT * FROM users_lich_orders 
-        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
-        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-        WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
-        ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
-        .then(async res => {
-            if (res.rows.length != 0) {
-                for (var j=0;j<res.rows.length;j++) {
-                    if (j==5)
-                        break
-                    
-                    var embed = {
-                        title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
-                        description: tradingBotReactions.buy[j],
-                        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                        fields: [],
-                        color: '#E74C3C',
-                        image: {url: ''}
-                    }
-                
-                    await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
-                    .then(async img1 => {
-                        var tlX = 90
-                        , tlY = 70
-                      
-                        , trX = tlX + img1.width
-                        , trY = tlY
-                      
-                        , blX = tlX
-                        , blY = tlY + img1.height
-                      
-                        , brX = blX + img1.width
-                        , brY = blY
-                      
-                        , twc = 0
-                      
-                        // Create image on canvas
-                        var canvas = new Canvas.createCanvas(1000,1000)
-                        , ctx = canvas.getContext('2d');
-                      
-                        ctx.drawImage(img1, tlX, tlY);
-                        ctx.fillStyle = '#ffffff';
-                        //ctx.fillRect(tlX,tlY,5,5);
-                        //ctx.fillRect(trX,trY,5,5);
-                        //ctx.fillRect(blX,blY,5,5);
-                        //ctx.fillRect(brX,brY,5,5);
-                        
-                        textC = draw(`${res.rows[j].ingame_name}`, tlX-75, tlY-30, 20, '#E74C3C');
-                        drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
-                        textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
-                        drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
-                        textC = draw(`${res.rows[j].damage}% ${res.rows[j].element}`, trX+20, trY-10, 20);
-                        drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
-                        textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
-                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
-                        textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
-                        drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
-                        textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
-                        drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
-                      
-                        let tempctx = ctx.getImageData(0,0,twc,blY+70)
-                        ctx.canvas.width = twc
-                        ctx.canvas.height = blY+70
-                        ctx.putImageData(tempctx,0,0)
-                      
-                        function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
-                            ctx.font = size + 'px Arial';
-                            ctx.fillStyle = color;
-                            ctx.fillText(text, x, y);
-                            var cords = ctx.measureText(text)
-                            var cordsH = ctx.measureText('M')
-                            if (x+cords.width > twc)
-                                twc = x+cords.width
-                            //note that the filltext uses bottom left as reference for drawing text
-                            var cordss = {
-                              tlX: x,
-                              tlY: y-cordsH.width,
-                              trX: x+cords.width,
-                              trY: y-cordsH.width,
-                              blX: x, 
-                              blY: y,
-                              brX: x+cords.width,
-                              brY: y
-                            }
-                            //console.log(cordss.tlX + 'x' + cordss.tlY)
-                            //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
-                            //ctx.fillRect(cordss.trX,cordss.trY,3,3);
-                            //ctx.fillRect(cordss.blX,cordss.blY,3,3);
-                            //ctx.fillRect(cordss.brX,cordss.brY,3,3);
-                            
-                            return cordss
-                        }
-                      
-                        function drawLineCurve(x1,y1,x2,y2,x3,y3) {
-                          ctx.beginPath();
-                          ctx.moveTo(x1,y1);
-                          ctx.lineTo(x2,y2);
-                          ctx.lineTo(x3,y3);
-                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
-                          ctx.lineWidth = 2;
-                          ctx.stroke();
-                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
-                        }
-                      
-                        function drawLineStr(x1,y1,x2,y2) {
-                          ctx.beginPath();
-                          ctx.moveTo(x1,y1);
-                          ctx.lineTo(x2,y2);
-                          ctx.strokeStyle = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4';
-                          ctx.lineWidth = 2;
-                          ctx.stroke();
-                          ctx.fillRect(x1-2.5,y1-2.5,5,5);
-                        }
-
-                        var attachment_url = ''
-                        if (res.rows[j].lich_image_url) {
-                            attachment_url = res.rows[j].lich_image_url
-                        }
-                        else {
-                            await client.channels.cache.get('912395290701602866').send({
-                                content: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`,
-                                files: [{
-                                    attachment: ctx.canvas.toBuffer(),
-                                    name: `canvas_t${res.rows[j].discord_id}_p${res.rows[j].user_price}.png`
-                                }]
-                            }).then(res => {
-                                res.attachments.map(attachment => {
-                                    attachment_url = attachment.url
-                                })
-                            }).catch(err => console.log(err))
-                            await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
-                        }
-                        
-                        embed.image.url = attachment_url
-                    }).catch(err => console.log(err))
-                    //================
-                    embeds.push(embed)
-                }
-                noOfBuyers = j
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            if (interaction)
-                interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
-            return Promise.reject()
-        })
-        embeds.forEach((element,index) => {
-            if (index != 0) {
-                embeds[index].url = null
-                embeds[index].title = null
-                embeds[index].thumbnail = null
-            }
-        })
-        console.log(JSON.stringify(embeds))
 
         await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
         .then(async res => {
