@@ -1083,7 +1083,7 @@ async function trading_lich_bot(interaction) {
             var status = await db.query(`INSERT INTO users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,quirk,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
                 ${interaction.user.id},
                 '${lich_info.lich_id}',
-                '${interaction.options.getString('order_type')}',
+                '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
                 ${interaction.options.getInteger('price')},
                 true,
                 '${interaction.options.getString('element')}',
