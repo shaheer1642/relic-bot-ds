@@ -1044,7 +1044,13 @@ async function trading_lich_bot(interaction) {
     })
     if (!status)
         return Promise.reject()
-    console.log(lich_info)
+    //----stats dynamic vars----
+    var q_quirk = ''
+    var q_lichName = ''
+    if (interaction.options.getString('quirk'))
+        q_quirk = interaction.options.getString('quirk').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    if (interaction.options.getString('name'))
+        q_lichName = interaction.options.getString('name')
     //----verify order in DB----
     await db.query(`DELETE FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(err => console.log(err))
     var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
@@ -1089,8 +1095,8 @@ async function trading_lich_bot(interaction) {
                 '${interaction.options.getString('element')}',
                 ${interaction.options.getNumber('damage')},
                 ${interaction.options.getBoolean('ephemera')},
-                '${interaction.options.getString('quirk').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}',
-                '${interaction.options.getString('name')}',
+                NULLIF('${q_quirk}', ''),
+                NULLIF('${q_lichName}', ''),
                 ${interaction.channel.id},
                 ${interaction.guild.id},
                 ${new Date().getTime()})`)
