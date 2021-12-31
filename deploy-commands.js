@@ -11,8 +11,10 @@ for (const file of commandFiles) {
 	commands.push(command.data.toJSON());
 }
 for (var e of commands) {
-	if (e.name	== 'lich')
-		e.options[0].autocomplete = true
+	if (e.name	== 'lich') {
+		e.options[0].options[0].autocomplete = true
+		e.options[1].options[0].autocomplete = true
+	}
 	if (e.name == 'track')
 		if (e.options[0].name == 'bounties')
 			e.options[0].options[1].autocomplete = true
