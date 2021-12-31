@@ -201,7 +201,7 @@ async function orders(message,args) {
                     break
                 if (ordersArr[j].mod_rank > 0)
                     continue
-                sellers += ordersArr[j].seller + "\u205F\u205F\u205F\u205F\u205F\n"
+                sellers += ordersArr[j].seller + "\n"
                 quantities += ordersArr[j].quantity + "\n"
                 prices += ordersArr[j].price + "\n"
             }
@@ -361,7 +361,7 @@ async function orders_update(message, reaction, user) {
                     break
                 if (ordersArr[j].mod_rank > 0)
                     continue
-                sellers += ordersArr[j].seller + "\u205F\u205F\u205F\u205F\u205F\n"
+                sellers += ordersArr[j].seller + "\n"
                 quantities += ordersArr[j].quantity + "\n"
                 prices += ordersArr[j].price + "\n"
             }
