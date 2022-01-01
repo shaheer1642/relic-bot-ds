@@ -1212,7 +1212,11 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     var canvas = new Canvas.createCanvas(1000,1000)
                     , ctx = canvas.getContext('2d');
                     ctx.font = '20px Arial';
-                    const name_width = ctx.measureText(res.rows[0].ingame_name).width
+
+                    //lich and trader name modification
+                    const trader_name = twoLiner(res.rows[0].ingame_name,15)
+                    const lich_name = twoLiner(res.rows[0].lich_name,30)
+                    const name_width = ctx.measureText(trader_name).width
 
                     // Coordinates
                     var tlX = (name_width < 80) ? 80:name_width
@@ -1232,7 +1236,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     ctx.drawImage(img1, tlX, tlY);
                     ctx.fillStyle = '#ffffff';
                     
-                    textC = draw(`${res.rows[j].ingame_name}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
+                    textC = draw(`${trader_name}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
                     drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
                     textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
                     drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
@@ -1241,7 +1245,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
                     twc += 32
                     drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
-                    textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
+                    textC = draw(`${lich_name}`, brX+30, brY+20);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
                     textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
                     drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
@@ -1281,6 +1285,20 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         return cordss
                     }
                   
+                    function twoLiner(text,width) {
+                        var fl = text.substring(0,width)
+                        var ll = text.substring(width,text.length)
+                        if (ll.length < fl.length) {
+                          while (ctx.measureText(ll).width <= ctx.measureText(fl).width)
+                            ll = ' ' + ll + ' '
+                        }
+                        else if (ll.length > fl.length) {
+                          while (ctx.measureText(ll).width >= ctx.measureText(fl).width)
+                            fl = ' ' + fl + ' '
+                        }
+                        return fl + '\n' + ll
+                    }
+
                     function drawLineCurve(x1,y1,x2,y2,x3,y3) {
                       ctx.beginPath();
                       ctx.moveTo(x1,y1);
@@ -1362,7 +1380,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     var canvas = new Canvas.createCanvas(1000,1000)
                     , ctx = canvas.getContext('2d');
                     ctx.font = '20px Arial';
-                    const name_width = ctx.measureText(res.rows[0].ingame_name).width
+
+                    //lich and trader name modification
+                    const trader_name = twoLiner(res.rows[0].ingame_name,15)
+                    const name_width = ctx.measureText(trader_name).width
 
                     // Coordinates
                     var tlX = (name_width < 80) ? 80:name_width
@@ -1382,7 +1403,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     ctx.drawImage(img1, tlX, tlY);
                     ctx.fillStyle = '#ffffff';
                     
-                    textC = draw(`${res.rows[j].ingame_name}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#E74C3C');
+                    textC = draw(`${trader_name}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#E74C3C');
                     drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
                     textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
                     drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
@@ -1429,6 +1450,20 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         //ctx.fillRect(cordss.brX,cordss.brY,3,3);
                         
                         return cordss
+                    }
+
+                    function twoLiner(text,width) {
+                      var fl = text.substring(0,width)
+                      var ll = text.substring(width,text.length)
+                      if (ll.length < fl.length) {
+                        while (ctx.measureText(ll).width <= ctx.measureText(fl).width)
+                          ll = ' ' + ll + ' '
+                      }
+                      else if (ll.length > fl.length) {
+                        while (ctx.measureText(ll).width >= ctx.measureText(fl).width)
+                          fl = ' ' + fl + ' '
+                      }
+                      return fl + '\n' + ll
                     }
                   
                     function drawLineCurve(x1,y1,x2,y2,x3,y3) {
