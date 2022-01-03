@@ -659,78 +659,6 @@ async function trading_bot(message,args,command) {
         .catch(err => {
             console.log(err)
         })
-        /*
-        setTimeout(async () => {
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
-            .then(res => {
-                if (res.rows.length == 0)
-                    return false
-                if (res.rows[0].visibility == false)
-                    return false
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return
-            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
-            .then(res => {
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status) {
-                console.log(`Error setting timeout for order discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}' AND user_rank = '${item_rank}'`)
-                return Promise.reject()
-            }
-            await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
-                var postdata = {}
-                postdata.content = " "
-                postdata.embeds = []
-                postdata.embeds.push({
-                    description: `❕ Order Notification ❕\n\nYour **${command.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
-                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                    timestamp: new Date()
-                })
-                if (command == 'wts')
-                    postdata.embeds[0].color = tb_sellColor
-                if (command == 'wtb')
-                    postdata.embeds[0].color = tb_buyColor
-                console.log(postdata)
-                var status = await db.query(`SELECT * from users_list WHERE discord_id = ${originMessage.author.id}`)
-                .then(res => {
-                    if (res.rows.length == 0)
-                        return false
-                    if (res.rows.length > 1)
-                        return false
-                    if (res.rows[0].notify_order == true) {
-                        var user_presc = client.guilds.cache.get(originMessage.guild.id).presences.cache.find(mem => mem.userId == originMessage.author.id)
-                        if (user_presc) {
-                            if (user_presc.status != 'dnd')
-                                originMessage.author.send(postdata).catch(err => console.log(err))
-                        }
-                        else
-                            originMessage.author.send(postdata).catch(err => console.log(err))
-                        return true
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}`)
-                    return Promise.reject()
-                }
-                return Promise.resolve()
-            })
-            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND order_type = '${command}`))
-        }, u_order_close_time);
-        */
     })
     .catch(err => console.log('Error occured midway of updating orders'))
     return Promise.resolve()
@@ -2357,7 +2285,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                     postdata.content = " "
                     postdata.embeds = []
                     postdata.embeds.push({
-                        description: `❕ Order Notification ❕\n\nYour **${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${lich_info.weapon_url}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                        description: `❕ Order Notification ❕\n\nYour **${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
                         footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                         timestamp: new Date()
                     })
