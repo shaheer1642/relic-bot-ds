@@ -1176,7 +1176,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
-                    let tempctx = ctx.getImageData(0,0,twc,blY+70)
+                    if (lich_name.match('\n'))
+                        var tempctx = ctx.getImageData(0,0,twc,blY+50)
+                    else
+                        var tempctx = ctx.getImageData(0,0,twc,blY+40)
                     ctx.canvas.width = twc
                     ctx.canvas.height = blY+70
                     ctx.putImageData(tempctx,0,0)
