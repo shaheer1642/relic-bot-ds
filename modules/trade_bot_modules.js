@@ -1176,12 +1176,12 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
+                    var canvasHeight = 40
                     if (lich_name.match('\n'))
-                        var tempctx = ctx.getImageData(0,0,twc,blY+30)
-                    else
-                        var tempctx = ctx.getImageData(0,0,twc,blY+20)
+                        canvasHeight = 50
+                    var tempctx = ctx.getImageData(0,0,twc,blY+canvasHeight)
                     ctx.canvas.width = twc
-                    ctx.canvas.height = blY+70
+                    ctx.canvas.height = blY+canvasHeight
                     ctx.putImageData(tempctx,0,0)
                   
                     function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
@@ -1215,6 +1215,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     function twoLiner(text,width) {
                         var fl = text.substring(0,width)
                         var ll = text.substring(width,text.length)
+                        if (ll='')
+                            return text
                         if (ll.length < fl.length) {
                           while (ctx.measureText(ll).width <= ctx.measureText(fl).width)
                             ll = ' ' + ll + ' '
