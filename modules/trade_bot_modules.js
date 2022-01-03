@@ -975,10 +975,7 @@ async function trading_lich_bot(interaction) {
     if (!status)
         return Promise.reject()
     //----stats dynamic vars----
-    var q_quirk = ''
     var q_lichName = ''
-    if (interaction.options.getString('quirk'))
-        q_quirk = interaction.options.getString('quirk').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     if (interaction.options.getString('name'))
         q_lichName = interaction.options.getString('name')
     //----verify order in DB----
@@ -1016,7 +1013,7 @@ async function trading_lich_bot(interaction) {
             })
             if (!status)
                 return false
-            var status = await db.query(`INSERT INTO users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,quirk,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
+            var status = await db.query(`INSERT INTO users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
                 ${interaction.user.id},
                 '${lich_info.lich_id}',
                 '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
@@ -1025,7 +1022,6 @@ async function trading_lich_bot(interaction) {
                 '${interaction.options.getString('element')}',
                 ${interaction.options.getNumber('damage')},
                 ${interaction.options.getBoolean('ephemera')},
-                NULLIF('${q_quirk}', ''),
                 NULLIF('${q_lichName}', ''),
                 ${interaction.channel.id},
                 ${interaction.guild.id},
@@ -1175,8 +1171,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
                     textC = draw(`${lich_name}`, brX+30, brY+20);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
-                    textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
-                    drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
+                    //textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
+                    //drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
                     textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
