@@ -1169,8 +1169,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
                     twc += 32
                     drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
-                    textC = draw(`${lich_name}`, blX+30, blY+20);
-                    drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
+                    textC = draw(`${lich_name}`, blX+40, blY+30,16);
+                    drawLineCurve(textC.tlX-10,textC.tlY+8,blX+10,textC.tlY+8,blX+10, blY+10)
                     //textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
                     //drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
                     textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
