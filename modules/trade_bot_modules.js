@@ -1177,9 +1177,9 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
                     if (lich_name.match('\n'))
-                        var tempctx = ctx.getImageData(0,0,twc,blY+50)
+                        var tempctx = ctx.getImageData(0,0,twc,blY+30)
                     else
-                        var tempctx = ctx.getImageData(0,0,twc,blY+40)
+                        var tempctx = ctx.getImageData(0,0,twc,blY+20)
                     ctx.canvas.width = twc
                     ctx.canvas.height = blY+70
                     ctx.putImageData(tempctx,0,0)
