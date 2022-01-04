@@ -97,6 +97,23 @@ async function bounty_check() {
     })
 }
 
+async function teshin_check() {
+    axios('https://api.warframestat.us/pc')
+    .then(async res => {
+        const timer = (new Date(res.data.steelPath.expiry).getTime() - new Date()) + 120000
+        setTimeout(teshin_func, 5000)
+        console.log('teshin check invokes in ' + msToTime(timer))
+    })
+    .catch(err => {
+        console.log(err)
+        setImmediate(teshin_check,5000)
+    })
+
+    async function teshin_func() {
+        console('teshin_func test')
+    }
+}
+
 axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
@@ -112,4 +129,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {bounty_check};
+module.exports = {bounty_check,teshin_check};

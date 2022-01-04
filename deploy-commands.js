@@ -1,7 +1,12 @@
 const fs = require('fs');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { clientId, guildId} = require('./config.json');
+
+const guildIds = [
+	"865904902941048862",
+	"832677897411493949"
+]
+const clientId = "878017655028723803"
 
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -22,10 +27,10 @@ for (var e of commands) {
 
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
-rest.put(Routes.applicationGuildCommands(clientId, guildId[0]), { body: commands })
-	.then(() => console.log('Successfully registered application commands for guild: ' + guildId[0]))
+rest.put(Routes.applicationGuildCommands(clientId, guildIds[0]), { body: [] })
+	.then(() => console.log('Successfully registered application commands for guild: ' + guildIds[0]))
 	.catch(console.error);
 
-rest.put(Routes.applicationGuildCommands(clientId, guildId[1]), { body: commands })
-    .then(() => console.log('Successfully registered application commands for guild: ' + guildId[1]))
+rest.put(Routes.applicationGuildCommands(clientId, guildIds[1]), { body: [] })
+    .then(() => console.log('Successfully registered application commands for guild: ' + guildIds[1]))
     .catch(console.error);

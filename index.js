@@ -15,7 +15,7 @@ const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
 const gpt3 = require('./modules/gpt3.js');
 const {pins_handler} = require('./modules/pins_handler.js');
-const bounty_tracker = require('./modules/bounty_tracker.js');
+const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const {client,tickcount} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
@@ -69,8 +69,11 @@ client.on('ready', () => {
     //----Set timeouts for orders if any----
     trade_bot_modules.td_set_orders_timeouts().catch(err => console.log(err))
 
-    //----Bounty timers---
-    setImmediate(bounty_tracker.bounty_check,-1)
+    //----Bounty timer---
+    setImmediate(trackers.bounty_check,-1)
+
+    //----Teshin timer---
+    setImmediate(trackers.teshin_check,-1)
 
     //----Ducat updater timeout----
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
@@ -81,7 +84,7 @@ client.on('ready', () => {
         msg.edit(process.env.DATABASE_URL)
     }).catch(err => console.log(err))
 
-    //----Re-define orders timers if any-----
+    //----Re-define trade-bot orders timers if any-----
     db.query(`SELECT * FROM auto_update_items`)
     .then(res => {
         if (res.rowCount > 0) {
