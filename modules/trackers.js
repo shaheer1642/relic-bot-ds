@@ -158,7 +158,7 @@ async function teshin_check() {
                             postdata.embeds[0].fields[2].value += e.name + '\n'
                     })
                     
-                    client.channels.cache.get('864199722676125757').send(postdata)
+                    client.channels.cache.get('892003813786017822').send(postdata)
                     .catch(err => console.log(err))
                 }
             })
