@@ -153,9 +153,9 @@ async function teshin_check() {
 
                     res.data.steelPath.rotation.forEach(e => {
                         if (e.name == res.data.steelPath.currentReward.name)
-                            postdata.embeds[0].fields[2].value += "`" + e.name + "`"
+                            postdata.embeds[0].fields[2].value += "`" + e.name + "`" + '\n'
                         else
-                            postdata.embeds[0].fields[2].value += e.name
+                            postdata.embeds[0].fields[2].value += e.name + '\n'
                     })
                     
                     client.channels.cache.get('864199722676125757').send(postdata)
