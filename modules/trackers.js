@@ -106,7 +106,7 @@ async function teshin_check() {
     axios('https://api.warframestat.us/pc')
     .then(async res => {
         const timer = (new Date(res.data.steelPath.expiry).getTime() - new Date()) + 120000
-        setTimeout(teshin_func, 5000)
+        setTimeout(teshin_func, timer)
         console.log('teshin check invokes in ' + ((timer/1000)/60/60) + ' hours')
     })
     .catch(err => {
