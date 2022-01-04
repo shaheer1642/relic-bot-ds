@@ -110,7 +110,7 @@ async function teshin_check() {
     })
 
     async function teshin_func() {
-        console('teshin_func test')
+        console.log('teshin_func test')
     }
 }
 
