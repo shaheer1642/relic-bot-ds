@@ -111,7 +111,7 @@ async function teshin_check() {
     })
     .catch(err => {
         console.log(err)
-        setImmediate(teshin_check,5000)
+        setTimeout(teshin_check,5000)
     })
 
     async function teshin_func() {
@@ -153,9 +153,9 @@ async function teshin_check() {
 
                     res.data.steelPath.rotation.forEach(e => {
                         if (e.name == res.data.steelPath.currentReward.name)
-                            embeds[0].fields[2].value += "`" + e.name + "`"
+                            postdata.embeds[0].fields[2].value += "`" + e.name + "`"
                         else
-                            embeds[0].fields[2].value += e.name
+                            postdata.embeds[0].fields[2].value += e.name
                     })
                     
                     client.channels.cache.get('864199722676125757').send(postdata)
@@ -163,11 +163,11 @@ async function teshin_check() {
                 }
             })
 
-            setImmediate(teshin_check,5000)
+            setTimeout(teshin_check,5000)
         })
         .catch(err => {
             console.log(err)
-            setImmediate(teshin_func,5000)
+            setTimeout(teshin_func,5000)
         })
     }
 }
