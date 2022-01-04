@@ -1754,6 +1754,29 @@ client.on('interactionCreate', async interaction => {
                 console.log('autocomplete (track bounties)')
                 return
             }
+            if (interaction.options.getSubcommand() == 'teshin') {
+                var rotation = interaction.options.getString('item')
+                var rotation_list = await db.query(`SELECT * FROM teshin_rotation ORDER BY id ASC`)
+                .then(res => {
+                    return res.rows
+                })
+                .catch(err => console.log(err))
+                var postdata = []
+                for (var i=0; i<rotation_list.length; i++) {
+                    if (postdata.length==25)
+                        break
+                    var e = rotation_list[i]
+                    if (e.type.toLowerCase().match(rotation.toLowerCase())) {
+                        if (e.users.users.includes(interaction.member.id))
+                            postdata.push({name: e.type + ' (Remove)', value: e.type.toLowerCase().replace(/ /g,'_')})
+                        else
+                            postdata.push({name: e.type, value: e.type.toLowerCase().replace(/ /g,'_')})
+                    }
+                }
+                interaction.respond(postdata).catch(err => console.log(err))
+                console.log('autocomplete (track teshin)')
+                return
+            }
         }
         else if (interaction.commandName == 'lich') {
             var weapon = interaction.options.getString('weapon')
@@ -1926,29 +1949,60 @@ client.on('interactionCreate', async interaction => {
                     await interaction.reply(postdata).catch(err => console.log(err));
                     return
                 }
-            })
+            }).catch(err => console.log(err))
         }
+		if (interaction.options.getSubcommand() === 'teshin') {
+            await db.query(`
+            SELECT * FROM teshin_rotation
+            WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g,' ')}'
+            `)
+            .then(async res => {
+                if (res.rowCount == 0 || res.rowCount > 1) {
+                    await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
+                    return
+                }
+                var user_list = res.rows[0].users
+                if (user_list.users.includes(interaction.user.id)) {
+                    user_list.users = user_list.users.filter(item => item !== interaction.user.id)
+                    await db.query(`
+                    UPDATE teshin_rotation
+                    SET users = '${JSON.stringify(user_list)}'
+                    WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g,' ')}'
+                    `)
+                    .then(async res => {
+                        if (res.rowCount == 0)
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false}).catch(err => console.log(err));
+                        else
+                            await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
+                    })
+                    .catch(err => console.log(err))
+                    return
+                }
+                else {
+                    user_list.users.push(interaction.user.id)
+                    await db.query(`
+                    UPDATE teshin_rotation
+                    SET users = '${JSON.stringify(user_list)}'
+                    WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g,' ')}'
+                    `)
+                    .then(async res => {
+                        if (res.rowCount == 0)
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false}).catch(err => console.log(err));
+                        else
+                            await interaction.reply({ content: 'Added tracker.', ephemeral: true}).catch(err => console.log(err));
+                    })
+                    .catch(err => console.log(err))
+                    return
+                }
+            }).catch(err => console.log(err))
+        }
+        return
     }
 
     else if (interaction.commandName == 'ping') {
 		await interaction.reply({ content: 'Pong!', ephemeral: false });
     }
     
-    /*const command = client.commands.get(interaction.commandName);
-
-	if (!command) 
-        return;
-    */
-    
-    /*
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-	}
-    */
-
     return;
 });
 

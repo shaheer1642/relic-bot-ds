@@ -25,14 +25,6 @@ module.exports = {
             .addStringOption(option =>
                 option.setName('item')
                     .setDescription('Select syndicate type')
-                    .setRequired(true)
-                    .addChoice('Umbra Forma Blueprint', 'Umbra_Forma_Blueprint')
-                    .addChoice('50,000 Kuva', '50,000_Kuva')
-                    .addChoice('Kitgun Riven Mod', 'Kitgun_Riven_Mod')
-                    .addChoice('3x Forma', '3x_Forma')
-                    .addChoice('Zaw Riven Mod', 'Zaw_Riven_Mod')
-                    .addChoice('30,000 Endo', '30,000_Endo')
-                    .addChoice('Rifle Riven Mod United', 'Rifle_Riven_Mod_United')
-                    .addChoice('Shotgun Riven Mod', 'Shotgun_Riven_Mod'))
+                    .setRequired(true))
         )
 };
