@@ -1380,17 +1380,19 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     }
 
                     function twoLiner(text,width) {
-                      var fl = text.substring(0,width)
-                      var ll = text.substring(width,text.length)
-                      if (ll.length < fl.length) {
-                        while (ctx.measureText(ll).width <= ctx.measureText(fl).width)
-                          ll = ' ' + ll + ' '
-                      }
-                      else if (ll.length > fl.length) {
-                        while (ctx.measureText(ll).width >= ctx.measureText(fl).width)
-                          fl = ' ' + fl + ' '
-                      }
-                      return fl + '\n' + ll
+                        var fl = text.substring(0,width)
+                        var ll = text.substring(width,text.length)
+                        if (!ll)
+                            return text
+                        if (ll.length < fl.length) {
+                          while (ctx.measureText(ll).width <= ctx.measureText(fl).width)
+                            ll = ' ' + ll + ' '
+                        }
+                        else if (ll.length > fl.length) {
+                          while (ctx.measureText(ll).width >= ctx.measureText(fl).width)
+                            fl = ' ' + fl + ' '
+                        }
+                        return fl + '\n' + ll
                     }
                   
                     function drawLineCurve(x1,y1,x2,y2,x3,y3) {
