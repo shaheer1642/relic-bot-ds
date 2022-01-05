@@ -351,7 +351,14 @@ async function updateDatabaseItem(db_items_list,item,index) {
         })
         if (buyAvgPrice > sellAvgPrice)
             buyAvgPrice = sellAvgPrice
-        //-------------
+        //----volume sold------
+        var volume_sold = 0
+        itemOrders.data.payload.statistics_closed["90days"].forEach(element => {
+            if (new Date(element.datetime).getTime() >= new Date().getTime()-2592000000)
+                volume_sold += element.volume
+        });
+        console.log('volume sold: ' + volume_sold)
+        //--------------------
         var ducat_value = null
         var relics = null
         var icon_url = ''
@@ -582,12 +589,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 return false
         }
         //---------------------
-        console.log(`Updating DB prices...`)
+        console.log(`Updating DB item detail...`)
         var status = await db.query(`UPDATE items_list SET 
             sell_price = ${sellAvgPrice},
             buy_price = ${buyAvgPrice},
             maxed_sell_price = ${maxedSellAvgPrice},
             maxed_buy_price = ${maxedBuyAvgPrice},
+            volume_sold = ${volume_sold},
             rank = ${rank},
             ducat = ${ducat_value},
             relics = ${(relics)? `'${JSON.stringify(relics)}'`:null},
