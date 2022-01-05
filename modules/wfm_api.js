@@ -144,7 +144,7 @@ async function orders(message,args) {
     {
         if ((new Date().getTime() - arrItems[i].update_timestamp) > 86400000) {
             console.log(`updating item in db`)
-            await db_modules.updateDatabaseItem(items_list,arrItems[i],0,db)
+            await db_modules.updateDatabaseItem(items_list,arrItems[i],0)
             .then(items_list => {
                 for (var j=0; j<items_list.length; j++) {
                     element = items_list[j]
