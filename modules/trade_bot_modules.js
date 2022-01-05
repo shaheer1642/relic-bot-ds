@@ -1155,7 +1155,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     , brX = blX + img1.width
                     , brY = blY
 
-                    , twc = 0
+                    , twc = trX
+                    , thc = brY
                   
                     ctx.drawImage(img1, tlX, tlY);
                     ctx.fillStyle = '#ffffff';
@@ -1174,12 +1175,9 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
-                    var canvasHeight = 35
-                    if (lich_name.match('\n'))
-                        canvasHeight = 55
-                    var tempctx = ctx.getImageData(0,0,twc,blY+canvasHeight)
+                    var tempctx = ctx.getImageData(0,0,twc,thc)
                     ctx.canvas.width = twc
-                    ctx.canvas.height = blY+canvasHeight
+                    ctx.canvas.height = thc - 7
                     ctx.putImageData(tempctx,0,0)
                   
                     function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
@@ -1190,6 +1188,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         var cordsH = ctx.measureText('M')
                         if (x+cords.width > twc)
                             twc = x+cords.width
+                        if (y+cordsH.width > thc)
+                            thc = y+cordsH.width
+                        if (text.match('\n'))
+                          thc += cordsH.width + 5
                         //note that the filltext uses bottom left as reference for drawing text
                         var cordss = {
                           tlX: x,
@@ -1325,7 +1327,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     , brX = blX + img1.width
                     , brY = blY
 
-                    , twc = 0
+                    , twc = trX
+                    , thc = brY
                   
                     ctx.drawImage(img1, tlX, tlY);
                     ctx.fillStyle = '#ffffff';
@@ -1339,16 +1342,12 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
                     twc += 32
                     drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
-                    //textC = draw(`${res.rows[j].lich_name}`, brX+30, brY+20);
-                    //drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
-                    //textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
-                    //drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
                     textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
-                  
-                    let tempctx = ctx.getImageData(0,0,twc,blY)
+
+                    var tempctx = ctx.getImageData(0,0,twc,thc)
                     ctx.canvas.width = twc
-                    ctx.canvas.height = blY
+                    ctx.canvas.height = thc - 7
                     ctx.putImageData(tempctx,0,0)
                   
                     function draw(text, x, y, size=10, color = res.rows[j].weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
@@ -1359,6 +1358,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         var cordsH = ctx.measureText('M')
                         if (x+cords.width > twc)
                             twc = x+cords.width
+                        if (y+cordsH.width > thc)
+                            thc = y+cordsH.width
+                        if (text.match('\n'))
+                          thc += cordsH.width + 5
                         //note that the filltext uses bottom left as reference for drawing text
                         var cordss = {
                           tlX: x,
