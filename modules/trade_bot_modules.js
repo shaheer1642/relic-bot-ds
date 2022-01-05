@@ -1171,14 +1171,12 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
                     textC = draw(`${lich_name}`, blX+40, blY+30,16);
                     drawLineCurve(textC.tlX-10,textC.tlY+8,blX+10,textC.tlY+8,blX+10, blY+10)
-                    //textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
-                    //drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
                     textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
-                    var canvasHeight = 40
+                    var canvasHeight = 35
                     if (lich_name.match('\n'))
-                        canvasHeight = 50
+                        canvasHeight = 55
                     var tempctx = ctx.getImageData(0,0,twc,blY+canvasHeight)
                     ctx.canvas.width = twc
                     ctx.canvas.height = blY+canvasHeight
@@ -1215,7 +1213,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     function twoLiner(text,width) {
                         var fl = text.substring(0,width)
                         var ll = text.substring(width,text.length)
-                        if (ll='')
+                        if (!ll)
                             return text
                         if (ll.length < fl.length) {
                           while (ctx.measureText(ll).width <= ctx.measureText(fl).width)
