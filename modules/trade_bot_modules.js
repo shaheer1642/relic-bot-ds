@@ -1164,14 +1164,14 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
                     textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
                     drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
-                    textC = draw(`${res.rows[j].damage}%`, trX+20, trY-10, 20);
+                    textC = draw(`${res.rows[j].damage}%`, trX+20, ((trY+brY)/2)-((trY+brY)/2)*0.3, 20);
                     const img2 = await Canvas.loadImage(`./icons/d_${res.rows[j].element}.png`)
                     ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
                     twc += 32
                     drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
                     textC = draw(`${lich_name}`, blX+40, blY+30,16);
                     drawLineCurve(textC.tlX-10,textC.tlY+8,blX+10,textC.tlY+8,blX+10, blY+10)
-                    textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                    textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
                     var canvasHeight = 35
@@ -1334,7 +1334,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
                     textC = draw(`${res.rows[j].user_price}p`, tlX+70, tlY-50, 25);
                     drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
-                    textC = draw(`${res.rows[j].damage}%+`, trX+20, trY-10, 20);
+                    textC = draw(`${res.rows[j].damage}%+`, trX+20, ((trY+brY)/2)-((trY+brY)/2)*0.3, 20);
                     const img2 = await Canvas.loadImage(`./icons/d_${res.rows[j].element}.png`)
                     ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
                     twc += 32
@@ -1343,7 +1343,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     //drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-30,trX+10, textC.tlY-30)
                     //textC = draw(`${res.rows[j].quirk}`, blX+10, blY+50, 15);
                     //drawLineStr(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),blY+10)
-                    textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, blY-10, 12);
+                    textC = draw(`${res.rows[j].ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
                     drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
                   
                     let tempctx = ctx.getImageData(0,0,twc,blY)
