@@ -261,6 +261,7 @@ async function orders(message,args) {
                 )
                 embeds[index-1].footer.text += 'Maxed: ' + item_data.maxed_sell_price + '\n\u200b'
             }
+            embeds[index-1].footer.text += 'Volume sold last 30 days: ' + item_data.volume_sold + '\n\u200b'
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 console.log(embeds)
@@ -423,6 +424,7 @@ async function orders_update(message, reaction, user) {
                 )
                 embeds[index-1].footer.text += 'Maxed: ' + item_data.maxed_sell_price + '\n\u200b'
             }
+            embeds[index-1].footer.text += 'Volume sold last 30 days: ' + item_data.volume_sold + '\n\u200b'
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 embeds = embeds.sort(dynamicSort("title"))
