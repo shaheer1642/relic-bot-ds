@@ -99,7 +99,7 @@ async function bounty_check() {
         })
         console.log('check complete')
         setTimeout(bounty_check,reset)
-        console.log('next bounty check in' + msToTime(reset))
+        console.log('next bounty check in ' + msToTime(reset))
     })
     .catch(err => {
         console.log(err)
