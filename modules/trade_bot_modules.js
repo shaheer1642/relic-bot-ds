@@ -2659,6 +2659,7 @@ async function tb_threadHandler(message) {
 }
 
 async function tb_updateDmCacheOrder(msg,discord_id) {
+    console.log(JSON.stringify(msg))
     const postdata = {
         msg_id: msg.id,
         channel_id: msg.channel_id,
