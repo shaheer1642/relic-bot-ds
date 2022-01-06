@@ -2379,10 +2379,10 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                             if (user_presc) {
                                 if (user_presc.status != 'dnd')
-                                    user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
+                                    user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                             }
                             else
-                                user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
+                                user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                             return true
                         }
                     })
@@ -2476,10 +2476,10 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                         var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                         if (user_presc) {
                             if (user_presc.status != 'dnd')
-                                user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
+                                user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                         }
                         else
-                            user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
+                            user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                         return true
                     }
                 })
@@ -2658,13 +2658,11 @@ async function tb_threadHandler(message) {
     }
 }
 
-async function tb_updateDmCache(msg,discord_id) {
+async function tb_updateDmCacheOrder(msg,discord_id) {
     const postdata = {
-        dm_cache_order: {
-            msg_id: msg.id,
-            channel_id: msg.channel_id,
-            timestamp: new Date().getTime()
-        }
+        msg_id: msg.id,
+        channel_id: msg.channel_id,
+        timestamp: new Date().getTime()
     }
     db.query(`UPDATE users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
 }
