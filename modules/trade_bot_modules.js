@@ -1756,12 +1756,19 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             }],
             color: tb_sellColor
         })
+        //----find pad length---
+        var pad = 0
+        sell_items.forEach(e => {
+            if (e.length > pad)
+                pad = e.length
+        })
+        //---------------------
         sell_items.forEach((e,index) => {
             if (index%2 == 0)
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            postdata.embeds[1].fields[fieldNum].value += `${e} - ${sell_prices[index]}\n`
+            postdata.embeds[1].fields[fieldNum].value += `${e}${'\u200b'.repeat(pad-e.length)} - ${sell_prices[index]}\n`
         })
     }
     if (buy_items.length != 0) {
@@ -1776,12 +1783,19 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             }],
             color: tb_buyColor
         })
+        //----find pad length---
+        var pad = 0
+        buy_items.forEach(e => {
+            if (e.length > pad)
+                pad = e.length
+        })
+        //---------------------
         buy_items.forEach((e,index) => {
             if (index%2 == 0)
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            postdata.embeds[2].fields[fieldNum].value += `${e} - ${buy_prices[index]}\n`
+            postdata.embeds[2].fields[fieldNum].value += `${e}${'\u200b'.repeat(pad-e.length)} - ${buy_prices[index]}\n`
         })
     }
     if (request_type == 1) {
