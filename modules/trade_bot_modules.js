@@ -1761,7 +1761,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            postdata.embeds[fieldNum].fields[0].value += `${e} - ${sell_prices[index]}\n`
+            postdata.embeds[1].fields[fieldNum].value += `${e} - ${sell_prices[index]}\n`
         })
     }
     if (buy_items.length != 0) {
@@ -1781,7 +1781,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            postdata.embeds[fieldNum].fields[0].value += `${e} - ${buy_prices[index]}\n`
+            postdata.embeds[2].fields[fieldNum].value += `${e} - ${buy_prices[index]}\n`
         })
     }
     if (request_type == 1) {
