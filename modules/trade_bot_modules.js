@@ -2366,11 +2366,15 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             return false
                         const user_data = res.rows[0]
                         if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
-                            client.channels.cache.get(user_data.extras.dm_cache_order.channel_id).messages.fetch(user_data.extras.dm_cache_order.msg_id)
-                            .then(msg => {
-                                msg.content = " "
-                                msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
-                                msg.edit(msg).catch(err => console.log(err))
+                            client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
+                            .then(channel => {
+                                channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
+                                .then(msg => {
+                                    msg.content = " "
+                                    msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
+                                    msg.edit(msg).catch(err => console.log(err))
+                                })
+                                .catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                             return
@@ -2464,11 +2468,15 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                         return false
                     const user_data = res.rows[0]
                     if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
-                        client.channels.cache.get(user_data.extras.dm_cache_order.channel_id).messages.fetch(user_data.extras.dm_cache_order.msg_id)
-                        .then(msg => {
-                            msg.content = " "
-                            msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
-                            msg.edit(msg).catch(err => console.log(err))
+                        client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
+                        .then(channel => {
+                            channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
+                            .then(msg => {
+                                msg.content = " "
+                                msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
+                                msg.edit(msg).catch(err => console.log(err))
+                            })
+                            .catch(err => console.log(err))
                         })
                         .catch(err => console.log(err))
                         return
