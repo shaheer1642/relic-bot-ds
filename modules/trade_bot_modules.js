@@ -1798,6 +1798,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             postdata.embeds[2].fields[fieldNum].value += `${e}${'\u200b'.repeat(pad-e.length)} - ${buy_prices[index]}\n`
         })
     }
+    console.log(JSON.stringify(postdata))
     if (request_type == 1) {
         postdata.components = []
         if (item_orders.length > 0) {
