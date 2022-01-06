@@ -19,6 +19,7 @@ async function bounty_check() {
     console.log('bounty check')
     axios('https://api.warframestat.us/pc')
     .then(async res => {
+        var reset = 0
         //get db bounties list
         var bounties_list = await db.query(`SELECT * FROM bounties_list`)
         .then(res => {return res.rows})
@@ -39,62 +40,66 @@ async function bounty_check() {
         }
         
         res.data.syndicateMissions.forEach(syndicate => {
-            syndicate.jobs.forEach(job => {
-                var hasBounty = 0
-                var bountyDB = {}
-                for (var k=0; k<bounties_list.length; k++) {
-                    bountyDB = bounties_list[k]
-                    if (bountyDB.type == job.type) {
-                        hasBounty = 1
-                        break
+            if (syndicate.syndicateKey == 'Entrati' || syndicate.syndicateKey == 'Ostrons' || syndicate.syndicateKey == 'Solaris United') {
+                reset = new Date(syndicate.expiry).getTime() - new Date().getTime()
+                syndicate.jobs.forEach(job => {
+                    var hasBounty = 0
+                    var bountyDB = {}
+                    for (var k=0; k<bounties_list.length; k++) {
+                        bountyDB = bounties_list[k]
+                        if (bountyDB.type == job.type) {
+                            hasBounty = 1
+                            break
+                        }
                     }
-                }
-                if (!hasBounty) {
-                    console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
-                    db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${getRandomColor()}')`).catch(err => console.log(err))
-                    return
-                }
-                if (Number(bountyDB.last_expiry) < new Date().getTime()) {
-                    //discord stuff
-                    db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime() + 60000}, appeared = ${new Date().getTime()} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
-                    .then(() => {
-                        var list = []
-                        for (var user in bountyDB.users2) {
-                            if (bountyDB.users2[user].levels.includes(job.enemyLevels.join('-')))
-                                list.push('<@' + user + '> ')
-                        }
-                        if (list.length > 0) {
-                            var postdata = {content: list.join(', '),embeds: []}
-                            postdata.embeds.push({
-                                description: 'A bounty you are tracking has appeared!',
-                                fields: [
-                                    {name: 'Syndicate', value: syndicate.syndicate, inline: true},
-                                    {name: 'Mission', value: `${job.type} (${job.enemyLevels.join('-')})`, inline: true},
-                                    {name: 'Rewards', value: job.rewardPool.join('\n'), inline: false},
-                                    {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
-                                ],
-                                footer: {
-                                    text: bountyHints[Math.floor(Math.random() * bountyHints.length)]
-                                },
-                                color: bountyDB.color
-                            })
-                            client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
-                                console.log(msg.id)
-                                db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
-                                .then(res => {
-                                    console.log(res.rowCount)
-                                    msg.pin().catch(err => console.log(err))
+                    if (!hasBounty) {
+                        console.log(`inserting into db ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}')`)
+                        db.query(`INSERT INTO bounties_list (syndicate,type,color) VALUES ('${syndicate.syndicate}','${job.type.replaceAll(`'`,`''`)}','${getRandomColor()}')`).catch(err => console.log(err))
+                        return
+                    }
+                    if (Number(bountyDB.last_expiry) < new Date().getTime()) {
+                        //discord stuff
+                        db.query(`UPDATE bounties_list SET last_expiry = ${new Date(syndicate.expiry).getTime() + 60000}, appeared = ${new Date().getTime()} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
+                        .then(() => {
+                            var list = []
+                            for (var user in bountyDB.users2) {
+                                if (bountyDB.users2[user].levels.includes(job.enemyLevels.join('-')))
+                                    list.push('<@' + user + '> ')
+                            }
+                            if (list.length > 0) {
+                                var postdata = {content: list.join(', '),embeds: []}
+                                postdata.embeds.push({
+                                    description: 'A bounty you are tracking has appeared!',
+                                    fields: [
+                                        {name: 'Syndicate', value: syndicate.syndicate, inline: true},
+                                        {name: 'Mission', value: `${job.type} (${job.enemyLevels.join('-')})`, inline: true},
+                                        {name: 'Rewards', value: job.rewardPool.join('\n'), inline: false},
+                                        {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
+                                    ],
+                                    footer: {
+                                        text: bountyHints[Math.floor(Math.random() * bountyHints.length)]
+                                    },
+                                    color: bountyDB.color
                                 })
-                                .catch(err => console.log(err))
-                            }).catch(err => console.log(err))
-                        }
-                    })
-                    .catch(err => console.log(err))
-                }
-            });
+                                client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
+                                    console.log(msg.id)
+                                    db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
+                                    .then(res => {
+                                        console.log(res.rowCount)
+                                        msg.pin().catch(err => console.log(err))
+                                    })
+                                    .catch(err => console.log(err))
+                                }).catch(err => console.log(err))
+                            }
+                        })
+                        .catch(err => console.log(err))
+                    }
+                });
+            }
         })
         console.log('check complete')
-        setTimeout(bounty_check,60000)
+        setTimeout(bounty_check,reset)
+        console.log('next bounty check in' + msToTime(reset))
     })
     .catch(err => {
         console.log(err)
