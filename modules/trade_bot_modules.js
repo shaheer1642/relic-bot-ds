@@ -1772,7 +1772,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             var text = '`' + e
             while (text.length <= pad)
                 text += ' '
-            text += '`'
+            text += '`\u205F\u205F\u205F'
             text += sell_prices[index] + '\n'
             console.log(text.length)
             postdata.embeds[1].fields[fieldNum].value += text
@@ -1805,7 +1805,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             var text = '`' + e
             while (text.length <= pad)
                 text += ' '
-            text += '`'
+            text += '`\u205F\u205F\u205F'
             text += buy_prices[index] + '\n'
             postdata.embeds[2].fields[fieldNum].value += text
         })
