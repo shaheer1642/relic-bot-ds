@@ -1768,7 +1768,11 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            postdata.embeds[1].fields[fieldNum].value += `${e}${'\u205F'.repeat(pad-e.length)} - ${sell_prices[index]}\n`
+            var text = e
+            while (text.length <= pad)
+                text += '\u205F'
+            text += sell_prices[index] + '\n'
+            postdata.embeds[1].fields[fieldNum].value += text
         })
     }
     if (buy_items.length != 0) {
@@ -1795,7 +1799,11 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            postdata.embeds[2].fields[fieldNum].value += `${e}${'\u205F'.repeat(pad-e.length)} - ${buy_prices[index]}\n`
+            var text = e
+            while (text.length <= pad)
+                text += '\u205F'
+            text += buy_prices[index] + '\n'
+            postdata.embeds[2].fields[fieldNum].value += text
         })
     }
     console.log(JSON.stringify(postdata))
