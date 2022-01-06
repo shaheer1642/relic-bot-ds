@@ -53,7 +53,7 @@ const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
-const u_order_close_time = 10800000
+const u_order_close_time = 10000 //10800000
 
 client.on('ready', () => {
     console.log(`Bot has started.`)
