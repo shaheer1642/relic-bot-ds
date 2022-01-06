@@ -34,7 +34,7 @@ const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
-const u_order_close_time = 10800000
+const u_order_close_time = 10000 //10800000
 
 async function check_user(message) {
     return new Promise((resolve, reject) => {
@@ -2352,14 +2352,11 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                     postdata.content = " "
                     postdata.embeds = []
                     postdata.embeds.push({
-                        description: `❕ Order Notification ❕\n\nYour **${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                        description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} ${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}**`,
                         footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                        timestamp: new Date()
+                        timestamp: new Date(),
+                        color: '#FFFFFF'
                     })
-                    if (all_orders.order_type == 'wts')
-                        postdata.embeds[0].color = tb_sellColor
-                    if (all_orders.order_type == 'wtb')
-                        postdata.embeds[0].color = tb_buyColor
                     console.log(postdata)
                     var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
                     .then(res => {
@@ -2367,15 +2364,25 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             return false
                         if (res.rows.length > 1)
                             return false
+                        const user_data = res.rows[0]
+                        if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
+                            client.channels.cache.get(user_data.extras.dm_cache_order.channel_id).messages.fetch(user_data.extras.dm_cache_order.msg_id)
+                            .then(msg => {
+                                msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
+                                msg.edit(msg).catch(err => console.log(err))
+                            })
+                            .catch(err => console.log(err))
+                            return
+                        }
                         const user = client.users.cache.get(all_orders.discord_id)
-                        if (res.rows[0].notify_order == true) {
+                        if (user_data.notify_order == true) {
                             var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                             if (user_presc) {
                                 if (user_presc.status != 'dnd')
-                                    user.send(postdata).catch(err => console.log(err))
+                                    user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
                             }
                             else
-                                user.send(postdata).catch(err => console.log(err))
+                                user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
                             return true
                         }
                     })
@@ -2442,14 +2449,11 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                 postdata.content = " "
                 postdata.embeds = []
                 postdata.embeds.push({
-                    description: `❕ Order Notification ❕\n\nYour **${order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been auto-closed after ${((u_order_close_time/60)/60)/1000} hours`,
+                    description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`,
                     footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                    timestamp: new Date()
+                    timestamp: new Date(),
+                    color: '#FFFFFF'
                 })
-                if (order_type == 'wts')
-                    postdata.embeds[0].color = tb_sellColor
-                if (order_type == 'wtb')
-                    postdata.embeds[0].color = tb_buyColor
                 console.log(postdata)
                 var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
                 .then(res => {
@@ -2457,15 +2461,25 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                         return false
                     if (res.rows.length > 1)
                         return false
+                    const user_data = res.rows[0]
+                    if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
+                        client.channels.cache.get(user_data.extras.dm_cache_order.channel_id).messages.fetch(user_data.extras.dm_cache_order.msg_id)
+                        .then(msg => {
+                            msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
+                            msg.edit(msg).catch(err => console.log(err))
+                        })
+                        .catch(err => console.log(err))
+                        return
+                    }
                     const user = client.users.cache.get(all_orders.discord_id)
-                    if (res.rows[0].notify_order == true) {
+                    if (user_data.notify_order == true) {
                         var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                         if (user_presc) {
                             if (user_presc.status != 'dnd')
-                                user.send(postdata).catch(err => console.log(err))
+                                user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
                         }
                         else
-                            user.send(postdata).catch(err => console.log(err))
+                            user.send(postdata).then(res => tb_updateDmCache(res,all_orders.discord_id)).catch(err => console.log(err))
                         return true
                     }
                 })
@@ -2642,6 +2656,17 @@ async function tb_threadHandler(message) {
         const thread = client.channels.cache.get(order_data.cross_thread_id)
         thread.send(`**${ingame_name}:** ${sentMessage}`).catch(err => console.log(err))
     }
+}
+
+async function tb_updateDmCache(msg,discord_id) {
+    const postdata = {
+        dm_cache_order: {
+            msg_id: msg.id,
+            channel_id: msg.channel_id,
+            timestamp: new Date().getTime()
+        }
+    }
+    db.query(`UPDATE users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
 }
 
 function generateId() {
