@@ -2659,13 +2659,11 @@ async function tb_threadHandler(message) {
 }
 
 async function tb_updateDmCacheOrder(msg,discord_id) {
-    console.log(JSON.stringify(msg))
     const postdata = {
         msg_id: msg.id,
-        channel_id: msg.channel_id,
+        channel_id: msg.channelId,
         timestamp: new Date().getTime()
     }
-    console.log(postdata)
     db.query(`UPDATE users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
 }
 
