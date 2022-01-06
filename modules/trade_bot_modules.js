@@ -2346,7 +2346,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                 console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}'`)
                 return
             }
-            trading_lich_orders_update(null, lich_info, 2)
+            await trading_lich_orders_update(null, lich_info, 2)
             .then(async res2 => {
                     var postdata = {}
                     postdata.content = " "
@@ -2359,20 +2359,20 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                     })
                     console.log(postdata)
                     var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
-                    .then(res => {
+                    .then(async res => {
                         if (res.rows.length == 0)
                             return false
                         if (res.rows.length > 1)
                             return false
                         const user_data = res.rows[0]
                         if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
-                            client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
-                            .then(channel => {
-                                channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
-                                .then(msg => {
+                            await client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
+                            .then(async channel => {
+                                await channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
+                                .then(async msg => {
                                     msg.content = " "
                                     msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
-                                    msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
+                                    await msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
                                 })
                                 .catch(err => console.log(err))
                             })
@@ -2384,10 +2384,10 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                             if (user_presc) {
                                 if (user_presc.status != 'dnd')
-                                    user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                                    await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                             }
                             else
-                                user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                             return true
                         }
                     })
@@ -2461,20 +2461,20 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                 })
                 console.log(postdata)
                 var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
-                .then(res => {
+                .then(async res => {
                     if (res.rows.length == 0)
                         return false
                     if (res.rows.length > 1)
                         return false
                     const user_data = res.rows[0]
                     if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
-                        client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
-                        .then(channel => {
-                            channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
-                            .then(msg => {
+                        await client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
+                        .then(async channel => {
+                            await channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
+                            .then(async msg => {
                                 msg.content = " "
                                 msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
-                                msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
+                                await msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                         })
@@ -2486,10 +2486,10 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                         var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                         if (user_presc) {
                             if (user_presc.status != 'dnd')
-                                user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                         }
                         else
-                            user.send(postdata).then(res => tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                            await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
                         return true
                     }
                 })
@@ -2674,7 +2674,7 @@ async function tb_updateDmCacheOrder(msg,discord_id) {
         channel_id: msg.channelId,
         timestamp: new Date().getTime()
     }
-    db.query(`UPDATE users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
+    await db.query(`UPDATE users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
 }
 
 function generateId() {
