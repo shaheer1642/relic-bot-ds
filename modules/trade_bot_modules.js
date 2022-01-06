@@ -2377,7 +2377,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                                 .catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
-                            return
+                            return true
                         }
                         const user = client.users.cache.get(all_orders.discord_id)
                         if (user_data.notify_order == true) {
@@ -2479,7 +2479,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             .catch(err => console.log(err))
                         })
                         .catch(err => console.log(err))
-                        return
+                        return true
                     }
                     const user = client.users.cache.get(all_orders.discord_id)
                     if (user_data.notify_order == true) {
