@@ -2371,7 +2371,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                                 await channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
                                 .then(async msg => {
                                     msg.content = " "
-                                    msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
+                                    msg.embeds[0].description += `\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} ${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}**`
                                     await msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
                                 })
                                 .catch(err => console.log(err))
