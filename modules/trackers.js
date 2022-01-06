@@ -41,7 +41,7 @@ async function bounty_check() {
         
         res.data.forEach(syndicate => {
             if (syndicate.syndicateKey == 'Entrati' || syndicate.syndicateKey == 'Ostrons' || syndicate.syndicateKey == 'Solaris United') {
-                reset = new Date(syndicate.expiry).getTime() - new Date().getTime()
+                reset = (new Date(syndicate.expiry).getTime() + 60000) - new Date().getTime()
                 syndicate.jobs.forEach(job => {
                     var hasBounty = 0
                     var bountyDB = {}
