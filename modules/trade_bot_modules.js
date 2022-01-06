@@ -1744,10 +1744,46 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         }],
         color: tb_invisColor
     })
-    if (sell_items.length != 0)
-        postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
-    if (buy_items.length != 0)
-        postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+    if (sell_items.length != 0) {
+        postdata.embeds.push({
+            title: 'Sell Orders',
+            fields: [{
+                name:'\u200b',value:'\u200b',inline:true
+            },{
+                name:'\u200b',value:'\u200b',inline:true
+            },{
+                name:'\u200b',value:'\u200b',inline:true
+            }],
+            color:tb_sellColor
+        })
+        sell_items.forEach(e,index => {
+            if (index%2 == 0)
+                var fieldNum = 0
+            else
+                var fieldNum = 2
+            postdata.embeds[fieldNum].fields[0].value += `${e} - ${sell_prices[index]}\n`
+        })
+    }
+    if (buy_items.length != 0){
+        postdata.embeds.push({
+            title: 'Buy Orders',
+            fields: [{
+                name:'\u200b',value:'\u200b',inline:true
+            },{
+                name:'\u200b',value:'\u200b',inline:true
+            },{
+                name:'\u200b',value:'\u200b',inline:true
+            }],
+            color:tb_sellColor
+        })
+        buy_items.forEach(e,index => {
+            if (index%2 == 0)
+                var fieldNum = 0
+            else
+                var fieldNum = 2
+            postdata.embeds[fieldNum].fields[0].value += `${e} - ${buy_prices[index]}\n`
+        })
+    }
     if (request_type == 1) {
         postdata.components = []
         if (item_orders.length > 0) {
