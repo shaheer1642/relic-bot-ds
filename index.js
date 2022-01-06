@@ -1308,10 +1308,72 @@ client.on('interactionCreate', async interaction => {
             }],
             color: tb_invisColor
         })
-        if (sell_items.length != 0)
-            postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
-        if (buy_items.length != 0)
-            postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+        if (sell_items.length != 0) {
+            postdata.embeds.push({
+                title: 'Sell Orders',
+                fields: [{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                }],
+                color: tb_sellColor
+            })
+            //----find pad length---
+            var pad = 0
+            sell_items.forEach(e => {
+                if (e.length > pad)
+                    pad = e.length
+            })
+            console.log('pad length = '+pad)
+            //---------------------
+            sell_items.forEach((e,index) => {
+                if (index%2 == 0)
+                    var fieldNum = 0
+                else
+                    var fieldNum = 2
+                var text = '`' + e
+                while (text.length <= pad)
+                    text += ' '
+                text += '`\u205F\u205F\u205F'
+                text += sell_prices[index] + '\n'
+                console.log(text.length)
+                postdata.embeds[1].fields[fieldNum].value += text
+            })
+        }
+        if (buy_items.length != 0) {
+            postdata.embeds.push({
+                title: 'Buy Orders',
+                fields: [{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                }],
+                color: tb_buyColor
+            })
+            //----find pad length---
+            var pad = 0
+            buy_items.forEach(e => {
+                if (e.length > pad)
+                    pad = e.length
+            })
+            //---------------------
+            buy_items.forEach((e,index) => {
+                if (index%2 == 0)
+                    var fieldNum = 0
+                else
+                    var fieldNum = 2
+                var text = '`' + e
+                while (text.length <= pad)
+                    text += ' '
+                text += '`\u205F\u205F\u205F'
+                text += buy_prices[index] + '\n'
+                postdata.embeds[2].fields[fieldNum].value += text
+            })
+        }
         postdata.components = []
         if (item_orders.length > 0) {
             var index = postdata.components.push({type:1,components:[]})
@@ -1526,10 +1588,72 @@ client.on('interactionCreate', async interaction => {
             }],
             color: tb_invisColor
         })
-        if (sell_items.length != 0)
-            postdata.embeds.push({title: 'Sell Orders',fields: [{name:'Item',value:sell_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:sell_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_sellColor})
-        if (buy_items.length != 0)
-            postdata.embeds.push({title: 'Buy Orders',fields: [{name:'Item',value:buy_items.toString().replace(/,/g,'\n'),inline:true},{name:'\u200b',value:'\u200b',inline:true},{name:'Price',value:buy_prices.toString().replace(/,/g,'\n'),inline:true}],color:tb_buyColor})
+        if (sell_items.length != 0) {
+            postdata.embeds.push({
+                title: 'Sell Orders',
+                fields: [{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                }],
+                color: tb_sellColor
+            })
+            //----find pad length---
+            var pad = 0
+            sell_items.forEach(e => {
+                if (e.length > pad)
+                    pad = e.length
+            })
+            console.log('pad length = '+pad)
+            //---------------------
+            sell_items.forEach((e,index) => {
+                if (index%2 == 0)
+                    var fieldNum = 0
+                else
+                    var fieldNum = 2
+                var text = '`' + e
+                while (text.length <= pad)
+                    text += ' '
+                text += '`\u205F\u205F\u205F'
+                text += sell_prices[index] + '\n'
+                console.log(text.length)
+                postdata.embeds[1].fields[fieldNum].value += text
+            })
+        }
+        if (buy_items.length != 0) {
+            postdata.embeds.push({
+                title: 'Buy Orders',
+                fields: [{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                },{
+                    name:'\u200b',value:'\u200b',inline:true
+                }],
+                color: tb_buyColor
+            })
+            //----find pad length---
+            var pad = 0
+            buy_items.forEach(e => {
+                if (e.length > pad)
+                    pad = e.length
+            })
+            //---------------------
+            buy_items.forEach((e,index) => {
+                if (index%2 == 0)
+                    var fieldNum = 0
+                else
+                    var fieldNum = 2
+                var text = '`' + e
+                while (text.length <= pad)
+                    text += ' '
+                text += '`\u205F\u205F\u205F'
+                text += buy_prices[index] + '\n'
+                postdata.embeds[2].fields[fieldNum].value += text
+            })
+        }
         postdata.components = []
         if (item_orders.length > 0) {
             var index = postdata.components.push({type:1,components:[]})
