@@ -1769,7 +1769,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            var text = e
+            var text = '`' + e + '`'
             while (text.length <= pad)
                 text += '\u205F'
             text += sell_prices[index] + '\n'
@@ -1801,7 +1801,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
                 var fieldNum = 0
             else
                 var fieldNum = 2
-            var text = e
+            var text = '`' + e + '`'
             while (text.length <= pad)
                 text += '\u205F'
             text += buy_prices[index] + '\n'
