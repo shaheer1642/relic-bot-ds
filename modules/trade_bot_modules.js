@@ -2352,7 +2352,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                     postdata.content = " "
                     postdata.embeds = []
                     postdata.embeds.push({
-                        description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} ${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}**`,
+                        description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')})**`,
                         footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                         timestamp: new Date(),
                         color: '#FFFFFF'
@@ -2371,7 +2371,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                                 await channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
                                 .then(async msg => {
                                     msg.content = " "
-                                    msg.embeds[0].description += `\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} ${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')}**`
+                                    msg.embeds[0].description += `\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')})**`
                                     await msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
                                 })
                                 .catch(err => console.log(err))
@@ -2454,7 +2454,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                 postdata.content = " "
                 postdata.embeds = []
                 postdata.embeds.push({
-                    description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`,
+                    description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} (${order_type.replace('wts','Sell').replace('wtb','Buy')})**`,
                     footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
                     timestamp: new Date(),
                     color: '#FFFFFF'
@@ -2473,7 +2473,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             await channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
                             .then(async msg => {
                                 msg.content = " "
-                                msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
+                                msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} (${order_type.replace('wts','Sell').replace('wtb','Buy')})**`
                                 await msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
