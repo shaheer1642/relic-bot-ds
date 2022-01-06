@@ -1759,9 +1759,11 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
         //----find pad length---
         var pad = 0
         sell_items.forEach(e => {
+            console.log(e.length)
             if (e.length > pad)
                 pad = e.length
         })
+        console.log(pad)
         //---------------------
         sell_items.forEach((e,index) => {
             if (index%2 == 0)
