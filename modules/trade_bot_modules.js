@@ -1754,9 +1754,9 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             },{
                 name:'\u200b',value:'\u200b',inline:true
             }],
-            color:tb_sellColor
+            color: tb_sellColor
         })
-        sell_items.forEach(e,index => {
+        sell_items.forEach((e,index) => {
             if (index%2 == 0)
                 var fieldNum = 0
             else
@@ -1774,9 +1774,9 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             },{
                 name:'\u200b',value:'\u200b',inline:true
             }],
-            color:tb_buyColor
+            color: tb_buyColor
         })
-        buy_items.forEach(e,index => {
+        buy_items.forEach((e,index) => {
             if (index%2 == 0)
                 var fieldNum = 0
             else
