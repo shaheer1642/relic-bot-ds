@@ -1124,8 +1124,10 @@ async function verifyUserOrders() {
                 })
                 if (!status)
                     continue
-                users_dm_list[all_orders[i].discord_id].push(`**${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')} (${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')})**`)
-                //users_dm_list[all_orders[i].discord_id].notify_remove = user_data.notify_remove
+                if (!users_dm_list[all_orders[i].discord_id])
+                    users_dm_list[all_orders[i].discord_id] = {orders:[],notify_remove:0}
+                users_dm_list[all_orders[i].discord_id].orders.push(`**${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')} (${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')})**`)
+                users_dm_list[all_orders[i].discord_id].notify_remove = user_data.notify_remove
                 /*
                 var postdata = {}
                 postdata.content = " "
