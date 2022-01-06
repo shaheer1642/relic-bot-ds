@@ -1764,7 +1764,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             postdata.embeds[fieldNum].fields[0].value += `${e} - ${sell_prices[index]}\n`
         })
     }
-    if (buy_items.length != 0){
+    if (buy_items.length != 0) {
         postdata.embeds.push({
             title: 'Buy Orders',
             fields: [{
@@ -1774,7 +1774,7 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
             },{
                 name:'\u200b',value:'\u200b',inline:true
             }],
-            color:tb_sellColor
+            color:tb_buyColor
         })
         buy_items.forEach(e,index => {
             if (index%2 == 0)
