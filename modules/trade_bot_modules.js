@@ -2372,7 +2372,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                                 .then(msg => {
                                     msg.content = " "
                                     msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
-                                    msg.edit(msg).catch(err => console.log(err))
+                                    msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
                                 })
                                 .catch(err => console.log(err))
                             })
@@ -2474,7 +2474,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             .then(msg => {
                                 msg.content = " "
                                 msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} ${order_type.replace('wts','Sell').replace('wtb','Buy')}**`
-                                msg.edit(msg).catch(err => console.log(err))
+                                msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                         })
