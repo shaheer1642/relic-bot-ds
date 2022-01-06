@@ -89,7 +89,10 @@ async function bounty_check() {
                                         msg.pin().catch(err => console.log(err))
                                     })
                                     .catch(err => console.log(err))
-                                }).catch(err => console.log(err))
+                                }).catch(err => {
+                                    console.log(err)
+                                    client.channels.cache.get('892003813786017822').send(JSON.stringify(err)).catch(err => console.log(err))
+                                })
                             }
                         })
                         .catch(err => console.log(err))
