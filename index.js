@@ -1251,21 +1251,21 @@ client.on('interactionCreate', async interaction => {
         item_orders.forEach((e,index) => {
             if (e.order_type == 'wts') {
                 sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
-                sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                sell_prices.push(e.user_price + 'p')
             }
             if (e.order_type == 'wtb') {
                 buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
-                buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                buy_prices.push(e.user_price + 'p')
             }
         })
         lich_orders.forEach((e,index) => {
             if (e.order_type == 'wts') {
                 sell_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                sell_prices.push(e.user_price + 'p')
             }
             if (e.order_type == 'wtb') {
                 buy_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                buy_prices.push(e.user_price + 'p')
             }
         })
         //----retrieve user rating----
@@ -1531,21 +1531,21 @@ client.on('interactionCreate', async interaction => {
         item_orders.forEach((e,index) => {
             if (e.order_type == 'wts') {
                 sell_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
-                sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                sell_prices.push(e.user_price + 'p')
             }
             if (e.order_type == 'wtb') {
                 buy_items.push(e.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + e.user_rank.replace('unranked','').replace('maxed',' (maxed)'))
-                buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                buy_prices.push(e.user_price + 'p')
             }
         })
         lich_orders.forEach((e,index) => {
             if (e.order_type == 'wts') {
                 sell_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                sell_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                sell_prices.push(e.user_price + 'p')
             }
             if (e.order_type == 'wtb') {
                 buy_items.push(e.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()))
-                buy_prices.push(e.user_price + '<:platinum:881692607791648778>')
+                buy_prices.push(e.user_price + 'p')
             }
         })
         //----retrieve user rating----
