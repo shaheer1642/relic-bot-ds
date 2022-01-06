@@ -50,6 +50,8 @@ const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 setUpdateTimer()
 backupItemsList()
 
+verifyUserOrders()
+
 function setUpdateTimer(time = null,message = null) {
     console.log(`database update timer set invoked`)
     clearTimeout(DB_Update_Timer)
@@ -1073,6 +1075,7 @@ async function verifyUserOrders() {
         return false
     })
     if (status) {
+        var users_dm_list = {}
         for (var i=0;i<all_orders.length;i++) {
             var item_data
             var status = await db.query(`SELECT * FROM items_list WHERE id='${all_orders[i].item_id}'`)
@@ -1119,6 +1122,9 @@ async function verifyUserOrders() {
                 })
                 if (!status)
                     continue
+                users_dm_list[all_orders[i].discord_id].orders.push(`**${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')} (${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')})**`)
+                users_dm_list[all_orders[i].discord_id].notify_remove = user_data.notify_remove
+                /*
                 var postdata = {}
                 postdata.content = " "
                 postdata.embeds = []
@@ -1141,8 +1147,10 @@ async function verifyUserOrders() {
                     else
                         user.send(postdata).catch(err => console.log(err))
                 }
+                */
             }
         }
+        console.log(JSON.stringify(users_dm_list))
     }
     console.log('verified orders.')
 }
