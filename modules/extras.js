@@ -59,7 +59,7 @@ function msToTime(s) {
     var hrs = (s - mins) / 60;
   
     if (hrs != 0)
-        return pad(hrs) + ' hours ' + pad(mins) + ' minutes ' + pad(secs) + ' seconds';
+        return pad(hrs,3) + ' hours ' + pad(mins) + ' minutes ' + pad(secs) + ' seconds';
     if (mins != 0)
         return pad(mins) + ' minutes ' + pad(secs) + ' seconds';
     return pad(secs) + ' seconds';
