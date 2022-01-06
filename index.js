@@ -1758,7 +1758,7 @@ client.on('interactionCreate', async interaction => {
             return Promise.resolve()
         var order_status = ''
         var order_rating = ''
-        if (interaction.values[0] == 'None') {
+        if (interaction.values[0] == 'NonePlat' || interaction.values[0] == 'NoneNoPlat') {
             order_status = 'successful'
             order_rating = `{"${order_data.order_owner}": 5,"${order_data.order_filler}": 5}`
         }
@@ -1805,9 +1805,12 @@ client.on('interactionCreate', async interaction => {
             desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** No` : desc[7] = `**Users balance changed:** No`
         }
         else if (order_status == 'successful') {
+            var balanceChange = 'Yes'
+            if (interaction.values[0] == 'NoneNoPlat')
+                balanceChange = 'No'
             postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
             desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${interaction.user.id}>)`
-            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** Yes` : desc[7] = `**Users balance changed:** Yes`
+            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** ${balanceChange}` : desc[7] = `**Users balance changed:** ${balanceChange}`
         }
         postdata.description = desc.join('\n')
         postdata.timestamp = new Date()
@@ -1816,7 +1819,7 @@ client.on('interactionCreate', async interaction => {
             console.log(err)
             interaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
         })
-        if (order_status == 'successful') {
+        if (order_status == 'successful' && interaction.values[0] == 'NonePlat') {
             //update plat balance for users
             if (order_data.order_type == 'wts') {
                 var status = db.query(`
@@ -4360,8 +4363,12 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                                 value: order_data.order_filler
                             },
                             {
-                                label: "None. All clear",
-                                value: "None"
+                                label: "None. All clear (change plat balance)",
+                                value: "NonePlat"
+                            },
+                            {
+                                label: "None. All clear (No change)",
+                                value: "NoneNoPlat"
                             }
                         ]
                     }]
@@ -4423,8 +4430,12 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                                 value: order_data.order_filler
                             },
                             {
-                                label: "None. All clear",
-                                value: "None"
+                                label: "None. All clear (change plat balance)",
+                                value: "NonePlat"
+                            },
+                            {
+                                label: "None. All clear (No change)",
+                                value: "NoneNoPlat"
                             }
                         ]
                     }]
