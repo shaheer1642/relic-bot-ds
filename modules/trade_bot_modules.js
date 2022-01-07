@@ -2744,7 +2744,7 @@ async function tb_activate_orders(message, interaction) {
             return
         }
         console.log(`updating orders ${item_name} for ${user_id}`)
-        await trading_bot_orders_update(null,item_id,item_url,item_name,update_type,item_rank)
+        await trading_bot_orders_update(null,item_id,item_url,item_name,1,item_rank)
         .then(res => {
             var user_order = null
             db.query(`SELECT * FROM users_orders WHERE discord_id = ${user_id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
