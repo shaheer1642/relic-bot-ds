@@ -73,7 +73,7 @@ async function bounty_check() {
                                     fields: [
                                         {name: 'Syndicate', value: syndicate.syndicate, inline: true},
                                         {name: 'Mission', value: `${job.type} (${job.enemyLevels.join('-')})`, inline: true},
-                                        {name: 'Rewards', value: '\u200b' + job.rewardPool.join('\n'), inline: false},
+                                        {name: 'Rewards', value: job.rewardPool.length ? job.rewardPool.join('\n'):'\u200b', inline: false},
                                         {name: 'Expires', value: `<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(syndicate.expiry).getTime()/1000)}:f>)`, inline: false}
                                     ],
                                     footer: {
