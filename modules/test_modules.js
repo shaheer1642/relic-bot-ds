@@ -16,9 +16,9 @@ async function trade_tut(message,args) {
                 name: 'Post order', 
                 value: 
                 `\`\`\`wts volt 140p\`\`\`
-                \`\`\`Average price: wts volt\`\`\`
+                \`\`\`wts volt\`\`\` Avg Price
+                \`\`\`wts primed chamber auto\`\`\` Match top price
                 \`\`\`wtb volt, loki 200p, arcane energize\`\`\`
-                \`\`\`Match price: wts primed chamber auto\`\`\`
                 \`\`\`wts blind rage maxed\`\`\``,
                 inline: true
             },{
@@ -28,7 +28,7 @@ async function trade_tut(message,args) {
             },{
                 name: 'Post previous orders',
                 value: '`my orders`',
-                inline: true
+                inline: false
             },{
                 name: 'Close orders',
                 value: '`close all`',
@@ -40,7 +40,7 @@ async function trade_tut(message,args) {
             },{
                 name: 'Trade item',
                 value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
-                inline: true
+                inline: false
             }],
             color: "FFFFFF"
         }]
