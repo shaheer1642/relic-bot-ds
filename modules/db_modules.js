@@ -1166,19 +1166,16 @@ async function verifyUserOrders() {
                 timestamp: new Date(),
                 color: '#ffffff'
             })
-            const user = client.users.cache.get(user_id)
+            const user = await client.users.fetch(user_id).catch(err => console.log(err))
             if (users_dm_list[user_id].notify_remove) {
-                await client.guilds.fetch(users_dm_list[user_id].guild_id)
-                .then(guild => {
-                    const user_presc = guild.presences.cache.find(mem => mem.userId == user_id)
-                    if (user_presc) {
-                        if (user_presc.status != 'dnd')
-                            user.send(postdata).catch(err => console.log(err))
-                    }
-                    else
+                const guild = await client.guilds.fetch(users_dm_list[user_id].guild_id).catch(err => console.log(err))
+                const user_presc = guild.presences.cache.find(mem => mem.userId == user_id)
+                if (user_presc) {
+                    if (user_presc.status != 'dnd')
                         user.send(postdata).catch(err => console.log(err))
-                })
-                .catch(err => console.log(err))
+                }
+                else
+                    user.send(postdata).catch(err => console.log(err))
             }
         }
     }
