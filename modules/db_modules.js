@@ -50,7 +50,7 @@ const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 setUpdateTimer()
 backupItemsList()
 
-verifyUserOrders()
+setTimeout(verifyUserOrders, 10000);
 
 function setUpdateTimer(time = null,message = null) {
     console.log(`database update timer set invoked`)
