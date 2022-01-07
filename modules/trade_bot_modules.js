@@ -2662,6 +2662,8 @@ async function tb_updateDmCacheOrder(msg,discord_id) {
 }
 
 async function tb_activate_orders(message, interaction) {
+    if (interaction)
+        interaction.deferUpdate().catch(err => console.log(err))
     var user_id = 0
     if (message)
         user_id = message.author.id
