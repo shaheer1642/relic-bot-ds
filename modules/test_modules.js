@@ -2,6 +2,11 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 
 async function trade_tut(message,args) {
+    if (message.author.id != '253525146923433984') {
+        message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
+        return
+    }
+    
     var postdata = {
         content: " ",
         embeds: [{
@@ -34,7 +39,7 @@ async function trade_tut(message,args) {
                 inline: true
             },{
                 name: 'Trade item',
-                value: 'React with emojis like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
+                value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
                 inline: true
             }],
             color: "FFFFFF"
