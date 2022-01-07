@@ -11,15 +11,19 @@ async function trade_tut(message,args) {
                 name: 'Post order', 
                 value: 
                 `\`wts volt 140p\`
-                \`wts volt\`                    <---- Avg item price is selected
-                \`wtb volt, loki 200p, arcane energize\`          <---- Multiple orders are posted
-                \`wts primed chamber auto\`         <----- Match currently active order top price
+                Average price: \`wts volt\`
+                \`wtb volt, loki 200p, arcane energize\`
+                Match price: \`wts primed chamber auto\`
                 \`wts blind rage maxed\``,
+                inline: true
+            },{
+                name: '\u200b',
+                value: '\u200b',
                 inline: true
             },{
                 name: 'Post previous orders',
                 value: '`my orders`',
-                inline: false
+                inline: true
             },{
                 name: 'Close orders',
                 value: '`close all`',
