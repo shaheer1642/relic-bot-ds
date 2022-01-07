@@ -15,11 +15,11 @@ async function trade_tut(message,args) {
             fields: [{
                 name: 'Post order', 
                 value: 
-                `\`wts volt 140p\`
-                Average price: \`wts volt\`
-                \`wtb volt, loki 200p, arcane energize\`
-                Match price: \`wts primed chamber auto\`
-                \`wts blind rage maxed\``,
+                `\`\`\`wts volt 140p\`\`\`
+                \`\`\`Average price: wts volt\`\`\`
+                \`\`\`wtb volt, loki 200p, arcane energize\`\`\`
+                \`\`\`Match price: wts primed chamber auto\`\`\`
+                \`\`\`wts blind rage maxed\`\`\``,
                 inline: true
             },{
                 name: '\u200b',
