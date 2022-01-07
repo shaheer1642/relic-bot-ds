@@ -5,6 +5,8 @@ async function trade_tut(message,args) {
     var postdata = {
         content: " ",
         embeds: [{
+            title: 'Trade Instructions',
+            /*
             description: 
 `
 Posting new/existing order
@@ -22,6 +24,31 @@ Matching top price
 Closing all orders
 **close all**
 `,
+*/
+            fields: [{
+                name: 'Post order', 
+                value: 
+                `\`wts volt 140p\`
+                \`wts volt\`                    <---- Avg item price is selected
+                \`wtb volt, loki 200p, arcane energize\`          <---- Multiple orders are posted
+                \`wts primed chamber auto\`         <----- Match currently active order top price
+                \`wts blind rage maxed\``,
+                inline: true
+            },{
+                name: 'Post previous orders',
+                value: '`my orders`',
+                inline: true
+            },{
+                name: 'Close orders',
+                value: '`close all`',
+                inline: true
+            },{
+                name: 'Remove orders',
+                value: 'Click \'My Profile\' button below'
+            }],
+            footer: {
+                text: 'For detailed tutorial, check <#919952480266248253>'
+            },
             color: "FFFFFF"
         }]
     }
