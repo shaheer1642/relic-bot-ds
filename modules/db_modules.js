@@ -50,8 +50,6 @@ const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 setUpdateTimer()
 backupItemsList()
 
-setTimeout(verifyUserOrders, 10000);
-
 function setUpdateTimer(time = null,message = null) {
     console.log(`database update timer set invoked`)
     clearTimeout(DB_Update_Timer)
@@ -1129,30 +1127,6 @@ async function verifyUserOrders() {
                 users_dm_list[all_orders[i].discord_id].orders.push(`**${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')} (${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')})**`)
                 users_dm_list[all_orders[i].discord_id].notify_remove = user_data.notify_remove
                 users_dm_list[all_orders[i].discord_id].guild_id = all_orders[i].origin_guild_id
-                /*
-                var postdata = {}
-                postdata.content = " "
-                postdata.embeds = []
-                postdata.embeds.push({
-                    description: `❕ Order Remove Notification ❕\n\nYour **${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')}** order for **${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')}** has been removed as its price is out of range of the average item price.`,
-                    footer: {text: `Type 'notifications' to disable these notifications in the future.\n\u200b`},
-                    timestamp: new Date()
-                })
-                if (all_orders[i].order_type == 'wts')
-                    postdata.embeds[0].color = tb_sellColor
-                if (all_orders[i].order_type == 'wtb')
-                    postdata.embeds[0].color = tb_buyColor
-                const user = client.users.cache.get(all_orders[i].discord_id)
-                if (user_data.notify_remove) {
-                    var user_presc = client.guilds.cache.get(all_orders[i].origin_guild_id).presences.cache.find(mem => mem.userId == all_orders[i].discord_id)
-                    if (user_presc) {
-                        if (user_presc.status != 'dnd')
-                            user.send(postdata).catch(err => console.log(err))
-                    }
-                    else
-                        user.send(postdata).catch(err => console.log(err))
-                }
-                */
             }
         }
         console.log(JSON.stringify(users_dm_list))
