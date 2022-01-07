@@ -2793,6 +2793,7 @@ module.exports = {
     trading_lich_orders_update,
     trading_bot_user_orders,
     trading_bot_item_orders,
+    tb_activate_orders,
     trading_bot_registeration,
     td_set_orders_timeouts,
     set_order_timeout,
