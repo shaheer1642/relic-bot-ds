@@ -278,7 +278,7 @@ client.on('messageCreate', async message => {
                 }
             }
             else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-                tb_activate_orders(message).catch(err => console.log(err))
+                trade_bot_modules.tb_activate_orders(message).catch(err => console.log(err))
                 return
             }
             else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
@@ -1838,7 +1838,8 @@ client.on('interactionCreate', async interaction => {
 
     if (interaction.isButton()) {
         if (interaction.customId == 'tb_actv_orders') {
-            tb_activate_orders(null, interaction).catch(err => console.log(err))
+            //add user check
+            trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
             return
         }
         return
