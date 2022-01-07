@@ -1167,7 +1167,7 @@ async function verifyUserOrders() {
                 color: '#ffffff'
             })
             await client.users.fetch(user_id)
-            .then(user => {
+            .then(async user => {
                 if (users_dm_list[user_id].notify_remove) {
                     await client.guilds.fetch(users_dm_list[user_id].guild_id)
                     .then(guild => {
