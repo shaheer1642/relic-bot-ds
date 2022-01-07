@@ -27,7 +27,11 @@ async function trade_tut(message,args) {
             },{
                 name: 'Remove orders',
                 value: 'Click \'My Profile\' button below',
-                inline: false
+                inline: true
+            },{
+                name: 'Trade item',
+                value: 'React with emojis like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
+                inline: true
             }],
             color: "FFFFFF"
         }]
