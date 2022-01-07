@@ -1125,9 +1125,10 @@ async function verifyUserOrders() {
                 if (!status)
                     continue
                 if (!users_dm_list[all_orders[i].discord_id])
-                    users_dm_list[all_orders[i].discord_id] = {orders:[],notify_remove:0}
+                    users_dm_list[all_orders[i].discord_id] = {orders:[],notify_remove:0,guild_id: 0}
                 users_dm_list[all_orders[i].discord_id].orders.push(`**${item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[i].user_rank.replace('unranked','').replace('maxed',' (maxed)')} (${all_orders[i].order_type.replace('wts','Sell').replace('wtb','Buy')})**`)
                 users_dm_list[all_orders[i].discord_id].notify_remove = user_data.notify_remove
+                users_dm_list[all_orders[i].discord_id].guild_id = all_orders[i].origin_guild_id
                 /*
                 var postdata = {}
                 postdata.content = " "
@@ -1155,6 +1156,27 @@ async function verifyUserOrders() {
             }
         }
         console.log(JSON.stringify(users_dm_list))
+        for (var user_id in users_dm_list) {
+            var postdata = {}
+            postdata.content = " "
+            postdata.embeds = []
+            postdata.embeds.push({
+                description: `❕ Order Remove Notification ❕\n\nFollowing orders have been removed for you as their prices range outside of average item price:\n\n ${users_dm_list[user_id].orders.join('\n')}`,
+                footer: {text: `Type 'notifications' to disable these notifications in the future.\n\u200b`},
+                timestamp: new Date(),
+                color: '#ffffff'
+            })
+            const user = client.users.cache.get(user_id)
+            if (users_dm_list[user_id].notify_remove) {
+                var user_presc = client.guilds.cache.get(users_dm_list[user_id].guild_id).presences.cache.find(mem => mem.userId == user_id)
+                if (user_presc) {
+                    if (user_presc.status != 'dnd')
+                        user.send(postdata).catch(err => console.log(err))
+                }
+                else
+                    user.send(postdata).catch(err => console.log(err))
+            }
+        }
     }
     console.log('verified orders.')
 }
