@@ -2,11 +2,12 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 
 async function trade_tut(message,args) {
-    if (message.author.id != '253525146923433984') {
-        message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
-        return
-    }
-    
+    if (message)
+        if (message.author.id != '253525146923433984') {
+            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
+            return
+        }
+
     var postdata = {
         content: " ",
         embeds: [{
@@ -15,15 +16,10 @@ async function trade_tut(message,args) {
             fields: [{
                 name: 'Post order', 
                 value: 
-                `\`\`\`wts volt 140p\`\`\`
-                \`\`\`wts volt\`\`\` Avg Price
-                \`\`\`wts primed chamber auto\`\`\` Match top price
-                \`\`\`wtb volt, loki 200p, arcane energize\`\`\`
-                \`\`\`wts blind rage maxed\`\`\``,
-                inline: true
-            },{
-                name: '\u200b',
-                value: '\u200b',
+                `\`wts volt 140p\`${'\u205F'.repeat(8)}\`wtb volt, loki 200p, arcane energize\`
+                \`wts frost\`${'\u205F'.repeat(15)}Avg Price
+                \`wts frost auto\`${'\u205F'.repeat(6)}Match top price
+                \`wts blind rage maxed\``,
                 inline: true
             },{
                 name: 'Post previous orders',
@@ -34,17 +30,59 @@ async function trade_tut(message,args) {
                 value: '`close all`',
                 inline: true
             },{
+                name: '\u200b',
+                value: '\u200b',
+                inline: true
+            },{
                 name: 'Remove orders',
                 value: 'Click \'My Profile\' button below',
                 inline: true
             },{
                 name: 'Trade item',
                 value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
-                inline: false
+                inline: true
             }],
             color: "FFFFFF"
-        }]
+        }],
+        components: [
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: "Verify",
+                        style: 1,
+                        custom_id: "tb_verify"
+                    },
+                    {
+                        type: 2,
+                        label: "Profile",
+                        style: 2,
+                        custom_id: "tb_my_profile"
+                    },
+                    {
+                        type: 2,
+                        label: "Activate Orders",
+                        style: 3,
+                        custom_id: "tb_actv_orders"
+                    },
+                    {
+                        type: 2,
+                        label: "Close Orders",
+                        style: 4,
+                        custom_id: "tb_close_orders"
+                    }
+                ]
+    
+            }
+        ]
     }
+    
+    if (process.env.DEBUG_MODE) {
+        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
+        return
+    }
+
     client.channels.cache.get('892160436881993758').messages.fetch('893138411861446676')
     .then(msg => {
         msg.edit(postdata).catch(err => console.log(err))

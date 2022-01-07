@@ -56,6 +56,9 @@ const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
 client.on('ready', () => {
+    if (process.env.DEBUG_MODE)
+        test_modules.trade_tut()
+
     console.log(`Bot has started.`)
     inform_dc(`Bot has started.`)
 
