@@ -2757,7 +2757,7 @@ async function tb_activate_orders(message, interaction) {
                 var currTime = new Date().getTime()
                 var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
                 console.log(after3h - currTime)
-                trade_bot_modules.set_order_timeout(user_order[0],after3h,currTime)
+                set_order_timeout(user_order[0],after3h,currTime)
             })
             .catch(err => {
                 console.log(err)
