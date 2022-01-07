@@ -1168,13 +1168,17 @@ async function verifyUserOrders() {
             })
             const user = client.users.cache.get(user_id)
             if (users_dm_list[user_id].notify_remove) {
-                var user_presc = client.guilds.cache.get(users_dm_list[user_id].guild_id).presences.cache.find(mem => mem.userId == user_id)
-                if (user_presc) {
-                    if (user_presc.status != 'dnd')
+                await client.guilds.fetch(users_dm_list[user_id].guild_id)
+                .then(guild => {
+                    const user_presc = guild.presences.cache.find(mem => mem.userId == user_id)
+                    if (user_presc) {
+                        if (user_presc.status != 'dnd')
+                            user.send(postdata).catch(err => console.log(err))
+                    }
+                    else
                         user.send(postdata).catch(err => console.log(err))
-                }
-                else
-                    user.send(postdata).catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
             }
         }
     }
