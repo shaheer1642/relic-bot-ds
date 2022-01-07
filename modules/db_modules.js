@@ -1092,7 +1092,6 @@ async function verifyUserOrders() {
             if (!status)
                 continue
             if ((all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.sell_price*0.8 || all_orders[i].user_price > item_data.sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'unranked' && (all_orders[i].user_price < item_data.buy_price*0.8 || all_orders[i].user_price > item_data.buy_price*1.2)) || (all_orders[i].order_type == 'wts' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_sell_price*0.8 || all_orders[i].user_price > item_data.maxed_sell_price*1.2)) || (all_orders[i].order_type == 'wtb' && all_orders[i].user_rank == 'maxed' && (all_orders[i].user_price < item_data.maxed_buy_price*0.8 || all_orders[i].user_price > item_data.maxed_buy_price*1.2))) {
-                /*
                 var status = await db.query(`DELETE FROM users_orders WHERE item_id='${all_orders[i].item_id}' AND discord_id=${all_orders[i].discord_id}`)
                 .then(res => {
                     return true
@@ -1103,7 +1102,6 @@ async function verifyUserOrders() {
                 })
                 if (!status)
                     continue
-                */
                 if (all_orders[i].visibility)
                     trade_bot_modules.trading_bot_orders_update(null,item_data.id,item_data.item_url,item_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,all_orders[i].user_rank).catch(err => console.log(err))
                 var user_data = null
