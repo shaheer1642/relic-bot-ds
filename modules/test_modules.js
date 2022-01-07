@@ -6,25 +6,7 @@ async function trade_tut(message,args) {
         content: " ",
         embeds: [{
             title: 'Trade Instructions',
-            /*
-            description: 
-`
-Posting new/existing order
-**wtb volt 160p**
-
-Posting existing orders
-**my orders**
-
-Posting multiple orders
-**wtb loki p systems 100p, limbo, nekros prime bp**
-
-Matching top price
-**wts ash auto**
-
-Closing all orders
-**close all**
-`,
-*/
+            description: 'For detailed tutorial, check <#919952480266248253>',
             fields: [{
                 name: 'Post order', 
                 value: 
@@ -37,18 +19,16 @@ Closing all orders
             },{
                 name: 'Post previous orders',
                 value: '`my orders`',
-                inline: true
+                inline: false
             },{
                 name: 'Close orders',
                 value: '`close all`',
                 inline: true
             },{
                 name: 'Remove orders',
-                value: 'Click \'My Profile\' button below'
+                value: 'Click \'My Profile\' button below',
+                inline: false
             }],
-            footer: {
-                text: 'For detailed tutorial, check <#919952480266248253>'
-            },
             color: "FFFFFF"
         }]
     }
