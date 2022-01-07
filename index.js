@@ -25,7 +25,8 @@ const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
 const userOrderLimit = 50
 const filledOrdersLimit = 500
-const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+//const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+const tradingBotChannels = ["892108718358007820"]
 const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
@@ -116,6 +117,7 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', async message => {
+    message.interaction
     if (message.author.id == client.user.id && message.type === 'CHANNEL_PINNED_MESSAGE') {
         pins_handler(message)
         return
@@ -277,7 +279,6 @@ client.on('messageCreate', async message => {
                 }
             }
             else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-                //continue
                 var items_ids = []
                 var status_msg = ''
                 var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${message.author.id}`)
@@ -373,7 +374,7 @@ client.on('messageCreate', async message => {
                     }
                 }
                 message.delete().catch(err => console.log(err))
-                return Promise.resolve()
+                return
             }
             else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
                 if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {

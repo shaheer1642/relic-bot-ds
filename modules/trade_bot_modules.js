@@ -6,7 +6,8 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('.
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
-const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+//const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+const tradingBotChannels = ["892108718358007820"]
 const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
@@ -2658,6 +2659,117 @@ async function tb_updateDmCacheOrder(msg,discord_id) {
         timestamp: new Date().getTime()
     }
     await db.query(`UPDATE users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
+}
+
+async function tb_activate_orders(message, interaction) {
+    var user_id = 0
+    if (message)
+        user_id = message.author.id
+    else if (interaction)
+        user_id = interaction.user.id
+    else 
+        return
+    var items_ids = []
+    var status_msg = ''
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${user_id}`)
+    .then(res => {
+        if (res.rows.length==0) {
+            status_msg = `❕ <@${user_id}> No orders found on your profile. ❕`
+            return false
+        }
+        items_ids = res.rows
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        status_msg = `☠️ Error fetching your orders from db. Please contact MrSofty#7926\nError code: 500 ☠️`
+        return false
+    })
+    if (!status) {
+        if (message) {
+            message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        }
+        else
+            interaction.reply({content: status_msg, embeds: [], ephemeral: true}).catch(err => console.log(err))
+        return
+    }
+    //set all orders as visible for this user
+    var status = await db.query(`UPDATE users_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${user_id}`)
+    .then(res => {
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        if (message) {
+            message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        }
+        else 
+            interaction.reply({content: `☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`, embeds: [], ephemeral: true}).catch(err => console.log(err))
+        return
+    }
+    for (var items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
+        var item_id = items_ids[items_ids_index].item_id
+        var order_type = items_ids[items_ids_index].order_type
+        var item_rank = items_ids[items_ids_index].user_rank
+        var item_url = ''
+        var item_name = ''
+        var status = await db.query(`SELECT * FROM items_list WHERE id='${item_id}'`)
+        .then(res => {
+            if (res.rows.length==0)
+                return false
+            if (res.rows.length>1) {
+                console.log(res.rows)
+                return false
+            }
+            item_url = res.rows[0].item_url
+            item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            if (message) {
+                message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            }
+            else
+                interaction.reply({content: `☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`, embeds: [], ephemeral: true}).catch(err => console.log(err))
+            return
+        }
+        console.log(`updating orders ${item_name} for ${user_id}`)
+        await trading_bot_orders_update(null,item_id,item_url,item_name,update_type,item_rank)
+        .then(res => {
+            var user_order = null
+            db.query(`SELECT * FROM users_orders WHERE discord_id = ${user_id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
+            .then(res => {
+                if (res.rows.length == 0)
+                    return false 
+                user_order = res.rows
+                var currTime = new Date().getTime()
+                var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
+                console.log(after3h - currTime)
+                trade_bot_modules.set_order_timeout(user_order[0],after3h,currTime)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+            return
+        })
+        .catch(err => {
+            console.log(`Error occured midway of updating orders in my orders command`)
+            return Promise.resolve()
+        })
+    }
+    if (message)
+        message.delete().catch(err => console.log(err))
 }
 
 function generateId() {
