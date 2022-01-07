@@ -1041,27 +1041,10 @@ async function trading_lich_bot(interaction) {
             if (!status)
                 return false
         }
-        else if (res.rows.length > 1) {
+        else if (res.rows.length > 0) {
             interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
             return false
         }
-        else {     //----update existing order in DB----
-            interaction.reply({content: `Order already found in db. right now updation is not implemented`, ephemeral: true}).catch(err => console.log(err))
-            return false
-            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
-            .then(res => {
-                return true
-            })
-            .catch(err => {
-                interaction.reply({content: `☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return false
-        }
-        if (!status)
-            return false
         return true
     })
     .catch(err => {
