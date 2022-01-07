@@ -78,7 +78,7 @@ async function trade_tut(message,args) {
         ]
     }
     
-    if (process.env.DEBUG_MODE) {
+    if (process.env.DEBUG_MODE == 1) {
         client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
         return
     }
