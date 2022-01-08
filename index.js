@@ -1778,7 +1778,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank).catch(err => console.log(err))
                     return
                 }
                 console.log('break test')
@@ -2078,7 +2078,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trade_bot_modules.trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    trade_bot_modules.trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
                     return Promise.resolve()
                 }
 
