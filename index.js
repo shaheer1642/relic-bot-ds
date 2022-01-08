@@ -1766,13 +1766,24 @@ client.on('interactionCreate', async interaction => {
     if (interaction.isButton()) {
         if (interaction.customId == 'tb_actv_orders') {
             console.log('activate orders clicked')
-            //user exists?
             await trade_bot_modules.tb_user_exist(interaction.user.id)
             .then(() => {
                 trade_bot_modules.tb_user_online(null,interaction)
                 .then(() => {
                     interaction.deferUpdate().catch(err => console.log(err))
                     trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+            return
+        }
+        if (interaction.customId == 'tb_close_orders') {
+            console.log('activate orders clicked')
+            await trade_bot_modules.tb_user_exist(interaction.user.id)
+            .then(() => {
+                trade_bot_modules.tb_user_online(null,interaction)
+                .then(() => {
+                    interaction.deferUpdate().catch(err => console.log(err))
+                    trade_bot_modules.tb_close_orders(null, interaction).catch(err => console.log(err))
                 }).catch(err => console.log(err))
             }).catch(err => interaction.reply(err).catch(err => console.log(err)))
             return
