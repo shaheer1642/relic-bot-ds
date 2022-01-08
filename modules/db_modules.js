@@ -768,11 +768,11 @@ async function getDB(message,args) {
                 if (value === null)
                     return ''
                 if (typeof value == 'object')
-                    return ''
+                    return 'is Object'
                 if (typeof value == 'number' && value > 99999999999)
                     return '\'' + value
                 if (typeof value == 'string')
-                    if (value.match('-') || value.match(/\\/))
+                    if (value.match('-') || value.match(/\\/) || value.match(/\//))
                         return '\'' + value
                 return value
             } 
