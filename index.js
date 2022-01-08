@@ -1845,6 +1845,8 @@ client.on('interactionCreate', async interaction => {
                 trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
             })
             .catch(err => {
+                console.log(err)
+                console.log(JSON.stringify(err))
                 interaction.reply(err).catch(err => console.log(err))
             })
             return
