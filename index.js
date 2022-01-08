@@ -244,8 +244,8 @@ client.on('messageCreate', async message => {
         }
         if (tradingBotChannels.includes(message.channelId)) {
             var status = await trade_bot_modules.tb_user_exist(message.author.id)
-            .then(res => {
-                var status = trade_bot_modules.tb_user_online(message)
+            .then(async res => {
+                var status = await trade_bot_modules.tb_user_online(message)
                 .catch(err => {
                     return false
                 })
