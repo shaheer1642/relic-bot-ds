@@ -38,7 +38,7 @@ async function trade_tut(message,args) {
                 value: 'Click \'My Profile\' button below',
                 inline: true
             },{
-                name: 'Trade item',
+                name: 'Open trade',
                 value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
                 inline: true
             }],
