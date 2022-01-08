@@ -6,8 +6,8 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('.
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
-//const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
-const tradingBotChannels = ["892108718358007820"]
+const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+//const tradingBotChannels = ["892108718358007820"]
 const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
