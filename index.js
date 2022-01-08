@@ -1846,6 +1846,7 @@ client.on('interactionCreate', async interaction => {
             .then(() => {
                 trade_bot_modules.tb_user_online(null,interaction)
                 .then(() => {
+                    interaction.deferUpdate().catch(err => console.log(err))
                     trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
                 }).catch(err => console.log(err))
             }).catch(err => interaction.reply(err).catch(err => console.log(err)))
