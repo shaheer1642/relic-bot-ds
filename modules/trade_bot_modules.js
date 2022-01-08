@@ -2230,44 +2230,40 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     return Promise.resolve()
 }
 
-async function trading_bot_registeration(message) {
-    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`).then(res => {
-        if (res.rows.length != 0)
-            message.channel.send(`Note: Your ign has already been verified. It will be updated upon re-verification`).catch(err => console.log(err))
-        return true
+async function trading_bot_registeration(discord_id) {
+    return new Promise((resolve, reject) => {
+        var postdata = {content: ' ', embeds: []}
+        db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`).then(res => {
+            if (res.rows.length != 0)
+                postdata.content += 'Note: Your ign has already been verified. It will be updated upon re-verification\n'
+            const uni_id = generateId()
+            db.query(`INSERT INTO users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
+            .then(res => {
+                postdata.content += 
+                `**Please follow these steps to verify your account:**
+                1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
+                2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
+                3) Write the message body as given below:
+                Subject: **${uni_id}**
+                Message: Hi
+                4) Click 'Send' button
+                5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`
+                postdata.embeds.push({
+                    description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
+                })
+                resolve(postdata)
+            }).catch(err => {
+                console.log(err)
+                postdata.content = "Some error occured inserting record into db.\nError code: 501\nPlease contact MrSofty#7926"
+                reject(postdata)
+            })
+        })
+        .catch (err => {
+            console.log(err)
+            postdata.content = "Some error occured retrieving database info.\nError code: 500\nPlease contact MrSofty#7926"
+            reject(postdata)
+        })
     })
-    .catch (err => {
-        console.log(err)
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"}).catch(err => console.log(err))
-        return false
-    })
-    if (!status)
-        return
-    const uni_id = generateId()
-    var status = await db.query(`INSERT INTO users_unverified (id,discord_id) VALUES ('${uni_id}',${message.author.id})`)
-    .then(res => {
-        return true
-    }).catch(err => {
-        console.log(err)
-        message.channel.send({content: "Some error occured inserting record into db.\nError code: 501"}).catch(err => console.log(err))
-        return false
-    })
-    if (!status)
-        return
-    message.channel.send({content: `
-**Please follow these steps to verify your account:**
-1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
-2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
-3) Write the message body as given below:
-Subject: **${uni_id}**
-Message: Hi
-4) Click 'Send' button
-5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!
-`, embeds: [{
-        description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
-    }]
-})
-    return
 }
 
 async function td_set_orders_timeouts() {
@@ -2662,8 +2658,6 @@ async function tb_updateDmCacheOrder(msg,discord_id) {
 }
 
 async function tb_activate_orders(message, interaction) {
-    if (interaction)
-        interaction.deferUpdate().catch(err => console.log(err))
     var user_id = 0
     if (message)
         user_id = message.author.id
@@ -2774,6 +2768,23 @@ async function tb_activate_orders(message, interaction) {
         message.delete().catch(err => console.log(err))
 }
 
+async function tb_user_exist(discord_id) {
+    return new Promise((resolve, reject) => {
+        db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+        .then(async res => {
+            if (res.rowCount==0) {
+                await trading_bot_registeration
+                .then(res => reject(res))
+                .catch(err => reject(res))
+            }
+            resolve('user exists')
+        })
+        .catch(err => {
+            reject({content: `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`, embeds: []})
+        })
+    })
+}
+
 function generateId() {
     let ID = "";
     let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -2797,5 +2808,6 @@ module.exports = {
     trading_bot_registeration,
     td_set_orders_timeouts,
     set_order_timeout,
-    tb_threadHandler
+    tb_threadHandler,
+    tb_user_exist
 }

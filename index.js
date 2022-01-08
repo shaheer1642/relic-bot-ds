@@ -1838,8 +1838,15 @@ client.on('interactionCreate', async interaction => {
 
     if (interaction.isButton()) {
         if (interaction.customId == 'tb_actv_orders') {
-            //add user check
-            trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
+            interaction.deferUpdate().catch(err => console.log(err))
+            //user exists?
+            await trade_bot_modules.tb_user_exist(interaction.user.id)
+            .then(res => {
+                trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
+            })
+            .catch(err => {
+                interaction.reply(err).catch(err => console.log(err))
+            })
             return
         }
         return
