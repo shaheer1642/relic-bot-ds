@@ -2958,6 +2958,75 @@ async function tb_close_orders(message, interaction) {
     return
 }
 
+async function tb_close_lich_orders(message, interaction) {
+    var user_id = 0
+    if (message)
+        user_id = message.author.id
+    else if (interaction)
+        user_id = interaction.user.id
+    else 
+        return
+    var user_data = null
+    var orders_list = []
+    var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${user_id} AND visibility = true`)
+    .then(res => {
+        if (res.rows.length == 0) {     //no visible orders at the time
+            console.log('No visible orders at the time')
+            return false
+        }
+        if (res.rows.length > 0) {     //visible orders found
+            orders_list = res.rows
+            return true
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        if (message)
+            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+        return
+    }
+    var status = await db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${user_id}`)
+    .then(res => {
+        if (res.rowCount == 0)
+            return false
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        if (message)
+            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+        return
+    }
+    for (var i=0;i<orders_list.length;i++) {
+        var status = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
+        .then(async res => {
+            if (res.rows.length==0) { //unexpected response 
+                console.log('Unexpected db response fetching item info')
+                return false
+            }
+            if (res.rows.length>1) { //unexpected response
+                console.log('Unexpected db response fetching item info')
+                return false
+            }
+            await trading_lich_orders_update(null,res.rows[0], 2)
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+    }
+    if (message)
+        setTimeout(() => message.delete().catch(err => console.log(err)), 500)
+    return
+}
+
 async function tb_user_exist(discord_id) {
     return new Promise((resolve, reject) => {
         db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
@@ -3016,6 +3085,7 @@ module.exports = {
     tb_activate_orders,
     tb_activate_lich_orders,
     tb_close_orders,
+    tb_close_lich_orders,
     trading_bot_registeration,
     td_set_orders_timeouts,
     set_order_timeout,
