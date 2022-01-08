@@ -14,32 +14,31 @@ async function trade_tut(message,args) {
             title: 'Trade Instructions',
             description: 'For detailed tutorial, check <#919952480266248253>',
             fields: [{
-                name: 'Post order', 
+                name: '__Post order__', 
                 value: 
-                `\`wts volt 140p\`${'\u205F'.repeat(8)}\`wtb volt, loki 200p, arcane energize\`
-                \`wts frost\`${'\u205F'.repeat(15)}Avg Price
-                \`wts frost auto\`${'\u205F'.repeat(6)}Match top price
-                \`wts blind rage maxed\``,
+`\`wts volt 140p\`${'\u205F'.repeat(8)}\`wtb volt, loki 200p\`${'\u205F'.repeat(8)}\`wts blind rage maxed\`
+\`wts ghoulsaw\`${'\u205F'.repeat(15)}Avg Price
+\`wts ghoulsaw auto\`${'\u205F'.repeat(6)}Match top price`,
                 inline: true
             },{
-                name: 'Post previous orders',
-                value: '`my orders`',
+                name: '__Open trade__',
+                value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
                 inline: false
             },{
-                name: 'Close orders',
-                value: '`close all`',
-                inline: true
-            },{
                 name: '\u200b',
-                value: '\u200b',
+                value: '<#892843006560981032> commands:',
+                inline: false
+            },{
+                name: 'Quick find trader',
+                value: '`wtb/wts item_name`',
                 inline: true
             },{
-                name: 'Remove orders',
-                value: 'Click \'My Profile\' button below',
+                name: 'User profile',
+                value: '`profile player_name`',
                 inline: true
             },{
-                name: 'Open trade',
-                value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
+                name: 'Top traders',
+                value: '`leaderboard`',
                 inline: true
             }],
             footer: {
