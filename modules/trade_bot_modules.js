@@ -1638,7 +1638,7 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
         return false
     })
     if (!status)
-        return {content: status_msg}
+        return {content: status_msg, ephemeral: true}
     var item_orders = null
     var lich_orders = null
     var status = await db.query(`SELECT * FROM users_orders 
@@ -1668,8 +1668,8 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
         return false
     })
     if (!status)
-        return {content: 'Error occured retrieving db records'}
-    let postdata = {content: ' ', embeds: []}
+        return {content: 'Error occured retrieving db records', ephemeral: true}
+    let postdata = {content: ' ', embeds: [], ephemeral: true}
     var sell_items = []
     var sell_prices = []
     var buy_items = []
