@@ -1588,12 +1588,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     return Promise.resolve()
 }
 
-async function trading_bot_user_orders(message,interaction,args,ingame_name,request_type) {
-    var user_id = 0
-    if (message)
-        user_id = message.author.id
-    else if (interaction)
-        user_id = interaction.user.id
+async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     console.log(ingame_name)
     var user_profile = {}
     var discord_id = ""

@@ -641,7 +641,7 @@ client.on('messageCreate', async message => {
 
             const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
             if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
-                trade_bot_modules.trading_bot_user_orders(message,null,args,message.author.id,1)
+                trade_bot_modules.trading_bot_user_orders(message.author.id,message.author.id,1)
                 .then(res => {
                     message.channel.send(res).catch(err => console.log(err))
                 })
@@ -649,7 +649,7 @@ client.on('messageCreate', async message => {
             }
             else if (args[0] == "user" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile" )) {
                 var ingame_name = args[2]
-                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2)
+                trade_bot_modules.trading_bot_user_orders(message.author.id,ingame_name,2)
                 .then(res => {
                     message.channel.send(res).catch(err => console.log(err))
                 })
@@ -657,7 +657,7 @@ client.on('messageCreate', async message => {
             }
             else if (args[0] == "orders" || args[0] == "order" || args[0] == "profile" ) {
                 var ingame_name = args[1]
-                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2)
+                trade_bot_modules.trading_bot_user_orders(message.author.id,ingame_name,2)
                 .then(res => {
                     message.channel.send(res).catch(err => console.log(err))
                 })
@@ -1793,7 +1793,7 @@ client.on('interactionCreate', async interaction => {
             return
         }
         if (interaction.customId == 'tb_close_orders') {
-            console.log('activate orders clicked')
+            console.log('close orders clicked')
             await trade_bot_modules.tb_user_exist(interaction.user.id)
             .then(() => {
                 trade_bot_modules.tb_user_online(null,interaction)
@@ -1804,7 +1804,21 @@ client.on('interactionCreate', async interaction => {
             }).catch(err => interaction.reply(err).catch(err => console.log(err)))
             return
         }
+        else if (interaction.customId == 'tb_my_profile') {
+            console.log('profile clicked')
+            await trade_bot_modules.tb_user_exist(interaction.user.id)
+            .then(() => {
+                trade_bot_modules.tb_user_online(null,interaction)
+                .then(() => {
+                    trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
+                    .then(res => interaction.reply(res).catch(err => console.log(err)))
+                    .catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+            return
+        }
         else if (interaction.customId == 'tb_verify') {
+            console.log('verify clicked')
             trade_bot_modules.trading_bot_registeration(interaction.user.id)
             .then(res => interaction.reply(res).catch(err => console.log(err)))
             .catch(err => interaction.reply(err).catch(err => console.log(err)))
