@@ -1619,7 +1619,7 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
             })
             .catch (err => {
                 console.log(err)
-                status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500.1`
+                status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500.1 ☠️`
                 return false
             })
             if (status)
@@ -1639,7 +1639,7 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
     })
     .catch (err => {
         console.log(err)
-        status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500`
+        status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500 ☠️`
         return false
     })
     if (!status)
