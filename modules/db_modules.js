@@ -769,9 +769,9 @@ async function getDB(message,args) {
                     return ''
                 if (typeof value == 'object')
                     return JSON.stringify(value)
-                if (key == 'discord_id')
+                if (typeof value == 'bigint')
                     return '\'' + value
-                if (key == 'ingame_name' && value.match('-'))
+                if (value.match('-'))
                     return '\'' + value
                 return value
             } 
