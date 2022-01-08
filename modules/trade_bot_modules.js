@@ -1602,7 +1602,7 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
     .then(async res => {
         if (res.rows.length == 0) {
             status_msg = `⚠️ <@${user_id}> The given user is not registered with the bot. ⚠️`
-            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${ingame_name}`)
+            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = '${ingame_name}'`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
@@ -1619,7 +1619,7 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
             })
             .catch (err => {
                 console.log(err)
-                status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500`
+                status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500.1`
                 return false
             })
             if (status)
