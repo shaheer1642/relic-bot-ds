@@ -768,7 +768,7 @@ async function getDB(message,args) {
                 if (value === null)
                     return ''
                 if (typeof value == 'object')
-                    return JSON.stringify(value)
+                    return value
                 if (typeof value == 'bigint')
                     return '\'' + value
                 if (typeof value == 'string')
