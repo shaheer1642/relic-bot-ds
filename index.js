@@ -255,6 +255,8 @@ client.on('messageCreate', async message => {
             })
             .catch(err => {
                 message.author.send(err).catch(err => console.log(err))
+                message.channel.send(`🛑 <@message.author.id> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
                 return false
             })
             if (!status)
