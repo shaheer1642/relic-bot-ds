@@ -666,6 +666,8 @@ async function trading_bot(message,args,command) {
 }
 
 async function trading_bot_orders_update(originMessage,item_id,item_url,item_name,update_type,item_rank = 'unranked') {
+    // update_type=1 means create order if doesn't exist
+
     var embeds = []
     var noOfSellers = 0
     var noOfBuyers = 0

@@ -2326,7 +2326,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                        trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank)
+                        trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank)
                         .catch(err => {
                             console.log(err)
                         })
@@ -2370,7 +2370,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (!all_orders[order_rank]) {
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank)
+                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank)
                     return Promise.resolve()
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
@@ -2400,7 +2400,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     console.log('that trader does not exist in db check #2')
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank)
+                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank)
                     return Promise.resolve()
                 }
                 console.log('exact trader found')
