@@ -243,16 +243,23 @@ client.on('messageCreate', async message => {
             }
         }
         if (tradingBotChannels.includes(message.channelId)) {
-            if (!message.member.presence) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return Promise.resolve()
-            }
-            if (message.member.presence.status == `offline`) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return Promise.resolve()
-            }
+            var status = await trade_bot_modules.tb_user_exist(message.author.id)
+            .then(res => {
+                var status = trade_bot_modules.tb_user_online(message)
+                .catch(err => {
+                    return false
+                })
+                if (!status)
+                    return false
+                return true
+            })
+            .catch(err => {
+                message.author.send(err).catch(err => console.log(err))
+                return false
+            })
+            if (!status)
+                return
+                
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             const command = args.shift()
     
@@ -350,91 +357,7 @@ client.on('messageCreate', async message => {
                 }
             }
             else if (command=='close' && (args[0]=='all')) {
-                var user_data = null
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
-                .then(res => {
-                    if (res.rows.length==0) {
-                        message.channel.send({content: "⚠️ Your in-game name is not registered with the bot. Please check your dms ⚠️"}).catch(err => console.log(err))
-                        message.author.send({content: "Type the following command to register your ign:\nverify ign"})
-                        .catch(err => {
-                            message.channel.send({content: "🛑 Some error occured sending dm. Please make sure you have dms enabled for the bot 🛑"}).catch(err => console.log(err))
-                            console.log(err)
-                        })
-                        return false
-                    }
-                    user_data = res.rows[0]
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                    return
-                }
-                var orders_list = []
-                var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${message.author.id} AND visibility = true`)
-                .then(res => {
-                    if (res.rows.length == 0) {     //no visible orders at the time
-                        console.log('No visible orders at the time')
-                        return false
-                    }
-                    if (res.rows.length > 0) {     //visible orders found
-                        orders_list = res.rows
-                        return true
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                    return
-                }
-                var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${message.author.id} AND visibility = true`)
-                .then(res => {
-                    if (res.rowCount == 0)
-                        return false
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                    return
-                }
-                for (var i=0;i<orders_list.length;i++) {
-                    var item_id = orders_list[i].item_id
-                    console.log(item_id)
-                    var item_url = ''
-                    var item_name = ''
-                    var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-                    .then(res => {
-                        if (res.rows.length==0) { //unexpected response 
-                            console.log('Unexpected db response fetching item info')
-                            return false
-                        }
-                        if (res.rows.length>1) { //unexpected response
-                            console.log('Unexpected db response fetching item info')
-                            return false
-                        }
-                        item_url = res.rows[0].item_url
-                        item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status)
-                        return Promise.resolve()
-                    await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
-                }
-                setTimeout(() => message.delete().catch(err => console.log(err)), 500)
+                trade_bot_modules.tb_close_orders(message).catch(err => console.log(err))
                 return
             }
             else {

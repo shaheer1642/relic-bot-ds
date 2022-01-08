@@ -2770,6 +2770,83 @@ async function tb_activate_orders(message, interaction) {
         message.delete().catch(err => console.log(err))
 }
 
+async function tb_close_orders(message, interaction) {
+    var user_id = 0
+    if (message)
+        user_id = message.author.id
+    else if (interaction)
+        user_id = interaction.user.id
+    else 
+        return
+    var user_data = null
+    var orders_list = []
+    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${user_id} AND visibility = true`)
+    .then(res => {
+        if (res.rows.length == 0) {     //no visible orders at the time
+            console.log('No visible orders at the time')
+            return false
+        }
+        if (res.rows.length > 0) {     //visible orders found
+            orders_list = res.rows
+            return true
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        if (message)
+            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+        return
+    }
+    var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${user_id} AND visibility = true`)
+    .then(res => {
+        if (res.rowCount == 0)
+            return false
+        return true
+    })
+    .catch(err => {
+        console.log(err)
+        return false
+    })
+    if (!status) {
+        if (message)
+            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+        return
+    }
+    for (var i=0;i<orders_list.length;i++) {
+        var item_id = orders_list[i].item_id
+        console.log(item_id)
+        var item_url = ''
+        var item_name = ''
+        var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+        .then(res => {
+            if (res.rows.length==0) { //unexpected response 
+                console.log('Unexpected db response fetching item info')
+                return false
+            }
+            if (res.rows.length>1) { //unexpected response
+                console.log('Unexpected db response fetching item info')
+                return false
+            }
+            item_url = res.rows[0].item_url
+            item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return Promise.resolve()
+        await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+    }
+    if (message)
+        setTimeout(() => message.delete().catch(err => console.log(err)), 500)
+    return
+}
+
 async function tb_user_exist(discord_id) {
     return new Promise((resolve, reject) => {
         db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
@@ -2826,6 +2903,7 @@ module.exports = {
     trading_bot_user_orders,
     trading_bot_item_orders,
     tb_activate_orders,
+    tb_close_orders,
     trading_bot_registeration,
     td_set_orders_timeouts,
     set_order_timeout,
