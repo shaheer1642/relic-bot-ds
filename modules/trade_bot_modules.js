@@ -2232,7 +2232,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
 
 async function trading_bot_registeration(discord_id) {
     return new Promise((resolve, reject) => {
-        var postdata = {content: ' ', embeds: []}
+        var postdata = {content: ' ', embeds: [], ephemeral: true}
         db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`).then(res => {
             if (res.rows.length != 0)
                 postdata.content += 'Note: Your ign has already been verified. It will be updated upon re-verification\n'
@@ -2780,7 +2780,7 @@ async function tb_user_exist(discord_id) {
             resolve('user exists')
         })
         .catch(err => {
-            reject({content: `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`, embeds: []})
+            reject({content: `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`, embeds: [], ephemeral: true})
         })
     })
 }
