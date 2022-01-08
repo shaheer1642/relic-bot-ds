@@ -767,6 +767,8 @@ async function getDB(message,args) {
             function replacer(key, value) {
                 if (value === null)
                     return ''
+                if (typeof value == 'object')
+                    return JSON.stringify(value)
                 if (key == 'discord_id')
                     return '\'' + value
                 if (key == 'ingame_name' && value.match('-'))
