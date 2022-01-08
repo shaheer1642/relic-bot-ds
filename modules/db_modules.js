@@ -772,7 +772,7 @@ async function getDB(message,args) {
                 if (typeof value == 'bigint')
                     return '\'' + value
                 if (typeof value == 'string')
-                    if (value.match('-') || value.match('\\'))
+                    if (value.match('-') || value.match(/\\/))
                         return '\'' + value
                 return value
             } 
