@@ -1766,6 +1766,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
+                        reaction.message.delete().catch(err => console.log(err))
                         return false
                     }
                     check_msg_id = res.rows[0].message_id
@@ -2065,6 +2066,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
+                        reaction.message.delete().catch(err => console.log(err))
                         return false
                     }
                     check_msg_id = res.rows[0].message_id
