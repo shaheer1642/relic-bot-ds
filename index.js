@@ -905,7 +905,7 @@ client.on('interactionCreate', async interaction => {
             if (!status)
                 return
             all_orders.forEach(async e => {
-                await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2,e.user_rank).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}`))
+                await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2,e.user_rank).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}` + err))
             })
         }
         trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
@@ -996,7 +996,7 @@ client.on('interactionCreate', async interaction => {
             if (!status)
                 continue
             all_orders.forEach(async e => {
-                await trade_bot_modules.trading_lich_orders_update(null,lich_info,2).then(res => console.log(`Updated orders for ${lich_info.weapon_url}`)).catch(err => console.log(`Error updating orders for ${lich_info.weapon_url}`))
+                await trade_bot_modules.trading_lich_orders_update(null,lich_info,2).then(res => console.log(`Updated orders for ${lich_info.weapon_url}`)).catch(err => console.log(`Error updating orders for ${lich_info.weapon_url}` + err))
             })
         }
         trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
@@ -1669,7 +1669,7 @@ client.on('messageDelete', async message => {
             })
             if (!status)
                 return Promise.resolve()
-            await trade_bot_modules.trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
+            trade_bot_modules.trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
         }
     }
     return Promise.resolve()
@@ -1777,7 +1777,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    return
                 }
                 console.log('break test')
                 var status = await db.query(`
@@ -1790,10 +1791,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                        trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank)
-                        .catch(err => {
-                            console.log(err)
-                        })
                         return false
                     }
                     else {
@@ -1808,7 +1805,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    return
                 }
                 console.log('message id found')
                 var color = ''
@@ -1834,8 +1832,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (!all_orders[order_rank]) {
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    return
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
                 trader.discord_id = all_orders[order_rank].discord_id
@@ -1864,8 +1862,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     console.log('that trader does not exist in db check #2')
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    return
                 }
                 console.log('exact trader found')
                 //----------------
@@ -2078,6 +2076,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    trade_bot_modules.trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
                     return Promise.resolve()
                 }
 
@@ -2105,7 +2104,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    return
                 }
                 console.log('message id found')
                 var color = ''
@@ -2125,13 +2125,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log(order_rank)
                 if (order_rank == -1) {
                     console.log('that trader does not exist in db check #1')
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    return
                 }
                 if (!all_orders[order_rank]) {
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    return
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
                 trader.discord_id = all_orders[order_rank].discord_id
@@ -2147,7 +2148,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     console.log('that trader does not exist in db check #2')
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    return
                 }
                 console.log('exact trader found')
                 //----------------
@@ -2374,11 +2376,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     .then(res => {
                         if (res.rows.length == 0) {
                             reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
-                            var args = []
-                            var tempp = reaction.message.embeds[0].fields[0].name.replace('Buyers','wts').replace('Sellers','wtb')
-                            args.push(tempp)
-                            args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                            trade_bot_modules.trading_bot_item_orders(reaction.message,args,2)
                             return false
                         }
                         check_msg_id = res.rows[0].message_id
@@ -2390,7 +2387,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     })
                     if (!status) {
                         setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                        return Promise.resolve()
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        return
                     }
                     var status = await db.query(`
                     SELECT * FROM lich_messages_ids
@@ -2416,7 +2420,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     })
                     if (!status) {
                         setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                        return Promise.resolve()
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        return
                     }
                     console.log('message id found')
                     var color = ''
@@ -2442,7 +2453,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     if (!all_orders[order_rank]) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                         setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                        return Promise.resolve()
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        return
                     }
                     trader.ingame_name = all_orders[order_rank].ingame_name
                     trader.discord_id = all_orders[order_rank].discord_id
@@ -2454,17 +2472,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     if (!match_trade) {
                         console.log('that trader does not exist in db check #2')
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                        var args = []
-                        var tempp = all_orders[order_rank].order_type
-                        if (tempp == 'wts')
-                            tempp = 'wtb'
-                        else 
-                            tempp = 'wts'
-                        args.push(tempp)
-                        args.push(all_orders[order_rank].weapon_url)
-                        trade_bot_modules.trading_bot_item_orders(reaction.message,args,2)
                         setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                        return Promise.resolve()
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        return
                     }
                     console.log('exact trader found')
                     //----------------
@@ -2500,7 +2516,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         tempp = 'wts'
                     args.push(tempp)
                     args.push(all_orders[order_rank].weapon_url)
-                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2)
+                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
                     await reaction.message.channel.threads.create({
                         name: threadName,
                         autoArchiveDuration: 60,
@@ -2653,13 +2669,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).catch(err => console.log(err));
-                        var args = []
-                        var tempp = reaction.message.embeds[0].fields[0].name.replace('Buyers','wts').replace('Sellers','wtb')
-                        args.push(tempp)
-                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        if (item_rank == 'maxed')
-                            args.push(item_rank)
-                        trade_bot_modules.trading_bot_item_orders(reaction.message,args,2)
                         return false
                     }
                     check_msg_id = res.rows[0].message_id
@@ -2671,7 +2680,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    var args = []
+                    if (order_type == 'wts')
+                        args.push('wtb')
+                    else 
+                        args.push('wtb')
+                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                    if (item_rank == 'maxed')
+                        args.push(item_rank)
+                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    return
                 }
                 console.log('break test')
                 var status = await db.query(`
@@ -2698,6 +2716,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 })
                 if (!status) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    var args = []
+                    if (order_type == 'wts')
+                        args.push('wtb')
+                    else 
+                        args.push('wtb')
+                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                    if (item_rank == 'maxed')
+                        args.push(item_rank)
+                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
                     return Promise.resolve()
                 }
                 console.log('message id found')
@@ -2719,12 +2746,30 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (order_rank == -1) {
                     console.log('that trader does not exist in db check #1')
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    var args = []
+                    if (order_type == 'wts')
+                        args.push('wtb')
+                    else 
+                        args.push('wtb')
+                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                    if (item_rank == 'maxed')
+                        args.push(item_rank)
+                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    return
                 }
                 if (!all_orders[order_rank]) {
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    var args = []
+                    if (order_type == 'wts')
+                        args.push('wtb')
+                    else 
+                        args.push('wtb')
+                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                    if (item_rank == 'maxed')
+                        args.push(item_rank)
+                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    return
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
                 trader.discord_id = all_orders[order_rank].discord_id
@@ -2752,19 +2797,17 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 if (!match_trade) {
                     console.log('that trader does not exist in db check #2')
                     reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     var args = []
-                    var tempp = all_orders[order_rank].order_type
-                    if (tempp == 'wts')
-                        tempp = 'wtb'
+                    if (order_type == 'wts')
+                        args.push('wtb')
                     else 
-                        tempp = 'wts'
-                    args.push(tempp)
-                    args.push(all_orders[order_rank].item_url)
+                        args.push('wtb')
+                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                     if (item_rank == 'maxed')
                         args.push(item_rank)
-                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2)
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    return
                 }
                 console.log('exact trader found')
                 //----------------
@@ -2794,15 +2837,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 trade_bot_modules.trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
                 var args = []
                 var tempp = all_orders[order_rank].order_type
-                if (tempp == 'wts')
-                    tempp = 'wtb'
+                if (order_type == 'wts')
+                    args.push('wtb')
                 else 
-                    tempp = 'wts'
-                args.push(tempp)
-                args.push(all_orders[order_rank].item_url)
+                    args.push('wts')
+                args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                 if (item_rank == 'maxed')
                     args.push(item_rank)
-                trade_bot_modules.trading_bot_item_orders(reaction.message,args,2)
+                trade_bot_modules.trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
                 const thread = await reaction.message.channel.threads.create({
                     name: threadName,
                     autoArchiveDuration: 60,
