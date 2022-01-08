@@ -742,11 +742,11 @@ async function getDB(message,args) {
                     name: 'users_list.csv'
                 },
                 {
-                    attachment: Buffer.from(users_orders),
+                    attachment: Buffer.from(users_orders, 'utf8'),
                     name: 'users_orders.csv'
                 },
                 {
-                    attachment: Buffer.from(filled_users_orders),
+                    attachment: Buffer.from(filled_users_orders, 'utf8'),
                     name: 'filled_users_orders.csv'
                 },
             ]
