@@ -27,7 +27,8 @@ const userOrderLimit = 50
 const filledOrdersLimit = 500
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
 //const tradingBotChannels = ["892108718358007820"]
-const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
+//const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
+const tradingBotLichChannels = ["906555131254956042"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {
@@ -57,8 +58,8 @@ const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
 client.on('ready', () => {
-    if (process.env.DEBUG_MODE == 1)
-        test_modules.riven_tut()
+    //if (process.env.DEBUG_MODE == 1)
+    //    test_modules.riven_tut()
 
     console.log(`Bot has started.`)
     inform_dc(`Bot has started.`)
@@ -369,103 +370,31 @@ client.on('messageCreate', async message => {
             continue
         }
         if (tradingBotLichChannels.includes(message.channelId)) {
-            if (!message.member.presence) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return Promise.resolve()
-            }
-            if (message.member.presence.status == `offline`) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return Promise.resolve()
-            }
+            var status = await trade_bot_modules.tb_user_exist(message.author.id)
+            .then(async res => {
+                var status = await trade_bot_modules.tb_user_online(message)
+                .catch(err => {
+                    return false
+                })
+                if (!status)
+                    return false
+                return true
+            })
+            .catch(err => {
+                message.author.send(err).catch(err => console.log(err))
+                message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                return false
+            })
+            if (!status)
+                return
+
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             const command = args.shift()
     
             if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-                //continue
-                var user_orders = []
-                var status_msg = ''
-                var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id=${message.author.id}`)
-                .then(res => {
-                    if (res.rows.length==0) {
-                        status_msg = `❕ <@${message.author.id}> No lich orders found on your profile. ❕`
-                        return false
-                    }
-                    user_orders = res.rows
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    status_msg = `☠️ Error fetching your lich orders from db. Please contact MrSofty#7926\nError code: 500 ☠️`
-                    return false
-                })
-                if (!status) {
-                    message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return Promise.resolve()
-                }
-                //set all orders as visible for this user
-                var status = await db.query(`UPDATE users_lich_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${message.author.id}`)
-                .then(res => {
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return Promise.resolve()
-                }
-                for (var i=0;i<user_orders.length;i++) {
-                    var lich_info = []
-                    var status = await db.query(`SELECT * FROM lich_list WHERE lich_id='${user_orders[i].lich_id}'`)
-                    .then(res => {
-                        if (res.rows.length==0)
-                            return false
-                        if (res.rows.length>1) {
-                            console.log(res.rows)
-                            return false
-                        }
-                        lich_info = res.rows[0]
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status) {
-                        message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                        return Promise.resolve()
-                    }
-                    console.log(`updating lich order ${lich_info.weapon_url} for ${message.author.username}`)
-                    await trade_bot_modules.trading_lich_orders_update(null,lich_info, 1)
-                    .then(async () => {
-                        await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${message.author.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
-                        .then(async res => {
-                            if (res.rows.length == 0)
-                                return false 
-                            var user_order = res.rows
-                            var currTime = new Date().getTime()
-                            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
-                            console.log(after3h - currTime)
-                            await trade_bot_modules.set_order_timeout(user_order[0],after3h,currTime,true,lich_info).catch(err => console.log(err))
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                        return
-                    })
-                    .catch(err => {
-                        console.log(`Error occured midway of updating lich orders in my orders command\n` + err)
-                        return Promise.resolve()
-                    })
-                }
-                message.delete().catch(err => console.log(err))
-                return Promise.resolve()
+                trade_bot_modules.tb_activate_lich_orders(message).catch(err => console.log(err))
+                return
             }
             else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
                 if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
@@ -1409,6 +1338,18 @@ client.on('interactionCreate', async interaction => {
                 .then(() => {
                     interaction.deferUpdate().catch(err => console.log(err))
                     trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+            return
+        }
+        if (interaction.customId == 'tb_actv_lich_orders') {
+            console.log('activate lich orders clicked')
+            await trade_bot_modules.tb_user_exist(interaction.user.id)
+            .then(() => {
+                trade_bot_modules.tb_user_online(null,interaction)
+                .then(() => {
+                    interaction.deferUpdate().catch(err => console.log(err))
+                    trade_bot_modules.tb_activate_lich_orders(null, interaction).catch(err => console.log(err))
                 }).catch(err => console.log(err))
             }).catch(err => interaction.reply(err).catch(err => console.log(err)))
             return
