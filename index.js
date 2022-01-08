@@ -1851,6 +1851,12 @@ client.on('interactionCreate', async interaction => {
             }).catch(err => interaction.reply(err).catch(err => console.log(err)))
             return
         }
+        else if (interaction.customId == 'tb_verify') {
+            trade_bot_modules.trading_bot_registeration(interaction.user.id)
+            .then(res => interaction.reply(res).catch(err => console.log(err)))
+            .catch(err => interaction.reply(err).catch(err => console.log(err)))
+            return
+        }
         return
     }
 
