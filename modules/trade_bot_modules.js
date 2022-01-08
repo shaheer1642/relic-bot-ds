@@ -2770,10 +2770,10 @@ async function tb_activate_orders(message, interaction) {
 
 async function tb_user_exist(discord_id) {
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+        db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
         .then(async res => {
             if (res.rowCount==0) {
-                await trading_bot_registeration
+                await trading_bot_registeration(discord_id)
                 .then(res => reject(res))
                 .catch(err => reject(res))
             }
