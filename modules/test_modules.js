@@ -242,9 +242,17 @@ async function riven_tut(message,args) {
         client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
         return
     }
-
-    client.channels.cache.get('892003731523113063').send(postdata).catch(err => console.log(err))
-    client.channels.cache.get('929499295751737455').send(postdata).catch(err => console.log(err))
+    
+    client.channels.cache.get('892003731523113063').messages.fetch('929501491356639292')
+    .then(msg => {
+        msg.edit(postdata).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
+    client.channels.cache.get('929499295751737455').messages.fetch('929501491310510120')
+    .then(msg => {
+        msg.edit(postdata).catch(err => console.log(err))
+    })
+    .catch(err => console.log(err))
 }
 
 async function ducat_template(message) {
