@@ -16,7 +16,7 @@ async function trade_tut(message,args) {
             fields: [{
                 name: '__Post order__', 
                 value: 
-`\`wts volt 140p\`${'\u205F'.repeat(8)}\`wtb volt, loki 200p\`${'\u205F'.repeat(8)}\`wts blind rage maxed\`
+`\`wts volt 140p\`${'\u205F'.repeat(9)}\`wtb volt, loki 200p\`${'\u205F'.repeat(9)}\`wts blind rage maxed\`
 \`wts ghoulsaw\`${'\u205F'.repeat(15)}Avg Price
 \`wts ghoulsaw auto\`${'\u205F'.repeat(6)}Match top price`,
                 inline: true
