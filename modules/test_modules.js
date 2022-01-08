@@ -42,6 +42,9 @@ async function trade_tut(message,args) {
                 value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
                 inline: true
             }],
+            footer: {
+                text: 'Your orders will auto-close in 3 hours, or when you go offline on Discord'
+            },
             color: "FFFFFF"
         }],
         components: [
