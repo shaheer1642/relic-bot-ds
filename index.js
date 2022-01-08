@@ -183,8 +183,8 @@ client.on('messageCreate', async message => {
             const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
             if ((args[0] && args[1]) && ((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
                 trade_bot_modules.trading_bot_registeration(message.author.id)
-                .then(res => message.channel.send(res))
-                .catch(err => message.channel.send(err))
+                .then(res => message.channel.send(res).catch(err => console.log(err)))
+                .catch(err => message.channel.send(err).catch(err => console.log(err)))
                 continue
             }
             else if (args[0].toLowerCase() == 'notifications' || args[0].toLowerCase() == 'notification') {
