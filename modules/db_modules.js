@@ -684,7 +684,7 @@ async function getDB(message,args) {
             if (res.rows.length == 0)
                 return false
             
-            users_list = getCsv(res.rowCount)
+            users_list = getCsv(res.rows)
             return true
         })
         .catch(err => {
@@ -759,6 +759,7 @@ async function getDB(message,args) {
             console.log(err)
             message.channel.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
         })
+
         function getCsv(items) {
             const header = Object.keys(items[0])
             const csv = [
