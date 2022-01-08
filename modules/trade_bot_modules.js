@@ -2854,7 +2854,7 @@ async function tb_activate_lich_orders(message, interaction) {
             return
         }
         console.log(`updating lich order ${lich_info.weapon_url} for ${user_id}`)
-        await trade_bot_modules.trading_lich_orders_update(null,lich_info, 1)
+        await trading_lich_orders_update(null,lich_info, 1)
         .then(async () => {
             await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${user_id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
             .then(async res => {
@@ -2864,7 +2864,7 @@ async function tb_activate_lich_orders(message, interaction) {
                 var currTime = new Date().getTime()
                 var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
                 console.log(after3h - currTime)
-                await trade_bot_modules.set_order_timeout(user_order[0],after3h,currTime,true,lich_info).catch(err => console.log(err))
+                await set_order_timeout(user_order[0],after3h,currTime,true,lich_info).catch(err => console.log(err))
             })
             .catch(err => {
                 console.log(err)
