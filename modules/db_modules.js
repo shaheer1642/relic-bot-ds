@@ -679,11 +679,12 @@ async function getDB(message,args) {
             message.channel.send(`Some error occured compiling 'items_list'. Please contact MrSofty#7926`).catch(err => console.log(err))
             return
         }
-        var status = await db.query(`SELECT * FROM users_list`)
+        var status = await db.query(`select discord_id,ingame_name,notify_order,notify_remove,notify_offline,is_staff,is_admin,plat_spent,plat_gained from users_list`)
         .then(res => {
             if (res.rows.length == 0)
                 return false
-            users_list = res.rows
+            
+            users_list = getCsv(res.rowCount)
             return true
         })
         .catch(err => {
@@ -730,7 +731,7 @@ async function getDB(message,args) {
             return
         }
         var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
-        var buffer_users_list = Buffer.from(JSON.stringify(users_list), 'utf8');
+        var buffer_users_list = Buffer.from(users_list, 'utf8');
         var buffer_users_orders = Buffer.from(JSON.stringify(users_orders), 'utf8');
         var buffer_filled_users_orders = Buffer.from(JSON.stringify(filled_users_orders), 'utf8');
         message.channel.send({
@@ -742,7 +743,7 @@ async function getDB(message,args) {
                 },
                 {
                     attachment: buffer_users_list,
-                    name: 'users_list.json'
+                    name: 'users_list.csv'
                 },
                 {
                     attachment: buffer_users_orders,
@@ -758,6 +759,24 @@ async function getDB(message,args) {
             console.log(err)
             message.channel.send('Some error occured sending message. Please contact MrSofty#7926').catch(err => console.log(err))
         })
+        function getCsv(items) {
+            const header = Object.keys(items[0])
+            const csv = [
+            header.join(','), // header row first
+            ...items.map(row => header.map(fieldName => replacer(fieldName, row[fieldName])).join(','))
+            ].join('\r\n')
+            return csv
+
+            function replacer(key, value) {
+                if (value === null)
+                    return ''
+                if (key == 'discord_id')
+                    return '\'' + value
+                if (key == 'ingame_name' && value.match('-'))
+                    return '\'' + value
+                return value
+            } 
+        }
     }
     else {
         message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`).catch(err => console.log(err))
