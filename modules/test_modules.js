@@ -103,26 +103,82 @@ async function trade_tut(message,args) {
 }
 
 async function lich_tut(message,args) {
+    if (message)
+        if (message.author.id != '253525146923433984') {
+            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
+            return
+        }
+
     var postdata = {
         content: " ",
         embeds: [{
-            description: 
-`
-Posting new lich
-**/lich**
-
-Editing existing lich
-(under dev.)
-
-Posting existing orders
-**my orders**
-
-Close all orders
-**close all**
-`,
+            title: 'Lich Trading Instructions',
+            description: 'For detailed tutorial, check <#919952480266248253>',
+            fields: [{
+                name: '__Post order__', 
+                value: 'Use the command `/lich`',
+                inline: true
+            },{
+                name: '\u200b',
+                value: '\u200b',
+                inline: true
+            },{
+                name: '__Open trade__',
+                value: 'React with emotes like <:sell_1st:897556451533402132> <:buy_3rd:897556454842716160> ',
+                inline: true
+            },{
+                name: '\u200b',
+                value: '<#892843006560981032> commands:',
+                inline: false
+            },{
+                name: 'Quick find trader',
+                value: '`wtb/wts weapon_name`',
+                inline: true
+            }],
+            footer: {
+                text: 'Your orders will auto-close in 3 hours, or when you go offline on Discord'
+            },
             color: "FFFFFF"
-        }]
+        }],
+        components: [
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: "Verify",
+                        style: 1,
+                        custom_id: "tb_verify"
+                    },
+                    {
+                        type: 2,
+                        label: "Profile",
+                        style: 2,
+                        custom_id: "tb_my_profile"
+                    },
+                    {
+                        type: 2,
+                        label: "Activate Orders",
+                        style: 3,
+                        custom_id: "tb_actv_lich_orders"
+                    },
+                    {
+                        type: 2,
+                        label: "Close Orders",
+                        style: 4,
+                        custom_id: "tb_close_lich_orders"
+                    }
+                ]
+    
+            }
+        ]
     }
+    
+    if (process.env.DEBUG_MODE == 1) {
+        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
+        return
+    }
+
     client.channels.cache.get('892003772698611723').messages.fetch('914453068978978842')
     .then(msg => {
         msg.edit(postdata).catch(err => console.log(err))
@@ -133,6 +189,62 @@ Close all orders
         msg.edit(postdata).catch(err => console.log(err))
     })
     .catch(err => console.log(err))
+}
+
+async function riven_tut(message,args) {
+    if (message)
+        if (message.author.id != '253525146923433984') {
+            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
+            return
+        }
+
+    var postdata = {
+        content: " ",
+        embeds: [{
+            title: 'Riven Trading Instructions',
+            description: '(This channel is under dev.)'
+        }],
+        components: [
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: "Verify",
+                        style: 1,
+                        custom_id: "tb_verify"
+                    },
+                    {
+                        type: 2,
+                        label: "Profile",
+                        style: 2,
+                        custom_id: "tb_my_profile"
+                    },
+                    {
+                        type: 2,
+                        label: "Activate Orders",
+                        style: 3,
+                        custom_id: "tb_actv_riven_orders"
+                    },
+                    {
+                        type: 2,
+                        label: "Close Orders",
+                        style: 4,
+                        custom_id: "tb_close_riven_orders"
+                    }
+                ]
+    
+            }
+        ]
+    }
+    
+    if (process.env.DEBUG_MODE == 1) {
+        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
+        return
+    }
+
+    client.channels.cache.get('892003731523113063').send(postdata).catch(err => console.log(err))
+    client.channels.cache.get('929499295751737455').send(postdata).catch(err => console.log(err))
 }
 
 async function ducat_template(message) {
@@ -552,6 +664,7 @@ async function baroArrival(message,args) {
 module.exports = {
     trade_tut,
     lich_tut,
+    riven_tut,
     ducat_template,
     getMessage,
     launchNuke,

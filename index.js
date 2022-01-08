@@ -57,8 +57,8 @@ const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
 client.on('ready', () => {
-    if (process.env.DEBUG_MODE)
-        test_modules.trade_tut()
+    if (process.env.DEBUG_MODE == 1)
+        test_modules.riven_tut()
 
     console.log(`Bot has started.`)
     inform_dc(`Bot has started.`)
@@ -747,11 +747,10 @@ client.on('messageCreate', async message => {
                 case 'baro':
                     test_modules.baroArrival(message,args)
                     break
-                case 'trade_tut':
+                case 'tb_tut':
                     test_modules.trade_tut(message,args)
-                    break
-                case 'lich_tut':
                     test_modules.lich_tut(message,args)
+                    test_modules.riven_tut(message,args)
                     break
                 case 'ducat_template':
                     test_modules.ducat_template(message)
