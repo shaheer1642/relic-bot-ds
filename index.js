@@ -620,32 +620,36 @@ client.on('messageCreate', async message => {
             continue
         }
         if (tradingBotSpamChannels.includes(message.channelId)) {
-            if (!message.member.presence) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return Promise.resolve()
-            }
-            if (message.member.presence.status == `offline`) {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                return Promise.resolve()
-            }
+            var status = await trade_bot_modules.tb_user_exist(message.author.id)
+            .then(async res => {
+                var status = await trade_bot_modules.tb_user_online(message)
+                .catch(err => {
+                    return false
+                })
+                if (!status)
+                    return false
+                return true
+            })
+            .catch(err => {
+                message.author.send(err).catch(err => console.log(err))
+                message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                return false
+            })
+            if (!status)
+                return
+
             const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
             if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
-                trade_bot_modules.check_user(message)
-                .then(res => {
-                    console.log(res)
-                    trade_bot_modules.trading_bot_user_orders(message,args,res.ingame_name,1).catch(err => console.log(err))
-                })
-                .catch(err => console.log(err))
+                trade_bot_modules.trading_bot_user_orders(message,null,args,res.rows[0].message.author.id,1).catch(err => console.log(err))
             }
             else if (args[0] == "user" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile" )) {
                 var ingame_name = args[2]
-                trade_bot_modules.trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
+                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2).catch(err => console.log(err))
             }
             else if (args[0] == "orders" || args[0] == "order" || args[0] == "profile" ) {
                 var ingame_name = args[1]
-                trade_bot_modules.trading_bot_user_orders(message,args,ingame_name,2).catch(err => console.log(err))
+                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2).catch(err => console.log(err))
             }
             else if (args[0] == "wts" || args[0] == "wtb") {
                 trade_bot_modules.trading_bot_item_orders(message,args).catch(err => console.log(err))

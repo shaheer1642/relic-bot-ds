@@ -1588,7 +1588,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     return Promise.resolve()
 }
 
-async function trading_bot_user_orders(message,args,ingame_name,request_type) {
+async function trading_bot_user_orders(message,interaction,args,ingame_name,request_type) {
     console.log(ingame_name)
     var user_profile = {}
     var discord_id = ""
@@ -1597,6 +1597,28 @@ async function trading_bot_user_orders(message,args,ingame_name,request_type) {
     .then(res => {
         if (res.rows.length == 0) {
             status_msg = `⚠️ <@${message.author.id}> The given user is not registered with the bot. ⚠️`
+            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${ingame_name}`)
+            .then(res => {
+                if (res.rows.length == 0)
+                    return false
+                else if (res.rows.length > 1) {
+                    status_msg = `<@${message.author.id}> More than one search result for that username.`
+                    return false
+                }
+                else {
+                    discord_id = res.rows[0].discord_id
+                    ingame_name = res.rows[0].ingame_name
+                    user_profile = res.rows[0]
+                    return true
+                }
+            })
+            .catch (err => {
+                console.log(err)
+                status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500`
+                return false
+            })
+            if (status)
+                return true
             return false
         }
         else if (res.rows.length > 1) {
