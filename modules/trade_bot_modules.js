@@ -2240,14 +2240,14 @@ async function trading_bot_registeration(discord_id) {
             db.query(`INSERT INTO users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
             .then(res => {
                 postdata.content += 
-                `**Please follow these steps to verify your account:**
-                1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
-                2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
-                3) Write the message body as given below:
-                Subject: **${uni_id}**
-                Message: Hi
-                4) Click 'Send' button
-                5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`
+`**Please follow these steps to verify your account:**
+1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
+2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
+3) Write the message body as given below:
+Subject: **${uni_id}**
+Message: Hi
+4) Click 'Send' button
+5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`
                 postdata.embeds.push({
                     description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
                 })
@@ -2785,6 +2785,25 @@ async function tb_user_exist(discord_id) {
     })
 }
 
+async function tb_user_online(message,interaction) {
+    return new Promise((resolve, reject) => {
+        if (interaction) {
+            if (!interaction.member.presence || interaction.member.presence.status == 'offline') {
+                interaction.reply({content: `⚠️ Your discord status must be online to use the bot. ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                reject('user not online')
+            }
+        }
+        if (message) {
+            if (!message.member.presence || message.member.presence.status == 'offline') {
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
+                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                reject('user not online')
+            }
+        }
+        resolve('user is online')
+    })
+}
+
 function generateId() {
     let ID = "";
     let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -2809,5 +2828,6 @@ module.exports = {
     td_set_orders_timeouts,
     set_order_timeout,
     tb_threadHandler,
-    tb_user_exist
+    tb_user_exist,
+    tb_user_online
 }

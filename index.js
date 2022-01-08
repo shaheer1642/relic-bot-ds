@@ -1841,14 +1841,12 @@ client.on('interactionCreate', async interaction => {
             console.log('activate orders clicked')
             //user exists?
             await trade_bot_modules.tb_user_exist(interaction.user.id)
-            .then(res => {
-                trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
-            })
-            .catch(err => {
-                console.log(err)
-                console.log(JSON.stringify(err))
-                interaction.reply(err).catch(err => console.log(err))
-            })
+            .then(() => {
+                trade_bot_modules.tb_user_online(null,interaction)
+                .then(() => {
+                    trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
             return
         }
         return
