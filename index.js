@@ -641,7 +641,7 @@ client.on('messageCreate', async message => {
 
             const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
             if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
-                trade_bot_modules.trading_bot_user_orders(message,null,args,res.rows[0].message.author.id,1).catch(err => console.log(err))
+                trade_bot_modules.trading_bot_user_orders(message,null,args,message.author.id,1).catch(err => console.log(err))
             }
             else if (args[0] == "user" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile" )) {
                 var ingame_name = args[2]
