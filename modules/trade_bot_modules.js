@@ -1589,6 +1589,11 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
 }
 
 async function trading_bot_user_orders(message,interaction,args,ingame_name,request_type) {
+    var user_id = 0
+    if (message)
+        user_id = message.author.id
+    else if (interaction)
+        user_id = interaction.user.id
     console.log(ingame_name)
     var user_profile = {}
     var discord_id = ""
@@ -1596,13 +1601,13 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
     var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
     .then(async res => {
         if (res.rows.length == 0) {
-            status_msg = `⚠️ <@${message.author.id}> The given user is not registered with the bot. ⚠️`
+            status_msg = `⚠️ <@${user_id}> The given user is not registered with the bot. ⚠️`
             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${ingame_name}`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
                 else if (res.rows.length > 1) {
-                    status_msg = `<@${message.author.id}> More than one search result for that username.`
+                    status_msg = `<@${user_id}> More than one search result for that id.`
                     return false
                 }
                 else {
@@ -1622,7 +1627,7 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
             return false
         }
         else if (res.rows.length > 1) {
-            status_msg = `<@${message.author.id}> More than one search result for that username.`
+            status_msg = `<@${user_id}> More than one search result for that username.`
             return false
         }
         else {
@@ -1637,11 +1642,8 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
         status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500`
         return false
     })
-    if (!status) {
-        message.channel.send({content: status_msg}).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-        return Promise.resolve()
-    }
+    if (!status)
+        return {content: status_msg}
     var item_orders = null
     var lich_orders = null
     var status = await db.query(`SELECT * FROM users_orders 
@@ -1656,10 +1658,8 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
         console.log(err)
         return false
     })
-    if (!status) {
-        message.channel.send(`Sorry error occured retrieving db records`).catch(err => console.log(err))
-        return Promise.resolve()
-    }
+    if (!status)
+        return {content: 'Error occured retrieving db records'}
     var status = await db.query(`SELECT * FROM users_lich_orders 
     JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
     JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
@@ -1672,21 +1672,9 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
         console.log(err)
         return false
     })
-    if (!status) {
-        message.channel.send(`Sorry error occured retrieving db records`).catch(err => console.log(err))
-        return Promise.resolve()
-    }
-    if (item_orders.length == 0 && lich_orders.length == 0) {
-        if (request_type == 1)
-            message.channel.send(`❕ <@${message.author.id}> No orders found on your profile ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-        else if (request_type == 2)
-            message.channel.send(`❕ <@${message.author.id}> No orders found for user ${ingame_name} ❕`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-        return Promise.resolve()
-    }
-    let postdata = {}
-    postdata.content = ' '
-    postdata.embeds = []
+    if (!status)
+        return {content: 'Error occured retrieving db records'}
+    let postdata = {content: ' ', embeds: []}
     var sell_items = []
     var sell_prices = []
     var buy_items = []
@@ -1847,8 +1835,7 @@ async function trading_bot_user_orders(message,interaction,args,ingame_name,requ
         }
         console.log(JSON.stringify(postdata.components))
     }
-    message.channel.send(postdata).catch(err => console.log(err))
-    return Promise.resolve()
+    return postdata
 }
 
 async function trading_bot_item_orders(message,args,request_type = 1) {

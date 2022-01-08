@@ -641,15 +641,27 @@ client.on('messageCreate', async message => {
 
             const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
             if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
-                trade_bot_modules.trading_bot_user_orders(message,null,args,message.author.id,1).catch(err => console.log(err))
+                trade_bot_modules.trading_bot_user_orders(message,null,args,message.author.id,1)
+                .then(res => {
+                    message.channel.send(res).catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
             }
             else if (args[0] == "user" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile" )) {
                 var ingame_name = args[2]
-                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2).catch(err => console.log(err))
+                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2)
+                .then(res => {
+                    message.channel.send(res).catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
             }
             else if (args[0] == "orders" || args[0] == "order" || args[0] == "profile" ) {
                 var ingame_name = args[1]
-                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2).catch(err => console.log(err))
+                trade_bot_modules.trading_bot_user_orders(message,null,args,ingame_name,2)
+                .then(res => {
+                    message.channel.send(res).catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
             }
             else if (args[0] == "wts" || args[0] == "wtb") {
                 trade_bot_modules.trading_bot_item_orders(message,args).catch(err => console.log(err))
