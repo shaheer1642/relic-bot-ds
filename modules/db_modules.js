@@ -769,7 +769,7 @@ async function getDB(message,args) {
                     return ''
                 if (typeof value == 'object')
                     return 'is Object'
-                if (typeof value == 'number' && value > 99999999999)
+                if (Number(value) > 99999999999)
                     return '\'' + value
                 if (typeof value == 'string')
                     if (value.match('-') || value.match(/\\/) || value.match(/\//))
