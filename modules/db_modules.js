@@ -668,7 +668,7 @@ async function getDB(message,args) {
         .then(res => {
             if (res.rows.length == 0)
                 return false
-            items_list = res.rows
+            items_list = getCsv(res.rows)
             return true
         })
         .catch(err => {
@@ -704,7 +704,7 @@ async function getDB(message,args) {
         .then(res => {
             if (res.rows.length == 0)
                 return false
-            users_orders = res.rows
+            users_orders = getCsv(res.rows)
             return true
         })
         .catch(err => {
@@ -719,7 +719,7 @@ async function getDB(message,args) {
         .then(res => {
             if (res.rows.length == 0)
                 return false
-            filled_users_orders = res.rows
+            filled_users_orders = getCsv(res.rows)
             return true
         })
         .catch(err => {
@@ -730,28 +730,24 @@ async function getDB(message,args) {
             message.channel.send(`Some error occured compiling 'filled_users_orders'. Please contact MrSofty#7926`)
             return
         }
-        var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
-        var buffer_users_list = Buffer.from(users_list, 'utf8');
-        var buffer_users_orders = Buffer.from(JSON.stringify(users_orders), 'utf8');
-        var buffer_filled_users_orders = Buffer.from(JSON.stringify(filled_users_orders), 'utf8');
         message.channel.send({
             content: " ", 
             files: [
                 {
-                    attachment: buffer_items_list,
-                    name: 'items_list.json'
+                    attachment: Buffer.from(items_list, 'utf8'),
+                    name: 'items_list.csv'
                 },
                 {
-                    attachment: buffer_users_list,
+                    attachment: Buffer.from(users_list, 'utf8'),
                     name: 'users_list.csv'
                 },
                 {
-                    attachment: buffer_users_orders,
-                    name: 'users_orders.json'
+                    attachment: Buffer.from(users_orders),
+                    name: 'users_orders.csv'
                 },
                 {
-                    attachment: buffer_filled_users_orders,
-                    name: 'filled_users_orders.json'
+                    attachment: Buffer.from(filled_users_orders),
+                    name: 'filled_users_orders.csv'
                 },
             ]
         })
