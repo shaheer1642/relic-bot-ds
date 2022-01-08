@@ -702,12 +702,7 @@ async function getDB(message,args) {
             message.channel.send(`Some error occured compiling 'users_list'. Please contact MrSofty#7926`).catch(err => console.log(err))
             return
         }
-        var status = await db.query(`
-        SELECT * FROM users_orders 
-        JOIN items_list ON users_orders.item_id=items_list.id 
-        JOIN users_list ON users_orders.discord_id=users_list.discord_id 
-        ORDER BY users_orders.visibility DESC
-        `)
+        var status = await db.query(`select * from users_list`)
         .then(res => {
             if (res.rows.length == 0)
                 return false
