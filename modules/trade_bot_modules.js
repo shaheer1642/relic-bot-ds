@@ -2840,7 +2840,7 @@ async function tb_close_orders(message, interaction) {
         })
         if (!status)
             return Promise.resolve()
-        await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+        await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
     }
     if (message)
         setTimeout(() => message.delete().catch(err => console.log(err)), 500)
