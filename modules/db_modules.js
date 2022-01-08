@@ -771,8 +771,9 @@ async function getDB(message,args) {
                     return JSON.stringify(value)
                 if (typeof value == 'bigint')
                     return '\'' + value
-                if (value.match('-') || value.match('\\'))
-                    return '\'' + value
+                if (typeof value == 'string')
+                    if (value.match('-') || value.match('\\'))
+                        return '\'' + value
                 return value
             } 
         }
