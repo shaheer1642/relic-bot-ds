@@ -679,7 +679,14 @@ async function getDB(message,args) {
             message.channel.send(`Some error occured compiling 'items_list'. Please contact MrSofty#7926`).catch(err => console.log(err))
             return
         }
-        var status = await db.query(`select discord_id,ingame_name,notify_order,notify_remove,notify_offline,is_staff,is_admin,plat_spent,plat_gained from users_list`)
+        var status = await db.query(`
+        SELECT * INTO #TempTable
+        FROM users_list
+        ALTER TABLE #TempTable
+        DROP COLUMN ColumnToDrop
+        /* Get results and drop temp table */
+        SELECT * FROM #TempTable
+        DROP TABLE #TempTable`)
         .then(res => {
             if (res.rows.length == 0)
                 return false
@@ -768,8 +775,8 @@ async function getDB(message,args) {
                 if (value === null)
                     return ''
                 if (typeof value == 'object')
-                    return value
-                if (typeof value == 'bigint')
+                    return ''
+                if (typeof value == 'number' && value > 99999999999)
                     return '\'' + value
                 if (typeof value == 'string')
                     if (value.match('-') || value.match(/\\/))
