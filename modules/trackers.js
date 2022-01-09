@@ -156,7 +156,7 @@ async function teshin_check() {
                             {name: 'Current rotation', value: rotation.type, inline: true},
                             {name: 'Cost', value: steelPath.currentReward.cost + ' Steel Essence', inline: true},
                             {name: 'Full rotation', value: '', inline: false},
-                            {name: 'Expires', value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(res.data.expiry).getTime()/1000)}:f>)`, inline: false}
+                            {name: 'Expires', value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:f>)`, inline: false}
                         ],
                         footer: {
                             text: teshinHints[Math.floor(Math.random() * bountyHints.length)]
