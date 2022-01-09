@@ -114,9 +114,10 @@ async function bounty_check() {
 }
 
 async function teshin_check() {
-    axios('https://api.warframestat.us/pc/steelPath')
-    .then(async res => {
-        const timer = (new Date(res.data.expiry).getTime() - new Date()) + 120000
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
+        const timer = (new Date(steelPath.expiry).getTime() - new Date()) + 120000
         setTimeout(teshin_func, timer)
         console.log('teshin check invokes in ' + msToTime(timer))
     })
@@ -128,15 +129,16 @@ async function teshin_check() {
     async function teshin_func() {
         console.log('teshin_func launched')
 
-        axios('https://api.warframestat.us/pc/steelPath')
-        .then(async res => {
+        axios('http://content.warframe.com/dynamic/worldState.php')
+        .then(async worldstateData => {
+            const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
             //get db teshin_rotation list
             var teshin_rotation = await db.query(`SELECT * FROM teshin_rotation`)
             .then(res => {return res.rows})
             .catch(err => console.log(err))
-
+            
             teshin_rotation.forEach(rotation => {
-                if (rotation.type == res.data.currentReward.name) {
+                if (rotation.type == steelPath.currentReward.name) {
                     postdata = {content: '',embeds: []}
 
                     var list = []
@@ -152,18 +154,18 @@ async function teshin_check() {
                         description: 'The teshin rotation you are tracking has appeared!',
                         fields: [
                             {name: 'Current rotation', value: rotation.type, inline: true},
-                            {name: 'Cost', value: res.data.currentReward.cost + ' Steel Essence', inline: true},
+                            {name: 'Cost', value: steelPath.currentReward.cost + ' Steel Essence', inline: true},
                             {name: 'Full rotation', value: '', inline: false},
-                            {name: 'Expires', value: `<t:${Math.round(new Date(res.data.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(res.data.expiry).getTime()/1000)}:f>)`, inline: false}
+                            {name: 'Expires', value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(res.data.expiry).getTime()/1000)}:f>)`, inline: false}
                         ],
                         footer: {
                             text: teshinHints[Math.floor(Math.random() * bountyHints.length)]
                         },
                         color: '#a83275'
                     })
-
-                    res.data.rotation.forEach(e => {
-                        if (e.name == res.data.currentReward.name)
+                    
+                    steelPath.rotation.forEach(e => {
+                        if (e.name == steelPath.currentReward.name)
                             postdata.embeds[0].fields[2].value += "`" + e.name + "`" + '\n'
                         else
                             postdata.embeds[0].fields[2].value += e.name + '\n'
