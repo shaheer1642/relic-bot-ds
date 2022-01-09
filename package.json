@@ -13,7 +13,8 @@
     "got": "^11.8.3",
     "pg": "^8.7.1",
     "request-promise": "^4.2.6",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "warframe-worldstate-parser": "^2.23.1"
   },
   "engines": {
     "node": "16.x",

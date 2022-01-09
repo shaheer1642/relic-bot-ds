@@ -3,6 +3,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor} = require('./extras.js');
+const WorldState = require('warframe-worldstate-parser');
 
 const bountyHints = [
     'Consider donating to poor softy!',
@@ -17,8 +18,9 @@ const teshinHints = [
 
 async function bounty_check() {
     console.log('bounty check')
-    axios('https://api.warframestat.us/pc/syndicateMissions')
-    .then(async res => {
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then(async worldstateData => {
+        const syndicateMissions = new WorldState(JSON.stringify(worldstateData.data)).syndicateMissions;
         var reset = 0
         //get db bounties list
         var bounties_list = await db.query(`SELECT * FROM bounties_list`)
@@ -39,7 +41,7 @@ async function bounty_check() {
             }
         }
         
-        res.data.forEach(syndicate => {
+        syndicateMissions.forEach(syndicate => {
             if (syndicate.syndicateKey == 'Entrati' || syndicate.syndicateKey == 'Ostrons' || syndicate.syndicateKey == 'Solaris United') {
                 reset = (new Date(syndicate.expiry).getTime() + 120000) - new Date().getTime()
                 syndicate.jobs.forEach(job => {
@@ -81,7 +83,7 @@ async function bounty_check() {
                                     },
                                     color: bountyDB.color
                                 })
-                                client.channels.cache.get('892003813786017822').send(postdata).then(msg => {
+                                client.channels.cache.get('864199722676125757').send(postdata).then(msg => {
                                     console.log(msg.id)
                                     db.query(`UPDATE bounties_list SET msg_id = ${msg.id} WHERE syndicate = '${syndicate.syndicate}' AND type = '${job.type.replaceAll(`'`,`''`)}'`)
                                     .then(res => {
@@ -92,7 +94,7 @@ async function bounty_check() {
                                 }).catch(err => {
                                     console.log(err)
                                     console.log(JSON.stringify(postdata))
-                                    client.channels.cache.get('892003813786017822').send(JSON.stringify(err)).catch(err => console.log(err))
+                                    client.channels.cache.get('864199722676125757').send(JSON.stringify(err)).catch(err => console.log(err))
                                 })
                             }
                         })
