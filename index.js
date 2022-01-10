@@ -3126,7 +3126,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         }
                         else if (reaction.emoji.name == '⚠️' || suspicious) {
                             var status = await db.query(`
-                            UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious? -999:user.id}, suspicious = ${suspicious}
+                            UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious? null:user.id}, suspicious = ${suspicious}
                             WHERE ${q_threadId} = ${reaction.message.channel.id} AND ${q_channelId} = ${reaction.message.channel.parentId}
                             `)
                             .then(res => {
