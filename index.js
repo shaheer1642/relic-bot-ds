@@ -3058,7 +3058,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             var q_threadId = 'cross_thread_id'
                             var q_channelId = 'cross_channel_id'
                         }
-                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0]) {
+                        var suspicious = false
+                        if (q_filledOrderTable == 'filled_users_lich_orders' && order_data.user_price > 1000)
+                            suspicious = true
+                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] && !suspicious) {
                             var status = await db.query(`
                             UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
                             WHERE ${q_threadId} = ${reaction.message.channel.id} AND ${q_channelId} = ${reaction.message.channel.parentId};
@@ -3121,9 +3124,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
                             }
                         }
-                        else if (reaction.emoji.name == '⚠️') {
+                        else if (reaction.emoji.name == '⚠️' || suspicious) {
                             var status = await db.query(`
-                            UPDATE ${q_filledOrderTable} SET reporter_id = ${user.id}
+                            UPDATE ${q_filledOrderTable} SET reporter_id = ${user.id}, suspicious = ${suspicious}
                             WHERE ${q_threadId} = ${reaction.message.channel.id} AND ${q_channelId} = ${reaction.message.channel.parentId}
                             `)
                             .then(res => {
@@ -3772,7 +3775,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             reported_by = `\n**Reported by:** <@${order_data.reporter_id}>`
         if (isLich) {
             var postdata = {}
-            postdata.content = ' '
+            postdata.content = order_data.suspicious ? '🛑 Bot has detected a suspicious trade. Require verification 🛑':' '
             postdata.embeds = [{
                 description: `
                     A lich order has been filled and thread archived
