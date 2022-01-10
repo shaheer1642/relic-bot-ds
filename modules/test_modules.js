@@ -561,6 +561,16 @@ DM the command \`notifications\` to the bot in order to stop receiving any notif
     if (message.author.id != '253525146923433984')
         return
 
+    const edit = 1
+    // editing
+    if (edit) {
+        client.channels.cache.get('919952480266248253').messages.fetch('929919497157103647')
+        .then(msg => {
+            msg.edit(generateContent('qnaFaq')).catch(err => console.log(err))
+        }).catch(err => console.log(err))
+        return
+    }
+
     for (const key in data) {
         // send title
         var status = await message.channel.send(data[key].title)
@@ -613,9 +623,15 @@ DM the command \`notifications\` to the bot in order to stop receiving any notif
 `
 **Q: How to [post an order](${data.postOrder.hyperlink})?**
 A: Use the command \`wts/wtb item_name\` in <#892160436881993758>
-                                                                                    
-**Q: How do I [close all](${data.removeOrder.hyperlink}) my active orders?**
-A: Click the 'close all' button in <#892160436881993758>
+
+**Q: How do I [remove](${data.removeOrder.hyperlink}) an order?**
+A: Click the 'profile' button in <#892160436881993758>
+                                                                            
+**Q: What does 'close all' button do?**
+A: It will close all your currently active orders in that channel
+                                 
+**Q: What does 'activate orders' button do?**
+A: It will re-activate all your profile orders in the respective channel 
 
 **Q: Why can I not sell my item [above average price](${data.importantNotes.hyperlink})?**
 A: The average prices are calculated from WFM on daily basis. If your price exceeds by a decent margin, the order is not allowed to be posted. Try lowering your sell price
