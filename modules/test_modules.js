@@ -1,3 +1,4 @@
+const { post } = require('request-promise');
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 
@@ -380,6 +381,273 @@ async function tbcommandslist(message,args) {
     }).catch(err => console.log(err))
 }
 
+async function tbFullTutorial(message,args) {
+    const data = {
+        postOrder: {
+            name: 'Posting an order',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879493185765406/posting_an_order.png',
+            content: 
+`
+__**General Tradable Items**__
+Use the command \`wts/wtb item_name\` in <#892160436881993758>
+
+With price:                                 \`wts volt 140p\`         
+w/o price (selects avg):         \`wtb volt\`
+Match top price:                       \`wts ghoulsaw auto\`
+Multiple items:                          \`wtb volt, loki 200p\`
+Item rank:                                   \`wts blind rage maxed\`
+
+__**Lich Trading**__
+Use the command \`/lich\` in <#892003772698611723>
+
+__**Riven Trading**__
+(This feature is under dev.)
+`,
+            examples: [
+                'https://cdn.discordapp.com/attachments/912395290701602866/929881903123808286/screen_1.PNG',
+                'https://cdn.discordapp.com/attachments/912395290701602866/929889944732831834/lich_screen_1.PNG',
+                'https://cdn.discordapp.com/attachments/912395290701602866/929889956661436466/lich_screen_2.PNG'
+            ],
+            hyperlink: ''
+        },
+        removeOrder: {
+            name: 'Removing orders',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879493928177754/removing_orders.png',
+            content: 
+`
+Click the Profile button in <#892160436881993758>
+Or type the command \`profile\` in <#892843006560981032>
+
+Then select your orders to remove using the select menu
+`,
+            examples: [
+                'https://cdn.discordapp.com/attachments/912395290701602866/929873983774543942/button_profile.PNG',
+                'https://cdn.discordapp.com/attachments/912395290701602866/929893499430662154/unknown.png'
+            ],
+            hyperlink: ''
+        },
+        openTrade: {
+            name: 'Opening trade',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879495048036443/opening_trade.png',
+            content: 
+`
+React with emotes like <:buy_2nd:897556455098580992> <:sell_5th:897556455371177984> to buy/sell the item
+The emote number should match the trader's rank on the message
+This will open a private channel for you and the trader to start trading
+Note that your chat will be logged, in-case the trade gets reported. Which you can do by clicking the :warning: emote when trade opens. React with <:order_success:894992959177654332> if successful otherwise
+Each trade will last 15m and will be archived afterwards
+You should receive a DM from the bot whenever someone wants to trade you
+`,
+            examples: [
+                'https://cdn.discordapp.com/attachments/912395290701602866/929897441661190144/unknown.png'
+            ],
+            hyperlink: ''
+        },
+        quickFind: {
+            name: 'Quick find trader',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879493693304872/quick_find_trader.png',
+            content: 
+`
+Use the command \`wts/wtb item_name\` in <#892843006560981032>
+
+\`wtb arcane energize\`
+\`wts kuva bramma\`
+
+This will show you a list of traders currently online and offline
+You can then open trade by clicking trader's emote
+`,
+            examples: [
+                'https://cdn.discordapp.com/attachments/912395290701602866/929899669612527616/screen_2.5.png'
+            ],
+            hyperlink: ''
+        },
+        userProfile: {
+            name: 'User profile',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879494150455296/user_profile.png',
+            content: 
+`
+View another user's profile by using the command \`profile player_name\` in <#892843006560981032>
+`,
+            examples: [
+                'https://cdn.discordapp.com/attachments/912395290701602866/929900365044916255/unknown.png'
+            ],
+            hyperlink: ''
+        },
+        leaderboard: {
+            name: 'Leaderboard',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879494838341692/leaderboard.png',
+            content: 
+`
+View top traders using the command \`leaderboard\` in <#892843006560981032>
+`,
+            examples: [
+                'https://cdn.discordapp.com/attachments/912395290701602866/929901452820873246/screen_6.PNG'
+            ],
+            hyperlink: ''
+        },
+        botNotify: {
+            name: 'Bot notifications',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879494427283496/bot_notifications.png',
+            content: 
+`
+__**Trade Open**__
+You should always receive a DM whenever someone wants to trade you
+
+__**Order close**__
+You will receive a DM whenever your order has been auto-closed after 3 hours, or if you are detected offline on Discord (You will not receive on DnD status)
+
+__**Order remove**__
+You will receive a DM if your order was auto-removed by the bot because of a change in average price (You will not receive on DnD status)
+
+__**Notification setting**__
+DM the command \`notifications\` to the bot in order to stop receiving any notification
+`,
+            examples: [
+                'https://cdn.discordapp.com/attachments/912395290701602866/929903650397110333/unknown.png'
+            ],
+            hyperlink: ''
+        },
+        importantNotes: {
+            name: 'Important notes',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879494641213460/important_notes.png',
+            content: {
+                content: ' ',
+                embeds: [{
+                    description: 
+`
+• You cannot trade if you are not verified, click the verify button below
+• If a relevant active seller is found for your given price, a trade will automatically be opened when posting new order
+• You cannot post order for a price greater than 120% or less than 80% of the average item price, and will be removed in-case the average price goes out of range
+• You cannot post sell and buy order for a single item at the same time
+• Your active orders will be auto closed after 3 hours
+• Your orders will immediately be closed if detected offline on Discord
+• You cannot trade if your status is invisible on Discord
+`
+                }],
+                components: [{
+                        type: 1,
+                        components: [
+                            {
+                                type: 2,
+                                label: "Verify",
+                                style: 1,
+                                custom_id: "tb_verify"
+                            }
+                        ]
+
+                }]
+            },
+            examples: [],
+            hyperlink: ''
+        },
+        qnaFaq: {
+            name: 'QnA Faq',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929879493458403418/qna_faq.png',
+            content: '',
+            examples: [],
+            hyperlink: '',
+            generate: true
+        },
+        tutorialCon: {
+            name: 'Tutorial contents',
+            title: 'https://cdn.discordapp.com/attachments/912395290701602866/929912096127324210/tutorial_contents.png',
+            content: '',
+            examples: [],
+            hyperlink: '',
+            generate: true
+        }
+    }
+
+    if (message.author.id != '253525146923433984')
+        return
+
+    for (const key in data) {
+        // send title
+        var status = await message.channel.send(data[key].title)
+        .then(res => {
+            data[key].hyperlink = `https://discord.com/channels/${message.guildId}/${message.channelId}/${res.id}`
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            break
+        // send content
+        if (data[key].generate)
+            data[key].content = generateContent(key)
+        var status = await message.channel.send(data[key].content)
+        .then(res => {
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            break
+        //send examples
+        if (data[key].examples.length > 0) {
+            for (const example of data[key].examples) {
+                var status = await message.channel.send(example)
+                .then(res => {
+                    return true
+                })
+                .catch(err => {
+                    console.log(err)
+                    return false
+                })
+                if (!status)
+                    break
+            }
+        }
+    }
+
+    function generateContent (key) {
+        if (key == "qnaFaq") {
+            return {
+                content: ' ',
+                embeds: [{
+                    description: 
+`
+**Q: How to [post an order](${data.postOrder.hyperlink})?**
+A: Use the command \`wts/wtb item_name\` in <#892160436881993758>
+                                                                                    
+**Q: How do I [close all](${data.removeOrder.hyperlink}) my active orders?**
+A: Click the 'close all' button in <#892160436881993758>
+
+**Q: Why can I not sell my item [above average price](${data.importantNotes.hyperlink})?**
+A: The average prices are calculated from WFM on daily basis. If your price exceeds by a decent margin, the order is not allowed to be posted. Try lowering your sell price
+
+**Q: How do I [contact a seller](${data.openTrade.hyperlink})?**
+A: Please react with the desired seller's emoji number, and then the bot will open a trade chat for you and the trader.
+
+**Q: How does the rating system work?**
+A: Your profile rating is based upon the amount of successful orders you have filled. If you got reported and a morderator doesn't approve of your trade, your rating will go down
+
+**Q: I am facing some issues registering my IGN. Can I get help?**
+A: Please directly contact <@253525146923433984>
+`,
+                    color: '#fcd303'
+                }]
+            }
+        }
+        if (key == 'tutorialCon') {
+            var toc = {content: ' ', embeds: [{description: '', color: '#fcd303'}]}
+            for (const key in data) {
+                if (data[key].content != '') {
+                    toc.embeds[0].description += `**[${data[key].name}](${data[key].hyperlink})**\n`
+                }
+            }
+            return toc
+        }
+    }
+
+    message.channel.send('finished.')
+    console.log(data)
+}
+
 function posttbcommandtut(message,args) {
     if (message.author.id != '253525146923433984')
         return
@@ -682,6 +950,7 @@ module.exports = {
     sendMessage,
     qnaFaq,
     tbcommandslist,
+    tbFullTutorial,
     posttbcommandtut,
     sendUet,
     baroArrival
