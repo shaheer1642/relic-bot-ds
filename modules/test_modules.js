@@ -564,6 +564,22 @@ DM the command \`notifications\` to the bot in order to stop receiving any notif
     const edit = 1
     // editing
     if (edit) {
+        //hyperlink set
+        const set = {
+            postOrder: 'https://discord.com/channels/865904902941048862/919952480266248253/929919375216095233',
+            removeOrder: 'https://discord.com/channels/865904902941048862/919952480266248253/929919399303970816',
+            openTrade: 'https://discord.com/channels/865904902941048862/919952480266248253/929919402684592148',
+            quickFind: 'https://discord.com/channels/865904902941048862/919952480266248253/929919425182847036',
+            userProfile: 'https://discord.com/channels/865904902941048862/919952480266248253/929919446976434197',
+            leaderboard: 'https://discord.com/channels/865904902941048862/919952480266248253/929919449702731837',
+            botNotify: 'https://discord.com/channels/865904902941048862/919952480266248253/929919472251310150',
+            importantNotes: 'https://discord.com/channels/865904902941048862/919952480266248253/929919474675646504',
+            qnaFaq: 'https://discord.com/channels/865904902941048862/919952480266248253/929919496448274543',
+            tutorialCon: 'https://discord.com/channels/865904902941048862/919952480266248253/929919497589112906',
+        }
+        for (const key in data) {
+            data[key].hyperlink = set[key]
+        }
         client.channels.cache.get('919952480266248253').messages.fetch('929919497157103647')
         .then(msg => {
             msg.edit(generateContent('qnaFaq')).catch(err => console.log(err))
