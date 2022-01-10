@@ -624,7 +624,7 @@ DM the command \`notifications\` to the bot in order to stop receiving any notif
 **Q: How to [post an order](${data.postOrder.hyperlink})?**
 A: Use the command \`wts/wtb item_name\` in <#892160436881993758>
 
-**Q: How do I [remove](${data.removeOrder.hyperlink}) an order?**
+**Q: How do I [remove an order](${data.removeOrder.hyperlink})?**
 A: Click the 'profile' button in <#892160436881993758>
                                                                             
 **Q: What does 'close all' button do?**
