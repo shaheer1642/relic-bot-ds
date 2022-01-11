@@ -1846,8 +1846,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     console.log('has embed 0')
                     console.log(reaction.message.embeds[0].fields[0].name)
                     if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                        console.log(`${reaction.message.embeds[0].fields[0].value.toLowerCase()} =? <:${reaction.emoji.identifier.toLowerCase()}> ${embedScore(trader.ingame_name.toLowerCase())}`)
-                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${embedScore(trader.ingame_name.toLowerCase())}`))
+                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
                             match_trade = true
                     }
                     else {
@@ -1855,8 +1854,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             console.log('has embed 1')
                             console.log(reaction.message.embeds[1].fields[0].name)
                             if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                                console.log(`${reaction.message.embeds[1].fields[0].value.toLowerCase()} =? <:${reaction.emoji.identifier.toLowerCase()}> ${embedScore(trader.ingame_name.toLowerCase())}`)
-                                if (reaction.message.embeds[1].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${embedScore(trader.ingame_name.toLowerCase())}`))
+                                if (reaction.message.embeds[1].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
                                     match_trade = true
                             }
                         }
@@ -2784,7 +2782,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     console.log('has embed 0')
                     console.log(reaction.message.embeds[0].fields[0].name)
                     if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${embedScore(trader.ingame_name.toLowerCase())}`))
+                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
                             match_trade = true
                     }
                     else {
@@ -2792,7 +2790,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             console.log('has embed 1')
                             console.log(reaction.message.embeds[1].fields[0].name)
                             if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                                if (reaction.message.embeds[1].fields[0].value.toLowerCase().match(`<:${reaction.emoji.identifier.toLowerCase()}> ${embedScore(trader.ingame_name.toLowerCase())}`))
+                                if (reaction.message.embeds[1].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
                                     match_trade = true
                             }
                         }
