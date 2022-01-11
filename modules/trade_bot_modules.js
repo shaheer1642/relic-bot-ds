@@ -696,7 +696,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             var embed = {
                 title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
                 thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
-                url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                url: `https://warframe.market/items/${item_url}`,
                 fields: [
                     {
                         name: 'Sellers',
@@ -747,7 +747,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             noOfBuyers = j
             var embed = {
                 title: item_name + res.rows[0].user_rank.replace('unranked','').replace('maxed',' (maxed)'),
-                url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                url: `https://warframe.market/items/${item_url}`,
                 thumbnail: {url: 'https://warframe.market/static/assets/' + res.rows[0].icon_url},
                 fields: [
                     {
@@ -1111,7 +1111,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 var embed = {
                     title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
                     description: tradingBotReactions.sell[j],
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: `https://warframe.market/auctions/search?type=${lich_info.weapon_url.match('kuva_')? 'lich':'sister'}&weapon_url_name=${lich_info.weapon_url}`,
                     fields: [],
                     color: '#7cb45d',
                     image: {url: ''}
@@ -1284,7 +1284,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 var embed = {
                     title: lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),
                     description: tradingBotReactions.buy[j],
-                    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    url: `https://warframe.market/auctions/search?type=${lich_info.weapon_url.match('kuva_')? 'lich':'sister'}&weapon_url_name=${lich_info.weapon_url}`,
                     fields: [],
                     color: '#E74C3C',
                     image: {url: ''}
@@ -2066,7 +2066,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             return Promise.reject()
         }
         postdata.embeds[0].title = weapon_name
-        postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        postdata.embeds[0].url = `https://warframe.market/auctions/search?type=${weapon_url.match('kuva_')? 'lich':'sister'}&weapon_url_name=${weapon_url}`
         postdata.embeds[0].thumbnail = {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
         console.log(JSON.stringify(postdata))
         if (request_type == 1) {
@@ -2206,7 +2206,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         return Promise.reject()
     }
     postdata.embeds[0].title = item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)')
-    postdata.embeds[0].url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+    postdata.embeds[0].url = `https://warframe.market/items/${item_url}`
     postdata.embeds[0].thumbnail = {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
     console.log(JSON.stringify(postdata))
     if (request_type == 1) {
