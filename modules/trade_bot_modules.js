@@ -2,7 +2,7 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const Canvas = require('canvas')
 const db_modules = require('./db_modules.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
@@ -118,7 +118,7 @@ async function leaderboard(message) {
                 inline: true
             })
         }
-        postdata.embeds[0].fields[x].value += i+1 + '. ' + all_users[i].ingame_name + '\n'
+        postdata.embeds[0].fields[x].value += i+1 + '. ' + embedScore(all_users[i].ingame_name) + '\n'
         postdata.embeds[0].fields[x+1].value += all_users[i].plat_gained + '\n'
         postdata.embeds[0].fields[x+2].value += all_users[i].plat_spent + '\n'
     }
@@ -2027,7 +2027,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                     },
                     {
                         name: `Prices`,
-                        value: vis_traders_prices.join('\n'),
+                        value: embedScore(vis_traders_prices.join('\n')),
                         inline: true
                     },
                     {
@@ -2049,7 +2049,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                     },
                     {
                         name: `Price`,
-                        value: invis_traders_prices.join('\n'),
+                        value: embedScore(invis_traders_prices.join('\n')),
                         inline: true
                     },
                     {
@@ -2177,7 +2177,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 },{name: '\u200b',value: '\u200b', inline: true},
                 {
                     name: `Prices`,
-                    value: vis_traders_prices.toString().replace(/,/g,'\n'),
+                    value: embedScore(vis_traders_prices.join('\n')),
                     inline: true
                 }
             ],
@@ -2194,7 +2194,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 },{name: '\u200b',value: '\u200b', inline: true},
                 {
                     name: `Price`,
-                    value: invis_traders_prices.toString().replace(/,/g,'\n'),
+                    value: embedScore(invis_traders_prices.join('\n')),
                     inline: true
                 }
             ],

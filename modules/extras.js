@@ -111,4 +111,8 @@ function getRandomColor() {
     return color;
 }
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor};
+function embedScore(text) {
+    return text.replaceAll('_','\\_')
+}
+
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore};
