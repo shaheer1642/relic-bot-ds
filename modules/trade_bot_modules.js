@@ -700,7 +700,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 fields: [
                     {
                         name: 'Sellers',
-                        value: emb_sellers,
+                        value: embedScore(emb_sellers),
                         inline: true
                     },{name: '\u200b',value:'\u200b',inline:true},
                     {
@@ -752,7 +752,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 fields: [
                     {
                         name: 'Buyers',
-                        value: emb_buyers,
+                        value: embedScore(emb_buyers),
                         inline: true
                     },{name: '\u200b',value:'\u200b',inline:true},
                     {

@@ -9,7 +9,7 @@ const wfm_api = require('./modules/wfm_api.js');
 const test_modules = require('./modules/test_modules.js');
 const trade_bot_modules = require('./modules/trade_bot_modules.js');
 const ducat_updater = require('./modules/ducat_updater.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log} = require('./modules/extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
 const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
@@ -1981,8 +1981,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                         **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
 
-                        /invite ${trader.ingame_name}
-                        /invite ${tradee.ingame_name}
+                        /invite ${embedScore(trader.ingame_name)}
+                        /invite ${embedScore(tradee.ingame_name)}
 
                         React with ${tradingBotReactions.success[0]} to finish this trade.
                         React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
@@ -2269,8 +2269,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         **Trade type:** Lich
                         **Weapon:** ${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
 
-                        /invite ${trader.ingame_name}
-                        /invite ${tradee.ingame_name}
+                        /invite ${embedScore(trader.ingame_name)}
+                        /invite ${embedScore(tradee.ingame_name)}
 
                         React with ${tradingBotReactions.success[0]} to finish this trade.
                         React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
@@ -2609,8 +2609,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             **Trade type:** Lich
                             **Weapon:** ${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
 
-                            /invite ${trader.ingame_name}
-                            /invite ${tradee.ingame_name}
+                            /invite ${embedScore(trader.ingame_name)}
+                            /invite ${embedScore(tradee.ingame_name)}
 
                             React with ${tradingBotReactions.success[0]} to finish this trade.
                             React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
@@ -2935,8 +2935,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
                         **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
 
-                        /invite ${trader.ingame_name}
-                        /invite ${tradee.ingame_name}
+                        /invite ${embedScore(trader.ingame_name)}
+                        /invite ${embedScore(tradee.ingame_name)}
 
                         React with ${tradingBotReactions.success[0]} to finish this trade.
                         React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
@@ -3779,8 +3779,8 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             postdata.embeds = [{
                 description: `
                     A lich order has been filled and thread archived
-                    **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
-                    **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
+                    **Created by:** <@${order_data.order_owner}> (${embedScore(trader_ign)}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
+                    **Filled by:** <@${order_data.order_filler}> (${embedScore(tradee_ign)}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
                     **Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
                     **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                     **Order status:** ${order_status} ${reported_by}
@@ -3847,8 +3847,8 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             postdata.embeds = [{
                 description: `
                     An order has been filled and thread archived
-                    **Created by:** <@${order_data.order_owner}> (${trader_ign}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
-                    **Filled by:** <@${order_data.order_filler}> (${tradee_ign}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
+                    **Created by:** <@${order_data.order_owner}> (${embedScore(trader_ign)}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
+                    **Filled by:** <@${order_data.order_filler}> (${embedScore(tradee_ign)}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
                     **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + order_data.user_rank.replace('unranked','').replace('maxed',' (maxed)')}
                     **Price:** ${order_data.user_price}<:platinum:881692607791648778>
                     **Order status:** ${order_status} ${reported_by}
