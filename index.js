@@ -3788,7 +3788,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                     **Thread:** <#${newThread.id}>
                     **Server:** ${newThread.guild.name}
                     **-----Chat Log-----**
-                    ${order_data.messages_log.replaceAll(trader_ign,embedScore(trader_ign)).replaceAll(tradee_ign,embedScore(tradee_ign))}
+                    ${order_data.messages_log? order_data.messages_log.replaceAll(trader_ign,embedScore(trader_ign)).replaceAll(tradee_ign,embedScore(tradee_ign)):'Empty'}
                 `,
                 image: {url: order_data.lich_image_url},
                 timestamp: new Date(), 
@@ -3856,7 +3856,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                     **Thread:** <#${newThread.id}>
                     **Server:** ${newThread.guild.name}
                     **-----Chat Log-----**
-                    ${order_data.messages_log.replaceAll(trader_ign,embedScore(trader_ign)).replaceAll(tradee_ign,embedScore(tradee_ign))}
+                    ${order_data.messages_log? order_data.messages_log.replaceAll(trader_ign,embedScore(trader_ign)).replaceAll(tradee_ign,embedScore(tradee_ign)):'Empty'}
                 `,
                 timestamp: new Date(), 
                 color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
