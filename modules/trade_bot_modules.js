@@ -689,7 +689,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             for (var j=0;j<res.rows.length;j++) {
                 if (j==5)
                     break
-                emb_sellers += tradingBotReactions.sell[j] + ' ' + res.rows[j].ingame_name + '\n'
+                emb_sellers += tradingBotReactions.sell[j] + ' ' + embedScore(res.rows[j].ingame_name) + '\n'
                 emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
             }
             noOfSellers = j
@@ -700,7 +700,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 fields: [
                     {
                         name: 'Sellers',
-                        value: embedScore(emb_sellers),
+                        value: emb_sellers,
                         inline: true
                     },{name: '\u200b',value:'\u200b',inline:true},
                     {
@@ -741,7 +741,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             for (var j=0;j<res.rows.length;j++) {
                 if (j==5)
                     break
-                emb_buyers += tradingBotReactions.buy[j] + ' ' + res.rows[j].ingame_name + '\n'
+                emb_buyers += tradingBotReactions.buy[j] + ' ' + embedScore(res.rows[j].ingame_name) + '\n'
                 emb_prices += res.rows[j].user_price + '<:platinum:881692607791648778>\n'
             }
             noOfBuyers = j
