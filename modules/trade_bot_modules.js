@@ -2022,12 +2022,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 fields: [
                     {
                         name: order_type.replace('wts','Sellers').replace('wtb','Buyers'),
-                        value: vis_traders_names.join('\n'),
+                        value: embedScore(vis_traders_names.join('\n')),
                         inline: true
                     },
                     {
                         name: `Prices`,
-                        value: embedScore(vis_traders_prices.join('\n')),
+                        value: vis_traders_prices.join('\n'),
                         inline: true
                     },
                     {
@@ -2044,12 +2044,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 fields: [
                     {
                         name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
-                        value: invis_traders_names.join('\n'),
+                        value: embedScore(invis_traders_names.join('\n')),
                         inline: true
                     },
                     {
                         name: `Price`,
-                        value: embedScore(invis_traders_prices.join('\n')),
+                        value: invis_traders_prices.join('\n'),
                         inline: true
                     },
                     {
@@ -2172,12 +2172,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             fields: [
                 {
                     name: order_type.replace('wts','Sellers').replace('wtb','Buyers'),
-                    value: vis_traders_names.toString().replace(/,/g,'\n'),
+                    value: embedScore(vis_traders_names.join('\n')),
                     inline: true
                 },{name: '\u200b',value: '\u200b', inline: true},
                 {
                     name: `Prices`,
-                    value: embedScore(vis_traders_prices.join('\n')),
+                    value: vis_traders_prices.join('\n'),
                     inline: true
                 }
             ],
@@ -2189,12 +2189,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             fields: [
                 {
                     name: `Offline ${order_type.replace('wts','seller').replace('wtb','buyer')}`,
-                    value: invis_traders_names.toString().replace(/,/g,'\n'),
+                    value: embedScore(invis_traders_names.join('\n')),
                     inline: true
                 },{name: '\u200b',value: '\u200b', inline: true},
                 {
                     name: `Price`,
-                    value: embedScore(invis_traders_prices.join('\n')),
+                    value: invis_traders_prices.join('\n'),
                     inline: true
                 }
             ],
