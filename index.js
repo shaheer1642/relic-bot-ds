@@ -1525,10 +1525,8 @@ client.on('interactionCreate', async interaction => {
         }
     
         else if (interaction.commandName == 'ping') {
-            interaction.deferReply()
-            .then(() => {
-                interaction.deleteReply()
-            })
+            interaction.reply({content: 'Pong!', ephemeral:true})
+            .catch(err => console.log(err));
         }
         return
     }
