@@ -27,4 +27,15 @@ module.exports = {
                     .setDescription('Select syndicate type')
                     .setRequired(true))
         )
+        .addSubcommand(subcommand =>
+            subcommand.setName('cetus')
+            .setDescription('Track cetus day/night cycle')
+            .addStringOption(option =>
+                option.setName('condition')
+                    .setDescription('Select time of the day')
+                    .setRequired(true)
+                    .addChoice('Day', 'day')
+                    .addChoice('Night', 'night')
+                    .addChoice('Remove tracker', 'remove'))
+        )
 };

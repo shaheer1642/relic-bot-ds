@@ -1521,6 +1521,47 @@ client.on('interactionCreate', async interaction => {
                     }
                 }).catch(err => console.log(err))
             }
+            if (interaction.options.getSubcommand() === 'cetus') {
+                db.query(`SELECT * FROM world_state WHERE type = 'cetusCycle'`)
+                .then(async res => {
+                    if (res.rowCount == 0 || res.rowCount > 1) {
+                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
+                        return
+                    }
+                    const world_state = res.rows[0]
+                    if (interaction.options.getString('condition') == 'remove') {
+                        delete world_state.users.day[interaction.user.id]
+                        delete world_state.users.night[interaction.user.id]
+                        await db.query(`
+                        UPDATE world_state
+                        SET users = '${JSON.stringify(world_state.users)}'
+                        WHERE type = 'cetusCycle'
+                        `)
+                        .then(async res => {
+                            if (res.rowCount == 0)
+                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false}).catch(err => console.log(err));
+                            else
+                                await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
+                        })
+                        .catch(err => console.log(err))
+                    }
+                    else {
+                        world_state.users[interaction.options.getString('condition')][interaction.user.id] = {guild_id: interaction.guildId}
+                        await db.query(`
+                        UPDATE world_state
+                        SET users = '${JSON.stringify(world_state.users)}'
+                        WHERE type = 'cetusCycle'
+                        `)
+                        .then(async res => {
+                            if (res.rowCount == 0)
+                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false}).catch(err => console.log(err));
+                            else
+                                await interaction.reply({ content: 'Added tracker.', ephemeral: true}).catch(err => console.log(err));
+                        })
+                        .catch(err => console.log(err))
+                    }
+                }).catch(err => console.log(err))
+            }
             return
         }
     
