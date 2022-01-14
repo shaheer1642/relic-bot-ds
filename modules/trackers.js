@@ -261,7 +261,7 @@ async function cetus_check() {
             //update expiry on db
             await db.query(`UPDATE world_state SET expiry = ${new Date(cetusCycle.expiry).getTime()} WHERE type='cetusCycle'`).catch(err => console.log(err))
             //remove pinned msg of older state
-            const old_state = cetusCycle.state == 'day'? 'night':'day'
+            const old_state = (cetusCycle.state == 'day') ? 'night':'day'
             if (world_state.pin_id[old_state]) {
                 client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id[old_state])
                 .then(async msg => {
@@ -274,9 +274,10 @@ async function cetus_check() {
             }
             //edit pin msg of new state if exists
             if (world_state.pin_id[cetusCycle.state]) {
+                console.log(world_state.pin_id[cetusCycle.state])
                 client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id[cetusCycle.state])
                 .then(msg => {
-                    console.log(msg)
+                    //console.log(msg)
                     msg.edit({
                         embeds: [{
                             title: 'Cetus cycle',
