@@ -222,6 +222,7 @@ async function cetus_check() {
                     }).catch(err => console.log(err))
                 }).catch(err => console.log(err))
             }
+            console.log('already alerted')
             setTimeout(cetus_check, reset)
             console.log(`cetus_check reset in ${msToTime(reset)}`)
             return
@@ -240,21 +241,22 @@ async function cetus_check() {
             }).catch(err => console.log(err))
         }
         //get users list for current state
-        if (world_state.users[cetusCycle.state].length == 0) {
-            setTimeout(cetus_check, reset)
-            console.log(`cetus_check reset in ${msToTime(reset)}`)
-            return
-        }
-        var users_list = ''
+        var users_list = []
         for (const key in world_state.users[cetusCycle.state]) {
             const obj = world_state.users[cetusCycle.state][key]
             const user_presc = client.guilds.cache.get(obj.guild_id).presences.cache.find(mem => mem.userId == key)
             if (user_presc)
                 if (user_presc.status != 'offline')
-                    users_list += `<@${key}> `
+                    users_list.push(`<@${key}>`)
+        }
+        if (users_list.length == 0) {
+            console.log('no users online for alert')
+            setTimeout(cetus_check, reset)
+            console.log(`cetus_check reset in ${msToTime(reset)}`)
+            return
         }
         //construct embed
-        var postdata = {content: users_list, embeds: []}
+        var postdata = {content: users_list.join(', '), embeds: []}
         postdata.embeds.push({
             title: 'Cetus Cycle',
             description: `${cetusCycle.state == 'day'? 'Night':'Day'} on Cetus starts ${`<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:f>)`}`,
