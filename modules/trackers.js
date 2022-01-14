@@ -4,6 +4,7 @@ const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor} = require('./extras.js');
 const WorldState = require('warframe-worldstate-parser');
+const { Channel, DiscordAPIError, Message } = require('discord.js');
 
 const bountyHints = [
     'Consider donating to poor softy!',
@@ -275,6 +276,7 @@ async function cetus_check() {
             if (world_state.pin_id[cetusCycle.state]) {
                 client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id[cetusCycle.state])
                 .then(msg => {
+                    console.log(msg)
                     msg.edit({
                         embeds: [{
                             title: 'Cetus cycle',
@@ -286,6 +288,7 @@ async function cetus_check() {
                         }]
                     }).catch(err => console.log(err))
                 }).catch(err => console.log(err))
+                
             }
             console.log('cycle changed.')
             var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
