@@ -199,13 +199,13 @@ async function cetus_check() {
         const alertChannel = '892003813786017822'
         const embColor = '#852e43'
         const cetusCycle = new WorldState(JSON.stringify(worldstateData.data)).cetusCycle;
-        const reset = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
+        var reset = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
         //get db
         const world_state = await db.query(`SELECT * FROM world_state WHERE type='cetusCycle'`)
         .then(res => {return res.rows[0]})
         .catch(err => console.log(err))
         //check if expiry changed
-        if ((world_state.expiry == new Date(cetusCycle.expiry).getTime()) && ((new Date(cetusCycle.expiry).getTime() - new Date().getTime()) > 300000)) {
+        if (world_state.expiry == new Date(cetusCycle.expiry).getTime()) {
             //edit pin msg if exists
             if (world_state.pin_id) {
                 client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id)
@@ -227,6 +227,7 @@ async function cetus_check() {
             console.log(`cetus_check reset in ${msToTime(reset)}`)
             return
         }
+        reset = new Date(cetusCycle.expiry).getTime() - new Date().getTime()
         //update expiry on db
         await db.query(`UPDATE world_state SET expiry = ${new Date(cetusCycle.expiry).getTime()} WHERE type='cetusCycle'`).catch(err => console.log(err))
         //remove pinned msgs if any after ~5m (expiry of the state)
@@ -242,46 +243,50 @@ async function cetus_check() {
                 }).catch(err => console.log(err))
             }, new Date(cetusCycle.expiry).getTime() - new Date().getTime());
         }
-        //get users list for current state
-        var users_list = []
-        for (const key in world_state.users[cetusCycle.state]) {
-            const obj = world_state.users[cetusCycle.state][key]
-            const user_presc = client.guilds.cache.get(obj.guild_id).presences.cache.find(mem => mem.userId == key)
-            if (user_presc)
-                if (user_presc.status != 'offline')
-                    users_list.push(`<@${key}>`)
-        }
-        if (users_list.length == 0) {
-            console.log('no users online for alert')
-            setTimeout(cetus_check, reset)
-            console.log(`cetus_check reset in ${msToTime(reset)}`)
-            return
-        }
-        //construct embed
-        var postdata = {content: users_list.join(', '), embeds: []}
-        postdata.embeds.push({
-            title: 'Cetus Cycle',
-            description: `${cetusCycle.state == 'day'? 'Night':'Day'} on Cetus starts ${`<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:f>)`}`,
-            footer: {
-                text: cetusHints[Math.floor(Math.random() * cetusHints.length)]
-            },
-            color: embColor
-        })
-        //send msg
-        client.channels.cache.get(alertChannel).send(postdata).then(msg => {
-            db.query(`UPDATE world_state SET pin_id = ${msg.id} WHERE type = 'cetusCycle'`)
-            .then(res => {
-                msg.pin().catch(err => console.log(err))
+        if ((new Date(cetusCycle.expiry).getTime() - new Date().getTime()) <= 300000)   //send alert 
+        {
+            //get users list for upcoming state
+            var users_list = []
+            const upcomingState = cetusCycle.state == 'day'? 'night':'day'
+            for (const key in world_state.users[upcomingState]) {
+                const obj = world_state.users[upcomingState][key]
+                const user_presc = client.guilds.cache.get(obj.guild_id).presences.cache.find(mem => mem.userId == key)
+                if (user_presc)
+                    if (user_presc.status != 'offline')
+                        users_list.push(`<@${key}>`)
+            }
+            if (users_list.length == 0) {
+                console.log('no users online for alert')
+                setTimeout(cetus_check, new Date(cetusCycle.expiry).getTime())
+                console.log(`cetus_check reset in ${msToTime(new Date(cetusCycle.expiry).getTime())}`)
+                return
+            }
+            //construct embed
+            var postdata = {content: users_list.join(', '), embeds: []}
+            postdata.embeds.push({
+                title: 'Cetus Cycle',
+                description: `${cetusCycle.state == 'day'? 'Night':'Day'} on Cetus starts ${`<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:f>)`}`,
+                footer: {
+                    text: cetusHints[Math.floor(Math.random() * cetusHints.length)]
+                },
+                color: embColor
             })
-            .catch(err => console.log(err))
-        }).catch(err => {
-            console.log(err)
-            console.log(JSON.stringify(postdata))
-            client.channels.cache.get(alertChannel).send(JSON.stringify(err)).catch(err => console.log(err))
-        })
-        console.log('check complete')
-        setTimeout(cetus_check, reset)
-        console.log(`cetus_check reset in ${msToTime(reset)}`)
+            //send msg
+            client.channels.cache.get(alertChannel).send(postdata).then(msg => {
+                db.query(`UPDATE world_state SET pin_id = ${msg.id} WHERE type = 'cetusCycle'`)
+                .then(res => {
+                    msg.pin().catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
+            }).catch(err => {
+                console.log(err)
+                console.log(JSON.stringify(postdata))
+                client.channels.cache.get(alertChannel).send(JSON.stringify(err)).catch(err => console.log(err))
+            })
+            console.log('check complete')
+            setTimeout(cetus_check, new Date(cetusCycle.expiry).getTime())
+            console.log(`cetus_check reset in ${msToTime(new Date(cetusCycle.expiry).getTime())}`)
+        }
     })
     .catch(err => {
         console.log(err)
