@@ -211,8 +211,8 @@ async function cetus_check() {
             for (const key in world_state.users[upcomingState]) {
                 const obj = world_state.users[upcomingState][key]
                 const user_presc = client.guilds.cache.get(obj.guild_id).presences.cache.find(mem => mem.userId == key)
-                if (user_presc)
-                    if (user_presc.status != 'offline')
+                //if (user_presc)
+                //    if (user_presc.status != 'offline')
                         users_list.push(`<@${key}>`)
             }
             if (users_list.length == 0) {
