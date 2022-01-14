@@ -80,6 +80,9 @@ client.on('ready', () => {
     //----Teshin timer---
     setImmediate(trackers.teshin_check,-1)
 
+    //----Cetus timer---
+    setImmediate(trackers.cetus_check,-1)
+
     //----Ducat updater timeout----
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
 
