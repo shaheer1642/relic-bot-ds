@@ -199,52 +199,12 @@ async function cetus_check() {
         const alertChannel = '864199722676125757'
         const embColor = '#852e43'
         const cetusCycle = new WorldState(JSON.stringify(worldstateData.data)).cetusCycle;
-        var reset = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
         //get db
         const world_state = await db.query(`SELECT * FROM world_state WHERE type='cetusCycle'`)
         .then(res => {return res.rows[0]})
         .catch(err => console.log(err))
         //check if expiry changed
-        if (world_state.expiry == new Date(cetusCycle.expiry).getTime()) {
-            //edit pin msg if exists
-            if (world_state.pin_id) {
-                client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id)
-                .then(msg => {
-                    msg.edit({
-                        embeds: [{
-                            title: 'Cetus cycle',
-                            description: `**Current state**\n${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n\n${cetusCycle.state == 'day'? 'Night':'Day'} starts ${`<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:f>)`}`,
-                            footer: {
-                                text: cetusHints[Math.floor(Math.random() * cetusHints.length)]
-                            },
-                            color: embColor
-                        }]
-                    }).catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            }
-            console.log('already alerted')
-            setTimeout(cetus_check, reset)
-            console.log(`cetus_check reset in ${msToTime(reset)}`)
-            return
-        }
-        reset = new Date(cetusCycle.expiry).getTime() - new Date().getTime()
-        //update expiry on db
-        await db.query(`UPDATE world_state SET expiry = ${new Date(cetusCycle.expiry).getTime()} WHERE type='cetusCycle'`).catch(err => console.log(err))
-        //remove pinned msgs if any after ~5m (expiry of the state)
-        if (world_state.pin_id) {
-            setTimeout(() => {
-                client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id)
-                .then(async msg => {
-                    await msg.unpin()
-                    .then(async res => {
-                        await db.query(`UPDATE world_state SET pin_id = NULL WHERE pin_id=${world_state.pin_id}'`).catch(err => console.log(err))
-                    })
-                    .catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            }, new Date(cetusCycle.expiry).getTime() - new Date().getTime());
-        }
-        if ((new Date(cetusCycle.expiry).getTime() - new Date().getTime()) <= 300000)   //send alert 
-        {
+        if ((new Date(cetusCycle.expiry).getTime() - new Date().getTime()) <= 300000) {  //send alert 
             //get users list for upcoming state
             var users_list = []
             const upcomingState = cetusCycle.state == 'day'? 'night':'day'
@@ -273,7 +233,7 @@ async function cetus_check() {
             })
             //send msg
             client.channels.cache.get(alertChannel).send(postdata).then(msg => {
-                db.query(`UPDATE world_state SET pin_id = ${msg.id} WHERE type = 'cetusCycle'`)
+                db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${upcomingState}}', '${msg.id}', true)`)
                 .then(res => {
                     msg.pin().catch(err => console.log(err))
                 })
@@ -283,9 +243,53 @@ async function cetus_check() {
                 console.log(JSON.stringify(postdata))
                 client.channels.cache.get(alertChannel).send(JSON.stringify(err)).catch(err => console.log(err))
             })
-            console.log('check complete')
-            setTimeout(cetus_check, new Date(cetusCycle.expiry).getTime())
-            console.log(`cetus_check reset in ${msToTime(new Date(cetusCycle.expiry).getTime())}`)
+            console.log('users alert sent')
+            var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime()
+            setTimeout(cetus_check, timer)
+            console.log(`cetus_check reset in ${msToTime(timer)}`)
+        }
+        else if (world_state.expiry == new Date(cetusCycle.expiry).getTime()) {
+            console.log('already alerted')
+            var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
+            setTimeout(cetus_check,  timer)
+            console.log(`cetus_check reset in ${msToTime(timer)}}`)
+            return
+        }
+        else if (world_state.expiry != new Date(cetusCycle.expiry).getTime()) {
+            //update expiry on db
+            await db.query(`UPDATE world_state SET expiry = ${new Date(cetusCycle.expiry).getTime()} WHERE type='cetusCycle'`).catch(err => console.log(err))
+            //remove pinned msg of older state
+            const old_state = cetusCycle.state == 'day'? 'night':'day'
+            if (world_state.pin_id[old_state]) {
+                client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id[old_state])
+                .then(async msg => {
+                    await msg.unpin()
+                    .then(async res => {
+                        await db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${old_state}}', '0', true)`).catch(err => console.log(err))
+                    })
+                    .catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }
+            //edit pin msg of new state if exists
+            if (world_state.pin_id[cetusCycle.state]) {
+                client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id[cetusCycle.state])
+                .then(msg => {
+                    msg.edit({
+                        embeds: [{
+                            title: 'Cetus cycle',
+                            description: `**Current state**\n${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n\n${cetusCycle.state == 'day'? 'Night':'Day'} starts ${`<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:f>)`}`,
+                            footer: {
+                                text: cetusHints[Math.floor(Math.random() * cetusHints.length)]
+                            },
+                            color: embColor
+                        }]
+                    }).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }
+            console.log('cycle changed.')
+            var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
+            setTimeout(cetus_check, timer)
+            console.log(`cetus_check reset in ${msToTime(timer)}}`)
         }
     })
     .catch(err => {
