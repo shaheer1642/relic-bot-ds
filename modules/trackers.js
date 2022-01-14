@@ -235,7 +235,7 @@ async function cetus_check() {
             })
             //send msg
             client.channels.cache.get(alertChannel).send(postdata).then(msg => {
-                db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${upcomingState}}', '${msg.id}', true)`)
+                db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${upcomingState}}', "${msg.id}", true)`)
                 .then(res => {
                     msg.pin().catch(err => console.log(err))
                 })
@@ -264,18 +264,18 @@ async function cetus_check() {
             await db.query(`UPDATE world_state SET expiry = ${new Date(cetusCycle.expiry).getTime()} WHERE type='cetusCycle'`).catch(err => console.log(err))
             //remove pinned msg of older state
             const old_state = (cetusCycle.state == 'day') ? 'night':'day'
-            if (world_state.pin_id[old_state]) {
+            if (world_state.pin_id[old_state] != "0") {
                 client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id[old_state])
                 .then(async msg => {
                     await msg.unpin()
                     .then(async res => {
-                        await db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${old_state}}', '0', true)`).catch(err => console.log(err))
+                        await db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${old_state}}', "0", true)`).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
                 }).catch(err => console.log(err))
             }
             //edit pin msg of new state if exists
-            if (world_state.pin_id[cetusCycle.state]) {
+            if (world_state.pin_id[cetusCycle.state] != "0") {
                 console.log(world_state.pin_id[cetusCycle.state])
                 client.channels.cache.get(alertChannel).messages.fetch(world_state.pin_id[cetusCycle.state])
                 .then(msg => {
