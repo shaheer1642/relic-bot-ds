@@ -217,8 +217,9 @@ async function cetus_check() {
             }
             if (users_list.length == 0) {
                 console.log('no users online for alert')
-                setTimeout(cetus_check, new Date(cetusCycle.expiry).getTime())
-                console.log(`cetus_check reset in ${msToTime(new Date(cetusCycle.expiry).getTime())}`)
+                var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime()
+                setTimeout(cetus_check, timer)
+                console.log(`cetus_check reset in ${msToTime(timer)}`)
                 return
             }
             //construct embed
