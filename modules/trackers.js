@@ -258,6 +258,8 @@ async function cetus_check() {
             return
         }
         else if (world_state.expiry != new Date(cetusCycle.expiry).getTime()) {
+            console.log(world_state)
+            console.log(JSON.stringify(world_state))
             //update expiry on db
             await db.query(`UPDATE world_state SET expiry = ${new Date(cetusCycle.expiry).getTime()} WHERE type='cetusCycle'`).catch(err => console.log(err))
             //remove pinned msg of older state
