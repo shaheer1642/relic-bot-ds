@@ -252,7 +252,7 @@ async function cetus_check() {
             console.log('already alerted')
             var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
             setTimeout(cetus_check,  timer)
-            console.log(`cetus_check reset in ${msToTime(timer)}}`)
+            console.log(`cetus_check reset in ${msToTime(timer)}`)
             return
         }
         else if (world_state.expiry != new Date(cetusCycle.expiry).getTime()) {
@@ -289,7 +289,7 @@ async function cetus_check() {
             console.log('cycle changed.')
             var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
             setTimeout(cetus_check, timer)
-            console.log(`cetus_check reset in ${msToTime(timer)}}`)
+            console.log(`cetus_check reset in ${msToTime(timer)}`)
         }
     })
     .catch(err => {
