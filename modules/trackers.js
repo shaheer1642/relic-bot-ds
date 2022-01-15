@@ -236,7 +236,7 @@ async function cetus_check() {
             //send msg
             client.channels.cache.get(alertChannel).send(postdata).then(msg => {
                 world_state.pin_id[upcomingState] = msg.id
-                db.query(`UPDATE world_state SET pin_id = ${JSON.stringify(world_state.pin_id)}`)
+                db.query(`UPDATE world_state SET pin_id = '${JSON.stringify(world_state.pin_id)}'`)
                 .then(res => {
                     msg.pin().catch(err => console.log(err))
                 })
@@ -271,7 +271,7 @@ async function cetus_check() {
                     await msg.unpin()
                     .then(async res => {
                         world_state.pin_id[old_state] = 0
-                        db.query(`UPDATE world_state SET pin_id = ${JSON.stringify(world_state.pin_id)}`).catch(err => console.log(err))
+                        db.query(`UPDATE world_state SET pin_id = '${JSON.stringify(world_state.pin_id)}'`).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
                 }).catch(err => console.log(err))
