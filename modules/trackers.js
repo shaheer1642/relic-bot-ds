@@ -258,6 +258,7 @@ async function cetus_check() {
             var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime()
             setTimeout(cetus_check, timer)
             console.log(`cetus_check reset in ${msToTime(timer)}`)
+            return
         }
         else if (world_state.expiry == new Date(cetusCycle.expiry).getTime()) {
             console.log('already alerted')
@@ -309,6 +310,7 @@ async function cetus_check() {
             var timer = timeDiff > 300000 ? timeDiff - 300000:timeDiff
             setTimeout(cetus_check, timer)
             console.log(`cetus_check reset in ${msToTime(timer)}`)
+            return
         }
     })
     .catch(err => {
