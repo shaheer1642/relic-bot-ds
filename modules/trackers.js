@@ -28,6 +28,13 @@ async function bounty_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then(async worldstateData => {
         const syndicateMissions = new WorldState(JSON.stringify(worldstateData.data)).syndicateMissions;
+        if (new Date(syndicateMissions[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+            console.log('negative expiry')
+            var timer = 10000
+            setTimeout(bounty_check, timer)
+            console.log(`bounty_check reset in ${msToTime(timer)}`)
+            return
+        }
         var reset = 0
         //get db bounties list
         var bounties_list = await db.query(`SELECT * FROM bounties_list`)
@@ -124,6 +131,13 @@ async function teshin_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
+        if (new Date(steelPath.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+            console.log('negative expiry')
+            var timer = 10000
+            setTimeout(teshin_check, timer)
+            console.log(`teshin_check reset in ${msToTime(timer)}`)
+            return
+        }
         const timer = (new Date(steelPath.expiry).getTime() - new Date()) + 120000
         setTimeout(teshin_func, timer)
         console.log('teshin check invokes in ' + msToTime(timer))
