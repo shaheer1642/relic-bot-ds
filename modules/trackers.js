@@ -200,7 +200,7 @@ async function cetus_check() {
         const alertChannel = '864199722676125757'
         const embColor = '#852e43'
         const cetusCycle = new WorldState(JSON.stringify(worldstateData.data)).cetusCycle;
-        if (new Date(cetusCycle.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+        if (new Date(cetusCycle.expiry).getTime() < new Date().getTime())   {     //negative expiry, retry
             console.log('negative expiry')
             var timer = 10000
             setTimeout(cetus_check, timer)
@@ -259,7 +259,7 @@ async function cetus_check() {
         }
         else if (world_state.expiry == new Date(cetusCycle.expiry).getTime()) {
             console.log('already alerted')
-            var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
+            var timer = (new Date(cetusCycle.expiry).getTime() - new Date().getTime()) - 300000
             setTimeout(cetus_check,  timer)
             console.log(`cetus_check reset in ${msToTime(timer)}`)
             return
@@ -302,7 +302,7 @@ async function cetus_check() {
                 
             }
             console.log('cycle changed.')
-            var timer = new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 300000
+            var timer = (new Date(cetusCycle.expiry).getTime() - new Date().getTime()) - 300000
             setTimeout(cetus_check, timer)
             console.log(`cetus_check reset in ${msToTime(timer)}`)
         }
