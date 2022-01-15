@@ -198,7 +198,7 @@ async function cetus_check() {
     console.log('cetus check')
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then(async worldstateData => {
-        const alertChannel = '864199722676125757'
+        const alertChannel = '892003813786017822'
         const embColor = '#852e43'
         const cetusCycle = new WorldState(JSON.stringify(worldstateData.data)).cetusCycle;
         if (new Date(cetusCycle.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
