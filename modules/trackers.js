@@ -227,7 +227,7 @@ async function cetus_check() {
             var postdata = {content: users_list.join(', '), embeds: []}
             postdata.embeds.push({
                 title: 'Cetus Cycle',
-                description: `${cetusCycle.state == 'day'? 'Night':'Day'} on Cetus starts ${`<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:f>)`}`,
+                description: `${cetusCycle.state == 'day'? 'Night':'Day'} starts ${`<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(cetusCycle.expiry).getTime()/1000)}:f>)`}`,
                 footer: {
                     text: cetusHints[Math.floor(Math.random() * cetusHints.length)]
                 },
@@ -235,7 +235,8 @@ async function cetus_check() {
             })
             //send msg
             client.channels.cache.get(alertChannel).send(postdata).then(msg => {
-                db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${upcomingState}}', "${msg.id}", true)`)
+                world_state.pin_id[upcomingState] = msg.id
+                db.query(`UPDATE world_state SET pin_id = ${JSON.stringify(world_state.pin_id)}`)
                 .then(res => {
                     msg.pin().catch(err => console.log(err))
                 })
@@ -269,7 +270,8 @@ async function cetus_check() {
                 .then(async msg => {
                     await msg.unpin()
                     .then(async res => {
-                        await db.query(`UPDATE world_state SET pin_id = jsonb_set(pin_id,'{${old_state}}', "0", true)`).catch(err => console.log(err))
+                        world_state.pin_id[upcomingState] = 0
+                        db.query(`UPDATE world_state SET pin_id = ${JSON.stringify(world_state.pin_id)}`).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
                 }).catch(err => console.log(err))
