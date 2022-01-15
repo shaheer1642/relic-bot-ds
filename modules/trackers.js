@@ -200,6 +200,12 @@ async function cetus_check() {
         const alertChannel = '864199722676125757'
         const embColor = '#852e43'
         const cetusCycle = new WorldState(JSON.stringify(worldstateData.data)).cetusCycle;
+        if (new Date(cetusCycle.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+            console.log('negative expiry')
+            var timer = 10000
+            setTimeout(cetus_check, timer)
+            console.log(`cetus_check reset in ${msToTime(timer)}`)
+        }
         //get db
         const world_state = await db.query(`SELECT * FROM world_state WHERE type='cetusCycle'`)
         .then(res => {return res.rows[0]})
