@@ -270,7 +270,7 @@ async function cetus_check() {
                 .then(async msg => {
                     await msg.unpin()
                     .then(async res => {
-                        world_state.pin_id[upcomingState] = 0
+                        world_state.pin_id[old_state] = 0
                         db.query(`UPDATE world_state SET pin_id = ${JSON.stringify(world_state.pin_id)}`).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
