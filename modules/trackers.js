@@ -138,7 +138,7 @@ async function teshin_check() {
             console.log(`teshin_check reset in ${msToTime(timer)}`)
             return
         }
-        const timer = (new Date(steelPath.expiry).getTime() - new Date()) + 120000
+        var timer = (new Date(steelPath.expiry).getTime() - new Date()) + 120000
         setTimeout(teshin_func, timer)
         console.log('teshin check invokes in ' + msToTime(timer))
     })
