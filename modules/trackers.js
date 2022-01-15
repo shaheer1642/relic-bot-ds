@@ -138,6 +138,7 @@ async function teshin_check() {
 
         axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
+            const alertChannel = '864199722676125757'
             const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
             //get db teshin_rotation list
             var teshin_rotation = await db.query(`SELECT * FROM teshin_rotation`)
@@ -178,7 +179,7 @@ async function teshin_check() {
                             postdata.embeds[0].fields[2].value += e.name + '\n'
                     })
                     
-                    client.channels.cache.get('892003813786017822').send(postdata)
+                    client.channels.cache.get(alertChannel).send(postdata)
                     .catch(err => console.log(err))
                 }
             })
