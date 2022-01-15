@@ -206,6 +206,7 @@ async function cetus_check() {
             var timer = 10000
             setTimeout(cetus_check, timer)
             console.log(`cetus_check reset in ${msToTime(timer)}`)
+            return
         }
         //get db
         const world_state = await db.query(`SELECT * FROM world_state WHERE type='cetusCycle'`)
