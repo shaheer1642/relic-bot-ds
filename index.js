@@ -90,7 +90,7 @@ client.on('ready', () => {
         //----flush terminate msgs----
         db.query(`SELECT * FROM process_terminate_flush`)
         .then(res => {
-            db.query(`DELETE * FROM process_terminate_flush`).catch(err => console.log(err))
+            db.query(`DELETE FROM process_terminate_flush`).catch(err => console.log(err))
             res.rows.forEach(e => {
                 client.channels.cache.get(e.channel_id).messages.fetch(e.msg_id)
                 .then(msg => msg.delete().catch(err => console.log(err)))
@@ -3976,8 +3976,17 @@ process
   .on('uncaughtException', procshutdown('uncaughtException'));
 
 function procshutdown(signal) {
-    //const downtimeInform = ['891756819045826621','899290597259640853','892160436881993758','892003772698611723','893133821313187881','892108718358007820','906555131254956042','892843006560981032','892843163851563009']
-    const downtimeInform = ['891756819045826621']
+    const downtimeInform = [
+        '891756819045826621',
+        '899290597259640853',
+        '892160436881993758',
+        '892003772698611723',
+        '893133821313187881',
+        '892108718358007820',
+        '906555131254956042',
+        '892843006560981032',
+        '892843163851563009'
+    ]
     return (err) => {
         console.log(`${ signal }...`);
         if (err) console.error(err.stack || err);
