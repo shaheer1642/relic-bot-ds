@@ -4,22 +4,28 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} =
 const osiris_guild_id = '905559118096531456'
 const osiris_channels = {
     owner_chat : '905647811939426325'
-} 
+}
+var emote_list = []
 
 async function sendMsg() {
     client.guilds.fetch(osiris_guild_id)
     .then(guild => {
         guild.emojis.fetch()
         .then(async emoji => {
-            var emote_list = []
+            emote_list = []
             emoji.map(emote => emote_list.push(emote.animated? '<' + emote.identifier + '>':'<:' + emote.identifier + '>'))
             await db.query(`SELECT * from osiris_emotes`)
             .then(async res => {
                 for (const emote of emote_list) {
+                    var flag = false
                     for (const dbemote of res.rows) {
-                        if (dbemote.identifier == emote)
-                            continue
+                        if (dbemote.identifier == emote) {
+                            flag = true
+                            break
+                        }
                     }
+                    if (flag)
+                        continue
                     await db.query(`INSERT INTO osiris_emotes (identifier) VALUES ('${emote}')`).catch(err => console.log(err))
                     console.log(`INSERT INTO osiris_emotes (identifier) VALUES ('${emote}')`)
                 }
@@ -99,6 +105,11 @@ function editMsg() {
 
 async function messageHandler(message) {
     console.log(message.content)
+    for (var emote of emote_list) {
+        if (message.content.match(emote)) {
+            await db.query(`UPDATE osiris_emotes SET usage_count = usage_count + 1 WHERE identifier = '${emote}'`).catch(err => console.log(err))
+        }
+    }
     return
 }
 
