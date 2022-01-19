@@ -152,7 +152,7 @@ async function teshin_check() {
 
         axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
-            const alertChannel = '864199722676125757'
+            const alertChannel = '892003813786017822'
             const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
             //get db teshin_rotation list
             var teshin_rotation = await db.query(`SELECT * FROM teshin_rotation`)
@@ -206,7 +206,6 @@ async function teshin_check() {
         })
     }
 }
-
 
 async function cetus_check() {
     console.log('cetus check')
