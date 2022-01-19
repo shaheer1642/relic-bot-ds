@@ -13,6 +13,17 @@ async function sendMsg() {
         .then(async emoji => {
             var emote_list = []
             emoji.map(emote => emote_list.push(emote.identifier.match(/^a:[a-zA-Z0-9!@#$%^&*()_+-=]*:/)?  '<' + emote.identifier + '>':'<:' + emote.identifier + '>'))
+            await db.query(`SELECT * from osiris_emotes`)
+            .then(async res => {
+                for (const emote of emote_list) {
+                    for (const dbemote of res.rows) {
+                        if (dbemote.identifier == emote)
+                            continue
+                    }
+                    await db.query(`INSERT INTO osiris_emotes (identifier) VALUES (${emote})`).catch(err => console.log(err))
+                    console.log(`INSERT INTO osiris_emotes (identifier) VALUES (${emote})`)
+                }
+            }).catch(err => console.log(err))
             //const channel = client.channels.cache.get(osiris_channels.owner_chat)
             const message = await client.channels.cache.get(osiris_channels.owner_chat).messages.fetch('933451508983398411')
             var postdata = {content: ' ', embeds: []}
@@ -21,7 +32,8 @@ async function sendMsg() {
 `Osiris emotes usage (under dev.)
 List of features:
 - Most usage
-- Most used by user`,
+- Most used by user
+- Plot graph for emotes`,
                 fields: [{
                     name: 'Emote',
                     value: '',
@@ -37,7 +49,7 @@ List of features:
                 }]
             })
             var x = 0
-            for (var e of emote_list) {
+            for (const emote of emote_list) {
                 if (postdata.embeds[0].fields[x].value.length >= 980) {
                     postdata.embeds[0].fields.push({
                         name: '\u200b',
@@ -54,7 +66,7 @@ List of features:
                     })
                     x += 3
                 }
-                postdata.embeds[0].fields[x].value += e + '\n'
+                postdata.embeds[0].fields[x].value += emote + '\n'
             }
             //channel.send(postdata).catch(err => console.log(err))
             message.edit(postdata).catch(err => console.log(err))
