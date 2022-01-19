@@ -87,6 +87,15 @@ client.on('ready', () => {
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
 
     if (process.env.DEBUG_MODE!=1) {
+        //----flush terminate msgs----
+        db.query(`SELECT * FROM process_terminate_flush`)
+        .then(res => {
+            res.rows.forEach(e => {
+                client.channels.cache.get(e.channel_id).messages.fetch(e.msg_id)
+                .then(msg => msg.delete().catch(err => console.log(err)))
+                .catch(err => console.log(err))
+            })
+        }).catch(err => console.log(err))
         //----update db url on discord----
         client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
         .then(msg => {
@@ -3971,7 +3980,10 @@ function procshutdown(signal) {
         console.log(`${ signal }...`);
         if (err) console.error(err.stack || err);
         downtimeInform.forEach(channel => {
-            client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
+            client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`)
+            .then(res => {
+                db.query(`INSERT INTO process_terminate_flush (channel_id,msg_id) VALUES (${res.channelId},${res.id})`).catch(err => console.log(err))
+            }).catch(err => console.log(err))
         })
         setTimeout(() => {
           console.log('...waited 15s, exiting.');
