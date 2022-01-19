@@ -3982,6 +3982,7 @@ process
   .on('uncaughtException', procshutdown('uncaughtException'));
 
 function procshutdown(signal) {
+    /*
     const downtimeInform = [
         '891756819045826621',
         '899290597259640853',
@@ -3993,6 +3994,8 @@ function procshutdown(signal) {
         '892843006560981032',
         '892843163851563009'
     ]
+    */
+    const downtimeInform = ['891756819045826621']
     return (err) => {
         console.log(`${ signal }...`);
         if (err) console.error(err.stack || err);
