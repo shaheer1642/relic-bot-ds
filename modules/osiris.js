@@ -36,7 +36,7 @@ List of features:
                 }]
             })
             var x = 0
-            for (var e in emote_list) {
+            for (var e of emote_list) {
                 if (postdata.embeds[0].fields[0].value.length >= 1024) {
                     postdata.embeds[0].fields.push({
                         name: '\u200b',
