@@ -7,32 +7,36 @@ const osiris_channels = {
 } 
 
 async function sendMsg() {
-    var emote_list = ''
     client.guilds.fetch(osiris_guild_id)
     .then(guild => {
         guild.emojis.fetch()
         .then(emoji => {
-            emoji.map(emote => emote_list += '<:' + emote.identifier + '>\n')
-            client.channels.cache.get(osiris_channels.owner_chat)
-            .send({
-                content: ' ',
-                embeds: [{
-                    description: 'Osiris emotes usage (under dev.)\nList of features:\n- Most usage\n- Most used by user',
-                    fields: [{
-                        name: 'Emote',
-                        value: emote_list,
-                        inline: true
-                    },{
-                        name: 'Usage',
+            var emote_list = []
+            emoji.map(emote => emote_list.push('<:' + emote.identifier + '>'))
+            const channel = client.channels.cache.get(osiris_channels.owner_chat)
+            var postdata = {content: ' ', embeds: []}
+            var x = 0
+            for (var e in emote_list) {
+                if (postdata[0].fields[0].name.length >= 1024) {
+                    postdata[0].fields.push({
+                        name: '\u200b',
                         value: '\u200b',
                         inline: true
                     },{
-                        name: 'Most used by',
+                        name: '\u200b',
                         value: '\u200b',
                         inline: true
-                    }]
-                }]
-            }).catch(err => console.log(err))
+                    },{
+                        name: '\u200b',
+                        value: '\u200b',
+                        inline: true
+                    })
+                    x += 3
+                }
+                postdata[0].fields[x].value += e + '\n'
+            }
+
+            channel.send(postdata).catch(err => console.log(err))
         }).catch(err => console.log(err))
     })
 }
