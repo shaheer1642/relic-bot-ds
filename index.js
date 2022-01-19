@@ -3992,7 +3992,7 @@ function procshutdown(signal) {
         if (err) console.error(err.stack || err);
         if (process.env.DEBUG_MODE != 1) {
             downtimeInform.forEach(channel => {
-                client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`)
+                client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a brief downtime`)
                 .then(res => {
                     db.query(`INSERT INTO process_terminate_flush (channel_id,msg_id) VALUES (${res.channelId},${res.id})`).catch(err => console.log(err))
                 }).catch(err => console.log(err))
