@@ -3968,8 +3968,6 @@ client.on('threadUpdate', async (oldThread,newThread) => {
     }
 })
 
-sleep(100)
-
 //process shutdown handles
 
 process
