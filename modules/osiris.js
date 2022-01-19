@@ -15,9 +15,29 @@ async function sendMsg() {
             emoji.map(emote => emote_list.push('<:' + emote.identifier + '>'))
             const channel = client.channels.cache.get(osiris_channels.owner_chat)
             var postdata = {content: ' ', embeds: []}
+            postdata.embeds.push({
+                description: 
+`Osiris emotes usage (under dev.)
+List of features:
+- Most usage
+- Most used by user`,
+                fields: [{
+                    name: 'Emote',
+                    value: '\u200b',
+                    inline: true
+                },{
+                    name: 'Usage',
+                    value: '\u200b',
+                    inline: true
+                },{
+                    name: 'Most used by',
+                    value: '\u200b',
+                    inline: true
+                }]
+            })
             var x = 0
             for (var e in emote_list) {
-                if (postdata[0].fields[0].name.length >= 1024) {
+                if (postdata[0].fields[0].value.length >= 1024) {
                     postdata[0].fields.push({
                         name: '\u200b',
                         value: '\u200b',
