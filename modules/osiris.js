@@ -12,7 +12,7 @@ async function sendMsg() {
         guild.emojis.fetch()
         .then(async emoji => {
             var emote_list = []
-            emoji.map(emote => emote_list.push('<:' + emote.identifier + '>'))
+            emoji.map(emote => emote_list.push(emote.identifier.match(/$a:*/)?  '<' + emote.identifier + '>':'<:' + emote.identifier + '>'))
             //const channel = client.channels.cache.get(osiris_channels.owner_chat)
             const message = await client.channels.cache.get(osiris_channels.owner_chat).messages.fetch('933451508983398411')
             var postdata = {content: ' ', embeds: []}
