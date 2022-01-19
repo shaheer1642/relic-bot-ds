@@ -17,6 +17,7 @@ const gpt3 = require('./modules/gpt3.js');
 const {pins_handler} = require('./modules/pins_handler.js');
 const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
+const osiris_guild = require('./modules/osiris.js');
 const {client,tickcount} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
 
@@ -65,6 +66,8 @@ client.on('ready', () => {
     inform_dc(`Bot has started.`)
 
     client.user.setActivity('.help', { type: 2 })
+
+    osiris_guild.sendMsg()
 
     console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
     
