@@ -3964,17 +3964,16 @@ process
   .on('SIGINT', procshutdown('SIGINT'))
   .on('uncaughtException', procshutdown('uncaughtException'));
 
-async function procshutdown(signal) {
-  return async (err) => {
+function procshutdown(signal) {
+  return (err) => {
     console.log(`${ signal }...`);
     if (err) console.error(err.stack || err);
     for (var channel in tradingBotChannels) {
-        await client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
+        client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
     }
     for (var channel in tradingBotLichChannels) {
-        await client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
+        client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
     }
-    process.exit(err ? 1 : 0);
   };
 }
 
