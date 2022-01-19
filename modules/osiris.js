@@ -8,30 +8,33 @@ const osiris_channels = {
 
 async function sendMsg() {
     var emote_list = ''
-    client.guilds.cache.get(osiris_guild_id).emojis.fetch()
-    .then(emoji => {
-        emote_list += emoji.map(emoji => emoji.identifier) + '\n'
-    }).catch(err => console.log(err))
-    client.channels.cache.get(osiris_channels.owner_chat)
-    .send({
-        content: ' ',
-        embeds: [{
-            description: 'Osiris emotes usage (under dev.)',
-            fields: [{
-                name: 'Emote',
-                value: emote_list,
-                inline: true
-            },{
-                name: '\u200b',
-                value: '\u200b',
-                inline: true
-            },{
-                name: 'Usage',
-                value: '\u200b',
-                inline: true
-            }]
-        }]
-    }).catch(err => console.log(err))
+    client.guilds.fetch(osiris_guild_id)
+    .then(guild => {
+        guild.emojis.fetch()
+        .then(emoji => {
+            emote_list += emoji.map(emoji => emoji.identifier) + '\n'
+            client.channels.cache.get(osiris_channels.owner_chat)
+            .send({
+                content: ' ',
+                embeds: [{
+                    description: 'Osiris emotes usage (under dev.)\nList of features:\n- Most usage\n- Most used by user',
+                    fields: [{
+                        name: 'Emote',
+                        value: emote_list,
+                        inline: true
+                    },{
+                        name: '\u200b',
+                        value: '\u200b',
+                        inline: true
+                    },{
+                        name: 'Usage',
+                        value: '\u200b',
+                        inline: true
+                    }]
+                }]
+            }).catch(err => console.log(err))
+        }).catch(err => console.log(err))
+    })
 }
 
 function editMsg() {

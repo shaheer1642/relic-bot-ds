@@ -67,7 +67,7 @@ client.on('ready', () => {
 
     client.user.setActivity('.help', { type: 2 })
 
-    osiris_guild.sendMsg()
+    osiris_guild.sendMsg().catch(err => console.log(err))
 
     console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
     
