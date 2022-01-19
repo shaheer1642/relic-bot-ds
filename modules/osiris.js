@@ -12,7 +12,7 @@ async function sendMsg() {
         guild.emojis.fetch()
         .then(async emoji => {
             var emote_list = []
-            emoji.map(emote => emote_list.push(emote.identifier.match(/^a:[a-zA-Z0-9!@#$%^&*()_+-=]*:/)?  '<' + emote.identifier + '>':'<:' + emote.identifier + '>'))
+            emoji.map(emote => emote_list.push(emote.animated? '<' + emote.identifier + '>':'<:' + emote.identifier + '>'))
             await db.query(`SELECT * from osiris_emotes`)
             .then(async res => {
                 for (const emote of emote_list) {
@@ -97,7 +97,13 @@ function editMsg() {
     }).catch(err => console.log(err))
 }
 
+async function messageHandler(message) {
+    console.log(message.content)
+    return
+}
+
 module.exports = {
     sendMsg,
-    editMsg
+    editMsg,
+    messageHandler
 }

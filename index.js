@@ -18,6 +18,7 @@ const {pins_handler} = require('./modules/pins_handler.js');
 const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
+const osiris_guild_id = '905559118096531456'
 const {client,tickcount} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
 
@@ -158,6 +159,10 @@ client.on('messageCreate', async message => {
     }
 
     if (message.guild) {
+        if (message.guild.id==osiris_guild_id) {
+            osiris_guild.messageHandler(message).catch(err => console.log(err))
+            return
+        }
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
             return Promise.resolve()
