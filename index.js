@@ -3959,33 +3959,24 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 })
 
 //process shutdown handles
-process.on('SIGTERM', signal => {
+process
+  .on('SIGTERM', procshutdown('SIGTERM'))
+  .on('SIGINT', procshutdown('SIGINT'))
+  .on('uncaughtException', procshutdown('uncaughtException'));
+
+async function procshutdown(signal) {
+  return (err) => {
+    console.log(`${ signal }...`);
+    if (err) console.error(err.stack || err);
     for (var channel in tradingBotChannels) {
-        client.channels.cache.get(channel).send('Bot is restarting, please expect a couple seconds downtime').catch(err => console.log(err))
+        await client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
     }
     for (var channel in tradingBotLichChannels) {
-        client.channels.cache.get(channel).send('Bot is restarting, please expect a couple seconds downtime').catch(err => console.log(err))
+        await client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
     }
-    console.log(`Process ${process.pid} received a SIGTERM signal`)
-})
-process.on('SIGKILL', signal => {
-    for (var channel in tradingBotChannels) {
-        client.channels.cache.get(channel).send('Bot process was terminated, please expect a couple seconds downtime').catch(err => console.log(err))
-    }
-    for (var channel in tradingBotLichChannels) {
-        client.channels.cache.get(channel).send('Bot process was terminated, please expect a couple seconds downtime').catch(err => console.log(err))
-    }
-    console.log(`Process ${process.pid} received a SIGKILL signal`)
-})
-process.on('SIGINT', signal => {
-    for (var channel in tradingBotChannels) {
-        client.channels.cache.get(channel).send('Bot process was interrupted, please expect a couple seconds downtime').catch(err => console.log(err))
-    }
-    for (var channel in tradingBotLichChannels) {
-        client.channels.cache.get(channel).send('Bot process was interrupted, please expect a couple seconds downtime').catch(err => console.log(err))
-    }
-    console.log(`Process ${process.pid} received a SIGINT signal`)
-})
+    process.exit(err ? 1 : 0);
+  };
+}
 
 axiosRetry(axios, {
     retries: 50, // number of retries
