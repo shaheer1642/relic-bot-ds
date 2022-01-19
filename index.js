@@ -3973,6 +3973,10 @@ function procshutdown(signal) {
         downtimeInform.forEach(channel => {
             client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
         })
+        setTimeout(() => {
+          console.log('...waited 15s, exiting.');
+          process.exit(err ? 1 : 0);
+        }, 15000).unref();
     };
 }
 
