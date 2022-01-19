@@ -10,10 +10,11 @@ async function sendMsg() {
     client.guilds.fetch(osiris_guild_id)
     .then(guild => {
         guild.emojis.fetch()
-        .then(emoji => {
+        .then(async emoji => {
             var emote_list = []
             emoji.map(emote => emote_list.push('<:' + emote.identifier + '>'))
-            const channel = client.channels.cache.get(osiris_channels.owner_chat)
+            //const channel = client.channels.cache.get(osiris_channels.owner_chat)
+            const message = await client.channels.cache.get(osiris_channels.owner_chat).messages.fetch('933451508983398411')
             var postdata = {content: ' ', embeds: []}
             postdata.embeds.push({
                 description: 
@@ -55,8 +56,8 @@ List of features:
                 }
                 postdata.embeds[0].fields[x].value += e + '\n'
             }
-
-            channel.send(postdata).catch(err => console.log(err))
+            //channel.send(postdata).catch(err => console.log(err))
+            message.edit(postdata).catch(err => console.log(err))
         }).catch(err => console.log(err))
     })
 }
