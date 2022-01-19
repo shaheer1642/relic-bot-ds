@@ -94,8 +94,8 @@ client.on('ready', () => {
     //----Osiris timer----
     setInterval(osiris_guild.dbUpdate, 3600000);     //every hour
     setInterval(osiris_guild.editMsg, 60000);        //every minute
-    setImmediate(osiris_guild.dbUpdate, -1);     //every hour
-    setImmediate(osiris_guild.editMsg, -1);        //every minute
+    setTimeout(osiris_guild.dbUpdate, -1);
+    setTimeout(osiris_guild.editMsg, 5000);
 
     if (process.env.DEBUG_MODE!=1) {
         //----flush terminate msgs----

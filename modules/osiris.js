@@ -6,12 +6,7 @@ const osiris_channels = {
     owner_chat : '905647811939426325'
 }
 
-var emote_list = await client.guilds.fetch(osiris_guild_id).then(async guild => {
-    await guild.emojis.fetch().then(async emoji => {
-        emote_list = []
-        emoji.map(emote => emote_list.push(emote.animated? '<' + emote.identifier + '>':'<:' + emote.identifier + '>'))
-    }).catch(err => console.log(err))
-}).catch(err => console.log(err))
+var emote_list = []
 
 async function dbUpdate() {
     client.guilds.fetch(osiris_guild_id)
