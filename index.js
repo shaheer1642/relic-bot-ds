@@ -90,6 +90,7 @@ client.on('ready', () => {
         //----flush terminate msgs----
         db.query(`SELECT * FROM process_terminate_flush`)
         .then(res => {
+            db.query(`DELETE * FROM process_terminate_flush`).catch(err => console.log(err))
             res.rows.forEach(e => {
                 client.channels.cache.get(e.channel_id).messages.fetch(e.msg_id)
                 .then(msg => msg.delete().catch(err => console.log(err)))
@@ -3980,12 +3981,14 @@ function procshutdown(signal) {
     return (err) => {
         console.log(`${ signal }...`);
         if (err) console.error(err.stack || err);
-        downtimeInform.forEach(channel => {
-            client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`)
-            .then(res => {
-                db.query(`INSERT INTO process_terminate_flush (channel_id,msg_id) VALUES (${res.channelId},${res.id})`).catch(err => console.log(err))
-            }).catch(err => console.log(err))
-        })
+        if (process.env.DEBUG_MODE != 1) {
+            downtimeInform.forEach(channel => {
+                client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`)
+                .then(res => {
+                    db.query(`INSERT INTO process_terminate_flush (channel_id,msg_id) VALUES (${res.channelId},${res.id})`).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            })
+        }
         setTimeout(() => {
           console.log('...waited 15s, exiting.');
           process.exit(err ? 1 : 0);
