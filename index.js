@@ -3959,22 +3959,21 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 })
 
 //process shutdown handles
+
 process
   .on('SIGTERM', procshutdown('SIGTERM'))
   .on('SIGINT', procshutdown('SIGINT'))
   .on('uncaughtException', procshutdown('uncaughtException'));
 
 function procshutdown(signal) {
-  return (err) => {
-    console.log(`${ signal }...`);
-    if (err) console.error(err.stack || err);
-    for (var channel in tradingBotChannels) {
-        client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
-    }
-    for (var channel in tradingBotLichChannels) {
-        client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
-    }
-  };
+    const downtimeInform = ['899290597259640853','892160436881993758','892003772698611723','893133821313187881','892108718358007820','906555131254956042']
+    return (err) => {
+        console.log(`${ signal }...`);
+        if (err) console.error(err.stack || err);
+        downtimeInform.forEach(channel => {
+            client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a couple seconds downtime`).catch(err => console.log(err))
+        })
+    };
 }
 
 axiosRetry(axios, {
