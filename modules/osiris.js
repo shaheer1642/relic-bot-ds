@@ -24,7 +24,7 @@ List of features:
 - Most used by user`,
                 fields: [{
                     name: 'Emote',
-                    value: '\u200b',
+                    value: '',
                     inline: true
                 },{
                     name: 'Usage',
@@ -41,7 +41,7 @@ List of features:
                 if (postdata.embeds[0].fields[x].value.length >= 980) {
                     postdata.embeds[0].fields.push({
                         name: '\u200b',
-                        value: '\u200b',
+                        value: '',
                         inline: true
                     },{
                         name: '\u200b',
