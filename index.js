@@ -3958,6 +3958,35 @@ client.on('threadUpdate', async (oldThread,newThread) => {
     }
 })
 
+//process shutdown handles
+process.on('SIGTERM', signal => {
+    for (var channel in tradingBotChannels) {
+        client.channels.cache.get(channel).send('Bot is restarting, please expect a couple seconds downtime').catch(err => console.log(err))
+    }
+    for (var channel in tradingBotLichChannels) {
+        client.channels.cache.get(channel).send('Bot is restarting, please expect a couple seconds downtime').catch(err => console.log(err))
+    }
+    console.log(`Process ${process.pid} received a SIGTERM signal`)
+})
+process.on('SIGKILL', signal => {
+    for (var channel in tradingBotChannels) {
+        client.channels.cache.get(channel).send('Bot process was terminated, please expect a couple seconds downtime').catch(err => console.log(err))
+    }
+    for (var channel in tradingBotLichChannels) {
+        client.channels.cache.get(channel).send('Bot process was terminated, please expect a couple seconds downtime').catch(err => console.log(err))
+    }
+    console.log(`Process ${process.pid} received a SIGKILL signal`)
+})
+process.on('SIGINT', signal => {
+    for (var channel in tradingBotChannels) {
+        client.channels.cache.get(channel).send('Bot process was interrupted, please expect a couple seconds downtime').catch(err => console.log(err))
+    }
+    for (var channel in tradingBotLichChannels) {
+        client.channels.cache.get(channel).send('Bot process was interrupted, please expect a couple seconds downtime').catch(err => console.log(err))
+    }
+    console.log(`Process ${process.pid} received a SIGINT signal`)
+})
+
 axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
