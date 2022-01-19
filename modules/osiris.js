@@ -12,7 +12,7 @@ async function sendMsg() {
         guild.emojis.fetch()
         .then(async emoji => {
             var emote_list = []
-            emoji.map(emote => emote_list.push(emote.identifier))
+            emoji.map(emote => emote_list.push(emote.identifier.match(/^a:[a-zA-Z0-9!@#$%^&*()_+-=]*:/)?  '<' + emote.identifier + '>':'<:' + emote.identifier + '>'))
             await db.query(`SELECT * from osiris_emotes`)
             .then(async res => {
                 for (const emote of emote_list) {
@@ -20,8 +20,8 @@ async function sendMsg() {
                         if (dbemote.identifier == emote)
                             continue
                     }
-                    await db.query(`INSERT INTO osiris_emotes (identifier) VALUES (${emote})`).catch(err => console.log(err))
-                    console.log(`INSERT INTO osiris_emotes (identifier) VALUES (${emote})`)
+                    await db.query(`INSERT INTO osiris_emotes (identifier) VALUES ('${emote}')`).catch(err => console.log(err))
+                    console.log(`INSERT INTO osiris_emotes (identifier) VALUES ('${emote}')`)
                 }
             }).catch(err => console.log(err))
             //const channel = client.channels.cache.get(osiris_channels.owner_chat)
@@ -66,7 +66,7 @@ List of features:
                     })
                     x += 3
                 }
-                postdata.embeds[0].fields[x].value += emote.match(/^a:[a-zA-Z0-9!@#$%^&*()_+-=]*:/)?  '<' + emote + '>'+ '\n':'<:' + emote + '>'+ '\n'
+                postdata.embeds[0].fields[x].value += emote + '\n'
             }
             //channel.send(postdata).catch(err => console.log(err))
             message.edit(postdata).catch(err => console.log(err))
