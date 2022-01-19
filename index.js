@@ -3965,7 +3965,7 @@ process
   .on('uncaughtException', procshutdown('uncaughtException'));
 
 async function procshutdown(signal) {
-  return (err) => {
+  return async (err) => {
     console.log(`${ signal }...`);
     if (err) console.error(err.stack || err);
     for (var channel in tradingBotChannels) {
