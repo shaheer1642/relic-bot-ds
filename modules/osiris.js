@@ -1,7 +1,7 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
-const osiris_guild_id = '905647811939426325'
+const osiris_guild_id = '905559118096531456'
 const osiris_channels = {
     owner_chat : '905647811939426325'
 } 
@@ -12,7 +12,7 @@ async function sendMsg() {
     .then(guild => {
         guild.emojis.fetch()
         .then(emoji => {
-            emote_list += emoji.map(emoji => emoji.identifier) + '\n'
+            emoji.map(emote => emote_list += '<:' + emote.identifier + '>\n')
             client.channels.cache.get(osiris_channels.owner_chat)
             .send({
                 content: ' ',
@@ -23,11 +23,11 @@ async function sendMsg() {
                         value: emote_list,
                         inline: true
                     },{
-                        name: '\u200b',
+                        name: 'Usage',
                         value: '\u200b',
                         inline: true
                     },{
-                        name: 'Usage',
+                        name: 'Most used by',
                         value: '\u200b',
                         inline: true
                     }]

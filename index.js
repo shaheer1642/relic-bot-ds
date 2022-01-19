@@ -67,7 +67,8 @@ client.on('ready', () => {
 
     client.user.setActivity('.help', { type: 2 })
 
-    //osiris_guild.sendMsg().catch(err => console.log(err))
+    //if (process.env.DEBUG_MODE==1)
+        osiris_guild.sendMsg().catch(err => console.log(err))
 
     console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
     
@@ -689,150 +690,152 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
     if (process.env.DEBUG_MODE==1)
         return
 
-    if (tradingBotGuilds.includes(newMember.member.guild.id)) {
-        let username = newMember.user.username;
-        if (!newMember.member.presence.status) {
-            console.log(`User ${username} has went offline.`)
-            await offline_orders_update(newMember).catch(err => console.log(err))
-        }
-        else if (newMember.member.presence.status == 'offline') {
-            console.log(`User ${username} has went offline.`)
-            await offline_orders_update(newMember).catch(err => console.log(err))
-        }
-        else if (newMember.member.presence.status == 'online')
-            console.log(`User ${username} has come online.`)
-        return Promise.resolve()
-        async function offline_orders_update(newMember) {
-            var user_data = null
-            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${newMember.user.id}`)
-            .then(res => {
-                if (res.rows.length == 0) {     //user does not exist in the db
-                    console.log('User does not exist in db')
-                    return false
+    if (newMember.member)
+        if (newMember.member.guild)
+            if (tradingBotGuilds.includes(newMember.member.guild.id)) {
+                let username = newMember.user.username;
+                if (!newMember.member.presence.status) {
+                    console.log(`User ${username} has went offline.`)
+                    await offline_orders_update(newMember).catch(err => console.log(err))
                 }
-                if (res.rows.length > 1) {     //unexpected response
-                    console.log('Unexpected db response')
-                    return false
+                else if (newMember.member.presence.status == 'offline') {
+                    console.log(`User ${username} has went offline.`)
+                    await offline_orders_update(newMember).catch(err => console.log(err))
                 }
-                user_data = res.rows[0]
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
+                else if (newMember.member.presence.status == 'online')
+                    console.log(`User ${username} has come online.`)
                 return Promise.resolve()
-            db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-            .then(res => {
-                if (res.rows.length == 0) {     //no visible orders at the time
-                    console.log('No visible items orders at the time')
-                    return
-                }
-                else if (res.rows.length > 0) {     //visible orders found
-                    var orders_list = res.rows
-                    db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                    .then(async res => {
-                        if (res.rowCount == 0)
+                async function offline_orders_update(newMember) {
+                    var user_data = null
+                    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${newMember.user.id}`)
+                    .then(res => {
+                        if (res.rows.length == 0) {     //user does not exist in the db
+                            console.log('User does not exist in db')
+                            return false
+                        }
+                        if (res.rows.length > 1) {     //unexpected response
+                            console.log('Unexpected db response')
+                            return false
+                        }
+                        user_data = res.rows[0]
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return Promise.resolve()
+                    db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                    .then(res => {
+                        if (res.rows.length == 0) {     //no visible orders at the time
+                            console.log('No visible items orders at the time')
                             return
-                        var all_orders_names = []
-                        for (var i=0;i<orders_list.length;i++) {
-                            var item_id = orders_list[i].item_id
-                            var item_rank = orders_list[i].user_rank
-                            console.log(JSON.stringify(orders_list))
-                            await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+                        }
+                        else if (res.rows.length > 0) {     //visible orders found
+                            var orders_list = res.rows
+                            db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
                             .then(async res => {
-                                if (res.rows.length==0) { //unexpected response 
-                                    console.log('Unexpected db response fetching item info')
+                                if (res.rowCount == 0)
                                     return
+                                var all_orders_names = []
+                                for (var i=0;i<orders_list.length;i++) {
+                                    var item_id = orders_list[i].item_id
+                                    var item_rank = orders_list[i].user_rank
+                                    console.log(JSON.stringify(orders_list))
+                                    await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+                                    .then(async res => {
+                                        if (res.rows.length==0) { //unexpected response 
+                                            console.log('Unexpected db response fetching item info')
+                                            return
+                                        }
+                                        if (res.rows.length>1) { //unexpected response
+                                            console.log('Unexpected db response fetching item info')
+                                            return
+                                        }
+                                        var item_url = res.rows[0].item_url
+                                        var item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
+                                        await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank)
+                                        .then(() => {
+                                            all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
+                                        })
+                                        .catch(err => console.log(err))
+                                    })
+                                    .catch(err => console.log(err))
                                 }
-                                if (res.rows.length>1) { //unexpected response
-                                    console.log('Unexpected db response fetching item info')
-                                    return
-                                }
-                                var item_url = res.rows[0].item_url
-                                var item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
-                                await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank)
-                                .then(() => {
-                                    all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
+                                var postdata = {}
+                                postdata.content = " "
+                                postdata.embeds = []
+                                postdata.embeds.push({
+                                    description: `
+                                    ❕ Offline Notification ❕\n
+                                    You have been detected offline. Following orders have been set invisible for you:\n
+                                    ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
+                                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                                    timestamp: new Date(),
+                                    color: '#FFFFFF'
                                 })
-                                .catch(err => console.log(err))
+                                if (user_data.notify_offline)
+                                    newMember.user.send(postdata).catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                         }
-                        var postdata = {}
-                        postdata.content = " "
-                        postdata.embeds = []
-                        postdata.embeds.push({
-                            description: `
-                            ❕ Offline Notification ❕\n
-                            You have been detected offline. Following orders have been set invisible for you:\n
-                            ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                            footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                            timestamp: new Date(),
-                            color: '#FFFFFF'
-                        })
-                        if (user_data.notify_offline)
-                            newMember.user.send(postdata).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
-                }
-            })
-            .catch(err => console.log(err))
-            db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-            .then(res => {
-                if (res.rows.length == 0) {     //no visible orders at the time
-                    console.log('No visible lich orders at the time')
-                    return
-                }
-                else if (res.rows.length > 0) {     //visible orders found
-                    var orders_list = res.rows
-                    db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                    .then(async res => {
-                        if (res.rowCount == 0)
+                    db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                    .then(res => {
+                        if (res.rows.length == 0) {     //no visible orders at the time
+                            console.log('No visible lich orders at the time')
                             return
-                        var all_orders_names = []
-                        for (var i=0;i<orders_list.length;i++) {
-                            await db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
+                        }
+                        else if (res.rows.length > 0) {     //visible orders found
+                            var orders_list = res.rows
+                            db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
                             .then(async res => {
-                                if (res.rows.length==0) { //unexpected response 
-                                    console.log('Unexpected db response fetching lich info')
+                                if (res.rowCount == 0)
                                     return
+                                var all_orders_names = []
+                                for (var i=0;i<orders_list.length;i++) {
+                                    await db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
+                                    .then(async res => {
+                                        if (res.rows.length==0) { //unexpected response 
+                                            console.log('Unexpected db response fetching lich info')
+                                            return
+                                        }
+                                        if (res.rows.length>1) { //unexpected response
+                                            console.log('Unexpected db response fetching lich info')
+                                            return
+                                        }
+                                        lich_info = res.rows[0]
+                                        await trade_bot_modules.trading_lich_orders_update(null,lich_info,2)
+                                        .then(() => {
+                                            all_orders_names.push(res.rows[0].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
+                                        })
+                                        .catch(err => console.log(err))
+                                    })
+                                    .catch(err => console.log(err))
                                 }
-                                if (res.rows.length>1) { //unexpected response
-                                    console.log('Unexpected db response fetching lich info')
-                                    return
-                                }
-                                lich_info = res.rows[0]
-                                await trade_bot_modules.trading_lich_orders_update(null,lich_info,2)
-                                .then(() => {
-                                    all_orders_names.push(res.rows[0].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
+                                var postdata = {}
+                                postdata.content = " "
+                                postdata.embeds = []
+                                postdata.embeds.push({
+                                    description: `
+                                    ❕ Offline Notification ❕\n
+                                    You have been detected offline. Following orders have been set invisible for you:\n
+                                    ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
+                                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
+                                    timestamp: new Date(),
+                                    color: '#FFFFFF'
                                 })
-                                .catch(err => console.log(err))
+                                if (user_data.notify_offline)
+                                    newMember.user.send(postdata).catch(err => console.log(err))
                             })
                             .catch(err => console.log(err))
                         }
-                        var postdata = {}
-                        postdata.content = " "
-                        postdata.embeds = []
-                        postdata.embeds.push({
-                            description: `
-                            ❕ Offline Notification ❕\n
-                            You have been detected offline. Following orders have been set invisible for you:\n
-                            ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                            footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                            timestamp: new Date(),
-                            color: '#FFFFFF'
-                        })
-                        if (user_data.notify_offline)
-                            newMember.user.send(postdata).catch(err => console.log(err))
                     })
                     .catch(err => console.log(err))
                 }
-            })
-            .catch(err => console.log(err))
-        }
-    }
+            }
     return Promise.resolve()
 })
 
@@ -4001,6 +4004,8 @@ function procshutdown(signal) {
                 }).catch(err => console.log(err))
             })
         }
+        else 
+            process.exit(err ? 1 : 0);
         setTimeout(() => {
           console.log('...waited 15s, exiting.');
           process.exit(err ? 1 : 0);
