@@ -91,6 +91,10 @@ client.on('ready', () => {
     //----Ducat updater timeout----
     ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
 
+    //----Osiris timer----
+    setInterval(osiris_guild.dbUpdate, 3600000);     //every hour
+    setInterval(osiris_guild.editMsg, 60000);        //every minute
+
     if (process.env.DEBUG_MODE!=1) {
         //----flush terminate msgs----
         db.query(`SELECT * FROM process_terminate_flush`)
