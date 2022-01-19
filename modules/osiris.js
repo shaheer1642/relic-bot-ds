@@ -37,8 +37,8 @@ List of features:
             })
             var x = 0
             for (var e in emote_list) {
-                if (postdata[0].fields[0].value.length >= 1024) {
-                    postdata[0].fields.push({
+                if (postdata.embeds[0].fields[0].value.length >= 1024) {
+                    postdata.embeds[0].fields.push({
                         name: '\u200b',
                         value: '\u200b',
                         inline: true
@@ -53,7 +53,7 @@ List of features:
                     })
                     x += 3
                 }
-                postdata[0].fields[x].value += e + '\n'
+                postdata.embeds[0].fields[x].value += e + '\n'
             }
 
             channel.send(postdata).catch(err => console.log(err))
