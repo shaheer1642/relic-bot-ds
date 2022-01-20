@@ -77,7 +77,7 @@ List of features:
                 inline: true
             },{
                 name: 'Most used by',
-                value: '\u200b',
+                value: '',
                 inline: true
             }]
         })
@@ -94,7 +94,7 @@ List of features:
                     inline: true
                 },{
                     name: '\u200b',
-                    value: '\u200b',
+                    value: '',
                     inline: true
                 })
                 x += 3
