@@ -44,6 +44,18 @@ async function editMsg() {
         for (const emote of res.rows) {
             field1.push(emote.identifier)
             field2.push(emote.usage_count)
+            var most_used_id = 0
+            var most_used_count = 0
+            for (const user in emote.usage_users) {
+                if (emote.usage_users[user] > most_used_count) {
+                    most_used_count = emote.usage_users[user]
+                    most_used_id = user
+                }
+            }
+            if (most_used_id)
+                field3.push(`<@${most_used_id}> (x${most_used_count})`)
+            else
+                field3.push('N/A')
         }
         const message = await client.channels.cache.get(osiris_channels.owner_chat).messages.fetch('933451508983398411')
         var postdata = {content: ' ', embeds: []}
@@ -88,6 +100,7 @@ List of features:
             }
             postdata.embeds[0].fields[x].value += field1[index] + '\n'
             postdata.embeds[0].fields[x+1].value += field2[index] + '\n'
+            postdata.embeds[0].fields[x+2].value += field3[index] + '\n'
         }
         message.edit(postdata).catch(err => console.log(err))
     }).catch(err => console.log(err))
