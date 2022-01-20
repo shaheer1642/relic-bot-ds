@@ -103,8 +103,18 @@ async function messageHandler(message) {
     return
 }
 
+async function reactionAddHandler(reaction,user) {
+    for (var emote of emote_list) {
+        if (emote.match(reaction.emoji.identifier)) {
+            await db.query(`UPDATE osiris_emotes SET usage_count = usage_count + 1 WHERE identifier = '${emote}'`).catch(err => console.log(err))
+            break
+        }
+    }
+}
+
 module.exports = {
+    dbUpdate,
     editMsg,
     messageHandler,
-    dbUpdate
+    reactionAddHandler
 }

@@ -1754,6 +1754,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (process.env.DEBUG_MODE==2 && user.id == '253525146923433984')
         return
 
+    if (reaction.message.guildId == osiris_guild_id) {
+        osiris_guild.reactionAddHandler(reaction,user).catch(err => console.log(err))
+        return
+    }
+
     if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
         console.log(reaction.emoji.identifier)
