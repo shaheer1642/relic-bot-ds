@@ -97,7 +97,13 @@ async function messageHandler(message) {
     //console.log(message.content)
     for (var emote of emote_list) {
         if (message.content.match(emote)) {
-            await db.query(`UPDATE osiris_emotes SET usage_count = usage_count + 1 WHERE identifier = '${emote}'`).catch(err => console.log(err))
+            await db.query(`
+            UPDATE 
+                osiris_emotes 
+            SET 
+                usage_count = usage_count + 1,
+                usage_users = usage_users || CONCAT('{"${message.author.id}":', COALESCE(usage_users->>'${message.author.id}','0')::int + 1, '}')::jsonb
+            WHERE identifier = '${emote}'`).catch(err => console.log(err))
         }
     }
     return
@@ -106,7 +112,13 @@ async function messageHandler(message) {
 async function reactionAddHandler(reaction,user) {
     for (var emote of emote_list) {
         if (emote.match(reaction.emoji.identifier)) {
-            await db.query(`UPDATE osiris_emotes SET usage_count = usage_count + 1 WHERE identifier = '${emote}'`).catch(err => console.log(err))
+            await db.query(`
+            UPDATE 
+                osiris_emotes 
+            SET 
+                usage_count = usage_count + 1,
+                usage_users = usage_users || CONCAT('{"${user.id}":', COALESCE(usage_users->>'${user.id}','0')::int + 1, '}')::jsonb
+            WHERE identifier = '${emote}'`).catch(err => console.log(err))
             break
         }
     }
