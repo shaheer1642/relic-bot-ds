@@ -30,6 +30,7 @@ async function dbUpdate() {
                     await db.query(`INSERT INTO osiris_emotes (identifier) VALUES ('${emote}')`).catch(err => console.log(err))
                     console.log(`INSERT INTO osiris_emotes (identifier) VALUES ('${emote}')`)
                 }
+                editMsg()
             }).catch(err => console.log(err))
         }).catch(err => console.log(err))
     }).catch(err => console.log(err))
