@@ -8,7 +8,7 @@ const trade_bot_modules = require('./modules/trade_bot_modules.js');
 const ducat_updater = require('./modules/ducat_updater.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
 const fs = require('fs')
-const {db} = require('./modules/db_connection.js');
+const {db,db_connect} = require('./modules/db_connection.js');
 const gpt3 = require('./modules/gpt3.js');
 const {pins_handler} = require('./modules/pins_handler.js');
 const trackers = require('./modules/trackers.js');
@@ -3981,6 +3981,12 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 })
 
 //process shutdown handles
+
+db.on('error', async err => {
+    console.log('----DB CONN ERROR----\n' + err)
+    await db.end()
+    db_connect();
+});
 
 process
   .on('SIGTERM', procshutdown('SIGTERM'))
