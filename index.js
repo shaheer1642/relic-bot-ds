@@ -8,7 +8,7 @@ const trade_bot_modules = require('./modules/trade_bot_modules.js');
 const ducat_updater = require('./modules/ducat_updater.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
 const fs = require('fs')
-const {db,db_connect} = require('./modules/db_connection.js');
+const {db,dbNewPool} = require('./modules/db_connection.js');
 const gpt3 = require('./modules/gpt3.js');
 const {pins_handler} = require('./modules/pins_handler.js');
 const trackers = require('./modules/trackers.js');
@@ -4007,7 +4007,7 @@ function procshutdown(signal) {
         if (err) console.error(err);
         if (err.code == '57P01') {
             console.log('----DATABASE DISCONNECTION----')
-            db_connect();
+            dbNewPool();
             return
         }
         if (process.env.DEBUG_MODE != 1) {

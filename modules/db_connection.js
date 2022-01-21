@@ -1,9 +1,9 @@
 const DB = require('pg');
 
 let db;
-db_connect();
+dbNewPool();
 
-async function db_connect() {
+async function dbNewPool() {
     console.log('Establishing connection to DB...')
     db = new DB.Pool({
         connectionString: process.env.DATABASE_URL,
@@ -11,13 +11,19 @@ async function db_connect() {
           rejectUnauthorized: false
         }
     })
-    return db.connect().then(res => {
-        console.log('Connection established.')
-        console.log(db.eventNames())
-    }).catch(err => {
-        console.log(err)
-        db_connect()
+    db.connect().catch(err => {
+        console.log('DB Connection failure.\n' + err)
+        dbNewPool()
     });
 }
 
-module.exports = {db,db_connect};
+db.on('connect', client => {
+    console.log('DB Connection established.')
+})
+
+db.on('error', err => {
+    console.log('DB Connection error.')
+    console.log(err)
+})
+
+module.exports = {db,dbNewPool};
