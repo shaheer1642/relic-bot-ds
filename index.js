@@ -4003,10 +4003,13 @@ function procshutdown(signal) {
     */
     const downtimeInform = ['891756819045826621']
     return (err) => {
-        if (err.code == '57P01')
-            console.log('----DATABASE DISCONNECTION----')
         console.log(`${ signal }...`);
         if (err) console.error(err);
+        if (err.code == '57P01') {
+            console.log('----DATABASE DISCONNECTION----')
+            db_connect();
+            return
+        }
         if (process.env.DEBUG_MODE != 1) {
             downtimeInform.forEach(channel => {
                 client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a brief downtime`)

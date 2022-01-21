@@ -11,10 +11,6 @@ async function db_connect() {
           rejectUnauthorized: false
         }
     })
-    db.on('error', err => {
-        console.log('----DB CONN ERROR----\n' + err)
-        db_connect();
-    });
     return db.connect().then(res => {
         console.log('Connection established.')
         console.log(db.eventNames())
