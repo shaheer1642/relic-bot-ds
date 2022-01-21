@@ -3993,6 +3993,11 @@ process
   .on('SIGINT', procshutdown('SIGINT'))
   .on('uncaughtException', procshutdown('uncaughtException'));
 
+db.on('error', err => {
+    console.log('hii33333333333333333333333333')
+    console.log(err)
+})
+
 function procshutdown(signal) {
     /*
     const downtimeInform = [
