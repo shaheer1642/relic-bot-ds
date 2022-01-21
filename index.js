@@ -3982,9 +3982,9 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 
 //process shutdown handles
 
-db.on('error', async err => {
+db.on('error', err => {
     console.log('----DB CONN ERROR----\n' + err)
-    await db.end()
+    db.end()
     db_connect();
 });
 
