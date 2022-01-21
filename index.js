@@ -3982,12 +3982,6 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 
 //process shutdown handles
 
-db.on('error', err => {
-    console.log('----DB CONN ERROR----\n' + err)
-    db.end()
-    db_connect();
-});
-
 process
   .on('SIGTERM', procshutdown('SIGTERM'))
   .on('SIGINT', procshutdown('SIGINT'))
