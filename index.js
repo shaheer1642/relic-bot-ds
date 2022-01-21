@@ -4003,6 +4003,8 @@ function procshutdown(signal) {
     */
     const downtimeInform = ['891756819045826621']
     return (err) => {
+        if (err.code == '57P01')
+            console.log('----DATABASE DISCONNECTION----')
         console.log(`${ signal }...`);
         if (err) console.error(err);
         if (process.env.DEBUG_MODE != 1) {
