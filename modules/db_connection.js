@@ -1,26 +1,27 @@
 const DB = require('pg');
 
-const db = new DB.Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false
-    }
-});
+let db;
+connect();
 
-console.log('Establishing connection to DB...')
-
-db.connect().then(res => {
-    console.log('Connection established.')
-    return true
-})
-.catch(err => {
-    console.log(err + '\nConnection failure.');
-    return false
-});
-
-db.on('error', err => {
-    console.log('hii33333333333333333333333333')
-    console.log(err)
-})
+async function connect() {
+    console.log('Establishing connection to DB...')
+    db = new DB.Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false
+        }
+    })
+    db.on('error', async err => {
+        console.log('----DB CONN ERROR----\n' + err)
+        await db.end()
+        connect();
+    });
+    return db.connect().then(res => {
+        console.log('Connection established.')
+    }).catch(err => {
+        console.log(err)
+        connect()
+    });
+}
 
 module.exports = {db};

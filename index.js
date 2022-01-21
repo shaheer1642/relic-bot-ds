@@ -1,8 +1,5 @@
 const config = require('./config.json')
-const {Client, Collection, Intents, MessageEmbed, MessageReaction, WebhookClient} = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+const {MessageEmbed, WebhookClient} = require('discord.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const wfm_api = require('./modules/wfm_api.js');
@@ -10,7 +7,6 @@ const test_modules = require('./modules/test_modules.js');
 const trade_bot_modules = require('./modules/trade_bot_modules.js');
 const ducat_updater = require('./modules/ducat_updater.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
-const Canvas = require('canvas')
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
 const gpt3 = require('./modules/gpt3.js');
@@ -19,10 +15,9 @@ const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
 const osiris_guild_id = '905559118096531456'
-const {client,tickcount} = require('./modules/discord_client.js');
+const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
 
-const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
 const userOrderLimit = 50
@@ -57,7 +52,6 @@ const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
-const u_order_close_time = 10800000
 
 client.on('ready', () => {
     //if (process.env.DEBUG_MODE == 1)
