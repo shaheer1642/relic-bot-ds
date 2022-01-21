@@ -26,4 +26,4 @@ db.on('error', err => {
     console.log(err)
 })
 
-module.exports = {db,dbNewPool};
+module.exports = {db};

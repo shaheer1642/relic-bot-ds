@@ -8,7 +8,7 @@ const trade_bot_modules = require('./modules/trade_bot_modules.js');
 const ducat_updater = require('./modules/ducat_updater.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
 const fs = require('fs')
-const {db,dbNewPool} = require('./modules/db_connection.js');
+const {db} = require('./modules/db_connection.js');
 const gpt3 = require('./modules/gpt3.js');
 const {pins_handler} = require('./modules/pins_handler.js');
 const trackers = require('./modules/trackers.js');
@@ -4004,12 +4004,13 @@ function procshutdown(signal) {
     const downtimeInform = ['891756819045826621']
     return (err) => {
         console.log(`${ signal }...`);
-        if (err) console.error(err);
-        if (err.code == '57P01') {
-            console.log('----DATABASE DISCONNECTION----')
-            dbNewPool();
-            return
-        }
+        if (err) {
+            console.error(err)
+            if (err.code == '57P01') {
+                console.log('----DATABASE DISCONNECTION----')
+                process.exit(err ? 1 : 0);
+            }
+        };
         if (process.env.DEBUG_MODE != 1) {
             downtimeInform.forEach(channel => {
                 client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a brief downtime`)
