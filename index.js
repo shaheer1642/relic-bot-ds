@@ -3991,7 +3991,14 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 process
   .on('SIGTERM', procshutdown('SIGTERM'))
   .on('SIGINT', procshutdown('SIGINT'))
+  .on('dbTERM', procshutdown('dbTERM'))
   .on('uncaughtException', procshutdown('uncaughtException'));
+
+db.on('error', err => {
+    console.log('Received err in DB, restarting process')
+    console.log(err)
+    process.emit('dbTERM')
+})
 
 function procshutdown(signal) {
     const downtimeInform = [
@@ -4009,7 +4016,7 @@ function procshutdown(signal) {
     return (err) => {
         console.log(`${ signal }...`);
         if (err) console.error(err.stack || err);
-        if (process.env.DEBUG_MODE != 1) {
+        if ((process.env.DEBUG_MODE != 1) && signal != 'dbTERM') {
             downtimeInform.forEach(channel => {
                 client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a brief downtime`)
                 .then(res => {
