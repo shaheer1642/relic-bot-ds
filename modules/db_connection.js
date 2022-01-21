@@ -7,14 +7,12 @@ const db = new DB.Pool({
     }
 })
 
-db.connect().catch(err => {
+db.connect().then(res => {
+    console.log('DB Connection established.')
+}).catch(err => {
     console.log('DB Connection failure.\n' + err)
     process.exit(1)
 });
-
-db.on('connect', client => {
-    console.log('DB Connection established.')
-})
 
 db.on('error', err => {
     console.log('=============== DB Connection error. ==============')
