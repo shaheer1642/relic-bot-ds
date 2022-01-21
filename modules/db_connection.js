@@ -18,6 +18,7 @@ async function connect() {
     });
     return db.connect().then(res => {
         console.log('Connection established.')
+        console.log(db.eventNames())
     }).catch(err => {
         console.log(err)
         connect()
