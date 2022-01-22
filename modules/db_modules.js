@@ -342,7 +342,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
             if (sellAvgPrice > sellAvgPrice_90)
                 sellAvgPrice_90 = sellAvgPrice
             if (maxedSellAvgPrice > maxedSellAvgPrice_90)
-                maxedSellAvgPrice = maxedSellAvgPrice_90
+                maxedSellAvgPrice_90 = maxedSellAvgPrice
         })
         //-----buy avg-----
         var buyAvgPrice = null
@@ -356,9 +356,9 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 else
                     buyAvgPrice = e.median
                 if (buyAvgPrice > buyAvgPrice_90)
-                    buyAvgPrice = buyAvgPrice_90
+                    buyAvgPrice_90 = buyAvgPrice
                 if (maxedBuyAvgPrice > maxedBuyAvgPrice_90)
-                    maxedBuyAvgPrice = maxedBuyAvgPrice_90
+                    maxedBuyAvgPrice_90 = maxedBuyAvgPrice
             }
         })
         if (buyAvgPrice > sellAvgPrice)
