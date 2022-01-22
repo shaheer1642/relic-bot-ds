@@ -324,7 +324,9 @@ async function updateDatabaseItem(db_items_list,item,index) {
     .then(async itemOrders => {
         //-----sell avg-----
         var sellAvgPrice = null
+        var sellAvgPrice_90 = 0
         var maxedSellAvgPrice = null
+        var maxedSellAvgPrice_90 = 0
         var rank = null
         itemOrders.data.payload.statistics_closed["90days"].forEach(e => {
             if (item.tags.includes('relic') && e.subtype) {
@@ -337,16 +339,26 @@ async function updateDatabaseItem(db_items_list,item,index) {
             }
             else
                 sellAvgPrice = e.median
+            if (sellAvgPrice > sellAvgPrice_90)
+                sellAvgPrice_90 = sellAvgPrice
+            if (maxedSellAvgPrice > maxedSellAvgPrice_90)
+                maxedSellAvgPrice = maxedSellAvgPrice_90
         })
         //-----buy avg-----
         var buyAvgPrice = null
+        var buyAvgPrice_90 = 0
         var maxedBuyAvgPrice = null
+        var maxedBuyAvgPrice_90 = 0
         itemOrders.data.payload.statistics_live["90days"].forEach(e => {
             if (e.order_type == "buy") {
                 if (e.mod_rank > 0)
                     maxedBuyAvgPrice = e.median
                 else
                     buyAvgPrice = e.median
+                if (buyAvgPrice > buyAvgPrice_90)
+                    buyAvgPrice = buyAvgPrice_90
+                if (maxedBuyAvgPrice > maxedBuyAvgPrice_90)
+                    maxedBuyAvgPrice = maxedBuyAvgPrice_90
             }
         })
         if (buyAvgPrice > sellAvgPrice)
@@ -592,9 +604,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
         console.log(`Updating DB item detail...`)
         var status = await db.query(`UPDATE items_list SET 
             sell_price = ${sellAvgPrice},
+            sell_last_90 = ${sellAvgPrice_90},
             buy_price = ${buyAvgPrice},
+            buy_last_90 = ${buyAvgPrice_90},
             maxed_sell_price = ${maxedSellAvgPrice},
+            maxed_sell_last_90 = ${maxedSellAvgPrice_90},
             maxed_buy_price = ${maxedBuyAvgPrice},
+            maxed_buy_last_90 = ${maxedBuyAvgPrice_90},
             volume_sold = ${volume_sold},
             rank = ${rank},
             ducat = ${ducat_value},
