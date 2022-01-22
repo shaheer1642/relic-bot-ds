@@ -634,9 +634,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
             element = db_items_list[i]
             if (element.id == item.id) {
                 db_items_list[i].sell_price = sellAvgPrice
+                db_items_list[i].sell_last_90 = sellAvgPrice_90
                 db_items_list[i].buy_price = buyAvgPrice
+                db_items_list[i].buy_last_90 = buyAvgPrice_90
                 db_items_list[i].maxed_sell_price = maxedSellAvgPrice
+                db_items_list[i].maxed_sell_last_90 = maxedSellAvgPrice_90
                 db_items_list[i].maxed_buy_price = maxedBuyAvgPrice
+                db_items_list[i].maxed_buy_last_90 = maxedBuyAvgPrice_90
                 db_items_list[i].volume_sold = volume_sold
                 db_items_list[i].rank = rank
                 db_items_list[i].ducat = ducat_value
