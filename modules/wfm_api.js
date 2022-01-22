@@ -226,7 +226,7 @@ async function orders(message,args) {
                     {name: 'Price', value: prices, inline: true}
                 ],
                 thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
-                footer: {text: "Yesterday Avg: " + item_data.sell_price + 'p\nMax last 90 days: ' + item_data.sell_last_90 + 'p\n\u200b'},
+                footer: {text: "Yesterday Avg: " + item_data.sell_price + 'p\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205FMax last 90 days: ' + item_data.sell_last_90 + 'p\n\u200b'},
                 timestamp: new Date()
             })
             if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
@@ -259,7 +259,7 @@ async function orders(message,args) {
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 )
-                embeds[index-1].footer.text += 'Max ranked avg: ' + item_data.maxed_sell_price + 'p\nMax last 90 days: ' + item_data.maxed_sell_last_90 + 'p\n\u200b'
+                embeds[index-1].footer.text += 'Max ranked avg: ' + item_data.maxed_sell_price + 'p\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205FMax last 90 days: ' + item_data.maxed_sell_last_90 + 'p\n\u200b'
             }
             embeds[index-1].footer.text += 'Volume sold last 30 days: ' + item_data.volume_sold + '\n\u200b'
             console.log(embeds.length + " " + arrItems.length)
@@ -387,7 +387,7 @@ async function orders_update(message, reaction, user) {
                     {name: 'Price', value: prices, inline: true}
                 ],
                 thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
-                footer: {text: "Yesterday Avg: " + item_data.sell_price + 'p\nMax last 90 days: ' + item_data.sell_last_90 + 'p\n\u200b'},
+                footer: {text: "Yesterday Avg: " + item_data.sell_price + 'p\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205FMax last 90 days: ' + item_data.sell_last_90 + 'p\n\u200b'},
                 timestamp: new Date()
             })
             if ((ordersArr.length > 0) && Object.keys(ordersArr[0]).includes("mod_rank")) {   // get orders for maxed rank
@@ -422,7 +422,7 @@ async function orders_update(message, reaction, user) {
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true}
                 )
-                embeds[index-1].footer.text += 'Max ranked avg: ' + item_data.maxed_sell_price + 'p\nMax last 90 days: ' + item_data.maxed_sell_last_90 + 'p\n\u200b'
+                embeds[index-1].footer.text += 'Max ranked avg: ' + item_data.maxed_sell_price + 'p\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205FMax last 90 days: ' + item_data.maxed_sell_last_90 + 'p\n\u200b'
             }
             embeds[index-1].footer.text += 'Volume sold last 30 days: ' + item_data.volume_sold + '\n\u200b'
             console.log(embeds.length + " " + arrItems.length)
