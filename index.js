@@ -4001,7 +4001,7 @@ function procshutdown(signal) {
         '892843163851563009'
     ]
     */
-    const downtimeInform = ['891756819045826621']
+    const downtimeInform = ['891756819045826621','892160436881993758']
     return (err) => {
         console.log(`${ signal }...`);
         if (err) {
