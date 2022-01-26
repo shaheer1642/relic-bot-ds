@@ -38,8 +38,8 @@ function help(message,args) {
             ]
         }]
     }
-    message.channel.send(postdata)
-    message.react(defaultReactions.check.string)
+    message.channel.send(postdata).catch(err => console.log(err))
+    message.react(defaultReactions.check.string).catch(err => console.log(err))
     return
 }
 
@@ -66,7 +66,7 @@ function uptime(message,args) {
     message.channel.send({
         content: `Current uptime: ${msToTime(new Date().getTime()-tickcount)}\nPing:  ${Math.round(client.ws.ping)}ms\nCycle restart in: ${msToTime((tickcount + 88200000) - new Date().getTime())}\nDatabase update in: ${msToTime(msTill1AM)}`
     }).catch(err => console.log(err))
-    message.react(defaultReactions.check.string);
+    message.react(defaultReactions.check.string).catch(err => console.log(err));
     return
 }
 
@@ -74,7 +74,7 @@ async function orders(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve top 5 sell orders for an item from warframe.market\nUsage example:\n.orders frost prime\n.orders ember\n.orders kronen prime blade\n.orders axi L4 relic\n.orders primed pressure point"}).catch(err => console.log(err));
-        message.react(defaultReactions.check.string)
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     }
     var d_item_url = ""
@@ -97,7 +97,7 @@ async function orders(message,args) {
     .catch (err => {
         console.log(err)
         console.log('Retrieving Database -> items_list error')
-        message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"})
+        message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"}).catch(err => console.log(err))
         return false
     })
     if (!status)
@@ -273,7 +273,7 @@ async function orders(message,args) {
             }
         })
         .catch(error => {
-            processMessage.edit("Error occured retrieving orders. Please try again.\nError code 501")
+            processMessage.edit("Error occured retrieving orders. Please try again.\nError code 501").catch(err => console.log(err))
             console.log(error)
             return
         });
@@ -428,12 +428,12 @@ async function orders_update(message, reaction, user) {
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 embeds = embeds.sort(dynamicSort("title"))
-                message.edit({embeds: embeds})
+                message.edit({embeds: embeds}).catch(err => console.log(err))
             }
         })
         .catch(err => {
             console.log(err)
-            message.edit('Error occured retrieving prices.')
+            message.edit('Error occured retrieving prices.').catch(err => console.log(err))
             return
         })
     }
@@ -443,7 +443,7 @@ async function relics(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve relics for a prime item\nUsage example:\n.relics frost prime\n.relics ember\n.relics kronen prime blade\n.relic axi s3"}).catch(err => console.log(err));
-        message.react(defaultReactions.check.string)
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     }
     var d_item_url = ""
@@ -464,7 +464,7 @@ async function relics(message,args) {
     .catch (err => {
         console.log(err)
         console.log('Retrieving Database -> items_list error')
-        message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"})
+        message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"}).catch(err => console.log(err))
         return false
     })
     if (!status)
@@ -564,7 +564,7 @@ async function relics(message,args) {
         else if (relic_drops.vault_status == 'P' && relic_drops.vault_timestamp)
             postdata.embeds[0].footer.text += '\nUnvaulted since: ' + msToFullTime(new Date().getTime() - relic_drops.vault_timestamp)
         message.channel.send(postdata).catch(err => console.log(err));
-        message.react(defaultReactions.check.string)
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     }
     var foundItem = 0
@@ -608,7 +608,7 @@ async function relics(message,args) {
         if (part_info.vault_status)
             vault_status = ' (' + part_info.vault_status + ')'
         if (!part_info.relics) {
-            message.channel.send(`Could not find relic data for item **${arrItemsUrl[i]}**`)
+            message.channel.send(`Could not find relic data for item **${arrItemsUrl[i]}**`).catch(err => console.log(err))
             continue
         }
         postdata[X].embeds[j] = {
@@ -778,7 +778,7 @@ async function auctions(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage\nUsage example:\n.auctions kuva kohm\n.auctions bramma\n.auctions kuva hek toxin"}).catch(err => console.log(err));
-        message.react(defaultReactions.check.string)
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     }
     var modifier = ""
@@ -807,7 +807,7 @@ async function auctions(message,args) {
     })
     .catch (err => {
         console.log(err + 'Retrieving Database -> lich_list error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"}).catch(err => console.log(err))
         return false
     })
     if (!status)
@@ -967,12 +967,12 @@ async function auctions(message,args) {
                 ]
             }
         )
-        processMessage.edit(postdata)
-        message.react(defaultReactions.check.string)
+        processMessage.edit(postdata).catch(err => console.log(err))
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     })
     .catch(function (error) {
-        processMessage.edit("Error occured retrieving auctions.\nError code 501")
+        processMessage.edit("Error occured retrieving auctions.\nError code 501").catch(err => console.log(err))
         if (error.response)
             console.log(JSON.stringify(error.response.data))
         else
@@ -985,7 +985,7 @@ async function list(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "List a prime item on your warframe.market profile as the top selling order (requires authorization)\nUsage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err));
-        message.react(defaultReactions.check.string)
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     }
     offset = 0
@@ -993,7 +993,7 @@ async function list(message,args) {
     {
         if (!(args[args.length-1].match(/-?\d+/g).map(Number)))
         {
-            message.channel.send({content: "Invalid offset. Usage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"})
+            message.channel.send({content: "Invalid offset. Usage example:\n.list frost_prime_blueprint\n.list frost_prime_blueprint +10\n.list frost_prime_blueprint -20"}).catch(err => console.log(err))
             return
         }
         offset = Number(args.pop())
@@ -1020,7 +1020,7 @@ async function list(message,args) {
     })
     .catch(err => {
         console.log(err)
-        message.channel.send('Error occured retrieving database info. Please try again.')
+        message.channel.send('Error occured retrieving database info. Please try again.').catch(err => console.log(err))
         return 0
     })
     if (!status)
@@ -1052,7 +1052,7 @@ async function list(message,args) {
             console.log(err.response.data)
         console.log(err)
         console.log('Retrieving Database -> wfm_items_list error')
-        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
+        message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"}).catch(err => console.log(err))
         return 0
     })
     if (!status)
@@ -1110,7 +1110,7 @@ async function list(message,args) {
         ordersArr = ordersArr.sort(dynamicSort("price"))
         if (ordersArr.length == 0)
         {
-            processMessage.edit("No orders active found for this item. No changes were made to your profile")
+            processMessage.edit("No orders active found for this item. No changes were made to your profile").catch(err => console.log(err))
             return
         }
         var price = ordersArr[0].price
@@ -1150,10 +1150,10 @@ async function list(message,args) {
                                 ]
                             }]
                         }
-                        processMessage.edit(postdata)
+                        processMessage.edit(postdata).catch(err => console.log(err))
                     })
                     .catch(function (error) {
-                        processMessage.edit("Error occured editing existing order. Possibly due to command spam. Please try again.\nError code 502")
+                        processMessage.edit("Error occured editing existing order. Possibly due to command spam. Please try again.\nError code 502").catch(err => console.log(err))
                         return
                     });
                     break
@@ -1190,22 +1190,22 @@ async function list(message,args) {
                             ]
                         }]
                     }
-                    processMessage.edit(postdata)
+                    processMessage.edit(postdata).catch(err => console.log(err))
                 })
                 .catch(function (error) {
-                    processMessage.edit("Error occured posting new order. Possibly duplicate order. Please try again.\nError code 503")
+                    processMessage.edit("Error occured posting new order. Possibly duplicate order. Please try again.\nError code 503").catch(err => console.log(err))
                     return
                 });
             }
             })
             .catch(function (error) {
-                processMessage.edit("Error occured retrieving profile orders. Please try again.\nError code 501")
+                processMessage.edit("Error occured retrieving profile orders. Please try again.\nError code 501").catch(err => console.log(err))
                 return
             });
             return
     })
     .catch(function (error) {
-        processMessage.edit("Error occured retrieving item orders. Please try again.\nError code 500")
+        processMessage.edit("Error occured retrieving item orders. Please try again.\nError code 500").catch(err => console.log(err))
         return
     });
     return
@@ -1215,7 +1215,7 @@ async function relist(message,args) {
     if (args.length == 0)
     {
         message.channel.send({content: "Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)\nIn order to prevent stress on the API, you can only use this command once every 15m.\nUsage example:\n.relist all\n.relist all +10\n.relist all -20"}).catch(err => console.log(err));
-        message.react(defaultReactions.check.string)
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     }
     if (args[0] != "all")
@@ -1255,7 +1255,7 @@ async function relist(message,args) {
     })
     .catch(err => {
         console.log(err)
-        message.channel.send('Error occured retrieving database info. Please try again.')
+        message.channel.send('Error occured retrieving database info. Please try again.').catch(err => console.log(err))
         return 0
     })
     if (!status)
@@ -1333,7 +1333,7 @@ async function relist(message,args) {
                                 ]
                             }]
                         }
-                        processMessage.edit(postdata)
+                        processMessage.edit(postdata).catch(err => console.log(err))
                     //}
                     return
                 }
@@ -1378,7 +1378,7 @@ async function relist(message,args) {
                                 ]
                             }]
                         }
-                        processMessage.edit(postdata)
+                        processMessage.edit(postdata).catch(err => console.log(err))
                     //}
                 })
                 .catch(function (error) {
@@ -1397,7 +1397,7 @@ async function relist(message,args) {
                             ]
                         }]
                     }
-                    processMessage.edit(postdata)
+                    processMessage.edit(postdata).catch(err => console.log(err))
                     if (error.response)
                         console.log(JSON.stringify(error.response.data))
                     else 
@@ -1420,7 +1420,7 @@ async function relist(message,args) {
                         ]
                     }]
                 }
-                processMessage.edit(postdata)
+                processMessage.edit(postdata).catch(err => console.log(err))
                 if (error.response)
                     console.log(JSON.stringify(error.response.data))
                 else 
@@ -1429,7 +1429,7 @@ async function relist(message,args) {
         })
     })
     .catch(function (error) {
-        processMessage.edit("Error occured retrieving profile orders. Please try again.\nError code 500")
+        processMessage.edit("Error occured retrieving profile orders. Please try again.\nError code 500").catch(err => console.log(err))
         if (error.response)
             console.log(JSON.stringify(error.response.data))
         else
@@ -1442,8 +1442,8 @@ async function relist(message,args) {
 async function WFMauthorize(message,args) {
     if (args.length == 0)
     {
-        message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"})
-        message.react(defaultReactions.check.string)
+        message.channel.send({content: "Usage example:\n.authorize wfm_email@xyz.com wfm_password123"}).catch(err => console.log(err))
+        message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
     }
     const email = args[0]
@@ -1472,7 +1472,7 @@ async function WFMauthorize(message,args) {
             if (res.rows.length == 0) {   //id does not exist
                 await db.query(`INSERT INTO discord_users (discord_id,jwt,ingame_name) values ('${discord_id}','${JWT}','${ingame_name}')`).then(res => {
                     console.log(res)
-                    processMessage.edit("Authorization successful.")
+                    processMessage.edit("Authorization successful.").catch(err => console.log(err))
                     return 1
                 })
                 .catch (err => {
@@ -1480,13 +1480,13 @@ async function WFMauthorize(message,args) {
                         console.log(err.response.data)
                     console.log(err)
                     console.log('Retrieving Database -> pricesDB error')
-                    processMessage.edit({content: "Some error occured inserting record into database.\nError code: 503"})
+                    processMessage.edit({content: "Some error occured inserting record into database.\nError code: 503"}).catch(err => console.log(err))
                     return 0
                 })
             }
             else {
                 await db.query(`UPDATE discord_users SET jwt = '${JWT}' WHERE discord_id = '${discord_id}'`).then(res => {
-                    processMessage.edit("Re-authorized.")
+                    processMessage.edit("Re-authorized.").catch(err => console.log(err))
                     return 1
                 })
                 .catch (err => {
@@ -1494,7 +1494,7 @@ async function WFMauthorize(message,args) {
                         console.log(err.response.data)
                     console.log(err)
                     console.log('Retrieving Database -> pricesDB error')
-                    processMessage.edit({content: "Some error occured updating record in database.\nError code: 504"})
+                    processMessage.edit({content: "Some error occured updating record in database.\nError code: 504"}).catch(err => console.log(err))
                     return 0
                 })
             }
@@ -1504,7 +1504,7 @@ async function WFMauthorize(message,args) {
                 console.log(err.response.data)
             console.log(err)
             console.log('Retrieving Database -> pricesDB error')
-            processMessage.edit({content: "Some error occured retrieving database info.\nError code: 502"})
+            processMessage.edit({content: "Some error occured retrieving database info.\nError code: 502"}).catch(err => console.log(err))
             return
         })
         if (!status)
@@ -1515,40 +1515,40 @@ async function WFMauthorize(message,args) {
         {
             const response = JSON.stringify(error.response.data)
             if (response.match('app.account.email_not_exist'))
-                {processMessage.edit("Invalid email. Could not sign you in"); return}
+                {processMessage.edit("Invalid email. Could not sign you in").catch(err => console.log(err)); return}
             else if (response.match('app.account.password_invalid'))
-                {processMessage.edit("Invalid password. Could not sign you in"); return}
+                {processMessage.edit("Invalid password. Could not sign you in").catch(err => console.log(err)); return}
             else
-                {processMessage.edit("Error occured sending sign-in request. Please try again.\nError code: 500\nServer response: " + response); return}
+                {processMessage.edit("Error occured sending sign-in request. Please try again.\nError code: 500\nServer response: " + response).catch(err => console.log(err)); return}
         }
-        processMessage.edit("Error occured processing sign-in request. Please try again.\nError code: 501")
+        processMessage.edit("Error occured processing sign-in request. Please try again.\nError code: 501").catch(err => console.log(err))
         return
     });
 }
 
 async function user_query(message,args) {
     if (args.length == 0) {
-        message.channel.send('Show relics that contain X rarity drops worth Y amount of ducats.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        message.channel.send('Show relics that contain X rarity drops worth Y amount of ducats.\nUsage example:\n.query <rarity> <ducat>\n.query common 45').catch(err => console.log(err))
         return
     }
     if (!args[0]) {
-        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45').catch(err => console.log(err))
         return
     }
     if (!args[1]) {
-        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45').catch(err => console.log(err))
         return
     }
     if (args[2]) {
-        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        message.channel.send('Invalid command.\nUsage example:\n.query <rarity> <ducat>\n.query common 45').catch(err => console.log(err))
         return
     }
     if (args[0] != 'common' && args[0] != 'uncommon' && args[0] != 'rare') {
-        message.channel.send('Invalid rarity.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        message.channel.send('Invalid rarity.\nUsage example:\n.query <rarity> <ducat>\n.query common 45').catch(err => console.log(err))
         return
     }
     if (args[1] != 15 && args[1] != 25 && args[1] != 45 && args[1] != 65 && args[1] != 100) {
-        message.channel.send('Invalid ducat value.\nUsage example:\n.query <rarity> <ducat>\n.query common 45')
+        message.channel.send('Invalid ducat value.\nUsage example:\n.query <rarity> <ducat>\n.query common 45').catch(err => console.log(err))
         return
     }
     var items_list = []
