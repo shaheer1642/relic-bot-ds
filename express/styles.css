@@ -1,15 +1,42 @@
+body{
+  margin: 0; /* Stripping out margin and padding so .bg can be full width*/
+  padding: 0;
+}
+.bg {
+  box-sizing: border-box; /*Not necessary in this situation*/
+  display: block; /*Not necessary, but we do want it this way*/
+  width: 100vw;  /*Not necessary, but we do want it this way*/
+  height: 100vh; /*Necessary.  100vh = 100% of the viewport height*/
+  padding: 0; /* No padding */
+  margin: 0; /* No margins */
+  background: url('./images//background_1.jpg') no-repeat center center;  
+  /* Shorthand: image, repeat, X align, Y align. */
+  background-size: cover; /* Cover all available space*/
+  text-align: center;
+}
+
 .button {
-    border: none;
-    color: white;
-    padding: 10px 25px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-  }
-  
-.button1 {background-color: #4CAF50;} /* Green */
-.button2 {background-color: #008CBA;} /* Blue */
-.button3 {background-color: #008CBA;padding: 10px 20px;} /* Blue */
+  display: inline-block;
+  border: none;
+  color: black;
+  padding: 15px 32px;
+  text-align: center;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  text-shadow: black;
+}
+
+button:hover {
+  background: #f7f7f7;
+  border: 1px solid #8b8b8b;
+}
+
+button:active {
+  background: #2e2e2e;
+  border: 1px solid black;
+  color: white;
+}
+
+button.buttondoc {background-color: #c71010; font-size: 48px;margin-top: 40vh} /* Green */
+button.buttonpat {background-color: #ffffff; font-size: 48px} /* Blue */
