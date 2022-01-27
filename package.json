@@ -11,6 +11,7 @@
     "fs": "^0.0.1-security",
     "googleapis": "^89.0.0",
     "got": "^11.8.3",
+    "nodemon": "^2.0.15",
     "pg": "^8.7.1",
     "request-promise": "^4.2.6",
     "rimraf": "^3.0.2",
