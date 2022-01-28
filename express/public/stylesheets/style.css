@@ -9,11 +9,17 @@ body{
   height: 100vh; /*Necessary.  100vh = 100% of the viewport height*/
   padding: 0; /* No padding */
   margin: 0; /* No margins */
-  background: url('./images//background_1.jpg') no-repeat center center;  
+  background: url('/images/background_1.jpg') no-repeat center center;  
   /* Shorthand: image, repeat, X align, Y align. */
   background-size: cover; /* Cover all available space*/
   text-align: center;
 }
+p {
+  font-size: 16px;
+  text-indent: 50px;
+}
+.p1 {font-size: 54px;}
+.p2 {font-size: 32px;line-height: 5;}
 
 .button {
   display: inline-block;
@@ -24,7 +30,6 @@ body{
   font-size: 16px;
   margin: 4px 2px;
   cursor: pointer;
-  text-shadow: black;
 }
 
 button:hover {
@@ -38,5 +43,5 @@ button:active {
   color: white;
 }
 
-button.buttondoc {background-color: #c71010; font-size: 48px;margin-top: 40vh} /* Green */
-button.buttonpat {background-color: #ffffff; font-size: 48px} /* Blue */
+button.buttondoc {background-color: #c71010; font-size: 48px;margin-top: -5vh} /* Green */
+button.buttonpat {background-color: #ffffff; font-size: 48px;margin-top: 5vh} /* Blue */
