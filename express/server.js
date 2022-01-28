@@ -25,7 +25,7 @@ router.get('/',function(req,res) {
 
 //add the router
 app.use('/', router);
-const port = process.env.port || 80
+const port = process.env.PORT || 80
 app.listen(port, () => {
   console.log('Listening to port ' + port);
 });
