@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, '/views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 app.post('/formSubmit', function(req, res) {
   console.log(req.body);
@@ -19,8 +19,15 @@ app.post('/formSubmit', function(req, res) {
 });
 
 router.get('/',function(req,res) {
-  console.log('sending index.html')
+  console.log('sending index.jade')
   res.render('index');
+});
+
+router.get('/test',function(req,res) {
+  console.log('sending form.pug')
+  res.render('form', {
+    message: 'changed'
+  });
 });
 
 //add the router
