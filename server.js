@@ -24,10 +24,12 @@ router.get('/',function(req,res) {
 });
 
 router.get('/doctor/login',function(req,res) {
-  console.log('sending form.pug')
-  res.render('form', {
-    message: 'changed'
-  });
+  console.log('sending login.pug')
+  res.render('login');
+});
+
+router.post('/doctor/login/authorize',function(req,res) {
+  console.log(req.body)
 });
 
 //add the router
