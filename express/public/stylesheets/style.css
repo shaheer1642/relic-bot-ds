@@ -1,6 +1,7 @@
 .button {
+  display: inline-block;
   border-radius: 4px;
-  background-color: white;
+  background-color: #f4511e;
   border: none;
   color: #FFFFFF;
   text-align: center;
@@ -10,6 +11,15 @@
   transition: all 0.5s;
   cursor: pointer;
   margin: 5px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.button.buttondoc {
+  background-color: red;
+}
+
+.button.buttonpat {
+  background-color: rgb(84, 82, 163);
 }
 
 .button span {
@@ -36,6 +46,3 @@
   opacity: 1;
   right: 0;
 }
-
-button.buttondoc {background-color: #c71010; font-size: 48px;margin-top: -5vh} /* Green */
-button.buttonpat {background-color: #ffffff; font-size: 48px;margin-top: 5vh} /* Blue */

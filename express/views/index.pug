@@ -13,9 +13,13 @@ html
             p.p1.text-center Please select your designation
             div.row
                 div.col-sm-6
-                    button.btn-danger.btn-lg.btn-block Doctor
+                    form(method="get" action="/doctor/login")
+                        button.button.buttondoc(type="submit")
+                            span Doctor
                 div.col-sm-6
-                    button.btn-info.btn-lg.btn-block Patient
+                    form(method="get" action="/patient/panel")
+                        button.button.buttonpat(type="submit")
+                            span Patient
     style.
         p.p1{font-size: 32px; color: #464646;}
         h1{font-size: 54px; color: #464646;}

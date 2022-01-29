@@ -23,7 +23,7 @@ router.get('/',function(req,res) {
   res.render('index');
 });
 
-router.get('/test',function(req,res) {
+router.get('/doctor/login',function(req,res) {
   console.log('sending form.pug')
   res.render('form', {
     message: 'changed'
