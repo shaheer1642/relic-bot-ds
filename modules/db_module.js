@@ -9,7 +9,7 @@ async function authorize(user,pass) {
         .then(res => {
             console.log('rowCount = ' + res.rowCount)
             if (res.rowCount == 1)
-                resolve({code: 1, status: 'Login Successful'})
+                resolve({code: 1, status: 'Login Successful', userid: res.rows[0].userid})
             else if (res.rowCount == 0)
                 resolve({code: 2, status: 'Invalid Credentials'})
             else

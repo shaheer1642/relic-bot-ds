@@ -31,7 +31,7 @@ router.get('/',function(req,res) {
 
 router.get('/doctor/login',function(req,res) {
   session=req.session;
-  if (session.userid){
+  if (session.userid) {
       res.redirect('/doctor/panel');
   } else {
     console.log('sending login.pug')
@@ -41,25 +41,28 @@ router.get('/doctor/login',function(req,res) {
 
 router.post('/doctor/auth',function(req,res) {
   db_module.authorize(req.body.user,req.body.pass)
-  .then(obj => {
-    if (obj.code != 1)
-      res.render('login', obj);
+  .then(dbres => {
+    if (dbres.code != 1)
+      res.render('login', dbres);
     else {
       session=req.session;
-      session.userid=req.body.user;
-      console.log(req.session)
+      session.userid=dbres.userid;
       res.redirect('/doctor/panel')
     }
-    console.log(obj)
+    console.log(dbres)
   })
-  .catch(obj => {
-    res.render('login', obj);
-    console.log(obj)
+  .catch(dbres => {
+    res.render('login', dbres);
+    console.log(dbres)
   })
 });
 
 router.get('/doctor/panel',function(req,res) {
-  res.send('Logged in')
+  if (session && session.userid) {
+    res.send('Logged in')
+  } else {
+    res.redirect('/doctor/login')
+  }
 });
 
 //add the router
