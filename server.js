@@ -11,14 +11,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
 
-app.post('/formSubmit', function(req, res) {
-  console.log(req.body);
-  res.render('form', {
-    var1: req.body.field1,
-    var2: req.body.field2,
-  });
-});
-
 router.get('/',function(req,res) {
   console.log('sending index.jade')
   res.render('index');
@@ -29,10 +21,10 @@ router.get('/doctor/login',function(req,res) {
   res.render('login');
 });
 
-router.post('/doctor/login/authorize',function(req,res) {
+router.post('/doctor/auth',function(req,res) {
   db_module.authorize(req.body.user,req.body.pass)
   .then(obj => {
-    res.render('login', obj);
+    res.redirect('/doctor/panel');
     console.log(obj)
   })
   .catch(obj => {
@@ -41,6 +33,9 @@ router.post('/doctor/login/authorize',function(req,res) {
   })
 });
 
+router.get('/doctor/panel',function(req,res) {
+  console.log('redirected')
+});
 //add the router
 app.use('/', router);
 const port = process.env.PORT || 80
