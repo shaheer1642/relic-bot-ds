@@ -3,6 +3,7 @@ const path = require('path');
 const app = express();
 const router = express.Router();
 const bodyParser = require('body-parser')
+const db_module = require('./modules/db_module.js')
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '/public')));
@@ -29,7 +30,15 @@ router.get('/doctor/login',function(req,res) {
 });
 
 router.post('/doctor/login/authorize',function(req,res) {
-  console.log(req.body)
+  db_module.authorize(req.body.user,req.body.pass)
+  .then(obj => {
+    res.render('login', obj);
+    console.log(obj)
+  })
+  .catch(obj => {
+    res.render('login', obj);
+    console.log(obj)
+  })
 });
 
 //add the router
