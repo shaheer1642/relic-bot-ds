@@ -1,0 +1,43 @@
+doctype html
+html
+  head
+    title Doctor Panel
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="/stylesheets/style.css")
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
+    script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js")
+  body.container-fluid
+    div(class="d-flex flex-column min-vh-100")
+      h2(class="text-center") Doctor Panel
+      if (code != 1)
+        div(class='alert alert-danger') #{status}
+      else
+        div.row
+          div.col
+            h6 MRNo
+          div.col 
+            h6 Name
+          div.col 
+            h6 Gender
+          div.col 
+            h6 Age
+          div.col 
+            h6 Registeration Date
+          div.col
+        each patient in data
+          div.row
+            div.col 
+              p #{patient.MRNo}
+            div.col 
+              p #{patient.name}
+            div.col 
+              p #{patient.gender}
+            div.col 
+              p #{patient.DoB}
+            div.col 
+              p #{patient.DoR}
+            div.col 
+              form(method="get" action="/doctor/panel/edit")
+                button(type="submit") Edit

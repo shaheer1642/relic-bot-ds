@@ -7,13 +7,13 @@ const sessions = require('cookie-session');
 const bodyParser = require('body-parser')
 const db_module = require('./modules/db_module.js')
 
-const oneDay = 60000;
+const oneDay = 300000;
 var session;
 
 //session middleware
 app.use(sessions({
     secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized:true,
+    saveUninitialized: true,
     cookie: { maxAge: oneDay },
     resave: false
 }));
@@ -58,11 +58,15 @@ router.post('/doctor/auth',function(req,res) {
 });
 
 router.get('/doctor/panel',function(req,res) {
-  if (session && session.userid) {
-    res.send('Logged in')
-  } else {
-    res.redirect('/doctor/login')
-  }
+  db_module.patients_list(session.userid)
+  .then(dbres => {
+    console.log(dbres)
+    res.render('main_panel', dbres);
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.render('main_panel', dbres);
+  })
 });
 
 //add the router
