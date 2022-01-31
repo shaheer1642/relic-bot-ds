@@ -12,10 +12,10 @@ var session;
 
 //session middleware
 app.use(sessions({
-    secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
-    saveUninitialized: true,
-    cookie: { maxAge: oneDay },
-    resave: false
+  secret: "thisismysecrctekeyfhrgfgrfrty84fwir767",
+  saveUninitialized: true,
+  cookie: { maxAge: oneDay },
+  resave: false
 }));
 
 app.use(express.json());
