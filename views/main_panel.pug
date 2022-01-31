@@ -5,6 +5,7 @@ html
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1")
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css")
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     link(rel="stylesheet", href="/stylesheets/style.css")
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
     script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js")
@@ -38,6 +39,13 @@ html
               p #{patient.DoB}
             div.col 
               p #{patient.DoR}
-            div.col 
-              form(method="get" action="/doctor/panel/edit")
-                button(type="submit") Edit
+            div.col
+              div.btn-toolbar
+                form(method="get" action="/doctor/panel/edit")
+                  button.btn.btn-info.btn-sm(type="submit") 
+                    i.fa.fa-pencil 
+                      span
+                form(method="get" action="/doctor/panel/delete")
+                  button.btn.btn-danger.btn-sm(type="submit")
+                    i.fa.fa-trash 
+                      span
