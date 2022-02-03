@@ -26,7 +26,7 @@ async function authorize(user,pass) {
 async function patients_list(userid) {
     console.log('retrieving patients list')
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM patients WHERE doc_id=${userid}`)
+        db.query(`SELECT * FROM patients WHERE doc_id=${userid} ORDER BY mrno DESC`)
         .then(res => {
             console.log('rowCount = ' + res.rowCount)
             if (res.rowCount > 0)
@@ -41,4 +41,23 @@ async function patients_list(userid) {
     });
 }
 
-module.exports = {authorize,patients_list};
+async function addPatient(userid,fields) {
+    console.log('inserting new patient')
+    return new Promise((resolve, reject) => {
+        db.query(`INSERT INTO patients (name,gender,reason_of_visit,dob,dor,doc_id) 
+        VALUES ('${fields.patientName}','${fields.patientGender}','${fields.patientReason}',${new Date(fields.patientDoB).getTime()},${new Date().getTime()},${userid})`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Patient added', data: null})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+module.exports = {authorize,patients_list,addPatient};

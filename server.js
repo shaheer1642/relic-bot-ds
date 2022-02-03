@@ -69,6 +69,19 @@ router.get('/doctor/panel',function(req,res) {
   })
 });
 
+router.post('/doctor/panel/add',function(req,res) {
+  console.log(req.body)
+  db_module.addPatient(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.redirect('/doctor/panel')
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send("error")
+  })
+});
+
 //add the router
 app.use('/', router);
 const port = process.env.PORT || 80
