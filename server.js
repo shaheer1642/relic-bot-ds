@@ -74,11 +74,11 @@ router.post('/doctor/panel/add',function(req,res) {
   db_module.addPatient(session.userid,req.body)
   .then(dbres => {
     console.log(dbres)
-    res.redirect('/doctor/panel')
+    res.send(dbres)
   })
   .catch(dbres => {
     console.log(dbres)
-    res.send("error")
+    res.send(dbres)
   })
 });
 
