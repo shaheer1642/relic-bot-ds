@@ -29,8 +29,13 @@ async function patients_list(userid) {
         db.query(`SELECT * FROM patients WHERE doc_id=${userid} ORDER BY mrno DESC`)
         .then(res => {
             console.log('rowCount = ' + res.rowCount)
-            if (res.rowCount > 0)
+            if (res.rowCount > 0) {
+                res.rows.forEach((obj,i) => {
+                    res.rows[i].dor = new Date(obj.dor).toLocaleString()
+                    res.rows[i].dob = ((new Date() - new Date(obj.dob))/31556952000).toFixed()
+                })
                 resolve({code: 1, status: 'Records retrieved', data: res.rows})
+            }
             else
                 resolve({code: 2, status: 'No records found yet', data: null})
         })
