@@ -547,7 +547,7 @@ client.on('messageCreate', async message => {
         }
         const args2 = commandsArr[commandsArrIndex].replace(/\./g,'').trim().split(/ +/g)
         if (message.guild)
-            if (args2[1] && !args2[1].match(/\?/g) && !(args2[1].length > 3) && (!args2[2] || args2[2]=='relic') && !args2[3])
+            if (args2[1] && !args2[1].match(/\?/g) && !args2[1].match(':') && !(args2[1].length > 3) && (!args2[2] || args2[2]=='relic') && !args2[3])
                 switch(args2[0].toLowerCase()) {
                     case 'lith':
                         wfm_api.relics(message,args2)
