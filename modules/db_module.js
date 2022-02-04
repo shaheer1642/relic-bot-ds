@@ -50,11 +50,15 @@ async function addPatient(userid,fields) {
     console.log('inserting new patient')
     return new Promise((resolve, reject) => {
         db.query(`INSERT INTO patients (name,gender,reason_of_visit,dob,dor,doc_id) 
-        VALUES ('${fields.patientName}','${fields.patientGender}','${fields.patientReason}',${new Date(fields.patientDoB).getTime()},${new Date().getTime()},${userid})`)
+        VALUES ('${fields.patientName}','${fields.patientGender}','${fields.patientReason}',${new Date(fields.patientDoB).getTime()},${new Date().getTime()},${userid})
+        RETURNING *`)
         .then(res => {
             console.log('rowCount = ' + res.rowCount)
-            if (res.rowCount == 1)
-                resolve({code: 1, status: 'Patient added', data: null})
+            if (res.rowCount == 1) {
+                res.rows[0].dor = new Date(res.rows[0].dor).toLocaleString()
+                res.rows[0].dob = ((new Date() - new Date(res.rows[0].dob))/31556952000).toFixed()
+                resolve({code: 1, status: 'Patient added', data: res.rows[0]})
+            }
             else
                 reject({code: 3, status: 'Internal Server Error. Try again', data: null})
         })
