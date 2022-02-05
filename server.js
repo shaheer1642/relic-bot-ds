@@ -82,6 +82,27 @@ router.post('/doctor/panel/add',function(req,res) {
   })
 });
 
+router.post('/doctor/panel/view',function(req,res) {
+  console.log(req.query)
+});
+
+router.post('/doctor/panel/edit',function(req,res) {
+  console.log(req.query)
+});
+
+router.post('/doctor/panel/delete',function(req,res) {
+  console.log(req.body)
+  db_module.deletePatient(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
 //add the router
 app.use('/', router);
 const port = process.env.PORT || 80

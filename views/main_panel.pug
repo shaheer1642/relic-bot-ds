@@ -30,7 +30,7 @@ html
                 th(scope="col")
             tbody
               each patient in data
-                tr
+                tr(id=`patient${patient.mrno}`)
                   th(scope="row") #{patient.mrno}
                   td #{patient.name}
                   td #{patient.gender}
@@ -39,14 +39,16 @@ html
                   td #{patient.dor}
                   td
                     div.btn-toolbar
-                      form(method="get" action="/doctor/panel/edit")
-                        button.btn.btn-info.btn-sm(type="submit") 
-                          i.fa.fa-pencil 
+                      form(method="post" action=`/doctor/panel/view?patient=${patient.mrno}`)
+                        button.btn.btn-info(type="submit")
+                          i.fa.fa-navicon 
                             span
-                      form(method="get" action="/doctor/panel/delete")
-                        button.btn.btn-danger.btn-sm(type="submit")
-                          i.fa.fa-trash 
-                            span
+                      button.btn.btn-info(type="submit" onclick=`editPatient(${patient.mrno})`)
+                        i.fa.fa-pencil 
+                          span
+                      button.btn.btn-danger(type="submit" onclick=`deletePatient(${patient.mrno})`)
+                        i.fa.fa-trash 
+                          span
   footer.page-footer
     form(method="get" action="/doctor/panel/add")
       button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addPatient")
@@ -155,4 +157,20 @@ html
           }
         }
       )
+    }
+    function deletePatient(patientMRNo) {
+      if (confirm(`Are you sure you want to delete patient#${patientMRNo} record?`)) {
+        console.log('deletePatient()')
+        $.post("/doctor/panel/delete", {
+            patientMRNo: patientMRNo
+          }, 
+          function(res) {
+            console.log(res)
+            if (res.code == 1)
+              $(`#patient${patientMRNo}`).fadeOut(300, function () { $(this).remove(); })
+            else
+              alert(res.status)
+          }
+        )
+      }
     }

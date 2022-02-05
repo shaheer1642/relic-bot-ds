@@ -69,4 +69,22 @@ async function addPatient(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient};
+async function deletePatient(userid,fields) {
+    console.log('deleting patient')
+    return new Promise((resolve, reject) => {
+        db.query(`DELETE FROM patients WHERE doc_id=${userid} AND mrno=${fields.patientMRNo}`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Patient deleted', data: null})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+module.exports = {authorize,patients_list,addPatient,deletePatient};
