@@ -69,6 +69,30 @@ async function addPatient(userid,fields) {
     });
 }
 
+async function editPatient(userid,fields) {
+    console.log('editing patient')
+    return new Promise((resolve, reject) => {
+        db.query(`UPDATE patients 
+        SET name='${fields.patientName}', gender='${fields.patientGender}', reason_of_visit='${fields.patientReason}'
+        WHERE doc_id=${userid} AND mrno=${fields.patientMRNo}
+        RETURNING *`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1) {
+                res.rows[0].dor = new Date(res.rows[0].dor).toLocaleString()
+                res.rows[0].dob = ((new Date() - new Date(res.rows[0].dob))/31556952000).toFixed()
+                resolve({code: 1, status: 'Patient edited', data: res.rows[0]})
+            }
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
 async function deletePatient(userid,fields) {
     console.log('deleting patient')
     return new Promise((resolve, reject) => {
@@ -87,4 +111,4 @@ async function deletePatient(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,deletePatient};
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient};

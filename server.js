@@ -60,7 +60,7 @@ router.post('/doctor/auth',function(req,res) {
 router.get('/doctor/panel',function(req,res) {
   db_module.patients_list(session.userid)
   .then(dbres => {
-    console.log(dbres)
+    //console.log(dbres)
     res.render('main_panel', dbres);
   })
   .catch(dbres => {
@@ -87,7 +87,16 @@ router.post('/doctor/panel/view',function(req,res) {
 });
 
 router.post('/doctor/panel/edit',function(req,res) {
-  console.log(req.query)
+  console.log(req.body)
+  db_module.editPatient(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
 });
 
 router.post('/doctor/panel/delete',function(req,res) {
