@@ -111,4 +111,25 @@ async function deletePatient(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient};
+async function getPatient(userid,mrno) {
+    console.log('getting patient')
+    return new Promise((resolve, reject) => {
+        db.query(`SELECT * FROM patients WHERE doc_id=${userid} AND mrno=${mrno}`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1) {
+                res.rows[0].dor = new Date(res.rows[0].dor).toLocaleString()
+                res.rows[0].dob = ((new Date() - new Date(res.rows[0].dob))/31556952000).toFixed()
+                resolve({code: 1, status: 'Patient retrieved', data: res.rows[0]})
+            }
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient};

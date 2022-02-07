@@ -84,6 +84,15 @@ router.post('/doctor/panel/add',function(req,res) {
 
 router.post('/doctor/panel/view',function(req,res) {
   console.log(req.query)
+  db_module.getPatient(session.userid,req.query.patient)
+  .then(dbres => {
+    console.log(dbres)
+    res.render('patient_detail', dbres);
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.render('patient_detail', dbres);
+  })
 });
 
 router.post('/doctor/panel/edit',function(req,res) {

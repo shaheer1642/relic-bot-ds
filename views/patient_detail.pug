@@ -14,10 +14,12 @@ html
   body.container-fluid
     header
       h2.text-center Patient Detail
-      h1.text-left MR Number: #{patientMRNo}
-      p.p1.text-left Name: #{patientName}
-      p.p1.text-left Age: #{patientAge}
-      p.p1.text-left Registeration Date: #{patientDoB}
+      h6.text-left MR Number: #{data.mrno}
+      p.p1.text-left Name: #{data.name}
+      p.p1.text-left Gender: #{data.gender}
+      p.p1.text-left Age: #{data.dob}
+      p.p1.text-left Reason of visit: #{data.reason_of_visit}
+      p.p1.text-left Registeration Date: #{data.dor}
   style.
     p.p1 {
       font-size: 15px
