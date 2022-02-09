@@ -120,7 +120,7 @@ async function getPatient(userid,mrno) {
             if (res.rowCount == 1) {
                 res.rows[0].dor = new Date(res.rows[0].dor).toLocaleString()
                 res.rows[0].dob = ((new Date() - new Date(res.rows[0].dob))/31556952000).toFixed()
-                resolve({code: 1, status: 'Patient retrieved', data: res.rows[0]})
+                resolve({code: 1, status: 'Patient retrieved', data: {patient: res.rows[0]}})
             }
             else
                 reject({code: 3, status: 'Internal Server Error. Try again', data: null})

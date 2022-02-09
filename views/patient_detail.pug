@@ -14,19 +14,112 @@ html
   body.container-fluid
     header
       h2.text-center Patient Detail
-      h6.text-left MR Number: #{data.mrno}
-      p.p1.text-left Name: #{data.name}
-      p.p1.text-left Gender: #{data.gender}
-      p.p1.text-left Age: #{data.dob}
-      p.p1.text-left Reason of visit: #{data.reason_of_visit}
-      p.p1.text-left Registeration Date: #{data.dor}
+      h6.text-left MR Number: #{data.patient.mrno}
+      p.p1.text-left Name: #{data.patient.name}
+      p.p1.text-left Gender: #{data.patient.gender}
+      p.p1.text-left Age: #{data.patient.dob}
+      p.p1.text-left Reason of visit: #{data.patient.reason_of_visit}
+      p.p1.text-left Registeration Date: #{data.patient.dor}
+    div(class="d-flex flex-column")
+      div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+        table.table.table-striped.table-dark(id="consultationTable")
+          caption Consultation Record
+          thead
+            tr
+              th(scope="col") ID
+              th(scope="col") Complaint
+              th(scope="col") Examination
+              th(scope="col") Advice
+              th(scope="col") Image
+              th(scope="col") Date
+              th(scope="col")
+          tbody
+            if (data.consultations)
+              each consultation in data.consultations
+                tr(id=`consultation${consultation.consult_id}`)
+                  th(scope="row") #{consultation.consult_id}
+                  td #{consultation.complaint}
+                  td #{consultation.examination}
+                  td #{consultation.advice}
+                  td #{consultation.image}
+                  td #{consultation.doc}
+                  td
+                    div.btn-toolbar
+                      form(method="post" action=`/doctor/panel/view/consultation?patient=${data.patient.mrno}&consultation=${consultation.consult_id}`)
+                        button.btn.btn-info(type="submit")
+                          i.fa.fa-navicon 
+                            span
+                      button.btn.btn-info(type="submit" onclick=`editConsultationModal(${data.patient.mrno},${consultation.consult_id})`)
+                        i.fa.fa-pencil 
+                          span
+                      button.btn.btn-danger(type="submit" onclick=`deleteConsultation(${data.patient.mrno},${consultation.consult_id})`)
+                        i.fa.fa-trash 
+                          span
+      div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+        table.table.table-striped.table-dark(id="investigationTable")
+          caption Investigation Record
+          thead
+            tr
+              th(scope="col") ID
+              th(scope="col") Type
+              th(scope="col") Date
+              th(scope="col")
+          tbody
+            if (data.investigations)
+              each investigation in data.investigations
+                tr(id=`investigation${investigation.invest_id}`)
+                  th(scope="row") #{investigation.invest_id}
+                  td #{investigation.invest_type}
+                  td #{investigation.doi}
+                  td
+                    div.btn-toolbar
+                      form(method="post" action=`/doctor/panel/view/investigation?patient=${data.patient.mrno}&investigation=${investigation.invest_id}`)
+                        button.btn.btn-info(type="submit")
+                          i.fa.fa-navicon 
+                            span
+                      button.btn.btn-info(type="submit" onclick=`editInvestigationModal(${data.patient.mrno},${investigation.invest_id})`)
+                        i.fa.fa-pencil 
+                          span
+                      button.btn.btn-danger(type="submit" onclick=`deleteInvestigation(${data.patient.mrno},${investigation.invest_id})`)
+                        i.fa.fa-trash 
+                          span
+      div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+        table.table.table-striped.table-dark(id="surgeryTable")
+          caption Surgery Record
+          thead
+            tr
+              th(scope="col") ID
+              th(scope="col") Type
+              th(scope="col") Surgeon
+              th(scope="col") Date
+              th(scope="col")
+          tbody
+            if (data.surgeries)
+              each surgery in data.surgeries
+                tr(id=`surgery${surgery.surgery_id}`)
+                  th(scope="row") #{surgery.surgery_id}
+                  td #{surgery.surgery_type}
+                  td #{surgery.surgeon_name}
+                  td #{surgery.dos}
+                  td
+                    div.btn-toolbar
+                      form(method="post" action=`/doctor/panel/view/surgery?patient=${data.patient.mrno}&surgery=${surgery.surgery_id}`)
+                        button.btn.btn-info(type="submit")
+                          i.fa.fa-navicon 
+                            span
+                      button.btn.btn-info(type="submit" onclick=`editSurgeryModal(${data.patient.mrno},${surgery.surgery_id})`)
+                        i.fa.fa-pencil 
+                          span
+                      button.btn.btn-danger(type="submit" onclick=`deleteSurgery(${data.patient.mrno},${surgery.surgery_id})`)
+                        i.fa.fa-trash 
+                          span
   style.
     p.p1 {
       font-size: 15px
     }
     .my-custom-scrollbar {
       position: relative;
-      height: 80vh;
+      height: 40vh;
       overflow: auto;
     }
     .table-wrapper-scroll-y {

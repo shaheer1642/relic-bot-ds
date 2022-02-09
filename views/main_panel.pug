@@ -15,7 +15,7 @@ html
     header
       h2(class="text-center") Doctor Panel
     div(class="d-flex flex-column")
-      if (code != 1)
+      if (code != 1 && code != 2)
         div(class='alert alert-danger') #{status}
       else
         div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
@@ -30,26 +30,27 @@ html
                 th(scope="col") Registeration Date
                 th(scope="col")
             tbody
-              each patient in data
-                tr(id=`patient${patient.mrno}`)
-                  th(scope="row") #{patient.mrno}
-                  td #{patient.name}
-                  td #{patient.gender}
-                  td #{patient.dob}
-                  td #{patient.reason_of_visit}
-                  td #{patient.dor}
-                  td
-                    div.btn-toolbar
-                      form(method="post" action=`/doctor/panel/view?patient=${patient.mrno}`)
-                        button.btn.btn-info(type="submit")
-                          i.fa.fa-navicon 
+              if (data)
+                each patient in data
+                  tr(id=`patient${patient.mrno}`)
+                    th(scope="row") #{patient.mrno}
+                    td #{patient.name}
+                    td #{patient.gender}
+                    td #{patient.dob}
+                    td #{patient.reason_of_visit}
+                    td #{patient.dor}
+                    td
+                      div.btn-toolbar
+                        form(method="post" action=`/doctor/panel/view?patient=${patient.mrno}`)
+                          button.btn.btn-info(type="submit")
+                            i.fa.fa-navicon 
+                              span
+                        button.btn.btn-info(type="submit" onclick=`editPatientModal(${patient.mrno})`)
+                          i.fa.fa-pencil 
                             span
-                      button.btn.btn-info(type="submit" onclick=`editPatientModal(${patient.mrno})`)
-                        i.fa.fa-pencil 
-                          span
-                      button.btn.btn-danger(type="submit" onclick=`deletePatient(${patient.mrno})`)
-                        i.fa.fa-trash 
-                          span
+                        button.btn.btn-danger(type="submit" onclick=`deletePatient(${patient.mrno})`)
+                          i.fa.fa-trash 
+                            span
   footer.page-footer
     form(method="get" action="/doctor/panel/add")
       button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addPatient")

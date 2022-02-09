@@ -11,6 +11,7 @@ db.connect().then(res => {
     console.log('DB Connection established.')
 }).catch(err => {
     console.log('DB Connection failure.\n' + err)
+    console.log(process.env.DATABASE_URL)
     process.exit(1)
 });
 
