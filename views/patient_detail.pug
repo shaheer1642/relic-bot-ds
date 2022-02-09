@@ -55,73 +55,226 @@ html
                       button.btn.btn-danger(type="submit" onclick=`deleteConsultation(${data.patient.mrno},${consultation.consult_id})`)
                         i.fa.fa-trash 
                           span
-      div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
-        table.table.table-striped.table-dark(id="investigationTable")
-          caption Investigation Record
-          thead
-            tr
-              th(scope="col") ID
-              th(scope="col") Type
-              th(scope="col") Date
-              th(scope="col")
-          tbody
-            if (data.investigations)
-              each investigation in data.investigations
-                tr(id=`investigation${investigation.invest_id}`)
-                  th(scope="row") #{investigation.invest_id}
-                  td #{investigation.invest_type}
-                  td #{investigation.doi}
-                  td
-                    div.btn-toolbar
-                      form(method="post" action=`/doctor/panel/view/investigation?patient=${data.patient.mrno}&investigation=${investigation.invest_id}`)
-                        button.btn.btn-info(type="submit")
-                          i.fa.fa-navicon 
-                            span
-                      button.btn.btn-info(type="submit" onclick=`editInvestigationModal(${data.patient.mrno},${investigation.invest_id})`)
-                        i.fa.fa-pencil 
-                          span
-                      button.btn.btn-danger(type="submit" onclick=`deleteInvestigation(${data.patient.mrno},${investigation.invest_id})`)
-                        i.fa.fa-trash 
-                          span
-      div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
-        table.table.table-striped.table-dark(id="surgeryTable")
-          caption Surgery Record
-          thead
-            tr
-              th(scope="col") ID
-              th(scope="col") Type
-              th(scope="col") Surgeon
-              th(scope="col") Date
-              th(scope="col")
-          tbody
-            if (data.surgeries)
-              each surgery in data.surgeries
-                tr(id=`surgery${surgery.surgery_id}`)
-                  th(scope="row") #{surgery.surgery_id}
-                  td #{surgery.surgery_type}
-                  td #{surgery.surgeon_name}
-                  td #{surgery.dos}
-                  td
-                    div.btn-toolbar
-                      form(method="post" action=`/doctor/panel/view/surgery?patient=${data.patient.mrno}&surgery=${surgery.surgery_id}`)
-                        button.btn.btn-info(type="submit")
-                          i.fa.fa-navicon 
-                            span
-                      button.btn.btn-info(type="submit" onclick=`editSurgeryModal(${data.patient.mrno},${surgery.surgery_id})`)
-                        i.fa.fa-pencil 
-                          span
-                      button.btn.btn-danger(type="submit" onclick=`deleteSurgery(${data.patient.mrno},${surgery.surgery_id})`)
-                        i.fa.fa-trash 
-                          span
+      form(method="get" action="/doctor/panel/view/consultation/add")
+        button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addConsultation")
+          i.fa.fa-plus 
+            span
+      div.row 
+        div.col 
+          div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+            table.table.table-striped.table-dark(id="investigationTable")
+              caption Investigation Record
+              thead
+                tr
+                  th(scope="col") ID
+                  th(scope="col") Type
+                  th(scope="col") Date
+                  th(scope="col")
+              tbody
+                if (data.investigations)
+                  each investigation in data.investigations
+                    tr(id=`investigation${investigation.invest_id}`)
+                      th(scope="row") #{investigation.invest_id}
+                      td #{investigation.invest_type}
+                      td #{investigation.doi}
+                      td
+                        div.btn-toolbar
+                          form(method="post" action=`/doctor/panel/view/investigation?patient=${data.patient.mrno}&investigation=${investigation.invest_id}`)
+                            button.btn.btn-info(type="submit")
+                              i.fa.fa-navicon 
+                                span
+                          button.btn.btn-info(type="submit" onclick=`editInvestigationModal(${data.patient.mrno},${investigation.invest_id})`)
+                            i.fa.fa-pencil 
+                              span
+                          button.btn.btn-danger(type="submit" onclick=`deleteInvestigation(${data.patient.mrno},${investigation.invest_id})`)
+                            i.fa.fa-trash 
+                              span
+          form(method="get" action="/doctor/panel/view/investigation/add")
+            button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addInvestigation")
+              i.fa.fa-plus 
+                span
+        div.col
+          div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+            table.table.table-striped.table-dark(id="surgeryTable")
+              caption Surgery Record
+              thead
+                tr
+                  th(scope="col") ID
+                  th(scope="col") Type
+                  th(scope="col") Surgeon
+                  th(scope="col") Date
+                  th(scope="col")
+              tbody
+                if (data.surgeries)
+                  each surgery in data.surgeries
+                    tr(id=`surgery${surgery.surgery_id}`)
+                      th(scope="row") #{surgery.surgery_id}
+                      td #{surgery.surgery_type}
+                      td #{surgery.surgeon_name}
+                      td #{surgery.dos}
+                      td
+                        div.btn-toolbar
+                          form(method="post" action=`/doctor/panel/view/surgery?patient=${data.patient.mrno}&surgery=${surgery.surgery_id}`)
+                            button.btn.btn-info(type="submit")
+                              i.fa.fa-navicon 
+                                span
+                          button.btn.btn-info(type="submit" onclick=`editSurgeryModal(${data.patient.mrno},${surgery.surgery_id})`)
+                            i.fa.fa-pencil 
+                              span
+                          button.btn.btn-danger(type="submit" onclick=`deleteSurgery(${data.patient.mrno},${surgery.surgery_id})`)
+                            i.fa.fa-trash 
+                              span
+          form(method="get" action="/doctor/panel/view/surgery/add")
+            button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addSurgery")
+              i.fa.fa-plus 
+                span
+
+  div.modal.fade(id="addConsultation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addConsultationLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          h5.modal-title(id="addConsultationLabel") New consultation
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body
+          form(id="addConsultationForm")
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientName") Name
+                div.col-sm-8
+                  input.form-control(type="Text" id="patientName" placeholder="Enter patient's name" name="patientName" required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientGender") Gender
+                div.col-sm-8
+                  select.form-control(id="patientGender" name="patientGender" required)
+                    option(selected disabled) Select
+                    option Male
+                    option Female
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientReason") Reason of Visit
+                div.col-sm-8
+                  select.form-control(id="patientReason" name="patientReason" required)
+                    option(selected disabled) Select
+                    option  Consultation
+                    option Surgery
+                    option Investigation
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientDoB") Date of Birth
+                div.col-sm-8
+                  div.input-group.date
+                    input.form-control(type="date" id="patientDoB" name="patientDoB" value="2000-12-31" required)
+                    span.input-group-addon
+                    span.fa.fa-time
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-primary(type="submit" onclick="addConsultation()") Add
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+
+  div.modal.fade(id="addInvestigation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addInvestigationLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          h5.modal-title(id="addInvestigationLabel") New investigation
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body
+          form(id="addInvestigationForm")
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientName") Name
+                div.col-sm-8
+                  input.form-control(type="Text" id="patientName" placeholder="Enter patient's name" name="patientName" required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientGender") Gender
+                div.col-sm-8
+                  select.form-control(id="patientGender" name="patientGender" required)
+                    option(selected disabled) Select
+                    option Male
+                    option Female
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientReason") Reason of Visit
+                div.col-sm-8
+                  select.form-control(id="patientReason" name="patientReason" required)
+                    option(selected disabled) Select
+                    option  Consultation
+                    option Surgery
+                    option Investigation
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientDoB") Date of Birth
+                div.col-sm-8
+                  div.input-group.date
+                    input.form-control(type="date" id="patientDoB" name="patientDoB" value="2000-12-31" required)
+                    span.input-group-addon
+                    span.fa.fa-time
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-primary(type="submit" onclick="addInvestigation()") Add
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+
+  div.modal.fade(id="addSurgery" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addSurgeryLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          h5.modal-title(id="addSurgeryLabel") New surgery
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body
+          form(id="addSurgeryForm")
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientName") Name
+                div.col-sm-8
+                  input.form-control(type="Text" id="patientName" placeholder="Enter patient's name" name="patientName" required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientGender") Gender
+                div.col-sm-8
+                  select.form-control(id="patientGender" name="patientGender" required)
+                    option(selected disabled) Select
+                    option Male
+                    option Female
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientReason") Reason of Visit
+                div.col-sm-8
+                  select.form-control(id="patientReason" name="patientReason" required)
+                    option(selected disabled) Select
+                    option  Consultation
+                    option Surgery
+                    option Investigation
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="patientDoB") Date of Birth
+                div.col-sm-8
+                  div.input-group.date
+                    input.form-control(type="date" id="patientDoB" name="patientDoB" value="2000-12-31" required)
+                    span.input-group-addon
+                    span.fa.fa-time
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-primary(type="submit" onclick="addSurgery()") Add
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+
   style.
     p.p1 {
       font-size: 15px
     }
     .my-custom-scrollbar {
       position: relative;
-      height: 40vh;
+      height: 30vh;
       overflow: auto;
     }
     .table-wrapper-scroll-y {
       display: block;
+    }
+    caption {
+      caption-side: top;
+      font-size: 30px;
+    }
+    tfoot {
+      position: absolute;
+      bottom: 0;
     }

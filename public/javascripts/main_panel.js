@@ -65,6 +65,7 @@ function addPatient() {
         }
     )
 }
+
 function deletePatient(patientMRNo) {
     if (confirm(`Are you sure you want to delete patient#${patientMRNo} record?`)) {
         console.log('deletePatient()')
@@ -91,6 +92,7 @@ function editPatientModal(patientMRNo) {
     document.getElementById("patientGenderEdit").value = $(`#patient${patientMRNo}`).find("td:eq(1)").text()
     document.getElementById("patientReasonEdit").value = $(`#patient${patientMRNo}`).find("td:eq(3)").text()
 }
+
 function editPatient() {
     if (!validateFormEdit())
         return
