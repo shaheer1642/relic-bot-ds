@@ -158,4 +158,4 @@ async function addInvestigation(userid,fields) {
 }
 
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient};
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation};
