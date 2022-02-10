@@ -7,7 +7,7 @@ function validateFormInvest() {
 }
 
 function addInvestigation(mrno) {
-    if (!validateForm())
+    if (!validateFormInvest())
         return
     console.log('addInvestigation()')
     $.post("/doctor/panel/view/investigation/add", {
