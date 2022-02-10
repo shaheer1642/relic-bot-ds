@@ -116,7 +116,7 @@ async function deletePatient(userid,fields) {
 async function getPatient(userid,mrno) {
     console.log('getting patient')
     return new Promise((resolve, reject) => {
-        var data = {patient: null,consultation: null,investigation: null,surgery: null}
+        var data = {patient: null,consultations: null,investigations: null,surgerys: null}
 
         //patient data
         db.query(`
@@ -137,7 +137,7 @@ async function getPatient(userid,mrno) {
                 res[1].rows.forEach((e,i) => {
                     res[1].rows[i].doi = new Date(res[1].rows[i].doi).toLocaleString()
                 })
-                data.consultation = res[1].rows
+                data.consultations = res[1].rows
             }
             resolve({code: 1, status: 'Patient data retrieved', data})
         })
