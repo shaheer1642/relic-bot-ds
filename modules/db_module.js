@@ -116,32 +116,30 @@ async function deletePatient(userid,fields) {
 async function getPatient(userid,mrno) {
     console.log('getting patient')
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM patients WHERE doc_id=${userid} AND mrno=${mrno}`)
+        var data = {patient: null,consultation: null,investigation: null,surgery: null}
+
+        //patient data
+        await db.query(`
+            SELECT * FROM patients WHERE doc_id=${userid} AND mrno=${mrno};
+            SELECT * FROM investigation WHERE mrno=${mrno}
+        `)
         .then(res => {
-            console.log('rowCount = ' + res.rowCount)
-            var data = {patient: null,consultation: null,investigation: null,surgery: null}
-            if (res.rowCount == 1) {
-                res.rows[0].dor = new Date(res.rows[0].dor).toLocaleString()
-                res.rows[0].dob = ((new Date() - new Date(res.rows[0].dob))/31556952000).toFixed()
-                const patient_data = res.rows[0]
-                db.query(`SELECT * FROM investigation WHERE mrno=${mrno}`)
-                .then(res => {
-                    console.log('rowCount = ' + res.rowCount)
-                    if (res.rowCount > 0) {
-                        res.rows[0].doi = new Date(res.rows[0].dor).toLocaleString()
-                        resolve({code: 1, status: 'Patient retrieved', data: {patient: res.rows[0]}})
-                    }
-                    else
-                        resolve({code: 2, status: 'No investigation records found yet', data})
-                })
-                .catch(err => {
-                    console.log(err)
-                    reject({code: 3, status: 'Internal Server Error. Try again', data: null})
-                })
-                resolve({code: 1, status: 'Patient retrieved', data: {patient: res.rows[0]}})
+            // res[0] = patient data
+            if (res[0].rowCount == 1) {
+                res[0].rows[0].dor = new Date(res[0].rows[0].dor).toLocaleString()
+                res[0].rows[0].dob = ((new Date() - new Date(res[0].rows[0].dob))/31556952000).toFixed()
+                data.patient = res[0].rows[0]
             }
             else
                 reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+            // res[1] = investigation data
+            if (res[1].rowCount > 0) {
+                res[1].rows.forEach((e,i) => {
+                    res[1].rows[i].doi = new Date(res[1].rows[i].doi).toLocaleString()
+                })
+                data.consultation = res[1].rows
+            }
+            resolve({code: 1, status: 'Patient data retrieved', data})
         })
         .catch(err => {
             console.log(err)
