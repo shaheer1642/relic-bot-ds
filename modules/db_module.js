@@ -121,7 +121,7 @@ async function getPatient(userid,mrno) {
         //patient data
         db.query(`
             SELECT * FROM patients WHERE doc_id=${userid} AND mrno=${mrno};
-            SELECT * FROM investigation WHERE mrno=${mrno}
+            SELECT * FROM investigation WHERE mrno=${mrno} ORDER BY doi DESC
         `)
         .then(res => {
             // res[0] = patient data
