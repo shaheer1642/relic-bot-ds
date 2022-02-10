@@ -121,10 +121,50 @@ router.post('/doctor/panel/delete',function(req,res) {
   })
 });
 
-//-------add investigation for patient------
+//-------patient investigation------
 router.post('/doctor/panel/view/investigation/add',function(req,res) {
   console.log(req.body)
   db_module.addInvestigation(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+router.post('/doctor/panel/view/investigation/delete',function(req,res) {
+  console.log(req.body)
+  db_module.deleteInvestigation(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+//-------patient surgery------
+router.post('/doctor/panel/view/surgery/add',function(req,res) {
+  console.log(req.body)
+  db_module.addSurgery(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+router.post('/doctor/panel/view/surgery/delete',function(req,res) {
+  console.log(req.body)
+  db_module.deleteSurgery(session.userid,req.body)
   .then(dbres => {
     console.log(dbres)
     res.send(dbres)

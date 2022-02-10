@@ -188,37 +188,22 @@ html
           form(id="addSurgeryForm")
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="patientName") Name
+                label.col-sm-4.col-form-label(for="surgeon_name") Surgeon
                 div.col-sm-8
-                  input.form-control(type="Text" id="patientName" placeholder="Enter patient's name" name="patientName" required)
+                  input.form-control(type="Text" id="surgeon_name" name="surgeon_name" placeholder="Enter surgeon's name"  required)
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="patientGender") Gender
+                label.col-sm-4.col-form-label(for="surgery_type") Type
                 div.col-sm-8
-                  select.form-control(id="patientGender" name="patientGender" required)
+                  select.form-control(id="surgery_type" name="surgery_type" required) 
                     option(selected disabled) Select
-                    option Male
-                    option Female
-            div.mb-3
-              div.row
-                label.col-sm-4.col-form-label(for="patientReason") Reason of Visit
-                div.col-sm-8
-                  select.form-control(id="patientReason" name="patientReason" required)
-                    option(selected disabled) Select
-                    option  Consultation
-                    option Surgery
-                    option Investigation
-            div.mb-3
-              div.row
-                label.col-sm-4.col-form-label(for="patientDoB") Date of Birth
-                div.col-sm-8
-                  div.input-group.date
-                    input.form-control(type="date" id="patientDoB" name="patientDoB" value="2000-12-31" required)
-                    span.input-group-addon
-                    span.fa.fa-time
+                    option PRK
+                    option Femto Lasik
+                    option Phaco
+                    option CXL
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick="addSurgery()") Add
+            button.btn.btn-primary(type="submit" onclick=`addSurgery(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   style.
