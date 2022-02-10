@@ -49,9 +49,6 @@ html
                         button.btn.btn-info(type="submit")
                           i.fa.fa-navicon 
                             span
-                      button.btn.btn-info(type="submit" onclick=`editConsultationModal(${data.patient.mrno},${consultation.consult_id})`)
-                        i.fa.fa-pencil 
-                          span
                       button.btn.btn-danger(type="submit" onclick=`deleteConsultation(${data.patient.mrno},${consultation.consult_id})`)
                         i.fa.fa-trash 
                           span
@@ -83,9 +80,6 @@ html
                             button.btn.btn-info(type="submit")
                               i.fa.fa-navicon 
                                 span
-                          button.btn.btn-info(type="submit" onclick=`editInvestigationModal(${data.patient.mrno},${investigation.invest_id})`)
-                            i.fa.fa-pencil 
-                              span
                           button.btn.btn-danger(type="submit" onclick=`deleteInvestigation(${data.patient.mrno},${investigation.invest_id})`)
                             i.fa.fa-trash 
                               span
@@ -118,9 +112,6 @@ html
                             button.btn.btn-info(type="submit")
                               i.fa.fa-navicon 
                                 span
-                          button.btn.btn-info(type="submit" onclick=`editSurgeryModal(${data.patient.mrno},${surgery.surgery_id})`)
-                            i.fa.fa-pencil 
-                              span
                           button.btn.btn-danger(type="submit" onclick=`deleteSurgery(${data.patient.mrno},${surgery.surgery_id})`)
                             i.fa.fa-trash 
                               span
@@ -182,37 +173,17 @@ html
           form(id="addInvestigationForm")
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="patientName") Name
+                label.col-sm-4.col-form-label(for="invest_type") Gender
                 div.col-sm-8
-                  input.form-control(type="Text" id="patientName" placeholder="Enter patient's name" name="patientName" required)
-            div.mb-3
-              div.row
-                label.col-sm-4.col-form-label(for="patientGender") Gender
-                div.col-sm-8
-                  select.form-control(id="patientGender" name="patientGender" required)
+                  select.form-control(id="invest_type" name="invest_type" required)
                     option(selected disabled) Select
-                    option Male
-                    option Female
-            div.mb-3
-              div.row
-                label.col-sm-4.col-form-label(for="patientReason") Reason of Visit
-                div.col-sm-8
-                  select.form-control(id="patientReason" name="patientReason" required)
-                    option(selected disabled) Select
-                    option  Consultation
-                    option Surgery
-                    option Investigation
-            div.mb-3
-              div.row
-                label.col-sm-4.col-form-label(for="patientDoB") Date of Birth
-                div.col-sm-8
-                  div.input-group.date
-                    input.form-control(type="date" id="patientDoB" name="patientDoB" value="2000-12-31" required)
-                    span.input-group-addon
-                    span.fa.fa-time
+                    option Pentacam
+                    option Crovis
+                    option OCT
+                    option Biometry
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick="addInvestigation()") Add
+            button.btn.btn-primary(type="submit" onclick="addInvestigation(#{data.patient.mrno})") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="addSurgery" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addSurgeryLabel" aria-hidden="true")
@@ -264,7 +235,7 @@ html
     }
     .my-custom-scrollbar {
       position: relative;
-      height: 30vh;
+      max-height: 30vh;
       overflow: auto;
     }
     .table-wrapper-scroll-y {

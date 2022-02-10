@@ -121,6 +121,20 @@ router.post('/doctor/panel/delete',function(req,res) {
   })
 });
 
+//-------add investigation for patient------
+router.post('/doctor/panel/view/investigation/add',function(req,res) {
+  console.log(req.body)
+  db_module.addInvestigation(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
 //add the router
 app.use('/', router);
 const port = process.env.PORT || 80
