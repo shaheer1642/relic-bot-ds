@@ -119,9 +119,25 @@ async function getPatient(userid,mrno) {
         db.query(`SELECT * FROM patients WHERE doc_id=${userid} AND mrno=${mrno}`)
         .then(res => {
             console.log('rowCount = ' + res.rowCount)
+            var data = {patient: null,consultation: null,investigation: null,surgery: null}
             if (res.rowCount == 1) {
                 res.rows[0].dor = new Date(res.rows[0].dor).toLocaleString()
                 res.rows[0].dob = ((new Date() - new Date(res.rows[0].dob))/31556952000).toFixed()
+                const patient_data = res.rows[0]
+                db.query(`SELECT * FROM investigation WHERE mrno=${mrno}`)
+                .then(res => {
+                    console.log('rowCount = ' + res.rowCount)
+                    if (res.rowCount > 0) {
+                        res.rows[0].doi = new Date(res.rows[0].dor).toLocaleString()
+                        resolve({code: 1, status: 'Patient retrieved', data: {patient: res.rows[0]}})
+                    }
+                    else
+                        resolve({code: 2, status: 'No investigation records found yet', data})
+                })
+                .catch(err => {
+                    console.log(err)
+                    reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+                })
                 resolve({code: 1, status: 'Patient retrieved', data: {patient: res.rows[0]}})
             }
             else
