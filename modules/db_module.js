@@ -137,7 +137,7 @@ async function getPatient(userid,mrno) {
                 res[1].rows.forEach((e,i) => {
                     res[1].rows[i].doi = new Date(res[1].rows[i].doi).toLocaleString()
                 })
-                data.consultations = res[1].rows
+                data.investigations = res[1].rows
             }
             resolve({code: 1, status: 'Patient data retrieved', data})
         })
