@@ -1,4 +1,5 @@
 function validateFormInvest() {
+    console.log('validateFormInvest()')
     if (document.forms["addInvestigationForm"]["invest_type"].value == "Select") {
         alert('Please select type')
         return false;
@@ -7,9 +8,9 @@ function validateFormInvest() {
 }
 
 function addInvestigation(mrno) {
+    console.log('addInvestigation()')
     if (!validateFormInvest())
         return
-    console.log('addInvestigation()')
     $.post("/doctor/panel/view/investigation/add", {
         patientMRNo: mrno,
         invest_type: document.getElementById("invest_type").value,
