@@ -119,7 +119,7 @@ async function getPatient(userid,mrno) {
         var data = {patient: null,consultation: null,investigation: null,surgery: null}
 
         //patient data
-        await db.query(`
+        db.query(`
             SELECT * FROM patients WHERE doc_id=${userid} AND mrno=${mrno};
             SELECT * FROM investigation WHERE mrno=${mrno}
         `)
