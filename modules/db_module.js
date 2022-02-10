@@ -137,10 +137,10 @@ async function getPatient(userid,mrno) {
 //-------Add investigation-----------
 
 async function addInvestigation(userid,fields) {
-    console.log('inserting new patient')
+    console.log('inserting new investigation')
     return new Promise((resolve, reject) => {
-        db.query(`INSERT INTO patients (name,gender,reason_of_visit,dob,dor,doc_id) 
-        VALUES ('${fields.patientName}','${fields.patientGender}','${fields.patientReason}',${new Date(fields.patientDoB).getTime()},${new Date().getTime()},${userid})
+        db.query(`INSERT INTO investigation (mrno,invest_type,doi) 
+        VALUES (${fields.patientMRNo},'${fields.invest_type}','${fields.patientReason}',${new Date(fields.patientDoB).getTime()},${new Date().getTime()},${userid})
         RETURNING *`)
         .then(res => {
             console.log('rowCount = ' + res.rowCount)

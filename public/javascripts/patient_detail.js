@@ -11,7 +11,8 @@ function addInvestigation(mrno) {
         return
     console.log('addInvestigation()')
     $.post("/doctor/panel/view/investigation/add", {
-        patientMRNo: document.getElementById("invest_type").mrno,
+        patientMRNo: mrno,
+        invest_type: document.getElementById("invest_type").value,
         }, 
         function(res) {
             console.log(res)
