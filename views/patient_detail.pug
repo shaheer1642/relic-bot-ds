@@ -76,10 +76,6 @@ html
                       td #{investigation.doi}
                       td
                         div.btn-toolbar
-                          form(method="post" action=`/doctor/panel/view/investigation?patient=${data.patient.mrno}&investigation=${investigation.invest_id}`)
-                            button.btn.btn-info(type="submit")
-                              i.fa.fa-navicon 
-                                span
                           button.btn.btn-danger(type="submit" onclick=`deleteInvestigation(${data.patient.mrno},${investigation.invest_id})`)
                             i.fa.fa-trash 
                               span
@@ -108,10 +104,6 @@ html
                       td #{surgery.dos}
                       td
                         div.btn-toolbar
-                          form(method="post" action=`/doctor/panel/view/surgery?patient=${data.patient.mrno}&surgery=${surgery.surgery_id}`)
-                            button.btn.btn-info(type="submit")
-                              i.fa.fa-navicon 
-                                span
                           button.btn.btn-danger(type="submit" onclick=`deleteSurgery(${data.patient.mrno},${surgery.surgery_id})`)
                             i.fa.fa-trash 
                               span

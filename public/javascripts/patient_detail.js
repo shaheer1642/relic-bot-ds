@@ -19,7 +19,7 @@ function addInvestigation(mrno) {
             console.log(res)
             if (res.code == 1) {
                 $('#addInvestigationForm').append(`<div id='investigationAddSuccess' class = "alert alert-success">${res.status}</div>`)
-                //$('#investigationTable').prepend(`<tr id="investigation${res.data.invest_id}"><th scope="row">${res.data.invest_id}</th><td>${res.data.invest_type}</td><td>${res.data.doi}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteInvestigation(${res.data.mrno},${res.data.invest_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#investigationTable').prepend(`<tr id="investigation${res.data.invest_id}"><th scope="row">${res.data.invest_id}</th><td>${res.data.invest_type}</td><td>${res.data.doi}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteInvestigation(${res.data.mrno},${res.data.invest_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
                 $('#addInvestigationForm').trigger("reset");
 
                 setTimeout(() => {
