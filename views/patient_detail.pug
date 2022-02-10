@@ -183,7 +183,7 @@ html
                     option Biometry
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick="addInvestigation(#{data.patient.mrno})") Add
+            button.btn.btn-primary(type="submit" onclick=`addInvestigation(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="addSurgery" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addSurgeryLabel" aria-hidden="true")
@@ -244,8 +244,4 @@ html
     caption {
       caption-side: top;
       font-size: 30px;
-    }
-    tfoot {
-      position: absolute;
-      bottom: 0;
     }
