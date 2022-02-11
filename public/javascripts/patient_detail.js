@@ -15,8 +15,8 @@ function addInvestigation(patientMRNo) {
     if (!validateFormInvest())
         return
     $.post("/doctor/panel/view/investigation/add", {
-        patientMRNo: patientMRNo,
-        invest_type: document.getElementById("invest_type").value,
+            patientMRNo: patientMRNo,
+            invest_type: document.getElementById("invest_type").value,
         }, 
         function(res) {
             console.log(res)
@@ -79,9 +79,9 @@ function addSurgery(patientMRNo) {
     if (!validateFormSurgery())
         return
     $.post("/doctor/panel/view/surgery/add", {
-        patientMRNo: patientMRNo,
-        surgeon_name: document.getElementById("surgeon_name").value,
-        surgery_type: document.getElementById("surgery_type").value
+            patientMRNo: patientMRNo,
+            surgeon_name: document.getElementById("surgeon_name").value,
+            surgery_type: document.getElementById("surgery_type").value
         }, 
         function(res) {
             console.log(res)
@@ -117,6 +117,77 @@ function deleteSurgery(patientMRNo,surgery_id) {
                 console.log(res)
                 if (res.code == 1)
                     $(`#surgery${surgery_id}`).fadeOut(300, function () { $(this).remove(); })
+                else
+                    alert(res.status)
+            }
+        )
+    }
+}
+
+//-----consultation-----
+
+function validateFormConsult() {
+    console.log('validateFormConsult()')
+    if (document.forms["addConsultationForm"]["complaint"].value == "") {
+        alert('Please select type')
+        return false;
+    }
+    if (document.forms["addConsultationForm"]["examination"].value == "") {
+        alert('Please select type')
+        return false;
+    }
+    if (document.forms["addConsultationForm"]["advice"].value == "") {
+        alert('Please select type')
+        return false;
+    }
+    return true
+}
+
+function addConsultation(patientMRNo) {
+    console.log('addConsultation()')
+    if (!validateFormConsult())
+        return
+    $.post("/doctor/panel/view/consultation/add", {
+            patientMRNo: patientMRNo,
+            complaint: document.getElementById("complaint").value,
+            examination: document.getElementById("examination").value,
+            advice: document.getElementById("advice").value,
+            image: document.getElementById("image").value,
+        }, 
+        function(res) {
+            console.log(res)
+            if (res.code == 1) {
+                $('#addConsultationForm').append(`<div id='consultationAddSuccess' class = "alert alert-success">${res.status}</div>`)
+                $('#consultationTable').prepend(`<tr id="consultation${res.data.consult_id}"><th scope="row">${res.data.consult_id}</th><td>${res.data.complaint}</td><td>${res.data.examination}</td><td>${res.data.advice}</td><td>${res.data.image}</td><td>${res.data.doc}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteConsultation(${res.data.mrno},${res.data.consult_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#addConsultationForm').trigger("reset");
+
+                setTimeout(() => {
+                console.log('alert remove timeout')
+                $('#consultationAddSuccess').fadeOut(300, function() { $(this).remove(); })
+                }, 3000);
+            }
+            else {
+                $('#addConsultationForm').append(`<div id='consultationAddFail' class = "alert alert-danger">${res.status}</div>`)
+                setTimeout(() => {
+                    console.log('alert remove timeout')
+                    $('#consultationAddFail').fadeOut(300, function () { $(this).remove(); })
+                }, 3000);
+            }
+        }
+    )
+}
+
+function deleteConsultation(patientMRNo,consult_id) {
+    if (confirm(`Are you sure you want to delete consultation#${consult_id}?`)) {
+        console.log('deleteConsultation()')
+        $.post("/doctor/panel/view/consultation/delete", {
+                patientMRNo: patientMRNo,
+                consult_id: consult_id
+            }, 
+            function(res) {
+                console.log(res)
+                if (res.code == 1)
+                    $(`#consultation${consult_id}`).fadeOut(300, function () { $(this).remove(); })
                 else
                     alert(res.status)
             }

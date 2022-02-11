@@ -122,37 +122,27 @@ html
           form(id="addConsultationForm")
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="patientName") Name
+                label.col-sm-4.col-form-label(for="complaint") Complaint
                 div.col-sm-8
-                  input.form-control(type="Text" id="patientName" placeholder="Enter patient's name" name="patientName" required)
+                  input.form-control(type="Text" id="complaint" name="complaint" placeholder="Patient's complaint" required)
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="patientGender") Gender
+                label.col-sm-4.col-form-label(for="examination") Examination
                 div.col-sm-8
-                  select.form-control(id="patientGender" name="patientGender" required)
-                    option(selected disabled) Select
-                    option Male
-                    option Female
+                  input.form-control(type="Text" id="examination" name="examination" placeholder="Examination" required)
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="patientReason") Reason of Visit
+                label.col-sm-4.col-form-label(for="advice") Advice
                 div.col-sm-8
-                  select.form-control(id="patientReason" name="patientReason" required)
-                    option(selected disabled) Select
-                    option  Consultation
-                    option Surgery
-                    option Investigation
+                  input.form-control(type="Text" id="advice" name="advice" placeholder="Doctor's advice" required)
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="patientDoB") Date of Birth
+                label.col-sm-4.col-form-label(for="image") Report image
                 div.col-sm-8
-                  div.input-group.date
-                    input.form-control(type="date" id="patientDoB" name="patientDoB" value="2000-12-31" required)
-                    span.input-group-addon
-                    span.fa.fa-time
+                  input.form-control(type="Text" id="image" name="image" placeholder="Insert report image")
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick="addConsultation()") Add
+            button.btn.btn-primary(type="submit" onclick=`addConsultation(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="addInvestigation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addInvestigationLabel" aria-hidden="true")
