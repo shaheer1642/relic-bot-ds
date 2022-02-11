@@ -123,6 +123,7 @@ async function getPatient(userid,mrno) {
             SELECT * FROM patients WHERE doc_id=${userid} AND mrno=${mrno};
             SELECT * FROM investigation WHERE mrno=${mrno} ORDER BY doi DESC;
             SELECT * FROM surgery WHERE mrno=${mrno} ORDER BY dos DESC;
+            SELECT * FROM consultation WHERE mrno=${mrno} ORDER BY doc DESC;
         `)
         .then(res => {
             // res[0] = patient data
@@ -146,6 +147,13 @@ async function getPatient(userid,mrno) {
                     res[2].rows[i].dos = new Date(res[2].rows[i].dos).toLocaleString()
                 })
                 data.surgeries = res[2].rows
+            }
+            // res[3] = consultation data
+            if (res[3].rowCount > 0) {
+                res[3].rows.forEach((e,i) => {
+                    res[3].rows[i].doc = new Date(res[3].rows[i].doc).toLocaleString()
+                })
+                data.consultations = res[3].rows
             }
             resolve({code: 1, status: 'Patient data retrieved', data})
         })
@@ -240,4 +248,46 @@ async function deleteSurgery(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery};
+//-------consultation-----------
+
+async function addConsultation(userid,fields) {
+    console.log('inserting new consultation')
+    return new Promise((resolve, reject) => {
+        db.query(`INSERT INTO consultation (mrno,complaint,examination,advice,image,doc) 
+        VALUES (${fields.patientMRNo},'${fields.complaint}','${fields.examination}','${fields.advice}','${fields.image}',${new Date().getTime()})
+        RETURNING *`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1) {
+                res.rows[0].doc = new Date(res.rows[0].doc).toLocaleString()
+                resolve({code: 1, status: 'Record added', data: res.rows[0]})
+            }
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+async function deleteConsultation(userid,fields) {
+    console.log('deleting consultation')
+    return new Promise((resolve, reject) => {
+        db.query(`DELETE FROM consultation WHERE mrno=${fields.patientMRNo} AND consult_id=${fields.consult_id}`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Record deleted', data: null})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addConsultation,deleteConsultation};

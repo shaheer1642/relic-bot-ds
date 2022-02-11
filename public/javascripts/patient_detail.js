@@ -158,7 +158,7 @@ function addConsultation(patientMRNo) {
             console.log(res)
             if (res.code == 1) {
                 $('#addConsultationForm').append(`<div id='consultationAddSuccess' class = "alert alert-success">${res.status}</div>`)
-                $('#consultationTable').prepend(`<tr id="consultation${res.data.consult_id}"><th scope="row">${res.data.consult_id}</th><td>${res.data.complaint}</td><td>${res.data.examination}</td><td>${res.data.advice}</td><td>${res.data.image}</td><td>${res.data.doc}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteConsultation(${res.data.mrno},${res.data.consult_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#consultationTable').prepend(`<tr id="consultation${res.data.consult_id}"><th scope="row">${res.data.consult_id}</th><td>${res.data.complaint}</td><td>${res.data.examination}</td><td>${res.data.advice}</td><td>${res.data.image}</td><td>${res.data.doc}</td><td><div class="btn-toolbar"><form method="post" action="/doctor/panel/view/consultation?patient=${patientMRNo}&consultation=${res.data.consult_id}"><button class="btn btn-info" type="submit"><i class="fa fa-navicon"> <span></span></i></button></form><button class="btn btn-danger" type="submit" onclick="deleteConsultation(${res.data.mrno},${res.data.consult_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
                 $('#addConsultationForm').trigger("reset");
 
                 setTimeout(() => {

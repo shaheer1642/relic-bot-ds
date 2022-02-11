@@ -175,6 +175,33 @@ router.post('/doctor/panel/view/surgery/delete',function(req,res) {
   })
 });
 
+//-------patient consultation------
+router.post('/doctor/panel/view/consultation/add',function(req,res) {
+  console.log(req.body)
+  db_module.addConsultation(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+router.post('/doctor/panel/view/consultation/delete',function(req,res) {
+  console.log(req.body)
+  db_module.deleteConsultation(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
 //add the router
 app.use('/', router);
 const port = process.env.PORT || 80
