@@ -91,7 +91,7 @@ router.post('/doctor/panel/view',function(req,res) {
   })
   .catch(dbres => {
     console.log(dbres)
-    res.render('patient_detail', dbres);
+    res.send(`<script>alert("${dbres.status}")</script>`)
   })
 });
 
@@ -192,6 +192,46 @@ router.post('/doctor/panel/view/consultation/add',function(req,res) {
 router.post('/doctor/panel/view/consultation/delete',function(req,res) {
   console.log(req.body)
   db_module.deleteConsultation(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+router.post('/doctor/panel/view/consultation/get',function(req,res) {
+  console.log(req.body)
+  db_module.getConsultations(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+//-------consultation treatment------
+router.post('/doctor/panel/view/consultation/treatment/add',function(req,res) {
+  console.log(req.body)
+  db_module.addTreatment(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+router.post('/doctor/panel/view/consultation/treatment/delete',function(req,res) {
+  console.log(req.body)
+  db_module.deleteTreatment(session.userid,req.body)
   .then(dbres => {
     console.log(dbres)
     res.send(dbres)

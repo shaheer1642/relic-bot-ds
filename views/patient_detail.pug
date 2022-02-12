@@ -45,7 +45,7 @@ html
                   td #{consultation.doc}
                   td
                     div.btn-toolbar
-                      button.btn.btn-info(type="button" data-bs-toggle="modal" data-bs-target="#viewConsultation")
+                      button.btn.btn-info(type="button" onclick=`viewConsultationModal(${data.patient.mrno},${consultation.consult_id})`)
                         i.fa.fa-navicon 
                           span
                       button.btn.btn-danger(type="submit" onclick=`deleteConsultation(${data.patient.mrno},${consultation.consult_id})`)
@@ -154,16 +154,16 @@ html
           header
             h2.text-center Consultation Detail
             h6.text-left MR Number: #{data.patient.mrno}
-            h6.text-left Consultation ID: #{data.patient.mrno}
-            p.p1.text-left Complaint:
-            p.p1.text-left Examination:
-            p.p1.text-left Advice:
-            p.p1.text-left Image:
-            p.p1.text-left Date: #{data.patient.dor}
+            h6.text-left(id="consultation_consult_id") Consultation ID: 
+            p.p1.text-left(id="consultation_complaint") Complaint:
+            p.p1.text-left(id="consultation_examination") Examination:
+            p.p1.text-left(id="consultation_advice") Advice:
+            p.p1.text-left(id="consultation_image") Image:
+            p.p1.text-left(id="consultation_doc") Date:
           div.row 
             div.col 
               div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
-                table.table.table-striped.table-dark(id="investigationTable")
+                table.table.table-striped.table-dark(id="treatmentTable")
                   caption Treatment Record
                   thead
                     tr
@@ -173,26 +173,13 @@ html
                       th(scope="col") Frq
                       th(scope="col") Dur
                       th(scope="col")
-                  tbody
-                    if (data.treatments)
-                      each treatment in data.treatments
-                        tr(id=`treatment${treatment.treat_id}`)
-                          th(scope="row") #{treatment.treat_id}
-                          td #{treatment.med_name}
-                          td #{treatment.med_str}
-                          td #{treatment.med_frq}
-                          td #{treatment.med_dur}
-                          td
-                            div.btn-toolbar
-                              button.btn.btn-danger(type="submit" onclick=`deleteTreatment(${data.patient.mrno},${treatment.treat_id})`)
-                                i.fa.fa-trash 
-                                  span
+                    tbody
               button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addTreatment")
                 i.fa.fa-plus 
                   span
             div.col
               div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
-                table.table.table-striped.table-dark(id="surgeryTable")
+                table.table.table-striped.table-dark(id="glassesPrescTable")
                   caption Glasses Prescription
                   thead
                     tr
@@ -221,7 +208,6 @@ html
                     span
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick=`addConsultation(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="addInvestigation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addInvestigationLabel" aria-hidden="true")
@@ -362,7 +348,7 @@ html
                     option After breakfast, Lunch & Dinner
             div.mb-3
               div.row
-                label.col-sm-4.col-form-label(for="med_dur1") Strength
+                label.col-sm-4.col-form-label(for="med_dur1") Duration
                 div.col-sm-4
                   input.form-control(type="Text" id="med_dur1" name="med_dur1" placeholder="Enter medicine duration" required)
                 div.col-sm-4

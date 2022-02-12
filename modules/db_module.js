@@ -290,4 +290,64 @@ async function deleteConsultation(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addConsultation,deleteConsultation};
+async function getConsultations(userid,fields) {
+    console.log('getting patient consultations')
+    return new Promise((resolve, reject) => {
+        db.query(`SELECT * FROM consultation 
+        JOIN treatment ON treatment.consult_id = consultation.consult_id
+        WHERE consultation.mrno=${fields.patientMRNo} AND consultation.consult_id=${fields.consult_id} 
+        ORDER BY doc DESC;`)
+        .then(res => {
+            res.rows.forEach((e,i) => {
+                res.rows[i].doc = new Date(res.rows[i].doc).toLocaleString()
+            })
+            resolve({code: 1, status: 'Consultations data retrieved', data: res.rows})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+//-------treatment-----------
+
+async function addTreatment(userid,fields) {
+    console.log('inserting new treatment')
+    return new Promise((resolve, reject) => {
+        db.query(`INSERT INTO treatment (consult_id,med_name,med_str,med_frq,med_dur) 
+        VALUES (${fields.consult_id},'${fields.med_name}','${fields.med_str}','${fields.med_frq}','${fields.med_dur}')
+        RETURNING *`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Medicine added', data: res.rows[0]})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+async function deleteTreatment(userid,fields) {
+    console.log('deleting treatment')
+    return new Promise((resolve, reject) => {
+        db.query(`DELETE FROM treatment WHERE consult_id=${fields.consult_id} AND treat_id=${fields.treat_id}`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Medicine deleted', data: null})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addConsultation,deleteConsultation,getConsultations,addTreatment,deleteTreatment};
