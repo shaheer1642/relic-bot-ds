@@ -45,10 +45,9 @@ html
                   td #{consultation.doc}
                   td
                     div.btn-toolbar
-                      form(method="post" action=`/doctor/panel/view/consultation?patient=${data.patient.mrno}&consultation=${consultation.consult_id}`)
-                        button.btn.btn-info(type="submit")
-                          i.fa.fa-navicon 
-                            span
+                      button.btn.btn-info(type="button" data-bs-toggle="modal" data-bs-target="#viewConsultation")
+                        i.fa.fa-navicon 
+                          span
                       button.btn.btn-danger(type="submit" onclick=`deleteConsultation(${data.patient.mrno},${consultation.consult_id})`)
                         i.fa.fa-trash 
                           span
@@ -145,6 +144,86 @@ html
             button.btn.btn-primary(type="submit" onclick=`addConsultation(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
+  div.modal.fade(id="viewConsultation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="viewConsultationLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-consult.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          h5.modal-title(id="viewConsultationLabel") New consultation
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body
+          header
+            h2.text-center Consultation Detail
+            h6.text-left MR Number: #{data.patient.mrno}
+            h6.text-left Consultation ID: #{data.patient.mrno}
+            p.p1.text-left Complaint:
+            p.p1.text-left Examination:
+            p.p1.text-left Advice:
+            p.p1.text-left Image:
+            p.p1.text-left Date: #{data.patient.dor}
+          div.row 
+            div.col 
+              div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+                table.table.table-striped.table-dark(id="investigationTable")
+                  caption Treatment Record
+                  thead
+                    tr
+                      th(scope="col") ID
+                      th(scope="col") Medicine
+                      th(scope="col") Str
+                      th(scope="col") Frq
+                      th(scope="col") Dur
+                      th(scope="col")
+                  tbody
+                    if (data.treatments)
+                      each treatment in data.treatments
+                        tr(id=`treatment${treatment.treat_id}`)
+                          th(scope="row") #{treatment.treat_id}
+                          td #{treatment.med_name}
+                          td #{treatment.med_str}
+                          td #{treatment.med_frq}
+                          td #{treatment.med_dur}
+                          td
+                            div.btn-toolbar
+                              button.btn.btn-danger(type="submit" onclick=`deleteTreatment(${data.patient.mrno},${treatment.treat_id})`)
+                                i.fa.fa-trash 
+                                  span
+              button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addTreatment")
+                i.fa.fa-plus 
+                  span
+            div.col
+              div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+                table.table.table-striped.table-dark(id="surgeryTable")
+                  caption Glasses Prescription
+                  thead
+                    tr
+                      th(scope="col") ID
+                      th(scope="col") Type
+                      th(scope="col") Str
+                      th(scope="col") Frq
+                      th(scope="col") Dur
+                      th(scope="col")
+                  tbody
+                    if (data.surgeries)
+                      each surgery in data.surgeries
+                        tr(id=`surgery${surgery.surgery_id}`)
+                          th(scope="row") #{surgery.surgery_id}
+                          td #{surgery.surgery_type}
+                          td #{surgery.surgeon_name}
+                          td #{surgery.dos}
+                          td
+                            div.btn-toolbar
+                              button.btn.btn-danger(type="submit" onclick=`deleteSurgery(${data.patient.mrno},${surgery.surgery_id})`)
+                                i.fa.fa-trash 
+                                  span
+              form(method="get" action="/doctor/panel/view/surgery/add")
+                button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addSurgery")
+                  i.fa.fa-plus 
+                    span
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-primary(type="submit" onclick=`addConsultation(${data.patient.mrno})`) Add
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+
   div.modal.fade(id="addInvestigation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addInvestigationLabel" aria-hidden="true")
     div.modal-dialog.modal-dialog-centered
       div.modal-content
@@ -214,3 +293,12 @@ html
     }
     table {border-collapse:collapse; table-layout:fixed; width:310px;}
     table td {width:100px; word-wrap:break-word;}
+
+    .modal .modal-body { /* Vertical scrollbar if necessary */
+        max-height: 480px;
+        overflow-y: auto;
+    }
+
+    body .modal-dialog-consult { /* Width */
+        max-width: 80%;
+    }

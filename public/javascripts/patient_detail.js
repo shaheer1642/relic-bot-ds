@@ -129,15 +129,15 @@ function deleteSurgery(patientMRNo,surgery_id) {
 function validateFormConsult() {
     console.log('validateFormConsult()')
     if (document.forms["addConsultationForm"]["complaint"].value == "") {
-        alert('Please select type')
+        alert('Please enter complaint')
         return false;
     }
     if (document.forms["addConsultationForm"]["examination"].value == "") {
-        alert('Please select type')
+        alert('Please enter examination')
         return false;
     }
     if (document.forms["addConsultationForm"]["advice"].value == "") {
-        alert('Please select type')
+        alert('Please enter advice')
         return false;
     }
     return true
