@@ -297,7 +297,9 @@ async function getConsultations(userid,fields) {
         JOIN treatment ON treatment.consult_id = consultation.consult_id
         WHERE consultation.mrno=${fields.patientMRNo} AND consultation.consult_id=${fields.consult_id} 
         ORDER BY doc DESC;`)
-        .then(res => {
+        .then(async res => {
+            if (res.rowCount == 0)
+                res = await db.query(`SELECT * FROM consultation WHERE mrno=${fields.patientMRNo} AND consult_id=${fields.consult_id} `)
             res.rows.forEach((e,i) => {
                 res.rows[i].doc = new Date(res.rows[i].doc).toLocaleString()
             })
