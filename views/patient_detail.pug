@@ -274,6 +274,108 @@ html
           div.btn-toolbar
             button.btn.btn-primary(type="submit" onclick=`addSurgery(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+    
+  div.modal.fade(id="addTreatment" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addTreatmentLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          h5.modal-title(id="addTreatmentLabel") New medicine
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body.modal-body-consult
+          form(id="addTreatmentForm")
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="med_name") Name
+                div.col-sm-8
+                  input.form-control(type="Text" id="med_name" name="med_name" placeholder="Enter medicine name"  required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="med_str1") Strength
+                div.col-sm-4
+                  input.form-control(type="Text" id="med_str1" name="med_str1" placeholder="Enter medicine strength" required)
+                div.col-sm-4
+                  select.form-control(id="med_str2" name="med_str2" required)
+                    option(selected) Capsule(s)
+                    option Tablet(s)
+                    option ml
+                    option mg
+                    option IU
+                    option Drop
+                    option Tablespoon
+                    option Teaspoon
+                    option Unit(s)
+                    option Puff(s)
+                    option Sachet
+                    option Injection
+                    option Dose Step
+                    option Dropper
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="med_frq") Frequency
+                div.col-sm-8
+                  select.form-control(id="med_frq" name="med_frq" size="5" required) 
+                    option(selected) Only Once
+                    option Once a day
+                    option Twice a day
+                    option Thrice a day
+                    option Four times a day
+                    option Before Bed
+                    option Every hour
+                    option Every 2 hours
+                    option Every 3 hours
+                    option Every 4 hours
+                    option Every 6 hours
+                    option Every 8 hours
+                    option Every 12 hours
+                    option Every Other day
+                    option Every 3 Days
+                    option Once a week
+                    option Twice a week
+                    option Thrice a week
+                    option Every 10 Days
+                    option Every 15 Days
+                    option Once a Month
+                    option Once in 3 Months
+                    option Once a Year
+                    option Every Morning
+                    option Every Evening
+                    option Every Night
+                    option If needed
+                    option Before Breakfast
+                    option Continuosly
+                    option Before Lunch
+                    option After Lunch
+                    option Before Meal
+                    option After Meal
+                    option Before Dinner
+                    option After Dinner
+                    option As Advised
+                    option Twice a month
+                    option After Breakfast
+                    option Before Breakfast and Lunch
+                    option Before Lunch and Dinner
+                    option Before breakfast and dinner
+                    option After Breakfast and Lunch
+                    option After Lunch and Dinner
+                    option After breakfast and dinner
+                    option Before breakfast, Lunch & Dinner
+                    option After breakfast, Lunch & Dinner
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="med_dur1") Strength
+                div.col-sm-4
+                  input.form-control(type="Text" id="med_dur1" name="med_dur1" placeholder="Enter medicine duration" required)
+                div.col-sm-4
+                  select.form-control(id="med_dur2" name="med_dur2" required)
+                    option(selected) Day(s)
+                    option Week(s)
+                    option Month(s)
+                    option Continuosly
+                    option When Required
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-primary(type="submit" onclick=`addTreatment(${data.patient.mrno})`) Add
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   style.
     p.p1 {
@@ -294,11 +396,11 @@ html
     table {border-collapse:collapse; table-layout:fixed; width:310px;}
     table td {width:100px; word-wrap:break-word;}
 
-    .modal .modal-body { /* Vertical scrollbar if necessary */
-        max-height: 480px;
+    .modal .modal-body-consult { /* Vertical scrollbar if necessary */
+        max-height: 80%;
         overflow-y: auto;
     }
 
     body .modal-dialog-consult { /* Width */
-        max-width: 80%;
+        max-width: 95%;
     }
