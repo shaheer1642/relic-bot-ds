@@ -290,20 +290,36 @@ async function deleteConsultation(userid,fields) {
     });
 }
 
-async function getConsultations(userid,fields) {
-    console.log('getting patient consultations')
+async function getConsultation(userid,fields) {
+    console.log('getting patient consultation')
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM consultation 
-        JOIN treatment ON treatment.consult_id = consultation.consult_id
-        WHERE consultation.mrno=${fields.patientMRNo} AND consultation.consult_id=${fields.consult_id} 
-        ORDER BY doc DESC;`)
+        db.query(`
+            SELECT * FROM consultation WHERE mrno=${fields.patientMRNo} AND consult_id=${fields.consult_id};
+            SELECT * FROM consultation 
+            JOIN treatment ON treatment.consult_id = consultation.consult_id
+            WHERE consultation.mrno=${fields.patientMRNo} AND consultation.consult_id=${fields.consult_id} 
+            ORDER BY treatment.treat_id DESC;
+            SELECT * FROM consultation 
+            JOIN glasses_prescription ON glasses_prescription.consult_id = consultation.consult_id
+            WHERE consultation.mrno=${fields.patientMRNo} AND consultation.consult_id=${fields.consult_id} 
+            ORDER BY glasses_prescription.presc_id DESC;
+        `)
         .then(async res => {
-            if (res.rowCount == 0)
-                res = await db.query(`SELECT * FROM consultation WHERE mrno=${fields.patientMRNo} AND consult_id=${fields.consult_id} `)
-            res.rows.forEach((e,i) => {
-                res.rows[i].doc = new Date(res.rows[i].doc).toLocaleString()
-            })
-            resolve({code: 1, status: 'Consultations data retrieved', data: res.rows})
+            var data = {consultation: {}, treatments: [], prescriptions: []}
+
+            //res[0] = consultation data
+            if (res[0].rowCount != 1)
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+            res[0].rows[0].doc = new Date(res[0].rows[0].doc).toLocaleString()
+            data.consultation = res[0].rows[0]
+
+            //res[1] = treatments data
+            data.treatments = res[1].rows
+
+            //res[2] = prescriptions data
+            data.prescriptions = res[2].rows
+
+            resolve({code: 1, status: 'Consultations data retrieved', data: data})
         })
         .catch(err => {
             console.log(err)
@@ -352,4 +368,44 @@ async function deleteTreatment(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addConsultation,deleteConsultation,getConsultations,addTreatment,deleteTreatment};
+//-------prescription-----------
+
+async function addPrescription(userid,fields) {
+    console.log('inserting new prescription')
+    return new Promise((resolve, reject) => {
+        db.query(`INSERT INTO glasses_prescription (consult_id,presc_type,l_spherical,r_spherical,l_cylindrical,r_cylindrical,l_axis,r_axis,l_visual_acuity,r_visual_acuity) 
+        VALUES (${fields.consult_id},'${fields.presc_type}',${fields.l_spherical},${fields.r_spherical},${fields.l_cylindrical},${fields.r_cylindrical},${fields.l_axis},${fields.r_axis},${fields.l_visual_acuity},${fields.r_visual_acuity})
+        RETURNING *`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Prescription added', data: res.rows[0]})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+async function deletePrescription(userid,fields) {
+    console.log('deleting prescription')
+    return new Promise((resolve, reject) => {
+        db.query(`DELETE FROM glasses_prescription WHERE consult_id=${fields.consult_id} AND presc_id=${fields.presc_id}`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Prescription deleted', data: null})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addConsultation,deleteConsultation,getConsultation,addTreatment,deleteTreatment,addPrescription,deletePrescription};

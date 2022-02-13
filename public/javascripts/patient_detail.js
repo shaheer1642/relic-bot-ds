@@ -197,22 +197,27 @@ function deleteConsultation(patientMRNo,consult_id) {
 
 function viewConsultationModal(patientMRNo,consult_id) {
     console.log('viewConsultationModal()')
-    document.getElementById("consultation_consult_id").innerHTML = 'Consultation ID: ' + consult_id
-    $('#treatmentTable tbody').empty();
 
     $.post("/doctor/panel/view/consultation/get", {
             patientMRNo: patientMRNo,
             consult_id: consult_id
         }, 
         function(res) {
-            res.data.forEach(consultation => {
-                document.getElementById("consultation_complaint").innerHTML = 'Complaint: ' + consultation.complaint
-                document.getElementById("consultation_examination").innerHTML = 'Examination: ' + consultation.examination
-                document.getElementById("consultation_advice").innerHTML = 'Advice: ' + consultation.advice
-                document.getElementById("consultation_image").innerHTML = 'Report image: ' + consultation.image
-                document.getElementById("consultation_doc").innerHTML = 'Date: ' + consultation.doc
-                if (consultation.treat_id)
-                    $('#treatmentTable').prepend(`<tr id="treatment${consultation.treat_id}"><th scope="row">${consultation.treat_id}</th><td>${consultation.med_name}</td><td>${consultation.med_str}</td><td>${consultation.med_frq}</td><td>${consultation.med_dur}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteTreatment(${consultation.consult_id},${consultation.treat_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+            document.getElementById("consultation_consult_id").innerHTML = 'Consultation ID: ' + res.data.consultation.consult_id
+            document.getElementById("consultation_complaint").innerHTML = 'Complaint: ' + res.data.consultation.complaint
+            document.getElementById("consultation_examination").innerHTML = 'Examination: ' + res.data.consultation.examination
+            document.getElementById("consultation_advice").innerHTML = 'Advice: ' + res.data.consultation.advice
+            document.getElementById("consultation_image").innerHTML = 'Report image: ' + res.data.consultation.image
+            document.getElementById("consultation_doc").innerHTML = 'Date: ' + res.data.consultation.doc
+            $('#treatmentTable tbody').empty();
+            res.data.treatments.forEach(treatment => {
+                if (treatment.treat_id)
+                    $('#treatmentTable').append(`<tr id="treatment${treatment.treat_id}"><th scope="row">${treatment.treat_id}</th><td>${treatment.med_name}</td><td>${treatment.med_str}</td><td>${treatment.med_frq}</td><td>${treatment.med_dur}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteTreatment(${treatment.consult_id},${treatment.treat_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+            });
+            $('#prescriptionTable tbody').empty();
+            res.data.prescriptions.forEach(prescription => {
+                if (prescription.presc_id)
+                    $('#prescriptionTable').append(`<tr id="prescription${prescription.presc_id}"><th scope="row">${prescription.presc_id}</th><td>${prescription.presc_type}</td><td>${prescription.l_spherical}</td><td>${prescription.r_spherical}</td><td>${prescription.l_cylindrical}</td><td>${prescription.r_cylindrical}</td><td>${prescription.l_axis}</td><td>${prescription.r_axis}</td><td>${prescription.l_visual_acuity}</td><td>${prescription.r_visual_acuity}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deletePrescription(${prescription.consult_id},${prescription.presc_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
             });
             $('#viewConsultation').modal('show')
         }
@@ -324,7 +329,7 @@ function addPrescription() {
             console.log(res)
             if (res.code == 1) {
                 $('#addPrescriptionForm').append(`<div id='prescriptionAddSuccess' class = "alert alert-success">${res.status}</div>`)
-                $('#prescriptionTable').prepend(`<tr id="prescription${res.data.presc_id}"><th scope="row">${res.data.presc_type}</th><td>${res.data.med_name}</td><td>${res.data.med_str}</td><td>${res.data.med_frq}</td><td>${res.data.med_dur}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deletePrescription(${res.data.consult_id},${res.data.presc_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#prescriptionTable').prepend(`<tr id="prescription${res.data.presc_id}"><th scope="row">${res.data.presc_id}</th><td>${res.data.presc_type}</td><td>${res.data.l_spherical}</td><td>${res.data.r_spherical}</td><td>${res.data.l_cylindrical}</td><td>${res.data.r_cylindrical}</td><td>${res.data.l_axis}</td><td>${res.data.r_axis}</td><td>${res.data.l_visual_acuity}</td><td>${res.data.r_visual_acuity}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deletePrescription(${res.data.consult_id},${res.data.presc_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
                 $('#addPrescriptionForm').trigger("reset");
 
                 setTimeout(() => {
