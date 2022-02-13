@@ -219,6 +219,7 @@ function viewConsultationModal(patientMRNo,consult_id) {
     )
 
 }
+
 //-----treatment-----
 
 function validateFormTreat() {
@@ -237,7 +238,6 @@ function validateFormTreat() {
     }
     return true
 }
-
 
 function addTreatment() {
     console.log('addTreatment()')
@@ -285,6 +285,75 @@ function deleteTreatment(consult_id,treat_id) {
                 console.log(res)
                 if (res.code == 1)
                     $(`#treatment${treat_id}`).fadeOut(300, function () { $(this).remove(); })
+                else
+                    alert(res.status)
+            }
+        )
+    }
+}
+
+//-----prescription-----
+
+function validateFormPresc() {
+    console.log('validateFormPresc()')
+    if (document.forms["addPrescriptionForm"]["l_spherical"].value == "" || document.forms["addPrescriptionForm"]["r_spherical"].value == ""  || document.forms["addPrescriptionForm"]["l_cylindrical"].value == ""  || document.forms["addPrescriptionForm"]["r_cylindrical"].value == ""  || document.forms["addPrescriptionForm"]["l_axis"].value == ""  || document.forms["addPrescriptionForm"]["r_axis"].value == ""  || document.forms["addPrescriptionForm"]["l_visual_acuity"].value == ""  || document.forms["addPrescriptionForm"]["r_visual_acuity"].value == "" ) {
+        alert('Please fill the form')
+        return false;
+    }
+    return true
+}
+
+function addPrescription() {
+    console.log('addPrescription()')
+    console.log(document.getElementById("consultation_consult_id").innerText)
+    if (!validateFormPresc())
+        return
+    $.post("/doctor/panel/view/consultation/prescription/add", {
+            consult_id: document.getElementById("consultation_consult_id").innerText.replace('Consultation ID:','').trim(),
+            presc_type: document.getElementById("presc_type").value,
+            l_spherical: document.getElementById("l_spherical").value,
+            r_spherical: document.getElementById("r_spherical").value,
+            l_cylindrical: document.getElementById("l_cylindrical").value,
+            r_cylindrical: document.getElementById("r_cylindrical").value,
+            l_axis: document.getElementById("l_axis").value,
+            r_axis: document.getElementById("r_axis").value,
+            l_visual_acuity: document.getElementById("l_visual_acuity").value,
+            r_visual_acuity: document.getElementById("r_visual_acuity").value
+        }, 
+        function(res) {
+            console.log(res)
+            if (res.code == 1) {
+                $('#addPrescriptionForm').append(`<div id='prescriptionAddSuccess' class = "alert alert-success">${res.status}</div>`)
+                $('#prescriptionTable').prepend(`<tr id="prescription${res.data.presc_id}"><th scope="row">${res.data.presc_type}</th><td>${res.data.med_name}</td><td>${res.data.med_str}</td><td>${res.data.med_frq}</td><td>${res.data.med_dur}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deletePrescription(${res.data.consult_id},${res.data.presc_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#addPrescriptionForm').trigger("reset");
+
+                setTimeout(() => {
+                console.log('alert remove timeout')
+                $('#prescriptionAddSuccess').fadeOut(300, function() { $(this).remove(); })
+                }, 3000);
+            }
+            else {
+                $('#addPrescriptionForm').append(`<div id='prescriptionAddFail' class = "alert alert-danger">${res.status}</div>`)
+                setTimeout(() => {
+                    console.log('alert remove timeout')
+                    $('#prescriptionAddFail').fadeOut(300, function () { $(this).remove(); })
+                }, 3000);
+            }
+        }
+    )
+}
+
+function deletePrescription(consult_id,presc_id) {
+    if (confirm(`Are you sure you want to delete prescription#${presc_id}?`)) {
+        console.log('deletePrescription()')
+        $.post("/doctor/panel/view/consultation/prescription/delete", {
+                consult_id: consult_id,
+                presc_id: presc_id
+            }, 
+            function(res) {
+                console.log(res)
+                if (res.code == 1)
+                    $(`#prescription${presc_id}`).fadeOut(300, function () { $(this).remove(); })
                 else
                     alert(res.status)
             }

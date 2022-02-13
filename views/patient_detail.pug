@@ -185,27 +185,27 @@ html
                     tr
                       th(scope="col") ID
                       th(scope="col") Type
-                      th(scope="col") Str
-                      th(scope="col") Frq
-                      th(scope="col") Dur
+                      th(scope="col" colspan="2") Spherical
+                      th(scope="col" colspan="2") Cylindrical
+                      th(scope="col" colspan="2") Axis
+                      th(scope="col" colspan="2") Visual Acuity
+                      th(scope="col")
+                    tr 
+                      th(scope="col")
+                      th(scope="col")
+                      th(scope="col") L
+                      th(scope="col") R
+                      th(scope="col") L
+                      th(scope="col") R
+                      th(scope="col") L
+                      th(scope="col") R
+                      th(scope="col") L
+                      th(scope="col") R
                       th(scope="col")
                   tbody
-                    if (data.surgeries)
-                      each surgery in data.surgeries
-                        tr(id=`surgery${surgery.surgery_id}`)
-                          th(scope="row") #{surgery.surgery_id}
-                          td #{surgery.surgery_type}
-                          td #{surgery.surgeon_name}
-                          td #{surgery.dos}
-                          td
-                            div.btn-toolbar
-                              button.btn.btn-danger(type="submit" onclick=`deleteSurgery(${data.patient.mrno},${surgery.surgery_id})`)
-                                i.fa.fa-trash 
-                                  span
-              form(method="get" action="/doctor/panel/view/surgery/add")
-                button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addSurgery")
-                  i.fa.fa-plus 
-                    span
+              button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addPrescription")
+                i.fa.fa-plus 
+                  span
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
@@ -361,6 +361,54 @@ html
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
             button.btn.btn-primary(type="submit" onclick=`addTreatment(${data.patient.mrno})`) Add
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+
+  div.modal.fade(id="addPrescription" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addPrescriptionLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          h5.modal-title(id="addPrescriptionLabel") New Glasses Prescription
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body
+          form(id="addPrescriptionForm")
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="presc_type") Type
+                div.col-sm-8
+                  select.form-control(id="presc_type" name="presc_type" required) 
+                    option(selected) New
+                    option Old
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="l_spherical") Spherical
+                div.col-sm-4
+                  input.form-control(type="number" id="l_spherical" name="l_spherical" placeholder="Left" required)
+                div.col-sm-4
+                  input.form-control(type="number" id="r_spherical" name="r_spherical" placeholder="Right" required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="l_cylindrical") Cylindrical
+                div.col-sm-4
+                  input.form-control(type="number" id="l_cylindrical" name="l_cylindrical" placeholder="Left" required)
+                div.col-sm-4
+                  input.form-control(type="number" id="r_cylindrical" name="r_cylindrical" placeholder="Right" required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="l_axis") Axis
+                div.col-sm-4
+                  input.form-control(type="number" id="l_axis" name="l_axis" placeholder="Left" required)
+                div.col-sm-4
+                  input.form-control(type="number" id="r_axis" name="r_axis" placeholder="Right" required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="l_visual_acuity") Visual Acuity
+                div.col-sm-4
+                  input.form-control(type="number" id="l_visual_acuity" name="l_visual_acuity" placeholder="Left" required)
+                div.col-sm-4
+                  input.form-control(type="number" id="r_visual_acuity" name="r_visual_acuity" placeholder="Right" required)
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-primary(type="submit" onclick=`addPrescription(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   style.
