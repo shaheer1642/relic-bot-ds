@@ -19,13 +19,13 @@ html
         div(class='alert alert-danger') #{status}
       else
         div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
-          table.table.table-striped.table-dark(id="patientsTable")
+          table.table.table-striped.table-dark.table-hover(id="patientsTable")
             thead
               tr
-                th(scope="col") MRNo
+                th.col-1(scope="col") MRNo
                 th(scope="col") Name
-                th(scope="col") Gender
-                th(scope="col") Age
+                th.col-2(scope="col") Gender
+                th.col-1(scope="col") Age
                 th(scope="col") Reason of Visit
                 th(scope="col") Registeration Date
                 th(scope="col")
@@ -33,10 +33,10 @@ html
               if (data)
                 each patient in data
                   tr(id=`patient${patient.mrno}`)
-                    th(scope="row") #{patient.mrno}
+                    th.col-1(scope="row") #{patient.mrno}
                     td #{patient.name}
-                    td #{patient.gender}
-                    td #{patient.dob}
+                    td.col-2 #{patient.gender}
+                    td.col-1 #{patient.dob}
                     td #{patient.reason_of_visit}
                     td #{patient.dor}
                     td
@@ -148,5 +148,11 @@ html
     .table-wrapper-scroll-y {
       display: block;
     }
-    table {border-collapse:collapse; table-layout:fixed; width:310px;}
-    table td {width:100px; word-wrap:break-word;}
+    table {
+      border-collapse:collapse; 
+      table-layout:fixed; 
+      width:310px;
+    }
+    table td {
+      word-wrap:break-word;
+    }
