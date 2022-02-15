@@ -1,7 +1,10 @@
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
+const {WebhookClient} = require('discord.js');
 const fs = require('fs')
+
+const wh_dbManager = new WebhookClient({url: 'https://discord.com/api/webhooks/943132131561984040/TNLs7CZM2S4OzgCP4QZKmR9SRwgnTqoYasY6Sf2G60a6brIJmCg1fLyENmziXNTSWmXy'});
 
 async function authorize(user,pass) {
     console.log('authorizing user')
@@ -250,11 +253,29 @@ async function deleteSurgery(userid,fields) {
 
 //-------consultation-----------
 
-async function addConsultation(userid,fields) {
+async function addConsultation(userid,fields,file) {
     console.log('inserting new consultation')
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+
+        var img_url = ""
+
+        if (file) {
+            await wh_dbManager.send({
+                content: "hi",
+                files: [
+                    {
+                        attachment: file.path,
+                        name: file.originalname
+                    }
+                ]
+            })
+            .then(res => {
+                img_url = res.attachments[0].url
+            }).catch(err => console.log(err))
+        }
+
         db.query(`INSERT INTO consultation (mrno,complaint,examination,advice,image,doc) 
-        VALUES (${fields.patientMRNo},'${fields.complaint}','${fields.examination}','${fields.advice}','${fields.image}',${new Date().getTime()})
+        VALUES (${fields.patientMRNo},'${fields.complaint}','${fields.examination}','${fields.advice}','${img_url}',${new Date().getTime()})
         RETURNING *`)
         .then(res => {
             console.log('rowCount = ' + res.rowCount)

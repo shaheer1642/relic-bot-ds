@@ -6,6 +6,8 @@ const cookieParser = require("cookie-parser");
 const sessions = require('cookie-session');
 const bodyParser = require('body-parser')
 const db_module = require('./modules/db_module.js')
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' })
 
 const oneDay = 300000;
 var session;
@@ -18,9 +20,10 @@ app.use(sessions({
   resave: false
 }));
 
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '/public')));
-app.use(bodyParser.urlencoded({ extended: true }));
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
 
@@ -83,7 +86,7 @@ router.post('/doctor/panel/add',function(req,res) {
 });
 
 router.post('/doctor/panel/view',function(req,res) {
-  console.log(req.query)
+  console.log(req.body)
   db_module.getPatient(session.userid,req.query.patient)
   .then(dbres => {
     console.log(dbres)
@@ -176,11 +179,12 @@ router.post('/doctor/panel/view/surgery/delete',function(req,res) {
 });
 
 //-------patient consultation------
-router.post('/doctor/panel/view/consultation/add',function(req,res) {
+router.post('/doctor/panel/view/consultation/add', upload.single('image'), function(req,res) {
+  console.log(req.file)
   console.log(req.body)
-  db_module.addConsultation(session.userid,req.body)
+  db_module.addConsultation(session.userid,req.body,req.file)
   .then(dbres => {
-    console.log(dbres)
+    //console.log(dbres)
     res.send(dbres)
   })
   .catch(dbres => {

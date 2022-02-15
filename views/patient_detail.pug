@@ -40,7 +40,10 @@ html
                 td.col-3 #{consultation.complaint}
                 td.col-3 #{consultation.examination}
                 td.col-3 #{consultation.advice}
-                td.col-3 #{consultation.image}
+                if (consultation.image)
+                  td.col-3 <img src=#{consultation.image}>
+                else 
+                  td.col-3 
                 td.col-2 #{consultation.doc}
                 td.col-3
                   div.btn-toolbar
@@ -113,7 +116,7 @@ html
           h5.modal-title(id="addConsultationLabel") New consultation
           button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
         div.modal-body
-          form(id="addConsultationForm")
+          form(id="addConsultationForm" enctype="multipart/form-data")
             div.mb-3
               div.row
                 label.col-sm-4.col-form-label(for="complaint") Complaint
@@ -133,7 +136,7 @@ html
               div.row
                 label.col-sm-4.col-form-label(for="image") Report image
                 div.col-sm-8
-                  input.form-control(type="file" id="image" name="image" placeholder="Insert report image")
+                  input.form-control(type="file" accept="image/*" id="image" name="image" placeholder="Insert report image")
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
             button.btn.btn-primary(type="submit" onclick=`addConsultation(${data.patient.mrno})`) Add
