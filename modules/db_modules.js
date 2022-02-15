@@ -6,10 +6,12 @@ const {WebhookClient} = require('discord.js');
 const {client,tickcount} = require('./discord_client.js');
 const fs = require('fs')
 const vaultExclusiveRelics = [
-    "neo_r1_relic",
-    "lith_b4_relic",
-    "meso_n6_relic",
-    "axi_s3_relic"
+    "meso_e5_relic",
+    "neo_b6_relic",
+    "axi_a12_relic",
+    "axi_h5_relic",
+    "lith_m7_relic",
+    "lith_k5_relic"
 ]
 const vaultExpectedRelics = [
     "lith_h3_relic",
