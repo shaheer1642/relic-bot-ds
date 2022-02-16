@@ -178,6 +178,33 @@ router.post('/doctor/panel/view/surgery/delete',function(req,res) {
   })
 });
 
+//-------patient invoice------
+router.post('/doctor/panel/view/invoice/add',function(req,res) {
+  console.log(req.body)
+  db_module.addInvoice(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
+router.post('/doctor/panel/view/invoice/delete',function(req,res) {
+  console.log(req.body)
+  db_module.deleteInvoice(session.userid,req.body)
+  .then(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.send(dbres)
+  })
+});
+
 //-------patient consultation------
 router.post('/doctor/panel/view/consultation/add', upload.single('image'), function(req,res) {
   console.log(req.file)

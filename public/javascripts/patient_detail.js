@@ -401,3 +401,68 @@ function deletePrescription(consult_id,presc_id) {
         )
     }
 }
+
+//-----invoice-----
+
+function validateFormInvoice() {
+    console.log('validateFormInvoice()')
+    if (document.forms["addInvoiceForm"]["payment"].value == "") {
+        alert('Please enter payment amount')
+        return false;
+    }
+    if (document.forms["addInvoiceForm"]["discount"].value == "") {
+        alert('Please enter discount %')
+        return false;
+    }
+    return true
+}
+
+function addInvoice(patientMRNo) {
+    console.log('addInvoice()')
+    if (!validateFormInvoice())
+        return
+    $.post("/doctor/panel/view/invoice/add", {
+            patientMRNo: patientMRNo,
+            payment: document.getElementById("payment").value,
+            discount: document.getElementById("discount").value
+        }, 
+        function(res) {
+            console.log(res)
+            if (res.code == 1) {
+                $('#addInvoiceForm').append(`<div id='invoiceAddSuccess' class = "alert alert-success">${res.status}</div>`)
+                $('#invoiceTable').prepend(`<tr id="invoice${res.data.invoice_id}"><th scope="row">${res.data.invoice_id}</th><td>${res.data.payment}</td><td>${res.data.discount}%</td><td>${res.data.total}</td><td>${res.data.dop}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteInvoice(${res.data.mrno},${res.data.invoice_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#addInvoiceForm').trigger("reset");
+
+                setTimeout(() => {
+                console.log('alert remove timeout')
+                $('#invoiceAddSuccess').fadeOut(300, function() { $(this).remove(); })
+                }, 3000);
+            }
+            else {
+                $('#addInvoiceForm').append(`<div id='invoiceAddFail' class = "alert alert-danger">${res.status}</div>`)
+                setTimeout(() => {
+                    console.log('alert remove timeout')
+                    $('#invoiceAddFail').fadeOut(300, function () { $(this).remove(); })
+                }, 3000);
+            }
+        }
+    )
+}
+
+function deleteInvoice(patientMRNo,invoice_id) {
+    if (confirm(`Are you sure you want to delete invoice#${invoice_id}?`)) {
+        console.log('deleteInvoice()')
+        $.post("/doctor/panel/view/invoice/delete", {
+                patientMRNo: patientMRNo,
+                invoice_id: invoice_id
+            }, 
+            function(res) {
+                console.log(res)
+                if (res.code == 1)
+                    $(`#invoice${invoice_id}`).fadeOut(300, function () { $(this).remove(); })
+                else
+                    alert(res.status)
+            }
+        )
+    }
+}

@@ -251,6 +251,48 @@ async function deleteSurgery(userid,fields) {
     });
 }
 
+//-------invoice-----------
+
+async function addSurgery(userid,fields) {
+    console.log('inserting new invoice')
+    return new Promise((resolve, reject) => {
+        db.query(`INSERT INTO invoice (mrno,payment,discount,total,dos) 
+        VALUES (${fields.patientMRNo},${fields.payment},${fields.discount},${fields.discount},${new Date().getTime()})
+        RETURNING *`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1) {
+                res.rows[0].dos = new Date(res.rows[0].dos).toLocaleString()
+                resolve({code: 1, status: 'Record added', data: res.rows[0]})
+            }
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
+async function deleteInvoice(userid,fields) {
+    console.log('deleting invoice')
+    return new Promise((resolve, reject) => {
+        db.query(`DELETE FROM invoice WHERE mrno=${fields.patientMRNo} AND invoice_id=${fields.invoice_id}`)
+        .then(res => {
+            console.log('rowCount = ' + res.rowCount)
+            if (res.rowCount == 1)
+                resolve({code: 1, status: 'Record deleted', data: null})
+            else
+                reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
+
 //-------consultation-----------
 
 async function addConsultation(userid,fields,file) {
@@ -429,4 +471,4 @@ async function deletePrescription(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addConsultation,deleteConsultation,getConsultation,addTreatment,deleteTreatment,addPrescription,deletePrescription};
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addInvoice,deleteInvoice,addConsultation,deleteConsultation,getConsultation,addTreatment,deleteTreatment,addPrescription,deletePrescription};

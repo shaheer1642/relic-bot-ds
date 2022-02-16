@@ -22,6 +22,11 @@
   background-color: rgb(84, 82, 163);
 }
 
+.button:hover span:after {
+  opacity: 1;
+  left: 0;
+}
+
 .button span {
   cursor: pointer;
   display: inline-block;

@@ -13,7 +13,13 @@ html
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   body.container-fluid
     header
-      h1.text-center(class="p-3 mb-2 text-white" style="background-color: #4CC5E0;") Patient Detail
+      div(class="p-3 mb-2 bg-info text-white")
+        h1.text-center Patient Detail
+          span.pull-left
+            form(method="get" action="/doctor/panel")
+              button.btn.btn-info(type="submit")
+                i.fa.fa-arrow-circle-left(style="font-size:32px")
+                  span
       div.container-fluid
         div.row
           div.col-6.text-break
@@ -24,6 +30,34 @@ html
               p.p1.text-left Age: #{data.patient.dob}
               p.p1.text-left Reason of visit: #{data.patient.reason_of_visit}
               p.p1.text-left Registeration Date: #{data.patient.dor}
+          div.col-6
+            table.table.table-striped.table-dark.table-hover(id="invoiceTable")
+              caption Invoice
+              thead
+                tr
+                  th.col-1(scope="col") ID
+                  th.col-3(scope="col") Payment
+                  th.col-3(scope="col") Discount
+                  th.col-3(scope="col") Total
+                  th.col-2(scope="col") Date
+                  th.col-3(scope="col")
+              tbody
+                if (data.invoices)
+                  each invoice in data.invoices
+                    tr(id=`invoice${invoice.invoice_id}`)
+                      th.col-1(scope="row") #{invoice.invoice_id}
+                      td.col-3 #{invoice.payment}
+                      td.col-3 #{invoice.discount}
+                      td.col-3 #{invoice.total}
+                      td.col-2 #{invoice.dop}
+                      td.col-3
+                        div.btn-toolbar
+                          button.btn.btn-danger(type="button" onclick=`deleteInvoice(${data.patient.mrno},${invoice.invoice_id})`)
+                            i.fa.fa-trash 
+                              span
+            button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addInvoice")
+              i.fa.fa-plus 
+                span
     div(class="d-flex flex-column")
       table.table.table-striped.table-dark.table-hover(id="consultationTable")
         caption Consultation Record
@@ -419,9 +453,32 @@ html
             button.btn.btn-primary(type="submit" onclick=`addPrescription(${data.patient.mrno})`) Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
+  div.modal.fade(id="addInvoice" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addInvoiceLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          h5.modal-title(id="addInvoiceLabel") New invoice
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body
+          form(id="addInvoiceForm")
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="payment") Payment
+                div.col-sm-8
+                  input.form-control(type="number" id="payment" name="payment" placeholder="Enter amount" required)
+            div.mb-3
+              div.row
+                label.col-sm-4.col-form-label(for="discount") Discount %
+                div.col-sm-8
+                  input.form-control(type="number" id="discount" name="discount" placeholder="Enter discount %"  min="0" max="100" value="0" required)
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-primary(type="submit" onclick=`addInvoice(${data.patient.mrno})`) Add
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+
   style.
     body {
-      background-color: #93D6E6;
+      background-color: white;
     }
     p.p1 {
       font-size: 15px
