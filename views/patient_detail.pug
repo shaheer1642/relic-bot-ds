@@ -13,7 +13,7 @@ html
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   body.container-fluid
     header
-      h2.text-center(class="p-3 mb-2 bg-light") Patient Detail
+      h1.text-center(class="p-3 mb-2 text-white" style="background-color: #4CC5E0;") Patient Detail
       div.container-fluid
         div.row
           div.col-6.text-break
@@ -420,6 +420,9 @@ html
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   style.
+    body {
+      background-color: #93D6E6;
+    }
     p.p1 {
       font-size: 15px
     }
@@ -427,10 +430,13 @@ html
       font-size: 15px;
       font-weight: bold;
     }
+    
 
     caption {
       caption-side: top;
       font-size: 30px;
+      color: #1C1D34;
+      font-family: Lucida;
     }
 
     table {
@@ -442,7 +448,6 @@ html
     table td {
       word-wrap: break-word;
       border: 1px solid gray;
-      min-width: 50%;
     }
     table th {
       border: 1px solid #458fa3;
