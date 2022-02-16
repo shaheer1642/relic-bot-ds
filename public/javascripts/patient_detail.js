@@ -163,7 +163,7 @@ async function addConsultation(patientMRNo) {
             //console.log(res)
             if (res.code == 1) {
                 $('#addConsultationForm').append(`<div id='consultationAddSuccess' class = "alert alert-success">${res.status}</div>`)
-                $('#consultationTable').prepend(`<tr id="consultation${res.data.consult_id}"><th scope="row">${res.data.consult_id}</th><td>${res.data.complaint}</td><td>${res.data.examination}</td><td>${res.data.advice}</td><td><img src="${res.data.image}"></td><td>${res.data.doc}</td><td><div class="btn-toolbar"><button class="btn btn-info" type="button" onclick="viewConsultationModal(${patientMRNo},${res.data.consult_id})"><i class="fa fa-navicon"> <span></span></i></button><button class="btn btn-danger" type="submit" onclick="deleteConsultation(${res.data.mrno},${res.data.consult_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#consultationTable').prepend(`<tr id="consultation${res.data.consult_id}"><th scope="row">${res.data.consult_id}</th><td>${res.data.complaint}</td><td>${res.data.examination}</td><td>${res.data.advice}</td><td><img src="${res.data.image}" width=100% height=auto></td><td>${res.data.doc}</td><td><div class="btn-toolbar"><button class="btn btn-info" type="button" onclick="viewConsultationModal(${patientMRNo},${res.data.consult_id})"><i class="fa fa-navicon"> <span></span></i></button><button class="btn btn-danger" type="submit" onclick="deleteConsultation(${res.data.mrno},${res.data.consult_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
                 $('#addConsultationForm').trigger("reset");
 
                 setTimeout(() => {
@@ -243,7 +243,7 @@ function viewConsultationModal(patientMRNo,consult_id) {
             document.getElementById("consultation_complaint").innerHTML = 'Complaint: ' + res.data.consultation.complaint
             document.getElementById("consultation_examination").innerHTML = 'Examination: ' + res.data.consultation.examination
             document.getElementById("consultation_advice").innerHTML = 'Advice: ' + res.data.consultation.advice
-            document.getElementById("consultation_image").innerHTML = 'Report image: ' + res.data.consultation.image
+            document.getElementById("consultation_image").src = res.data.consultation.image
             document.getElementById("consultation_doc").innerHTML = 'Date: ' + res.data.consultation.doc
             $('#treatmentTable tbody').empty();
             res.data.treatments.forEach(treatment => {

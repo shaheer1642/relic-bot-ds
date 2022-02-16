@@ -13,13 +13,17 @@ html
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   body.container-fluid
     header
-      h2.text-center Patient Detail
-      h6.text-left MR Number: #{data.patient.mrno}
-      p.p1.text-left Name: #{data.patient.name}
-      p.p1.text-left Gender: #{data.patient.gender}
-      p.p1.text-left Age: #{data.patient.dob}
-      p.p1.text-left Reason of visit: #{data.patient.reason_of_visit}
-      p.p1.text-left Registeration Date: #{data.patient.dor}
+      h2.text-center(class="p-3 mb-2 bg-light") Patient Detail
+      div.container-fluid
+        div.row
+          div.col-6.text-break
+            div.container.p-3.my-3.bg-dark.text-white(overflow-wrap="break-word")
+              p.p2.text-center MR Number: #{data.patient.mrno}
+              p.p1.text-left Name: #{data.patient.name}
+              p.p1.text-left Gender: #{data.patient.gender}
+              p.p1.text-left Age: #{data.patient.dob}
+              p.p1.text-left Reason of visit: #{data.patient.reason_of_visit}
+              p.p1.text-left Registeration Date: #{data.patient.dor}
     div(class="d-flex flex-column")
       table.table.table-striped.table-dark.table-hover(id="consultationTable")
         caption Consultation Record
@@ -41,7 +45,7 @@ html
                 td.col-3 #{consultation.examination}
                 td.col-3 #{consultation.advice}
                 if (consultation.image)
-                  td.col-3 <img src=#{consultation.image} width="180" height="200">
+                  td.col-3 <img src=#{consultation.image} width=100% height=auto>
                 else 
                   td.col-3 
                 td.col-2 #{consultation.doc}
@@ -150,14 +154,22 @@ html
           button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
         div.modal-body
           header
-            h2.text-center Consultation Detail
-            h6.text-left MR Number: #{data.patient.mrno}
-            h6.text-left(id="consultation_consult_id") Consultation ID: 
-            p.p1.text-left(id="consultation_complaint") Complaint:
-            p.p1.text-left(id="consultation_examination") Examination:
-            p.p1.text-left(id="consultation_advice") Advice:
-            p.p1.text-left(id="consultation_image") Image:
-            p.p1.text-left(id="consultation_doc") Date:
+            h2.text-center(class="p-3 mb-2 bg-light") Consultation Detail
+            div.container-fluid
+              div.row
+                div.col-6.text-break
+                  div.container.p-3.my-3.bg-dark.text-white(overflow-wrap="break-word")
+                    div.row.text-center
+                      div.col
+                        p.p2 MR Number: #{data.patient.mrno}
+                      div.col
+                        p.p2(id="consultation_consult_id") Consultation ID: 
+                    p.p1.text-left(id="consultation_complaint") Complaint:
+                    p.p1.text-left(id="consultation_examination") Examination:
+                    p.p1.text-left(id="consultation_advice") Advice:
+                    p.p1.text-left(id="consultation_doc") Date:
+                div.col-6
+                  img(width="80%" height="auto" id="consultation_image")
           div.row 
             div.col 
               table.table.table-striped.table-dark.table-hover(id="treatmentTable")
@@ -410,6 +422,10 @@ html
   style.
     p.p1 {
       font-size: 15px
+    }
+    p.p2 {
+      font-size: 15px;
+      font-weight: bold;
     }
 
     caption {

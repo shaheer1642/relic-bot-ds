@@ -13,7 +13,7 @@ html
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   body.container-fluid
     header
-      h2(class="text-center") Doctor Panel
+      h1.text-center(class="p-3 mb-2 bg-info text-white") Doctor Panel
     div(class="d-flex flex-column")
       if (code != 1 && code != 2)
         div(class='alert alert-danger') #{status}
@@ -150,7 +150,7 @@ html
     }
     table {
       border-collapse:collapse; 
-      table-layout:fixed; 
+      table-layout:flex; 
       width:310px;
     }
     table td {
