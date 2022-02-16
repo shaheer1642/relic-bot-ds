@@ -430,7 +430,7 @@ function addInvoice(patientMRNo) {
             console.log(res)
             if (res.code == 1) {
                 $('#addInvoiceForm').append(`<div id='invoiceAddSuccess' class = "alert alert-success">${res.status}</div>`)
-                $('#invoiceTable').prepend(`<tr id="invoice${res.data.invoice_id}"><th scope="row">${res.data.invoice_id}</th><td>${res.data.payment}</td><td>${res.data.discount}%</td><td>${res.data.total}</td><td>${res.data.dop}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteInvoice(${res.data.mrno},${res.data.invoice_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
+                $('#invoiceTable').prepend(`<tr id="invoice${res.data.invoice_id}"><th scope="row">${res.data.invoice_id}</th><td>${res.data.payment}</td><td>${res.data.discount}</td><td>${res.data.total}</td><td>${res.data.dop}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deleteInvoice(${res.data.mrno},${res.data.invoice_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
                 $('#addInvoiceForm').trigger("reset");
 
                 setTimeout(() => {

@@ -22,14 +22,17 @@ html
                   span
       div.container-fluid
         div.row
-          div.col-6.text-break
+          div.col-6.text-break.p-5
             div.container.p-3.my-3.bg-dark.text-white(overflow-wrap="break-word")
-              p.p2.text-center MR Number: #{data.patient.mrno}
-              p.p1.text-left Name: #{data.patient.name}
-              p.p1.text-left Gender: #{data.patient.gender}
-              p.p1.text-left Age: #{data.patient.dob}
-              p.p1.text-left Reason of visit: #{data.patient.reason_of_visit}
-              p.p1.text-left Registeration Date: #{data.patient.dor}
+              p.p2.text-center MR##{data.patient.mrno}
+              p.p3.text-left Name: #{data.patient.name}
+              div.row
+                div.col
+                  p.p3.text-left Gender: #{data.patient.gender}
+                div.col 
+                  p.p3.text-left Age: #{data.patient.dob}
+              p.p3.text-left Reason of visit: #{data.patient.reason_of_visit}
+              p.p3.text-left Registeration Date: #{data.patient.dor}
           div.col-6
             table.table.table-striped.table-dark.table-hover(id="invoiceTable")
               caption Invoice
@@ -37,10 +40,10 @@ html
                 tr
                   th.col-1(scope="col") ID
                   th.col-3(scope="col") Payment
-                  th.col-3(scope="col") Discount
+                  th.col-2(scope="col") Discount
                   th.col-3(scope="col") Total
-                  th.col-2(scope="col") Date
-                  th.col-3(scope="col")
+                  th.col-3(scope="col") Date
+                  th.col-2(scope="col")
               tbody
                 if (data.invoices)
                   each invoice in data.invoices
@@ -195,7 +198,7 @@ html
                   div.container.p-3.my-3.bg-dark.text-white(overflow-wrap="break-word")
                     div.row.text-center
                       div.col
-                        p.p2 MR Number: #{data.patient.mrno}
+                        p.p2 MR##{data.patient.mrno}
                       div.col
                         p.p2(id="consultation_consult_id") Consultation ID: 
                     p.p1.text-left(id="consultation_complaint") Complaint:
@@ -484,10 +487,12 @@ html
       font-size: 15px
     }
     p.p2 {
-      font-size: 15px;
+      font-size: 20px;
       font-weight: bold;
     }
-    
+    p.p3 {
+      font-size: 20px
+    }
 
     caption {
       caption-side: top;

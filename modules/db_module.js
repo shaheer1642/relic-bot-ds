@@ -119,7 +119,7 @@ async function deletePatient(userid,fields) {
 async function getPatient(userid,mrno) {
     console.log('getting patient')
     return new Promise((resolve, reject) => {
-        var data = {patient: null,consultations: null,investigations: null,surgeries: null}
+        var data = {patient: null,consultations: null,investigations: null,surgeries: null,invoices: null}
 
         //patient data
         db.query(`
@@ -127,6 +127,7 @@ async function getPatient(userid,mrno) {
             SELECT * FROM investigation WHERE mrno=${mrno} ORDER BY doi DESC;
             SELECT * FROM surgery WHERE mrno=${mrno} ORDER BY dos DESC;
             SELECT * FROM consultation WHERE mrno=${mrno} ORDER BY doc DESC;
+            SELECT * FROM invoice WHERE mrno=${mrno} ORDER BY dop DESC;
         `)
         .then(res => {
             // res[0] = patient data
@@ -157,6 +158,14 @@ async function getPatient(userid,mrno) {
                     res[3].rows[i].doc = new Date(res[3].rows[i].doc).toLocaleString()
                 })
                 data.consultations = res[3].rows
+            }
+            // res[4] = invoice data
+            if (res[4].rowCount > 0) {
+                res[4].rows.forEach((e,i) => {
+                    res[4].rows[i].dop = new Date(res[4].rows[i].dop).toLocaleString()
+                    res[4].rows[i].discount = res[4].rows[i].payment*(res[4].rows[i].discount/100)
+                })
+                data.invoices = res[4].rows
             }
             resolve({code: 1, status: 'Patient data retrieved', data})
         })
@@ -253,17 +262,18 @@ async function deleteSurgery(userid,fields) {
 
 //-------invoice-----------
 
-async function addSurgery(userid,fields) {
+async function addInvoice(userid,fields) {
     console.log('inserting new invoice')
     return new Promise((resolve, reject) => {
-        db.query(`INSERT INTO invoice (mrno,payment,discount,total,dos) 
-        VALUES (${fields.patientMRNo},${fields.payment},${fields.discount},${fields.discount},${new Date().getTime()})
+        db.query(`INSERT INTO invoice (mrno,payment,discount,total,dop) 
+        VALUES (${fields.patientMRNo},${fields.payment},${fields.discount},${fields.payment - (fields.payment*(fields.discount/100))},${new Date().getTime()})
         RETURNING *`)
         .then(res => {
             console.log('rowCount = ' + res.rowCount)
             if (res.rowCount == 1) {
-                res.rows[0].dos = new Date(res.rows[0].dos).toLocaleString()
-                resolve({code: 1, status: 'Record added', data: res.rows[0]})
+                res.rows[0].dop = new Date(res.rows[0].dop).toLocaleString()
+                res.rows[0].discount = res.rows[0].payment*(res.rows[0].discount/100)
+                resolve({code: 1, status: 'Invoice added', data: res.rows[0]})
             }
             else
                 reject({code: 3, status: 'Internal Server Error. Try again', data: null})
@@ -282,7 +292,7 @@ async function deleteInvoice(userid,fields) {
         .then(res => {
             console.log('rowCount = ' + res.rowCount)
             if (res.rowCount == 1)
-                resolve({code: 1, status: 'Record deleted', data: null})
+                resolve({code: 1, status: 'Invoice deleted', data: null})
             else
                 reject({code: 3, status: 'Internal Server Error. Try again', data: null})
         })
