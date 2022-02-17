@@ -180,7 +180,7 @@ html
                   input.form-control(type="file" accept="image/*" id="image" name="image" placeholder="Insert report image")
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick=`addConsultation(${data.patient.mrno})`) Add
+            button.btn.btn-primary(type="submit" onclick=`addConsultation(${data.patient.mrno})` id="btnAddConsultation") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="viewConsultation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="viewConsultationLabel" aria-hidden="true")
@@ -275,7 +275,7 @@ html
                     option Biometry
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick=`addInvestigation(${data.patient.mrno})`) Add
+            button.btn.btn-primary(type="submit" onclick=`addInvestigation(${data.patient.mrno})` id="btnAddInvestigation") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="addSurgery" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addSurgeryLabel" aria-hidden="true")
@@ -303,7 +303,7 @@ html
                     option CXL
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick=`addSurgery(${data.patient.mrno})`) Add
+            button.btn.btn-primary(type="submit" onclick=`addSurgery(${data.patient.mrno})` id="btnAddSurgery") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
     
   div.modal.fade(id="addTreatment" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addTreatmentLabel" aria-hidden="true")
@@ -405,7 +405,7 @@ html
                     option When Required
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick=`addTreatment(${data.patient.mrno})`) Add
+            button.btn.btn-primary(type="submit" onclick=`addTreatment(${data.patient.mrno})` id="btnAddTreatment") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="addPrescription" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addPrescriptionLabel" aria-hidden="true")
@@ -453,7 +453,7 @@ html
                   input.form-control(type="number" id="r_visual_acuity" name="r_visual_acuity" placeholder="Right" required)
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick=`addPrescription(${data.patient.mrno})`) Add
+            button.btn.btn-primary(type="submit" onclick=`addPrescription(${data.patient.mrno})` id="btnAddPrescription") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   div.modal.fade(id="addInvoice" tabindex="-1" data-bs-backdrop="static" aria-labelledby="addInvoiceLabel" aria-hidden="true")
@@ -476,7 +476,7 @@ html
                   input.form-control(type="number" id="discount" name="discount" placeholder="Enter discount %"  min="0" max="100" value="0" required)
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick=`addInvoice(${data.patient.mrno})`) Add
+            button.btn.btn-primary(type="submit" onclick=`addInvoice(${data.patient.mrno})` id="btnAddInvoice") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   style.

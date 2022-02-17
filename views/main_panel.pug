@@ -51,8 +51,6 @@ html
                         button.btn.btn-danger(type="submit" onclick=`deletePatient(${patient.mrno})`)
                           i.fa.fa-trash 
                             span
-  footer.page-footer
-    form(method="get" action="/doctor/panel/add")
       button.btn.btn-primary.btn-block.w-100(type="button" data-bs-toggle="modal" data-bs-target="#addPatient")
         i.fa.fa-plus 
           span
@@ -97,7 +95,7 @@ html
                     span.fa.fa-time
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick="addPatient()") Add
+            button.btn.btn-primary(type="submit" onclick="addPatient()" id="btnAddPatient") Add
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
 
@@ -131,12 +129,12 @@ html
                 div.col-sm-8
                   select.form-control(id="patientReasonEdit" required)
                     option(selected disabled) Select
-                    option  Consultation
+                    option Consultation
                     option Surgery
                     option Investigation
         div.modal-footer.d-flex.flex-column
           div.btn-toolbar
-            button.btn.btn-primary(type="submit" onclick="editPatient()") Edit
+            button.btn.btn-primary(type="submit" onclick="editPatient()" id="btnEditPatient") Edit
             button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
 
   style.
@@ -150,7 +148,7 @@ html
     }
     table {
       border-collapse:collapse; 
-      table-layout:flex; 
+      table-layout:fixed; 
       width:310px;
     }
     table td {

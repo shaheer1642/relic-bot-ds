@@ -10,9 +10,11 @@ function validateFormInvest() {
 }
 
 function addInvestigation(patientMRNo) {
-    console.log('addInvestigation()')
     if (!validateFormInvest())
         return
+    console.log('addInvestigation()')
+    $('#addInvestigationForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnAddInvestigation').prop('disabled', true);
     $.post("/doctor/panel/view/investigation/add", {
             patientMRNo: patientMRNo,
             invest_type: document.getElementById("invest_type").value,
@@ -36,6 +38,8 @@ function addInvestigation(patientMRNo) {
                     $('#investigationAddFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnAddInvestigation').prop('disabled', false);
         }
     )
 }
@@ -77,6 +81,8 @@ function addSurgery(patientMRNo) {
     console.log('addSurgery()')
     if (!validateFormSurgery())
         return
+    $('#addSurgeryForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnAddSurgery').prop('disabled', true);
     $.post("/doctor/panel/view/surgery/add", {
             patientMRNo: patientMRNo,
             surgeon_name: document.getElementById("surgeon_name").value,
@@ -101,6 +107,8 @@ function addSurgery(patientMRNo) {
                     $('#surgeryAddFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnAddSurgery').prop('disabled', false);
         }
     )
 }
@@ -148,6 +156,9 @@ async function addConsultation(patientMRNo) {
     if (!validateFormConsult())
         return
 
+    $('#addConsultationForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnAddConsultation').prop('disabled', true);
+
     var form = $('#addConsultationForm')[0];
     var fd = new FormData(form);
     fd.append('patientMRNo',patientMRNo)
@@ -178,6 +189,8 @@ async function addConsultation(patientMRNo) {
                     $('#consultationAddFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnAddConsultation').prop('disabled', false);
         },
     });
     
@@ -285,6 +298,8 @@ function addTreatment() {
     console.log(document.getElementById("consultation_consult_id").innerText)
     if (!validateFormTreat())
         return
+    $('#addTreatmentForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnAddTreatment').prop('disabled', true);
     $.post("/doctor/panel/view/consultation/treatment/add", {
             consult_id: document.getElementById("consultation_consult_id").innerText.replace('Consultation ID:','').trim(),
             med_name: document.getElementById("med_name").value,
@@ -311,6 +326,8 @@ function addTreatment() {
                     $('#treatmentAddFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnAddTreatment').prop('disabled', false);
         }
     )
 }
@@ -349,6 +366,8 @@ function addPrescription() {
     console.log(document.getElementById("consultation_consult_id").innerText)
     if (!validateFormPresc())
         return
+    $('#addPrescriptionForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnAddPrescription').prop('disabled', true);
     $.post("/doctor/panel/view/consultation/prescription/add", {
             consult_id: document.getElementById("consultation_consult_id").innerText.replace('Consultation ID:','').trim(),
             presc_type: document.getElementById("presc_type").value,
@@ -380,6 +399,8 @@ function addPrescription() {
                     $('#prescriptionAddFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnAddPrescription').prop('disabled', false);
         }
     )
 }
@@ -421,6 +442,8 @@ function addInvoice(patientMRNo) {
     console.log('addInvoice()')
     if (!validateFormInvoice())
         return
+    $('#addInvoiceForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnAddInvoice').prop('disabled', true);
     $.post("/doctor/panel/view/invoice/add", {
             patientMRNo: patientMRNo,
             payment: document.getElementById("payment").value,
@@ -445,6 +468,8 @@ function addInvoice(patientMRNo) {
                     $('#invoiceAddFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnAddInvoice').prop('disabled', false);
         }
     )
 }

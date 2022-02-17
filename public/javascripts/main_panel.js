@@ -37,6 +37,8 @@ function addPatient() {
     if (!validateForm())
         return
     console.log('addPatient()')
+    $('#addPatientForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnAddPatient').prop('disabled', true);
     $.post("/doctor/panel/add", {
         patientName: document.getElementById("patientName").value,
         patientGender: document.getElementById("patientGender").value,
@@ -62,6 +64,8 @@ function addPatient() {
                     $('#patientAddFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnAddPatient').prop('disabled', false);
         }
     )
 }
@@ -97,6 +101,8 @@ function editPatient() {
     if (!validateFormEdit())
         return
     console.log('editPatient()')
+    $('#editPatientForm').append(`<div id='loading'><img src="/images/loading.gif" width="10%" height="auto"></div>`)
+    $('#btnEditPatient').prop('disabled', true);
     $.post("/doctor/panel/edit", {
             patientMRNo: document.getElementById("patientMRNoEdit").innerHTML.replace('MRNo: ',''),
             patientName: document.getElementById("patientNameEdit").value,
@@ -123,6 +129,8 @@ function editPatient() {
                     $('#patientEditFail').fadeOut(300, function () { $(this).remove(); })
                 }, 3000);
             }
+            $('#loading').remove()
+            $('#btnEditPatient').prop('disabled', false);
         }
     )
 }

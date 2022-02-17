@@ -24,7 +24,7 @@
 
 .button:hover span:after {
   opacity: 1;
-  left: 0;
+  right: 0;
 }
 
 .button span {
