@@ -8,6 +8,7 @@ const bodyParser = require('body-parser')
 const db_module = require('./modules/db_module.js')
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' })
+const pug = require('pug');
 
 const oneDay = 300000;
 var session;
@@ -30,6 +31,22 @@ app.set('view engine', 'pug');
 router.get('/',function(req,res) {
   console.log('sending index.jade')
   res.render('index');
+});
+
+router.get('/patient/panel',function(req,res) {
+  res.render('patient_panel');
+});
+
+router.post('/patient/panel/view',function(req,res) {
+  console.log(req.body)
+  db_module.getPatient2(req.body)
+  .then(dbres => {
+    res.render('patient_view', dbres);
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.render('patient_panel', dbres)
+  })
 });
 
 router.get('/doctor/login',function(req,res) {
@@ -97,6 +114,7 @@ router.post('/doctor/panel/view',function(req,res) {
     res.send(`<script>alert("${dbres.status}")</script>`)
   })
 });
+
 
 router.post('/doctor/panel/edit',function(req,res) {
   console.log(req.body)
@@ -235,7 +253,7 @@ router.post('/doctor/panel/view/consultation/delete',function(req,res) {
 
 router.post('/doctor/panel/view/consultation/get',function(req,res) {
   console.log(req.body)
-  db_module.getConsultation(session.userid,req.body)
+  db_module.getConsultation(req.body)
   .then(dbres => {
     console.log(dbres)
     res.send(dbres)

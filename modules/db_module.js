@@ -176,6 +176,65 @@ async function getPatient(userid,mrno) {
     });
 }
 
+async function getPatient2(fields) {
+    console.log('getting patient')
+    return new Promise((resolve, reject) => {
+        var data = {patient: null,consultations: null,investigations: null,surgeries: null,invoices: null}
+
+        //patient data
+        db.query(`
+            SELECT * FROM patients WHERE mrno=${fields.mrno} AND dob=${fields.dob ? new Date(fields.dob).getTime():-1} OR LOWER(name)='${fields.name.toLowerCase()}';
+            SELECT * FROM investigation WHERE mrno=${fields.mrno} ORDER BY doi DESC;
+            SELECT * FROM surgery WHERE mrno=${fields.mrno} ORDER BY dos DESC;
+            SELECT * FROM consultation WHERE mrno=${fields.mrno} ORDER BY doc DESC;
+            SELECT * FROM invoice WHERE mrno=${fields.mrno} ORDER BY dop DESC;
+        `)
+        .then(res => {
+            // res[0] = patient data
+            if (res[0].rowCount == 1) {
+                res[0].rows[0].dor = new Date(res[0].rows[0].dor).toLocaleString()
+                res[0].rows[0].dob = ((new Date() - new Date(res[0].rows[0].dob))/31556952000).toFixed()
+                data.patient = res[0].rows[0]
+            }
+            else
+                reject({code: 2, status: 'No record found', data: null})
+            // res[1] = investigation data
+            if (res[1].rowCount > 0) {
+                res[1].rows.forEach((e,i) => {
+                    res[1].rows[i].doi = new Date(res[1].rows[i].doi).toLocaleString()
+                })
+                data.investigations = res[1].rows
+            }
+            // res[2] = surgery data
+            if (res[2].rowCount > 0) {
+                res[2].rows.forEach((e,i) => {
+                    res[2].rows[i].dos = new Date(res[2].rows[i].dos).toLocaleString()
+                })
+                data.surgeries = res[2].rows
+            }
+            // res[3] = consultation data
+            if (res[3].rowCount > 0) {
+                res[3].rows.forEach((e,i) => {
+                    res[3].rows[i].doc = new Date(res[3].rows[i].doc).toLocaleString()
+                })
+                data.consultations = res[3].rows
+            }
+            // res[4] = invoice data
+            if (res[4].rowCount > 0) {
+                res[4].rows.forEach((e,i) => {
+                    res[4].rows[i].dop = new Date(res[4].rows[i].dop).toLocaleString()
+                    res[4].rows[i].discount = res[4].rows[i].payment*(res[4].rows[i].discount/100)
+                })
+                data.invoices = res[4].rows
+            }
+            resolve({code: 1, status: 'Patient data retrieved', data})
+        })
+        .catch(err => {
+            console.log(err)
+            reject({code: 3, status: 'Internal Server Error. Try again', data: null})
+        })
+    });
+}
 //-------investigation-----------
 
 async function addInvestigation(userid,fields) {
@@ -363,7 +422,7 @@ async function deleteConsultation(userid,fields) {
     });
 }
 
-async function getConsultation(userid,fields) {
+async function getConsultation(fields) {
     console.log('getting patient consultation')
     return new Promise((resolve, reject) => {
         db.query(`
@@ -481,4 +540,4 @@ async function deletePrescription(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addInvoice,deleteInvoice,addConsultation,deleteConsultation,getConsultation,addTreatment,deleteTreatment,addPrescription,deletePrescription};
+module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,getPatient2,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addInvoice,deleteInvoice,addConsultation,deleteConsultation,getConsultation,addTreatment,deleteTreatment,addPrescription,deletePrescription};

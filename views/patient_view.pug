@@ -1,0 +1,249 @@
+doctype html
+html
+  head
+    title Patient Detail
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous")
+    link(rel="stylesheet", href="/stylesheets/style.css")
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous" async></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" async></script>
+  body.container-fluid
+    header
+      div(class="p-3 mb-2 bg-info text-white")
+        h1.text-center Patient Detail
+      div.container-fluid
+        div.row
+          div.col-6.text-break.p-5
+            div.container.p-3.my-3.bg-dark.text-white(overflow-wrap="break-word")
+              p.p2.text-center MR##{data.patient.mrno}
+              p.p3.text-left Name: #{data.patient.name}
+              div.row
+                div.col
+                  p.p3.text-left Gender: #{data.patient.gender}
+                div.col 
+                  p.p3.text-left Age: #{data.patient.dob}
+              p.p3.text-left Reason of visit: #{data.patient.reason_of_visit}
+              p.p3.text-left Registeration Date: #{data.patient.dor}
+          div.col-6
+            table.table.table-striped.table-dark.table-hover(id="invoiceTable")
+              caption Invoice
+              thead
+                tr
+                  th.col-1(scope="col") ID
+                  th.col-3(scope="col") Payment
+                  th.col-2(scope="col") Discount
+                  th.col-3(scope="col") Total
+                  th.col-3(scope="col") Date
+              tbody
+                if (data.invoices)
+                  each invoice in data.invoices
+                    tr(id=`invoice${invoice.invoice_id}`)
+                      th.col-1(scope="row") #{invoice.invoice_id}
+                      td.col-3 #{invoice.payment}
+                      td.col-3 #{invoice.discount}
+                      td.col-3 #{invoice.total}
+                      td.col-2 #{invoice.dop}
+    div(class="d-flex flex-column")
+      table.table.table-striped.table-dark.table-hover(id="consultationTable")
+        caption Consultation Record
+        thead
+          tr
+            th.col-1(scope="col") ID
+            th.col-3(scope="col") Complaint
+            th.col-3(scope="col") Examination
+            th.col-3(scope="col") Advice
+            th.col-3(scope="col") Image
+            th.col-2(scope="col") Date
+            th.col-3(scope="col")
+        tbody
+          if (data.consultations)
+            each consultation in data.consultations
+              tr(id=`consultation${consultation.consult_id}`)
+                th.col-1(scope="row") #{consultation.consult_id}
+                td.col-3 #{consultation.complaint}
+                td.col-3 #{consultation.examination}
+                td.col-3 #{consultation.advice}
+                if (consultation.image)
+                  td.col-3 <img src=#{consultation.image} width=100% height=auto>
+                else 
+                  td.col-3 
+                td.col-2 #{consultation.doc}
+                td.col-3
+                  div.btn-toolbar
+                    button.btn.btn-info(type="button" onclick=`viewConsultationModal(${data.patient.mrno},${consultation.consult_id})`)
+                      i.fa.fa-navicon 
+                        span
+      div.row 
+        div.col 
+          table.table.table-striped.table-dark.table-hover(id="investigationTable")
+            caption Investigation Record
+            thead
+              tr
+                th.col-1(scope="col") ID
+                th(scope="col") Type
+                th(scope="col") Date
+            tbody
+              if (data.investigations)
+                each investigation in data.investigations
+                  tr(id=`investigation${investigation.invest_id}`)
+                    th.col-1(scope="row") #{investigation.invest_id}
+                    td #{investigation.invest_type}
+                    td #{investigation.doi}
+        div.col
+          div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+            table.table.table-striped.table-dark.table-hover(id="surgeryTable")
+              caption Surgery Record
+              thead
+                tr
+                  th.col-1(scope="col") ID
+                  th(scope="col") Type
+                  th(scope="col") Surgeon
+                  th(scope="col") Date
+              tbody
+                if (data.surgeries)
+                  each surgery in data.surgeries
+                    tr(id=`surgery${surgery.surgery_id}`)
+                      th.col-1(scope="row") #{surgery.surgery_id}
+                      td #{surgery.surgery_type}
+                      td #{surgery.surgeon_name}
+                      td #{surgery.dos}
+
+  div.modal.fade(id="viewConsultation" tabindex="-1" data-bs-backdrop="static" aria-labelledby="viewConsultationLabel" aria-hidden="true")
+    div.modal-dialog.modal-dialog-consult.modal-dialog-centered
+      div.modal-content
+        div.modal-header
+          button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+        div.modal-body
+          header
+            h2.text-center(class="p-3 mb-2 bg-light") Consultation Detail
+            div.container-fluid
+              div.row
+                div.col-6.text-break
+                  div.container.p-3.my-3.bg-dark.text-white(overflow-wrap="break-word")
+                    div.row.text-center
+                      div.col
+                        p.p2 MR##{data.patient.mrno}
+                      div.col
+                        p.p2(id="consultation_consult_id") Consultation ID: 
+                    p.p1.text-left(id="consultation_complaint") Complaint:
+                    p.p1.text-left(id="consultation_examination") Examination:
+                    p.p1.text-left(id="consultation_advice") Advice:
+                    p.p1.text-left(id="consultation_doc") Date:
+                div.col-6
+                  img(width="80%" height="auto" id="consultation_image")
+          div.row 
+            div.col 
+              table.table.table-striped.table-dark.table-hover(id="treatmentTable")
+                caption Treatment Record
+                thead
+                  tr
+                    th(scope="col") ID
+                    th(scope="col") Medicine
+                    th(scope="col") Str
+                    th(scope="col") Frq
+                    th(scope="col") Dur
+                  tbody
+            div.col
+              table.table.table-striped.table-dark.table-hover(id="prescriptionTable")
+                caption Glasses Prescription
+                thead
+                  tr
+                    th(scope="col") ID
+                    th(scope="col") Type
+                    th(scope="col" colspan="2" border="1px solid") Spherical
+                    th(scope="col" colspan="2" border="1px solid") Cylindrical
+                    th(scope="col" colspan="2" border="1px solid") Axis
+                    th(scope="col" colspan="2" border="1px solid") Visual Acuity
+                  tr 
+                    th(scope="col")
+                    th(scope="col")
+                    th(scope="col" border="1px solid") L
+                    th(scope="col" border="1px solid") R
+                    th(scope="col" border="1px solid") L
+                    th(scope="col" border="1px solid") R
+                    th(scope="col" border="1px solid") L
+                    th(scope="col" border="1px solid") R
+                    th(scope="col" border="1px solid") L
+                    th(scope="col" border="1px solid") R
+                tbody
+        div.modal-footer.d-flex.flex-column
+          div.btn-toolbar
+            button.btn.btn-danger(type="button" data-bs-dismiss="modal") Close
+
+style.
+    body {
+        background-color: white;
+    }
+    p.p1 {
+        font-size: 15px
+    }
+    p.p2 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    p.p3 {
+        font-size: 20px
+    }
+
+    caption {
+        caption-side: top;
+        font-size: 30px;
+        color: #1C1D34;
+        font-family: Lucida;
+    }
+
+    table {
+        border-collapse:collapse; 
+        table-layout:fixed; 
+        min-width: 30vh;
+    }
+
+    table td {
+        word-wrap: break-word;
+        border: 1px solid gray;
+    }
+    table th {
+        border: 1px solid #458fa3;
+    }
+
+    .modal .modal-body-consult { /* Vertical scrollbar if necessary */
+        max-height: 80%;
+        overflow-y: auto;
+    }
+
+    body .modal-dialog-consult { /* Width */
+        max-width: 95%;
+    }
+
+script.
+    function viewConsultationModal(patientMRNo,consult_id) {
+        console.log('viewConsultationModal()')
+
+        $.post("/doctor/panel/view/consultation/get", {
+                patientMRNo: patientMRNo,
+                consult_id: consult_id
+            }, 
+            function(res) {
+                document.getElementById("consultation_consult_id").innerHTML = 'Consultation ID: ' + res.data.consultation.consult_id
+                document.getElementById("consultation_complaint").innerHTML = 'Complaint: ' + res.data.consultation.complaint
+                document.getElementById("consultation_examination").innerHTML = 'Examination: ' + res.data.consultation.examination
+                document.getElementById("consultation_advice").innerHTML = 'Advice: ' + res.data.consultation.advice
+                document.getElementById("consultation_image").src = res.data.consultation.image
+                document.getElementById("consultation_doc").innerHTML = 'Date: ' + res.data.consultation.doc
+                $('#treatmentTable tbody').empty();
+                res.data.treatments.forEach(treatment => {
+                    if (treatment.treat_id)
+                        $('#treatmentTable').append(`<tr id="treatment${treatment.treat_id}"><th scope="row">${treatment.treat_id}</th><td>${treatment.med_name}</td><td>${treatment.med_str}</td><td>${treatment.med_frq}</td><td>${treatment.med_dur}</td></tr>`);
+                });
+                $('#prescriptionTable tbody').empty();
+                res.data.prescriptions.forEach(prescription => {
+                    if (prescription.presc_id)
+                        $('#prescriptionTable').append(`<tr id="prescription${prescription.presc_id}"><th scope="row">${prescription.presc_id}</th><td>${prescription.presc_type}</td><td>${prescription.l_spherical}</td><td>${prescription.r_spherical}</td><td>${prescription.l_cylindrical}</td><td>${prescription.r_cylindrical}</td><td>${prescription.l_axis}</td><td>${prescription.r_axis}</td><td>${prescription.l_visual_acuity}</td><td>${prescription.r_visual_acuity}</td></tr>`);
+                });
+                $('#viewConsultation').modal('show');
+            }
+        )
+    }

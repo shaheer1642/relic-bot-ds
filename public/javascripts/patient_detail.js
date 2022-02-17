@@ -193,37 +193,6 @@ async function addConsultation(patientMRNo) {
             $('#btnAddConsultation').prop('disabled', false);
         },
     });
-    
-    /*
-    $.post("/doctor/panel/view/consultation/add", {
-        patientMRNo: patientMRNo,
-        complaint: document.getElementById("complaint").value,
-        examination: document.getElementById("examination").value,
-        advice: document.getElementById("advice").value,
-        image: reader.result,
-    }, 
-        function(res) {
-            //console.log(res)
-            if (res.code == 1) {
-                $('#addConsultationForm').append(`<div id='consultationAddSuccess' class = "alert alert-success">${res.status}</div>`)
-                $('#consultationTable').prepend(`<tr id="consultation${res.data.consult_id}"><th scope="row">${res.data.consult_id}</th><td>${res.data.complaint}</td><td>${res.data.examination}</td><td>${res.data.advice}</td><td>${res.data.image}</td><td>${res.data.doc}</td><td><div class="btn-toolbar"><button class="btn btn-info" type="button" onclick="viewConsultationModal(${patientMRNo},${res.data.consult_id})"><i class="fa fa-navicon"> <span></span></i></button><button class="btn btn-danger" type="submit" onclick="deleteConsultation(${res.data.mrno},${res.data.consult_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
-                $('#addConsultationForm').trigger("reset");
-
-                setTimeout(() => {
-                console.log('alert remove timeout')
-                $('#consultationAddSuccess').fadeOut(300, function() { $(this).remove(); })
-                }, 3000);
-            }
-            else {
-                $('#addConsultationForm').append(`<div id='consultationAddFail' class = "alert alert-danger">${res.status}</div>`)
-                setTimeout(() => {
-                    console.log('alert remove timeout')
-                    $('#consultationAddFail').fadeOut(300, function () { $(this).remove(); })
-                }, 3000);
-            }
-        }
-    )
-    */
 }
 
 function deleteConsultation(patientMRNo,consult_id) {
@@ -268,7 +237,7 @@ function viewConsultationModal(patientMRNo,consult_id) {
                 if (prescription.presc_id)
                     $('#prescriptionTable').append(`<tr id="prescription${prescription.presc_id}"><th scope="row">${prescription.presc_id}</th><td>${prescription.presc_type}</td><td>${prescription.l_spherical}</td><td>${prescription.r_spherical}</td><td>${prescription.l_cylindrical}</td><td>${prescription.r_cylindrical}</td><td>${prescription.l_axis}</td><td>${prescription.r_axis}</td><td>${prescription.l_visual_acuity}</td><td>${prescription.r_visual_acuity}</td><td><div class="btn-toolbar"><button class="btn btn-danger" type="submit" onclick="deletePrescription(${prescription.consult_id},${prescription.presc_id})"><i class="fa fa-trash"> <span></span></i></button></div></td></tr>`);
             });
-            $('#viewConsultation').modal('show')
+            $('#viewConsultation').modal('show');
         }
     )
 
