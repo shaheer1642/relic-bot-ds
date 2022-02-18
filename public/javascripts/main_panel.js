@@ -1,6 +1,9 @@
 var serverData = []
 $(document).ready(function() {
-    serverData = JSON.parse(document.getElementById("serverData").value)
+    if (document.getElementById("serverData").value == "null")
+        serverData = []
+    else
+        serverData = JSON.parse(document.getElementById("serverData").value)
 });
 
 function searchByName(element) {
@@ -87,6 +90,7 @@ function addPatient() {
                     reason_of_visit: res.data.reason_of_visit,
                     doc_id: res.data.doc_id
                 })
+                document.getElementById("totalPatients").innerText = "Total: " + serverData.length
             }
             else {
                 $('#addPatientForm').append(`<div id='patientAddFail' class = "alert alert-danger">${res.status}</div>`)
@@ -112,6 +116,7 @@ function deletePatient(patientMRNo) {
                 if (res.code == 1) {
                     $(`#patient${patientMRNo}`).fadeOut(300, function () { $(this).remove(); })
                     serverData = serverData.filter(function(el) { return el.mrno != patientMRNo; });
+                    document.getElementById("totalPatients").innerText = "Total: " + serverData.length
                 }
                 else
                     alert(res.status)

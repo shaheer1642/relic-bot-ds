@@ -53,7 +53,7 @@ html
                 th.col-1(scope="col") Age
                 th.col-3(scope="col") Reason of Visit
                 th.col-3(scope="col") Registeration Date
-                th.col-2(scope="col")
+                th.col-2(scope="col" id="totalPatients") Total: #{`${data ? data.length : 0}`}
             tbody
               if (data)
                 each patient in data
