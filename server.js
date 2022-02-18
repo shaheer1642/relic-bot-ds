@@ -59,7 +59,7 @@ router.get('/doctor/login',function(req,res) {
   }
 });
 
-router.post('/doctor/auth',function(req,res) {
+router.post('/doctor/login/auth',function(req,res) {
   db_module.authorize(req.body.user,req.body.pass)
   .then(dbres => {
     if (dbres.code != 1)
@@ -76,6 +76,32 @@ router.post('/doctor/auth',function(req,res) {
     console.log(dbres)
   })
 });
+
+router.get('/doctor/signup',function(req,res) {
+  console.log('sending signup.pug')
+  res.render('signup');
+});
+
+router.post('/doctor/signup/auth',function(req,res) {
+  db_module.signup(req.body)
+  .then(dbres => {
+    console.log(dbres)
+    if (dbres.code != 1)
+      res.render('signup', dbres);
+    else
+      res.redirect('/doctor/login')
+  })
+  .catch(dbres => {
+    console.log(dbres)
+    res.render('signup', dbres);
+  })
+});
+
+router.get('/doctor/logout',function(req,res) {
+  req.session=null
+  res.redirect('/doctor/login')
+});
+
 
 router.get('/doctor/panel',function(req,res) {
   db_module.patients_list(session.userid)

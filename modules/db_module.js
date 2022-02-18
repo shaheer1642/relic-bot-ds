@@ -26,6 +26,30 @@ async function authorize(user,pass) {
     });
 }
 
+async function signup(fields) {
+    console.log('signing up user')
+    return new Promise((resolve, reject) => {
+        if (fields.pass != fields.c_pass)
+            reject({code: 2, status: 'Password mismatch'})
+        else
+            db.query(`INSERT INTO users_list (username,password) VALUES('${fields.user}','${fields.pass}')`)
+            .then(res => {
+                console.log('rowCount = ' + res.rowCount)
+                if (res.rowCount == 1)
+                    resolve({code: 1, status: 'Sign up Successful'})
+                else
+                    reject({code: 3, status: 'Internal Server Error. Try again'})
+            })
+            .catch(err => {
+                console.log(err)
+                if (err.code == 23505)
+                    reject({code: 2, status: 'That username already exists'})
+                else
+                    reject({code: 3, status: err})
+            })
+    });
+}
+
 async function patients_list(userid) {
     console.log('retrieving patients list')
     return new Promise((resolve, reject) => {
@@ -540,4 +564,4 @@ async function deletePrescription(userid,fields) {
     });
 }
 
-module.exports = {authorize,patients_list,addPatient,editPatient,deletePatient,getPatient,getPatient2,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addInvoice,deleteInvoice,addConsultation,deleteConsultation,getConsultation,addTreatment,deleteTreatment,addPrescription,deletePrescription};
+module.exports = {authorize,signup,patients_list,addPatient,editPatient,deletePatient,getPatient,getPatient2,addInvestigation,deleteInvestigation,addSurgery,deleteSurgery,addInvoice,deleteInvoice,addConsultation,deleteConsultation,getConsultation,addTreatment,deleteTreatment,addPrescription,deletePrescription};

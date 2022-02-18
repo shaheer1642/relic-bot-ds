@@ -14,12 +14,14 @@ html
   body.container-fluid
     header
       h1.text-center(class="p-3 mb-2 bg-info text-white") Doctor Panel
+        span.pull-right
+          form(method="get" action="/doctor/logout")
+            button.btn.btn-info(type="submit" style="color: white")
+              i.fa.fa-sign-out(style="font-size:22px") Logout
+                span
     div(class="d-flex flex-column")
-      if (code != 1 && code != 2)
-        div(class='alert alert-danger') #{status}
-      else
-        div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
-          table.table.table-striped.table-dark.table-hover(id="patientsTable")
+      div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
+        table.table.table-striped.table-dark.table-hover(id="patientsTable")
             thead
               tr
                 th.col-1(scope="col") MRNo
@@ -140,7 +142,7 @@ html
   style.
     .my-custom-scrollbar {
       position: relative;
-      height: 80vh;
+      max-height: 80vh;
       overflow: auto;
     }
     .table-wrapper-scroll-y {

@@ -2,7 +2,7 @@
 doctype html
 html(lang="en")
   head
-    title Login Form
+    title Sign up Form
     meta(charset='UTF-8')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
     link(rel='stylesheet', href='https://fonts.googleapis.com/css?family=Lato:300,400,700,900&display=swap')
@@ -11,15 +11,17 @@ html(lang="en")
     link(rel='stylesheet', href='/stylesheets/login.css')
   body
     #main
-      form(method="POST" action="/doctor/login/auth")
-        div.label Login form
+      form(method="POST" action="/doctor/signup/auth")
+        div.label Sign up form
         div.username
           input(type="text" placeholder="Username" name='user')
         div.password
           input(type="password" placeholder="Password" name='pass')
-        p Don't have an account? <a href="/doctor/signup">Sign up</a>
+        div.c_password
+          input(type="password" placeholder="Confirm password" name='c_pass')
+        p Existing user? <a href="/doctor/login">Login</a>
         if (code == 1)
           div(class='alert alert-success') #{status}
         else if (code > 1)
           div(class='alert alert-danger') #{status}
-        button(type="submit") Login 
+        button(type="submit") Sign up 
