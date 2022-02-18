@@ -7,10 +7,11 @@ html
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous")
     link(rel="stylesheet", href="/stylesheets/style.css")
-    <script src="/javascripts/main_panel.js"></script>
+    link(rel="icon" href="/images/logo.png")
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/javascripts/main_panel.js"></script>
   body.container-fluid
     header
       h1.text-center(class="p-3 mb-2 bg-info text-white") Doctor Panel
@@ -19,6 +20,28 @@ html
             button.btn.btn-info(type="submit" style="color: white")
               i.fa.fa-sign-out(style="font-size:22px") Logout
                 span
+        span.pull-left
+          form(method="get" action="/")
+            button.btn.btn-info(type="submit" style="color: white")
+              i.fa.fa-home(style="font-size:22px") Home
+                span
+    div.container(style="padding-bottom: 10px;padding-right: 150px;")
+      div.row
+        div.col
+          div.row
+            div.col(style="text-align: right")
+              label.col-form-label(for="searchByName") Search by Name
+            div.col
+              input.form-control(type="Text" id="searchByName" name="searchByName" placeholder="Patient's Name" oninput=`searchByName(this)`)
+        div.col
+          div.row
+            div.col(style="text-align: right")
+              label.col-form-label(for="searchByMrno") Search by MR#
+            div.col
+              input.form-control(type="Text" id="searchByMrno" name="searchByMrno" placeholder="Patient's MR#" oninput=`searchByMrno(this)`)
+
+    input(type='hidden', id='serverData', value=`${JSON.stringify(data)}`)
+
     div(class="d-flex flex-column")
       div.table-wrapper-scroll-y.my-custom-scrollbar.scrollbar.scrollbar-primary
         table.table.table-striped.table-dark.table-hover(id="patientsTable")
@@ -84,7 +107,7 @@ html
                 div.col-sm-8
                   select.form-control(id="patientReason" name="patientReason" required)
                     option(selected disabled) Select
-                    option  Consultation
+                    option Consultation
                     option Surgery
                     option Investigation
             div.mb-3
@@ -110,8 +133,8 @@ html
         div.modal-body
           form(id="editPatientForm")
             div.mb-3
-              div.row
-                label(id="patientMRNoEdit") MRNo: 
+              div.row(style="text-align: center")
+                label(id="patientMRNoEdit" style="font-weight: bold;") MR# 
             div.mb-3
               div.row
                 label.col-sm-4.col-form-label(for="patientNameEdit") Name
