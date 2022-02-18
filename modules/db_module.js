@@ -4,7 +4,7 @@ const {db} = require('./db_connection.js');
 const {WebhookClient} = require('discord.js');
 const fs = require('fs')
 
-const wh_dbManager = new WebhookClient({url: 'https://discord.com/api/webhooks/943132131561984040/TNLs7CZM2S4OzgCP4QZKmR9SRwgnTqoYasY6Sf2G60a6brIJmCg1fLyENmziXNTSWmXy'});
+const wh_dbManager = new WebhookClient({url: process.env.DISCORD_IMAGES});
 
 async function authorize(user,pass) {
     console.log('authorizing user')
