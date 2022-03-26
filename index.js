@@ -20,6 +20,7 @@ require('./modules/gmail_client.js');
 
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
+const otherRolesMessageId = "XXX"
 const userOrderLimit = 50
 const filledOrdersLimit = 500
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
@@ -3492,6 +3493,28 @@ client.on('messageReactionAdd', async (reaction, user) => {
         else
             reaction.users.remove(user.id);
     }
+    if (reaction.message.id == otherRolesMessageId) {
+        if (reaction.emoji.id == "957325143699501156") {
+            const role = reaction.message.guild.roles.cache.find(role => role.name === 'Lost Ark')
+            reaction.message.guild.members.cache.get(user.id).roles.add(role)
+            .then (response => {
+                console.log(JSON.stringify(response))
+                user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
+                .then(() => {
+                    mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                })
+                .catch(err => {
+                    mod_log(`Error assigning role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                    console.log(err)
+                })
+            })
+            .catch(function (error) {
+                console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                user.send('Error occured adding role. Please try again.\nError Code: 500')
+                inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+            })
+        }
+    }
 });
 
 client.on('messageReactionRemove', async (reaction, user) => {
@@ -3715,6 +3738,23 @@ client.on('messageReactionRemove', async (reaction, user) => {
             .catch(function (error) {
                 user.send('Error occured removing role. Please try again.\nError Code: 500')
                 inform_dc(`Error removing role ${role.name} from user ${user.username} `)
+            })
+        }
+    }
+
+    if (reaction.message.id == otherRolesMessageId) {
+        if (reaction.emoji.id == "957325143699501156") {
+            const role = reaction.message.guild.roles.cache.find(role => role.name === 'Lost Ark')
+            reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+            .then (response => {
+                console.log(JSON.stringify(response))
+                user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                .catch(err => console.log(err))
+                mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
+            })
+            .catch(function (error) {
+                user.send('Error occured removing role. Please try again.\nError Code: 500')
+                inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
             })
         }
     }

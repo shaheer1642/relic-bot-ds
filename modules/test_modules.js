@@ -881,8 +881,14 @@ message.channel.send({
 async function admin_test(message,args) {
     if (message.author.id != '253525146923433984')
         return
-    message.channel.send('pin this!').then(msg => {
-        msg.pin().catch(err => console.log(err))
+    
+    message.channel.send({
+        content: " ",
+        embeds: [{
+            description: "React to emotes to obtain these roles\n<:LostArk:957325143699501156><@957296244273844316>"
+        }]
+    }).then(msg => {
+        msg.react("<:LostArk:957325143699501156>").catch(err => console.log(err))
     }).catch(err => console.log(err))
     return
     client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')
