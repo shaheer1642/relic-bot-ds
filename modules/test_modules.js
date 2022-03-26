@@ -885,8 +885,9 @@ async function admin_test(message,args) {
     message.channel.send({
         content: " ",
         embeds: [{
-            description: "React to emotes to obtain these roles\n<:LostArk:957325143699501156><@957296244273844316>"
-        }]
+            description: "React to emotes to obtain these roles\n\n<:LostArk:957325143699501156><@957296244273844316>"
+        }],
+        color: "223b8c"
     }).then(msg => {
         msg.react("<:LostArk:957325143699501156>").catch(err => console.log(err))
     }).catch(err => console.log(err))
