@@ -881,25 +881,15 @@ message.channel.send({
 async function admin_test(message,args) {
     if (message.author.id != '253525146923433984')
         return
-    
-    message.channel.send({
-        content: " ",
-        embeds: [{
-            description: "React to emotes to obtain these roles\n\n<:LostArk:957325143699501156><@957296244273844316>"
-        }],
-        color: "#223b8c"
-    }).then(msg => {
-        msg.react("<:LostArk:957325143699501156>").catch(err => console.log(err))
-    }).catch(err => console.log(err))
-    return
-    client.channels.cache.get('793207311891562556').messages.fetch('892630748958437416')
-    .then(msg => {
-        msg.react('<:four2:918420407097364480>').catch(err => console.log(err))
-    }).catch(err => console.log(err))
-    client.channels.cache.get('793207311891562556').messages.fetch('915914251066015774')
-    .then(msg => {
-        msg.react('<:five2:918420406472421387>').catch(err => console.log(err))
-    }).catch(err => console.log(err))
+    client.channels.cache.get('891923650649939989').messages.fetch('957330415734095932').then(msg => {
+        msg.edit({
+            content: " ",
+            embeds: [{
+                description: "React to emotes to obtain these roles\n\n<:LostArk:957325143699501156><@&957296244273844316>"
+            }],
+            color: "#223b8c"
+        }).catch(err => console.log(err))
+    })
 }
 
 async function sendMessage(message,args) {
