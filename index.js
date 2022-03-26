@@ -20,7 +20,7 @@ require('./modules/gmail_client.js');
 
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
-const otherRolesMessageId = "XXX"
+const otherRolesMessageId = "957330415734095932"
 const userOrderLimit = 50
 const filledOrdersLimit = 500
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
