@@ -886,7 +886,7 @@ async function admin_test(message,args) {
             content: " ",
             embeds: [{
                 description: "React to emotes to obtain these roles\n\n<:LostArk:957325143699501156><@&957296244273844316>",
-                color: "#223b8c"
+                color: "#7bdee3"
             }],
         }).catch(err => console.log(err))
     })
