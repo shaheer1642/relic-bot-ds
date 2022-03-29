@@ -476,8 +476,8 @@ async function updateDatabaseItem(db_items_list,item,index) {
             //${item.item_url.replace('_relic','')}`)
             var status = await axios(`https://warframe.fandom.com/api.php?action=parse&page=${item.item_url.replace('_relic','').replace(/_/g,' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(/ /g, '_')}&prop=text&redirects=true&format=json`)
             .then(async (wikiInfo) => {
-                if (!wikiInfo.data) {
-                    console.log(wikiInfo)
+                if (!wikiInfo.data.parse) {
+                    console.log(wikiInfo.data)
                     return true
                 }
                 var matches = wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g)
