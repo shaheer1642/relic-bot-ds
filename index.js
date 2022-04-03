@@ -670,6 +670,9 @@ client.on('messageCreate', async message => {
                 case 'tbfulltut':
                     test_modules.tbFullTutorial(message,args)
                     break
+                case 'react':
+                    test_modules.react(message,args)
+                    break
                 ///*----------------------
                 case 'test':
                     test_modules.admin_test(message,args)

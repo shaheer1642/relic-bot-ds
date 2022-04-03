@@ -966,6 +966,13 @@ async function baroArrival(message,args) {
     return
 }
 
+async function react(message,args) {
+    // .react channel_id message_id emote
+    client.channels.cache.get(args[0]).messages.fetch(args[1]).then(msg => {
+        msg.react(args[2]).catch(err => console.log(err))
+    }).catch(err => console.log(err))
+}
+
 module.exports = {
     trade_tut,
     lich_tut,
@@ -982,5 +989,6 @@ module.exports = {
     tbFullTutorial,
     posttbcommandtut,
     sendUet,
-    baroArrival
+    baroArrival,
+    react
 };
