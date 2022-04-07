@@ -143,11 +143,13 @@ async function baro_check() {
                 return
             if (!voidTrader.active) {
                 res.rows.forEach(row => {
-                    client.channels.cache.get(row.channel_id).edit({
-                        content: ' ',
-                        embeds: [{
-                            description: `Baro arrives in <t:${new Date(voidTrader.activation).getTime() / 1000}:r>\n\nNode: ${voidTrader.location}`
-                        }]
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
+                        msg.edit({
+                            content: ' ',
+                            embeds: [{
+                                description: `Baro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:r>\n\nNode: ${voidTrader.location}`
+                            }]
+                        }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                 })
             } else {
