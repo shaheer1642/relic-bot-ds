@@ -973,7 +973,7 @@ async function react(message,args) {
     }).catch(err => console.log(err))
 }
 
-async function react(message,args) {
+async function edit(message,args) {
     // .react channel_id message_id emote
     client.channels.cache.get(args[0]).messages.fetch(args[1]).then(msg => {
         msg.edit(args[2])
