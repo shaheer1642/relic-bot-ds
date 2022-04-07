@@ -145,6 +145,7 @@ async function baro_check() {
                 res.rows.forEach(row => {
                     console.log(row)
                     client.channels.fetch(row.channel_id).then(channel => {
+                        console.log(channel)
                         channel.messages.fetch(row.baro_alert).then(msg => {
                             msg.edit({
                                 content: ' ',
