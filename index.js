@@ -3526,14 +3526,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
     
     if (reaction.emoji.name == "1️⃣") {
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.embeds[0].title === "Worldstate Alerts Setup") {
             worldstatealerts.setupReaction(reaction, user)
             return
         }
     }
-
+    console.log(reaction.emoji.identifier)
     if (reaction.emoji.identifier == '<:baro:961548844368293969>') {
+        console.log('identified baro reaction')
         worldstatealerts.setupReaction(reaction, user, "add")
     }
 });
