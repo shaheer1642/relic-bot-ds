@@ -46,6 +46,10 @@ async function wssetup(message,args) {
 async function setupReaction(reaction,user,type) {
     const channel_id = reaction.message.channel.id
     if (reaction.emoji.name == "1️⃣") {
+        if (!access_ids.includes(user.id))
+            return
+        if (reaction.message.author.id != client.user.id)
+            return
         var status = db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
