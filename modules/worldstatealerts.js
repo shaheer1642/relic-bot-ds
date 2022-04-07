@@ -182,9 +182,7 @@ async function baro_check() {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
                         msg.edit({
                             content: `<@&${row.baro_role}>`,
-                            embeds: [{
-                                description: `Baro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n\n**Node:** ${voidTrader.location}`
-                            }]
+                            embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                 })
@@ -195,7 +193,8 @@ async function baro_check() {
                         msg.edit({
                             content: ' ',
                             embeds: [{
-                                description: `React with ${emotes.baro.string} to be notified when baro arrives\n\nBaro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`
+                                description: `React with ${emotes.baro.string} to be notified when arrives\n\nNext arrival <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
+                                color: colors.baro
                             }]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
