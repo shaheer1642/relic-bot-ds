@@ -57,7 +57,7 @@ async function setupReaction(reaction,user) {
             }]
         }).then(msg => {
             msg.react(emotes.baro).catch(err => console.log(err))
-            db.query(`UPDATE worldstatealert SET baroReact = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            db.query(`UPDATE worldstatealert SET baro_react = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         // ----- baroAlert
         await reaction.message.channel.send({
@@ -66,17 +66,14 @@ async function setupReaction(reaction,user) {
                 description: `Loading...`
             }]
         }).then(msg => {
-            msg.react(emotes.baro).catch(err => console.log(err))
-            db.query(`UPDATE worldstatealert SET baroAlert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         // ----- baroRole
         reaction.message.guild.roles.create({
-            data: {
-                name: 'Baro Alert'
-            },
+            name: 'Baro Alert',
             reason: 'Automatic role creation',
         }).then(role => {
-            db.query(`UPDATE worldstatealert SET baroRole = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => console.log(err))
     }
 }
