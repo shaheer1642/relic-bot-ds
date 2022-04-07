@@ -13,6 +13,8 @@ const emotes = {
         identifier: 'baro:961548844368293969'
     }
 }
+//----set timers----
+setImmediate(baro_check,-1)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -121,6 +123,45 @@ async function setupReaction(reaction,user,type) {
             }
         })
     }
+}
+
+//----tracking----
+
+async function baro_check() {
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        const voidTrader = new WorldState(JSON.stringify(worldstateData.data)).voidTrader;
+        if (new Date(voidTrader.activation).getTime() < new Date().getTime()) {     //negative activation, retry
+            console.log('Baro check: negative activation')
+            var timer = 10000
+            setTimeout(baro_check, timer)
+            console.log(`baro_check reset in ${msToTime(timer)}`)
+            return
+        }
+        db.query(`SELECT * FROM worldstatealert`).then(res => {
+            if (res.rowCount == 0)
+                return
+            if (!voidTrader.active) {
+                res.rows.forEach(row => {
+                    client.channels.cache.get(row.channel_id).edit({
+                        content: ' ',
+                        embeds: [{
+                            description: `Baro arrives in <t:${new Date(voidTrader.activation).getTime() / 1000}:r>\n\nNode: ${voidTrader.location}`
+                        }]
+                    }).catch(err => console.log(err))
+                })
+            } else {
+
+            }
+        })
+        var timer = (new Date(voidTrader.activation).getTime() - new Date()) + 120000
+        setTimeout(baro_check, timer)
+        console.log('baro_check invokes in ' + msToTime(timer))
+    })
+    .catch(err => {
+        console.log(err)
+        setTimeout(baro_check,5000)
+    })
 }
 
 module.exports = {wssetup,setupReaction};
