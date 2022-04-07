@@ -14,6 +14,7 @@ const {pins_handler} = require('./modules/pins_handler.js');
 const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
+const worldstatealerts = require('./modules/worldstatealerts.js');
 const osiris_guild_id = '905559118096531456'
 const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
@@ -672,6 +673,9 @@ client.on('messageCreate', async message => {
                     break
                 case 'react':
                     test_modules.react(message,args)
+                    break
+                case 'wssetup':
+                    worldstatealerts.setup(message,args)
                     break
                 ///*----------------------
                 case 'test':
