@@ -14,7 +14,7 @@ const emotes = {
     }
 }
 //----set timers----
-setImmediate(baro_check,5000)
+setTimeout(baro_check,5000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
