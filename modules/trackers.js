@@ -4,7 +4,6 @@ const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor} = require('./extras.js');
 const WorldState = require('warframe-worldstate-parser');
-const { Channel, DiscordAPIError, Message } = require('discord.js');
 
 const bountyHints = [
     'Consider donating to poor softy!',

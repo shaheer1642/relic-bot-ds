@@ -8,8 +8,8 @@ const access_ids = [
     '253525146923433984'
 ]
 
-async function setup(message,args) {
-    if (!access_ids.includes(message.user.id)) {
+async function wssetup(message,args) {
+    if (!access_ids.includes(message.author.id)) {
         message.channel.send('You do not have access to this command').catch(err => console.log(err))
         return
     }
@@ -24,4 +24,4 @@ async function setup(message,args) {
     }).catch(err => console.log(err))
 }
 
-module.exports = {setup};
+module.exports = {wssetup};

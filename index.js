@@ -675,7 +675,7 @@ client.on('messageCreate', async message => {
                     test_modules.react(message,args)
                     break
                 case 'wssetup':
-                    worldstatealerts.setup(message,args)
+                    worldstatealerts.wssetup(message,args)
                     break
                 ///*----------------------
                 case 'test':
@@ -684,7 +684,7 @@ client.on('messageCreate', async message => {
                 //-----------------------*/
             }
         }
-
+        
         //for dms
         else 
             switch(command) {
