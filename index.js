@@ -3532,8 +3532,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
             return
         }
     }
+
     if (reaction.emoji.identifier == '<:baro:961548844368293969>') {
-        worldstatealerts.setupReaction(reaction, user)
+        worldstatealerts.setupReaction(reaction, user, "add")
     }
 });
 
@@ -3777,6 +3778,10 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
             })
         }
+    }
+
+    if (reaction.emoji.identifier == '<:baro:961548844368293969>') {
+        worldstatealerts.setupReaction(reaction, user, "remove")
     }
 });
 

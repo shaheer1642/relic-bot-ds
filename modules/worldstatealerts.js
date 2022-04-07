@@ -82,6 +82,8 @@ async function setupReaction(reaction,user,type) {
         await db.query(`SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}`).then(res => {
             if (res.rowCount != 1)
                 return
+            if (reaction.message.id != res.rows[0].baro_react)
+                return
             const role = reaction.message.guild.roles.cache.find(role => role.id === res.rows[0].baro_role)
             if (type == "add") {
                 reaction.message.guild.members.cache.get(user.id).roles.add(role)
