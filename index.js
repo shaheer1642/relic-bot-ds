@@ -3524,7 +3524,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
     
-    if (reaction.emoji.name == ("1️⃣" || "2️⃣") ) {
+    if (reaction.emoji.name == "1️⃣") {
         if (!reaction.message.author)
             await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.embeds[0].title === "Worldstate Alerts Setup") {
