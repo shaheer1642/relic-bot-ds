@@ -169,7 +169,7 @@ async function baro_check() {
                         client.channels.cache.get(row.channel_id).send(`<@&${row.baro_role}>`)
                     })
                 }
-                var embed = {description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>`,fields: [], color: colors.baro}
+                var embed = {description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,fields: [], color: colors.baro}
                 voidTrader.inventory.forEach(item => {
                     embed.fields.push({
                         name: item.item,
