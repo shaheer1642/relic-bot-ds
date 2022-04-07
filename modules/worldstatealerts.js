@@ -143,7 +143,7 @@ async function baro_check() {
                 return
             if (!voidTrader.active) {
                 res.rows.forEach(row => {
-                    console.log(row)
+                    console.log(row.channel_id)
                     client.channels.fetch(row.channel_id).then(channel => {
                         console.log(channel)
                         channel.messages.fetch(row.baro_alert).then(msg => {
