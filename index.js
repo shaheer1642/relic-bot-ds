@@ -1763,6 +1763,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         return
     }
 
+
     if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
         console.log(reaction.emoji.identifier)
@@ -3522,6 +3523,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
             })
         }
     }
+
+    if (reaction.emoji.name == ("1️⃣" || "2️⃣") ) {
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id)
+        if (reaction.message.embeds[0].title === "Worldstate Alerts Setup") {
+            worldstatealerts.setupReaction(reaction, user)
+            return
+        }
+    }
 });
 
 client.on('messageReactionRemove', async (reaction, user) => {
@@ -4031,11 +4041,12 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 
 //process shutdown handles
 
+/*
 process
   .on('SIGTERM', procshutdown('SIGTERM'))
   .on('SIGINT', procshutdown('SIGINT'))
   .on('uncaughtException', procshutdown('uncaughtException'));
-
+*/
 function procshutdown(signal) {
     /*
     const downtimeInform = [

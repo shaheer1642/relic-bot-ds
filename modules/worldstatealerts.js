@@ -7,6 +7,9 @@ const WorldState = require('warframe-worldstate-parser');
 const access_ids = [
     '253525146923433984'
 ]
+const emotes = {
+    baro: '<:baro:961548844368293969>'
+}
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -24,4 +27,33 @@ async function wssetup(message,args) {
     }).catch(err => console.log(err))
 }
 
-module.exports = {wssetup};
+async function setupReaction(reaction,user) {
+    if (reaction.emoji.name == "1️⃣") {
+        var status = db.query(`
+            IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${reaction.channel.id}) THEN
+                INSERT INTO worldstatealert (channel_id) VALUES (${reaction.channel.id})
+            END IF;
+        `).then(res => {
+            if (res.rowCount == 1)
+                return true
+            return false
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured')
+            return
+        }
+        return
+        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961559893142282270/alerts_baro_kiteer.png').catch(err => console.log(err))
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                description: `React with ${emotes.baro} to be notified when baro arrives` 
+            }]
+        })
+    }
+}
+
+module.exports = {wssetup,setupReaction};
