@@ -91,6 +91,54 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         setTimeout(baro_check, 10000)
         console.log('baro_check invokes in ' + msToTime(timer))
+        return
+    }
+    if (reaction.emoji.name == "2️⃣") {
+        if (!access_ids.includes(user.id))
+            return
+        if (reaction.message.author.id != client.user.id)
+            return
+        var status = db.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
+                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
+                END IF;
+            END $$;
+        `).then(res => {
+            if (res.rowCount == 1)
+                return true
+            return false
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            return
+        }
+        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961559893142282270/alerts_baro_kiteer.png').catch(err => console.log(err))
+        // ----- baroAlert
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                description: `React with ${emotes.baro.string} to be notified when baro arrives`,
+                color: colors.baro
+            }]
+        }).then(msg => {
+            msg.react(emotes.baro.string).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+        // ----- baroRole
+        reaction.message.guild.roles.create({
+            name: 'Baro Alert',
+            reason: 'Automatic role creation',
+        }).then(role => {
+            db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+        }).catch(err => console.log(err))
+        clearTimeout(baroTimer)
+        var timer = 10000
+        setTimeout(baro_check, 10000)
+        console.log('baro_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')

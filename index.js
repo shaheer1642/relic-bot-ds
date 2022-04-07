@@ -674,6 +674,9 @@ client.on('messageCreate', async message => {
                 case 'react':
                     test_modules.react(message,args)
                     break
+                case 'edit':
+                    test_modules.edit(message,args)
+                    break
                 case 'wssetup':
                     worldstatealerts.wssetup(message,args)
                     break
@@ -3524,7 +3527,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
     
-    if (reaction.emoji.name == "1️⃣") {
+    if (reaction.emoji.name == "1️⃣" || reaction.emoji.name == "2️⃣") {
         if (!reaction.message.author)
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.embeds[0].title === "Worldstate Alerts Setup") {

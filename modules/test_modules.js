@@ -973,6 +973,13 @@ async function react(message,args) {
     }).catch(err => console.log(err))
 }
 
+async function react(message,args) {
+    // .react channel_id message_id emote
+    client.channels.cache.get(args[0]).messages.fetch(args[1]).then(msg => {
+        msg.edit(args[2])
+    }).catch(err => console.log(err))
+}
+
 module.exports = {
     trade_tut,
     lich_tut,
@@ -990,5 +997,6 @@ module.exports = {
     posttbcommandtut,
     sendUet,
     baroArrival,
-    react
+    react,
+    edit
 };
