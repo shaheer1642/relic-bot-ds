@@ -8,7 +8,10 @@ const access_ids = [
     '253525146923433984'
 ]
 const emotes = {
-    baro: '<:baro:961548844368293969>'
+    baro: {
+        string: '<:baro:961548844368293969>',
+        identifier: 'baro:961548844368293969'
+    }
 }
 
 async function wssetup(message,args) {
@@ -53,11 +56,11 @@ async function setupReaction(reaction,user,type) {
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
-                description: `React with ${emotes.baro} to be notified when baro arrives`,
+                description: `React with ${emotes.baro.string} to be notified when baro arrives`,
                 color: "#95744"
             }]
         }).then(msg => {
-            msg.react(emotes.baro).catch(err => console.log(err))
+            msg.react(emotes.baro.string).catch(err => console.log(err))
             db.query(`UPDATE worldstatealert SET baro_react = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         // ----- baroAlert
@@ -78,7 +81,7 @@ async function setupReaction(reaction,user,type) {
             db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => console.log(err))
     }
-    if (reaction.emoji.identifier == emotes.baro) {
+    if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
         await db.query(`SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}`).then(res => {
             console.log(res.rows)

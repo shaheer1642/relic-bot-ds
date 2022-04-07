@@ -3532,9 +3532,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
             return
         }
     }
-    console.log(reaction.emoji.identifier)
-    if (reaction.emoji.identifier == '<:baro:961548844368293969>') {
-        console.log('identified baro reaction')
+    
+    if (reaction.emoji.identifier == 'baro:961548844368293969') {
         worldstatealerts.setupReaction(reaction, user, "add")
     }
 });
@@ -3781,7 +3780,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         }
     }
 
-    if (reaction.emoji.identifier == '<:baro:961548844368293969>') {
+    if (reaction.emoji.identifier == 'baro:961548844368293969') {
         worldstatealerts.setupReaction(reaction, user, "remove")
     }
 });
