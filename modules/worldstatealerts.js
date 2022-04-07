@@ -69,7 +69,7 @@ async function setupReaction(reaction,user,type) {
             return
         }
         await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961559893142282270/alerts_baro_kiteer.png').catch(err => console.log(err))
-        // ----- baroReact
+        // ----- baroAlert
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
@@ -78,16 +78,6 @@ async function setupReaction(reaction,user,type) {
             }]
         }).then(msg => {
             msg.react(emotes.baro.string).catch(err => console.log(err))
-            db.query(`UPDATE worldstatealert SET baro_react = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        // ----- baroAlert
-        await reaction.message.channel.send({
-            content: ' ',
-            embeds: [{
-                description: `Loading...`,
-                color: colors.baro
-            }]
-        }).then(msg => {
             db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         // ----- baroRole
@@ -108,7 +98,7 @@ async function setupReaction(reaction,user,type) {
             console.log(res.rows)
             if (res.rowCount != 1)
                 return
-            if (reaction.message.id != res.rows[0].baro_react)
+            if (reaction.message.id != res.rows[0].baro_alert)
                 return
             const role = reaction.message.guild.roles.cache.find(role => role.id === res.rows[0].baro_role)
             if (type == "add") {
@@ -205,7 +195,7 @@ async function baro_check() {
                         msg.edit({
                             content: ' ',
                             embeds: [{
-                                description: `Baro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n\n**Node:** ${voidTrader.location}`
+                                description: `React with ${emotes.baro.string} to be notified when baro arrives\n\nBaro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`
                             }]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
