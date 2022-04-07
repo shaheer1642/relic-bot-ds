@@ -3523,7 +3523,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             })
         }
     }
-
+    
     if (reaction.emoji.name == ("1️⃣" || "2️⃣") ) {
         if (!reaction.message.author)
             await reaction.message.channel.messages.fetch(reaction.message.id)
@@ -3531,6 +3531,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
             worldstatealerts.setupReaction(reaction, user)
             return
         }
+    }
+    if (reaction.emoji.identifier == '<:baro:961548844368293969>') {
+        worldstatealerts.setupReaction(reaction, user)
     }
 });
 

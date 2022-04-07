@@ -27,7 +27,7 @@ async function wssetup(message,args) {
     }).catch(err => console.log(err))
 }
 
-async function setupReaction(reaction,user) {
+async function setupReaction(reaction,user,type) {
     const channel_id = reaction.message.channel.id
     if (reaction.emoji.name == "1️⃣") {
         var status = db.query(`
@@ -53,7 +53,8 @@ async function setupReaction(reaction,user) {
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
-                description: `React with ${emotes.baro} to be notified when baro arrives` 
+                description: `React with ${emotes.baro} to be notified when baro arrives`,
+                color: "#95744"
             }]
         }).then(msg => {
             msg.react(emotes.baro).catch(err => console.log(err))
@@ -63,7 +64,8 @@ async function setupReaction(reaction,user) {
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
-                description: `Loading...`
+                description: `Loading...`,
+                color: "#95744"
             }]
         }).then(msg => {
             db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
@@ -75,6 +77,42 @@ async function setupReaction(reaction,user) {
         }).then(role => {
             db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => console.log(err))
+    }
+    if (reaction.emoji.identifier == emotes.baro) {
+        await db.query(`SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}`).then(res => {
+            if (res.rowCount != 1)
+                return
+            const role = reaction.message.guild.roles.cache.find(role => role.id === res.rows[0].baro_role)
+            if (type == "add") {
+                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                .then(response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**')
+                    .catch(err => {
+                        console.log(err)
+                    })
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                    user.send('Error occured adding role. Please try again.\nError Code: 500')
+                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+                })
+            } else if (type == "remove") {
+                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                .then(response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**')
+                    .catch(err => {
+                        console.log(err)
+                    })
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error removing role ${role.name} for user ${user.username}`)
+                    user.send('Error occured removing role. Please try again.\nError Code: 500')
+                    inform_dc(`Error removing role ${role.name} for user ${user.username}`)
+                })
+            }
+        })
     }
 }
 
