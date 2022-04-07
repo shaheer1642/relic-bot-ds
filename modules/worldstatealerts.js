@@ -79,7 +79,9 @@ async function setupReaction(reaction,user,type) {
         }).catch(err => console.log(err))
     }
     if (reaction.emoji.identifier == emotes.baro) {
+        console.log('baro reaction')
         await db.query(`SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}`).then(res => {
+            console.log(res.rows)
             if (res.rowCount != 1)
                 return
             if (reaction.message.id != res.rows[0].baro_react)
