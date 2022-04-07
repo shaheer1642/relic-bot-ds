@@ -30,8 +30,8 @@ async function wssetup(message,args) {
 async function setupReaction(reaction,user) {
     if (reaction.emoji.name == "1️⃣") {
         var status = db.query(`
-            IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${reaction.channel.id}) THEN
-                INSERT INTO worldstatealert (channel_id) VALUES (${reaction.channel.id})
+            IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${reaction.message.channel.id}) THEN
+                INSERT INTO worldstatealert (channel_id) VALUES (${reaction.message.channel.id})
             END IF;
         `).then(res => {
             if (res.rowCount == 1)
