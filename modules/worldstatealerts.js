@@ -97,6 +97,10 @@ async function setupReaction(reaction,user,type) {
         }).then(role => {
             db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => console.log(err))
+        clearTimeout(baroTimer)
+        var timer = 10000
+        setTimeout(baro_check, 10000)
+        console.log('baro_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
@@ -137,10 +141,6 @@ async function setupReaction(reaction,user,type) {
                 })
             }
         })
-        clearTimeout(baroTimer)
-        var timer = 10000
-        setTimeout(baro_check, 10000)
-        console.log('baro_check invokes in ' + msToTime(timer))
     }
 }
 
