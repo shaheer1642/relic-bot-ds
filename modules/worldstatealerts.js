@@ -11,10 +11,21 @@ const emotes = {
     baro: {
         string: '<:baro:961548844368293969>',
         identifier: 'baro:961548844368293969'
+    },
+    credits: {
+        string: '<:credits:961605300601913424>',
+        identifier: 'credits:961605300601913424'
+    },
+    ducats: {
+        string: '<:ducats:961605317425234000>',
+        identifier: 'ducats:961605317425234000'
     }
 }
+const colors = {
+    baro: "#95744"
+}
 //----set timers----
-setTimeout(baro_check,5000)
+var baroTimer = setTimeout(baro_check,10000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -59,7 +70,7 @@ async function setupReaction(reaction,user,type) {
             content: ' ',
             embeds: [{
                 description: `React with ${emotes.baro.string} to be notified when baro arrives`,
-                color: "#95744"
+                color: colors.baro
             }]
         }).then(msg => {
             msg.react(emotes.baro.string).catch(err => console.log(err))
@@ -70,7 +81,7 @@ async function setupReaction(reaction,user,type) {
             content: ' ',
             embeds: [{
                 description: `Loading...`,
-                color: "#95744"
+                color: colors.baro
             }]
         }).then(msg => {
             db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
@@ -122,6 +133,10 @@ async function setupReaction(reaction,user,type) {
                 })
             }
         })
+        clearTimeout(baroTimer)
+        var timer = 10000
+        setTimeout(baro_check, 10000)
+        console.log('baro_check invokes in ' + msToTime(timer))
     }
 }
 
@@ -130,43 +145,83 @@ async function setupReaction(reaction,user,type) {
 async function baro_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
+        
         const voidTrader = new WorldState(JSON.stringify(worldstateData.data)).voidTrader;
-        if (new Date(voidTrader.activation).getTime() < new Date().getTime()) {     //negative activation, retry
-            console.log('Baro check: negative activation')
-            var timer = 10000
-            setTimeout(baro_check, timer)
-            console.log(`baro_check reset in ${msToTime(timer)}`)
-            return
+        
+        if (voidTrader.active) {
+            if (new Date(voidTrader.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+                console.log('Baro check: negative expiry')
+                var timer = 10000
+                baroTimer = setTimeout(baro_check, timer)
+                console.log(`baro_check reset in ${msToTime(timer)}`)
+                return
+            }
+        } else {
+            if (new Date(voidTrader.activation).getTime() < new Date().getTime()) {     //negative activation, retry
+                console.log('Baro check: negative activation')
+                var timer = 10000
+                baroTimer = setTimeout(baro_check, timer)
+                console.log(`baro_check reset in ${msToTime(timer)}`)
+                return
+            }
         }
         db.query(`SELECT * FROM worldstatealert`).then(res => {
             if (res.rowCount == 0)
                 return
-            if (!voidTrader.active) {
+            if (voidTrader.active) {
+                if (res.rows[0].baro_status == false) {
+                    db.query(`UPDATE worldstatealert SET baro_status = true`).catch(err => console.log(err))
+                    res.rows.forEach(row => {
+                        client.channels.cache.get(row.channel_id).send(`<@&${row.baro_role}>`)
+                    })
+                }
+                var embed = {description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>`,fields: [], color: colors.baro}
+                voidTrader.inventory.forEach(item => {
+                    embed.fields.push({
+                        name: item.item,
+                        value: `${emotes.credits.string} ${item.credits}\n${emotes.ducats.string} ${item.ducats}`,
+                        inline: true
+                    })
+                })
+                console.log(JSON.stringify(embed))
                 res.rows.forEach(row => {
-                    console.log(row.channel_id)
-                    client.channels.fetch(row.channel_id).then(channel => {
-                        console.log(channel)
-                        channel.messages.fetch(row.baro_alert).then(msg => {
-                            msg.edit({
-                                content: ' ',
-                                embeds: [{
-                                    description: `Baro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:r>\n\nNode: ${voidTrader.location}`
-                                }]
-                            }).catch(err => console.log(err))
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
+                        msg.edit({
+                            content: `<@&${row.baro_role}>`,
+                            embeds: [{
+                                description: `Baro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n\n**Node:** ${voidTrader.location}`
+                            }]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                 })
             } else {
-
+                db.query(`UPDATE worldstatealert SET baro_status = false`).catch(err => console.log(err))
+                res.rows.forEach(row => {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
+                        msg.edit({
+                            content: ' ',
+                            embeds: [{
+                                description: `Baro arrives <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n\n**Node:** ${voidTrader.location}`
+                            }]
+                        }).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
+                })
             }
         })
-        var timer = (new Date(voidTrader.activation).getTime() - new Date()) + 120000
-        setTimeout(baro_check, timer)
-        console.log('baro_check invokes in ' + msToTime(timer))
+        if (voidTrader.active) {
+            var timer = (new Date(voidTrader.expiry).getTime() - new Date()) + 120000
+            baroTimer = setTimeout(baro_check, timer)
+            console.log('baro_check invokes in ' + msToTime(timer))
+        } else {
+            var timer = (new Date(voidTrader.activation).getTime() - new Date()) + 120000
+            baroTimer = setTimeout(baro_check, timer)
+            console.log('baro_check invokes in ' + msToTime(timer))
+        }
+        return
     })
     .catch(err => {
         console.log(err)
-        setTimeout(baro_check,5000)
+        baroTimer = setTimeout(baro_check,5000)
     })
 }
 
