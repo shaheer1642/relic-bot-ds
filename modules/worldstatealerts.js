@@ -193,7 +193,7 @@ async function baro_check() {
                         msg.edit({
                             content: ' ',
                             embeds: [{
-                                description: `React with ${emotes.baro.string} to be notified when arrives\n\nNext arrival <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
+                                description: `React with ${emotes.baro.string} to be notified when baro arrives\n\nNext arrival <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
                                 color: colors.baro
                             }]
                         }).catch(err => console.log(err))
