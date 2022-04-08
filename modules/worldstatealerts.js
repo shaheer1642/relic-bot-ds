@@ -260,6 +260,7 @@ async function baro_check() {
                                 embeds: [embed]
                             }).catch(err => console.log(err))
                         }).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000))).catch(err => console.log(err))
                     }
                 })
             } else {
@@ -371,6 +372,7 @@ async function cycles_check() {
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
+                    client.channels.cache.get(row.channel_id).send(`Cycle changed ${users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000))).catch(err => console.log(err))
                 }
             })
         })

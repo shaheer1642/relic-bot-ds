@@ -160,8 +160,7 @@ async function trading_bot(message,args,command) {
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
     }
     if (price < 0) {
-        message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 5000))).catch(err => console.log(err))
         return Promise.resolve()
     }
     console.log(price)
