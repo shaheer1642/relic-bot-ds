@@ -66,6 +66,7 @@ const worldstatealertEmotes = [
     "salvage:961939373908164638",
     "survival:961937707477655592",
     "excavation:961938527266955324",
+    "disruption:962048774388195328"
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
