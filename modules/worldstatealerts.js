@@ -785,6 +785,13 @@ async function arbitration_check() {
                 return
             }
         }
+
+        if (!arbitration.type) {
+            console.log('Arbitration check: arbitrary data')
+            var timer = 10000
+            arbitrationTimer = setTimeout(arbitration_check, timer)
+            console.log(`arbitration_check reset in ${msToTime(timer)}`)
+        }
         
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
             console.log('Arbitration check: negative expiry')
