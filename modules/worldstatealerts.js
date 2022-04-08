@@ -343,6 +343,7 @@ async function cycles_check() {
                     })
                 })
             }
+            console.log('Cycles check: user mentions list\n' + JSON.stringify(users))
             // ---- construct embed
             var embed = {
                 title: 'Open worlds State', 
@@ -368,11 +369,12 @@ async function cycles_check() {
                 if (row.cycles_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.cycles_alert).then(msg => {
                         msg.edit({
-                            content: users[msg.channel_id].join(', '),
+                            content: users[msg.channel_id] ? users[msg.channel_id].join(', ') : ' ',
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
-                    client.channels.cache.get(row.channel_id).send(`Cycle changed ${users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000))).catch(err => console.log(err))
+                    if (users[row.channel_id])
+                        client.channels.cache.get(row.channel_id).send(`Cycle changed ${users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000))).catch(err => console.log(err))
                 }
             })
         })
