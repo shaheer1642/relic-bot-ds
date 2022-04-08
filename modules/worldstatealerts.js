@@ -71,7 +71,8 @@ const emotes = {
 }
 const colors = {
     baro: "#95744",
-    cycleArbitrationFissure: "#a83258"
+    cycles: "#a83258",
+    arbitration: "#f59e42"
 }
 //----set timers----
 var baroTimer = setTimeout(baro_check,8000)
@@ -183,7 +184,7 @@ async function setupReaction(reaction,user,type) {
             embeds: [{
                 title: 'Open worlds State',
                 description: `React to be notified upon cycle changes`,
-                color: colors.cycleArbitrationFissure
+                color: colors.cycles
             }]
         }).then(async msg => {
             db.query(`UPDATE worldstatealert SET cycles_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
@@ -205,7 +206,7 @@ async function setupReaction(reaction,user,type) {
             embeds: [{
                 title: 'Arbitration',
                 description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception\n${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation`,
-                color: colors.cycleArbitrationFissure
+                color: colors.arbitration
             }]
         }).then(async msg => {
             db.query(`UPDATE worldstatealert SET arbitration_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
@@ -505,6 +506,7 @@ async function cycles_check() {
                 return
             var users = {}
             var ping_users = {}
+            var cycles_changed = []
             // ----- cetus check 
             db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
@@ -514,6 +516,8 @@ async function cycles_check() {
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
                     if (res.rows[0].cetus_status != cetusCycle.state) {
+                        if (!cycles_changed.includes(`Cetus`))
+                            cycles_changed.push(`Cetus`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -530,6 +534,8 @@ async function cycles_check() {
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
                     if (res.rows[0].vallis_status != vallisCycle.state) {
+                        if (!cycles_changed.includes(`Orb Vallis`))
+                            cycles_changed.push(`Orb Vallis`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -546,6 +552,8 @@ async function cycles_check() {
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
                     if (res.rows[0].cambion_status != cambionCycle.active) {
+                        if (!cycles_changed.includes(`Cambion Drift`))
+                            cycles_changed.push(`Cambion Drift`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -571,7 +579,7 @@ async function cycles_check() {
                     value: `${emotes[cambionCycle.active].string} ${cambionCycle.active.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cambionCycle.active == "fass" ? `${emotes.vome.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>` : `${emotes.fass.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>`}`,
                     inline: true
                 }],
-                color: colors.cycleArbitrationFissure
+                color: colors.cycles
             }
             //console.log(JSON.stringify(embed))
             // ---- send msg
@@ -584,7 +592,7 @@ async function cycles_check() {
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id])
-                        client.channels.cache.get(row.channel_id).send(`Cycle changed ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} Cycle changed ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
         })
@@ -606,7 +614,6 @@ async function cycles_check() {
 }
 
 async function arbitration_check() {
-    return
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         
@@ -615,7 +622,7 @@ async function arbitration_check() {
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
             console.log('Arbitration check: negative expiry')
             var timer = 10000
-            arbitrationTimer = setTimeout(cycles_check, timer)
+            arbitrationTimer = setTimeout(arbitration_check, timer)
             console.log(`arbitration_check reset in ${msToTime(timer)}`)
             return
         }
@@ -624,15 +631,28 @@ async function arbitration_check() {
                 return
             var users = {}
             var ping_users = {}
-            // ----- cetus check 
-            db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
+            var mission = "unknown"
+            if (arbitration.type.match('defection'))
+                mission = 'defection'
+            else if (arbitration.type.match('defense'))
+                mission = 'defense'
+            else if (arbitration.type.match('interception'))
+                mission = 'interception'
+            else if (arbitration.type.match('salvage'))
+                mission = 'salvage'
+            else if (arbitration.type.match('survival'))
+                mission = 'survival'
+            else if (arbitration.type.match('excavation'))
+                mission = 'excavation'
+            // -----
+            db.query(`UPDATE worldstatealert SET arbitration_mission = '${arbitration.type}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
-                row.cycles_users[cetusCycle.state].forEach(user => {
+                row.arbitration_users[mission].forEach(user => {
                     if (!users[row.channel_id])
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].cetus_status != cetusCycle.state) {
+                    if (res.rows[0].arbitration_mission != mission) {
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -640,87 +660,36 @@ async function arbitration_check() {
                     }
                 })
             })
-            // ----- vallis check
-            db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
-            res.rows.forEach(row => {
-                row.cycles_users[vallisCycle.state].forEach(user => {
-                    if (!users[row.channel_id])
-                        users[row.channel_id] = []
-                    if (!users[row.channel_id].includes(`<@${user}>`))
-                        users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].vallis_status != vallisCycle.state) {
-                        if (!ping_users[row.channel_id])
-                            ping_users[row.channel_id] = []
-                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                            ping_users[row.channel_id].push(`<@${user}>`)
-                    }
-                })
-            })
-            // ----- cambion check
-            db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
-            res.rows.forEach(row => {
-                row.cycles_users[cambionCycle.active].forEach(user => {
-                    if (!users[row.channel_id])
-                        users[row.channel_id] = []
-                    if (!users[row.channel_id].includes(`<@${user}>`))
-                        users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].cambion_status != cambionCycle.active) {
-                        if (!ping_users[row.channel_id])
-                            ping_users[row.channel_id] = []
-                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                            ping_users[row.channel_id].push(`<@${user}>`)
-                    }
-                })
-            })
-            console.log('Cycles check: user mention lists' + JSON.stringify(users) + JSON.stringify(ping_users))
+            console.log('Arbitration check: user mention lists' + JSON.stringify(users) + JSON.stringify(ping_users))
             // ---- construct embed
             var embed = {
                 title: 'Open worlds State', 
-                description: 'React to be notified upon cycle changes', 
-                fields: [{
-                    name: '__Cetus__',
-                    value: `${emotes[cetusCycle.state].string} ${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cetusCycle.state == "day" ? `${emotes.night.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>` : `${emotes.day.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>`}`,
-                    inline: true
-                },{
-                    name: '__Orb Vallis__',
-                    value: `${emotes[vallisCycle.state].string} ${vallisCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${vallisCycle.state == "cold" ? `Becomes ${emotes.warm.string} <t:${new Date(vallisCycle.expiry).getTime() / 1000}:R>` : `Becomes ${emotes.cold.string} <t:${new Date(vallisCycle.expiry).getTime() / 1000}:R>`}`,
-                    inline: true
-                },{
-                    name: '__Cambion Drift__',
-                    value: `${emotes[cambionCycle.active].string} ${cambionCycle.active.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cambionCycle.active == "fass" ? `${emotes.vome.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>` : `${emotes.fass.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>`}`,
-                    inline: true
-                }],
-                color: colors.cycleArbitrationFissure
+                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception\n${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation\n\n**Mission**: ${arbitration.type}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
+                color: colors.arbitration
             }
-            //console.log(JSON.stringify(embed))
+            console.log(JSON.stringify(embed))
             // ---- send msg
             res.rows.forEach(row => {
-                if (row.cycles_alert) {
-                    client.channels.cache.get(row.channel_id).messages.fetch(row.cycles_alert).then(msg => {
+                if (row.arbitration_alert) {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.arbitration_alert).then(msg => {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id])
-                        client.channels.cache.get(row.channel_id).send(`Cycle changed ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Arbitration mission has appeared ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
         })
-        var expiry = new Date(cetusCycle.expiry).getTime()
-        if (expiry > new Date(vallisCycle.expiry).getTime())
-            expiry = new Date(vallisCycle.expiry).getTime()
-        if (expiry > new Date(cambionCycle.expiry).getTime())
-            expiry = new Date(cambionCycle.expiry).getTime()
-
-        var timer = expiry - new Date()
-        arbitrationTimer = setTimeout(cycles_check, timer)
-        console.log('cycles_check invokes in ' + msToTime(timer))
+        var timer = new Date(arbitration.expiry).getTime() - new Date()
+        arbitrationTimer = setTimeout(arbitration_check, timer)
+        console.log('arbitration_check invokes in ' + msToTime(timer))
         return
     })
     .catch(err => {
         console.log(err)
-        arbitrationTimer = setTimeout(cycles_check,5000)
+        arbitrationTimer = setTimeout(arbitration_check,5000)
     })
 }
 
