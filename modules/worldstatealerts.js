@@ -79,7 +79,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title === "Worldstate Alerts Setup")
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
         var status = db.query(`
             DO $$ BEGIN
@@ -131,7 +131,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title === "Worldstate Alerts Setup")
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
         var status = db.query(`
             DO $$ BEGIN
