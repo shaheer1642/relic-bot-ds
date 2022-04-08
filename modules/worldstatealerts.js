@@ -631,7 +631,7 @@ async function cycles_check() {
 
 async function arbitration_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-    .then( worldstateData => {
+    .then( async worldstateData => {
         
         const arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
 
