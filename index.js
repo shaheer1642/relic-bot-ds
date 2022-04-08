@@ -60,6 +60,12 @@ const worldstatealertEmotes = [
     "🔥",
     "fass:961853261961371670",
     "vome:961853261713907752",
+    "defection:961938897829523566",
+    "defense:961938213256179802",
+    "interception:961937942488678401",
+    "salvage:961939373908164638",
+    "survival:961937707477655592",
+    "excavation:961938527266955324",
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
