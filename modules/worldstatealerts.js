@@ -531,6 +531,28 @@ async function setupReaction(reaction,user,type) {
             `).then(() => user.send("Removed tracker: Arbitraction excavation").catch(err => console.log(err))).catch(err => console.log(err))
         }
     }
+    if (reaction.emoji.identifier == emotes.disruption.identifier) {
+        console.log('disruption reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Arbitration")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{disruption,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Arbitraction disruption").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{disruption}', (arbitration_users->'disruption') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Arbitraction disruption").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
 }
 
 //----tracking----
