@@ -3538,7 +3538,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
     
-    if (worldstatealertEmotes.includes(reaction.emoji.identifier)) {
+    if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
         worldstatealerts.setupReaction(reaction, user, "add")
     }
 });
@@ -3785,7 +3785,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         }
     }
 
-    if (worldstatealertEmotes.includes(reaction.emoji.identifier)) {
+    if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
         worldstatealerts.setupReaction(reaction, user, "remove")
     }
 });
