@@ -679,6 +679,7 @@ async function arbitration_check() {
                 mission = 'survival'
             else if (arbitration.type.match('excavation'))
                 mission = 'excavation'
+            console.log('Arbitration check: mission is ' + mission + `(${arbitration.type})`)
             // -----
             db.query(`UPDATE worldstatealert SET arbitration_mission = '${arbitration.type}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
