@@ -250,7 +250,7 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{night,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Night cycle").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
@@ -261,15 +261,91 @@ async function setupReaction(reaction,user,type) {
     }
     if (reaction.emoji.name == emotes.cold.string) {
         console.log('cold reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Open worlds State")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{cold,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Cold cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{cold}', (cycles_users->'cold') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Cold cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        }
     }
     if (reaction.emoji.name == emotes.warm.string) {
         console.log('warm reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Open worlds State")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{warm,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Warm cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{warm}', (cycles_users->'warm') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Warm cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        }
     }
     if (reaction.emoji.identifier == emotes.fass.identifier) {
         console.log('fass reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Open worlds State")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{fass,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Fass cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{fass}', (cycles_users->'fass') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Fass cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        }
     }
     if (reaction.emoji.identifier == emotes.vome.identifier) {
         console.log('vome reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Open worlds State")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{vome,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Vome cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{vome}', (cycles_users->'vome') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Vome cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        }
     }
 }
 
