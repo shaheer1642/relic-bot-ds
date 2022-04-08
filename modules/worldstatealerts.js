@@ -321,6 +321,8 @@ async function cycles_check() {
                 db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
                 res.rows.forEach(row => {
                     row.cycles_users[cetusCycle.state].forEach(user => {
+                        if (!users[row.channel_id])
+                            users[row.channel_id] = []
                         users[row.channel_id].push(`<@${user}>`)
                     })
                 })
@@ -330,6 +332,8 @@ async function cycles_check() {
                 db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
                 res.rows.forEach(row => {
                     row.cycles_users[vallisCycle.state].forEach(user => {
+                        if (!users[row.channel_id])
+                            users[row.channel_id] = []
                         users[row.channel_id].push(`<@${user}>`)
                     })
                 })
@@ -339,6 +343,8 @@ async function cycles_check() {
                 db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
                 res.rows.forEach(row => {
                     row.cycles_users[cambionCycle.active].forEach(user => {
+                        if (!users[row.channel_id])
+                            users[row.channel_id] = []
                         users[row.channel_id].push(`<@${user}>`)
                     })
                 })
