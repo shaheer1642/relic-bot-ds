@@ -72,10 +72,14 @@ async function wssetup(message,args) {
 
 async function setupReaction(reaction,user,type) {
     const channel_id = reaction.message.channel.id
-    if (reaction.emoji.name == "1️⃣") {
+    if (reaction.emoji.name == "1️⃣" && type=="add") {
         if (!access_ids.includes(user.id))
             return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title === "Worldstate Alerts Setup")
             return
         var status = db.query(`
             DO $$ BEGIN
@@ -120,10 +124,14 @@ async function setupReaction(reaction,user,type) {
         console.log('baro_check invokes in ' + msToTime(timer))
         return
     }
-    if (reaction.emoji.name == "2️⃣") {
+    if (reaction.emoji.name == "2️⃣" && type=="add") {
         if (!access_ids.includes(user.id))
             return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title === "Worldstate Alerts Setup")
             return
         var status = db.query(`
             DO $$ BEGIN
@@ -206,6 +214,24 @@ async function setupReaction(reaction,user,type) {
                 })
             }
         })
+    }
+    if (reaction.emoji.identifier == emotes.day.identifier) {
+        console.log('day reaction')
+    }
+    if (reaction.emoji.identifier == emotes.night.identifier) {
+        console.log('night reaction')
+    }
+    if (reaction.emoji.identifier == emotes.cold.identifier) {
+        console.log('cold reaction')
+    }
+    if (reaction.emoji.identifier == emotes.warm.identifier) {
+        console.log('warm reaction')
+    }
+    if (reaction.emoji.identifier == emotes.fass.identifier) {
+        console.log('fass reaction')
+    }
+    if (reaction.emoji.identifier == emotes.vome.identifier) {
+        console.log('vome reaction')
     }
 }
 
@@ -391,7 +417,7 @@ async function cycles_check() {
         if (expiry > new Date(cambionCycle.expiry).getTime())
             expiry = new Date(cambionCycle.expiry).getTime()
 
-        var timer = (expiry - new Date()) + 120000
+        var timer = expiry - new Date()
         cyclesTimer = setTimeout(cycles_check, timer)
         console.log('cycles_check invokes in ' + msToTime(timer))
         return

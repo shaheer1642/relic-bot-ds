@@ -50,6 +50,17 @@ const defaultReactions = {
         identifier: 'auto_update:906923980852715640'
     }
 }
+const worldstatealertEmotes = [
+    "1️⃣",
+    "2️⃣",
+    "baro:961548844368293969",
+    "☀️",
+    "🌙",
+    "❄️",
+    "🔥",
+    "fass:961853261961371670",
+    "vome:961853261713907752",
+]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
@@ -3527,16 +3538,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
     
-    if (reaction.emoji.name == "1️⃣" || reaction.emoji.name == "2️⃣") {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
-        if (reaction.message.embeds[0].title === "Worldstate Alerts Setup") {
-            worldstatealerts.setupReaction(reaction, user)
-            return
-        }
-    }
-    
-    if (reaction.emoji.identifier == 'baro:961548844368293969') {
+    if (worldstatealertEmotes.includes(reaction.emoji.identifier)) {
         worldstatealerts.setupReaction(reaction, user, "add")
     }
 });
@@ -3783,7 +3785,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         }
     }
 
-    if (reaction.emoji.identifier == 'baro:961548844368293969') {
+    if (worldstatealertEmotes.includes(reaction.emoji.identifier)) {
         worldstatealerts.setupReaction(reaction, user, "remove")
     }
 });
