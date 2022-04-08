@@ -636,11 +636,21 @@ async function arbitration_check() {
         const arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
 
         if (!arbitration) {
-            console.log('Arbitration check: no data available')
-            var timer = 300000
-            arbitrationTimer = setTimeout(arbitration_check, timer)
-            console.log(`arbitration_check reset in ${msToTime(timer)}`)
-            return
+            var status = axios('https://api.warframestat.us/pc/arbitration')    // get data from wfstat.us
+            .then(res => {
+                arbitration = res.data
+                return true
+            }).catch(err => {
+                console.log(err)
+                return false
+            })
+            if (!status) {
+                console.log('Arbitration check: no data available')
+                var timer = 300000
+                arbitrationTimer = setTimeout(arbitration_check, timer)
+                console.log(`arbitration_check reset in ${msToTime(timer)}`)
+                return
+            }
         }
         
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
