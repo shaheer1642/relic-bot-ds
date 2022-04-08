@@ -381,7 +381,8 @@ async function baro_check() {
                 if (res.rows[0].baro_status == false) {
                     db.query(`UPDATE worldstatealert SET baro_status = true`).catch(err => console.log(err))
                     res.rows.forEach(row => {
-                        client.channels.cache.get(row.channel_id).send(`<@&${row.baro_role}>`)
+                        if (row.baro_alert)
+                            client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                     })
                 }
                 var embed = {description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,fields: [], color: colors.baro}
@@ -401,7 +402,6 @@ async function baro_check() {
                                 embeds: [embed]
                             }).catch(err => console.log(err))
                         }).catch(err => console.log(err))
-                        client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000))).catch(err => console.log(err))
                     }
                 })
             } else {
@@ -457,40 +457,56 @@ async function cycles_check() {
             if (res.rowCount == 0)
                 return
             var users = {}
+            var ping_users = {}
             // ----- cetus check 
-            if (res.rows[0].cetus_status != cetusCycle.state) {
-                db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
-                res.rows.forEach(row => {
-                    row.cycles_users[cetusCycle.state].forEach(user => {
-                        if (!users[row.channel_id])
-                            users[row.channel_id] = []
+            db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
+            res.rows.forEach(row => {
+                row.cycles_users[cetusCycle.state].forEach(user => {
+                    if (!users[row.channel_id])
+                        users[row.channel_id] = []
+                    if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    })
+                    if (res.rows[0].cetus_status != cetusCycle.state) {
+                        if (!ping_users[row.channel_id])
+                            ping_users[row.channel_id] = []
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
                 })
-            }
+            })
             // ----- vallis check
-            if (res.rows[0].vallis_status != vallisCycle.state) {
-                db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
-                res.rows.forEach(row => {
-                    row.cycles_users[vallisCycle.state].forEach(user => {
-                        if (!users[row.channel_id])
-                            users[row.channel_id] = []
+            db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
+            res.rows.forEach(row => {
+                row.cycles_users[vallisCycle.state].forEach(user => {
+                    if (!users[row.channel_id])
+                        users[row.channel_id] = []
+                    if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    })
+                    if (res.rows[0].vallis_status != vallisCycle.state) {
+                        if (!ping_users[row.channel_id])
+                            ping_users[row.channel_id] = []
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
                 })
-            }
+            })
             // ----- cambion check
-            if (res.rows[0].cambion_status != cambionCycle.active) {
-                db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
-                res.rows.forEach(row => {
-                    row.cycles_users[cambionCycle.active].forEach(user => {
-                        if (!users[row.channel_id])
-                            users[row.channel_id] = []
+            db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
+            res.rows.forEach(row => {
+                row.cycles_users[cambionCycle.active].forEach(user => {
+                    if (!users[row.channel_id])
+                        users[row.channel_id] = []
+                    if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    })
+                    if (res.rows[0].cambion_status != cambionCycle.active) {
+                        if (!ping_users[row.channel_id])
+                            ping_users[row.channel_id] = []
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
                 })
-            }
-            console.log('Cycles check: user mentions list\n' + JSON.stringify(users))
+            })
+            console.log('Cycles check: user mention lists' + JSON.stringify(users) + JSON.stringify(ping_users))
             // ---- construct embed
             var embed = {
                 title: 'Open worlds State', 
@@ -510,7 +526,7 @@ async function cycles_check() {
                 }],
                 color: colors.cycleArbitrationFissure
             }
-            console.log(JSON.stringify(embed))
+            //console.log(JSON.stringify(embed))
             // ---- send msg
             res.rows.forEach(row => {
                 if (row.cycles_alert) {
@@ -520,8 +536,8 @@ async function cycles_check() {
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
-                    if (users[row.channel_id])
-                        client.channels.cache.get(row.channel_id).send(`Cycle changed ${users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000))).catch(err => console.log(err))
+                    if (ping_users[row.channel_id])
+                        client.channels.cache.get(row.channel_id).send(`Cycle changed ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
         })
