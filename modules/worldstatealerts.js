@@ -19,6 +19,14 @@ const emotes = {
     ducats: {
         string: '<:ducats:961605317425234000>',
         identifier: 'ducats:961605317425234000'
+    },
+    fass: {
+        string: '<:fass:961853261961371670>',
+        identifier: 'fass:961853261961371670'
+    },
+    vome: {
+        string: '<:vome:961853261713907752>',
+        identifier: 'vome:961853261713907752'
     }
 }
 const colors = {
@@ -36,7 +44,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert'
+            description: '1️⃣ Baro Alert\n2️⃣ Cycles | Arbitration | Fissures'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -116,29 +124,30 @@ async function setupReaction(reaction,user,type) {
             reaction.message.channel.send('Some error occured').catch(err => console.log(err))
             return
         }
-        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961559893142282270/alerts_baro_kiteer.png').catch(err => console.log(err))
-        // ----- baroAlert
+        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961640420658528326/alerts_cycles_arbitration_fissures.png').catch(err => console.log(err))
+        // ----- cyclesAlert
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
-                description: `React with ${emotes.baro.string} to be notified when baro arrives`,
+                description: `React to be notified upon cycle changes`,
                 color: colors.baro
             }]
-        }).then(msg => {
-            msg.react(emotes.baro.string).catch(err => console.log(err))
-            db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+        }).then(async msg => {
+            db.query(`UPDATE worldstatealert SET cycles_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await msg.react("☀️").catch(err => console.log(err))
+            await msg.react("🌙").catch(err => console.log(err))
+            await msg.react("❄️").catch(err => console.log(err))
+            await msg.react("🔥").catch(err => console.log(err))
+            await msg.react(emotes.fass.string).catch(err => console.log(err))
+            msg.react(emotes.vome.string).catch(err => console.log(err))
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        // ----- baroRole
-        reaction.message.guild.roles.create({
-            name: 'Baro Alert',
-            reason: 'Automatic role creation',
-        }).then(role => {
-            db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        }).catch(err => console.log(err))
+        // ----
+        /*
         clearTimeout(baroTimer)
         var timer = 10000
         setTimeout(baro_check, 10000)
         console.log('baro_check invokes in ' + msToTime(timer))
+        */
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
