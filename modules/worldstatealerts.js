@@ -636,7 +636,8 @@ async function arbitration_check() {
         const arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
 
         if (!arbitration) {
-            var status = axios('https://api.warframestat.us/pc/arbitration')    // get data from wfstat.us
+            console.log('Arbitration check: getting data from warframestat.us')
+            var status = axios('https://api.warframestat.us/pc/arbitration')    // get data from warframestat.us
             .then(res => {
                 arbitration = res.data
                 return true
