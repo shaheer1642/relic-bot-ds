@@ -405,6 +405,13 @@ async function baro_check() {
         
         const voidTrader = new WorldState(JSON.stringify(worldstateData.data)).voidTrader;
         
+        if (!voidTrader) {
+            console.log('Baro check: no data available')
+            var timer = 300000
+            arbitrationTimer = setTimeout(baro_check, timer)
+            console.log(`baro_check reset in ${msToTime(timer)}`)
+        }
+
         if (voidTrader.active) {
             if (new Date(voidTrader.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
                 console.log('Baro check: negative expiry')
@@ -494,6 +501,13 @@ async function cycles_check() {
         const vallisCycle = new WorldState(JSON.stringify(worldstateData.data)).vallisCycle;
         const cambionCycle = new WorldState(JSON.stringify(worldstateData.data)).cambionCycle;
         
+        if (!cetusCycle || !vallisCycle || !cambionCycle) {
+            console.log('Cycles check: no data available for a certain node')
+            var timer = 300000
+            arbitrationTimer = setTimeout(cycles_check, timer)
+            console.log(`cycles_check reset in ${msToTime(timer)}`)
+        }
+
         if (new Date(cetusCycle.expiry).getTime() < new Date().getTime() || new Date(vallisCycle.expiry).getTime() < new Date().getTime() || new Date(cambionCycle.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
             console.log('Cycles check: negative expiry')
             var timer = 10000
@@ -617,9 +631,14 @@ async function arbitration_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         
-        const arbitration = new WorldState(JSON.stringify(worldstateData.data)).sentientOutposts;
-        console.log(arbitration)
-        return
+        const arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
+
+        if (!arbitration) {
+            console.log('Arbitration check: no data available')
+            var timer = 300000
+            arbitrationTimer = setTimeout(arbitration_check, timer)
+            console.log(`arbitration_check reset in ${msToTime(timer)}`)
+        }
         
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
             console.log('Arbitration check: negative expiry')
