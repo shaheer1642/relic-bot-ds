@@ -67,6 +67,10 @@ const emotes = {
     excavation: {
         string: '<:excavation:961938527266955324>',
         identifier: 'excavation:961938527266955324'
+    },
+    disruption: {
+        string: '<:disruption:962048774388195328>',
+        identifier: 'disruption:962048774388195328'
     }
 }
 const colors = {
@@ -205,7 +209,7 @@ async function setupReaction(reaction,user,type) {
             content: ' ',
             embeds: [{
                 title: 'Arbitration',
-                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception\n${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation`,
+                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption`,
                 color: colors.arbitration
             }]
         }).then(async msg => {
@@ -819,10 +823,21 @@ async function arbitration_check() {
                     mission = 'survival'
                 else if (arbitration.type.match('Excavation'))
                     mission = 'excavation'
-                console.log('Arbitration check: mission is ' + mission + `(${arbitration.type})`)
+                else if (arbitration.type.match('Disruption'))
+                    mission = 'disruption'
+                if (mission == "unknown") {
+                    inform_dc('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
+                    console.log('Arbitration check: mission type unknown')
+                    var timer = 300000
+                    arbitrationTimer = setTimeout(arbitration_check, timer)
+                    console.log(`arbitration_check reset in ${msToTime(timer)}`)
+                    return
+                }
+                console.log('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
             } catch (e) {
                 console.log(e)
                 console.log('Arbitration check: unknown error')
+                console.log(arbitration)
                 var timer = 10000
                 arbitrationTimer = setTimeout(arbitration_check, timer)
                 console.log(`arbitration_check reset in ${msToTime(timer)}`)
@@ -848,7 +863,7 @@ async function arbitration_check() {
             // ---- construct embed
             var embed = {
                 title: 'Arbitration', 
-                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception\n${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation\n\n**Mission**: ${arbitration.type}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
+                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${arbitration.type}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
                 color: colors.arbitration
             }
             console.log(JSON.stringify(embed))
