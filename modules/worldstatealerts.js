@@ -226,13 +226,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET users = jsonb_set(users, '{day,999999}', '"${user.id}"', true)
+                SET cycles_users = jsonb_set(cycles_users, '{day,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
-                UPDATE test_table
-                SET users = jsonb_set(users, '{day}', (users->'day') - '${user.id}')
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{day}', (cycles_users->'day') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -248,13 +248,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET users = jsonb_set(users, '{night,999999}', '"${user.id}"', true)
+                SET cycles_users = jsonb_set(cycles_users, '{night,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
-                UPDATE test_table
-                SET users = jsonb_set(users, '{night}', (users->'night') - '${user.id}')
+                UPDATE worldstatealert
+                SET cycles_users = jsonb_set(cycles_users, '{night}', (cycles_users->'night') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Night cycle").catch(err => console.log(err))).catch(err => console.log(err))
         }
