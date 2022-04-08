@@ -395,6 +395,138 @@ async function setupReaction(reaction,user,type) {
             `).then(() => user.send("Removed tracker: Vome cycle").catch(err => console.log(err))).catch(err => console.log(err))
         }
     }
+    if (reaction.emoji.identifier == emotes.defection.identifier) {
+        console.log('defection reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Arbitration")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{defection,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Arbitraction defection").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{defection}', (arbitration_users->'defection') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Arbitraction defection").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.defense.identifier) {
+        console.log('defense reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Arbitration")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{defense,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Arbitraction defense").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{defense}', (arbitration_users->'defense') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Arbitraction defense").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.interception.identifier) {
+        console.log('interception reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Arbitration")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{interception,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Arbitraction interception").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{interception}', (arbitration_users->'interception') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Arbitraction interception").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.salvage.identifier) {
+        console.log('salvage reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Arbitration")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{salvage,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Arbitraction salvage").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{salvage}', (arbitration_users->'salvage') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Arbitraction salvage").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.survival.identifier) {
+        console.log('survival reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Arbitration")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{survival,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Arbitraction survival").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{survival}', (arbitration_users->'survival') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Arbitraction survival").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.excavation.identifier) {
+        console.log('excavation reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Arbitration")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{excavation,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Arbitraction excavation").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET arbitration_users = jsonb_set(arbitration_users, '{excavation}', (arbitration_users->'excavation') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Arbitraction excavation").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
 }
 
 //----tracking----
@@ -699,8 +831,8 @@ async function arbitration_check() {
             console.log('Arbitration check: user mention lists' + JSON.stringify(users) + JSON.stringify(ping_users))
             // ---- construct embed
             var embed = {
-                title: 'Open worlds State', 
-                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception\n${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation\n\n**Mission**: ${arbitration.type}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
+                title: 'Arbitration', 
+                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception\n${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation\n\n**Mission**: ${arbitration.type}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
                 color: colors.arbitration
             }
             console.log(JSON.stringify(embed))
