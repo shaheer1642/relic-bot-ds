@@ -384,7 +384,7 @@ async function cycles_check() {
         if (expiry > new Date(cambionCycle.expiry).getTime())
             expiry = new Date(cambionCycle.expiry).getTime()
 
-        var timer = (new Date(expiry).getTime() - new Date()) + 120000
+        var timer = (expiry - new Date()) + 120000
         cyclesTimer = setTimeout(cycles_check, timer)
         console.log('cycles_check invokes in ' + msToTime(timer))
         return
