@@ -617,10 +617,8 @@ async function arbitration_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         
-        const arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
-
+        const arbitration = new WorldState(JSON.stringify(worldstateData.data)).sentientOutposts;
         console.log(arbitration)
-        console.log(new WorldState(JSON.stringify(worldstateData.data)))
         return
         
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
