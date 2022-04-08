@@ -813,7 +813,7 @@ async function arbitration_check() {
                 mission = 'excavation'
             console.log('Arbitration check: mission is ' + mission + `(${arbitration.type})`)
             // -----
-            db.query(`UPDATE worldstatealert SET arbitration_mission = '${arbitration.type}'`).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET arbitration_mission = '${mission}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
                 row.arbitration_users[mission].forEach(user => {
                     if (!users[row.channel_id])
