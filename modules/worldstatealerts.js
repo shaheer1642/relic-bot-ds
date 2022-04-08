@@ -806,28 +806,37 @@ async function arbitration_check() {
             var users = {}
             var ping_users = {}
             var mission = "unknown"
-            if (arbitration.type.match('Defection'))
-                mission = 'defection'
-            else if (arbitration.type.match('Defense'))
-                mission = 'defense'
-            else if (arbitration.type.match('Interception'))
-                mission = 'interception'
-            else if (arbitration.type.match('Salvage'))
-                mission = 'salvage'
-            else if (arbitration.type.match('Survival'))
-                mission = 'survival'
-            else if (arbitration.type.match('Excavation'))
-                mission = 'excavation'
-            console.log('Arbitration check: mission is ' + mission + `(${arbitration.type})`)
+            try {
+                if (arbitration.type.match('Defection'))
+                    mission = 'defection'
+                else if (arbitration.type.match('Defense'))
+                    mission = 'defense'
+                else if (arbitration.type.match('Interception'))
+                    mission = 'interception'
+                else if (arbitration.type.match('Salvage'))
+                    mission = 'salvage'
+                else if (arbitration.type.match('Survival'))
+                    mission = 'survival'
+                else if (arbitration.type.match('Excavation'))
+                    mission = 'excavation'
+                console.log('Arbitration check: mission is ' + mission + `(${arbitration.type})`)
+            } catch (e) {
+                console.log(e)
+                console.log('Arbitration check: unknown error')
+                var timer = 10000
+                arbitrationTimer = setTimeout(arbitration_check, timer)
+                console.log(`arbitration_check reset in ${msToTime(timer)}`)
+                return
+            }
             // -----
-            db.query(`UPDATE worldstatealert SET arbitration_mission = '${mission}'`).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET arbitration_mission = '${mission}_${arbitration.enemy}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
                 row.arbitration_users[mission].forEach(user => {
                     if (!users[row.channel_id])
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].arbitration_mission != mission) {
+                    if (res.rows[0].arbitration_mission != `${mission}_${arbitration.enemy}`) {
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
