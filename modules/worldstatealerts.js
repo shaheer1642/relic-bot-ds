@@ -633,7 +633,7 @@ async function arbitration_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( async worldstateData => {
         
-        const arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
+        var arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
 
         if (!arbitration) {
             console.log('Arbitration check: getting data from warframestat.us')
