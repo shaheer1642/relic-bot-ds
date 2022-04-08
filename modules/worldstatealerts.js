@@ -410,6 +410,7 @@ async function baro_check() {
             var timer = 300000
             arbitrationTimer = setTimeout(baro_check, timer)
             console.log(`baro_check reset in ${msToTime(timer)}`)
+            return
         }
 
         if (voidTrader.active) {
@@ -506,6 +507,7 @@ async function cycles_check() {
             var timer = 300000
             arbitrationTimer = setTimeout(cycles_check, timer)
             console.log(`cycles_check reset in ${msToTime(timer)}`)
+            return
         }
 
         if (new Date(cetusCycle.expiry).getTime() < new Date().getTime() || new Date(vallisCycle.expiry).getTime() < new Date().getTime() || new Date(cambionCycle.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
@@ -638,6 +640,7 @@ async function arbitration_check() {
             var timer = 300000
             arbitrationTimer = setTimeout(arbitration_check, timer)
             console.log(`arbitration_check reset in ${msToTime(timer)}`)
+            return
         }
         
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
