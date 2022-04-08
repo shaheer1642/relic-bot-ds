@@ -215,16 +215,54 @@ async function setupReaction(reaction,user,type) {
             }
         })
     }
-    if (reaction.emoji.identifier == emotes.day.identifier) {
+    if (reaction.emoji.name == emotes.day.string) {
         console.log('day reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title === "Open worlds State")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET users = jsonb_set(users, '{day,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE test_table
+                SET users = jsonb_set(users, '{day}', (users->'day') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        }
     }
-    if (reaction.emoji.identifier == emotes.night.identifier) {
+    if (reaction.emoji.name == emotes.night.string) {
         console.log('night reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title === "Open worlds State")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET users = jsonb_set(users, '{night,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE test_table
+                SET users = jsonb_set(users, '{night}', (users->'night') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Night cycle").catch(err => console.log(err))).catch(err => console.log(err))
+        }
     }
-    if (reaction.emoji.identifier == emotes.cold.identifier) {
+    if (reaction.emoji.name == emotes.cold.string) {
         console.log('cold reaction')
     }
-    if (reaction.emoji.identifier == emotes.warm.identifier) {
+    if (reaction.emoji.name == emotes.warm.string) {
         console.log('warm reaction')
     }
     if (reaction.emoji.identifier == emotes.fass.identifier) {
