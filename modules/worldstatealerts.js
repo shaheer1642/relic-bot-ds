@@ -204,11 +204,11 @@ async function setupReaction(reaction,user,type) {
             content: ' ',
             embeds: [{
                 title: 'Arbitration',
-                description: `React to subscribe to specific mission types\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation`,
+                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception\n${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation`,
                 color: colors.cycleArbitrationFissure
             }]
         }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET cycles_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            db.query(`UPDATE worldstatealert SET arbitration_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
             await msg.react(emotes.defection.string).catch(err => console.log(err))
             await msg.react(emotes.defense.string).catch(err => console.log(err))
             await msg.react(emotes.interception.string).catch(err => console.log(err))
