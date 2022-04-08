@@ -221,7 +221,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title === "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open worlds State")
             return
         if (type == "add") {
             db.query(`
@@ -243,7 +243,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title === "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open worlds State")
             return
         if (type == "add") {
             db.query(`
