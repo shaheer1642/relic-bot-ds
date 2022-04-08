@@ -43,6 +43,30 @@ const emotes = {
     vome: {
         string: '<:vome:961853261713907752>',
         identifier: 'vome:961853261713907752'
+    },
+    defection: {
+        string: '<:defection:961938897829523566>',
+        identifier: 'defection:961938897829523566'
+    },
+    defense: {
+        string: '<:defense:961938213256179802>',
+        identifier: 'defense:961938213256179802'
+    },
+    interception: {
+        string: '<:interception:961937942488678401>',
+        identifier: 'interception:961937942488678401'
+    },
+    salvage: {
+        string: '<:salvage:961939373908164638>',
+        identifier: 'salvage:961939373908164638'
+    },
+    survival: {
+        string: '<:survival:961937707477655592>',
+        identifier: 'survival:961937707477655592'
+    },
+    excavation: {
+        string: '<:excavation:961938527266955324>',
+        identifier: 'excavation:961938527266955324'
     }
 }
 const colors = {
@@ -52,6 +76,7 @@ const colors = {
 //----set timers----
 var baroTimer = setTimeout(baro_check,8000)
 var cyclesTimer = setTimeout(cycles_check,10000)
+var arbitrationTimer = setTimeout(arbitration_check,12000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -169,11 +194,33 @@ async function setupReaction(reaction,user,type) {
             await msg.react(emotes.fass.string).catch(err => console.log(err))
             await msg.react(emotes.vome.string).catch(err => console.log(err))
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        // ----
+
         clearTimeout(cyclesTimer)
         var timer = 10000
         setTimeout(cycles_check, 10000)
         console.log('cycles_check invokes in ' + msToTime(timer))
+        // ---- arbitrationAlert
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                title: 'Arbitration',
+                description: `React to subscribe to specific mission types\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage | ${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation`,
+                color: colors.cycleArbitrationFissure
+            }]
+        }).then(async msg => {
+            db.query(`UPDATE worldstatealert SET cycles_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await msg.react(emotes.defection.string).catch(err => console.log(err))
+            await msg.react(emotes.defense.string).catch(err => console.log(err))
+            await msg.react(emotes.interception.string).catch(err => console.log(err))
+            await msg.react(emotes.salvage.string).catch(err => console.log(err))
+            await msg.react(emotes.survival.string).catch(err => console.log(err))
+            await msg.react(emotes.excavation.string).catch(err => console.log(err))
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+
+        clearTimeout(arbitrationTimer)
+        var timer = 10000
+        setTimeout(arbitration_check, 10000)
+        console.log('arbitration_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
@@ -513,7 +560,7 @@ async function cycles_check() {
                 description: 'React to be notified upon cycle changes', 
                 fields: [{
                     name: '__Cetus__',
-                    value: `${emotes[cetusCycle.state].string} ${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cetusCycle.state == "day" ? `${emotes.night.string} starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>` : `${emotes.day.string} starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>`}`,
+                    value: `${emotes[cetusCycle.state].string} ${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cetusCycle.state == "day" ? `${emotes.night.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>` : `${emotes.day.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>`}`,
                     inline: true
                 },{
                     name: '__Orb Vallis__',
@@ -521,7 +568,7 @@ async function cycles_check() {
                     inline: true
                 },{
                     name: '__Cambion Drift__',
-                    value: `${emotes[cambionCycle.active].string} ${cambionCycle.active.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cambionCycle.active == "fass" ? `${emotes.vome.string} spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>` : `${emotes.fass.string} spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>`}`,
+                    value: `${emotes[cambionCycle.active].string} ${cambionCycle.active.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cambionCycle.active == "fass" ? `${emotes.vome.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>` : `${emotes.fass.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>`}`,
                     inline: true
                 }],
                 color: colors.cycleArbitrationFissure
@@ -555,6 +602,125 @@ async function cycles_check() {
     .catch(err => {
         console.log(err)
         cyclesTimer = setTimeout(cycles_check,5000)
+    })
+}
+
+async function arbitration_check() {
+    return
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        
+        const arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
+        
+        if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+            console.log('Arbitration check: negative expiry')
+            var timer = 10000
+            arbitrationTimer = setTimeout(cycles_check, timer)
+            console.log(`arbitration_check reset in ${msToTime(timer)}`)
+            return
+        }
+        db.query(`SELECT * FROM worldstatealert`).then(res => {
+            if (res.rowCount == 0)
+                return
+            var users = {}
+            var ping_users = {}
+            // ----- cetus check 
+            db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
+            res.rows.forEach(row => {
+                row.cycles_users[cetusCycle.state].forEach(user => {
+                    if (!users[row.channel_id])
+                        users[row.channel_id] = []
+                    if (!users[row.channel_id].includes(`<@${user}>`))
+                        users[row.channel_id].push(`<@${user}>`)
+                    if (res.rows[0].cetus_status != cetusCycle.state) {
+                        if (!ping_users[row.channel_id])
+                            ping_users[row.channel_id] = []
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
+                })
+            })
+            // ----- vallis check
+            db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
+            res.rows.forEach(row => {
+                row.cycles_users[vallisCycle.state].forEach(user => {
+                    if (!users[row.channel_id])
+                        users[row.channel_id] = []
+                    if (!users[row.channel_id].includes(`<@${user}>`))
+                        users[row.channel_id].push(`<@${user}>`)
+                    if (res.rows[0].vallis_status != vallisCycle.state) {
+                        if (!ping_users[row.channel_id])
+                            ping_users[row.channel_id] = []
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
+                })
+            })
+            // ----- cambion check
+            db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
+            res.rows.forEach(row => {
+                row.cycles_users[cambionCycle.active].forEach(user => {
+                    if (!users[row.channel_id])
+                        users[row.channel_id] = []
+                    if (!users[row.channel_id].includes(`<@${user}>`))
+                        users[row.channel_id].push(`<@${user}>`)
+                    if (res.rows[0].cambion_status != cambionCycle.active) {
+                        if (!ping_users[row.channel_id])
+                            ping_users[row.channel_id] = []
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
+                })
+            })
+            console.log('Cycles check: user mention lists' + JSON.stringify(users) + JSON.stringify(ping_users))
+            // ---- construct embed
+            var embed = {
+                title: 'Open worlds State', 
+                description: 'React to be notified upon cycle changes', 
+                fields: [{
+                    name: '__Cetus__',
+                    value: `${emotes[cetusCycle.state].string} ${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cetusCycle.state == "day" ? `${emotes.night.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>` : `${emotes.day.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>`}`,
+                    inline: true
+                },{
+                    name: '__Orb Vallis__',
+                    value: `${emotes[vallisCycle.state].string} ${vallisCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${vallisCycle.state == "cold" ? `Becomes ${emotes.warm.string} <t:${new Date(vallisCycle.expiry).getTime() / 1000}:R>` : `Becomes ${emotes.cold.string} <t:${new Date(vallisCycle.expiry).getTime() / 1000}:R>`}`,
+                    inline: true
+                },{
+                    name: '__Cambion Drift__',
+                    value: `${emotes[cambionCycle.active].string} ${cambionCycle.active.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cambionCycle.active == "fass" ? `${emotes.vome.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>` : `${emotes.fass.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>`}`,
+                    inline: true
+                }],
+                color: colors.cycleArbitrationFissure
+            }
+            //console.log(JSON.stringify(embed))
+            // ---- send msg
+            res.rows.forEach(row => {
+                if (row.cycles_alert) {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.cycles_alert).then(msg => {
+                        msg.edit({
+                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            embeds: [embed]
+                        }).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
+                    if (ping_users[row.channel_id])
+                        client.channels.cache.get(row.channel_id).send(`Cycle changed ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                }
+            })
+        })
+        var expiry = new Date(cetusCycle.expiry).getTime()
+        if (expiry > new Date(vallisCycle.expiry).getTime())
+            expiry = new Date(vallisCycle.expiry).getTime()
+        if (expiry > new Date(cambionCycle.expiry).getTime())
+            expiry = new Date(cambionCycle.expiry).getTime()
+
+        var timer = expiry - new Date()
+        arbitrationTimer = setTimeout(cycles_check, timer)
+        console.log('cycles_check invokes in ' + msToTime(timer))
+        return
+    })
+    .catch(err => {
+        console.log(err)
+        arbitrationTimer = setTimeout(cycles_check,5000)
     })
 }
 
