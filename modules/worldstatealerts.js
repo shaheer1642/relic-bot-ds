@@ -220,6 +220,7 @@ async function setupReaction(reaction,user,type) {
             await msg.react(emotes.salvage.string).catch(err => console.log(err))
             await msg.react(emotes.survival.string).catch(err => console.log(err))
             await msg.react(emotes.excavation.string).catch(err => console.log(err))
+            await msg.react(emotes.disruption.string).catch(err => console.log(err))
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
 
         clearTimeout(arbitrationTimer)
@@ -817,6 +818,7 @@ async function arbitration_check() {
             var timer = 10000
             arbitrationTimer = setTimeout(arbitration_check, timer)
             console.log(`arbitration_check reset in ${msToTime(timer)}`)
+            return
         }
         
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
@@ -911,6 +913,7 @@ async function arbitration_check() {
     .catch(err => {
         console.log(err)
         arbitrationTimer = setTimeout(arbitration_check,5000)
+        return
     })
 }
 
