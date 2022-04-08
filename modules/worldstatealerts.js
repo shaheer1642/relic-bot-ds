@@ -148,6 +148,7 @@ async function setupReaction(reaction,user,type) {
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
+                title: 'Open worlds State',
                 description: `React to be notified upon cycle changes`,
                 color: colors.cycleArbitrationFissure
             }]
@@ -375,7 +376,7 @@ async function cycles_check() {
                 if (row.cycles_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.cycles_alert).then(msg => {
                         msg.edit({
-                            content: users[msg.channel_id] ? users[msg.channel_id].join(', ') : ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
