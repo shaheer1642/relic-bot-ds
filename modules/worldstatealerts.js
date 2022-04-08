@@ -786,7 +786,7 @@ async function arbitration_check() {
             }
         }
 
-        if (!arbitration.type) {
+        if (!arbitration.type || typeof(arbitration.type) != "string") {
             console.log('Arbitration check: arbitrary data')
             var timer = 10000
             arbitrationTimer = setTimeout(arbitration_check, timer)
