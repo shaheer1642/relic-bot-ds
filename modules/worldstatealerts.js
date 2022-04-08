@@ -667,17 +667,17 @@ async function arbitration_check() {
             var users = {}
             var ping_users = {}
             var mission = "unknown"
-            if (arbitration.type.match('defection'))
+            if (arbitration.type.toLowerCase().match('defection'))
                 mission = 'defection'
-            else if (arbitration.type.match('defense'))
+            else if (arbitration.type.toLowerCase().match('defense'))
                 mission = 'defense'
-            else if (arbitration.type.match('interception'))
+            else if (arbitration.type.toLowerCase().match('interception'))
                 mission = 'interception'
-            else if (arbitration.type.match('salvage'))
+            else if (arbitration.type.toLowerCase().match('salvage'))
                 mission = 'salvage'
-            else if (arbitration.type.match('survival'))
+            else if (arbitration.type.toLowerCase().match('survival'))
                 mission = 'survival'
-            else if (arbitration.type.match('excavation'))
+            else if (arbitration.type.toLowerCase().match('excavation'))
                 mission = 'excavation'
             console.log('Arbitration check: mission is ' + mission + `(${arbitration.type})`)
             // -----
