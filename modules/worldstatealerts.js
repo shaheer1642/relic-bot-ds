@@ -659,11 +659,11 @@ async function baro_check() {
             }
         })
         if (voidTrader.active) {
-            var timer = (new Date(voidTrader.expiry).getTime() - new Date()) + 120000
+            var timer = (new Date(voidTrader.expiry).getTime() - new Date().getTime()) + 120000
             baroTimer = setTimeout(baro_check, timer)
             console.log('baro_check invokes in ' + msToTime(timer))
         } else {
-            var timer = (new Date(voidTrader.activation).getTime() - new Date()) + 120000
+            var timer = (new Date(voidTrader.activation).getTime() - new Date().getTime()) + 120000
             baroTimer = setTimeout(baro_check, timer)
             console.log('baro_check invokes in ' + msToTime(timer))
         }
@@ -799,7 +799,7 @@ async function cycles_check() {
         if (expiry > new Date(cambionCycle.expiry).getTime())
             expiry = new Date(cambionCycle.expiry).getTime()
 
-        var timer = expiry - new Date()
+        var timer = expiry - new Date().getTime()
         cyclesTimer = setTimeout(cycles_check, timer)
         console.log('cycles_check invokes in ' + msToTime(timer))
         return
@@ -965,7 +965,7 @@ async function fissures_check() {
             var min_expiry = new Date(fissures[0].expiry).getTime()
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
-                if (expiry - new Date().getTime() > 0) {
+                if ((expiry - new Date().getTime()) > 0) {
                     if (expiry < min_expiry)
                         min_expiry = expiry
                     if (fissure.isStorm)
@@ -1034,7 +1034,7 @@ async function fissures_check() {
                 }
             })
 
-            var timer = (min_expiry - new Date())
+            var timer = min_expiry - new Date().getTime()
             fissuresTimer = setTimeout(fissures_check, timer)
             console.log('fissures_check invokes in ' + msToTime(timer))
         })
