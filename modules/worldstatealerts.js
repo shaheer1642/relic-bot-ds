@@ -1015,12 +1015,12 @@ async function fissures_check() {
             fissures_list.normal.forEach(fissure => {
                 embed1.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
-                embed1.fields[2].value += `<t:${new Date(fissure.expiry).getTime()}:R>\n`
+                embed1.fields[2].value += `<t:${new Date(fissure.expiry).getTime() / 1000}:R>\n`
             })
             fissures_list.voidStorm.forEach(fissure => {
                 embed2.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
-                embed2.fields[2].value += `<t:${new Date(fissure.expiry).getTime()}:R>\n`
+                embed2.fields[2].value += `<t:${new Date(fissure.expiry).getTime() / 1000}:R>\n`
             })
 
             res.rows.forEach(row => {
