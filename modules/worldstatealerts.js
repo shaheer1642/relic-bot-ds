@@ -930,7 +930,7 @@ async function arbitration_check() {
                 }
             })
         })
-        var timer = new Date(arbitration.expiry).getTime() - new Date()
+        var timer = new Date(arbitration.expiry).getTime() - new Date().getTime()
         arbitrationTimer = setTimeout(arbitration_check, timer)
         console.log('arbitration_check invokes in ' + msToTime(timer))
         return
@@ -965,7 +965,7 @@ async function fissures_check() {
             var min_expiry = new Date(fissures[0].expiry).getTime()
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
-                if (expiry > 0) {
+                if (expiry - new Date().getTime() > 0) {
                     if (expiry < min_expiry)
                         min_expiry = expiry
                     if (fissure.isStorm)
@@ -1013,12 +1013,12 @@ async function fissures_check() {
             }
 
             fissures_list.normal.forEach(fissure => {
-                embed1.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
+                embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
             fissures_list.voidStorm.forEach(fissure => {
-                embed2.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
+                embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
