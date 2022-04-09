@@ -76,7 +76,8 @@ const emotes = {
 const colors = {
     baro: "#95744",
     cycles: "#a83258",
-    arbitration: "#f59e42"
+    arbitration: "#f59e42",
+    fissures: "#3295a8"
 }
 //----set timers----
 var baroTimer = setTimeout(baro_check,8000)
@@ -227,6 +228,26 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         setTimeout(arbitration_check, 10000)
         console.log('arbitration_check invokes in ' + msToTime(timer))
+        // ---- fissuresAlert
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                title: 'Fissures',
+                description: `Active fissures`,
+                color: colors.fissures
+            },{
+                title: 'Void Storms',
+                description: `Active railjack fissures`,
+                color: colors.fissures
+            }]
+        }).then(async msg => {
+            db.query(`UPDATE worldstatealert SET fissures_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+
+        clearTimeout(fissuresTimer)
+        var timer = 10000
+        setTimeout(fissures_check, 10000)
+        console.log('fissures_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
@@ -917,6 +938,103 @@ async function arbitration_check() {
         console.log(err)
         arbitrationTimer = setTimeout(arbitration_check,5000)
         return
+    })
+}
+
+
+async function fissures_check() {
+    return
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        
+        const voidTrader = new WorldState(JSON.stringify(worldstateData.data)).voidTrader;
+        
+        if (!voidTrader) {
+            console.log('Baro check: no data available')
+            var timer = 300000
+            arbitrationTimer = setTimeout(fissures_check, timer)
+            console.log(`fissures_check reset in ${msToTime(timer)}`)
+            return
+        }
+
+        if (voidTrader.active) {
+            if (new Date(voidTrader.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+                console.log('Baro check: negative expiry')
+                var timer = 10000
+                baroTimer = setTimeout(fissures_check, timer)
+                console.log(`fissures_check reset in ${msToTime(timer)}`)
+                return
+            }
+        } else {
+            if (new Date(voidTrader.activation).getTime() < new Date().getTime()) {     //negative activation, retry
+                console.log('Baro check: negative activation')
+                var timer = 10000
+                baroTimer = setTimeout(fissures_check, timer)
+                console.log(`fissures_check reset in ${msToTime(timer)}`)
+                return
+            }
+        }
+        db.query(`SELECT * FROM worldstatealert`).then(res => {
+            if (res.rowCount == 0)
+                return
+            if (voidTrader.active) {
+                if (res.rows[0].baro_status == false) {
+                    db.query(`UPDATE worldstatealert SET baro_status = true`).catch(err => console.log(err))
+                    res.rows.forEach(row => {
+                        if (row.baro_alert)
+                            client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                    })
+                }
+                var embed = {description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,fields: [], color: colors.baro}
+                voidTrader.inventory.forEach(item => {
+                    embed.fields.push({
+                        name: item.item,
+                        value: `${emotes.credits.string} ${item.credits}\n${emotes.ducats.string} ${item.ducats}`,
+                        inline: true
+                    })
+                })
+                console.log(JSON.stringify(embed))
+                res.rows.forEach(row => {
+                    if (row.baro_alert) {
+                        client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
+                            msg.edit({
+                                content: `<@&${row.baro_role}>`,
+                                embeds: [embed]
+                            }).catch(err => console.log(err))
+                        }).catch(err => console.log(err))
+                    }
+                })
+            } else {
+                db.query(`UPDATE worldstatealert SET baro_status = false`).catch(err => console.log(err))
+                res.rows.forEach(row => {
+                    if (row.baro_alert) {
+                        client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
+                            msg.edit({
+                                content: ' ',
+                                embeds: [{
+                                    description: `React with ${emotes.baro.string} to be notified when baro arrives\n\nNext arrival <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
+                                    color: colors.baro
+                                }]
+                            }).catch(err => console.log(err))
+                        }).catch(err => console.log(err))
+                    }
+                })
+            }
+        })
+        if (voidTrader.active) {
+            var timer = (new Date(voidTrader.expiry).getTime() - new Date()) + 120000
+            baroTimer = setTimeout(fissures_check, timer)
+            console.log('fissures_check invokes in ' + msToTime(timer))
+        } else {
+            var timer = (new Date(voidTrader.activation).getTime() - new Date()) + 120000
+            baroTimer = setTimeout(fissures_check, timer)
+            console.log('fissures_check invokes in ' + msToTime(timer))
+        }
+        return
+    })
+    .catch(err => {
+        console.log(err)
+        baroTimer = setTimeout(fissures_check,5000)
     })
 }
 
