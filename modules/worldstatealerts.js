@@ -965,14 +965,13 @@ async function fissures_check() {
             var min_expiry = new Date(fissures[0].expiry).getTime()
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
-                if (expiry < min_expiry)
-                    min_expiry = expiry
                 if (expiry > 0) {
-                    if (fissure.isStorm) {
+                    if (expiry < min_expiry)
+                        min_expiry = expiry
+                    if (fissure.isStorm)
                         fissures_list.voidStorm.push(fissure)
-                    } else {
+                    else
                         fissures_list.normal.push(fissure)
-                    }
                 }
             })
             fissures_list.normal.sort(dynamicSort("tierNum"))
