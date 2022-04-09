@@ -991,6 +991,8 @@ async function fissures_check() {
                     if (resetsNormal[fissure.tier] < Math.round((expiry - 180000) / 1000))
                         resetsNormal[fissure.tier] = Math.round((expiry - 180000) / 1000)
                 }
+                if ((resetsNormal[fissure.tier]*1000) < min_expiry)
+                    min_expiry = resetsNormal[fissure.tier]*1000
                 if ((expiry - new Date().getTime()) > 0) {
                     if (expiry < min_expiry)
                         min_expiry = expiry
