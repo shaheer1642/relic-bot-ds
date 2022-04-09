@@ -642,7 +642,12 @@ async function baro_check() {
                             client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                     })
                 }
-                var embed = {description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,fields: [], color: colors.baro}
+                var embed = {
+                    title: "Baro Ki'teer", 
+                    description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
+                    fields: [], 
+                    color: colors.baro
+                }
                 voidTrader.inventory.forEach(item => {
                     embed.fields.push({
                         name: item.item,
@@ -669,6 +674,7 @@ async function baro_check() {
                             msg.edit({
                                 content: ' ',
                                 embeds: [{
+                                    title: "Baro Ki'teer",
                                     description: `React with ${emotes.baro.string} to be notified when baro arrives\n\nNext arrival <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
                                     color: colors.baro
                                 }]
