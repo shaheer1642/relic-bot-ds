@@ -986,10 +986,10 @@ async function fissures_check() {
                 var expiry = new Date(fissure.expiry).getTime()
                 if (fissure.isStorm) {
                     if (resetsRailjack[fissure.tier] < expiry)
-                        resetsRailjack[fissure.tier] = expiry - 180000
+                        resetsRailjack[fissure.tier] = Math.round(expiry - 180000 / 1000)
                 } else {
                     if (resetsNormal[fissure.tier] < expiry)
-                        resetsNormal[fissure.tier] = expiry - 180000
+                        resetsNormal[fissure.tier] = Math.round(expiry - 180000 / 1000)
                 }
                 if ((expiry - new Date().getTime()) > 0) {
                     if (expiry < min_expiry)
