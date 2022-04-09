@@ -151,7 +151,6 @@ async function setupReaction(reaction,user,type) {
             reaction.message.channel.send('Some error occured').catch(err => console.log(err))
             return
         }
-        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961641067785125948/Template.png').catch(err => console.log(err))
         // ----- baroAlert
         await reaction.message.channel.send({
             content: ' ',
@@ -203,7 +202,6 @@ async function setupReaction(reaction,user,type) {
             reaction.message.channel.send('Some error occured').catch(err => console.log(err))
             return
         }
-        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961640420658528326/alerts_cycles_arbitration_fissures.png').catch(err => console.log(err))
         // ----- cyclesAlert
         await reaction.message.channel.send({
             content: ' ',
@@ -226,6 +224,34 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         cyclesTimer = setTimeout(cycles_check, 10000)
         console.log('cycles_check invokes in ' + msToTime(timer))
+    }
+    if (reaction.emoji.name == "3️⃣" && type=="add") {
+        if (!access_ids.includes(user.id))
+            return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
+            return
+        var status = db.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
+                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
+                END IF;
+            END $$;
+        `).then(res => {
+            if (res.rowCount == 1)
+                return true
+            return false
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            return
+        }
         // ---- arbitrationAlert
         await reaction.message.channel.send({
             content: ' ',
@@ -249,6 +275,34 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         arbitrationTimer = setTimeout(arbitration_check, 10000)
         console.log('arbitration_check invokes in ' + msToTime(timer))
+    }
+    if (reaction.emoji.name == "4️⃣" && type=="add") {
+        if (!access_ids.includes(user.id))
+            return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
+            return
+        var status = db.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
+                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
+                END IF;
+            END $$;
+        `).then(res => {
+            if (res.rowCount == 1)
+                return true
+            return false
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            return
+        }
         // ---- fissuresAlert
         await reaction.message.channel.send({
             content: ' ',

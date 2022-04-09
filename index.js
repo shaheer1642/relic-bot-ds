@@ -53,6 +53,8 @@ const defaultReactions = {
 const worldstatealertEmotes = [
     "1️⃣",
     "2️⃣",
+    "3️⃣",
+    "4️⃣",
     "baro:961548844368293969",
     "☀️",
     "🌙",
