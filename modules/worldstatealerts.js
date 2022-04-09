@@ -114,7 +114,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Cycles | Arbitration | Fissures'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration4️⃣ Fissures'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -206,7 +206,7 @@ async function setupReaction(reaction,user,type) {
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
-                title: 'Open worlds State',
+                title: 'Open World Cycles',
                 description: `React to be notified upon cycle changes`,
                 color: colors.cycles
             }]
@@ -370,7 +370,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open World Cycles")
             return
         if (type == "add") {
             db.query(`
@@ -392,7 +392,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open World Cycles")
             return
         if (type == "add") {
             db.query(`
@@ -414,7 +414,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open World Cycles")
             return
         if (type == "add") {
             db.query(`
@@ -436,7 +436,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open World Cycles")
             return
         if (type == "add") {
             db.query(`
@@ -458,7 +458,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open World Cycles")
             return
         if (type == "add") {
             db.query(`
@@ -480,7 +480,7 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Open worlds State")
+        if (reaction.message.embeds[0].title != "Open World Cycles")
             return
         if (type == "add") {
             db.query(`
@@ -841,7 +841,7 @@ async function cycles_check() {
             console.log('Cycles check: user mention lists' + JSON.stringify(users) + JSON.stringify(ping_users))
             // ---- construct embed
             var embed = {
-                title: 'Open worlds State', 
+                title: 'Open World Cycles', 
                 description: 'React to be notified upon cycle changes', 
                 fields: [{
                     name: '__Cetus__',
