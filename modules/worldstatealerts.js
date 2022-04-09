@@ -119,6 +119,8 @@ async function wssetup(message,args) {
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
         msg.react('2️⃣').catch(err => console.log(err))
+        msg.react('3️⃣').catch(err => console.log(err))
+        msg.react('4️⃣').catch(err => console.log(err))
     }).catch(err => console.log(err))
 }
 
