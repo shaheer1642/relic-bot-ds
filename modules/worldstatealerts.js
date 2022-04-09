@@ -957,7 +957,6 @@ async function fissures_check() {
             return
         }
 
-
         db.query(`SELECT * FROM worldstatealert`).then(res => {
             if (res.rowCount == 0)
                 return
@@ -969,7 +968,7 @@ async function fissures_check() {
                 if (expiry < min_expiry)
                     min_expiry = expiry
                 if (expiry > 0) {
-                    if (isStorm) {
+                    if (fissure.isStorm) {
                         fissures_list.voidStorm.push(fissure)
                     } else {
                         fissures_list.normal.push(fissure)
