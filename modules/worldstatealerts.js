@@ -153,7 +153,7 @@ async function setupReaction(reaction,user,type) {
             reaction.message.channel.send('Some error occured').catch(err => console.log(err))
             return
         }
-        // ----- baroAlert
+        // ----- baroAlert 
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
