@@ -83,6 +83,7 @@ const colors = {
 var baroTimer = setTimeout(baro_check,8000)
 var cyclesTimer = setTimeout(cycles_check,10000)
 var arbitrationTimer = setTimeout(arbitration_check,12000)
+var fissuresTimer = setTimeout(fissures_check,14000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -130,7 +131,7 @@ async function setupReaction(reaction,user,type) {
             reaction.message.channel.send('Some error occured').catch(err => console.log(err))
             return
         }
-        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961559893142282270/alerts_baro_kiteer.png').catch(err => console.log(err))
+        await reaction.message.channel.send('https://cdn.discordapp.com/attachments/943131999189733387/961641067785125948/Template.png').catch(err => console.log(err))
         // ----- baroAlert
         await reaction.message.channel.send({
             content: ' ',
@@ -151,7 +152,7 @@ async function setupReaction(reaction,user,type) {
         }).catch(err => console.log(err))
         clearTimeout(baroTimer)
         var timer = 10000
-        setTimeout(baro_check, 10000)
+        baroTimer = setTimeout(baro_check, 10000)
         console.log('baro_check invokes in ' + msToTime(timer))
         return
     }
@@ -203,7 +204,7 @@ async function setupReaction(reaction,user,type) {
 
         clearTimeout(cyclesTimer)
         var timer = 10000
-        setTimeout(cycles_check, 10000)
+        cyclesTimer = setTimeout(cycles_check, 10000)
         console.log('cycles_check invokes in ' + msToTime(timer))
         // ---- arbitrationAlert
         await reaction.message.channel.send({
@@ -226,7 +227,7 @@ async function setupReaction(reaction,user,type) {
 
         clearTimeout(arbitrationTimer)
         var timer = 10000
-        setTimeout(arbitration_check, 10000)
+        arbitrationTimer = setTimeout(arbitration_check, 10000)
         console.log('arbitration_check invokes in ' + msToTime(timer))
         // ---- fissuresAlert
         await reaction.message.channel.send({
@@ -246,7 +247,7 @@ async function setupReaction(reaction,user,type) {
 
         clearTimeout(fissuresTimer)
         var timer = 10000
-        setTimeout(fissures_check, 10000)
+        fissuresTimer = setTimeout(fissures_check, 10000)
         console.log('fissures_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
@@ -588,7 +589,7 @@ async function baro_check() {
         if (!voidTrader) {
             console.log('Baro check: no data available')
             var timer = 300000
-            arbitrationTimer = setTimeout(baro_check, timer)
+            baroTimer = setTimeout(baro_check, timer)
             console.log(`baro_check reset in ${msToTime(timer)}`)
             return
         }
@@ -943,98 +944,107 @@ async function arbitration_check() {
 
 
 async function fissures_check() {
-    return
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         
-        const voidTrader = new WorldState(JSON.stringify(worldstateData.data)).voidTrader;
+        const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures;
         
-        if (!voidTrader) {
-            console.log('Baro check: no data available')
+        if (!fissures) {
+            console.log('Fissures check: no data available')
             var timer = 300000
-            arbitrationTimer = setTimeout(fissures_check, timer)
+            fissuresTimer = setTimeout(fissures_check, timer)
             console.log(`fissures_check reset in ${msToTime(timer)}`)
             return
         }
 
-        if (voidTrader.active) {
-            if (new Date(voidTrader.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
-                console.log('Baro check: negative expiry')
-                var timer = 10000
-                baroTimer = setTimeout(fissures_check, timer)
-                console.log(`fissures_check reset in ${msToTime(timer)}`)
-                return
-            }
-        } else {
-            if (new Date(voidTrader.activation).getTime() < new Date().getTime()) {     //negative activation, retry
-                console.log('Baro check: negative activation')
-                var timer = 10000
-                baroTimer = setTimeout(fissures_check, timer)
-                console.log(`fissures_check reset in ${msToTime(timer)}`)
-                return
-            }
-        }
+
         db.query(`SELECT * FROM worldstatealert`).then(res => {
             if (res.rowCount == 0)
                 return
-            if (voidTrader.active) {
-                if (res.rows[0].baro_status == false) {
-                    db.query(`UPDATE worldstatealert SET baro_status = true`).catch(err => console.log(err))
-                    res.rows.forEach(row => {
-                        if (row.baro_alert)
-                            client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-                    })
+
+            var fissures_list = {normal: [], voidStorm: []}
+            var min_expiry = new Date(fissures[0].expiry).getTime()
+            fissures.forEach(fissure => {
+                var expiry = new Date(fissure.expiry).getTime()
+                if (expiry < min_expiry)
+                    min_expiry = expiry
+                if (expiry > 0) {
+                    if (isStorm) {
+                        fissures_list.voidStorm.push(fissure)
+                    } else {
+                        fissures_list.normal.push(fissure)
+                    }
                 }
-                var embed = {description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,fields: [], color: colors.baro}
-                voidTrader.inventory.forEach(item => {
-                    embed.fields.push({
-                        name: item.item,
-                        value: `${emotes.credits.string} ${item.credits}\n${emotes.ducats.string} ${item.ducats}`,
-                        inline: true
-                    })
-                })
-                console.log(JSON.stringify(embed))
-                res.rows.forEach(row => {
-                    if (row.baro_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
-                            msg.edit({
-                                content: `<@&${row.baro_role}>`,
-                                embeds: [embed]
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
-                    }
-                })
-            } else {
-                db.query(`UPDATE worldstatealert SET baro_status = false`).catch(err => console.log(err))
-                res.rows.forEach(row => {
-                    if (row.baro_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
-                            msg.edit({
-                                content: ' ',
-                                embeds: [{
-                                    description: `React with ${emotes.baro.string} to be notified when baro arrives\n\nNext arrival <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
-                                    color: colors.baro
-                                }]
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
-                    }
-                })
+            })
+            fissures_list.normal.sort(dynamicSort("tierNum"))
+            fissures_list.voidStorm.sort(dynamicSort("tierNum"))
+
+            var embed1 = {
+                title: "Fissures",
+                fields: [{
+                    name: "Tier",
+                    value: "",
+                    inline: true
+                },{
+                    name: "Mission",
+                    value: "",
+                    inline: true
+                },{
+                    name: "Expires",
+                    value: "",
+                    inline: true
+                }],
+                color: colors.fissures
             }
+            var embed2 = {
+                title: "Railjack Fissures",
+                fields: [{
+                    name: "Tier",
+                    value: "",
+                    inline: true
+                },{
+                    name: "Mission",
+                    value: "",
+                    inline: true
+                },{
+                    name: "Expires",
+                    value: "",
+                    inline: true
+                }],
+                color: colors.fissures
+            }
+
+            fissures_list.normal.forEach(fissure => {
+                embed1.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
+                embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                embed1.fields[2].value += `<t:${new Date(fissure.expiry).getTime()}:R>\n`
+            })
+            fissures_list.voidStorm.forEach(fissure => {
+                embed2.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
+                embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                embed2.fields[2].value += `<t:${new Date(fissure.expiry).getTime()}:R>\n`
+            })
+
+            res.rows.forEach(row => {
+                if (row.fissures_alert) {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.fissures_alert).then(msg => {
+                        msg.edit({
+                            content: ' ',
+                            embeds: [embed1, embed2]
+                        }).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
+                }
+            })
+
+            var timer = (min_expiry - new Date())
+            fissuresTimer = setTimeout(fissures_check, timer)
+            console.log('fissures_check invokes in ' + msToTime(timer))
         })
-        if (voidTrader.active) {
-            var timer = (new Date(voidTrader.expiry).getTime() - new Date()) + 120000
-            baroTimer = setTimeout(fissures_check, timer)
-            console.log('fissures_check invokes in ' + msToTime(timer))
-        } else {
-            var timer = (new Date(voidTrader.activation).getTime() - new Date()) + 120000
-            baroTimer = setTimeout(fissures_check, timer)
-            console.log('fissures_check invokes in ' + msToTime(timer))
-        }
         return
     })
     .catch(err => {
         console.log(err)
-        baroTimer = setTimeout(fissures_check,5000)
+        fissuresTimer = setTimeout(fissures_check,5000)
     })
 }
 
