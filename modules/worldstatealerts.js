@@ -980,19 +980,8 @@ async function fissures_check() {
 
             var fissures_list = {normal: [], voidStorm: []}
             var min_expiry = new Date().getTime() + 3600000
-            var resetsNormal = {Lith: Math.round(new Date().getTime()/1000), Meso: Math.round(new Date().getTime()/1000), Neo: Math.round(new Date().getTime()/1000), Axi: Math.round(new Date().getTime()/1000), Requiem: Math.round(new Date().getTime()/1000)}
-            var resetsRailjack = {Lith: Math.round(new Date().getTime()/1000), Meso: Math.round(new Date().getTime()/1000), Neo: Math.round(new Date().getTime()/1000), Axi: Math.round(new Date().getTime()/1000)}
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
-                if (fissure.isStorm) {
-                    if (resetsRailjack[fissure.tier] < Math.round((expiry - 180000) / 1000))
-                        resetsRailjack[fissure.tier] = Math.round((expiry - 180000) / 1000)
-                } else {
-                    if (resetsNormal[fissure.tier] < Math.round((expiry - 180000) / 1000))
-                        resetsNormal[fissure.tier] = Math.round((expiry - 180000) / 1000)
-                }
-                if ((resetsNormal[fissure.tier]*1000) < min_expiry)
-                    min_expiry = resetsNormal[fissure.tier]*1000
                 if ((expiry - new Date().getTime()) > 0) {
                     if (expiry < min_expiry)
                         min_expiry = expiry
@@ -1007,7 +996,6 @@ async function fissures_check() {
 
             var embed1 = {
                 title: "Fissures",
-                description: `Reset: ${emotes.Lith.string} <t:${resetsNormal.Lith}:R> • ${emotes.Meso.string} <t:${resetsNormal.Meso}:R> • ${emotes.Neo.string} <t:${resetsNormal.Neo}:R> • ${emotes.Axi.string} <t:${resetsNormal.Axi}:R> • ${emotes.Requiem.string} <t:${resetsNormal.Requiem}:R>`,
                 fields: [{
                     name: "Tier",
                     value: "",
@@ -1025,7 +1013,6 @@ async function fissures_check() {
             }
             var embed2 = {
                 title: "Railjack Fissures",
-                description: `Reset: ${emotes.Lith.string} <t:${resetsRailjack.Lith}:R> • ${emotes.Meso.string} <t:${resetsRailjack.Meso}:R> • ${emotes.Neo.string} <t:${resetsRailjack.Neo}:R> • ${emotes.Axi.string} <t:${resetsRailjack.Axi}:R>`,
                 fields: [{
                     name: "Tier",
                     value: "",
