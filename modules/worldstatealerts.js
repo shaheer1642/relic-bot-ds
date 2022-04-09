@@ -114,7 +114,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration4️⃣ Fissures'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
