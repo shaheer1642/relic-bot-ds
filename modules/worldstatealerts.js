@@ -980,8 +980,8 @@ async function fissures_check() {
 
             var fissures_list = {normal: [], voidStorm: []}
             var min_expiry = new Date().getTime() + 3600000
-            var resetsNormal = {Lith: new Date().getTime(), Meso: new Date().getTime(), Neo: new Date().getTime(), Axi: new Date().getTime(), Requiem: new Date().getTime()}
-            var resetsRailjack = {Lith: new Date().getTime(), Meso: new Date().getTime(), Neo: new Date().getTime(), Axi: new Date().getTime()}
+            var resetsNormal = {Lith: Math.round(new Date().getTime()/1000), Meso: Math.round(new Date().getTime()/1000), Neo: Math.round(new Date().getTime()/1000), Axi: Math.round(new Date().getTime()/1000), Requiem: Math.round(new Date().getTime()/1000)}
+            var resetsRailjack = {Lith: Math.round(new Date().getTime()/1000), Meso: Math.round(new Date().getTime()/1000), Neo: Math.round(new Date().getTime()/1000), Axi: Math.round(new Date().getTime()/1000)}
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
                 if (fissure.isStorm) {
