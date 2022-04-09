@@ -930,10 +930,7 @@ async function arbitration_check() {
             var embed = {
                 title: 'Arbitration', 
                 description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${arbitration.type}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
-                color: colors.arbitration,
-                footer: {
-                    text: "Disclaimer: Arbitration tracker is unstable at the moment and is prone to spam pings. If things go side-ways, timeout the bot"
-                }
+                color: colors.arbitration
             }
             console.log(JSON.stringify(embed))
             // ---- send msg
