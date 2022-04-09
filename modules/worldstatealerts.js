@@ -980,8 +980,17 @@ async function fissures_check() {
 
             var fissures_list = {normal: [], voidStorm: []}
             var min_expiry = new Date().getTime() + 3600000
+            var resetsNormal = {Lith: new Date().getTime(), Meso: new Date().getTime(), Neo: new Date().getTime(), Axi: new Date().getTime(), Requiem: new Date().getTime()}
+            var resetsRailjack = {Lith: new Date().getTime(), Meso: new Date().getTime(), Neo: new Date().getTime(), Axi: new Date().getTime()}
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
+                if (fissure.isStorm) {
+                    if (resetsRailjack[fissure.tier] < expiry)
+                        resetsRailjack[fissure.tier] = expiry - 180000
+                } else {
+                    if (resetsNormal[fissure.tier] < expiry)
+                        resetsNormal[fissure.tier] = expiry - 180000
+                }
                 if ((expiry - new Date().getTime()) > 0) {
                     if (expiry < min_expiry)
                         min_expiry = expiry
@@ -1009,6 +1018,9 @@ async function fissures_check() {
                     value: "",
                     inline: true
                 }],
+                footer: {
+                    text: `Reset: ${emotes.Lith.string} <t:${resetsNormal.Lith}:R> • ${emotes.Meso.string} <t:${resetsNormal.Meso}:R> • ${emotes.Neo.string} <t:${resetsNormal.Neo}:R> • ${emotes.Axi.string} <t:${resetsNormal.Axi}:R> • ${emotes.Requiem.string} <t:${resetsNormal.Requiem}:R>`
+                },
                 color: colors.fissures
             }
             var embed2 = {
@@ -1026,6 +1038,9 @@ async function fissures_check() {
                     value: "",
                     inline: true
                 }],
+                footer: {
+                    text: `Reset: ${emotes.Lith.string} <t:${resetsRailjack.Lith}:R> • ${emotes.Meso.string} <t:${resetsRailjack.Meso}:R> • ${emotes.Neo.string} <t:${resetsRailjack.Neo}:R> • ${emotes.Axi.string} <t:${resetsRailjack.Axi}:R>`
+                },
                 color: colors.fissures
             }
 
