@@ -1005,6 +1005,7 @@ async function fissures_check() {
 
             var embed1 = {
                 title: "Fissures",
+                description: `Reset: ${emotes.Lith.string} <t:${resetsNormal.Lith}:R> • ${emotes.Meso.string} <t:${resetsNormal.Meso}:R> • ${emotes.Neo.string} <t:${resetsNormal.Neo}:R> • ${emotes.Axi.string} <t:${resetsNormal.Axi}:R> • ${emotes.Requiem.string} <t:${resetsNormal.Requiem}:R>`,
                 fields: [{
                     name: "Tier",
                     value: "",
@@ -1018,13 +1019,11 @@ async function fissures_check() {
                     value: "",
                     inline: true
                 }],
-                footer: {
-                    text: `Reset: ${emotes.Lith.string} <t:${resetsNormal.Lith}:R> • ${emotes.Meso.string} <t:${resetsNormal.Meso}:R> • ${emotes.Neo.string} <t:${resetsNormal.Neo}:R> • ${emotes.Axi.string} <t:${resetsNormal.Axi}:R> • ${emotes.Requiem.string} <t:${resetsNormal.Requiem}:R>`
-                },
                 color: colors.fissures
             }
             var embed2 = {
                 title: "Railjack Fissures",
+                description: `Reset: ${emotes.Lith.string} <t:${resetsRailjack.Lith}:R> • ${emotes.Meso.string} <t:${resetsRailjack.Meso}:R> • ${emotes.Neo.string} <t:${resetsRailjack.Neo}:R> • ${emotes.Axi.string} <t:${resetsRailjack.Axi}:R>`,
                 fields: [{
                     name: "Tier",
                     value: "",
@@ -1038,9 +1037,6 @@ async function fissures_check() {
                     value: "",
                     inline: true
                 }],
-                footer: {
-                    text: `Reset: ${emotes.Lith.string} <t:${resetsRailjack.Lith}:R> • ${emotes.Meso.string} <t:${resetsRailjack.Meso}:R> • ${emotes.Neo.string} <t:${resetsRailjack.Neo}:R> • ${emotes.Axi.string} <t:${resetsRailjack.Axi}:R>`
-                },
                 color: colors.fissures
             }
 
