@@ -979,7 +979,7 @@ async function fissures_check() {
                 return
 
             var fissures_list = {normal: [], voidStorm: []}
-            var min_expiry = new Date(fissures[0].expiry).getTime()
+            var min_expiry = new Date().getTime() + 3600000
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
                 if ((expiry - new Date().getTime()) > 0) {
