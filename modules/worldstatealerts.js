@@ -71,6 +71,26 @@ const emotes = {
     disruption: {
         string: '<:disruption:962048774388195328>',
         identifier: 'disruption:962048774388195328'
+    },
+    Lith: {
+        string: '<:Lith:962457564493271051>',
+        identifier: 'Lith:962457564493271051'
+    },
+    Meso: {
+        string: '<:Meso:962457563092361257>',
+        identifier: 'Meso:962457563092361257'
+    },
+    Neo: {
+        string: '<:Neo:962457562844909588>',
+        identifier: 'Neo:962457562844909588'
+    },
+    Axi: {
+        string: '<:Axi:962457563423735868>',
+        identifier: 'Axi:962457563423735868'
+    },
+    Requiem: {
+        string: '<:Requiem:962457575230701598>',
+        identifier: 'Requiem:962457575230701598'
     }
 }
 const colors = {
@@ -1013,12 +1033,12 @@ async function fissures_check() {
             }
 
             fissures_list.normal.forEach(fissure => {
-                embed1.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
+                embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
             fissures_list.voidStorm.forEach(fissure => {
-                embed2.fields[0].value += `${emotes[fissure.tier]} ${fissure.tier}\n`
+                embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
