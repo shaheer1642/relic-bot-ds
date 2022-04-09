@@ -985,10 +985,10 @@ async function fissures_check() {
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
                 if (fissure.isStorm) {
-                    if (resetsRailjack[fissure.tier] < expiry)
+                    if (resetsRailjack[fissure.tier] < Math.round((expiry - 180000) / 1000))
                         resetsRailjack[fissure.tier] = Math.round((expiry - 180000) / 1000)
                 } else {
-                    if (resetsNormal[fissure.tier] < expiry)
+                    if (resetsNormal[fissure.tier] < Math.round((expiry - 180000) / 1000))
                         resetsNormal[fissure.tier] = Math.round((expiry - 180000) / 1000)
                 }
                 if ((expiry - new Date().getTime()) > 0) {
