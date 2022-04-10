@@ -1266,8 +1266,8 @@ async function teshin_check() {
                 var flag = false
                 for (const item of steelPath.rotation) {
                     if (flag)
-                        return teshin_item_replace(item)
-                    if (steelPath.currentReward.name == item)
+                        return teshin_item_replace(item.name)
+                    if (steelPath.currentReward.name == item.name)
                         flag = true
                 }
                 return teshin_item_replace(steelPath.rotation[0].name)
