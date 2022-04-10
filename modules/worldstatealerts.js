@@ -1266,11 +1266,11 @@ async function teshin_check() {
                 var flag = false
                 for (const item of steelPath.rotation) {
                     if (flag)
-                        return teshin_item_replace(item)
+                        return emotes[teshin_item_replace(item)].string
                     if (steelPath.currentReward.name == item)
                         flag = true
                 }
-                return teshin_item_replace(steelPath.rotation[0].name)
+                return emotes[teshin_item_replace(steelPath.rotation[0].name)].string
             })
 
             var embed = {
