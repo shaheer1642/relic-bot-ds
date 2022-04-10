@@ -742,6 +742,182 @@ async function setupReaction(reaction,user,type) {
             `).then(() => user.send("Removed tracker: Arbitration disruption").catch(err => console.log(err))).catch(err => console.log(err))
         }
     }
+    if (reaction.emoji.identifier == emotes.umbra_forma.identifier) {
+        console.log('umbra_forma reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{umbra_forma,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{umbra_forma}', (teshin_users->'umbra_forma') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.kuva.identifier) {
+        console.log('kuva reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{kuva,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin kuva").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{kuva}', (teshin_users->'kuva') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin kuva").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.kitgun_riven.identifier) {
+        console.log('kitgun_riven reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{kitgun_riven,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin kitgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{kitgun_riven}', (teshin_users->'kitgun_riven') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin kitgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.forma.identifier) {
+        console.log('forma reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{forma,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{forma}', (teshin_users->'forma') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.zaw_riven.identifier) {
+        console.log('zaw_riven reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{zaw_riven,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin zaw_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{zaw_riven}', (teshin_users->'zaw_riven') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin zaw_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.endo.identifier) {
+        console.log('endo reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{endo,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin endo").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{endo}', (teshin_users->'endo') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin endo").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.rifle_riven.identifier) {
+        console.log('rifle_riven reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{rifle_riven,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin rifle_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{rifle_riven}', (teshin_users->'rifle_riven') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin rifle_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.shotgun_riven.identifier) {
+        console.log('shotgun_riven reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{shotgun_riven,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Teshin shotgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET teshin_users = jsonb_set(teshin_users, '{shotgun_riven}', (teshin_users->'shotgun_riven') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Teshin shotgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
 }
 
 //----tracking----
