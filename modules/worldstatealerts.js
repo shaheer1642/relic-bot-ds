@@ -1262,15 +1262,15 @@ async function teshin_check() {
                 })
             })
 
-            var next_rotation = (function() {
+            const next_rotation = (function() {
                 var flag = false
                 for (const item of steelPath.rotation) {
                     if (flag)
-                        return emotes[teshin_item_replace(item)].string
+                        return teshin_item_replace(item)
                     if (steelPath.currentReward.name == item)
                         flag = true
                 }
-                return emotes[teshin_item_replace(steelPath.rotation[0].name)].string
+                return teshin_item_replace(steelPath.rotation[0].name)
             })();
 
             var embed = {
@@ -1290,7 +1290,7 @@ async function teshin_check() {
                     inline: false
                 },{
                     name: "Next rotation",
-                    value: `${next_rotation} <t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R>`,
+                    value: `${emotes[next_rotation].string} <t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R>`,
                     inline: false
                 }],
                 color: colors.teshin
