@@ -55,6 +55,7 @@ const worldstatealertEmotes = [
     "2️⃣",
     "3️⃣",
     "4️⃣",
+    "5️⃣",
     "baro:961548844368293969",
     "☀️",
     "🌙",
@@ -68,7 +69,15 @@ const worldstatealertEmotes = [
     "salvage:961939373908164638",
     "survival:961937707477655592",
     "excavation:961938527266955324",
-    "disruption:962048774388195328"
+    "disruption:962048774388195328",
+    "endo:962507075475370005",
+    "forma:962507080667910194",
+    "kitgun_riven:962507042113880064",
+    "kuva:962507064977023056",
+    "rifle_riven:962507043137261640",
+    "shotgun_riven:962507043695120414",
+    "umbra_forma:962507079111811093",
+    "zaw_riven:962507044613685279"
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'

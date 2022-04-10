@@ -91,19 +91,57 @@ const emotes = {
     Requiem: {
         string: '<:Requiem:962457575230701598>',
         identifier: 'Requiem:962457575230701598'
+    },
+    endo: {
+        string: '<:endo:962507075475370005>',
+        identifier: 'endo:962507075475370005'
+    },
+    forma: {
+        string: '<:forma:962507080667910194>',
+        identifier: 'forma:962507080667910194'
+    },
+    kitgun_riven: {
+        string: '<:kitgun_riven:962507042113880064>',
+        identifier: 'kitgun_riven:962507042113880064'
+    },
+    kuva: {
+        string: '<:kuva:962507064977023056>',
+        identifier: 'kuva:962507064977023056'
+    },
+    rifle_riven: {
+        string: '<:rifle_riven:962507043137261640>',
+        identifier: 'rifle_riven:962507043137261640'
+    },
+    shotgun_riven: {
+        string: '<:shotgun_riven:962507043695120414>',
+        identifier: 'shotgun_riven:962507043695120414'
+    },
+    umbra_forma: {
+        string: '<:umbra_forma:962507079111811093>',
+        identifier: 'umbra_forma:962507079111811093'
+    },
+    zaw_riven: {
+        string: '<:zaw_riven:962507044613685279>',
+        identifier: 'zaw_riven:962507044613685279'
+    },
+    steel_essence: {
+        string: '<:steel_essence:962508988442869800>',
+        identifier: 'steel_essence:962508988442869800'
     }
 }
 const colors = {
     baro: "#95744",
     cycles: "#a83258",
     arbitration: "#f59e42",
-    fissures: "#3295a8"
+    fissures: "#3295a8",
+    teshin: "#6432a8"
 }
 //----set timers----
 var baroTimer = setTimeout(baro_check,8000)
 var cyclesTimer = setTimeout(cycles_check,10000)
 var arbitrationTimer = setTimeout(arbitration_check,12000)
 var fissuresTimer = setTimeout(fissures_check,14000)
+var teshinTimer = setTimeout(teshin_check,16000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -114,7 +152,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -325,6 +363,58 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         fissuresTimer = setTimeout(fissures_check, 10000)
         console.log('fissures_check invokes in ' + msToTime(timer))
+    }
+    if (reaction.emoji.name == "5️⃣" && type=="add") {
+        if (!access_ids.includes(user.id))
+            return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
+            return
+        var status = db.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
+                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
+                END IF;
+            END $$;
+        `).then(res => {
+            if (res.rowCount == 1)
+                return true
+            return false
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            return
+        }
+        // ---- teshinAlert
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                title: 'Teshin Rotation (Steel Path)',
+                description: `React to subscribe to a specific item rotation`,
+                color: colors.teshin
+            }]
+        }).then(async msg => {
+            db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await msg.react(emotes.umbra_forma.string).catch(err => console.log(err))
+            await msg.react(emotes.kuva.string).catch(err => console.log(err))
+            await msg.react(emotes.kitgun_riven.string).catch(err => console.log(err))
+            await msg.react(emotes.forma.string).catch(err => console.log(err))
+            await msg.react(emotes.zaw_riven.string).catch(err => console.log(err))
+            await msg.react(emotes.endo.string).catch(err => console.log(err))
+            await msg.react(emotes.rifle_riven.string).catch(err => console.log(err))
+            await msg.react(emotes.shotgun_riven.string).catch(err => console.log(err))
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+
+        clearTimeout(teshinTimer)
+        var timer = 10000
+        teshinTimer = setTimeout(teshin_check, 10000)
+        console.log('teshin_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
@@ -1021,7 +1111,6 @@ async function arbitration_check() {
     })
 }
 
-
 async function fissures_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
@@ -1123,6 +1212,87 @@ async function fissures_check() {
         console.log(err)
         fissuresTimer = setTimeout(fissures_check,5000)
     })
+}
+
+async function teshin_check() {
+    return
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
+        if (new Date(steelPath.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+            console.log('negative expiry')
+            var timer = 10000
+            setTimeout(teshin_check, timer)
+            console.log(`teshin_check reset in ${msToTime(timer)}`)
+            return
+        }
+        var timer = (new Date(steelPath.expiry).getTime() - new Date()) + 120000
+        setTimeout(teshin_func, timer)
+        console.log('teshin check invokes in ' + msToTime(timer))
+    })
+    .catch(err => {
+        console.log(err)
+        setTimeout(teshin_check,5000)
+    })
+
+    async function teshin_func() {
+        console.log('teshin_func launched')
+
+        axios('http://content.warframe.com/dynamic/worldState.php')
+        .then(async worldstateData => {
+            const alertChannel = '892003813786017822'
+            const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
+            //get db teshin_rotation list
+            var teshin_rotation = await db.query(`SELECT * FROM teshin_rotation`)
+            .then(res => {return res.rows})
+            .catch(err => console.log(err))
+            
+            teshin_rotation.forEach(rotation => {
+                if (rotation.type == steelPath.currentReward.name) {
+                    postdata = {content: '',embeds: []}
+
+                    var list = []
+                    rotation.users.users.forEach(user => {
+                        list.push('<@' + user + '> ')
+                    })
+                    if (list.length == 0)
+                        return
+
+                    postdata.content = list.join(',')
+
+                    postdata.embeds.push({
+                        description: 'The teshin rotation you are tracking has appeared!',
+                        fields: [
+                            {name: 'Current rotation', value: rotation.type, inline: true},
+                            {name: 'Cost', value: steelPath.currentReward.cost + ' Steel Essence', inline: true},
+                            {name: 'Full rotation', value: '', inline: false},
+                            {name: 'Expires', value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:f>)`, inline: false}
+                        ],
+                        footer: {
+                            text: teshinHints[Math.floor(Math.random() * bountyHints.length)]
+                        },
+                        color: '#a83275'
+                    })
+                    
+                    steelPath.rotation.forEach(e => {
+                        if (e.name == steelPath.currentReward.name)
+                            postdata.embeds[0].fields[2].value += "`" + e.name + "`" + '\n'
+                        else
+                            postdata.embeds[0].fields[2].value += e.name + '\n'
+                    })
+                    
+                    client.channels.cache.get(alertChannel).send(postdata)
+                    .catch(err => console.log(err))
+                }
+            })
+
+            setTimeout(teshin_check,5000)
+        })
+        .catch(err => {
+            console.log(err)
+            setTimeout(teshin_func,5000)
+        })
+    }
 }
 
 module.exports = {wssetup,setupReaction};
