@@ -1263,6 +1263,7 @@ async function teshin_check() {
             })
 
             var next_rotation = (function() {
+                var flag = false
                 for (const item of steelPath.rotation) {
                     if (flag)
                         return teshin_item_replace(item)
