@@ -137,11 +137,11 @@ const colors = {
     teshin: "#6432a8"
 }
 //----set timers----
-var baroTimer = setTimeout(baro_check,8000)
+var baroTimer = setTimeout(baro_check,16000)
 var cyclesTimer = setTimeout(cycles_check,10000)
 var arbitrationTimer = setTimeout(arbitration_check,12000)
 var fissuresTimer = setTimeout(fissures_check,14000)
-var teshinTimer = setTimeout(teshin_check,16000)
+var teshinTimer = setTimeout(teshin_check,8000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -1286,7 +1286,7 @@ async function teshin_check() {
             }
 
             steelPath.rotation.forEach(rotation => {
-                embed.fields[2].push(teshin_item_replace(rotation.name) == currentReward ? `\`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\`\n`:`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\n`)
+                embed.fields[2].value += teshin_item_replace(rotation.name) == currentReward ? `\`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\`\n`:`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\n`
             })
 
             res.rows.forEach(row => {
