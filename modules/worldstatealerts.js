@@ -1271,7 +1271,7 @@ async function teshin_check() {
                         flag = true
                 }
                 return emotes[teshin_item_replace(steelPath.rotation[0].name)].string
-            })
+            })();
 
             var embed = {
                 title: 'Teshin Rotation (Steel Path)',
