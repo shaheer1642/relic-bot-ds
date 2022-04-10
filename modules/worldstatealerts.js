@@ -885,8 +885,8 @@ async function cycles_check() {
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
                     if (res.rows[0].cetus_status != cetusCycle.state) {
-                        if (!cycles_changed.includes(`Cetus`))
-                            cycles_changed.push(`Cetus`)
+                        if (!cycles_changed.includes(`Cetus: ${cetusCycle.state}`))
+                            cycles_changed.push(`Cetus: ${cetusCycle.state}`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -903,8 +903,8 @@ async function cycles_check() {
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
                     if (res.rows[0].vallis_status != vallisCycle.state) {
-                        if (!cycles_changed.includes(`Orb Vallis`))
-                            cycles_changed.push(`Orb Vallis`)
+                        if (!cycles_changed.includes(`Orb Vallis: ${vallisCycle.state}`))
+                            cycles_changed.push(`Orb Vallis: ${vallisCycle.state}`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -921,8 +921,8 @@ async function cycles_check() {
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
                     if (res.rows[0].cambion_status != cambionCycle.active) {
-                        if (!cycles_changed.includes(`Cambion Drift`))
-                            cycles_changed.push(`Cambion Drift`)
+                        if (!cycles_changed.includes(`Cambion Drift: ${cambionCycle.active}`))
+                            cycles_changed.push(`Cambion Drift: ${cambionCycle.active}`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -961,7 +961,7 @@ async function cycles_check() {
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id])
-                        client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} Cycle changed ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
         })
@@ -1095,7 +1095,7 @@ async function arbitration_check() {
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id])
-                        client.channels.cache.get(row.channel_id).send(`Arbitration mission has appeared ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Arbitration ${arbitration.type} has started ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
         })
@@ -1279,24 +1279,26 @@ async function teshin_check() {
                     inline: false
                 },{
                     name: "Next rotation",
-                    value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R`,
+                    value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R>`,
                     inline: false
                 }],
                 color: colors.teshin
             }
 
             steelPath.rotation.forEach(rotation => {
-                embed.fields[2].value += teshin_item_replace(rotation.name) == currentReward ? `\`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\`\n`:`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\n`
+                embed.fields[2].value += teshin_item_replace(rotation.name) == currentReward ? `${emotes[teshin_item_replace(rotation.name)].string} \`${rotation.name}\`\n`:`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\n`
             })
 
             res.rows.forEach(row => {
                 if (row.teshin_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.teshin_alert).then(msg => {
                         msg.edit({
-                            content: ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
+                    if (ping_users[row.channel_id])
+                        client.channels.cache.get(row.channel_id).send(`Teshin rotation: ${steelPath.currentReward.name} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
 
