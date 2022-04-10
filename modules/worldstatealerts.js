@@ -1262,12 +1262,22 @@ async function teshin_check() {
                 })
             })
 
+            var next_rotation = (function() {
+                for (const item of steelPath.rotation) {
+                    if (flag)
+                        return teshin_item_replace(item)
+                    if (steelPath.currentReward.name == item)
+                        flag = true
+                }
+                return teshin_item_replace(steelPath.rotation[0].name)
+            })
+
             var embed = {
                 title: 'Teshin Rotation (Steel Path)',
                 description: `React to subscribe to a specific item rotation`,
                 fields: [{
                     name: "Current rotation",
-                    value: steelPath.currentReward.name,
+                    value: `${emotes[currentReward].string} __${steelPath.currentReward.name}__`,
                     inline: true
                 },{
                     name: "Cost",
@@ -1279,7 +1289,7 @@ async function teshin_check() {
                     inline: false
                 },{
                     name: "Next rotation",
-                    value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R>`,
+                    value: `${next_rotation} <t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R>`,
                     inline: false
                 }],
                 color: colors.teshin
