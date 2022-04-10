@@ -1215,84 +1215,112 @@ async function fissures_check() {
 }
 
 async function teshin_check() {
-    return
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
+        
         const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
-        if (new Date(steelPath.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
-            console.log('negative expiry')
-            var timer = 10000
-            setTimeout(teshin_check, timer)
+        
+        if (!steelPath) {
+            console.log('Teshin check: no data available')
+            var timer = 300000
+            teshinTimer = setTimeout(teshin_check, timer)
             console.log(`teshin_check reset in ${msToTime(timer)}`)
             return
         }
-        var timer = (new Date(steelPath.expiry).getTime() - new Date()) + 120000
-        setTimeout(teshin_func, timer)
-        console.log('teshin check invokes in ' + msToTime(timer))
-    })
-    .catch(err => {
-        console.log(err)
-        setTimeout(teshin_check,5000)
-    })
 
-    async function teshin_func() {
-        console.log('teshin_func launched')
+        if (new Date(steelPath.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+            console.log('Teshin check: negative expiry')
+            var timer = 10000
+            teshinTimer = setTimeout(teshin_check, timer)
+            console.log(`teshin_check reset in ${msToTime(timer)}`)
+            return
+        }
 
-        axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(async worldstateData => {
-            const alertChannel = '892003813786017822'
-            const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
-            //get db teshin_rotation list
-            var teshin_rotation = await db.query(`SELECT * FROM teshin_rotation`)
-            .then(res => {return res.rows})
-            .catch(err => console.log(err))
+        db.query(`SELECT * FROM worldstatealert`).then(res => {
+            if (res.rowCount == 0)
+                return
+
+            const currentReward = teshin_item_replace(steelPath.currentReward.name)
+
+            db.query(`UPDATE worldstatealert SET teshin_rotation = '${currentReward}'`).catch(err => console.log(err))
             
-            teshin_rotation.forEach(rotation => {
-                if (rotation.type == steelPath.currentReward.name) {
-                    postdata = {content: '',embeds: []}
+            var users = {}
+            var ping_users = {}
 
-                    var list = []
-                    rotation.users.users.forEach(user => {
-                        list.push('<@' + user + '> ')
-                    })
-                    if (list.length == 0)
-                        return
+            res.rows.forEach(row => {
+                row.teshin_users[currentReward].forEach(user => {
+                    if (!users[row.channel_id])
+                        users[row.channel_id] = []
+                    if (!users[row.channel_id].includes(`<@${user}>`))
+                        users[row.channel_id].push(`<@${user}>`)
+                    if (res.rows[0].teshin_rotation != currentReward) {
+                        if (!ping_users[row.channel_id])
+                            ping_users[row.channel_id] = []
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
+                })
+            })
 
-                    postdata.content = list.join(',')
+            var embed = {
+                title: 'Teshin Rotation (Steel Path)',
+                description: `React to subscribe to a specific item rotation`,
+                fields: [{
+                    name: "Current rotation",
+                    value: steelPath.currentReward.name,
+                    inline: true
+                },{
+                    name: "Cost",
+                    value: `${emotes.steel_essence.string} ${steelPath.currentReward.cost}`,
+                    inline: true
+                },{
+                    name: "Full rotation",
+                    value: "",
+                    inline: false
+                },{
+                    name: "Next rotation",
+                    value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R`,
+                    inline: false
+                }],
+                color: colors.teshin
+            }
 
-                    postdata.embeds.push({
-                        description: 'The teshin rotation you are tracking has appeared!',
-                        fields: [
-                            {name: 'Current rotation', value: rotation.type, inline: true},
-                            {name: 'Cost', value: steelPath.currentReward.cost + ' Steel Essence', inline: true},
-                            {name: 'Full rotation', value: '', inline: false},
-                            {name: 'Expires', value: `<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R> (<t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:f>)`, inline: false}
-                        ],
-                        footer: {
-                            text: teshinHints[Math.floor(Math.random() * bountyHints.length)]
-                        },
-                        color: '#a83275'
-                    })
-                    
-                    steelPath.rotation.forEach(e => {
-                        if (e.name == steelPath.currentReward.name)
-                            postdata.embeds[0].fields[2].value += "`" + e.name + "`" + '\n'
-                        else
-                            postdata.embeds[0].fields[2].value += e.name + '\n'
-                    })
-                    
-                    client.channels.cache.get(alertChannel).send(postdata)
-                    .catch(err => console.log(err))
+            steelPath.rotation.forEach(rotation => {
+                embed.fields[2].push(teshin_item_replace(rotation.name) == currentReward ? `\`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\`\n`:`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\n`)
+            })
+
+            res.rows.forEach(row => {
+                if (row.teshin_alert) {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.teshin_alert).then(msg => {
+                        msg.edit({
+                            content: ' ',
+                            embeds: [embed]
+                        }).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
                 }
             })
 
-            setTimeout(teshin_check,5000)
+            function teshin_item_replace(string) {
+                return string
+                .replace("Umbra Forma Blueprint","umbra_forma")
+                .replace("50,000 Kuva","kuva")
+                .replace("Kitgun Riven Mod","kitgun_riven")
+                .replace("3x Forma","forma")
+                .replace("Zaw Riven Mod","zaw_riven")
+                .replace("30,000 Endo","endo")
+                .replace("Rifle Riven Mod","rifle_riven")
+                .replace("Shotgun Riven Mod","shotgun_riven")
+            }
         })
-        .catch(err => {
-            console.log(err)
-            setTimeout(teshin_func,5000)
-        })
-    }
+        var timer = (new Date(steelPath.expiry).getTime() - new Date().getTime())
+        teshinTimer = setTimeout(teshin_check, timer)
+        console.log('teshin_check invokes in ' + msToTime(timer))
+        return
+    })
+    .catch(err => {
+        console.log(err)
+        teshinTimer = setTimeout(teshin_check,5000)
+    })
 }
 
 module.exports = {wssetup,setupReaction};
