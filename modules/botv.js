@@ -48,9 +48,9 @@ async function updateMasteryDistr() {
         data: {
         labels: ['8+', '16+', '20+', '25+', '30+'],
         datasets: [{
-            data: data
+            data: data,
+            backgroundColor: data_backgroundColor
         }],
-        backgroundColor: data_backgroundColor
         },
         options: {
             plugins: {
