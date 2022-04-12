@@ -21,8 +21,8 @@ async function updateMasteryDistr() {
     try {
         client.guilds.cache.get('776804537095684108').roles.cache.map(role => {
             if (role.name == "MR 8+" || role.name == "MR 16+" || role.name == "MR 20+" || role.name == "MR 25+" || role.name == "MR 30+") {
-                data_backgroundColor.push(role.color)
-                data.push(role.members.length)
+                data_backgroundColor.push(`#${role.color}`)
+                data.push(role.members.size)
                 console.log('hi')
             }
         })
