@@ -56,13 +56,13 @@ async function updateMasteryDistr() {
     
         var base64Data = base64Image.replace(/^data:image\/png;base64,/, "");
     
-        fs.writeFile("assets/masterydistr.png", base64Data, 'base64', function (err) {
+        fs.writeFile("masterydistr.png", base64Data, 'base64', function (err) {
             if (err) {
                 console.log(err);
             }
         })
 
-        const file = new MessageAttachment('../assets/masterydistr.png');
+        const file = new MessageAttachment('masterydistr.png');
 
         client.channels.cache.get('891923650649939989').messages.fetch('892084165405716541').then(msg => {
             msg.edit({
@@ -83,7 +83,7 @@ async function updateMasteryDistr() {
                 files: [file]
             }).catch(err => console.log(err))
         })
-    })
+    }).catch(err => console.log(err))
 }
 
 module.exports = {
