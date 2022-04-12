@@ -50,6 +50,7 @@ async function updateMasteryDistr() {
             }
         }
     }
+    console.log(JSON.stringify(configuration))
     
     chartJSNodeCanvas.renderToDataURL(configuration).then(dataUrl => {
         const base64Image = dataUrl
