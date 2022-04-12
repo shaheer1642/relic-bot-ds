@@ -62,7 +62,7 @@ async function updateMasteryDistr() {
             }
         })
 
-        const file = new MessageAttachment('./assets/masterydistr.png');
+        const file = new MessageAttachment('../assets/masterydistr.png');
 
         client.channels.cache.get('891923650649939989').messages.fetch('892084165405716541').then(msg => {
             msg.edit({
