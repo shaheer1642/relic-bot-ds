@@ -166,7 +166,7 @@ client.on('ready', () => {
         }
     }).catch(err => console.log(err))
 
-    setTimeout(botv.updateMasteryDistr().catch(err => console.log(err)), 10000);
+    setTimeout(botv.updateMasteryDistr, 10000);
 })
 
 client.on('messageCreate', async message => {
