@@ -62,8 +62,7 @@ async function updateMasteryDistr() {
                 formatter: (val, ctx) => {
                     return ctx.chart.data.labels[ctx.dataIndex];
                 },
-                color: '#fff',
-                backgroundColor: '#404040'
+                color: '#fff'
                 },
             }
         }
