@@ -58,11 +58,14 @@ async function updateMasteryDistr() {
                     display: false
                 },
                 datalabels: {
-                display: true,
-                formatter: (val, ctx) => {
-                    return ctx.chart.data.labels[ctx.dataIndex];
-                },
-                color: '#fff'
+                    display: true,
+                    formatter: (val, ctx) => {
+                        return ctx.chart.data.labels[ctx.dataIndex];
+                    },
+                    color: '#000000',
+                    font: {
+                        size: 25
+                    }
                 },
             }
         }
