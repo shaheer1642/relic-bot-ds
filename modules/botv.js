@@ -71,14 +71,15 @@ async function updateMasteryDistr() {
                 msg.edit({
                     content: ' ',
                     embeds: [{
-                        description: `
-                            React to this message with desired emoji to obtain your mastery role.
-                            <:MR8:892062162376327198> <@&891984426693697537>
-                            <:MR16:892062164813225994> <@&891984653928525834>
-                            <:MR20:892062164389625898> <@&891985679804928000>
-                            <:MR25:892062165115224074> <@&891986636672487484>
-                            <:MR30:892062165501087765> <@&891986953145290772>
-                        `,
+                        description: 
+`
+React to this message with desired emoji to obtain your mastery role.
+<:MR8:892062162376327198> <@&891984426693697537>
+<:MR16:892062164813225994> <@&891984653928525834>
+<:MR20:892062164389625898> <@&891985679804928000>
+<:MR25:892062165115224074> <@&891986636672487484>
+<:MR30:892062165501087765> <@&891986953145290772>
+`,
                         thumbnail: {
                             url: 'attachment://masterydistr.png'
                         },
