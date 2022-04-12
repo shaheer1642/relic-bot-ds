@@ -1,4 +1,6 @@
 const {client} = require('./discord_client.js');
+const { MessageAttachment } = require('discord.js');
+const fs = require('fs');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 
 async function updateMasteryDistr() {
@@ -48,8 +50,20 @@ async function updateMasteryDistr() {
             }
         }
     }
-
+    
     chartJSNodeCanvas.renderToDataURL(configuration).then(dataUrl => {
+        const base64Image = dataUrl
+    
+        var base64Data = base64Image.replace(/^data:image\/png;base64,/, "");
+    
+        fs.writeFile("assets/masterydistr.png", base64Data, 'base64', function (err) {
+            if (err) {
+                console.log(err);
+            }
+        })
+
+        const file = new MessageAttachment('./assets/masterydistr.png');
+
         client.channels.cache.get('891923650649939989').messages.fetch('892084165405716541').then(msg => {
             msg.edit({
                 content: ' ',
@@ -63,9 +77,10 @@ async function updateMasteryDistr() {
                         <:MR30:892062165501087765> <@&891986953145290772>
                     `,
                     thumbnail: {
-                        url: dataUrl
+                        url: 'attachment://masterydistr.png'
                     },
-                }]
+                }],
+                files: [file]
             }).catch(err => console.log(err))
         })
     })
