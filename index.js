@@ -733,7 +733,7 @@ client.on('messageCreate', async message => {
 })
 
 client.on("messageUpdate", function(oldMessage, newMessage) {
-    if (newMessage.guildId == "776804537095684108")
+    if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
 });
 

@@ -111,7 +111,11 @@ React to this message with desired emoji to obtain your mastery role.
 }
 
 async function messageUpdate(oldMessage, newMessage) {
-    client.channels.cache.get('964217621266456586').send(newMessage.content).catch(err => console.log(err))
+    if (newMessage.channel.id == "793207311891562556") {
+        if (!newMessage.author)
+            await newMessage.channel.messages.fetch(newMessage.id).catch(err => console.log(err))
+        client.channels.cache.get('964217621266456586').send(newMessage.content).catch(err => console.log(err))
+    }
 }
 
 module.exports = {
