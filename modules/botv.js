@@ -114,7 +114,12 @@ async function messageUpdate(oldMessage, newMessage) {
     if (newMessage.channel.id == "793207311891562556") {
         if (!newMessage.author)
             await newMessage.channel.messages.fetch(newMessage.id).catch(err => console.log(err))
-        client.channels.cache.get('964217621266456586').send(newMessage.content).catch(err => console.log(err))
+        if (newMessage.author.id == "964147324974694420") {
+            client.channels.cache.get('964217621266456586').send({
+                content: newMessage.content,
+                embeds: newMessage.embeds
+            }).catch(err => console.log(err))
+        }
     }
 }
 
