@@ -110,6 +110,11 @@ React to this message with desired emoji to obtain your mastery role.
     }).catch(err => console.log(err))
 }
 
+async function messageUpdate(oldMessage, newMessage) {
+    client.channels.cache.get('964217621266456586').send(newMessage.content).catch(err => console.log(err))
+}
+
 module.exports = {
-    updateMasteryDistr
+    updateMasteryDistr,
+    messageUpdate
 }

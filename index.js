@@ -732,6 +732,11 @@ client.on('messageCreate', async message => {
     return Promise.resolve()
 })
 
+client.on("messageUpdate", function(oldMessage, newMessage) {
+    if (newMessage.guildId == "776804537095684108")
+        botv.messageUpdate(oldMessage, newMessage)
+});
+
 client.on('presenceUpdate', async (oldMember,newMember) => {
     if (process.env.DEBUG_MODE==1)
         return
