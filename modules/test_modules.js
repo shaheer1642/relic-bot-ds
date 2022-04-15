@@ -881,13 +881,10 @@ message.channel.send({
 async function admin_test(message,args) {
     if (message.author.id != '253525146923433984')
         return
-    client.channels.cache.get('891923650649939989').messages.fetch('957330415734095932').then(msg => {
-        msg.edit({
-            content: " ",
-            embeds: [{
-                description: "React to emotes to obtain these roles\n\n<:LostArk:957325143699501156><@&957296244273844316>",
-                color: "#7bdee3"
-            }],
+    client.channels.cache.get('793207311891562556').messages.fetch('963329927199985724').then(msg => {
+        client.channels.cache.get('964217621266456586').send({
+            content: msg.content,
+            embeds: msg.embeds
         }).catch(err => console.log(err))
     })
 }
