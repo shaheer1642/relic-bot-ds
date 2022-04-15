@@ -881,6 +881,7 @@ message.channel.send({
 async function admin_test(message,args) {
     if (message.author.id != '253525146923433984')
         return
+    return
     client.channels.cache.get('793207311891562556').messages.fetch('963329927199985724').then(msg => {
         client.channels.cache.get('964217621266456586').send({
             content: msg.content,
