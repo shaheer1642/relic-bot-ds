@@ -438,7 +438,7 @@ async function setupReaction(reaction,user,type) {
             content: ' ',
             embeds: [{
                 title: 'Notification Settings',
-                description: `React to supress notifications depending upon Discord online status\n*This does not apply to Baro or Teshin alerts*\n\n🔴 Disable on 'Do Not Disturb'\n🟣 Disable on 'Invisible/Offline'`,
+                description: `React to suppress notifications depending upon Discord online status\n*This does not apply to Baro or Teshin alerts*\n\n🔴 Disable on 'Do Not Disturb'\n🟣 Disable on 'Invisible/Offline'`,
                 color: colors.notification
             }]
         }).then(async msg => {
