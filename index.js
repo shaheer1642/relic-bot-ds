@@ -1806,7 +1806,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
         return
     }
 
-
     if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
         console.log(reaction.emoji.identifier)
@@ -3415,16 +3414,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
             await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != ducatRolesMessageId)
+        if (reaction.message.id == ducatRolesMessageId) {
+            await db.query(`UPDATE ducat_users_details SET dnd = true WHERE discord_id = ${user.id}`)
+            .then(async res => {
+                if (res.rowCount == 0) {
+                    await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},true)`).catch(err => console.log(err))
+                }
+            })
+            .catch(err => console.log(err))
             return
-        await db.query(`UPDATE ducat_users_details SET dnd = true WHERE discord_id = ${user.id}`)
-        .then(async res => {
-            if (res.rowCount == 0) {
-                await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},true)`).catch(err => console.log(err))
-            }
-        })
-        .catch(err => console.log(err))
-        return
+        }
     }
 
     if (reaction.emoji.name == "🟣") {
@@ -3432,16 +3431,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
             await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != ducatRolesMessageId)
+        if (reaction.message.id == ducatRolesMessageId) {
+            await db.query(`UPDATE ducat_users_details SET invis = true WHERE discord_id = ${user.id}`)
+            .then(async res => {
+                if (res.rowCount == 0) {
+                    await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},true)`).catch(err => console.log(err))
+                }
+            })
+            .catch(err => console.log(err))
             return
-        await db.query(`UPDATE ducat_users_details SET invis = true WHERE discord_id = ${user.id}`)
-        .then(async res => {
-            if (res.rowCount == 0) {
-                await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},true)`).catch(err => console.log(err))
-            }
-        })
-        .catch(err => console.log(err))
-        return
+        }
     }
 
     if (reaction.emoji.name == "🎉") {      //removing giveaway reactions for hiatus members
@@ -3694,16 +3693,16 @@ client.on('messageReactionRemove', async (reaction, user) => {
             await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != ducatRolesMessageId)
+        if (reaction.message.id == ducatRolesMessageId) {
+            await db.query(`UPDATE ducat_users_details SET dnd = false WHERE discord_id = ${user.id}`)
+            .then(async res => {
+                if (res.rowCount == 0) {
+                    await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},false)`).catch(err => console.log(err))
+                }
+            })
+            .catch(err => console.log(err))
             return
-        await db.query(`UPDATE ducat_users_details SET dnd = false WHERE discord_id = ${user.id}`)
-        .then(async res => {
-            if (res.rowCount == 0) {
-                await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},false)`).catch(err => console.log(err))
-            }
-        })
-        .catch(err => console.log(err))
-        return
+        }
     }
 
     if (reaction.emoji.name == "🟣") {
@@ -3711,16 +3710,16 @@ client.on('messageReactionRemove', async (reaction, user) => {
             await reaction.message.channel.messages.fetch(reaction.message.id)
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.id != ducatRolesMessageId)
+        if (reaction.message.id == ducatRolesMessageId) {
+            await db.query(`UPDATE ducat_users_details SET invis = false WHERE discord_id = ${user.id}`)
+            .then(async res => {
+                if (res.rowCount == 0) {
+                    await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},false)`).catch(err => console.log(err))
+                }
+            })
+            .catch(err => console.log(err))
             return
-        await db.query(`UPDATE ducat_users_details SET invis = false WHERE discord_id = ${user.id}`)
-        .then(async res => {
-            if (res.rowCount == 0) {
-                await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},false)`).catch(err => console.log(err))
-            }
-        })
-        .catch(err => console.log(err))
-        return
+        }
     }
 
     if (reaction.message.id == masteryRolesMessageId)
