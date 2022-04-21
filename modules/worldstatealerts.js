@@ -442,7 +442,6 @@ async function setupReaction(reaction,user,type) {
                 color: colors.notification
             }]
         }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
             await msg.react('🔴').catch(err => console.log(err))
             await msg.react('🟣').catch(err => console.log(err))
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
@@ -972,7 +971,7 @@ async function setupReaction(reaction,user,type) {
         }
     }
     if (reaction.emoji.name == "🟣") {
-        console.log('dnd reaction')
+        console.log('offline/invisible reaction')
         if (!reaction.message.author)
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
@@ -1140,8 +1139,24 @@ async function cycles_check() {
                             cycles_changed.push(`Cetus: ${cetusCycle.state}`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
-                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                            ping_users[row.channel_id].push(`<@${user}>`)
+                        if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                            // get user discord status
+                            const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                            if (!user_presc || user_presc.status == 'offline') {
+                                if (!row.ping_filter.offline.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            } else if (user_presc.status == 'dnd') {
+                                if (!row.ping_filter.dnd.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            }
+                        } else {
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
                     }
                 })
             })
@@ -1158,8 +1173,24 @@ async function cycles_check() {
                             cycles_changed.push(`Orb Vallis: ${vallisCycle.state}`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
-                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                            ping_users[row.channel_id].push(`<@${user}>`)
+                        if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                            // get user discord status
+                            const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                            if (!user_presc || user_presc.status == 'offline') {
+                                if (!row.ping_filter.offline.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            } else if (user_presc.status == 'dnd') {
+                                if (!row.ping_filter.dnd.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            }
+                        } else {
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
                     }
                 })
             })
@@ -1176,8 +1207,24 @@ async function cycles_check() {
                             cycles_changed.push(`Cambion Drift: ${cambionCycle.active}`)
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
-                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                            ping_users[row.channel_id].push(`<@${user}>`)
+                        if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                            // get user discord status
+                            const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                            if (!user_presc || user_presc.status == 'offline') {
+                                if (!row.ping_filter.offline.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            } else if (user_presc.status == 'dnd') {
+                                if (!row.ping_filter.dnd.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            }
+                        } else {
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
                     }
                 })
             })
@@ -1323,8 +1370,24 @@ async function arbitration_check() {
                     if (res.rows[0].arbitration_mission != `${mission}_${arbitration.enemy}`) {
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
-                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                            ping_users[row.channel_id].push(`<@${user}>`)
+                        if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                            // get user discord status
+                            const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                            if (!user_presc || user_presc.status == 'offline') {
+                                if (!row.ping_filter.offline.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            } else if (user_presc.status == 'dnd') {
+                                if (!row.ping_filter.dnd.includes(user)) {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            }
+                        } else {
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
                     }
                 })
             })
