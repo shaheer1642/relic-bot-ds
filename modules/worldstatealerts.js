@@ -1392,6 +1392,9 @@ async function arbitration_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
+                            } else if (user_presc.status == 'online') {
+                                if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                    ping_users[row.channel_id].push(`<@${user}>`)
                             }
                         } else {
                             if (!ping_users[row.channel_id].includes(`<@${user}>`))
