@@ -1152,7 +1152,7 @@ async function cycles_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
-                            } else if (user_presc.status == 'online') {
+                            } else {
                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                     ping_users[row.channel_id].push(`<@${user}>`)
                             }
@@ -1189,7 +1189,7 @@ async function cycles_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
-                            } else if (user_presc.status == 'online') {
+                            } else {
                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                     ping_users[row.channel_id].push(`<@${user}>`)
                             }
@@ -1226,7 +1226,7 @@ async function cycles_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
-                            } else if (user_presc.status == 'online') {
+                            } else {
                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                     ping_users[row.channel_id].push(`<@${user}>`)
                             }
@@ -1392,7 +1392,7 @@ async function arbitration_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
-                            } else if (user_presc.status == 'online') {
+                            } else {
                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                     ping_users[row.channel_id].push(`<@${user}>`)
                             }
