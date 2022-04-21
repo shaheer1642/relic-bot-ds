@@ -1156,15 +1156,15 @@ async function cycles_check() {
                 description: 'React to be notified upon cycle changes', 
                 fields: [{
                     name: '__Cetus__',
-                    value: `${emotes[cetusCycle.state].string} ${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cetusCycle.state == "day" ? `${emotes.night.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>` : `${emotes.day.string} Starts <t:${new Date(cetusCycle.expiry).getTime() / 1000}:R>`}`,
+                    value: `${emotes[cetusCycle.state].string} ${cetusCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cetusCycle.state == "day" ? `${emotes.night.string} Starts <t:${Math.round(new Date(cetusCycle.expiry).getTime() / 1000)}:R>` : `${emotes.day.string} Starts <t:${Math.round(new Date(cetusCycle.expiry).getTime() / 1000)}:R>`}`,
                     inline: true
                 },{
                     name: '__Orb Vallis__',
-                    value: `${emotes[vallisCycle.state].string} ${vallisCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${vallisCycle.state == "cold" ? `Becomes ${emotes.warm.string} <t:${new Date(vallisCycle.expiry).getTime() / 1000}:R>` : `Becomes ${emotes.cold.string} <t:${new Date(vallisCycle.expiry).getTime() / 1000}:R>`}`,
+                    value: `${emotes[vallisCycle.state].string} ${vallisCycle.state.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${vallisCycle.state == "cold" ? `Becomes ${emotes.warm.string} <t:${Math.round(new Date(vallisCycle.expiry).getTime() / 1000)}:R>` : `Becomes ${emotes.cold.string} <t:${Math.round(new Date(vallisCycle.expiry).getTime() / 1000)}:R>`}`,
                     inline: true
                 },{
                     name: '__Cambion Drift__',
-                    value: `${emotes[cambionCycle.active].string} ${cambionCycle.active.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cambionCycle.active == "fass" ? `${emotes.vome.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>` : `${emotes.fass.string} Spawns <t:${new Date(cambionCycle.expiry).getTime() / 1000}:R>`}`,
+                    value: `${emotes[cambionCycle.active].string} ${cambionCycle.active.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}\n${cambionCycle.active == "fass" ? `${emotes.vome.string} Spawns <t:${Math.round(new Date(cambionCycle.expiry).getTime() / 1000)}:R>` : `${emotes.fass.string} Spawns <t:${Math.round(new Date(cambionCycle.expiry).getTime() / 1000)}:R>`}`,
                     inline: true
                 }],
                 color: colors.cycles
