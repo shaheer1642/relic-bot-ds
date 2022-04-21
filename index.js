@@ -18,7 +18,6 @@ const worldstatealerts = require('./modules/worldstatealerts.js');
 const botv = require('./modules/botv.js');
 const osiris_guild_id = '905559118096531456'
 const {client} = require('./modules/discord_client.js');
-require('./modules/omegle.js')
 require('./modules/gmail_client.js');
 
 const ducatRolesMessageId = "899402069159608320"
@@ -58,7 +57,6 @@ const worldstatealertEmotes = [
     "3️⃣",
     "4️⃣",
     "5️⃣",
-    "6️⃣",
     "baro:961548844368293969",
     "☀️",
     "🌙",

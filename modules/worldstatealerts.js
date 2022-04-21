@@ -152,7 +152,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -160,7 +160,6 @@ async function wssetup(message,args) {
         msg.react('3️⃣').catch(err => console.log(err))
         msg.react('4️⃣').catch(err => console.log(err))
         msg.react('5️⃣').catch(err => console.log(err))
-        msg.react('6️⃣').catch(err => console.log(err))
     }).catch(err => console.log(err))
 }
 
@@ -175,7 +174,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = await db.query(`
+        var status = db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -226,7 +225,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = await db.query(`
+        var status = db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -276,7 +275,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = await db.query(`
+        var status = db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -375,7 +374,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = await db.query(`
+        var status = db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -417,47 +416,6 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         teshinTimer = setTimeout(teshin_check, 10000)
         console.log('teshin_check invokes in ' + msToTime(timer))
-    }
-    if (reaction.emoji.name == "6️⃣" && type=="add") {
-        if (!access_ids.includes(user.id))
-            return
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
-            return
-        var status = await db.query(`
-            DO $$ BEGIN
-                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
-                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
-                END IF;
-            END $$;
-        `).then(res => {
-            if (res.rowCount == 1)
-                return true
-            return false
-        }).catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
-            return
-        }
-        // ---- notificationSettings
-        await reaction.message.channel.send({
-            content: ' ',
-            embeds: [{
-                title: 'Notification Settings',
-                description: `React to supress notifications depending upon Discord online status:\n🔴 Disable on 'Do Not Disturb'\n🟣 Disable on 'Invisible/Offline'`,
-                color: colors.teshin
-            }]
-        }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            await msg.react('🔴').catch(err => console.log(err))
-            await msg.react('🟣').catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
