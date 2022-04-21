@@ -1152,6 +1152,9 @@ async function cycles_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
+                            } else if (user_presc.status == 'online') {
+                                if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                    ping_users[row.channel_id].push(`<@${user}>`)
                             }
                         } else {
                             if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -1186,6 +1189,9 @@ async function cycles_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
+                            } else if (user_presc.status == 'online') {
+                                if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                    ping_users[row.channel_id].push(`<@${user}>`)
                             }
                         } else {
                             if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -1220,6 +1226,9 @@ async function cycles_check() {
                                     if (!ping_users[row.channel_id].includes(`<@${user}>`))
                                         ping_users[row.channel_id].push(`<@${user}>`)
                                 }
+                            } else if (user_presc.status == 'online') {
+                                if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                    ping_users[row.channel_id].push(`<@${user}>`)
                             }
                         } else {
                             if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -1258,7 +1267,7 @@ async function cycles_check() {
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
-                    if (ping_users[row.channel_id])
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
                         client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
@@ -1408,7 +1417,7 @@ async function arbitration_check() {
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
-                    if (ping_users[row.channel_id])
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
                         client.channels.cache.get(row.channel_id).send(`Arbitration ${arbitration.type} has started ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
@@ -1622,7 +1631,7 @@ async function teshin_check() {
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
-                    if (ping_users[row.channel_id])
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
                         client.channels.cache.get(row.channel_id).send(`Teshin rotation: ${steelPath.currentReward.name} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
