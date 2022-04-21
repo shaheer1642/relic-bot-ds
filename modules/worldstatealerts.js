@@ -984,13 +984,13 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET ping_filter = jsonb_set(ping_filter, '{offline,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Disabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Disabled pinging on invisible/offline").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET ping_filter = jsonb_set(ping_filter, '{offline}', (ping_filter->'offline') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Re-enabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Re-enabled pinging on invisible/offline").catch(err => console.log(err))).catch(err => console.log(err))
         }
     }
 }

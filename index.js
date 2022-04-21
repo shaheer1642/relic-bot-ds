@@ -79,7 +79,9 @@ const worldstatealertEmotes = [
     "rifle_riven:962507043137261640",
     "shotgun_riven:962507043695120414",
     "umbra_forma:962507079111811093",
-    "zaw_riven:962507044613685279"
+    "zaw_riven:962507044613685279",
+    "🔴",
+    "🟣"
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
