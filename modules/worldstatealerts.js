@@ -182,9 +182,7 @@ async function setupReaction(reaction,user,type) {
                 END IF;
             END $$;
         `).then(res => {
-            if (res.rowCount == 1)
-                return true
-            return false
+            return true
         }).catch(err => {
             console.log(err)
             return false
@@ -233,9 +231,7 @@ async function setupReaction(reaction,user,type) {
                 END IF;
             END $$;
         `).then(res => {
-            if (res.rowCount == 1)
-                return true
-            return false
+            return true
         }).catch(err => {
             console.log(err)
             return false
@@ -283,9 +279,7 @@ async function setupReaction(reaction,user,type) {
                 END IF;
             END $$;
         `).then(res => {
-            if (res.rowCount == 1)
-                return true
-            return false
+            return true
         }).catch(err => {
             console.log(err)
             return false
@@ -334,9 +328,7 @@ async function setupReaction(reaction,user,type) {
                 END IF;
             END $$;
         `).then(res => {
-            if (res.rowCount == 1)
-                return true
-            return false
+            return true
         }).catch(err => {
             console.log(err)
             return false
@@ -382,9 +374,7 @@ async function setupReaction(reaction,user,type) {
                 END IF;
             END $$;
         `).then(res => {
-            if (res.rowCount == 1)
-                return true
-            return false
+            return true
         }).catch(err => {
             console.log(err)
             return false
@@ -434,9 +424,7 @@ async function setupReaction(reaction,user,type) {
                 END IF;
             END $$;
         `).then(res => {
-            if (res.rowCount == 1)
-                return true
-            return false
+            return true
         }).catch(err => {
             console.log(err)
             return false
