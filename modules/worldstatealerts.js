@@ -134,7 +134,8 @@ const colors = {
     cycles: "#a83258",
     arbitration: "#f59e42",
     fissures: "#3295a8",
-    teshin: "#6432a8"
+    teshin: "#6432a8",
+    notification: "#32a852"
 }
 //----set timers----
 var baroTimer = setTimeout(baro_check,16000)
@@ -152,7 +153,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -174,7 +175,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = db.query(`
+        var status = await db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -225,7 +226,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = db.query(`
+        var status = await db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -275,7 +276,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = db.query(`
+        var status = await db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -326,7 +327,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = db.query(`
+        var status = await db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -374,7 +375,7 @@ async function setupReaction(reaction,user,type) {
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
             return
-        var status = db.query(`
+        var status = await db.query(`
             DO $$ BEGIN
                 IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
                     INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
@@ -416,6 +417,47 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         teshinTimer = setTimeout(teshin_check, 10000)
         console.log('teshin_check invokes in ' + msToTime(timer))
+    }
+    if (reaction.emoji.name == "6️⃣" && type=="add") {
+        if (!access_ids.includes(user.id))
+            return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
+            return
+        var status = await db.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
+                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
+                END IF;
+            END $$;
+        `).then(res => {
+            if (res.rowCount == 1)
+                return true
+            return false
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            return
+        }
+        // ---- notificationSettings
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                title: 'Notification Settings',
+                description: `React to supress notifications depending upon Discord online status:\n🔴 Disable on 'Do Not Disturb'\n🟣 Disable on 'Invisible/Offline'`,
+                color: colors.notification
+            }]
+        }).then(async msg => {
+            db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await msg.react('🔴').catch(err => console.log(err))
+            await msg.react('🟣').catch(err => console.log(err))
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
@@ -917,6 +959,50 @@ async function setupReaction(reaction,user,type) {
                 SET teshin_users = jsonb_set(teshin_users, '{shotgun_riven}', (teshin_users->'shotgun_riven') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Teshin shotgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.name == "🔴") {
+        console.log('dnd reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Notification Settings")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET ping_filter = jsonb_set(ping_filter, '{dnd,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Disabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET ping_filter = jsonb_set(ping_filter, '{dnd}', (ping_filter->'dnd') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Re-enabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.name == "🟣") {
+        console.log('dnd reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Notification Settings")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET ping_filter = jsonb_set(ping_filter, '{dnd,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Disabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET ping_filter = jsonb_set(ping_filter, '{dnd}', (ping_filter->'dnd') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Re-enabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
         }
     }
 }
