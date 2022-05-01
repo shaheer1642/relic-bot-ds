@@ -421,7 +421,16 @@ async function updateDatabaseItem(db_items_list,item,index) {
         }
         console.log(`Sell price: ${sellAvgPrice} Buy price: ${buyAvgPrice} Ducats: ${ducat_value}`)
         //------items in set-----------
-        const items_in_set = itemOrders.data.include.item.items_in_set.length > 0 ? itemOrders.data.include.item.items_in_set : null
+        var items_in_set = null
+        if (itemOrders.data.include.item.items_in_set.length > 0) {
+            items_in_set = []
+            itemOrders.data.include.item.items_in_set.length.forEach(item => {
+                items_in_set.push({
+                    url_name: item.url_name,
+                    quantity_for_set: item.quantity_for_set
+                })
+            })
+        }
         console.log(JSON.stringify(items_in_set))
         //----update relic rewards----
         if (relics)
