@@ -421,7 +421,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
         }
         console.log(`Sell price: ${sellAvgPrice} Buy price: ${buyAvgPrice} Ducats: ${ducat_value}`)
         //------items in set-----------
-        const items_in_set = itemOrders.data.include.item.items_in_set.length > 0 ? itemOrders.data.include.item.items_in_set.length : null
+        const items_in_set = itemOrders.data.include.item.items_in_set.length > 0 ? itemOrders.data.include.item.items_in_set : null
         //----update relic rewards----
         if (relics)
             if (relics.length != 0) {
