@@ -420,6 +420,8 @@ async function updateDatabaseItem(db_items_list,item,index) {
             return false
         }
         console.log(`Sell price: ${sellAvgPrice} Buy price: ${buyAvgPrice} Ducats: ${ducat_value}`)
+        //------items in set-----------
+        const items_in_set = itemOrders.data.include.item.items_in_set.length > 0 ? itemOrders.data.include.item.items_in_set.length : null
         //----update relic rewards----
         if (relics)
             if (relics.length != 0) {
@@ -646,6 +648,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
             ducat = ${ducat_value},
             relics = ${(relics)? `'${JSON.stringify(relics)}'`:null},
             icon_url = NULLIF('${icon_url}', ''),
+            items_in_set = ${(items_in_set)? `'${JSON.stringify(items_in_set)}'`:null},
             update_timestamp = ${new Date().getTime()}
             WHERE id = '${item.id}'`)
         .then( () => {
