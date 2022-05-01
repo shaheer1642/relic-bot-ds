@@ -424,7 +424,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
         var items_in_set = null
         if (itemOrders.data.include.item.items_in_set.length > 0) {
             items_in_set = []
-            itemOrders.data.include.item.items_in_set.length.forEach(item => {
+            itemOrders.data.include.item.items_in_set.forEach(item => {
                 items_in_set.push({
                     url_name: item.url_name,
                     quantity_for_set: item.quantity_for_set
