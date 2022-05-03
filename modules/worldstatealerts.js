@@ -158,7 +158,7 @@ var arbitrationTimer = setTimeout(arbitration_check,12000)
 var fissuresTimer = setTimeout(fissures_check,14000)
 var teshinTimer = setTimeout(teshin_check,8000)
 var alertsTimer = setTimeout(alerts_check,8000)
-var globalUpgradesTimer = setTimeout(global_upgrades_check, 10000)
+var global_upgrades_timer = setTimeout(global_upgrades_check, 10000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -169,7 +169,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts\n8️⃣ Event Boosters'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts\n8️⃣ Event Booster'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -456,7 +456,7 @@ async function setupReaction(reaction,user,type) {
             content: ' ',
             embeds: [{
                 title: 'Notification Settings',
-                description: `React to suppress notifications depending upon Discord online status\n*This does not apply to Baro or Teshin alerts*\n\n🔴 Disable on 'Do Not Disturb'\n🟣 Disable on 'Invisible/Offline'`,
+                description: `React to suppress notifications depending upon Discord online status\n*This does not apply to Baro, Teshin and Event Booster alerts*\n\n🔴 Disable on 'Do Not Disturb'\n🟣 Disable on 'Invisible/Offline'`,
                 color: colors.notification
             }]
         }).then(async msg => {
@@ -535,8 +535,8 @@ async function setupReaction(reaction,user,type) {
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
-                title: 'Event Boosters',
-                description: `Event Boosters will show up here`,
+                title: 'Event Booster',
+                description: `Event Booster will show up here`,
                 color: colors.global_upgrades
             }]
         }).then(async msg => {
@@ -547,9 +547,9 @@ async function setupReaction(reaction,user,type) {
             await msg.react(emotes.resource_chance_booster.string).catch(err => console.log(err))
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
 
-        clearTimeout(globalUpgradesTimer)
+        clearTimeout(global_upgrades_timer)
         var timer = 10000
-        globalUpgradesTimer = setTimeout(global_upgrades_check, 10000)
+        global_upgrades_timer = setTimeout(global_upgrades_check, 10000)
         console.log('global_upgrades_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
@@ -1096,6 +1096,94 @@ async function setupReaction(reaction,user,type) {
                 SET ping_filter = jsonb_set(ping_filter, '{offline}', (ping_filter->'offline') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Re-enabled pinging on invisible/offline").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.affinity_booster.identifier) {
+        console.log('affinity_booster reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Event Booster")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity}', (global_upgrades_users->'affinity') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.credit_booster.identifier) {
+        console.log('credit_booster reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Event Booster")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit}', (global_upgrades_users->'credit') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.resource_booster.identifier) {
+        console.log('resource_booster reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Event Booster")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource}', (global_upgrades_users->'resource') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.resource_chance_booster.identifier) {
+        console.log('resource_chance_booster reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Event Booster")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_chance,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_chance}', (global_upgrades_users->'resource_chance') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
     }
 }
@@ -1870,26 +1958,27 @@ async function global_upgrades_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         
-        const globalUpgrades = new WorldState(JSON.stringify(worldstateData.data)).global_upgrades;
+        const global_upgrades = new WorldState(JSON.stringify(worldstateData.data)).globalUpgrades;
 
         db.query(`SELECT * FROM worldstatealert`).then(res => {
             if (res.rowCount == 0)
                 return
 
-            if (!globalUpgrades || globalUpgrades.length == 0) {
+            if (!global_upgrades || global_upgrades.length == 0) {
                 // check back in 15m
                 var timer = 900000
-                alertsTimer = setTimeout(alerts_check, timer)
-                console.log(`alerts_check: no data available, reset in ${msToTime(timer)}`)
+                global_upgrades_timer = setTimeout(global_upgrades_check, timer)
+                console.log(`global_upgrades_check: no data available, reset in ${msToTime(timer)}`)
                 res.rows.forEach(row => {
-                    if (row.alerts_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
+                    if (row.global_upgrades_alert) {
+                        client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
                             msg.edit({
                                 content: ' ',
                                 embeds: [{
-                                    title: 'Alerts',
-                                    description: `No alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
-                                    color: colors.alerts
+                                    title: 'Event Booster',
+                                    description: `React to be notified when a booster is active\n\nNo booster active right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
+                                    footer: {text: '*Note: This alert is unstable at the moment*'},
+                                    color: colors.global_upgrades
                                 }]
                             }).catch(err => console.log(err))
                         }).catch(err => console.log(err))
@@ -1897,27 +1986,51 @@ async function global_upgrades_check() {
                 })
                 return
             }
-            if (new Date(alerts[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
-                var timer = 10000
-                alertsTimer = setTimeout(alerts_check, timer)
-                console.log(`alerts_check: negative expiry, reset in ${msToTime(timer)}`)
+
+            if (global_upgrades.length > 1) {
+                // check back in 15m
+                var timer = 900000
+                global_upgrades_timer = setTimeout(global_upgrades_check, timer)
+                console.log(`global_upgrades_check: no data available, reset in ${msToTime(timer)}`)
+                res.rows.forEach(row => {
+                    if (row.global_upgrades_alert) {
+                        client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
+                            msg.edit({
+                                content: ' ',
+                                embeds: [{
+                                    title: 'Event Booster',
+                                    description: `React to be notified when a booster is active\n\nSome issue with API results. Please contact <@253525146923433984>`,
+                                    footer: {text: '*Note: This alert is unstable at the moment*'},
+                                    color: colors.global_upgrades
+                                }]
+                            }).catch(err => console.log(err))
+                        }).catch(err => console.log(err))
+                    }
+                })
                 return
             }
 
-            const currentReward = teshin_item_replace(steelPath.currentReward.name)
+            if (new Date(global_upgrades[0].end).getTime() < new Date().getTime()) {     //negative expiry, retry
+                var timer = 10000
+                global_upgrades_timer = setTimeout(global_upgrades_check, timer)
+                console.log(`global_upgrades_check: negative expiry, reset in ${msToTime(timer)}`)
+                return
+            }
 
-            db.query(`UPDATE worldstatealert SET teshin_rotation = '${currentReward}'`).catch(err => console.log(err))
+            const active_booster = global_upgrades[0].desc
+
+            db.query(`UPDATE worldstatealert SET active_booster = '${active_booster.toLowerCase()}'`).catch(err => console.log(err))
             
             var users = {}
             var ping_users = {}
 
             res.rows.forEach(row => {
-                row.teshin_users[currentReward].forEach(user => {
+                row.global_upgrades_users[active_booster.toLowerCase()].forEach(user => {
                     if (!users[row.channel_id])
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].teshin_rotation != currentReward) {
+                    if (res.rows[0].active_booster != active_booster.toLowerCase()) {
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -1926,77 +2039,43 @@ async function global_upgrades_check() {
                 })
             })
 
-            const next_rotation = (function() {
-                var flag = false
-                for (const item of steelPath.rotation) {
-                    if (flag)
-                        return teshin_item_replace(item.name)
-                    if (steelPath.currentReward.name == item.name)
-                        flag = true
-                }
-                return teshin_item_replace(steelPath.rotation[0].name)
-            })();
-
             var embed = {
-                title: 'Teshin Rotation (Steel Path)',
+                title: 'Event Booster',
                 description: `React to subscribe to a specific item rotation`,
                 fields: [{
-                    name: "Current rotation",
-                    value: `${emotes[currentReward].string} __${steelPath.currentReward.name}__`,
+                    name: "Active booster",
+                    value: active_booster,
                     inline: true
                 },{
-                    name: "Cost",
-                    value: `${emotes.steel_essence.string} ${steelPath.currentReward.cost}`,
+                    name: "Expires",
+                    value: `<t:${Math.round(new Date(global_upgrades[0].end).getTime() / 1000)}:R>`,
                     inline: true
-                },{
-                    name: "Full rotation",
-                    value: "",
-                    inline: false
-                },{
-                    name: "Next rotation",
-                    value: `${emotes[next_rotation].string} <t:${Math.round(new Date(steelPath.expiry).getTime()/1000)}:R>`,
-                    inline: false
                 }],
-                color: colors.teshin
+                color: colors.global_upgrades
             }
 
-            steelPath.rotation.forEach(rotation => {
-                embed.fields[2].value += teshin_item_replace(rotation.name) == currentReward ? `${emotes[teshin_item_replace(rotation.name)].string} \`${rotation.name}\`\n`:`${emotes[teshin_item_replace(rotation.name)].string} ${rotation.name}\n`
-            })
-
             res.rows.forEach(row => {
-                if (row.teshin_alert) {
-                    client.channels.cache.get(row.channel_id).messages.fetch(row.teshin_alert).then(msg => {
+                if (row.global_upgrades_alert) {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Teshin rotation: ${steelPath.currentReward.name} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Event booster: ${active_booster} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
 
-            function teshin_item_replace(string) {
-                return string
-                .replace("Umbra Forma Blueprint","umbra_forma")
-                .replace("50,000 Kuva","kuva")
-                .replace("Kitgun Riven Mod","kitgun_riven")
-                .replace("3x Forma","forma")
-                .replace("Zaw Riven Mod","zaw_riven")
-                .replace("30,000 Endo","endo")
-                .replace("Rifle Riven Mod","rifle_riven")
-                .replace("Shotgun Riven Mod","shotgun_riven")
-            }
+            var timer = (new Date(global_upgrades[0].end).getTime() - new Date().getTime())
+            global_upgrades_timer = setTimeout(global_upgrades_check, timer)
+            console.log('global_upgrades_check invokes in ' + msToTime(timer))
+            return
         }).catch(err => console.log(err))
-        var timer = (new Date(steelPath.expiry).getTime() - new Date().getTime())
-        globalUpgradesTimer = setTimeout(global_upgrades_check, timer)
-        console.log('global_upgrades_check invokes in ' + msToTime(timer))
-        return
     })
     .catch(err => {
         console.log(err)
-        globalUpgradesTimer = setTimeout(global_upgrades_check,5000)
+        global_upgrades_timer = setTimeout(global_upgrades_check,5000)
     })
 }
 
