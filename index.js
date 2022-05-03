@@ -84,10 +84,10 @@ const worldstatealertEmotes = [
     "zaw_riven:962507044613685279",
     "🔴",
     "🟣",
-    "affinity_booster:971042818120372224",
-    "credit_booster:971042817889673268",
-    "resource_booster:971042818497851422",
-    "resource_chance_booster:971042818812432464",
+    "affinity:971084285434032158",
+    "credit:971084287136890932",
+    "resource:971084287501799464",
+    "resource_chance:971084287774449674",
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'

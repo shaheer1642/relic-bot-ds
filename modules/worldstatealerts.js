@@ -125,20 +125,20 @@ const emotes = {
         identifier: 'zaw_riven:962507044613685279'
     },
     affinity_booster: {
-        string: '<:affinity_booster:971042818120372224>',
-        identifier: 'affinity_booster:971042818120372224'
+        string: '<:affinity:971084285434032158>',
+        identifier: 'affinity:971084285434032158'
     },
     credit_booster: {
-        string: '<:credit_booster:971042817889673268>',
-        identifier: 'credit_booster:971042817889673268'
+        string: '<:credit:971084287136890932>',
+        identifier: 'credit:971084287136890932'
     },
     resource_booster: {
-        string: '<:resource_booster:971042818497851422>',
-        identifier: 'resource_booster:971042818497851422'
+        string: '<:resource:971084287501799464>',
+        identifier: 'resource:971084287501799464'
     },
     resource_chance_booster: {
-        string: '<:resource_chance_booster:971042818812432464>',
-        identifier: 'resource_chance_booster:971042818812432464'
+        string: '<:resource_chance:971084287774449674>',
+        identifier: 'resource_chance:971084287774449674'
     }
 }
 const colors = {
@@ -1978,7 +1978,7 @@ async function global_upgrades_check() {
                                 embeds: [{
                                     title: 'Event Booster',
                                     description: `React to be notified when a booster is active\n\nNo booster active right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
-                                    footer: {text: '*Note: This alert is unstable at the moment*'},
+                                    footer: {text: 'Note: This alert is unstable at the moment'},
                                     color: colors.global_upgrades
                                 }]
                             }).catch(err => console.log(err))
@@ -2001,7 +2001,7 @@ async function global_upgrades_check() {
                                 embeds: [{
                                     title: 'Event Booster',
                                     description: `React to be notified when a booster is active\n\nSome issue with API results. Please contact <@253525146923433984>`,
-                                    footer: {text: '*Note: This alert is unstable at the moment*'},
+                                    footer: {text: 'Note: This alert is unstable at the moment'},
                                     color: colors.global_upgrades
                                 }]
                             }).catch(err => console.log(err))
