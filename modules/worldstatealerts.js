@@ -1755,7 +1755,7 @@ async function alerts_check() {
                 mission_list.push({
                     title: alert.getDescription(),
                     node: alert.mission ? `${alert.mission.node} - ${alert.mission.type}`:'\u200b',
-                    reward: alert.getReward(),
+                    reward: alert.mission.reward.asString? alert.mission.reward.asString:alert.getReward(),
                     expiry: Math.round(new Date(alert.expiry).getTime() / 1000),
                 })
             })
