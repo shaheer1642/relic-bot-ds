@@ -1120,7 +1120,7 @@ async function baro_check() {
                     }
                 })
             }
-        })
+        }).catch(err => console.log(err))
         if (voidTrader.active) {
             var timer = (new Date(voidTrader.expiry).getTime() - new Date().getTime()) + 120000
             baroTimer = setTimeout(baro_check, timer)
@@ -1312,7 +1312,7 @@ async function cycles_check() {
                         client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
-        })
+        }).catch(err => console.log(err))
         var expiry = new Date(cetusCycle.expiry).getTime()
         if (expiry > new Date(vallisCycle.expiry).getTime())
             expiry = new Date(vallisCycle.expiry).getTime()
@@ -1465,7 +1465,7 @@ async function arbitration_check() {
                         client.channels.cache.get(row.channel_id).send(`Arbitration ${arbitration.type} has started ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
-        })
+        }).catch(err => console.log(err))
         var timer = new Date(arbitration.expiry).getTime() - new Date().getTime()
         arbitrationTimer = setTimeout(arbitration_check, timer)
         console.log('arbitration_check invokes in ' + msToTime(timer))
@@ -1572,7 +1572,7 @@ async function fissures_check() {
             var timer = min_expiry - new Date().getTime()
             fissuresTimer = setTimeout(fissures_check, timer)
             console.log('fissures_check invokes in ' + msToTime(timer))
-        })
+        }).catch(err => console.log(err))
         return
     })
     .catch(err => {
@@ -1691,7 +1691,7 @@ async function teshin_check() {
                 .replace("Rifle Riven Mod","rifle_riven")
                 .replace("Shotgun Riven Mod","shotgun_riven")
             }
-        })
+        }).catch(err => console.log(err))
         var timer = (new Date(steelPath.expiry).getTime() - new Date().getTime())
         teshinTimer = setTimeout(teshin_check, timer)
         console.log('teshin_check invokes in ' + msToTime(timer))
@@ -1720,7 +1720,7 @@ async function alerts_check() {
                 // check back in 15m
                 var timer = 900000
                 alertsTimer = setTimeout(alerts_check, timer)
-                console.log(`${getFuncName()}: no data available, reset in ${msToTime(timer)}`)
+                console.log(`alerts_check: no data available, reset in ${msToTime(timer)}`)
                 res.rows.forEach(row => {
                     if (row.alerts_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
@@ -1741,7 +1741,7 @@ async function alerts_check() {
             if (new Date(alerts[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
                 var timer = 10000
                 alertsTimer = setTimeout(alerts_check, timer)
-                console.log(`${getFuncName()}: negative expiry, reset in ${msToTime(timer)}`)
+                console.log(`alerts_check: negative expiry, reset in ${msToTime(timer)}`)
                 return
             }
             
@@ -1794,18 +1794,14 @@ async function alerts_check() {
             })
             var timer = (least_expiry - new Date().getTime())
             alertsTimer = setTimeout(alerts_check, timer)
-            console.log(`${getFuncName()} invokes in ${msToTime(timer)}`)
-        })
+            console.log(`alerts_check invokes in ${msToTime(timer)}`)
+        }).catch(err => console.log(err))
         return
     })
     .catch(err => {
         console.log(err)
         alertsTimer = setTimeout(alerts_check,5000)
     })
-}
-
-function getFuncName() {
-    return getFuncName.caller.name
 }
 
 module.exports = {wssetup,setupReaction};
