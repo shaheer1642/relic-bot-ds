@@ -1870,27 +1870,39 @@ async function global_upgrades_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         
-        const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
-        
-        if (!steelPath) {
-            console.log('Teshin check: no data available')
-            var timer = 300000
-            teshinTimer = setTimeout(global_upgrades_check, timer)
-            console.log(`teshin_check reset in ${msToTime(timer)}`)
-            return
-        }
-
-        if (new Date(steelPath.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
-            console.log('Teshin check: negative expiry')
-            var timer = 10000
-            teshinTimer = setTimeout(global_upgrades_check, timer)
-            console.log(`teshin_check reset in ${msToTime(timer)}`)
-            return
-        }
+        const globalUpgrades = new WorldState(JSON.stringify(worldstateData.data)).global_upgrades;
 
         db.query(`SELECT * FROM worldstatealert`).then(res => {
             if (res.rowCount == 0)
                 return
+
+            if (!globalUpgrades || globalUpgrades.length == 0) {
+                // check back in 15m
+                var timer = 900000
+                alertsTimer = setTimeout(alerts_check, timer)
+                console.log(`alerts_check: no data available, reset in ${msToTime(timer)}`)
+                res.rows.forEach(row => {
+                    if (row.alerts_alert) {
+                        client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
+                            msg.edit({
+                                content: ' ',
+                                embeds: [{
+                                    title: 'Alerts',
+                                    description: `No alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
+                                    color: colors.alerts
+                                }]
+                            }).catch(err => console.log(err))
+                        }).catch(err => console.log(err))
+                    }
+                })
+                return
+            }
+            if (new Date(alerts[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+                var timer = 10000
+                alertsTimer = setTimeout(alerts_check, timer)
+                console.log(`alerts_check: negative expiry, reset in ${msToTime(timer)}`)
+                return
+            }
 
             const currentReward = teshin_item_replace(steelPath.currentReward.name)
 
@@ -1978,13 +1990,13 @@ async function global_upgrades_check() {
             }
         }).catch(err => console.log(err))
         var timer = (new Date(steelPath.expiry).getTime() - new Date().getTime())
-        teshinTimer = setTimeout(teshin_check, timer)
-        console.log('teshin_check invokes in ' + msToTime(timer))
+        globalUpgradesTimer = setTimeout(global_upgrades_check, timer)
+        console.log('global_upgrades_check invokes in ' + msToTime(timer))
         return
     })
     .catch(err => {
         console.log(err)
-        teshinTimer = setTimeout(teshin_check,5000)
+        globalUpgradesTimer = setTimeout(global_upgrades_check,5000)
     })
 }
 
