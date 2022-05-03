@@ -135,7 +135,8 @@ const colors = {
     arbitration: "#f59e42",
     fissures: "#3295a8",
     teshin: "#6432a8",
-    notification: "#32a852"
+    notification: "#32a852",
+    alerts: "#3fccb0",
 }
 //----set timers----
 var baroTimer = setTimeout(baro_check,16000)
@@ -143,6 +144,7 @@ var cyclesTimer = setTimeout(cycles_check,10000)
 var arbitrationTimer = setTimeout(arbitration_check,12000)
 var fissuresTimer = setTimeout(fissures_check,14000)
 var teshinTimer = setTimeout(teshin_check,8000)
+var alertsTimer = setTimeout(alerts_check,8000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -153,7 +155,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -161,6 +163,8 @@ async function wssetup(message,args) {
         msg.react('3️⃣').catch(err => console.log(err))
         msg.react('4️⃣').catch(err => console.log(err))
         msg.react('5️⃣').catch(err => console.log(err))
+        msg.react('6️⃣').catch(err => console.log(err))
+        msg.react('7️⃣').catch(err => console.log(err))
     }).catch(err => console.log(err))
 }
 
@@ -444,6 +448,43 @@ async function setupReaction(reaction,user,type) {
         }).then(async msg => {
             await msg.react('🔴').catch(err => console.log(err))
             await msg.react('🟣').catch(err => console.log(err))
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+    }
+    if (reaction.emoji.name == "7️⃣" && type=="add") {
+        if (!access_ids.includes(user.id))
+            return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
+            return
+        var status = await db.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
+                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
+                END IF;
+            END $$;
+        `).then(res => {
+            return true
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            return
+        }
+        // ---- notificationSettings
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                title: 'Alerts',
+                description: `In-game alerts will show up here`,
+                color: colors.alerts
+            }]
+        }).then(async msg => {
+            db.query(`UPDATE worldstatealert SET alerts_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
@@ -1660,6 +1701,109 @@ async function teshin_check() {
         console.log(err)
         teshinTimer = setTimeout(teshin_check,5000)
     })
+}
+
+
+async function alerts_check() {
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        
+        const alerts = new WorldState(JSON.stringify(worldstateData.data)).alerts;
+
+        db.query(`SELECT * FROM worldstatealert`).then(res => {
+            if (res.rowCount == 0)
+                return
+
+            if (!alerts || alerts.length == 0) {
+                // check back in 15m
+                var timer = 900000
+                alertsTimer = setTimeout(alerts_check, timer)
+                console.log(`${getFuncName()}: no data available, reset in ${msToTime(timer)}`)
+                res.rows.forEach(row => {
+                    if (row.alerts_alert) {
+                        client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
+                            msg.edit({
+                                content: ' ',
+                                embeds: [{
+                                    title: 'Alerts',
+                                    description: `No alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
+                                    color: colors.alerts
+                                }]
+                            }).catch(err => console.log(err))
+                        }).catch(err => console.log(err))
+                    }
+                })
+                return
+            }
+    
+            if (new Date(alerts[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+                var timer = 10000
+                alertsTimer = setTimeout(alerts_check, timer)
+                console.log(`${getFuncName()}: negative expiry, reset in ${msToTime(timer)}`)
+                return
+            }
+            
+            var mission_list = []
+            var least_expiry = new Date(alerts[0].expiry).getTime()
+            alerts.forEach(alert => {
+                if (new Date(alert.expiry).getTime() < least_expiry)
+                    least_expiry = new Date(alert).getTime()
+                mission_list.push({
+                    title: alert.getDescription(),
+                    node: alert.mission ? `${alert.mission.node} - ${alert.mission.type}`:'\u200b',
+                    reward: alert.getReward(),
+                    expiry: Math.round(new Date(alert.expiry).getTime() / 1000),
+                })
+            })
+
+            var embed = {
+                title: 'Alerts',
+                fields: [{
+                    name: "Mission",
+                    value: '',
+                    inline: true
+                },{
+                    name: "Reward",
+                    value: '',
+                    inline: true
+                },{
+                    name: "Expires",
+                    value: '',
+                    inline: false
+                }],
+                color: colors.alerts
+            }
+
+            mission_list.forEach(mission => {
+                embed.fields[0].value += mission.node + '(' + mission.title + ')'
+                embed.fields[1].value += mission.reward
+                embed.fields[2].value += '<t:' + mission.expiry + ':R>'
+            })
+
+            res.rows.forEach(row => {
+                if (row.alerts_alert) {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
+                        msg.edit({
+                            content: ' ',
+                            embeds: [embed]
+                        }).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
+                }
+            })
+        })
+        var timer = (least_expiry - new Date().getTime())
+        alertsTimer = setTimeout(alerts_check, timer)
+        console.log(`${getFuncName()} invokes in ${msToTime(timer)}`)
+        return
+    })
+    .catch(err => {
+        console.log(err)
+        alertsTimer = setTimeout(alerts_check,5000)
+    })
+}
+
+function getFuncName() {
+    return getFuncName.caller.name
 }
 
 module.exports = {wssetup,setupReaction};
