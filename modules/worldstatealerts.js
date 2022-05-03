@@ -1710,8 +1710,6 @@ async function alerts_check() {
         
         const alerts = new WorldState(JSON.stringify(worldstateData.data)).alerts;
 
-        var least_expiry = null
-
         db.query(`SELECT * FROM worldstatealert`).then(res => {
             if (res.rowCount == 0)
                 return
@@ -1737,7 +1735,6 @@ async function alerts_check() {
                 })
                 return
             }
-    
             if (new Date(alerts[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
                 var timer = 10000
                 alertsTimer = setTimeout(alerts_check, timer)
@@ -1746,7 +1743,7 @@ async function alerts_check() {
             }
             
             var mission_list = []
-            least_expiry = new Date(alerts[0].expiry).getTime()
+            var least_expiry = new Date(alerts[0].expiry).getTime()
             alerts.forEach(alert => {
                 if (new Date(alert.expiry).getTime() < least_expiry)
                     least_expiry = new Date(alert.expiry).getTime()
@@ -1775,7 +1772,6 @@ async function alerts_check() {
                 }],
                 color: colors.alerts
             }
-
             mission_list.forEach(mission => {
                 embed.fields[0].value += mission.node
                 embed.fields[1].value += mission.reward
@@ -1792,6 +1788,7 @@ async function alerts_check() {
                     }).catch(err => console.log(err))
                 }
             })
+
             var timer = (least_expiry - new Date().getTime())
             alertsTimer = setTimeout(alerts_check, timer)
             console.log(`alerts_check invokes in ${msToTime(timer)}`)
