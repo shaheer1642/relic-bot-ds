@@ -1714,6 +1714,7 @@ async function alerts_check() {
     .then( worldstateData => {
         
         const alerts = new WorldState(JSON.stringify(worldstateData.data)).alerts;
+        console.log(JSON.stringify(alerts))
 
         db.query(`SELECT * FROM worldstatealert`).then(res => {
             if (res.rowCount == 0)
