@@ -396,7 +396,7 @@ async function setupReaction(reaction,user,type) {
                 color: colors.teshin
             }]
         }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
             await msg.react(emotes.umbra_forma.string).catch(err => console.log(err))
             await msg.react(emotes.kuva.string).catch(err => console.log(err))
             await msg.react(emotes.kitgun_riven.string).catch(err => console.log(err))
@@ -475,7 +475,7 @@ async function setupReaction(reaction,user,type) {
             reaction.message.channel.send('Some error occured').catch(err => console.log(err))
             return
         }
-        // ---- notificationSettings
+        // ---- alerts 
         await reaction.message.channel.send({
             content: ' ',
             embeds: [{
@@ -484,8 +484,13 @@ async function setupReaction(reaction,user,type) {
                 color: colors.alerts
             }]
         }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET alerts_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await db.query(`UPDATE worldstatealert SET alerts_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+
+        clearTimeout(alertsTimer)
+        var timer = 10000
+        alertsTimer = setTimeout(alerts_check, 10000)
+        console.log('alerts_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
