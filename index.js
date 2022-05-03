@@ -59,6 +59,7 @@ const worldstatealertEmotes = [
     "5️⃣",
     "6️⃣",
     "7️⃣",
+    "8️⃣",
     "baro:961548844368293969",
     "☀️",
     "🌙",
@@ -82,7 +83,11 @@ const worldstatealertEmotes = [
     "umbra_forma:962507079111811093",
     "zaw_riven:962507044613685279",
     "🔴",
-    "🟣"
+    "🟣",
+    "affinity_booster:971042818120372224",
+    "credit_booster:971042817889673268",
+    "resource_booster:971042818497851422",
+    "resource_chance_booster:971042818812432464",
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
