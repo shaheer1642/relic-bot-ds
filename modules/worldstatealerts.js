@@ -1747,7 +1747,7 @@ async function alerts_check() {
             var least_expiry = new Date(alerts[0].expiry).getTime()
             alerts.forEach(alert => {
                 if (new Date(alert.expiry).getTime() < least_expiry)
-                    least_expiry = new Date(alert).getTime()
+                    least_expiry = new Date(alert.expiry).getTime()
                 mission_list.push({
                     title: alert.getDescription(),
                     node: alert.mission ? `${alert.mission.node} - ${alert.mission.type}`:'\u200b',
