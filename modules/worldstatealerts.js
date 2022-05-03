@@ -1754,9 +1754,9 @@ async function alerts_check() {
                 if (new Date(alert.expiry).getTime() < least_expiry)
                     least_expiry = new Date(alert.expiry).getTime()
                 mission_list.push({
-                    title: alert.getDescription(),
-                    node: alert.mission ? `${alert.mission.node} - ${alert.mission.type}`:'\u200b',
-                    reward: alert.mission.reward.asString? alert.mission.reward.asString:alert.getReward(),
+                    title: alert.mission.description,
+                    node: `${alert.mission.node} - ${alert.mission.type}`,
+                    reward: alert.mission.reward.asString,
                     expiry: Math.round(new Date(alert.expiry).getTime() / 1000),
                 })
             })
