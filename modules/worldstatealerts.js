@@ -1110,13 +1110,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_KILL_XP_AMOUNT,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity}', (global_upgrades_users->'affinity') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_KILL_XP_AMOUNT}', (global_upgrades_users->'GAMEPLAY_KILL_XP_AMOUNT') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -1132,13 +1132,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_PICKUP_AMOUNT,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit}', (global_upgrades_users->'credit') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_PICKUP_AMOUNT}', (global_upgrades_users->'GAMEPLAY_MONEY_PICKUP_AMOUNT') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -1154,13 +1154,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_PICKUP_AMOUNT,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource}', (global_upgrades_users->'resource') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_PICKUP_AMOUNT}', (global_upgrades_users->'GAMEPLAY_PICKUP_AMOUNT') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -1176,13 +1176,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_chance,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_REWARD_AMOUNT,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_chance}', (global_upgrades_users->'resource_chance') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_REWARD_AMOUNT}', (global_upgrades_users->'GAMEPLAY_MONEY_REWARD_AMOUNT') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -2018,7 +2018,7 @@ async function global_upgrades_check() {
                 return
             }
 
-            const active_booster = global_upgrades[0].desc
+            const active_booster = global_upgrades[0].upgrade
 
             db.query(`UPDATE worldstatealert SET active_booster = '${active_booster.toLowerCase()}'`).catch(err => console.log(err))
             
