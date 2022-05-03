@@ -1792,12 +1792,10 @@ async function alerts_check() {
                     }).catch(err => console.log(err))
                 }
             })
-        })
-        if (least_expiry) {
             var timer = (least_expiry - new Date().getTime())
             alertsTimer = setTimeout(alerts_check, timer)
             console.log(`${getFuncName()} invokes in ${msToTime(timer)}`)
-        }
+        })
         return
     })
     .catch(err => {
