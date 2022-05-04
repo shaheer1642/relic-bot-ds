@@ -1966,7 +1966,7 @@ async function alerts_check() {
                                 content: ' ',
                                 embeds: [{
                                     title: 'Alerts',
-                                    description: `No alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
+                                    description: `React to subscribe to specific rewards\n\nNo alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
                                     color: colors.alerts
                                 }]
                             }).catch(err => console.log(err))
@@ -2028,6 +2028,7 @@ async function alerts_check() {
 
             var embed = {
                 title: 'Alerts',
+                description: `React to subscribe to specific rewards`,
                 fields: [{
                     name: "Mission",
                     value: '',
