@@ -1419,7 +1419,7 @@ async function cycles_check() {
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].cetus_status != cetusCycle.state) {
+                    if (row.cetus_status != cetusCycle.state) {
                         if (!cycles_changed.includes(`Cetus: ${cetusCycle.state}`))
                             cycles_changed.push(`Cetus: ${cetusCycle.state}`)
                         if (!ping_users[row.channel_id])
@@ -1456,7 +1456,7 @@ async function cycles_check() {
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].vallis_status != vallisCycle.state) {
+                    if (row.vallis_status != vallisCycle.state) {
                         if (!cycles_changed.includes(`Orb Vallis: ${vallisCycle.state}`))
                             cycles_changed.push(`Orb Vallis: ${vallisCycle.state}`)
                         if (!ping_users[row.channel_id])
@@ -1493,7 +1493,7 @@ async function cycles_check() {
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].cambion_status != cambionCycle.active) {
+                    if (row.cambion_status != cambionCycle.active) {
                         if (!cycles_changed.includes(`Cambion Drift: ${cambionCycle.active}`))
                             cycles_changed.push(`Cambion Drift: ${cambionCycle.active}`)
                         if (!ping_users[row.channel_id])
@@ -1661,7 +1661,7 @@ async function arbitration_check() {
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].arbitration_mission != `${mission}_${arbitration.enemy}`) {
+                    if (row.arbitration_mission != `${mission}_${arbitration.enemy}`) {
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
@@ -1864,7 +1864,7 @@ async function teshin_check() {
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].teshin_rotation != currentReward) {
+                    if (row.teshin_rotation != currentReward) {
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2016,7 +2016,7 @@ async function alerts_check() {
                                 users[row.channel_id] = []
                             if (!users[row.channel_id].includes(`<@${user}>`))
                                 users[row.channel_id].push(`<@${user}>`)
-                            if (!res.rows[0].alerts_rewards.includes(active_reward)) {
+                            if (!row.alerts_rewards.includes(active_reward)) {
                                 if (!ping_users[row.channel_id])
                                     ping_users[row.channel_id] = []
                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2154,7 +2154,7 @@ async function global_upgrades_check() {
                         users[row.channel_id] = []
                     if (!users[row.channel_id].includes(`<@${user}>`))
                         users[row.channel_id].push(`<@${user}>`)
-                    if (res.rows[0].active_booster != active_booster.toLowerCase()) {
+                    if (row.active_booster != active_booster.toLowerCase()) {
                         if (!ping_users[row.channel_id])
                             ping_users[row.channel_id] = []
                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
