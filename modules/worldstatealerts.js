@@ -148,6 +148,10 @@ const emotes = {
         string: '<:orokin_catalyst:971513248576860190>',
         identifier: 'orokin_catalyst:971513248576860190'
     },
+    steel_essence: {
+        string: '<:steel_essence:962508988442869800>',
+        identifier: 'steel_essence:962508988442869800'
+    },
 }
 const colors = {
     baro: "#95744",
