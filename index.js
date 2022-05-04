@@ -88,6 +88,8 @@ const worldstatealertEmotes = [
     "credit:971084287136890932",
     "resource:971084287501799464",
     "resource_chance:971084287774449674",
+    "orokin_reactor:971513247930941480",
+    "orokin_catalyst:971513248576860190",
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'

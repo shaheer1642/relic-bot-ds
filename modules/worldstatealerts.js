@@ -139,7 +139,15 @@ const emotes = {
     resource_chance_booster: {
         string: '<:resource_chance:971084287774449674>',
         identifier: 'resource_chance:971084287774449674'
-    }
+    },
+    orokin_reactor: {
+        string: '<:orokin_reactor:971513247930941480>',
+        identifier: 'orokin_reactor:971513247930941480'
+    },
+    orokin_catalyst: {
+        string: '<:orokin_catalyst:971513248576860190>',
+        identifier: 'orokin_catalyst:971513248576860190'
+    },
 }
 const colors = {
     baro: "#95744",
@@ -500,6 +508,10 @@ async function setupReaction(reaction,user,type) {
             }]
         }).then(async msg => {
             await db.query(`UPDATE worldstatealert SET alerts_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await msg.react(emotes.orokin_reactor.string).catch(err => console.log(err))
+            await msg.react(emotes.orokin_catalyst.string).catch(err => console.log(err))
+            await msg.react(emotes.umbra_forma.string).catch(err => console.log(err))
+            await msg.react(emotes.forma.string).catch(err => console.log(err))
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
 
         clearTimeout(alertsTimer)
@@ -885,20 +897,35 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
-            return
-        if (type == "add") {
-            db.query(`
-                UPDATE worldstatealert
-                SET teshin_users = jsonb_set(teshin_users, '{umbra_forma,999999}', '"${user.id}"', true)
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
-        } else if (type == "remove") {
-            db.query(`
-                UPDATE worldstatealert
-                SET teshin_users = jsonb_set(teshin_users, '{umbra_forma}', (teshin_users->'umbra_forma') - '${user.id}')
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+        if (reaction.message.embeds[0].title == "Teshin Rotation (Steel Path)") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET teshin_users = jsonb_set(teshin_users, '{umbra_forma,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET teshin_users = jsonb_set(teshin_users, '{umbra_forma}', (teshin_users->'umbra_forma') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+        if (reaction.message.embeds[0].title == "Alerts") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{umbra_forma,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Alerts umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{umbra_forma}', (alerts_users->'umbra_forma') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Alerts umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+            }
         }
     }
     if (reaction.emoji.identifier == emotes.kuva.identifier) {
@@ -951,20 +978,35 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
-            return
-        if (type == "add") {
-            db.query(`
-                UPDATE worldstatealert
-                SET teshin_users = jsonb_set(teshin_users, '{forma,999999}', '"${user.id}"', true)
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
-        } else if (type == "remove") {
-            db.query(`
-                UPDATE worldstatealert
-                SET teshin_users = jsonb_set(teshin_users, '{forma}', (teshin_users->'forma') - '${user.id}')
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
+        if (reaction.message.embeds[0].title == "Teshin Rotation (Steel Path)") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET teshin_users = jsonb_set(teshin_users, '{forma,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET teshin_users = jsonb_set(teshin_users, '{forma}', (teshin_users->'forma') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+        if (reaction.message.embeds[0].title == "Alerts") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{forma,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Alerts forma").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{forma}', (alerts_users->'forma') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Alerts forma").catch(err => console.log(err))).catch(err => console.log(err))
+            }
         }
     }
     if (reaction.emoji.identifier == emotes.zaw_riven.identifier) {
@@ -1185,6 +1227,50 @@ async function setupReaction(reaction,user,type) {
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_REWARD_AMOUNT}', (global_upgrades_users->'GAMEPLAY_MONEY_REWARD_AMOUNT') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.orokin_reactor.identifier) {
+        console.log('orokin_reactor reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Alerts")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor}', (alerts_users->'orokin_reactor') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
+        }
+    }
+    if (reaction.emoji.identifier == emotes.orokin_catalyst.identifier) {
+        console.log('orokin_catalyst reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Alerts")
+            return
+        if (type == "add") {
+            db.query(`
+                UPDATE worldstatealert
+                SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst,999999}', '"${user.id}"', true)
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Added tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
+        } else if (type == "remove") {
+            db.query(`
+                UPDATE worldstatealert
+                SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst}', (alerts_users->'orokin_catalyst') - '${user.id}')
+                WHERE channel_id = ${channel_id};
+            `).then(() => user.send("Removed tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
         }
     }
 }
@@ -1895,8 +1981,12 @@ async function alerts_check() {
                 console.log(`alerts_check: negative expiry, reset in ${msToTime(timer)}`)
                 return
             }
-            
+
+            var users = {}
+            var ping_users = {}
+
             var mission_list = []
+            var alerts_rewards = []
             var least_expiry = new Date(alerts[0].expiry).getTime()
             alerts.forEach(alert => {
                 if (new Date(alert.expiry).getTime() < least_expiry)
@@ -1907,7 +1997,34 @@ async function alerts_check() {
                     reward: alert.mission.reward.asString,
                     expiry: Math.round(new Date(alert.expiry).getTime() / 1000),
                 })
+                var active_reward = alert.mission.reward.asString.toLowerCase().replace(/ /g,'_')
+                if (active_reward.match('orokin_reactor'))
+                    active_reward = 'orokin_reactor'
+                if (active_reward.match('orokin_catalyst'))
+                    active_reward = 'orokin_catalyst'
+                if (active_reward.match('umbra_forma'))
+                    active_reward = 'umbra_forma'
+                if (active_reward.match('forma'))
+                    active_reward = 'forma'
+                alerts_rewards.push(active_reward)
+
+                res.rows.forEach(row => {
+                    row.alerts_users[active_reward].forEach(user => {
+                        if (!users[row.channel_id])
+                            users[row.channel_id] = []
+                        if (!users[row.channel_id].includes(`<@${user}>`))
+                            users[row.channel_id].push(`<@${user}>`)
+                        if (!res.rows[0].alerts_rewards.includes(active_reward)) {
+                            if (!ping_users[row.channel_id])
+                                ping_users[row.channel_id] = []
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
+                    })
+                })
             })
+
+            db.query(`UPDATE worldstatealert SET alerts_rewards = '${JSON.stringify(alerts_rewards)}'`).catch(err => console.log(err))
 
             var embed = {
                 title: 'Alerts',
@@ -1936,10 +2053,12 @@ async function alerts_check() {
                 if (row.alerts_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
                         msg.edit({
-                            content: ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
+                        client.channels.cache.get(row.channel_id).send(`Alert reward: ${alerts_rewards.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
 
