@@ -2,7 +2,7 @@ const {client} = require('./discord_client.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor,convertUpper} = require('./extras.js');
 const WorldState = require('warframe-worldstate-parser');
 const access_ids = [
     '253525146923433984'
@@ -2062,7 +2062,7 @@ async function alerts_check() {
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Alert reward: ${alerts_rewards.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Alert reward: ${convertUpper(alerts_rewards.join(', '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
 
@@ -2187,7 +2187,7 @@ async function global_upgrades_check() {
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Event booster: ${active_booster} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Event booster: ${convertUpper(active_booster)} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
 

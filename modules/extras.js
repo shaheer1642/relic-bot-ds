@@ -115,4 +115,8 @@ function embedScore(text) {
     return text.replaceAll('_','\\_')
 }
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore};
+function convertUpper(str) {
+    return str.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+}
+
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper};
