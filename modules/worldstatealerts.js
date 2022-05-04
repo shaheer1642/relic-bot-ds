@@ -1600,10 +1600,10 @@ async function arbitration_check() {
         }
 
         if (!arbitration.type || typeof(arbitration.type) != "string") {
-            console.log('Arbitration check: arbitrary data')
+            //console.log('Arbitration check: arbitrary data')
             var timer = 10000
             arbitrationTimer = setTimeout(arbitration_check, timer)
-            console.log(`arbitration_check reset in ${msToTime(timer)}`)
+            //console.log(`arbitration_check reset in ${msToTime(timer)}`)
             return
         }
         
@@ -1970,7 +1970,7 @@ async function alerts_check() {
                                 content: ' ',
                                 embeds: [{
                                     title: 'Alerts',
-                                    description: `React to subscribe to specific rewards\n\nNo alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
+                                    description: `React to subscribe to specific rewards\n\nNo alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
                                     color: colors.alerts
                                 }]
                             }).catch(err => console.log(err))
@@ -2010,18 +2010,20 @@ async function alerts_check() {
                 alerts_rewards.push(active_reward)
 
                 res.rows.forEach(row => {
-                    row.alerts_users[active_reward].forEach(user => {
-                        if (!users[row.channel_id])
-                            users[row.channel_id] = []
-                        if (!users[row.channel_id].includes(`<@${user}>`))
-                            users[row.channel_id].push(`<@${user}>`)
-                        if (!res.rows[0].alerts_rewards.includes(active_reward)) {
-                            if (!ping_users[row.channel_id])
-                                ping_users[row.channel_id] = []
-                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                                ping_users[row.channel_id].push(`<@${user}>`)
-                        }
-                    })
+                    if (row.alerts_users[active_reward]) {
+                        row.alerts_users[active_reward].forEach(user => {
+                            if (!users[row.channel_id])
+                                users[row.channel_id] = []
+                            if (!users[row.channel_id].includes(`<@${user}>`))
+                                users[row.channel_id].push(`<@${user}>`)
+                            if (!res.rows[0].alerts_rewards.includes(active_reward)) {
+                                if (!ping_users[row.channel_id])
+                                    ping_users[row.channel_id] = []
+                                if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                    ping_users[row.channel_id].push(`<@${user}>`)
+                            }
+                        })
+                    }
                 })
             })
 
@@ -2098,7 +2100,7 @@ async function global_upgrades_check() {
                                 content: ' ',
                                 embeds: [{
                                     title: 'Event Booster',
-                                    description: `React to be notified when a booster is active\n\nNo booster active right now. Checking back <t:${Math.round((new Date().getTime() + 900000)/1000)}:R>`,
+                                    description: `React to be notified when a booster is active\n\nNo booster active right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
                                     footer: {text: 'Note: This alert is unstable at the moment'},
                                     color: colors.global_upgrades
                                 }]
