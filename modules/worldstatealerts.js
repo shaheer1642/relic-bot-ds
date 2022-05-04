@@ -1927,9 +1927,9 @@ async function alerts_check() {
                 color: colors.alerts
             }
             mission_list.forEach(mission => {
-                embed.fields[0].value += mission.node
-                embed.fields[1].value += mission.reward
-                embed.fields[2].value += '<t:' + mission.expiry + ':R>'
+                embed.fields[0].value += mission.node + '\n'
+                embed.fields[1].value += mission.reward + '\n'
+                embed.fields[2].value += '<t:' + mission.expiry + ':R>' + '\n'
             })
 
             res.rows.forEach(row => {
