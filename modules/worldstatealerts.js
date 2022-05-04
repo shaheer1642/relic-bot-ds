@@ -1955,8 +1955,8 @@ async function alerts_check() {
                 return
 
             if (!alerts || alerts.length == 0) {
-                // check back in 15m
-                var timer = 900000
+                // check back in 60m
+                var timer = 3600000
                 alertsTimer = setTimeout(alerts_check, timer)
                 console.log(`alerts_check: no data available, reset in ${msToTime(timer)}`)
                 res.rows.forEach(row => {
@@ -1987,10 +1987,7 @@ async function alerts_check() {
 
             var mission_list = []
             var alerts_rewards = []
-            var least_expiry = new Date(alerts[0].expiry).getTime()
             alerts.forEach(alert => {
-                if (new Date(alert.expiry).getTime() < least_expiry)
-                    least_expiry = new Date(alert.expiry).getTime()
                 mission_list.push({
                     title: alert.mission.description,
                     node: `${alert.mission.node} - ${alert.mission.type}`,
@@ -2063,7 +2060,7 @@ async function alerts_check() {
                 }
             })
 
-            var timer = (least_expiry - new Date().getTime())
+            var timer = 3600000
             alertsTimer = setTimeout(alerts_check, timer)
             console.log(`alerts_check invokes in ${msToTime(timer)}`)
         }).catch(err => console.log(err))
@@ -2086,8 +2083,8 @@ async function global_upgrades_check() {
                 return
 
             if (!global_upgrades || global_upgrades.length == 0) {
-                // check back in 15m
-                var timer = 900000
+                // check back in 60m
+                var timer = 3600000
                 global_upgrades_timer = setTimeout(global_upgrades_check, timer)
                 console.log(`global_upgrades_check: no data available, reset in ${msToTime(timer)}`)
                 res.rows.forEach(row => {
@@ -2188,7 +2185,7 @@ async function global_upgrades_check() {
                 }
             })
 
-            var timer = (new Date(global_upgrades[0].end).getTime() - new Date().getTime())
+            var timer = 3600000
             global_upgrades_timer = setTimeout(global_upgrades_check, timer)
             console.log('global_upgrades_check invokes in ' + msToTime(timer))
             return
