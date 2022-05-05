@@ -2050,6 +2050,7 @@ async function alerts_check() {
             })
 
             res.rows.forEach(row => {
+                if (row.channel_id == '960543998982897704') return
                 if (row.alerts_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
                         msg.edit({
