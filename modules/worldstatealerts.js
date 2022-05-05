@@ -1999,14 +1999,10 @@ async function alerts_check() {
                     expiry: Math.round(new Date(alert.expiry).getTime() / 1000),
                 })
                 var active_reward = alert.mission.reward.asString.toLowerCase().replace(/ /g,'_')
-                if (active_reward.match('orokin_reactor'))
-                    active_reward = 'orokin_reactor'
-                if (active_reward.match('orokin_catalyst'))
-                    active_reward = 'orokin_catalyst'
-                if (active_reward.match('umbra_forma'))
-                    active_reward = 'umbra_forma'
-                if (active_reward.match('forma'))
-                    active_reward = 'forma'
+                if (active_reward.match('orokin_reactor')) active_reward = 'orokin_reactor'
+                else if (active_reward.match('orokin_catalyst')) active_reward = 'orokin_catalyst'
+                else if (active_reward.match('umbra_forma')) active_reward = 'umbra_forma'
+                else if (active_reward.match('forma')) active_reward = 'forma'
                 alerts_rewards.push(active_reward)
 
                 res.rows.forEach(row => {
