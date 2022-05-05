@@ -1963,6 +1963,7 @@ async function alerts_check() {
                 var timer = 3600000
                 alertsTimer = setTimeout(alerts_check, timer)
                 console.log(`alerts_check: no data available, reset in ${msToTime(timer)}`)
+                db.query(`UPDATE worldstatealert SET alerts_rewards = '[]'`).catch(err => console.log(err))
                 res.rows.forEach(row => {
                     if (row.alerts_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
@@ -2050,7 +2051,6 @@ async function alerts_check() {
             })
 
             res.rows.forEach(row => {
-                if (row.channel_id == '960543998982897704') return
                 if (row.alerts_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
                         msg.edit({
