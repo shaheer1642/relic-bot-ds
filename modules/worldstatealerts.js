@@ -164,13 +164,13 @@ const colors = {
     global_upgrades: '#f00a0a'
 }
 //----set timers----
-var baroTimer = setTimeout(baro_check,16000)
-var cyclesTimer = setTimeout(cycles_check,10000)
+var baroTimer = setTimeout(baro_check,10000)
+var cyclesTimer = setTimeout(cycles_check,11000)
 var arbitrationTimer = setTimeout(arbitration_check,12000)
-var fissuresTimer = setTimeout(fissures_check,14000)
-var teshinTimer = setTimeout(teshin_check,8000)
-var alertsTimer = setTimeout(alerts_check,8000)
-var global_upgrades_timer = setTimeout(global_upgrades_check, 10000)
+var fissuresTimer = setTimeout(fissures_check,13000)
+var teshinTimer = setTimeout(teshin_check,14000)
+var alertsTimer = setTimeout(alerts_check,15000)
+var global_upgrades_timer = setTimeout(global_upgrades_check, 16000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -181,7 +181,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts\n8️⃣ Event Booster'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts\n8️⃣ Event Booster'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
