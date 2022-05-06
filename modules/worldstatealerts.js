@@ -1350,7 +1350,7 @@ async function baro_check() {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
                             msg.edit({
                                 content: `<@&${row.baro_role}>`,
-                                embeds: [embed]
+                                embeds: embed
                             }).catch(err => console.log(err))
                         }).catch(err => console.log(err))
                     }
