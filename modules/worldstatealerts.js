@@ -1323,14 +1323,22 @@ async function baro_check() {
                             client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                     })
                 }
-                var embed = {
+                var embed = [{
                     title: "Baro Ki'teer", 
                     description: `Baro has arrived! Leaving <t:${new Date(voidTrader.expiry).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
                     fields: [], 
                     color: colors.baro
-                }
-                voidTrader.inventory.forEach(item => {
-                    embed.fields.push({
+                }]
+                var emb_index = 0
+                voidTrader.inventory.forEach((item, index) => {
+                    if (index == 24 || index == 47) {
+                        embed.push({
+                            fields: [], 
+                            color: colors.baro
+                        })
+                        emb_index++
+                    }
+                    embed[emb_index].fields.push({
                         name: item.item,
                         value: `${emotes.credits.string} ${item.credits}\n${emotes.ducats.string} ${item.ducats}`,
                         inline: true
