@@ -1251,7 +1251,7 @@ async function preprocess_db_update() {
     // ------- update current prime vault sets ---------
     await db.query(`
         UPDATE items_list set vault_status = 'P', vault_timestamp = ${vaultOpenTime}
-        WHERE items_list IN ${JSON.stringify(vaultExclusiveRelics).replace(/"/g,`'`).replace('[', '(').replace(']', ')')}
+        WHERE item_url IN ${JSON.stringify(vaultExclusiveRelics).replace(/"/g,`'`).replace('[', '(').replace(']', ')')}
     `).catch(err => console.log(err))
 }
 
