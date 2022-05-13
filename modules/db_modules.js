@@ -6,37 +6,43 @@ const {WebhookClient} = require('discord.js');
 const {client,tickcount} = require('./discord_client.js');
 const fs = require('fs')
 const vaultExclusiveRelics = [
-    "meso_e5_relic",
-    "neo_b6_relic",
-    "axi_a12_relic",
-    "axi_h5_relic",
-    "lith_m7_relic",
-    "lith_k5_relic",
-    "banshee_prime_neuroptics",
-    "banshee_prime_set",
-    "banshee_prime_chassis",
-    "banshee_prime_systems",
-    "banshee_prime_blueprint",
-    "mirage_prime_neuroptics",
-    "mirage_prime_set",
-    "mirage_prime_chassis",
-    "mirage_prime_systems",
-    "mirage_prime_blueprint",
+    "lith_c8_relic",
+    "lith_t6_relic",
+    "meso_r4_relic",
+    "neo_k3_relic",
+    "neo_z8_relic",
+    "axi_g5_relic",
+    "chroma_prime_neuroptics",
+    "chroma_prime_set",
+    "chroma_prime_chassis",
+    "chroma_prime_systems",
+    "chroma_prime_blueprint",
+    "zephyr_prime_neuroptics",
+    "zephyr_prime_set",
+    "zephyr_prime_chassis",
+    "zephyr_prime_systems",
+    "zephyr_prime_blueprint",
     "akbolto_prime_blueprint",
-    "akbolto_prime_barrel",
-    "akbolto_prime_link",
-    "akbolto_prime_receiver",
-    "akbolto_prime_set",
-    "euphona_prime_blueprint",
-    "euphona_prime_set",
-    "euphona_prime_receiver",
-    "euphona_prime_barrel",
-    "helios_prime_blueprint",
-    "helios_prime_set",
-    "helios_prime_carapace",
-    "helios_prime_systems",
-    "helios_prime_cerebrum"
+    "gram_prime_blade",
+    "gram_prime_blueprint",
+    "gram_prime_handle",
+    "gram_prime_set",
+    "tiberon_prime_barrel",
+    "tiberon_prime_blueprint",
+    "tiberon_prime_receiver",
+    "tiberon_prime_set",
+    "tiberon_prime_stock",
+    "rubico_prime_set",
+    "rubico_prime_barrel",
+    "rubico_prime_blueprint",
+    "rubico_prime_receiver",
+    "rubico_prime_stock",
+    "kronen_prime_blade",
+    "kronen_prime_blueprint",
+    "kronen_prime_handle",
+    "kronen_prime_set",
 ]
+const vaultOpenTime = 1652266800000
 const vaultExpectedRelics = [
     "lith_h3_relic",
     "lith_g4_relic",
@@ -80,10 +86,8 @@ function setUpdateTimer(time = null,message = null) {
     console.log(`database update timer set invoked`)
     clearTimeout(DB_Update_Timer)
     if (time) {
-        if (message)
-            DB_Update_Timer = setTimeout(updateDatabaseItems, time, message);  
-        else
-            DB_Update_Timer = setTimeout(updateDatabaseItems, time);
+        if (message) DB_Update_Timer = setTimeout(updateDatabaseItems, time, message);  
+        else DB_Update_Timer = setTimeout(updateDatabaseItems, time);
         return
     }
     //--------Set new timer--------
@@ -109,7 +113,7 @@ function setUpdateTimer(time = null,message = null) {
     return msTill1AM
 }
 
-async function updateDatabaseItems(up_origin) {
+async function updateDatabaseItems(up_origin = null) {
     if (DB_Updating) {
         console.log(`An update is already in progress.`)
         return
@@ -117,8 +121,7 @@ async function updateDatabaseItems(up_origin) {
     DB_Updating = true
     //console.log(up_origin)
     inform_dc('Updating DB...')
-    if (up_origin)
-        up_origin.channel.send('Updating DB...')
+    if (up_origin) up_origin.channel.send('Updating DB...')
     console.log('Retrieving WFM items list...')
     const func1 = await axios("https://api.warframe.market/v1/items")
     .then(async wfm_items_list => {
@@ -284,12 +287,13 @@ async function updateDatabaseItems(up_origin) {
     }
     else {
         console.log('Verified all items in the DB.')
-        setTimeout(updateDatabasePrices, 3000, up_origin);
+        setTimeout(updateDatabasePrices, 1000, up_origin);
     }
 }
 
 async function updateDatabasePrices(up_origin) {
     var updateTickcount = new Date().getTime();
+    preprocess_db_update()
     //var status = await db.query(`UPDATE items_list SET rewards = null`)
     console.log('Retrieving DB items list...')
     var main = await db.query(`SELECT * FROM items_list`)
@@ -493,7 +497,8 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     return true
                 }
                 var matches = wikiInfo.data.parse.text["*"].match(/<a href="\/wiki\/Empyrean" title="Empyrean">Empyrean<\/a>/g)
-                var isRailjack = matches && matches.length <= 3;
+                const isRailjack = matches && matches.length <= 3;
+                var vault_timestamp = null
                 if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                     vault_status = 'V'
                 else if (isRailjack)
@@ -504,7 +509,6 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     vault_status = 'P'
                 else if (vaultExpectedRelics.includes(item.item_url))
                     vault_status = 'E'
-                var vault_timestamp = null
                 if (vault_status == 'V') {
                     var str = wikiInfo.data.parse.text["*"].toLowerCase()
                     if (str.match('latest vaulting')) {
@@ -550,8 +554,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     console.log(err + '\nError updating DB components vault status.')
                     return false
                 });
-                if (!status)
-                    return false
+                if (!status) return false
                 for (var i=0; i<db_items_list.length; i++) {
                     element = db_items_list[i]
                     if (element.id == item.id) {
@@ -1242,6 +1245,14 @@ async function verifyUserOrders() {
         }
     }
     console.log('verified orders.')
+}
+
+function preprocess_db_update() {
+    // ------- update current prime vault sets ---------
+    await db.query(`
+        UPDATE items_list set vault_status = 'P', vault_timestamp = ${vaultOpenTime}
+        WHERE items_list IN ${JSON.stringify(vaultExclusiveRelics).replace(/"/g,`'`).replace('[', '(').replace(']', ')')}
+    `).catch(err => console.log(err))
 }
 
 module.exports = {updateDatabaseItems,updateDatabasePrices,updateDatabaseItem,backupItemsList,updateDB,getDB,setUpdateTimer};
