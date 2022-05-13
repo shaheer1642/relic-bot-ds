@@ -1247,7 +1247,7 @@ async function verifyUserOrders() {
     console.log('verified orders.')
 }
 
-function preprocess_db_update() {
+async function preprocess_db_update() {
     // ------- update current prime vault sets ---------
     await db.query(`
         UPDATE items_list set vault_status = 'P', vault_timestamp = ${vaultOpenTime}
