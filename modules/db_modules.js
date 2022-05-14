@@ -585,7 +585,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     vault_status = 'V'
                 else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of.*being only obtainable through.*Railjack.*missions/))
                     vault_status = 'R'
-                else if (wikiInfo.data.parse.text["*"].match(`has returned from the <a href="/wiki/Prime_Vault" title="Prime Vault">Prime Vault</a> for a limited time`))
+                else if (vaultExclusiveRelics.includes(item.item_url))
                     vault_status = 'P'
                 else if (vaultExpectedRelics.includes(item.item_url))
                     vault_status = 'E'
