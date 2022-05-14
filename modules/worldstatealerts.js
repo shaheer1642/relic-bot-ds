@@ -1822,6 +1822,7 @@ async function fissures_check() {
             })
 
             var timer = min_expiry - new Date().getTime()
+            if (timer > 180000) timer -= 180000  // check 3 min before for reset
             fissuresTimer = setTimeout(fissures_check, timer)
             console.log('fissures_check invokes in ' + msToTime(timer))
         }).catch(err => console.log(err))
