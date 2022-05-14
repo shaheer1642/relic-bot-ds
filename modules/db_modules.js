@@ -501,13 +501,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 var vault_timestamp = null
                 if (wikiInfo.data.parse.text["*"].match(`is no longer obtainable from the <a href="/wiki/Drop_Tables" title="Drop Tables">Drop Tables</a>`))
                     vault_status = 'V'
-                else if (isRailjack)
+                if (isRailjack)
                     vault_status = 'R'
-                else if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
+                if (wikiInfo.data.parse.text["*"].match(`Baro Ki'Teer Exclusive`))
                     vault_status = 'B'
-                else if (vaultExclusiveRelics.includes(item.item_url))
+                if (vaultExclusiveRelics.includes(item.item_url))
                     vault_status = 'P'
-                else if (vaultExpectedRelics.includes(item.item_url))
+                if (vaultExpectedRelics.includes(item.item_url))
                     vault_status = 'E'
                 if (vault_status == 'V') {
                     var str = wikiInfo.data.parse.text["*"].toLowerCase()
@@ -583,11 +583,11 @@ async function updateDatabaseItem(db_items_list,item,index) {
             .then(async (wikiInfo) => {
                 if (wikiInfo.data.parse.text["*"].match(`The <a href="/wiki/Void_Relic" title="Void Relic">Void Relics</a> for this item have been removed from the <a href="/wiki/Drop_Tables" title="Drop Tables">drop tables</a>`))
                     vault_status = 'V'
-                else if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of.*being only obtainable through.*Railjack.*missions/))
+                if (wikiInfo.data.parse.text["*"].match(/relics were permanently unvaulted as of.*being only obtainable through.*Railjack.*missions/))
                     vault_status = 'R'
-                else if (vaultExclusiveRelics.includes(item.item_url))
+                if (vaultExclusiveRelics.includes(item.item_url))
                     vault_status = 'P'
-                else if (vaultExpectedRelics.includes(item.item_url))
+                if (vaultExpectedRelics.includes(item.item_url))
                     vault_status = 'E'
                 console.log(`Updating DB components vault status...`)
                 for (var j=0;j<components_list.length;j++) {
