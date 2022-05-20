@@ -2175,7 +2175,7 @@ async function global_upgrades_check() {
 
             var embed = {
                 title: 'Event Booster',
-                description: `React to subscribe to a specific item rotation`,
+                description: `React to be notified when a booster is active`,
                 fields: [{
                     name: "Active booster",
                     value: convertUpper(active_booster),
