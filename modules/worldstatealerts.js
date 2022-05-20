@@ -1156,13 +1156,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_KILL_XP_AMOUNT,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_KILL_XP_AMOUNT}', (global_upgrades_users->'GAMEPLAY_KILL_XP_AMOUNT') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity_booster}', (global_upgrades_users->'affinity_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -1178,13 +1178,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_PICKUP_AMOUNT,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_PICKUP_AMOUNT}', (global_upgrades_users->'GAMEPLAY_MONEY_PICKUP_AMOUNT') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit_booster}', (global_upgrades_users->'credit_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -1200,13 +1200,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_PICKUP_AMOUNT,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_amount_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_PICKUP_AMOUNT}', (global_upgrades_users->'GAMEPLAY_PICKUP_AMOUNT') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_amount_booster}', (global_upgrades_users->'resource_drop_amount_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -1222,13 +1222,13 @@ async function setupReaction(reaction,user,type) {
         if (type == "add") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_REWARD_AMOUNT,999999}', '"${user.id}"', true)
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_chance_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Added tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
-                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{GAMEPLAY_MONEY_REWARD_AMOUNT}', (global_upgrades_users->'GAMEPLAY_MONEY_REWARD_AMOUNT') - '${user.id}')
+                SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_chance_booster}', (global_upgrades_users->'resource_drop_chance_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
             `).then(() => user.send("Removed tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
         }
@@ -2147,7 +2147,11 @@ async function global_upgrades_check() {
                 return
             }
 
-            const active_booster = global_upgrades[0].upgrade
+            const active_booster = global_upgrades[0].upgrade.toLowerCase().replace(/ /g,'_')
+            .replace('mission_kill_xp','affinity_booster')
+            .replace('resource_drop_amount','resource_drop_amount_booster')
+            .replace('credit_drop_chance','resource_drop_chance_booster')
+            .replace('credit_drop_amount','credit_booster');
 
             db.query(`UPDATE worldstatealert SET active_booster = '${active_booster.toLowerCase()}'`).catch(err => console.log(err))
             
@@ -2174,7 +2178,7 @@ async function global_upgrades_check() {
                 description: `React to subscribe to a specific item rotation`,
                 fields: [{
                     name: "Active booster",
-                    value: active_booster,
+                    value: convertUpper(active_booster),
                     inline: true
                 },{
                     name: "Expires",
