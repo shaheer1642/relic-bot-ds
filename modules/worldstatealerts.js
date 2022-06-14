@@ -161,7 +161,8 @@ const colors = {
     teshin: "#6432a8",
     notification: "#32a852",
     alerts: "#3fccb0",
-    global_upgrades: '#f00a0a'
+    global_upgrades: '#f00a0a',
+    invasions: '#f0692b'
 }
 //----set timers----
 var baroTimer = setTimeout(baro_check,10000)
@@ -171,6 +172,7 @@ var fissuresTimer = setTimeout(fissures_check,13000)
 var teshinTimer = setTimeout(teshin_check,14000)
 var alertsTimer = setTimeout(alerts_check,15000)
 var global_upgrades_timer = setTimeout(global_upgrades_check, 16000)
+var invasions_timer = setTimeout(invasions_check, 9000)
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -181,7 +183,7 @@ async function wssetup(message,args) {
         content: ' ',
         embeds: [{
             title: 'Worldstate Alerts Setup',
-            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts\n8️⃣ Event Booster'
+            description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts\n8️⃣ Event Booster\n9️⃣ Invasions'
         }]
     }).then(msg => {
         msg.react('1️⃣').catch(err => console.log(err))
@@ -192,6 +194,7 @@ async function wssetup(message,args) {
         msg.react('6️⃣').catch(err => console.log(err))
         msg.react('7️⃣').catch(err => console.log(err))
         msg.react('8️⃣').catch(err => console.log(err))
+        msg.react('9️⃣').catch(err => console.log(err))
     }).catch(err => console.log(err))
 }
 
@@ -568,6 +571,49 @@ async function setupReaction(reaction,user,type) {
         var timer = 10000
         global_upgrades_timer = setTimeout(global_upgrades_check, 10000)
         console.log('global_upgrades_check invokes in ' + msToTime(timer))
+    }
+    if (reaction.emoji.name == "9️⃣" && type=="add") {
+        if (!access_ids.includes(user.id))
+            return
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
+            return
+        var status = await db.query(`
+            DO $$ BEGIN
+                IF NOT EXISTS (SELECT * FROM worldstatealert WHERE channel_id = ${channel_id}) THEN
+                    INSERT INTO worldstatealert (channel_id) VALUES (${channel_id});
+                END IF;
+            END $$;
+        `).then(res => {
+            return true
+        }).catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            return
+        }
+        // ---- alerts 
+        await reaction.message.channel.send({
+            content: ' ',
+            embeds: [{
+                title: 'Invasions',
+                description: `Invasions will show up here`,
+                color: colors.invasions
+            }]
+        }).then(async msg => {
+            await db.query(`UPDATE worldstatealert SET invasions_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            //await msg.react(emotes.affinity_booster.string).catch(err => console.log(err))
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+
+        clearTimeout(invasions_timer)
+        var timer = 10000
+        invasions_timer = setTimeout(invasions_check, 10000)
+        console.log('invasions_check invokes in ' + msToTime(timer))
     }
     if (reaction.emoji.identifier == emotes.baro.identifier) {
         console.log('baro reaction')
@@ -2212,6 +2258,150 @@ async function global_upgrades_check() {
     .catch(err => {
         console.log(err)
         global_upgrades_timer = setTimeout(global_upgrades_check,5000)
+    })
+}
+
+async function invasions_check() {
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        
+        const invasions = new WorldState(JSON.stringify(worldstateData.data)).invasions;
+
+        db.query(`SELECT * FROM worldstatealert`).then(res => {
+            if (res.rowCount == 0)
+                return
+
+            if (!invasions || invasions.length == 0) {
+                // check back in 5m
+                var timer = 300000
+                invasions_timer = setTimeout(invasions_check, timer)
+                console.log(`invasions_check: no data available, reset in ${msToTime(timer)}`)
+                res.rows.forEach(row => {
+                    if (row.invasions_alert) {
+                        client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
+                            msg.edit({
+                                content: ' ',
+                                embeds: [{
+                                    title: 'Invasions',
+                                    description: `React to track a specific reward\n\nNo invasion active right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
+                                    footer: {text: 'Note: This alert is unstable at the moment'},
+                                    color: colors.global_upgrades
+                                }]
+                            }).catch(err => console.log(err))
+                        }).catch(err => console.log(err))
+                    }
+                })
+                return
+            }
+
+            var rewards_list = []
+
+            invasions.forEach(invasion => {
+                if (invasion.completed) return
+            })
+
+            var users = {}
+            var ping_users = {}
+            var invasions_list = []
+            var invasions_rewards = []
+
+            invasions.forEach(invasion => {
+                invasions_list.push({
+                    title: invasion.desc,
+                    node: `${invasion.node} - ${invasion.attackingFaction} vs ${invasion.defendingFaction}`,
+                    reward: `${invasion.attacker.reward.asString} ${invasion.defender.reward.asString != "" ? 'vs':''} ${invasion.defender.reward.asString}`.trim(),
+                    expiry: Math.round(invasion.getRemainingTime() / 1000),
+                    completed: invasion.completed
+                })
+
+                if (invasion.completed) return
+
+                invasion.attacker.reward.countedItems.forEach(item => {
+                    const str = item.key.toLowerCase().replace(/ /g, '_')
+                    if (!rewards_list.includes(str))
+                        invasions_rewards.push(str)
+                    
+                })
+                invasion.defender.reward.countedItems.forEach(item => {
+                    const str = item.key.toLowerCase().replace(/ /g, '_')
+                    if (!rewards_list.includes(str))
+                        invasions_rewards.push(str)
+                })
+
+            })
+
+            invasions_rewards.forEach(active_reward => {
+                res.rows.forEach(row => {
+                    if (row.invasions_users[active_reward]) {
+                        row.invasions_users[active_reward].forEach(user => {
+                            if (!users[row.channel_id])
+                                users[row.channel_id] = []
+                            if (!users[row.channel_id].includes(`<@${user}>`))
+                                users[row.channel_id].push(`<@${user}>`)
+                            if (!row.invasions_rewards.includes(active_reward)) {
+                                if (!ping_users[row.channel_id])
+                                    ping_users[row.channel_id] = []
+                                if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                    ping_users[row.channel_id].push(`<@${user}>`)
+                            }
+                        })
+                    }
+                })
+            })
+
+            db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(err => console.log(err))
+
+            var embed = {
+                title: 'Invasions',
+                description: `React to subscribe to specific rewards`,
+                fields: [{
+                    name: "Mission",
+                    value: '',
+                    inline: true
+                },{
+                    name: "Reward",
+                    value: '',
+                    inline: true
+                },{
+                    name: "Expires",
+                    value: '',
+                    inline: true
+                }],
+                color: colors.alerts
+            }
+            invasions_list.forEach(invasion => {
+                embed.fields[0].value += invasion.node + '\n'
+                embed.fields[1].value += invasion.reward + '\n'
+                if (invasion.expiry < 0)
+                    embed.fields[2].value += 'Expired' + '\n'
+                else if (invasion.expiry == Infinity)
+                    embed.fields[2].value += 'Not estimated yet' + '\n'
+                else
+                    embed.fields[2].value += '<t:' + invasion.expiry + ':R>' + '\n'
+            })
+
+            res.rows.forEach(row => {
+                if (row.invasions_alert) {
+                    client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
+                        msg.edit({
+                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            embeds: [embed]
+                        }).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
+                        client.channels.cache.get(row.channel_id).send(`Invasion reward: ${convertUpper(invasions_rewards.join(', ').replace(/_/g,' '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                }
+            })
+
+            var timer = 300000
+            invasions_timer = setTimeout(invasions_check, timer)
+            console.log('invasions_check invokes in ' + msToTime(timer))
+            return
+        }).catch(err => console.log(err))
+    })
+    .catch(err => {
+        console.log(err)
+        invasions_timer = setTimeout(invasions_check,5000)
     })
 }
 
