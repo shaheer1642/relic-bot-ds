@@ -2889,6 +2889,7 @@ async function invasions_check() {
                     value: '',
                     inline: true
                 }],
+                footer: {text: 'Note: This alert is unstable at the moment'},
                 color: colors.invasions
             }
             invasions_list.forEach(invasion => {
