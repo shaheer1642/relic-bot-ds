@@ -2310,7 +2310,7 @@ async function invasions_check() {
                     title: invasion.desc,
                     node: `${invasion.node} - ${invasion.attackingFaction} vs ${invasion.defendingFaction}`,
                     reward: `${invasion.attacker.reward.asString} ${invasion.defender.reward.asString != "" ? 'vs':''} ${invasion.defender.reward.asString}`.trim(),
-                    expiry: Math.round(invasion.getRemainingTime() / 1000),
+                    expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
                     completed: invasion.completed
                 })
 
@@ -2355,7 +2355,7 @@ async function invasions_check() {
                 title: 'Invasions',
                 description: `React to subscribe to specific rewards`,
                 fields: [{
-                    name: "Mission",
+                    name: "Node",
                     value: '',
                     inline: true
                 },{
