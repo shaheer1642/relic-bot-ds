@@ -152,6 +152,54 @@ const emotes = {
         string: '<:steel_essence:962508988442869800>',
         identifier: 'steel_essence:962508988442869800'
     },
+    detonite_injector: {
+        string: '<:detonite_injector:986700371462324224>',
+        identifier: 'detonite_injector:986700371462324224'
+    },
+    fieldron: {
+        string: '<:fieldron:986700389120372836>',
+        identifier: 'fieldron:986700389120372836'
+    },
+    mutagen_mass: {
+        string: '<:mutagen_mass:986700394627465237>',
+        identifier: 'mutagen_mass:986700394627465237'
+    },
+    mutalist_alad_v_nav_coordinate: {
+        string: '<:mutalist_alad_v_nav_coordinate:986700403951427624>',
+        identifier: 'mutalist_alad_v_nav_coordinate:986700403951427624'
+    },
+    exilus_adapter_blueprint: {
+        string: '<:exilus_adapter_blueprint:986700377502150706>',
+        identifier: 'exilus_adapter_blueprint:986700377502150706'
+    },
+    snipetron_vandal: {
+        string: '<:snipetron_vandal:986655973026443304>',
+        identifier: 'snipetron_vandal:986655973026443304'
+    },
+    strun_wraith: {
+        string: '<:strun_wraith:986656019071516752>',
+        identifier: 'strun_wraith:986656019071516752'
+    },
+    twin_vipers_wraith: {
+        string: '<:twin_vipers_wraith:986656068052590693>',
+        identifier: 'twin_vipers_wraith:986656068052590693'
+    },
+    dera_vandal: {
+        string: '<:dera_vandal:986655641647067156>',
+        identifier: 'dera_vandal:986655641647067156'
+    },
+    sheev: {
+        string: '<:sheev:986655789911539722>',
+        identifier: 'sheev:986655789911539722'
+    },
+    latron_wraith: {
+        string: '<:latron_wraith:986655734487986207>',
+        identifier: 'latron_wraith:986655734487986207'
+    },
+    karak_wraith: {
+        string: '<:karak_wraith:986655689097244692>',
+        identifier: 'karak_wraith:986655689097244692'
+    }
 }
 const colors = {
     baro: "#95744",
@@ -602,12 +650,26 @@ async function setupReaction(reaction,user,type) {
             content: ' ',
             embeds: [{
                 title: 'Invasions',
-                description: `Invasions will show up here`,
+                description: `React to subscribe to specific rewards\n\n${emotes.forma.string} Forma BP${'\u3000'.repeat(5)}${emotes.orokin_catalyst.string} Orokin Catalyst BP${'\u3000'.repeat(5)}${emotes.orokin_reactor.string} Orokin Reactor BP\n${emotes.fieldron.string} Fieldron${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.detonite_injector.string} Detonite Injector${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.mutagen_mass.string} Mutagen Mass\n${emotes.exilus_adapter_blueprint.string} Exilus Adapater BP${'\u3000'.repeat(1)}${'\u202F'.repeat(2)}${emotes.mutalist_alad_v_nav_coordinate.string} Mutalist Alad V Nav Coordinate\n${emotes.snipetron_vandal.string} Snipetron Vandal BP & Parts${'\u3000'.repeat(5)}${emotes.dera_vandal.string} Dera Vandal BP & Parts\n${emotes.twin_vipers_wraith.string} Twin Vipers Wraith BP & Parts${'\u3000'.repeat(4)}${'\u202F'.repeat(1)}${emotes.sheev.string} Sheev BP & Parts\n${emotes.latron_wraith.string} Latron Wraith BP & Parts${'\u3000'.repeat(6)}${'\u202F'.repeat(3)}${emotes.karak_wraith.string} Karak Wraith BP & Parts\n${emotes.strun_wraith.string} Strun Wraith BP & Parts`,
                 color: colors.invasions
             }]
         }).then(async msg => {
             await db.query(`UPDATE worldstatealert SET invasions_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            //await msg.react(emotes.affinity_booster.string).catch(err => console.log(err))
+            await msg.react(emotes.forma.string).catch(err => console.log(err))
+            await msg.react(emotes.orokin_catalyst.string).catch(err => console.log(err))
+            await msg.react(emotes.orokin_reactor.string).catch(err => console.log(err))
+            await msg.react(emotes.fieldron.string).catch(err => console.log(err))
+            await msg.react(emotes.detonite_injector.string).catch(err => console.log(err))
+            await msg.react(emotes.mutagen_mass.string).catch(err => console.log(err))
+            await msg.react(emotes.exilus_adapter_blueprint.string).catch(err => console.log(err))
+            await msg.react(emotes.mutalist_alad_v_nav_coordinate.string).catch(err => console.log(err))
+            await msg.react(emotes.snipetron_vandal.string).catch(err => console.log(err))
+            await msg.react(emotes.dera_vandal.string).catch(err => console.log(err))
+            await msg.react(emotes.twin_vipers_wraith.string).catch(err => console.log(err))
+            await msg.react(emotes.sheev.string).catch(err => console.log(err))
+            await msg.react(emotes.latron_wraith.string).catch(err => console.log(err))
+            await msg.react(emotes.karak_wraith.string).catch(err => console.log(err))
+            await msg.react(emotes.strun_wraith.string).catch(err => console.log(err))
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
 
         clearTimeout(invasions_timer)
@@ -2283,9 +2345,8 @@ async function invasions_check() {
                                 content: ' ',
                                 embeds: [{
                                     title: 'Invasions',
-                                    description: `React to track a specific reward\n\nNo invasion active right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
-                                    footer: {text: 'Note: This alert is unstable at the moment'},
-                                    color: colors.global_upgrades
+                                    description: `React to subscribe to specific rewards\n\n${emotes.forma.string} Forma BP${'\u3000'.repeat(5)}${emotes.orokin_catalyst.string} Orokin Catalyst BP${'\u3000'.repeat(5)}${emotes.orokin_reactor.string} Orokin Reactor BP\n${emotes.fieldron.string} Fieldron${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.detonite_injector.string} Detonite Injector${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.mutagen_mass.string} Mutagen Mass\n${emotes.exilus_adapter_blueprint.string} Exilus Adapater BP${'\u3000'.repeat(1)}${'\u202F'.repeat(2)}${emotes.mutalist_alad_v_nav_coordinate.string} Mutalist Alad V Nav Coordinate\n${emotes.snipetron_vandal.string} Snipetron Vandal BP & Parts${'\u3000'.repeat(5)}${emotes.dera_vandal.string} Dera Vandal BP & Parts\n${emotes.twin_vipers_wraith.string} Twin Vipers Wraith BP & Parts${'\u3000'.repeat(4)}${'\u202F'.repeat(1)}${emotes.sheev.string} Sheev BP & Parts\n${emotes.latron_wraith.string} Latron Wraith BP & Parts${'\u3000'.repeat(6)}${'\u202F'.repeat(3)}${emotes.karak_wraith.string} Karak Wraith BP & Parts\n${emotes.strun_wraith.string} Strun Wraith BP & Parts`,                
+                                    color: colors.invasions
                                 }]
                             }).catch(err => console.log(err))
                         }).catch(err => console.log(err))
@@ -2295,10 +2356,6 @@ async function invasions_check() {
             }
 
             var rewards_list = []
-
-            invasions.forEach(invasion => {
-                if (invasion.completed) return
-            })
 
             var users = {}
             var ping_users = {}
@@ -2330,6 +2387,8 @@ async function invasions_check() {
 
             })
 
+            db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(err => console.log(err))
+
             invasions_rewards.forEach(active_reward => {
                 res.rows.forEach(row => {
                     if (row.invasions_users[active_reward]) {
@@ -2349,11 +2408,9 @@ async function invasions_check() {
                 })
             })
 
-            db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(err => console.log(err))
-
             var embed = {
                 title: 'Invasions',
-                description: `React to subscribe to specific rewards`,
+                description: `React to subscribe to specific rewards\n\n${emotes.forma.string} Forma BP${'\u3000'.repeat(5)}${emotes.orokin_catalyst.string} Orokin Catalyst BP${'\u3000'.repeat(5)}${emotes.orokin_reactor.string} Orokin Reactor BP\n${emotes.fieldron.string} Fieldron${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.detonite_injector.string} Detonite Injector${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.mutagen_mass.string} Mutagen Mass\n${emotes.exilus_adapter_blueprint.string} Exilus Adapater BP${'\u3000'.repeat(1)}${'\u202F'.repeat(2)}${emotes.mutalist_alad_v_nav_coordinate.string} Mutalist Alad V Nav Coordinate\n${emotes.snipetron_vandal.string} Snipetron Vandal BP & Parts${'\u3000'.repeat(5)}${emotes.dera_vandal.string} Dera Vandal BP & Parts\n${emotes.twin_vipers_wraith.string} Twin Vipers Wraith BP & Parts${'\u3000'.repeat(4)}${'\u202F'.repeat(1)}${emotes.sheev.string} Sheev BP & Parts\n${emotes.latron_wraith.string} Latron Wraith BP & Parts${'\u3000'.repeat(6)}${'\u202F'.repeat(3)}${emotes.karak_wraith.string} Karak Wraith BP & Parts\n${emotes.strun_wraith.string} Strun Wraith BP & Parts`,
                 fields: [{
                     name: "Node",
                     value: '',
@@ -2363,15 +2420,15 @@ async function invasions_check() {
                     value: '',
                     inline: true
                 },{
-                    name: "Expires",
+                    name: "Estimated Expiry",
                     value: '',
                     inline: true
                 }],
-                color: colors.alerts
+                color: colors.invasions
             }
             invasions_list.forEach(invasion => {
                 embed.fields[0].value += invasion.node + '\n'
-                embed.fields[1].value += invasion.reward + '\n'
+                embed.fields[1].value += rewardIcon(invasion.reward) + '\n'
                 if (invasion.expiry == Infinity)
                     embed.fields[2].value += 'Not estimated yet' + '\n'
                 else
@@ -2390,6 +2447,16 @@ async function invasions_check() {
                         client.channels.cache.get(row.channel_id).send(`Invasion reward: ${convertUpper(invasions_rewards.join(', ').replace(/_/g,' '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
+
+            function rewardIcon(rewardString) {
+                rewardString = rewardString.toLowerCase().replace(/ /g,'_')
+                Object.keys(emotes).forEach(emote => {
+                    if (rewardString.match(emote)) {
+                        rewardString = rewardString.replace(emote,emotes[emote].string)
+                    }
+                })
+                return convertUpper(rewardString)
+            }
 
             var timer = 300000
             invasions_timer = setTimeout(invasions_check, timer)

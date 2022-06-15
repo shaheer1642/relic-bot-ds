@@ -91,6 +91,18 @@ const worldstatealertEmotes = [
     "resource_chance:971084287774449674",
     "orokin_reactor:971513247930941480",
     "orokin_catalyst:971513248576860190",
+    "detonite_injector:986700371462324224",
+    "fieldron:986700389120372836",
+    "mutagen_mass:986700394627465237",
+    "mutalist_alad_v_nav_coordinate:986700403951427624",
+    "exilus_adapter_blueprint:986700377502150706",
+    "snipetron_vandal:986655973026443304",
+    "strun_wraith:986656019071516752",
+    "twin_vipers_wraith:986656068052590693",
+    "dera_vandal:986655641647067156",
+    "sheev:986655789911539722",
+    "latron_wraith:986655734487986207",
+    "karak_wraith:986655689097244692",
 ]
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
