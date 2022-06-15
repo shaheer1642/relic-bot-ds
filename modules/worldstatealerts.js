@@ -2306,15 +2306,15 @@ async function invasions_check() {
             var invasions_rewards = []
 
             invasions.forEach(invasion => {
+                if (invasion.completed) return
+
                 invasions_list.push({
                     title: invasion.desc,
-                    node: `${invasion.node} - ${invasion.attackingFaction} vs ${invasion.defendingFaction}`,
-                    reward: `${invasion.attacker.reward.asString} ${invasion.defender.reward.asString != "" ? 'vs':''} ${invasion.defender.reward.asString}`.trim(),
+                    node: `${invasion.node}`,
+                    reward: `${invasion.attacker.reward.asString} ${invasion.defender.reward.asString != "" ?  'vs':''} ${invasion.defender.reward.asString}`.trim(),
                     expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
                     completed: invasion.completed
                 })
-
-                if (invasion.completed) return
 
                 invasion.attacker.reward.countedItems.forEach(item => {
                     const str = item.key.toLowerCase().replace(/ /g, '_')
@@ -2372,9 +2372,7 @@ async function invasions_check() {
             invasions_list.forEach(invasion => {
                 embed.fields[0].value += invasion.node + '\n'
                 embed.fields[1].value += invasion.reward + '\n'
-                if (invasion.expiry < 0)
-                    embed.fields[2].value += 'Expired' + '\n'
-                else if (invasion.expiry == Infinity)
+                if (invasion.expiry == Infinity)
                     embed.fields[2].value += 'Not estimated yet' + '\n'
                 else
                     embed.fields[2].value += '<t:' + invasion.expiry + ':R>' + '\n'
