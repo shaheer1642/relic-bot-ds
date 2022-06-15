@@ -2823,6 +2823,7 @@ async function invasions_check() {
             var ping_users = {}
             var invasions_list = []
             var invasions_rewards = []
+            var ping_rewards = []
 
             invasions.forEach(invasion => {
                 if (invasion.completed) return
@@ -2860,6 +2861,8 @@ async function invasions_check() {
                             if (!users[row.channel_id].includes(`<@${user}>`))
                                 users[row.channel_id].push(`<@${user}>`)
                             if (!row.invasions_rewards.includes(active_reward)) {
+                                if (!ping_rewards.includes(active_reward))
+                                    ping_rewards.push(active_reward)
                                 if (!ping_users[row.channel_id])
                                     ping_users[row.channel_id] = []
                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2906,7 +2909,7 @@ async function invasions_check() {
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Invasion reward: ${convertUpper(invasions_rewards.join(', ').replace(/_/g,' '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Invasion reward: ${convertUpper(ping_rewards.join(', ').replace(/_/g,' '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
 
