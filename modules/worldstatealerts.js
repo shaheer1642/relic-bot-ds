@@ -2457,8 +2457,7 @@ async function invasions_check() {
                 })
                 rewardString = convertUpper(rewardString)
                 rewardString = rewardString.replace(/@@/g,'_')
-                console.log(rewardString)
-                return convertUpper(rewardString)
+                return rewardString
             }
 
             var timer = 300000
