@@ -100,6 +100,10 @@ const emotes = {
         string: '<:forma:962507080667910194>',
         identifier: 'forma:962507080667910194'
     },
+    forma_blueprint: {
+        string: '<:forma:962507080667910194>',
+        identifier: 'forma:962507080667910194'
+    },
     kitgun_riven: {
         string: '<:kitgun_riven:962507042113880064>',
         identifier: 'kitgun_riven:962507042113880064'
@@ -144,7 +148,15 @@ const emotes = {
         string: '<:orokin_reactor:971513247930941480>',
         identifier: 'orokin_reactor:971513247930941480'
     },
+    orokin_reactor_blueprint: {
+        string: '<:orokin_reactor:971513247930941480>',
+        identifier: 'orokin_reactor:971513247930941480'
+    },
     orokin_catalyst: {
+        string: '<:orokin_catalyst:971513248576860190>',
+        identifier: 'orokin_catalyst:971513248576860190'
+    },
+    orokin_catalyst_blueprint: {
         string: '<:orokin_catalyst:971513248576860190>',
         identifier: 'orokin_catalyst:971513248576860190'
     },
@@ -1120,6 +1132,21 @@ async function setupReaction(reaction,user,type) {
                 `).then(() => user.send("Removed tracker: Alerts forma").catch(err => console.log(err))).catch(err => console.log(err))
             }
         }
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{forma_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions forma blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{forma_blueprint}', (invasions_users->'forma_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions forma blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
     }
     if (reaction.emoji.identifier == emotes.zaw_riven.identifier) {
         console.log('zaw_riven reaction')
@@ -1347,20 +1374,36 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Alerts")
-            return
-        if (type == "add") {
-            db.query(`
-                UPDATE worldstatealert
-                SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor,999999}', '"${user.id}"', true)
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
-        } else if (type == "remove") {
-            db.query(`
-                UPDATE worldstatealert
-                SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor}', (alerts_users->'orokin_reactor') - '${user.id}')
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
+            
+        if (reaction.message.embeds[0].title == "Alerts") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor}', (alerts_users->'orokin_reactor') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{orokin_reactor_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{orokin_reactor_blueprint}', (invasions_users->'orokin_reactor_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            }
         }
     }
     if (reaction.emoji.identifier == emotes.orokin_catalyst.identifier) {
@@ -1369,20 +1412,193 @@ async function setupReaction(reaction,user,type) {
             await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
         if (reaction.message.author.id != client.user.id)
             return
-        if (reaction.message.embeds[0].title != "Alerts")
+            
+        if (reaction.message.embeds[0].title == "Alerts") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst}', (alerts_users->'orokin_catalyst') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{orokin_catalyst_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{orokin_catalyst_blueprint}', (invasions_users->'orokin_catalyst_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.exilus_adapter_blueprint.identifier) {
+        console.log('exilus_adapter_blueprint reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
             return
-        if (type == "add") {
-            db.query(`
-                UPDATE worldstatealert
-                SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst,999999}', '"${user.id}"', true)
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
-        } else if (type == "remove") {
-            db.query(`
-                UPDATE worldstatealert
-                SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst}', (alerts_users->'orokin_catalyst') - '${user.id}')
-                WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{exilus_adapter_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions exilus adapter blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{exilus_adapter_blueprint}', (invasions_users->'exilus_adapter_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions exilus adapter blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.fieldron.identifier) {
+        console.log('fieldron reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{fieldron,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions fieldron").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{fieldron}', (invasions_users->'fieldron') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions fieldron").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.detonite_injector.identifier) {
+        console.log('detonite_injector reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{detonite_injector,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions detonite injector").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{detonite_injector}', (invasions_users->'detonite_injector') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions detonite injector").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.mutagen_mass.identifier) {
+        console.log('mutagen_mass reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{mutagen_mass,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions mutagen mass").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{mutagen_mass}', (invasions_users->'mutagen_mass') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions mutagen mass").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.mutalist_alad_v_nav_coordinate.identifier) {
+        console.log('mutalist_alad_v_nav_coordinate reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{mutalist_alad_v_nav_coordinate,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions mutalist alad v nav coordinate").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{mutalist_alad_v_nav_coordinate}', (invasions_users->'mutalist_alad_v_nav_coordinate') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions mutalist alad v nav coordinate").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.snipetron_vandal.identifier) {
+        console.log('snipetron_vandal reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_barrel,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_stock,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_receiver,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions snipetron vandal").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_blueprint}', (invasions_users->'snipetron_vandal_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_barrel}', (invasions_users->'snipetron_vandal_barrel') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_stock}', (invasions_users->'snipetron_vandal_stock') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_receiver}', (invasions_users->'snipetron_vandal_receiver') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions snipetron vandal").catch(err => console.log(err))).catch(err => console.log(err))
+            }
         }
     }
 }
