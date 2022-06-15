@@ -2457,6 +2457,7 @@ async function invasions_check() {
                 })
                 rewardString = convertUpper(rewardString)
                 rewardString = rewardString.replace(/@@/g,'_')
+                console.log(rewardString)
                 return convertUpper(rewardString)
             }
 
