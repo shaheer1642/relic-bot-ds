@@ -2311,7 +2311,7 @@ async function invasions_check() {
                 invasions_list.push({
                     title: invasion.desc,
                     node: `${invasion.node}`,
-                    reward: `${invasion.attacker.reward.asString} ${invasion.defender.reward.asString != "" ?  'vs':''} ${invasion.defender.reward.asString}`.trim(),
+                    reward: `${invasion.attacker.reward.asString} ${((invasion.defender.reward.asString != "") && (invasion.attacker.reward.asString != "")) ? 'vs':''} ${invasion.defender.reward.asString}`.trim(),
                     expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
                     completed: invasion.completed
                 })
