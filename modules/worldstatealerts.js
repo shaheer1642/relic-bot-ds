@@ -2452,9 +2452,11 @@ async function invasions_check() {
                 rewardString = rewardString.toLowerCase().replace(/ /g,'_')
                 Object.keys(emotes).forEach(emote => {
                     if (rewardString.match(emote)) {
-                        rewardString = rewardString.replace(emote,emotes[emote].string)
+                        rewardString = rewardString.replace(emote,emotes[emote].string.replace(/_/g,'@@'))
                     }
                 })
+                rewardString = convertUpper(rewardString)
+                rewardString = rewardString.replace(/@@/g,'_')
                 return convertUpper(rewardString)
             }
 
