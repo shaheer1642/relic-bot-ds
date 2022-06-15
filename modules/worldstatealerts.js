@@ -1601,6 +1601,252 @@ async function setupReaction(reaction,user,type) {
             }
         }
     }
+    if (reaction.emoji.identifier == emotes.dera_vandal.identifier) {
+        console.log('dera_vandal reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_barrel,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_stock,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_receiver,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions dera vandal").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_blueprint}', (invasions_users->'dera_vandal_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_barrel}', (invasions_users->'dera_vandal_barrel') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_stock}', (invasions_users->'dera_vandal_stock') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_receiver}', (invasions_users->'dera_vandal_receiver') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions dera vandal").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.twin_vipers_wraith.identifier) {
+        console.log('twin_vipers_wraith reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_barrels,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_link,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_receivers,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions twin vipers wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_blueprint}', (invasions_users->'twin_vipers_wraith_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_barrels}', (invasions_users->'twin_vipers_wraith_barrels') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_link}', (invasions_users->'twin_vipers_wraith_link') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_receivers}', (invasions_users->'twin_vipers_wraith_receivers') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions twin vipers wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.sheev.identifier) {
+        console.log('sheev reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_hilt,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_blade,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_heatsink,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions sheev").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_blueprint}', (invasions_users->'sheev_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_hilt}', (invasions_users->'sheev_hilt') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_blade}', (invasions_users->'sheev_blade') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{sheev_heatsink}', (invasions_users->'sheev_heatsink') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions sheev").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.latron_wraith.identifier) {
+        console.log('latron_wraith reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_barrel,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_stock,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_receiver,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions latron wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_blueprint}', (invasions_users->'latron_wraith_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_barrel}', (invasions_users->'latron_wraith_barrel') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_stock}', (invasions_users->'latron_wraith_stock') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_receiver}', (invasions_users->'latron_wraith_receiver') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions latron wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.karak_wraith.identifier) {
+        console.log('karak_wraith reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_barrel,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_stock,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_receiver,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions karak wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_blueprint}', (invasions_users->'karak_wraith_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_barrel}', (invasions_users->'karak_wraith_barrel') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_stock}', (invasions_users->'karak_wraith_stock') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_receiver}', (invasions_users->'karak_wraith_receiver') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions karak wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
+    if (reaction.emoji.identifier == emotes.strun_wraith.identifier) {
+        console.log('strun_wraith reaction')
+        if (!reaction.message.author)
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+        if (reaction.message.author.id != client.user.id)
+            return
+        
+        if (reaction.message.embeds[0].title == "Invasions") {
+            if (type == "add") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_blueprint,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_barrel,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_stock,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_receiver,999999}', '"${user.id}"', true)
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Added tracker: Invasions strun wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            } else if (type == "remove") {
+                db.query(`
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_blueprint}', (invasions_users->'strun_wraith_blueprint') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_barrel}', (invasions_users->'strun_wraith_barrel') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_stock}', (invasions_users->'strun_wraith_stock') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                    UPDATE worldstatealert
+                    SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_receiver}', (invasions_users->'strun_wraith_receiver') - '${user.id}')
+                    WHERE channel_id = ${channel_id};
+                `).then(() => user.send("Removed tracker: Invasions strun wraith").catch(err => console.log(err))).catch(err => console.log(err))
+            }
+        }
+    }
 }
 
 //----tracking----
