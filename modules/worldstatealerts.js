@@ -2892,6 +2892,7 @@ async function invasions_check() {
                 footer: {text: 'Note: This alert is unstable at the moment'},
                 color: colors.invasions
             }
+            invasions_list = invasions_list.sort(dynamicSort("expiry"))
             invasions_list.forEach(invasion => {
                 embed.fields[0].value += invasion.node + '\n'
                 embed.fields[1].value += rewardIcon(invasion.reward) + '\n'
