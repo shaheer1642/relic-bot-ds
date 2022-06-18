@@ -2895,7 +2895,7 @@ async function invasions_check() {
             invasions_list.forEach(invasion => {
                 embed.fields[0].value += invasion.node + '\n'
                 embed.fields[1].value += rewardIcon(invasion.reward) + '\n'
-                if (invasion.expiry == Infinity || invasion.expiry == -Infinity || invasion.expiry > (new Date().getTime() + 172800000))
+                if (invasion.expiry == Infinity || invasion.expiry == -Infinity || invasion.expiry > ((new Date().getTime() + 172800000)/1000))
                     embed.fields[2].value += 'Not estimated yet' + '\n'
                 else
                     embed.fields[2].value += '<t:' + invasion.expiry + ':R>' + '\n'
