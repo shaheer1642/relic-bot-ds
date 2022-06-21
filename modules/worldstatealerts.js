@@ -2831,7 +2831,7 @@ async function invasions_check() {
                 invasions_list.push({
                     title: invasion.desc,
                     node: `${invasion.node}`,
-                    reward: `${invasion.attacker.reward.asString} ${((invasion.defender.reward.asString != "") && (invasion.attacker.reward.asString != "")) ? 'vs':''} ${invasion.defender.reward.asString}`.trim(),
+                    reward: `${invasion.attacker.reward.asString.replace('wraith_twin_vipers','twin_vipers_wraith')} ${((invasion.defender.reward.asString != "") && (invasion.attacker.reward.asString != "")) ? 'vs':''} ${invasion.defender.reward.asString.replace('wraith_twin_vipers','twin_vipers_wraith')}`.trim(),
                     expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
                     completed: invasion.completed
                 })
@@ -2855,6 +2855,9 @@ async function invasions_check() {
             db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(err => console.log(err))
 
             invasions_rewards.forEach(active_reward => {
+                active_reward = active_reward.split('_')
+                active_reward.pop()
+                active_reward = active_reward.join('_')
                 res.rows.forEach(row => {
                     if (row.invasions_users[active_reward]) {
                         row.invasions_users[active_reward].forEach(user => {
