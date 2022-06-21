@@ -2855,19 +2855,19 @@ async function invasions_check() {
             db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(err => console.log(err))
 
             invasions_rewards.forEach(active_reward => {
-                active_reward = active_reward.split('_')
-                active_reward.pop()
-                active_reward = active_reward.join('_')
+                active_reward_key = active_reward.split('_')
+                active_reward_key.pop()
+                active_reward_key = active_reward_key.join('_')
                 res.rows.forEach(row => {
-                    if (row.invasions_users[active_reward]) {
-                        row.invasions_users[active_reward].forEach(user => {
+                    if (row.invasions_users[active_reward_key]) {
+                        row.invasions_users[active_reward_key].forEach(user => {
                             if (!users[row.channel_id])
                                 users[row.channel_id] = []
                             if (!users[row.channel_id].includes(`<@${user}>`))
                                 users[row.channel_id].push(`<@${user}>`)
                             if (!row.invasions_rewards.includes(active_reward)) {
-                                if (!ping_rewards.includes(active_reward))
-                                    ping_rewards.push(active_reward)
+                                if (!ping_rewards.includes(active_reward_key))
+                                    ping_rewards.push(active_reward_key)
                                 if (!ping_users[row.channel_id])
                                     ping_users[row.channel_id] = []
                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
