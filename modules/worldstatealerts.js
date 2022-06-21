@@ -2837,13 +2837,15 @@ async function invasions_check() {
                 })
 
                 invasion.attacker.reward.countedItems.forEach(item => {
-                    const str = item.key.toLowerCase().replace(/ /g, '_')
+                    var str = item.key.toLowerCase().replace(/ /g, '_') + '_' + new Date(invasion.activation).getTime()
+                    str = str.replace('wraith_twin_vipers','twin_vipers_wraith')
                     if (!rewards_list.includes(str))
                         invasions_rewards.push(str)
                     
                 })
                 invasion.defender.reward.countedItems.forEach(item => {
-                    const str = item.key.toLowerCase().replace(/ /g, '_')
+                    var str = item.key.toLowerCase().replace(/ /g, '_') + '_' + new Date(invasion.activation).getTime()
+                    str = str.replace('wraith_twin_vipers','twin_vipers_wraith')
                     if (!rewards_list.includes(str))
                         invasions_rewards.push(str)
                 })
