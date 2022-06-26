@@ -2290,6 +2290,7 @@ async function arbitration_check() {
                 }
             })
         }).catch(err => console.log(err))
+        
         var timer = new Date(arbitration.expiry).getTime() - new Date().getTime()
         arbitrationTimer = setTimeout(arbitration_check, timer)
         console.log('arbitration_check invokes in ' + msToTime(timer))
@@ -2397,7 +2398,10 @@ async function fissures_check() {
             if (timer > 180000) timer -= 180000  // check 3 min before for reset
             fissuresTimer = setTimeout(fissures_check, timer)
             console.log('fissures_check invokes in ' + msToTime(timer))
-        }).catch(err => console.log(err))
+        }).catch(err => {
+            console.log(err)
+            fissuresTimer = setTimeout(fissures_check,5000)
+        })
         return
     })
     .catch(err => {
@@ -2517,6 +2521,7 @@ async function teshin_check() {
                 .replace("Shotgun Riven Mod","shotgun_riven")
             }
         }).catch(err => console.log(err))
+        
         var timer = (new Date(steelPath.expiry).getTime() - new Date().getTime())
         teshinTimer = setTimeout(teshin_check, timer)
         console.log('teshin_check invokes in ' + msToTime(timer))
@@ -2644,11 +2649,11 @@ async function alerts_check() {
                 }
             })
 
-            var timer = 3600000
-            alertsTimer = setTimeout(alerts_check, timer)
-            console.log(`alerts_check invokes in ${msToTime(timer)}`)
         }).catch(err => console.log(err))
-        return
+
+        var timer = 3600000
+        alertsTimer = setTimeout(alerts_check, timer)
+        console.log(`alerts_check invokes in ${msToTime(timer)}`)
     })
     .catch(err => {
         console.log(err)
@@ -2773,11 +2778,12 @@ async function global_upgrades_check() {
                 }
             })
 
-            var timer = 3600000
-            global_upgrades_timer = setTimeout(global_upgrades_check, timer)
-            console.log('global_upgrades_check invokes in ' + msToTime(timer))
-            return
         }).catch(err => console.log(err))
+
+        var timer = 3600000
+        global_upgrades_timer = setTimeout(global_upgrades_check, timer)
+        console.log('global_upgrades_check invokes in ' + msToTime(timer))
+        return
     })
     .catch(err => {
         console.log(err)
@@ -2931,12 +2937,11 @@ async function invasions_check() {
                 rewardString = rewardString.replace(/@@/g,'_')
                 return rewardString
             }
-
-            var timer = 300000
-            invasions_timer = setTimeout(invasions_check, timer)
-            console.log('invasions_check invokes in ' + msToTime(timer))
-            return
         }).catch(err => console.log(err))
+
+        var timer = 300000
+        invasions_timer = setTimeout(invasions_check, timer)
+        console.log('invasions_check invokes in ' + msToTime(timer))
     })
     .catch(err => {
         console.log(err)
