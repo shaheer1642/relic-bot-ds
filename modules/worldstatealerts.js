@@ -1985,14 +1985,14 @@ async function cycles_check() {
             console.log(`cycles_check reset in ${msToTime(timer)}`)
             return
         }
-        db.query(`SELECT * FROM worldstatealert`).then(res => {
+        db.query(`SELECT * FROM worldstatealert`).then(async res => {
             if (res.rowCount == 0)
                 return
             var users = {}
             var ping_users = {}
             var cycles_changed = []
             // ----- cetus check 
-            db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
+            await db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
                 row.cycles_users[cetusCycle.state].forEach(user => {
                     if (!users[row.channel_id])
@@ -2029,7 +2029,7 @@ async function cycles_check() {
                 })
             })
             // ----- vallis check
-            db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
+            await db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
                 row.cycles_users[vallisCycle.state].forEach(user => {
                     if (!users[row.channel_id])
@@ -2066,7 +2066,7 @@ async function cycles_check() {
                 })
             })
             // ----- cambion check
-            db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
+            await db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
             res.rows.forEach(row => {
                 row.cycles_users[cambionCycle.active].forEach(user => {
                     if (!users[row.channel_id])
