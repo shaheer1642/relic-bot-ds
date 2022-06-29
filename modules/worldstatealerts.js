@@ -2648,12 +2648,10 @@ async function alerts_check() {
                         client.channels.cache.get(row.channel_id).send(`Alert reward: ${convertUpper(alerts_rewards.join(', '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
-
+            var timer = 3600000
+            alertsTimer = setTimeout(alerts_check, timer)
+            console.log(`alerts_check invokes in ${msToTime(timer)}`)
         }).catch(err => console.log(err))
-
-        var timer = 3600000
-        alertsTimer = setTimeout(alerts_check, timer)
-        console.log(`alerts_check invokes in ${msToTime(timer)}`)
     })
     .catch(err => {
         console.log(err)
@@ -2777,13 +2775,11 @@ async function global_upgrades_check() {
                         client.channels.cache.get(row.channel_id).send(`Event booster: ${convertUpper(active_booster)} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
-
+            var timer = 3600000
+            global_upgrades_timer = setTimeout(global_upgrades_check, timer)
+            console.log('global_upgrades_check invokes in ' + msToTime(timer))
+            return
         }).catch(err => console.log(err))
-
-        var timer = 3600000
-        global_upgrades_timer = setTimeout(global_upgrades_check, timer)
-        console.log('global_upgrades_check invokes in ' + msToTime(timer))
-        return
     })
     .catch(err => {
         console.log(err)
@@ -2937,11 +2933,11 @@ async function invasions_check() {
                 rewardString = rewardString.replace(/@@/g,'_')
                 return rewardString
             }
+            
+            var timer = 300000
+            invasions_timer = setTimeout(invasions_check, timer)
+            console.log('invasions_check invokes in ' + msToTime(timer))
         }).catch(err => console.log(err))
-
-        var timer = 300000
-        invasions_timer = setTimeout(invasions_check, timer)
-        console.log('invasions_check invokes in ' + msToTime(timer))
     })
     .catch(err => {
         console.log(err)
