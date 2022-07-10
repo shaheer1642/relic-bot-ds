@@ -29,6 +29,7 @@ async function interactionHandler(interaction) {
     })
 }
 
+var timeout_edit_components = null;
 async function edit_main_msg() {
     console.log('editing main msg')
     var squads = {
@@ -121,37 +122,42 @@ async function edit_main_msg() {
 
     const channel = client.channels.cache.get('950400363410915348')
 
-    channel.messages.cache.get('995482866614009876').edit({
-        content: ' ',
-        embeds: [{
-            title: 'Recruitment',
-            description: 'empty'
-        }],
-        components: [
-            {
-                type: 1,
-                components: getComponents()
-            }
-        ]
-    }).catch(err => console.log(err)).then(console.log('edited 1st msg'))
-    channel.messages.cache.get('995482896276148266').edit({
-        content: '_ _',
-        components: [
-            {
-                type: 1,
-                components: getComponents()
-            }
-        ]
-    }).catch(err => console.log(err)).then(console.log('edited 2nd msg'))
-    channel.messages.cache.get('995482901204434984').edit({
-        content: '_ _',
-        components: [
-            {
-                type: 1,
-                components: getComponents()
-            }
-        ]
-    }).catch(err => console.log(err)).then(console.log('edited 3rd msg'))
+    clearTimeout(timeout_edit_components)
+    timeout_edit_components = setTimeout(edit_components, 2000);
+
+    function edit_components() {
+        channel.messages.cache.get('995482866614009876').edit({
+            content: ' ',
+            embeds: [{
+                title: 'Recruitment',
+                description: 'empty'
+            }],
+            components: [
+                {
+                    type: 1,
+                    components: getComponents()
+                }
+            ]
+        }).catch(err => console.log(err)).then(console.log('edited 1st msg'))
+        channel.messages.cache.get('995482896276148266').edit({
+            content: '_ _',
+            components: [
+                {
+                    type: 1,
+                    components: getComponents()
+                }
+            ]
+        }).catch(err => console.log(err)).then(console.log('edited 2nd msg'))
+        channel.messages.cache.get('995482901204434984').edit({
+            content: '_ _',
+            components: [
+                {
+                    type: 1,
+                    components: getComponents()
+                }
+            ]
+        }).catch(err => console.log(err)).then(console.log('edited 3rd msg'))
+    }
 
     function getComponents() {
         var components = [];
