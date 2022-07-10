@@ -12,7 +12,7 @@ function send_msg(msg, args) {
 
 function interactionHandler(interaction) {
     if (interaction.customId == 'sq_leave_all') {
-        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => edit_main_msg()).catch(err => console.log(err))
+        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate();edit_main_msg()}).catch(err => console.log(err))
         return
     } else {
         db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
