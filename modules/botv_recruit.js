@@ -151,11 +151,14 @@ async function edit_main_msg() {
                     break;
             }
         }
-        
+
         return {
             content: content,
             embeds: embeds,
-            components: components
+            components: {
+                type: 1,
+                components: components
+            }
         }
     }
 }
