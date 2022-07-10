@@ -8,8 +8,8 @@ function send_msg(msg, args) {
     
 }
 
-function edit_main_msg() {
-    var msg = client.channels.cache.get('950400363410915348').messages.cache.get('995482866614009876')
+async function edit_main_msg() {
+    var msg = await client.channels.cache.get('950400363410915348').messages.fetch('995482866614009876')
     msg.edit({
             content: ' ',
             embeds: [{
