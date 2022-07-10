@@ -49,12 +49,6 @@ async function edit_main_msg() {
                             label: "5",
                             style: 4,
                             custom_id: "5"
-                        },
-                        {
-                            type: 2,
-                            label: "6",
-                            style: 4,
-                            custom_id: "6"
                         }
                     ]
         
