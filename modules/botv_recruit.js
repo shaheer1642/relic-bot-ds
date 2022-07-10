@@ -107,6 +107,7 @@ async function edit_main_msg() {
         for (var index=0; index<squadsArr.length; index++) {
             const squad = squadsArr[index];
             console.log(squad)
+            console.log(index, componentIndex)
             if (index == componentIndex) {
                 components.push({
                     type: 2,
@@ -115,9 +116,9 @@ async function edit_main_msg() {
                     custom_id: squads[squad].id
                 })
                 componentIndex++;
-                if ((componentIndex+1) % 5 == 0) {
-                    break
-                }
+
+                if ((componentIndex+1) % 5 == 0)
+                    break;
             }
         }
         console.log(components)
