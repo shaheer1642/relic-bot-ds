@@ -9,8 +9,8 @@ function send_msg(msg, args) {
 }
 
 function edit_main_msg() {
-    client.channels.cache.get('950400363410915348').messages.cache.get('995482866614009876').edit(
-        {
+    var msg = client.channels.cache.get('950400363410915348').messages.cache.get('995482866614009876')
+    msg.edit({
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
@@ -60,8 +60,7 @@ function edit_main_msg() {
         
                 }
             ]
-        }
-    ).catch(err => console.log(err))
+    }).catch(err => console.log(err))
 }
 
 module.exports = {
