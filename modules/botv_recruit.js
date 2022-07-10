@@ -240,11 +240,20 @@ function open_squad(squad) {
             client.users.fetch(userId).then(user => user.send({content: `Your ${squad.name} squad has opened. Click on <#${thread.id}> to view squad`}).catch(err => console.log(err))).catch(err => console.log(err))
         })
 
-        thread.send({content: msg.trim(), embeds: [{
-            title: squad.name,
-            description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname.replace(/_/g, '\_')}\n`)}`,
-            color: '#ffffff'
-        }]}).catch(err => console.log(err))
+        try {
+            thread.send({content: msg.trim(), embeds: [{
+                title: squad.name,
+                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname.toString().replace(/_/g, '\_')}\n`)}`,
+                color: '#ffffff'
+            }]}).catch(err => console.log(err))
+        } catch (e) {
+            console.log(e)
+            thread.send({content: msg.trim(), embeds: [{
+                title: squad.name,
+                description: `Please decide a host and invite each other in the game.`,
+                color: '#ffffff'
+            }]}).catch(err => console.log(err))
+        }
 
     })
     db.query(`DELETE FROM botv_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}]) AND squad_type = '${squad.id}'`).catch(err => console.log(err))
