@@ -9,13 +9,13 @@ function send_msg(msg, args) {
 async function interactionHandler(interaction) {
     db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
     .then(res => {
-        if (res.rowCount == 1) {
-            console.log('rows are 1')
-            interaction.deferUpdate()
-        }
+        if (res.rowCount == 1) interaction.deferUpdate()
     }).catch(err => {
         if (err.code == 23505) { // duplicate key
             db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
+            .then(res => {
+                if (res.rowCount == 1) interaction.deferUpdate()
+            })
             .catch(err => console.log(err))
         } else {
             console.log(err)
