@@ -28,18 +28,21 @@ function send_msg(msg, args) {
 function interactionHandler(interaction) {
     if (interaction.customId == 'sq_leave_all') {
         db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate();edit_main_msg()}).catch(err => console.log(err))
+        console.log(`botv_recruit: user ${interaction.user.id} left all squads`)
         return
     } else {
         db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
         .then(res => {
             if (res.rowCount == 1) interaction.deferUpdate()
             edit_main_msg()
+            console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
         }).catch(err => {
             if (err.code == 23505) { // duplicate key
                 db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
                 .then(res => {
                     if (res.rowCount == 1) interaction.deferUpdate()
                     edit_main_msg()
+                    console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
                 })
                 .catch(err => console.log(err))
             } else {
@@ -172,7 +175,7 @@ async function edit_main_msg() {
                     components: getComponents()
                 }
             ]
-        }).catch(err => console.log(err)).then(console.log('edited 1st msg'))
+        }).catch(err => console.log(err))
         channel.messages.cache.get('995482896276148266').edit({
             content: '_ _',
             components: [
@@ -181,7 +184,7 @@ async function edit_main_msg() {
                     components: getComponents()
                 }
             ]
-        }).catch(err => console.log(err)).then(console.log('edited 2nd msg'))
+        }).catch(err => console.log(err))
         channel.messages.cache.get('995482901204434984').edit({
             content: '_ _',
             components: [
@@ -190,7 +193,7 @@ async function edit_main_msg() {
                     components: getComponents()
                 }
             ]
-        }).catch(err => console.log(err)).then(console.log('edited 3rd msg'))
+        }).catch(err => console.log(err))
     }
 
     function getComponents() {
