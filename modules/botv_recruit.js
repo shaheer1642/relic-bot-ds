@@ -123,7 +123,7 @@ async function edit_main_msg() {
             const join = res.rows[i];
             squads[join.squad_type].filled.push(join.user_id);
             if (squads[join.squad_type].filled.length == squads[join.squad_type].spots) {
-                open_squad(squads[join.squad_type])
+                open_squad(JSON.parse(JSON.stringify(squads[join.squad_type])))
                 squads[join.squad_type].filled = []
             }
         }
@@ -201,13 +201,12 @@ async function edit_main_msg() {
 
 function open_squad(squad) {
     console.log('botv squad opened')
-    console.log(JSON.stringify(squad))
-    return
     client.channels.cache.get('950400363410915348').threads.create({
         name: squad.name,
         autoArchiveDuration: 60,
         reason: 'Squad filled',
     }).then(thread => {
+        console.log(JSON.stringify(squad))
         setTimeout(() => thread.parent.messages.cache.get(thread.id).delete().catch(err => console.log(err)), 5000)
         var msg = ""
         squad.filled.forEach(userId => {
