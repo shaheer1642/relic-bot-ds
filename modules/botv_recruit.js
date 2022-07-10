@@ -4,8 +4,18 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} =
 
 function send_msg(msg, args) {
     client.channels.cache.get('950400363410915348').send({content: 'empty'}).catch*(err => console.log(err))
-    //
-    
+}
+
+async function interactionHandler(interaction) {
+    db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+    .then(res => {
+        if (res.rowCount == 0) {
+            console.log(res)
+        }
+    }).catch(err => {
+        console.log(err)
+        console.log('error occured')
+    })
 }
 
 async function edit_main_msg() {
@@ -41,13 +51,13 @@ async function edit_main_msg() {
             filled: 0
         },
         sq_taxi_help: {
-            name: 'Taxi/Help',
+            name: 'Taxi,Help',
             id: 'sq_taxi_help',
             spots: 2,
             filled: 0
         },
         sq_mining_fishing: {
-            name: 'Mining/Fishing',
+            name: 'Mining,Fishing',
             id: 'sq_mining_fishing',
             spots: 2,
             filled: 0
@@ -143,5 +153,6 @@ async function edit_main_msg() {
 
 module.exports = {
     send_msg,
-    edit_main_msg
+    edit_main_msg,
+    interactionHandler
 }
