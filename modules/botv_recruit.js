@@ -123,7 +123,7 @@ async function edit_main_msg() {
             const join = res.rows[i];
             squads[join.squad_type].filled.push(join.user_id);
             if (squads[join.squad_type].filled.length == squads[join.squad_type].spots) {
-                open_squad(squads[join.squad_type])
+                open_squad(Object.create(squads[join.squad_type]))
                 squads[join.squad_type].filled = []
             }
         }
@@ -206,7 +206,7 @@ function open_squad(squad) {
         autoArchiveDuration: 60,
         reason: 'Squad filled',
     }).then(thread => {
-        setTimeout(() => thread.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+        setTimeout(() => thread.parent.messages.cache.get(thread.id).delete().catch(err => console.log(err)), 5000)
         var msg = ""
         squad.filled.forEach(userId => {
             msg += `<@${userId}> `
