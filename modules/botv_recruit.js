@@ -210,7 +210,7 @@ async function edit_main_msg() {
                     components.push({
                         type: 2,
                         label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
-                        style: squads[squad].filled.length == 4 ? 2:squads[squad].filled.length == 3 ? 4:squads[squad].filled.length == 2 ? 3:squads[squad].filled.length == 2 ? 1:2,
+                        style: squads[squad].filled.length == 4 ? 2:squads[squad].filled.length == 3 ? 4:squads[squad].filled.length == 2 ? 3:squads[squad].filled.length == 1 ? 1:2,
                         custom_id: squads[squad].id
                     })
                 }
