@@ -19,6 +19,7 @@ setInterval(() => {     // check every 5m for squads timeouts
 
 function bot_initialize() {
     client.channels.fetch('950400363410915348').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+    client.guilds.fetch('776804537095684108').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
 }
 
 function send_msg(msg, args) {
@@ -225,7 +226,7 @@ async function edit_main_msg() {
 }
 
 function open_squad(squad) {
-    console.log('botv squad opened')
+    console.log('botv squad opened', squad.filled.join(' '))
     client.channels.cache.get('950400363410915348').threads.create({
         name: squad.name,
         autoArchiveDuration: 60,
