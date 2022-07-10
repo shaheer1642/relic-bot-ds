@@ -235,7 +235,7 @@ function open_squad(squad) {
 
         thread.send({content: msg.trim(), embeds: [{
             title: squad.name,
-            description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname}\n`)}`,
+            description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname.replace(/_/g, '\_')}\n`)}`,
             color: '#ffffff'
         }]}).catch(err => console.log(err))
 
