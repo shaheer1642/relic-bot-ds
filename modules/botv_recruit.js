@@ -130,7 +130,7 @@ async function edit_main_msg() {
             filled: []
         },
         sq_lich_murmur: {
-            name: 'Lich (MurMur)',
+            name: 'Lich (murmur)',
             id: 'sq_lich_murmur',
             spots: 3,
             filled: []
