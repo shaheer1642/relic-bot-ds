@@ -2,6 +2,10 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 
+function bot_initialize() {
+    client.channels.fetch('950400363410915348').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+}
+
 function send_msg(msg, args) {
     client.channels.cache.get('950400363410915348').send({content: 'empty'}).catch(err => console.log(err))
 }
@@ -114,8 +118,8 @@ async function edit_main_msg() {
         }
     }).catch(err => console.log(err))
 
-    const channel = await client.channels.fetch('950400363410915348').catch(err => console.log(err))
-    if (!channel.messages) await channel.messages.fetch();
+    const channel = client.channels.cache.get('950400363410915348')
+
     channel.messages.cache.get('995482866614009876').edit({
         content: ' ',
         embeds: [{
@@ -186,6 +190,7 @@ function open_squad(squad) {
 }
 
 module.exports = {
+    bot_initialize,
     send_msg,
     edit_main_msg,
     interactionHandler

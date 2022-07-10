@@ -192,6 +192,8 @@ client.on('ready', () => {
     }).catch(err => console.log(err))
 
     setTimeout(botv.updateMasteryDistr, 10000);
+
+    botv_recruit.bot_initialize()
 })
 
 client.on('messageCreate', async message => {
