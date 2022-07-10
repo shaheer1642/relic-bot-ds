@@ -68,13 +68,13 @@ async function edit_main_msg() {
         sq_incursions: {
             name: 'Incursions',
             id: 'sq_incursions',
-            spots: 4,
+            spots: 3,
             filled: []
         },
         sq_alerts: {
             name: 'Alerts',
             id: 'sq_alerts',
-            spots: 4,
+            spots: 3,
             filled: []
         },
         sq_eidolons: {
@@ -123,6 +123,12 @@ async function edit_main_msg() {
             name: 'Nightwave',
             id: 'sq_nightwave',
             spots: 2,
+            filled: []
+        },
+        sq_nightwave: {
+            name: 'Lich (MurMur)',
+            id: 'sq_lich_murmur',
+            spots: 3,
             filled: []
         },
         sq_leave_all: {
@@ -204,7 +210,7 @@ async function edit_main_msg() {
                     components.push({
                         type: 2,
                         label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
-                        style: squads[squad].filled.length == 4 ? 4:squads[squad].filled.length == 3 ? 1:squads[squad].filled.length == 2 ? 3:2,
+                        style: squads[squad].filled.length == 4 ? 2:squads[squad].filled.length == 3 ? 4:squads[squad].filled.length == 2 ? 3:squads[squad].filled.length == 2 ? 1:2,
                         custom_id: squads[squad].id
                     })
                 }
