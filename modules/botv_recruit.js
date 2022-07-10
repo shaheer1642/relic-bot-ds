@@ -85,8 +85,8 @@ async function edit_main_msg() {
     }
     var componentIndex = 0
 
-    var msg = await client.channels.cache.get('950400363410915348').messages.fetch('995482866614009876')
-    msg.edit({
+    const channel = await client.channels.fetch('950400363410915348').catch(err => console.log(err))
+    channel.messages.catche.get('995482866614009876').edit({
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
@@ -99,9 +99,26 @@ async function edit_main_msg() {
                 }
             ]
     }).catch(err => console.log(err))
+    channel.messages.catche.get('995482896276148266').edit({
+            content: '_ _',
+            components: [
+                {
+                    type: 1,
+                    components: getComponents()
+                }
+            ]
+    }).catch(err => console.log(err))
+    channel.messages.catche.get('995482901204434984').edit({
+            content: '_ _',
+            components: [
+                {
+                    type: 1,
+                    components: getComponents()
+                }
+            ]
+    }).catch(err => console.log(err))
 
     function getComponents() {
-        console.log('in getComponents')
         var components = [];
         const squadsArr = Object.keys(squads)
         for (var index=0; index<squadsArr.length; index++) {
@@ -110,7 +127,7 @@ async function edit_main_msg() {
                 components.push({
                     type: 2,
                     label: `${squads[squad].filled}/${squads[squad].spots} ${squads[squad].name}`,
-                    style: 1,
+                    style: 2,
                     custom_id: squads[squad].id
                 })
                 componentIndex++;
