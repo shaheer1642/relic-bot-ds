@@ -135,6 +135,12 @@ async function edit_main_msg() {
             spots: 3,
             filled: []
         },
+        sq_endo_arena: {
+            name: 'Endo Arena',
+            id: 'sq_endo_arena',
+            spots: 3,
+            filled: []
+        },
         sq_leave_all: {
             name: 'Leave All',
             id: 'sq_leave_all',
@@ -156,34 +162,36 @@ async function edit_main_msg() {
 
     const channel = client.channels.cache.get('950400363410915348')
 
-    //clearTimeout(timeout_edit_components)
-    //timeout_edit_components = setTimeout(edit_components, 2000);
+    clearTimeout(timeout_edit_components)
+    timeout_edit_components = setTimeout(edit_components, 1500);
 
-    channel.messages.cache.get('995482866614009876').edit({
-        content: ' ',
-        embeds: [{
-            title: 'Recruitment',
-            description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
-            footer: {
-                text: 'Note: The messages may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
-            },
-            color: '#ffffff'
-        }],
-        components: [
-            {
-                type: 1,
-                components: getComponents()
-            },
-            {
-                type: 1,
-                components: getComponents()
-            },
-            {
-                type: 1,
-                components: getComponents()
-            }
-        ]
-    }).catch(err => console.log(err))
+    function edit_components() {
+        channel.messages.cache.get('995482866614009876').edit({
+            content: ' ',
+            embeds: [{
+                title: 'Recruitment',
+                description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
+                footer: {
+                    text: 'Note: The messages may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
+                },
+                color: '#ffffff'
+            }],
+            components: [
+                {
+                    type: 1,
+                    components: getComponents()
+                },
+                {
+                    type: 1,
+                    components: getComponents()
+                },
+                {
+                    type: 1,
+                    components: getComponents()
+                }
+            ]
+        }).catch(err => console.log(err))
+    }
 
     function getComponents() {
         var components = [];
