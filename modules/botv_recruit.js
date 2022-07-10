@@ -101,10 +101,12 @@ async function edit_main_msg() {
 
     var componentIndex = 0
     function getComponents() {
+        console.log('in getComponents')
         var components = [];
         const squadsArr = Object.keys(squads)
-        for (var index=0; index<Object.keys(squads).length; index++) {
+        for (var index=0; index<squadsArr.length; index++) {
             const squad = squadsArr[index];
+            console.log(squad)
             if (index == componentIndex) {
                 components.push({
                     type: 2,
@@ -113,11 +115,12 @@ async function edit_main_msg() {
                     custom_id: squads[squad].id
                 })
                 componentIndex++;
-                if ((componentIndex+1 % 5) == 0) {
+                if ((componentIndex+1) % 5 == 0) {
                     break
                 }
             }
         }
+        console.log(components)
         return components;
     }
 }
