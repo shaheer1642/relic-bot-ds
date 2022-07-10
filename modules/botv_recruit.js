@@ -138,7 +138,7 @@ async function edit_main_msg() {
         sq_endo_arena: {
             name: 'Endo Arena',
             id: 'sq_endo_arena',
-            spots: 3,
+            spots: 4,
             filled: []
         },
         sq_leave_all: {
