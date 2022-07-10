@@ -24,37 +24,37 @@ async function edit_main_msg() {
                             type: 2,
                             label: "1",
                             style: 1,
-                            custom_id: "tb_verify"
+                            custom_id: "1"
                         },
                         {
                             type: 2,
                             label: "2",
                             style: 2,
-                            custom_id: "tb_my_profile"
+                            custom_id: "2"
                         },
                         {
                             type: 2,
                             label: "3",
                             style: 3,
-                            custom_id: "tb_actv_orders"
+                            custom_id: "3"
                         },
                         {
                             type: 2,
                             label: "4",
                             style: 4,
-                            custom_id: "tb_close_orders"
+                            custom_id: "4"
                         },
                         {
                             type: 2,
                             label: "5",
                             style: 4,
-                            custom_id: "tb_close_orders"
+                            custom_id: "5"
                         },
                         {
                             type: 2,
                             label: "6",
                             style: 4,
-                            custom_id: "tb_close_orders"
+                            custom_id: "6"
                         }
                     ]
         
