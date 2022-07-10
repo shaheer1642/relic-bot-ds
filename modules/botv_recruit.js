@@ -139,7 +139,10 @@ async function edit_main_msg() {
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
-                description: 'empty'
+                description: 'Click on the button to join a squad.\nYour join request will automatically be timed-out in 1 hour in-case it does not fill.\nPress button again to leave the squad, or you can press \'Leave all\'\nYou will be notified in DMs when squad fills.\nFor any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
+                footer: {
+                    text: 'Note: The messages may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
+                }
             }],
             components: [
                 {
@@ -211,12 +214,15 @@ function open_squad(squad) {
         var msg = ""
         squad.filled.forEach(userId => {
             msg += `<@${userId}> `
+            client.users.fetch(userId).then(user => user.send({content: `Your ${squad.name} squad has opened. Click on <#${thread.id}> to view squad`}).catch(err => console.log(err))).catch(err => console.log(err))
         })
 
-        thread.send({content: msg.trim() + ' Your squad has been filled', embeds: [{
+        thread.send({content: msg.trim(), embeds: [{
             title: squad.name,
-            description: 'empty'
+            description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname}\n`)}`,
+            color: '#ffffff'
         }]}).catch(err => console.log(err))
+
     })
     db.query(`DELETE FROM botv_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}]) AND squad_type = '${squad.id}'`).catch(err => console.log(err))
     db.query(`UPDATE botv_squads_history SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
