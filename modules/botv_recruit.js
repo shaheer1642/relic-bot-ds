@@ -1,19 +1,21 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
-const squad_timeout = 10000
+const squad_timeout = 3600000
 
 setInterval(() => {     // check every 5m for squads timeouts
     db.query(`SELECT * FROM botv_recruit_members`)
     .then(async res => {
         for (var i=0; i<res.rowCount; i++) {
             squad = res.rows[i]
-            if ((new Date().getTime() - squad.join_timestamp) > squad_timeout)
+            if ((new Date().getTime() - squad.join_timestamp) > squad_timeout) {
+                console.log(`botv_recruit: timing out squad ${squad.user_id} ${squad.squad_type}`)
                 await db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${squad.user_id} AND squad_type = '${squad.squad_type}'`)
+            }
         }
         edit_main_msg()
     }).catch(err => console.log(err))
-}, 10000);
+}, 300000);
 
 function bot_initialize() {
     client.channels.fetch('950400363410915348').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
@@ -152,7 +154,7 @@ async function edit_main_msg() {
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
-                description: 'Click on the button to join a squad.\nYour join request will automatically be timed-out in 1 hour in-case it does not fill.\nPress button again to leave the squad, or you can press \'Leave all\'\nYou will be notified in DMs when squad fills.\nFor any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
+                description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out in 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
                 footer: {
                     text: 'Note: The messages may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
                 },
