@@ -206,9 +206,16 @@ function open_squad(squad) {
         autoArchiveDuration: 60,
         reason: 'Squad filled',
     }).then(thread => {
+        setTimeout(() => thread.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+        var msg = ""
         squad.filled.forEach(userId => {
-            thread.members.add(userId).catch(err => console.log(err))
+            msg += `<@${userId}> `
         })
+
+        thread.send({content: msg.trim() + ' Your squad has been filled', embeds: [{
+            title: squad.name,
+            description: 'empty'
+        }]}).catch(err => console.log(err))
     })
     db.query(`DELETE FROM botv_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}]) AND squad_type = '${squad.id}'`).catch(err => console.log(err))
     db.query(`UPDATE botv_squads_history SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
