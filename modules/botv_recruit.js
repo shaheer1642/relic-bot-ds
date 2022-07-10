@@ -125,7 +125,7 @@ async function edit_main_msg() {
             spots: 2,
             filled: []
         },
-        sq_nightwave: {
+        sq_lich_murmur: {
             name: 'Lich (MurMur)',
             id: 'sq_lich_murmur',
             spots: 3,
