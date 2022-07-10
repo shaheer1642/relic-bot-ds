@@ -115,7 +115,7 @@ async function edit_main_msg() {
     }).catch(err => console.log(err))
 
     const channel = await client.channels.fetch('950400363410915348').catch(err => console.log(err))
-    await channel.messages.fetch();
+    if (!channel.messages) await channel.messages.fetch();
     channel.messages.cache.get('995482866614009876').edit({
         content: ' ',
         embeds: [{
