@@ -7,7 +7,7 @@ function send_msg(msg, args) {
 }
 
 async function interactionHandler(interaction) {
-    db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+    db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
     .then(res => {
         if (res.rowCount == 1) interaction.deferUpdate()
     }).catch(err => {
@@ -29,76 +29,88 @@ async function edit_main_msg() {
             name: 'Fissures',
             id: 'sq_fissures',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_sortie: {
             name: 'Sortie',
             id: 'sq_sortie',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_incursions: {
             name: 'Incursions',
             id: 'sq_incursions',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_alerts: {
             name: 'Alerts',
             id: 'sq_alerts',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_eidolons: {
             name: 'Eidolons',
             id: 'sq_eidolons',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_taxi_help: {
             name: 'Taxi,Help',
             id: 'sq_taxi_help',
             spots: 2,
-            filled: 0
+            filled: []
         },
         sq_mining_fishing: {
             name: 'Mining,Fishing',
             id: 'sq_mining_fishing',
             spots: 2,
-            filled: 0
+            filled: []
         },
         sq_bounties: {
             name: 'Bounties',
             id: 'sq_bounties',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_leveling: {
             name: 'Leveling',
             id: 'sq_leveling',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_index: {
             name: 'Index',
             id: 'sq_index',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_arbitration: {
             name: 'Arbitration',
             id: 'sq_arbitration',
             spots: 4,
-            filled: 0
+            filled: []
         },
         sq_nightwave: {
             name: 'Nightwave',
             id: 'sq_nightwave',
             spots: 2,
-            filled: 0
+            filled: []
         },
     }
     var componentIndex = 0
+
+    await db.query(`SELECT * FROM botv_recruit_members`)
+    .then(async res => {
+        for (var i=0; i<res.rowCount; i++) {
+            const join = res.rows[i];
+            squads[join.squad_type].filled.push(join.user_id);
+            if (squads[join.squad_type].filled.length == squads[join.squad_type].spots) {
+                open_squad(squads[join.squad_type])
+                squads[join.squad_type].filled = []
+            }
+        }
+    }).catch(err => console.log(err))
 
     const channel = await client.channels.fetch('950400363410915348').catch(err => console.log(err))
     await channel.messages.fetch();
@@ -142,8 +154,8 @@ async function edit_main_msg() {
             if (index == componentIndex) {
                 components.push({
                     type: 2,
-                    label: `${squads[squad].filled}/${squads[squad].spots} ${squads[squad].name}`,
-                    style: 2,
+                    label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
+                    style: squads[squad].filled.length == 4 ? 4:squads[squad].filled.length == 3 ? 1:squads[squad].filled.length == 2 ? 3:2,
                     custom_id: squads[squad].id
                 })
                 componentIndex++;
@@ -154,6 +166,21 @@ async function edit_main_msg() {
         }
         return components;
     }
+}
+
+function open_squad(squad) {
+    console.log('botv squad opened')
+    client.channels.cache.get('950400363410915348').threads.create({
+        name: threadName,
+        autoArchiveDuration: 60,
+        reason: 'Squad filled',
+    }).then(thread => {
+        squad.filled.forEach(userId => {
+            thread.members.add(userId).catch(err => console.log(err))
+        })
+    })
+    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}]) AND squad_type = '${squad.id}'`).catch(err => console.log(err))
+    db.query(`UPDATE botv_squads_history SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
 }
 
 module.exports = {
