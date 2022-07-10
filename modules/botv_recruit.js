@@ -83,6 +83,7 @@ async function edit_main_msg() {
             filled: 0
         },
     }
+    var componentIndex = 0
 
     var msg = await client.channels.cache.get('950400363410915348').messages.fetch('995482866614009876')
     msg.edit({
@@ -99,15 +100,12 @@ async function edit_main_msg() {
             ]
     }).catch(err => console.log(err))
 
-    var componentIndex = 0
     function getComponents() {
         console.log('in getComponents')
         var components = [];
         const squadsArr = Object.keys(squads)
         for (var index=0; index<squadsArr.length; index++) {
             const squad = squadsArr[index];
-            console.log(squad)
-            console.log(index, componentIndex)
             if (index == componentIndex) {
                 components.push({
                     type: 2,
@@ -117,11 +115,10 @@ async function edit_main_msg() {
                 })
                 componentIndex++;
 
-                if ((componentIndex+1) % 5 == 0)
+                if (componentIndex % 5 == 0)
                     break;
             }
         }
-        console.log(components)
         return components;
     }
 }
