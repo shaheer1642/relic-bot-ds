@@ -9,7 +9,7 @@ function send_msg(msg, args) {
 }
 
 function edit_main_msg() {
-    client.channels.cache.get('950400363410915348').messages.cache.get('000').edit(
+    client.channels.cache.get('950400363410915348').messages.cache.get('995482866614009876').edit(
         {
             content: ' ',
             embeds: [{

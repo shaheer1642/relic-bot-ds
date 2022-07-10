@@ -739,7 +739,7 @@ client.on('messageCreate', async message => {
                     break
                 ///*----------------------
                 case 'test':
-                    botv_recruit.send_msg(message,args)
+                    botv_recruit.edit_main_msg(message,args)
                     break
                 //-----------------------*/
             }
