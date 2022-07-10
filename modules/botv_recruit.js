@@ -10,23 +10,28 @@ function send_msg(msg, args) {
     client.channels.cache.get('950400363410915348').send({content: 'empty'}).catch(err => console.log(err))
 }
 
-async function interactionHandler(interaction) {
-    await db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
-    .then(res => {
-        if (res.rowCount == 1) interaction.deferUpdate()
-        edit_main_msg()
-    }).catch(err => {
-        if (err.code == 23505) { // duplicate key
-            db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
-            .then(res => {
-                if (res.rowCount == 1) interaction.deferUpdate()
-                edit_main_msg()
-            })
-            .catch(err => console.log(err))
-        } else {
-            console.log(err)
-        }
-    })
+function interactionHandler(interaction) {
+    if (interaction.customId == 'sq_leave_all') {
+        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => edit_main_msg()).catch(err => console.log(err))
+        return
+    } else {
+        db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+        .then(res => {
+            if (res.rowCount == 1) interaction.deferUpdate()
+            edit_main_msg()
+        }).catch(err => {
+            if (err.code == 23505) { // duplicate key
+                db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
+                .then(res => {
+                    if (res.rowCount == 1) interaction.deferUpdate()
+                    edit_main_msg()
+                })
+                .catch(err => console.log(err))
+            } else {
+                console.log(err)
+            }
+        })
+    }
 }
 
 var timeout_edit_components = null;
@@ -105,6 +110,10 @@ async function edit_main_msg() {
             spots: 2,
             filled: []
         },
+        sq_leave_all: {
+            name: 'Leave All',
+            id: 'sq_leave_all',
+        },
     }
     var componentIndex = 0
 
@@ -165,12 +174,21 @@ async function edit_main_msg() {
         for (var index=0; index<squadsArr.length; index++) {
             const squad = squadsArr[index];
             if (index == componentIndex) {
-                components.push({
-                    type: 2,
-                    label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
-                    style: squads[squad].filled.length == 4 ? 4:squads[squad].filled.length == 3 ? 1:squads[squad].filled.length == 2 ? 3:2,
-                    custom_id: squads[squad].id
-                })
+                if (squad == 'sq_leave_all') {
+                    components.push({
+                        type: 2,
+                        label: squads[squad].name,
+                        style: 4,
+                        custom_id: squads[squad].id
+                    })
+                } else {
+                    components.push({
+                        type: 2,
+                        label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
+                        style: squads[squad].filled.length == 4 ? 4:squads[squad].filled.length == 3 ? 1:squads[squad].filled.length == 2 ? 3:2,
+                        custom_id: squads[squad].id
+                    })
+                }
                 componentIndex++;
 
                 if (componentIndex % 5 == 0)
@@ -184,7 +202,7 @@ async function edit_main_msg() {
 function open_squad(squad) {
     console.log('botv squad opened')
     client.channels.cache.get('950400363410915348').threads.create({
-        name: threadName,
+        name: squad.name,
         autoArchiveDuration: 60,
         reason: 'Squad filled',
     }).then(thread => {
