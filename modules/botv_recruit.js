@@ -155,10 +155,10 @@ async function edit_main_msg() {
         return {
             content: content,
             embeds: embeds,
-            components: {
+            components: [{
                 type: 1,
                 components: components
-            }
+            }]
         }
     }
 }
