@@ -7,14 +7,16 @@ function send_msg(msg, args) {
 }
 
 async function interactionHandler(interaction) {
-    db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+    await db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
     .then(res => {
         if (res.rowCount == 1) interaction.deferUpdate()
+        edit_main_msg()
     }).catch(err => {
         if (err.code == 23505) { // duplicate key
             db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate()
+                edit_main_msg()
             })
             .catch(err => console.log(err))
         } else {
