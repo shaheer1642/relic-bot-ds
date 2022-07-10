@@ -86,36 +86,36 @@ async function edit_main_msg() {
     var componentIndex = 0
 
     const channel = await client.channels.fetch('950400363410915348').catch(err => console.log(err))
-    channel.messages.catche.get('995482866614009876').edit({
-            content: ' ',
-            embeds: [{
-                title: 'Recruitment',
-                description: 'empty'
-            }],
-            components: [
-                {
-                    type: 1,
-                    components: getComponents()
-                }
-            ]
+    channel.messages.cache.get('995482866614009876').edit({
+        content: ' ',
+        embeds: [{
+            title: 'Recruitment',
+            description: 'empty'
+        }],
+        components: [
+            {
+                type: 1,
+                components: getComponents()
+            }
+        ]
     }).catch(err => console.log(err))
-    channel.messages.catche.get('995482896276148266').edit({
-            content: '_ _',
-            components: [
-                {
-                    type: 1,
-                    components: getComponents()
-                }
-            ]
+    channel.messages.cache.get('995482896276148266').edit({
+        content: '_ _',
+        components: [
+            {
+                type: 1,
+                components: getComponents()
+            }
+        ]
     }).catch(err => console.log(err))
-    channel.messages.catche.get('995482901204434984').edit({
-            content: '_ _',
-            components: [
-                {
-                    type: 1,
-                    components: getComponents()
-                }
-            ]
+    channel.messages.cache.get('995482901204434984').edit({
+        content: '_ _',
+        components: [
+            {
+                type: 1,
+                components: getComponents()
+            }
+        ]
     }).catch(err => console.log(err))
 
     function getComponents() {
