@@ -121,27 +121,47 @@ async function edit_main_msg() {
 
     const channel = client.channels.cache.get('950400363410915348')
 
-    channel.messages.cache.get('995482866614009876').edit(getEdit(1, 1, 1)).catch(err => console.log(err)).then(console.log('edited 1st msg'))
-    channel.messages.cache.get('995482896276148266').edit(getEdit(1, 0, 1)).catch(err => console.log(err)).then(console.log('edited 2nd msg'))
-    channel.messages.cache.get('995482901204434984').edit(getEdit(1, 0, 1)).catch(err => console.log(err)).then(console.log('edited 3rd msg'))
-
-    function getEdit(c, e, cmp) {
-        var content = ""
-        var embeds = [{
+    channel.messages.cache.get('995482866614009876').edit({
+        content: ' ',
+        embeds: [{
             title: 'Recruitment',
             description: 'empty'
-        }]
-        if (!e) embeds = []
-        var components = [];
+        }],
+        components: [
+            {
+                type: 1,
+                components: getComponents()
+            }
+        ]
+    }).catch(err => console.log(err)).then(console.log('edited 1st msg'))
+    channel.messages.cache.get('995482896276148266').edit({
+        content: '_ _',
+        components: [
+            {
+                type: 1,
+                components: getComponents()
+            }
+        ]
+    }).catch(err => console.log(err)).then(console.log('edited 2nd msg'))
+    channel.messages.cache.get('995482901204434984').edit({
+        content: '_ _',
+        components: [
+            {
+                type: 1,
+                components: getComponents()
+            }
+        ]
+    }).catch(err => console.log(err)).then(console.log('edited 3rd msg'))
 
+    function getComponents() {
+        var components = [];
         const squadsArr = Object.keys(squads)
         for (var index=0; index<squadsArr.length; index++) {
             const squad = squadsArr[index];
             if (index == componentIndex) {
-                content += `${squads[squad].filled.length}/${squads[squad].spots}          `
                 components.push({
                     type: 2,
-                    label: squads[squad].name,
+                    label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
                     style: squads[squad].filled.length == 4 ? 4:squads[squad].filled.length == 3 ? 1:squads[squad].filled.length == 2 ? 3:2,
                     custom_id: squads[squad].id
                 })
@@ -151,15 +171,7 @@ async function edit_main_msg() {
                     break;
             }
         }
-
-        return {
-            content: content,
-            embeds: embeds,
-            components: [{
-                type: 1,
-                components: components
-            }]
-        }
+        return components;
     }
 }
 
