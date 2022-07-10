@@ -123,7 +123,7 @@ async function edit_main_msg() {
             const join = res.rows[i];
             squads[join.squad_type].filled.push(join.user_id);
             if (squads[join.squad_type].filled.length == squads[join.squad_type].spots) {
-                open_squad(Object.create(squads[join.squad_type]))
+                open_squad(squads[join.squad_type])
                 squads[join.squad_type].filled = []
             }
         }
