@@ -4,4 +4,5 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} =
 
 function send_msg(msg, args) {
     client.channels.cache.get('950400363410915348').send('empty').catch*(err => console.log(err))
+    //
 }
