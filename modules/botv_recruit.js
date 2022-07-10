@@ -174,9 +174,18 @@ async function edit_main_msg() {
                 {
                     type: 1,
                     components: getComponents()
+                },
+                {
+                    type: 1,
+                    components: getComponents()
+                },
+                {
+                    type: 1,
+                    components: getComponents()
                 }
             ]
         }).catch(err => console.log(err))
+        /*
         channel.messages.cache.get('995482896276148266').edit({
             content: '_ _',
             components: [
@@ -194,7 +203,7 @@ async function edit_main_msg() {
                     components: getComponents()
                 }
             ]
-        }).catch(err => console.log(err))
+        }).catch(err => console.log(err))*/
     }
 
     function getComponents() {
