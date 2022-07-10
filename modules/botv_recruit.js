@@ -133,7 +133,7 @@ async function edit_main_msg() {
                 components: getComponents()
             }
         ]
-    }).catch(err => console.log(err))
+    }).catch(err => console.log(err)).then(console.log('edited 1st msg'))
     channel.messages.cache.get('995482896276148266').edit({
         content: '_ _',
         components: [
@@ -142,7 +142,7 @@ async function edit_main_msg() {
                 components: getComponents()
             }
         ]
-    }).catch(err => console.log(err))
+    }).catch(err => console.log(err)).then(console.log('edited 2nd msg'))
     channel.messages.cache.get('995482901204434984').edit({
         content: '_ _',
         components: [
@@ -151,7 +151,7 @@ async function edit_main_msg() {
                 components: getComponents()
             }
         ]
-    }).catch(err => console.log(err))
+    }).catch(err => console.log(err)).then(console.log('edited 3rd msg'))
 
     function getComponents() {
         var components = [];
