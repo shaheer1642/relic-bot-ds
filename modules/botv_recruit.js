@@ -13,13 +13,13 @@ function send_msg(msg, args) {
 async function interactionHandler(interaction) {
     await db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
     .then(res => {
-        if (res.rowCount == 1) interaction.deferUpdate()
+        if (res.rowCount == 1) interaction.deferReply()
         edit_main_msg()
     }).catch(err => {
         if (err.code == 23505) { // duplicate key
             db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
             .then(res => {
-                if (res.rowCount == 1) interaction.deferUpdate()
+                if (res.rowCount == 1) interaction.deferReply()
                 edit_main_msg()
             })
             .catch(err => console.log(err))
@@ -30,6 +30,7 @@ async function interactionHandler(interaction) {
 }
 
 async function edit_main_msg() {
+    console.log('editing main msg')
     var squads = {
         sq_fissures: {
             name: 'Fissures',
