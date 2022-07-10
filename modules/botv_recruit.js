@@ -201,6 +201,8 @@ async function edit_main_msg() {
 
 function open_squad(squad) {
     console.log('botv squad opened')
+    console.log(JSON.stringify(squad))
+    return
     client.channels.cache.get('950400363410915348').threads.create({
         name: squad.name,
         autoArchiveDuration: 60,
