@@ -15,6 +15,7 @@ const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
+const botv_recruit = require('./modules/botv_recruit.js');
 const botv = require('./modules/botv.js');
 const osiris_guild_id = '905559118096531456'
 const {client} = require('./modules/discord_client.js');
@@ -738,7 +739,7 @@ client.on('messageCreate', async message => {
                     break
                 ///*----------------------
                 case 'test':
-                    test_modules.admin_test(message,args)
+                    botv_recruit.send_msg(message,args)
                     break
                 //-----------------------*/
             }
