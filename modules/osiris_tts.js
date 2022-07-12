@@ -39,7 +39,7 @@ function interactionHandler(interaction) {
 var timeout_edit_components = null;
 async function edit_main_msg() {
     var users = []
-    await db.query(`SELECT * FROM osiris_tts SORT BY join_timestamp ASC`)
+    await db.query(`SELECT * FROM osiris_tts ORDER BY join_timestamp ASC`)
     .then(async res => {
         for (var i=0; i<res.rowCount; i++) {
             const user = res.rows[i];
