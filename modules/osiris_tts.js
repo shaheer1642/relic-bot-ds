@@ -46,7 +46,7 @@ async function edit_main_msg() {
         for (var i=0; i<res.rowCount; i++) {
             const user = res.rows[i];
             users.push(user)
-            if (users.length > 2) {
+            if (users.length == 2) {
                 open_chat(JSON.parse(JSON.stringify(users)))
                 users = []
             }
