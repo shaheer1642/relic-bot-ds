@@ -3,7 +3,9 @@ const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 const squad_timeout = 3600000
 
-edit_main_msg()
+setTimeout(() => {
+    edit_main_msg()
+}, 10000);
 
 setInterval(() => {     // check every 5m for squads timeouts
     edit_main_msg()
