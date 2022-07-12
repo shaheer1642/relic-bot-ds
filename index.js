@@ -195,6 +195,7 @@ client.on('ready', () => {
     setTimeout(botv.updateMasteryDistr, 10000);
 
     botv_recruit.bot_initialize()
+    osiris_tts.bot_initialize()
 })
 
 client.on('messageCreate', async message => {
