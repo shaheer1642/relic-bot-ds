@@ -87,13 +87,13 @@ async function edit_main_msg() {
 }
 
 function open_chat(users) {
-    console.log('osiris_tts chat opened', squad.filled.join(' '))
+    console.log('osiris_tts chat opened')
     client.channels.cache.get('996418373137219595').threads.create({
-        name: squad.name,
+        name: 'RandoChat',
         autoArchiveDuration: 60,
         reason: 'Chat opened',
     }).then(thread => {
-        console.log(JSON.stringify(squad))
+        console.log(JSON.stringify(users))
         setTimeout(() => thread.parent.messages.cache.get(thread.id).delete().catch(err => console.log(err)), 5000)
         var msg = ""
         users.forEach(user => {
