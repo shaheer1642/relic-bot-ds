@@ -12,7 +12,6 @@ setInterval(() => {     // check every 5m for squads timeouts
 }, 300000);
 
 function bot_initialize() {
-    client.channels.cache.get('996418373137219595').send('empty').catch(err => console.log(err))
     client.channels.fetch('996418373137219595').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
     client.guilds.fetch('905559118096531456').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
 }
@@ -60,7 +59,7 @@ async function edit_main_msg() {
     timeout_edit_components = setTimeout(edit_components, 500);
 
     function edit_components() {
-        channel.messages.cache.get('996418688393687101').edit({
+        channel.messages.cache.get('996429387262079089').edit({
             content: ' ',
             embeds: [{
                 title: 'Chat Now',
