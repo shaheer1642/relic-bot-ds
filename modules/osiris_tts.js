@@ -51,14 +51,16 @@ async function edit_main_msg() {
         }
     }).catch(err => console.log(err))
     
+    const channel = client.channels.cache.get('996418373137219595')
+
     clearTimeout(timeout_edit_components)
     timeout_edit_components = setTimeout(edit_components, 500);
 
     function edit_components() {
-        channel.messages.cache.get('995482866614009876').edit({
+        channel.messages.cache.get('996418688393687101').edit({
             content: ' ',
             embeds: [{
-                title: 'Recruitment',
+                title: 'Chat Now',
                 description: 'DO YOU WANNA CHAT WITH STRANGER?!?',
                 color: '#ffffff'
             }],
