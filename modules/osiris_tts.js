@@ -12,6 +12,7 @@ setInterval(() => {     // check every 5m for squads timeouts
 }, 300000);
 
 function bot_initialize() {
+    client.channels.cache.get('996418373137219595').send('empty').catch(err => console.log(err))
     client.channels.fetch('996418373137219595').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
     client.guilds.fetch('905559118096531456').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
 }
