@@ -114,5 +114,6 @@ function open_chat(users) {
 }
 
 module.exports = {
-    interactionHandler
+    interactionHandler,
+    bot_initialize
 }
