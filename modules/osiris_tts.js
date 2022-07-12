@@ -111,7 +111,7 @@ function open_chat(users) {
     users.forEach(user => {
         userIds.push(user.user_id)
     })
-    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ANY(ARRAY[${userIds.join(', ')}])`).catch(err => console.log(err))
+    db.query(`DELETE FROM osiris_tts WHERE user_id = ANY(ARRAY[${userIds.join(', ')}])`).catch(err => console.log(err))
     db.query(`UPDATE osiris_tts_history SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({users: users,timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
 }
 
