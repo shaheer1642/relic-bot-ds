@@ -18,21 +18,21 @@ function bot_initialize() {
 
 function interactionHandler(interaction) {
     if (interaction.customId == 'osiris_sign_up') {
-        db.query(`INSERT INTO orisis_tts (user_id,join_timestamp) VALUES (${interaction.user.id},${new Date().getTime()})`)
+        db.query(`INSERT INTO osiris_tts (user_id,join_timestamp) VALUES (${interaction.user.id},${new Date().getTime()})`)
         .then(res => {
             if (res.rowCount == 1) interaction.deferUpdate()
             edit_main_msg()
-            console.log(`orisis_tts: user ${interaction.user.id} signed up`)
+            console.log(`osiris_tts: user ${interaction.user.id} signed up`)
         }).catch(err => {
                 console.log(err)
         })
     }
     if (interaction.customId == 'osiris_sign_out') {
-        db.query(`DELETE FROM orisis_tts WHERE user_id = ${interaction.user.id}`)
+        db.query(`DELETE FROM osiris_tts WHERE user_id = ${interaction.user.id}`)
         .then(res => {
             if (res.rowCount == 1) interaction.deferUpdate()
             edit_main_msg()
-            console.log(`orisis_tts: user ${interaction.user.id} signed off`)
+            console.log(`osiris_tts: user ${interaction.user.id} signed off`)
         })
         .catch(err => console.log(err))
     }
