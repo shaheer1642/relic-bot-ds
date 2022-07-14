@@ -2725,11 +2725,12 @@ async function global_upgrades_check() {
             var active_booster=[];
 
             global_upgrades.forEach(booster => {
-                active_booster.push(booster.upgrade.toLowerCase().replace(/ /g,'_'))
+                active_booster.push(booster.upgrade.toLowerCase().replace(/ /g,'_')
                 .replace('mission_kill_xp','affinity_booster')
                 .replace('resource_drop_amount','resource_drop_amount_booster')
                 .replace('credit_drop_chance','resource_drop_chance_booster')
-                .replace('credit_drop_amount','credit_booster');
+                .replace('credit_drop_amount','credit_booster')
+                )
             })
 
             db.query(`UPDATE worldstatealert SET active_booster = '${JSON.stringify(active_booster)}'`).catch(err => console.log(err))
