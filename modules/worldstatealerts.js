@@ -2692,7 +2692,7 @@ async function global_upgrades_check() {
                 return
             }
 
-            if (global_upgrades.length > 1) {
+            /*if (global_upgrades.length > 1) {
                 // check back in 15m
                 var timer = 900000
                 global_upgrades_timer = setTimeout(global_upgrades_check, timer)
@@ -2713,7 +2713,7 @@ async function global_upgrades_check() {
                     }
                 })
                 return
-            }
+            }*/
 
             if (new Date(global_upgrades[0].end).getTime() < new Date().getTime()) {     //negative expiry, retry
                 var timer = 10000
@@ -2722,29 +2722,35 @@ async function global_upgrades_check() {
                 return
             }
 
-            const active_booster = global_upgrades[0].upgrade.toLowerCase().replace(/ /g,'_')
-            .replace('mission_kill_xp','affinity_booster')
-            .replace('resource_drop_amount','resource_drop_amount_booster')
-            .replace('credit_drop_chance','resource_drop_chance_booster')
-            .replace('credit_drop_amount','credit_booster');
+            var active_booster=[];
 
-            db.query(`UPDATE worldstatealert SET active_booster = '${active_booster.toLowerCase()}'`).catch(err => console.log(err))
+            global_upgrades.forEach(booster => {
+                active_booster.push(booster.upgrade.toLowerCase().replace(/ /g,'_'))
+                .replace('mission_kill_xp','affinity_booster')
+                .replace('resource_drop_amount','resource_drop_amount_booster')
+                .replace('credit_drop_chance','resource_drop_chance_booster')
+                .replace('credit_drop_amount','credit_booster');
+            })
+
+            db.query(`UPDATE worldstatealert SET active_booster = '${JSON.stringify(active_booster)}'`).catch(err => console.log(err))
             
             var users = {}
             var ping_users = {}
 
             res.rows.forEach(row => {
-                row.global_upgrades_users[active_booster.toLowerCase()].forEach(user => {
-                    if (!users[row.channel_id])
-                        users[row.channel_id] = []
-                    if (!users[row.channel_id].includes(`<@${user}>`))
-                        users[row.channel_id].push(`<@${user}>`)
-                    if (row.active_booster != active_booster.toLowerCase()) {
-                        if (!ping_users[row.channel_id])
-                            ping_users[row.channel_id] = []
-                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                            ping_users[row.channel_id].push(`<@${user}>`)
-                    }
+                active_booster.forEach(booster => {
+                    row.global_upgrades_users[booster.toLowerCase()].forEach(user => {
+                        if (!users[row.channel_id])
+                            users[row.channel_id] = []
+                        if (!users[row.channel_id].includes(`<@${user}>`))
+                            users[row.channel_id].push(`<@${user}>`)
+                        if (!row.active_booster.includes(booster)) {
+                            if (!ping_users[row.channel_id])
+                                ping_users[row.channel_id] = []
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
+                    })
                 })
             })
 
@@ -2753,11 +2759,11 @@ async function global_upgrades_check() {
                 description: `React to be notified when a booster is active`,
                 fields: [{
                     name: "Active booster",
-                    value: convertUpper(active_booster),
+                    value: active_booster.map(booster => `${convertUpper(booster)}\n`),
                     inline: true
                 },{
                     name: "Expires",
-                    value: `<t:${Math.round(new Date(global_upgrades[0].end).getTime() / 1000)}:R>`,
+                    value: global_upgrades.map(upgrade => `<t:${Math.round(new Date(upgrade.end).getTime() / 1000)}:R>\n`),
                     inline: true
                 }],
                 color: colors.global_upgrades
@@ -2772,7 +2778,7 @@ async function global_upgrades_check() {
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Event booster: ${convertUpper(active_booster)} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Event booster: ${convertUpper(active_booster.toString())} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
             var timer = 3600000
