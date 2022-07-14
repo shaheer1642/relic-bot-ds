@@ -2760,11 +2760,11 @@ async function global_upgrades_check() {
                 description: `React to be notified when a booster is active`,
                 fields: [{
                     name: "Active booster",
-                    value: active_booster.map(booster => `${convertUpper(booster)}\n`),
+                    value: active_booster.map(booster => `${convertUpper(booster)}\n`).toString().replace(/,/g,''),
                     inline: true
                 },{
                     name: "Expires",
-                    value: global_upgrades.map(upgrade => `<t:${Math.round(new Date(upgrade.end).getTime() / 1000)}:R>\n`),
+                    value: global_upgrades.map(upgrade => `<t:${Math.round(new Date(upgrade.end).getTime() / 1000)}:R>\n`).toString().replace(/,/g,''),
                     inline: true
                 }],
                 color: colors.global_upgrades
