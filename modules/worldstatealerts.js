@@ -2201,19 +2201,21 @@ async function arbitration_check() {
             var ping_users = {}
             var mission = "unknown"
             try {
-                if (arbitration.type.match('Defection'))
+                if (arbitration.type.toLowerCase().match('defection'))
                     mission = 'defection'
-                else if (arbitration.type.match('Defense'))
-                    mission = 'defense'
-                else if (arbitration.type.match('Interception'))
-                    mission = 'interception'
-                else if (arbitration.type.match('Salvage'))
+                else if (arbitration.type.toLowerCase().match('mobile defense'))
                     mission = 'salvage'
-                else if (arbitration.type.match('Survival'))
+                else if (arbitration.type.toLowerCase().match('defense'))
+                    mission = 'defense'
+                else if (arbitration.type.toLowerCase().match('interception'))
+                    mission = 'interception'
+                else if (arbitration.type.toLowerCase().match('salvage'))
+                    mission = 'salvage'
+                else if (arbitration.type.toLowerCase().match('survival'))
                     mission = 'survival'
-                else if (arbitration.type.match('Excavation'))
+                else if (arbitration.type.toLowerCase().match('excavation'))
                     mission = 'excavation'
-                else if (arbitration.type.match('Disruption'))
+                else if (arbitration.type.toLowerCase().match('disruption'))
                     mission = 'disruption'
                 if (mission == "unknown") {
                     inform_dc('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
@@ -2268,7 +2270,7 @@ async function arbitration_check() {
                     }
                 })
             })
-            console.log('Arbitration check: user mention lists' + JSON.stringify(users) + JSON.stringify(ping_users))
+            console.log('Arbitration check: user mention lists [users] :: ' + JSON.stringify(users) +  ' [ping users] :: ' + JSON.stringify(ping_users))
             // ---- construct embed
             var embed = {
                 title: 'Arbitration', 
