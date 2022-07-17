@@ -3,6 +3,7 @@ const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 
 function bot_initialize() {
+    await client.channels.cache.get('997821173641519204').messages.fetch().catch(err => console.log(err))
     update_msg()
     setInterval(update_msg, 300000);
 }
