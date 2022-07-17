@@ -88,6 +88,6 @@ function setToMonday( date ) {
     return new Date(date).getTime();
 }
 
-export {
+module.exports = {
     bot_initialize
 }
