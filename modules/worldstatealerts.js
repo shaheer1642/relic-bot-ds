@@ -2274,7 +2274,7 @@ async function arbitration_check() {
             // ---- construct embed
             var embed = {
                 title: 'Arbitration', 
-                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${arbitration.type}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
+                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${convertUpper(mission)}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`, 
                 color: colors.arbitration
             }
             console.log(JSON.stringify(embed))
