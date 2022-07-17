@@ -24,11 +24,11 @@ function update_msg() {
             }
             userData.runs_log.mission_initialize.forEach(mission => {
                 if (new Date(mission.timestamp).setHours(0,0,0,0) == new Date().setHours(0,0,0,0))
-                    today++
+                    user_runs.today++
                 if (new Date(mission.timestamp).getTime() > setToMonday(new Date()))
-                    week++
+                    user_runs.week++
                 if (new Date(mission.timestamp).getTime() > new Date(new Date().setHours(0,0,0,0)).setDate(1))
-                    month++
+                    user_runs.month++
             })
             runs_all_time.today.push({
                 username: userData.username,
