@@ -18,6 +18,7 @@ const osiris_tts = require('./modules/osiris_tts.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
 const botv_recruit = require('./modules/botv_recruit.js');
 const botv = require('./modules/botv.js');
+const wfrim = require('./modules/wfrim.js');
 const osiris_guild_id = '905559118096531456'
 const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
@@ -196,6 +197,7 @@ client.on('ready', () => {
 
     botv_recruit.bot_initialize()
     osiris_tts.bot_initialize()
+    wfrim.bot_initialize()
 })
 
 client.on('messageCreate', async message => {
