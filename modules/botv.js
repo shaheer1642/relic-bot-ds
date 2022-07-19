@@ -1,7 +1,7 @@
 const {client} = require('./discord_client.js');
 const { MessageAttachment, Message } = require('discord.js');
 const fs = require('fs');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
 
 async function updateMasteryDistr() {
     // Create chart for mastery distribution
@@ -123,7 +123,16 @@ async function messageUpdate(oldMessage, newMessage) {
     }
 }
 
+function guildMemberUpdate(oldMember, newMember) {
+    try {
+        mod_log(`Member <@${newMember.id}> has changed their nickname\n${oldMember.nickname}  ->  ${newMember.nickname}`,'#4287f5')
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 module.exports = {
     updateMasteryDistr,
-    messageUpdate
+    messageUpdate,
+    guildMemberUpdate
 }

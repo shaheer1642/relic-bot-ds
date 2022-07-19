@@ -4119,6 +4119,11 @@ client.on('threadUpdate', async (oldThread,newThread) => {
     }
 })
 
+client.on('guildMemberUpdate', (oldMember, newMember) => {
+    if (oldMember.guild.id == '776804537095684108')
+        botv.guildMemberUpdate(oldMember, newMember)
+})
+
 //process shutdown handles
 
 /*
