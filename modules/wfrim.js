@@ -26,7 +26,7 @@ function update_msg() {
             userData.runs_log.mission_initialize.forEach(mission => {
                 if (new Date(mission.timestamp).setHours(0,0,0,0) == new Date().setHours(0,0,0,0))
                     user_runs.today++
-                if (new Date(mission.timestamp).getTime() > setToMonday(new Date()))
+                if (new Date(mission.timestamp).getTime() > getMonday())
                     user_runs.week++
                 if (new Date(mission.timestamp).getTime() > new Date(new Date().setHours(0,0,0,0)).setDate(1))
                     user_runs.month++
@@ -87,6 +87,10 @@ function setToMonday( date ) {
     if( day !== 1 ) 
         date.setHours(-24 * (day - 1)); 
     return new Date(date).getTime();
+}
+
+function getMonday() {
+    return new Date().setHours(0,0,0,0) - (((new Date().getDay() || 7)-1)*86400000)
 }
 
 module.exports = {
