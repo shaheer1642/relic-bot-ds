@@ -226,7 +226,6 @@ client.on('messageCreate', async message => {
     if (message.guild) {
         if (message.guild.id==osiris_guild_id) {
             osiris_guild.messageHandler(message).catch(err => console.log(err))
-            return
         }
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
