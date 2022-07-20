@@ -125,7 +125,7 @@ async function messageUpdate(oldMessage, newMessage) {
 
 async function guildMemberUpdate(oldMember, newMember) {
     try {
-        mod_log(`Member <@${newMember.id}> has changed their nickname\n\n${oldMember.nickname || oldMember.displayName} -> ${newMember.nickname || newMember.displayName}`,'#4287f5')
+        mod_log(`Member <@${newMember.id}> has changed their nickname\n\n${oldMember.nickname} -> ${newMember.nickname}`,'#4287f5')
     } catch (e) {
         console.log(e)
     }
