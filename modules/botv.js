@@ -3,6 +3,10 @@ const { MessageAttachment, Message } = require('discord.js');
 const fs = require('fs');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
 
+function bot_initialize() {
+    client.guilds.cache.get('776804537095684108').members.fetch().catch(err => console.log(err))
+}
+
 async function updateMasteryDistr() {
     // Create chart for mastery distribution
     const { ChartJSNodeCanvas } = require('chartjs-node-canvas');
@@ -124,6 +128,9 @@ async function messageUpdate(oldMessage, newMessage) {
 }
 
 async function guildMemberUpdate(oldMember, newMember) {
+    console.log(oldMember)
+    console.log(newMember)
+    console.log(JSON.stringify(oldMember),JSON.stringify(newMember))
     try {
         mod_log(`Member <@${newMember.id}> has changed their nickname\n\n${oldMember.nickname} -> ${newMember.nickname}`,'#4287f5')
     } catch (e) {
@@ -134,5 +141,6 @@ async function guildMemberUpdate(oldMember, newMember) {
 module.exports = {
     updateMasteryDistr,
     messageUpdate,
-    guildMemberUpdate
+    guildMemberUpdate,
+    bot_initialize
 }

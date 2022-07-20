@@ -195,6 +195,7 @@ client.on('ready', () => {
 
     setTimeout(botv.updateMasteryDistr, 10000);
 
+    botv.bot_initialize()
     botv_recruit.bot_initialize()
     osiris_tts.bot_initialize()
     wfrim.bot_initialize()
