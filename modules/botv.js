@@ -124,10 +124,8 @@ async function messageUpdate(oldMessage, newMessage) {
 }
 
 async function guildMemberUpdate(oldMember, newMember) {
-    await oldMember.fetch().then(member => oldMember = member).catch(err => console.log(err))
-    await newMember.fetch().then(member => newMember = member).catch(err => console.log(err))
     try {
-        mod_log(`Member <@${newMember.id}> has changed their nickname\n\n${oldMember.nickname}  ->  ${newMember.nickname}`,'#4287f5')
+        mod_log(`Member <@${newMember.id}> has changed their nickname\n\n${oldMember.nickname} -> ${newMember.nickname}`,'#4287f5')
     } catch (e) {
         console.log(e)
     }

@@ -3861,6 +3861,8 @@ client.on('guildMemberAdd', async member => {
     if (process.env.DEBUG_MODE==1)
         return
 
+    await member.fetch().catch(err => console.log(err))
+
     if (member.guild.id == "776804537095684108" && !member.user.bot) {      //For BotV
         const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
         const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
