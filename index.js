@@ -15,6 +15,7 @@ const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
 const osiris_tts = require('./modules/osiris_tts.js');
+const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
 const botv_recruit = require('./modules/botv_recruit.js');
 const botv = require('./modules/botv.js');
@@ -743,6 +744,9 @@ client.on('messageCreate', async message => {
                     break
                 case 'wssetup':
                     worldstatealerts.wssetup(message,args)
+                    break
+                case 'getserverstats':
+                    discord_server_modules.computeServerStats(message,args)
                     break
                 ///*----------------------
                 case 'test':
