@@ -5,7 +5,7 @@ const {client} = require('./discord_client.js');
 async function computeServerStats(message, args) {
     try {
         var edit_msg = await message.channel.send('Collecting data, this may take a few seconds...').catch(err => console.log(err))
-        offset = args[0] || 7
+        var offset = args[0] || 7
     
         var timestamp = new Date().setHours(0,0,0,0) - (offset * 86400000)
     
@@ -38,7 +38,7 @@ async function computeServerStats(message, args) {
                     if (!all_msgs_ids.includes(messageId))
                         all_msgs_ids.push(messageId)
                 }
-                if (messages.size < 100)
+                if (messages.size <= 100)
                     break
             }
             console.log('total msgs',all_msgs_ids.length)
