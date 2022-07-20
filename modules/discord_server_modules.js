@@ -38,7 +38,7 @@ async function computeServerStats(message, args) {
                     if (!all_msgs_ids.includes(messageId))
                         all_msgs_ids.push(messageId)
                 }
-                if (messages.size <= 100)
+                if (messages.size < 100)
                     break
             }
             console.log('total msgs',all_msgs_ids.length)
