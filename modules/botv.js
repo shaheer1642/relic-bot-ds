@@ -3,8 +3,33 @@ const { MessageAttachment, Message } = require('discord.js');
 const fs = require('fs');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
 
+const admin_channelId = '870385402916249611'
+
 function bot_initialize() {
     client.guilds.cache.get('776804537095684108').members.fetch().catch(err => console.log(err))
+}
+
+function message_handler(message) {
+    setTimeout(() => {
+        message.delete().catch(err => {
+            console.log(err);
+            mod_log('Error deleting message in <#1000036014867353711>')
+        })
+    }, 2000);
+    client.channels.cache.get(admin_channelId).send({
+        content: ' ',
+        embeds: [{
+            title: `Report #${Math.round(new Date().getTime() / 1000)}`,
+            description: `Reported by <@${message.author.id}> (${message.author.username})\n\n${message.content}`,
+            color: 'RANDOM'
+        }],
+        files: Array.from(message.attachments.values())
+    }).catch(err => {
+        console.log(err);
+        console.log('report_id:',Math.round(new Date().getTime() / 1000))
+        console.log(JSON.stringify(message))
+        mod_log('Error generating report, <@253525146923433984> check logs')
+    })
 }
 
 async function updateMasteryDistr() {
@@ -128,9 +153,8 @@ async function messageUpdate(oldMessage, newMessage) {
 }
 
 async function guildMemberUpdate(oldMember, newMember) {
-    console.log(oldMember)
-    console.log(newMember)
-    console.log(JSON.stringify(oldMember),JSON.stringify(newMember))
+    if ((oldMember.nickname || oldMember.displayName) == (newMember.nickname || newMember.displayName))
+        return
     try {
         mod_log(`Member <@${newMember.id}> has changed their nickname\n\n${oldMember.nickname || oldMember.displayName} -> ${newMember.nickname || newMember.displayName}`,'#4287f5')
     } catch (e) {
@@ -142,5 +166,6 @@ module.exports = {
     updateMasteryDistr,
     messageUpdate,
     guildMemberUpdate,
-    bot_initialize
+    bot_initialize,
+    message_handler
 }

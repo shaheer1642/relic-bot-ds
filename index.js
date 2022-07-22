@@ -21,6 +21,7 @@ const botv_recruit = require('./modules/botv_recruit.js');
 const botv = require('./modules/botv.js');
 const wfrim = require('./modules/wfrim.js');
 const osiris_guild_id = '905559118096531456'
+const botv_guild_id = '776804537095684108'
 const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
 
@@ -226,6 +227,14 @@ client.on('messageCreate', async message => {
     if (message.guild) {
         if (message.guild.id==osiris_guild_id) {
             osiris_guild.messageHandler(message).catch(err => console.log(err))
+        }
+
+        message.attachments.map(attachment => {
+            attachment.url
+        })
+
+        if (message.guild.id == botv_guild_id) {
+            botv.message_handler(message)
         }
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
@@ -4126,6 +4135,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
 })
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
+    if (oldMember.user.bot) return
     if (oldMember.guild.id == '776804537095684108')
         botv.guildMemberUpdate(oldMember, newMember)
 })
