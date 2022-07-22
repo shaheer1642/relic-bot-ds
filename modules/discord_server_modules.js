@@ -55,18 +55,27 @@ async function computeServerStats(message, args) {
         })
         );
         console.log(channel_data)
+        var user_msgs_sorted = []
+        for(const userId in user_msgs) {
+            user_msgs_sorted.push({
+                user: userId,
+                messages: user_msgs[userId]
+            })
+        }
+        user_msgs_sorted = user_msgs_sorted.sort(dynamicSortDesc("messages"))
+        console.log(user_msgs_sorted)
         var embed = {
             title: `Activity in past ${offset} days`,
             description: ''
         }
-        channel_data.forEach(value => {
-            if (value.messages == 0) return
-            embed.description += `<#${value.channel}>: ${value.messages} msgs\n`
+        channel_data.forEach(obj => {
+            if (obj.messages == 0) return
+            embed.description += `<#${obj.channel}>: ${obj.messages} msgs\n`
         })
         embed.description += '\n-----\n\n'
-        for(const userId in user_msgs) {
-            embed.description += `<@${userId}>: ${user_msgs[userId]} msgs\n`
-        }
+        user_msgs_sorted.forEach(obj => {
+            embed.description += `<@${obj.user}>: ${obj.messages} msgs\n`
+        })
         if (embed.description.length > 4096)
             edit_msg.edit({content: 'Embed is too long to send'}).catch(err => console.log(err))
         else
