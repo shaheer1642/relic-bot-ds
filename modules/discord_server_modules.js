@@ -65,7 +65,7 @@ async function computeServerStats(message, args) {
         })
         embed.description += '\n-----\n\n'
         for(const userId in user_msgs) {
-            embed.description += `<@${userId}>: ${data.user_data[userId]} msgs\n`
+            embed.description += `<@${userId}>: ${user_msgs[userId]} msgs\n`
         }
         if (embed.description.length > 4096)
             msg.edit({content: 'Embed is too long to send'}).catch(err => console.log(err))
