@@ -16,6 +16,7 @@ function message_handler(message) {
 }
 
 function generate_report(message) {
+    message.channel.send('Your issue has been recorded. Thanks for your feedback!\nIn-case of any enquiry on the report, please contact any admin').catch(err => console.log(err)).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000)));
     setTimeout(() => {
         message.delete().catch(err => {
             console.log(err);
@@ -35,7 +36,7 @@ function generate_report(message) {
         console.log('report_id:',Math.round(new Date().getTime() / 1000))
         console.log(JSON.stringify(message))
         mod_log('Error generating report, <@253525146923433984> check logs')
-    })
+    });
 }
 
 async function updateMasteryDistr() {
