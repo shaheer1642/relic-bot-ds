@@ -15,7 +15,9 @@ async function computeServerStats(message, args) {
     
         console.log(channels.size)
         
-        var data = await Promise.all(channels.map(async (channel,channelId) => {
+        var user_msgs = {}
+
+        var channel_data = await Promise.all(channels.map(async (channel,channelId) => {
             if (channel.type == 'GUILD_CATEGORY') return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_VOICE') return {channel: channelId, messages: 0}
             var last_msg = await channel.messages.fetch({limit: 1}).catch(err => console.log(err))
@@ -37,6 +39,12 @@ async function computeServerStats(message, args) {
                     //console.log(message.createdTimestamp)
                     if (!all_msgs_ids.includes(messageId))
                         all_msgs_ids.push(messageId)
+                    if (!message.author.bot) {
+                        if (!user_msgs[message.author.id]) {
+                            user_msgs[message.author.id] = 0
+                        }
+                        user_msgs[message.author.id]++
+                    }
                 }
                 if (messages.size < 100)
                     break
@@ -46,16 +54,23 @@ async function computeServerStats(message, args) {
             //channel_msgs[channelId] = all_msgs_ids.length
         })
         );
-        console.log(data)
+        console.log(channel_data)
         var embed = {
             title: `Activity in past ${offset} days`,
             description: ''
         }
-        data.forEach(value => {
+        channel_data.forEach(value => {
             if (value.messages == 0) return
             embed.description += `<#${value.channel}>: ${value.messages} msgs\n`
         })
-        edit_msg.edit({content: ' ', embeds: [embed]}).catch(err => console.log(err))
+        embed.description += '\n-----\n\n'
+        for(const userId in user_msgs) {
+            embed.description += `<@${userId}>: ${data.user_data[userId]} msgs\n`
+        }
+        if (embed.description.length > 4096)
+            msg.edit({content: 'Embed is too long to send'}).catch(err => console.log(err))
+        else
+            msg.edit({content: ' ', embeds: [embed]}).catch(err => console.log(err))
     } catch (e) {
         console.log(e)
         message.channel.send({content: `Sorry, some error occured\n${JSON.stringify(e.stack? e.stack:e)}`})
