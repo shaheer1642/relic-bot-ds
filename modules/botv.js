@@ -4,16 +4,22 @@ const fs = require('fs');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
 
 const admin_channelId = '870385402916249611'
+const report_channelId = '1000036014867353711'
 
 function bot_initialize() {
     client.guilds.cache.get('776804537095684108').members.fetch().catch(err => console.log(err))
 }
 
 function message_handler(message) {
+    if (message.channel.id == report_channelId)
+        generate_report(message)
+}
+
+function generate_report(message) {
     setTimeout(() => {
         message.delete().catch(err => {
             console.log(err);
-            mod_log('Error deleting message in <#1000036014867353711>')
+            mod_log(`Error deleting message in <#${report_channelId}>`)
         })
     }, 2000);
     client.channels.cache.get(admin_channelId).send({
