@@ -68,9 +68,9 @@ async function computeServerStats(message, args) {
             embed.description += `<@${userId}>: ${user_msgs[userId]} msgs\n`
         }
         if (embed.description.length > 4096)
-            msg.edit({content: 'Embed is too long to send'}).catch(err => console.log(err))
+            edit_msg.edit({content: 'Embed is too long to send'}).catch(err => console.log(err))
         else
-            msg.edit({content: ' ', embeds: [embed]}).catch(err => console.log(err))
+            edit_msg.edit({content: ' ', embeds: [embed]}).catch(err => console.log(err))
     } catch (e) {
         console.log(e)
         message.channel.send({content: `Sorry, some error occured\n${JSON.stringify(e.stack? e.stack:e)}`})
