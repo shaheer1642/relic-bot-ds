@@ -54,6 +54,7 @@ async function computeServerStats(message, args) {
             //channel_msgs[channelId] = all_msgs_ids.length
         })
         );
+        channel_data = channel_data.sort(dynamicSortDesc("messages"))
         console.log(channel_data)
         var user_msgs_sorted = []
         for(const userId in user_msgs) {
