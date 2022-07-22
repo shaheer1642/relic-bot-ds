@@ -16,7 +16,7 @@ function message_handler(message) {
 }
 
 function generate_report(message) {
-    message.channel.send('Your issue has been recorded. Thanks for your feedback!\nIn-case of any enquiry on the report, please contact any admin').catch(err => console.log(err)).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 10000)));
+    message.channel.send('Your issue has been recorded. Thanks for your feedback!\nIn-case of any enquiry on the report, please contact any admin').catch(err => console.log(err)).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000));
     setTimeout(() => {
         message.delete().catch(err => {
             console.log(err);
