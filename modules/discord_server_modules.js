@@ -1,6 +1,6 @@
 
 const {client} = require('./discord_client.js');
-
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
 
 async function computeServerStats(message, args) {
     try {
