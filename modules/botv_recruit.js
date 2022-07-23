@@ -2,7 +2,7 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 const squad_timeout = 3600000
-const mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
+var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
 setInterval(() => {     // check every 5m for squads timeouts
     db.query(`SELECT * FROM botv_recruit_members`)
@@ -138,7 +138,7 @@ async function edit_main_msg() {
                 title: 'Recruitment',
                 description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
                 footer: {
-                    text: 'Note: The messages may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
+                    text: 'Note: The squads may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
                 },
                 color: '#ffffff'
             }],
