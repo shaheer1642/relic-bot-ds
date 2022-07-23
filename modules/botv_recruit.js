@@ -33,7 +33,7 @@ function interactionHandler(interaction) {
         db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
         .then(res => {
             var trackers = res.rows[0].trackers
-            for (const [index, value] of interaction.values) {
+            for (const value of interaction.values) {
                 if (value == 'remove_all') {
                     for (const key in trackers) {
                         trackers[key] = trackers[key].filter(function(f) { return f !== interaction.user.id })
@@ -43,8 +43,10 @@ function interactionHandler(interaction) {
                 if (trackers[value]) {
                     if (trackers[value].includes(interaction.user.id)) {
                         trackers[value] = trackers[value].filter(function(f) { return f !== interaction.user.id })
+                        console.log('botv_recruit: user',interaction.user.id,'is untracking',value)
                     } else {
                         trackers[value].push(interaction.user.id)
+                        console.log('botv_recruit: user',interaction.user.id,'is now tracking',value)
                     }
                 } else {
                     console.log('value',value,'does not exist')
