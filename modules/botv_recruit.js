@@ -20,7 +20,7 @@ setInterval(() => {     // check every 5m for squads timeouts
 function bot_initialize() {
     client.channels.fetch('950400363410915348').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
     client.guilds.fetch('776804537095684108').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-    edit_main_msg()
+    //edit_main_msg()
 }
 
 function send_msg(msg, args) {
@@ -166,6 +166,8 @@ async function edit_main_msg() {
     clearTimeout(timeout_edit_components)
     timeout_edit_components = setTimeout(edit_components, 1500);
 
+
+
     function edit_components() {
         channel.messages.cache.get('995482866614009876').edit({
             content: ' ',
@@ -191,9 +193,9 @@ async function edit_main_msg() {
                     components: getComponents()
                 },
                 {
-                    type:3,
-                    placeholder:'Notification Settings',
-                    custom_id:'botv_recruit_notify',
+                    type: 3,
+                    placeholder: 'Notification Settings',
+                    custom_id: 'botv_recruit_notify',
                     min_values:1,
                     max_values: Object.keys(squads).length,
                     options: squads.map(squad => {
