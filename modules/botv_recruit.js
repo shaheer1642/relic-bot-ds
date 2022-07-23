@@ -46,6 +46,8 @@ function interactionHandler(interaction) {
                     } else {
                         trackers[value].push(interaction.user.id)
                     }
+                } else {
+                    console.log('value',value,'does not exist')
                 }
             }
             db.query(`UPDATE botv_squads_data SET trackers='${JSON.stringify(trackers)}' WHERE id=1`).catch(err => console.log(err))
