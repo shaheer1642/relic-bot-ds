@@ -28,6 +28,32 @@ function send_msg(msg, args) {
 }
 
 function interactionHandler(interaction) {
+    if (interaction.customId == 'botv_recruit_notify') {
+        console.log(interaction.values)
+        db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
+        .then(res => {
+            var trackers = res.rows[0].trackers
+            interaction.values.forEach(value => {
+                if (trackers[value]) {
+                    if (trackers[value].includes(interaction.user.id)) {
+                        trackers[value] = trackers[value].filter(function(f) { return f !== interaction.user.id })
+                    } else {
+                        trackers[value].push(interaction.user.id)
+                    }
+                }
+            })
+            db.query(`UPDATE botv_squads_data SET trackers='${JSON.stringify(trackers)}' WHERE id=1`).catch(err => console.log(err))
+            var squads_list = getSquadsList()
+            var tracked_squads = []
+            for (const key in trackers) {
+                if (trackers[key].includes(interaction.user.id))
+                    tracked_squads.push(squads_list[key].name)
+            }
+            var reply_msg = tracked_squads.length > 0 ? `You are now tracking the following squads:\n${tracked_squads.join('\n')}`:'You are not tracking any squads'
+            interaction.reply({content: reply_msg, ephemeral: true}).catch(err => console.log(err))
+        })
+        return
+    }
     if (interaction.customId == 'sq_leave_all') {
         db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate();edit_main_msg()}).catch(err => console.log(err))
         console.log(`botv_recruit: user ${interaction.user.id} left all squads`)
@@ -57,96 +83,7 @@ function interactionHandler(interaction) {
 var timeout_edit_components = null;
 async function edit_main_msg() {
     console.log('editing main msg')
-    var squads = {
-        sq_fissures: {
-            name: 'Fissures',
-            id: 'sq_fissures',
-            spots: 4,
-            filled: []
-        },
-        sq_sortie: {
-            name: 'Sortie',
-            id: 'sq_sortie',
-            spots: 4,
-            filled: []
-        },
-        sq_incursions: {
-            name: 'Incursions',
-            id: 'sq_incursions',
-            spots: 3,
-            filled: []
-        },
-        sq_alerts: {
-            name: 'Alerts',
-            id: 'sq_alerts',
-            spots: 3,
-            filled: []
-        },
-        sq_eidolons: {
-            name: 'Eidolons',
-            id: 'sq_eidolons',
-            spots: 4,
-            filled: []
-        },
-        sq_taxi_help: {
-            name: 'Taxi,Help',
-            id: 'sq_taxi_help',
-            spots: 2,
-            filled: []
-        },
-        sq_mining_fishing: {
-            name: 'Mining,Fishing',
-            id: 'sq_mining_fishing',
-            spots: 2,
-            filled: []
-        },
-        sq_bounties: {
-            name: 'Bounties',
-            id: 'sq_bounties',
-            spots: 4,
-            filled: []
-        },
-        sq_leveling: {
-            name: 'Leveling',
-            id: 'sq_leveling',
-            spots: 4,
-            filled: []
-        },
-        sq_index: {
-            name: 'Index',
-            id: 'sq_index',
-            spots: 4,
-            filled: []
-        },
-        sq_arbitration: {
-            name: 'Arbitration',
-            id: 'sq_arbitration',
-            spots: 4,
-            filled: []
-        },
-        sq_nightwave: {
-            name: 'Nightwave',
-            id: 'sq_nightwave',
-            spots: 2,
-            filled: []
-        },
-        sq_lich_murmur: {
-            name: 'Lich (murmur)',
-            id: 'sq_lich_murmur',
-            spots: 3,
-            filled: []
-        },
-        sq_endo_arena: {
-            name: 'Endo Arena',
-            id: 'sq_endo_arena',
-            spots: 4,
-            filled: []
-        },
-        sq_leave_all: {
-            name: 'Leave All',
-            id: 'sq_leave_all',
-        },
-    }
+    var squads = getSquadsList()
     var componentIndex = 0
 
     await db.query(`SELECT * FROM botv_recruit_members`)
@@ -285,7 +222,100 @@ function open_squad(squad) {
 
     }).catch(err => console.log(err))
     db.query(`DELETE FROM botv_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}])`).catch(err => console.log(err)).then(res => edit_main_msg())
-    db.query(`UPDATE botv_squads_history SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
+    db.query(`UPDATE botv_squads_data SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
+}
+
+function getSquadsList() {
+    return {
+        sq_fissures: {
+            name: 'Fissures',
+            id: 'sq_fissures',
+            spots: 4,
+            filled: []
+        },
+        sq_sortie: {
+            name: 'Sortie',
+            id: 'sq_sortie',
+            spots: 4,
+            filled: []
+        },
+        sq_incursions: {
+            name: 'Incursions',
+            id: 'sq_incursions',
+            spots: 3,
+            filled: []
+        },
+        sq_alerts: {
+            name: 'Alerts',
+            id: 'sq_alerts',
+            spots: 3,
+            filled: []
+        },
+        sq_eidolons: {
+            name: 'Eidolons',
+            id: 'sq_eidolons',
+            spots: 4,
+            filled: []
+        },
+        sq_taxi_help: {
+            name: 'Taxi | Help',
+            id: 'sq_taxi_help',
+            spots: 2,
+            filled: []
+        },
+        sq_mining_fishing: {
+            name: 'Mining | Fishing',
+            id: 'sq_mining_fishing',
+            spots: 2,
+            filled: []
+        },
+        sq_bounties: {
+            name: 'Bounties',
+            id: 'sq_bounties',
+            spots: 4,
+            filled: []
+        },
+        sq_leveling: {
+            name: 'Leveling',
+            id: 'sq_leveling',
+            spots: 4,
+            filled: []
+        },
+        sq_index: {
+            name: 'Index',
+            id: 'sq_index',
+            spots: 4,
+            filled: []
+        },
+        sq_arbitration: {
+            name: 'Arbitration',
+            id: 'sq_arbitration',
+            spots: 4,
+            filled: []
+        },
+        sq_nightwave: {
+            name: 'Nightwave',
+            id: 'sq_nightwave',
+            spots: 2,
+            filled: []
+        },
+        sq_lich_murmur: {
+            name: 'Lich (murmur)',
+            id: 'sq_lich_murmur',
+            spots: 3,
+            filled: []
+        },
+        sq_endo_arena: {
+            name: 'Endo Arena',
+            id: 'sq_endo_arena',
+            spots: 4,
+            filled: []
+        },
+        sq_leave_all: {
+            name: 'Leave All',
+            id: 'sq_leave_all',
+        },
+    }
 }
 
 module.exports = {
