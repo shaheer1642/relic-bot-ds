@@ -11,7 +11,8 @@ async function computeServerStats(message, args) {
     
         //var channel_msgs = {}
     
-        const channels = await client.guilds.cache.get(message.guildId).channels.fetch().catch(err => console.log(err))
+        const guild = await client.guilds.fetch(message.guildId)
+        const channels = await guild.channels.fetch()
     
         console.log(channels.size)
         
@@ -20,7 +21,7 @@ async function computeServerStats(message, args) {
         var channel_data = await Promise.all(channels.map(async (channel,channelId) => {
             if (channel.type == 'GUILD_CATEGORY') return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_VOICE') return {channel: channelId, messages: 0}
-            var last_msg = await channel.messages.fetch({limit: 1}).catch(err => console.log(err))
+            var last_msg = await channel.messages.fetch({limit: 1})
             last_msg.forEach(msg => last_msg = msg)
             if (last_msg.createdTimestamp < timestamp)
                 return {channel: channelId, messages: 0}
@@ -29,7 +30,7 @@ async function computeServerStats(message, args) {
             all_msgs_ids.push(last_id)
             var stopFlag = 0
             while(!stopFlag) {
-                const messages = await channel.messages.fetch({limit: 100, before: last_id}).catch(err => console.log(err))
+                const messages = await channel.messages.fetch({limit: 100, before: last_id})
                 for (var [messageId,message] of messages) {
                     last_id = messageId
                     if (message.createdTimestamp < timestamp) {
@@ -78,12 +79,12 @@ async function computeServerStats(message, args) {
             embed.description += `<@${obj.user}>: ${obj.messages} msgs\n`
         })
         if (embed.description.length > 4096)
-            edit_msg.edit({content: 'Embed is too long to send'}).catch(err => console.log(err))
+            edit_msg.edit({content: 'Embed is too long to send'})
         else
-            edit_msg.edit({content: ' ', embeds: [embed]}).catch(err => console.log(err))
+            edit_msg.edit({content: ' ', embeds: [embed]})
     } catch (e) {
         console.log(e)
-        message.channel.send({content: `Sorry, some error occured\n${JSON.stringify(e.stack? e.stack:e)}`})
+        message.channel.send({content: `Sorry, some error occured\n${JSON.stringify(e.stack? e.stack:e)}`}).catch(err => console.log(err))
         return
     }
 }
