@@ -29,6 +29,7 @@ function send_msg(msg, args) {
 
 function interactionHandler(interaction) {
     if (interaction.customId == 'botv_recruit_notify') {
+        interaction.deferUpdate().catch(err => console.log(err))
         console.log(interaction.values)
         db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
         .then(res => {
