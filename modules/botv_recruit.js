@@ -205,27 +205,38 @@ async function edit_main_msg() {
 
 function mention_users(joined_user_id,squad_id) {
     db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
-    .then(res => {
-        var trackers = res.rows[0].trackers
-        var mention_list = []
-        if (trackers[squad_id]) {
-            trackers[squad_id].forEach(userId => {
-                if (userId != joined_user_id) {
-                    if (!mention_users_timeout.includes(userId)) {
-                        mention_list.push(`<@${userId}>`)
-                        mention_users_timeout.push(userId)
-                        setTimeout(() => {
-                            mention_users_timeout = mention_users_timeout.filter(function(f) { return f !== userId })
-                        }, 120000);
+    .then(botv_squads_data => {
+        db.query(`SELECT * FROM botv_recruit_members`).catch(err => console.log(err))
+        .then(botv_recruit_members => {
+            var trackers = botv_squads_data.rows[0].trackers
+            var joined_members = botv_recruit_members.rows
+            var mention_list = []
+            if (trackers[squad_id]) {
+                trackers[squad_id].forEach(userId => {
+                    var member_in_squad = false
+                    for (var member of joined_members) {
+                        if ((member.user_id == userId) && (member.squad_type == squad_id)) {
+                            member_in_squad = true
+                            break
+                        }
                     }
-                }
-            })
-        }
-        if (mention_list.length > 0) {
-            var squads_list = getSquadsList()
-            client.channels.cache.get('950400363410915348').send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`}).catch(err => console.log(err))
-            .then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-        }
+                    if ((userId != joined_user_id) && !member_in_squad) {
+                        if (!mention_users_timeout.includes(userId)) {
+                            mention_list.push(`<@${userId}>`)
+                            mention_users_timeout.push(userId)
+                            setTimeout(() => {
+                                mention_users_timeout = mention_users_timeout.filter(function(f) { return f !== userId })
+                            }, 120000);
+                        }
+                    }
+                })
+            }
+            if (mention_list.length > 0) {
+                var squads_list = getSquadsList()
+                client.channels.cache.get('950400363410915348').send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`}).catch(err => console.log(err))
+                .then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+            }
+        })
     })
 }
 
