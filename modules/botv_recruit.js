@@ -206,12 +206,15 @@ async function edit_main_msg() {
                     components: getComponents()
                 },
                 {
-                    type: 3,
-                    placeholder: 'Notification Settings',
-                    custom_id: 'botv_recruit_notify',
-                    min_values: 1,
-                    max_values: notification_options.length,
-                    options: notification_options
+                    type: 1,
+                    components: [{
+                        type: 3,
+                        placeholder: 'Notification Settings',
+                        custom_id: 'botv_recruit_notify',
+                        min_values: 1,
+                        max_values: notification_options.length,
+                        options: notification_options
+                    }]
                 }
             ]
         }).catch(err => console.log(err))
