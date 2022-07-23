@@ -224,6 +224,7 @@ function mention_users(joined_user_id,squad_id) {
         if (mention_list.length > 0) {
             var squads_list = getSquadsList()
             client.channels.cache.get('950400363410915348').send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`}).catch(err => console.log(err))
+            .then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
         }
     })
 }
