@@ -29,7 +29,7 @@ function send_msg(msg, args) {
 
 function interactionHandler(interaction) {
     if (interaction.customId == 'botv_recruit_notify') {
-        interaction.deferUpdate().catch(err => console.log(err))
+        edit_main_msg()
         console.log(interaction.values)
         db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
         .then(res => {
@@ -66,20 +66,20 @@ function interactionHandler(interaction) {
         return
     }
     if (interaction.customId == 'sq_leave_all') {
-        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate();edit_main_msg()}).catch(err => console.log(err))
+        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate().catch(err => console.log(err));edit_main_msg()}).catch(err => console.log(err))
         console.log(`botv_recruit: user ${interaction.user.id} left all squads`)
         return
     } else {
         db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
         .then(res => {
-            if (res.rowCount == 1) interaction.deferUpdate()
+            if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
             edit_main_msg()
             console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
         }).catch(err => {
             if (err.code == 23505) { // duplicate key
                 db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
                 .then(res => {
-                    if (res.rowCount == 1) interaction.deferUpdate()
+                    if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                     edit_main_msg()
                     console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
                 })
