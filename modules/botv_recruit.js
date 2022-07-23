@@ -33,7 +33,13 @@ function interactionHandler(interaction) {
         db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
         .then(res => {
             var trackers = res.rows[0].trackers
-            interaction.values.forEach(value => {
+            for (const [index, value] of interaction.values) {
+                if (value == 'remove_all') {
+                    for (const key in trackers) {
+                        trackers[key] = trackers[key].filter(function(f) { return f !== interaction.user.id })
+                    }
+                    break
+                }
                 if (trackers[value]) {
                     if (trackers[value].includes(interaction.user.id)) {
                         trackers[value] = trackers[value].filter(function(f) { return f !== interaction.user.id })
@@ -41,7 +47,7 @@ function interactionHandler(interaction) {
                         trackers[value].push(interaction.user.id)
                     }
                 }
-            })
+            }
             db.query(`UPDATE botv_squads_data SET trackers='${JSON.stringify(trackers)}' WHERE id=1`).catch(err => console.log(err))
             var squads_list = getSquadsList()
             var tracked_squads = []
