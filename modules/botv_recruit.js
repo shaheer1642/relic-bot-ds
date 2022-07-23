@@ -20,7 +20,7 @@ setInterval(() => {     // check every 5m for squads timeouts
 function bot_initialize() {
     client.channels.fetch('950400363410915348').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
     client.guilds.fetch('776804537095684108').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-    //edit_main_msg()
+    edit_main_msg()
 }
 
 function send_msg(msg, args) {
@@ -166,7 +166,19 @@ async function edit_main_msg() {
     clearTimeout(timeout_edit_components)
     timeout_edit_components = setTimeout(edit_components, 1500);
 
-
+    var notification_options = []
+    for (const key in squads) {
+        if (key == 'sq_leave_all')
+            continue
+        notification_options.push({
+            label: squads[key].name,
+            value: squads[key].id
+        })
+    }
+    notification_options.push({
+        label: 'Remove all',
+        value: 'remove_all'
+    })
 
     function edit_components() {
         channel.messages.cache.get('995482866614009876').edit({
@@ -196,11 +208,9 @@ async function edit_main_msg() {
                     type: 3,
                     placeholder: 'Notification Settings',
                     custom_id: 'botv_recruit_notify',
-                    min_values:1,
-                    max_values: Object.keys(squads).length,
-                    options: squads.map(squad => {
-                        return {label: squad.name,value: squad.id}
-                    })
+                    min_values: 1,
+                    max_values: notification_options.length,
+                    options: notification_options
                 }
             ]
         }).catch(err => console.log(err))
