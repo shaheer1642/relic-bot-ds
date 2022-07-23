@@ -2,6 +2,7 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 const squad_timeout = 3600000
+const mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
 setInterval(() => {     // check every 5m for squads timeouts
     db.query(`SELECT * FROM botv_recruit_members`)
@@ -75,6 +76,7 @@ function interactionHandler(interaction) {
             if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
             edit_main_msg()
             console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
+            mention_users(interaction.user.id,interaction.customId)
         }).catch(err => {
             if (err.code == 23505) { // duplicate key
                 db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
@@ -199,6 +201,31 @@ async function edit_main_msg() {
         }
         return components;
     }
+}
+
+function mention_users(joined_user_id,squad_id) {
+    db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
+    .then(res => {
+        var trackers = res.rows[0].trackers
+        var mention_list = []
+        if (trackers[squad_id]) {
+            trackers[squad_id].forEach(userId => {
+                if (userId != joined_user_id) {
+                    if (!mention_users_timeout.includes(userId)) {
+                        mention_list.push(`<@${userId}>`)
+                        mention_users_timeout.push(userId)
+                        setTimeout(() => {
+                            mention_users_timeout = mention_users_timeout.filter(function(f) { return f !== userId })
+                        }, 120000);
+                    }
+                }
+            })
+        }
+        if (mention_list.length > 0) {
+            var squads_list = getSquadsList()
+            client.channels.cache.get('950400363410915348').send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`}).catch(err => console.log(err))
+        }
+    })
 }
 
 function open_squad(squad) {
