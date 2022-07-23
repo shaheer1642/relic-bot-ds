@@ -179,6 +179,7 @@ async function edit_main_msg() {
         label: 'Remove all',
         value: 'remove_all'
     })
+    console.log(JSON.stringify(notification_options))
 
     function edit_components() {
         channel.messages.cache.get('995482866614009876').edit({

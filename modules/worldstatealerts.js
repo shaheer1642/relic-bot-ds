@@ -2161,7 +2161,7 @@ async function arbitration_check() {
         var arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
 
         if (!arbitration) {
-            console.log('Arbitration check: getting data from warframestat.us')
+            //console.log('Arbitration check: getting data from warframestat.us')
             var status = await axios('https://api.warframestat.us/pc/arbitration')    // get data from warframestat.us
             .then(res => {
                 arbitration = res.data
@@ -2171,7 +2171,7 @@ async function arbitration_check() {
                 return false
             })
             if (!status) {
-                console.log('Arbitration check: no data available')
+                //console.log('Arbitration check: no data available')
                 var timer = 300000
                 arbitrationTimer = setTimeout(arbitration_check, timer)
                 console.log(`arbitration_check reset in ${msToTime(timer)}`)
@@ -2181,15 +2181,15 @@ async function arbitration_check() {
 
         if (!arbitration.type || typeof(arbitration.type) != "string") {
             //console.log('Arbitration check: arbitrary data')
-            var timer = 10000
+            var timer = 20000
             arbitrationTimer = setTimeout(arbitration_check, timer)
             //console.log(`arbitration_check reset in ${msToTime(timer)}`)
             return
         }
         
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
-            console.log('Arbitration check: negative expiry')
-            var timer = 10000
+            //console.log('Arbitration check: negative expiry')
+            var timer = 20000
             arbitrationTimer = setTimeout(arbitration_check, timer)
             console.log(`arbitration_check reset in ${msToTime(timer)}`)
             return
@@ -2300,7 +2300,7 @@ async function arbitration_check() {
     })
     .catch(err => {
         console.log(err)
-        arbitrationTimer = setTimeout(arbitration_check,5000)
+        arbitrationTimer = setTimeout(arbitration_check,20000)
         return
     })
 }
