@@ -202,6 +202,7 @@ client.on('ready', () => {
     botv_recruit.bot_initialize()
     osiris_tts.bot_initialize()
     wfrim.bot_initialize()
+    botv_event_voting.bot_initialize()
 })
 
 client.on('messageCreate', async message => {
