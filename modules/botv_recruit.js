@@ -258,7 +258,7 @@ function open_squad(squad) {
         try {
             thread.send({content: msg.trim(), embeds: [{
                 title: squad.name,
-                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname.toString().replace(/_/g, '\_')}\n`)}`,
+                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).displayName || client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname}\n`).toString().replace(/,/g,'').replace(/_/g, '\_')}`,
                 color: '#ffffff'
             }]}).catch(err => console.log(err))
         } catch (e) {
