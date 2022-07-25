@@ -6,6 +6,7 @@ function bot_initialize(reaction,user) {
         channel.messages.fetch().catch(err=>console.log(err))
         .then(messages => {
             messages.forEach(async msg => {
+                await msg.reactions.removeAll().catch(err => console.log(err))
                 await msg.react('1️⃣').catch(err => console.log(err))
                 await msg.react('2️⃣').catch(err => console.log(err))
                 await msg.react('3️⃣').catch(err => console.log(err))
