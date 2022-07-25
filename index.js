@@ -18,6 +18,7 @@ const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
 const botv_recruit = require('./modules/botv_recruit.js');
+const botv_event_voting = require('./modules/botv_event_voting.js');
 const botv = require('./modules/botv.js');
 const wfrim = require('./modules/wfrim.js');
 const osiris_guild_id = '905559118096531456'
@@ -228,6 +229,8 @@ client.on('messageCreate', async message => {
         if (message.guild.id==osiris_guild_id) {
             osiris_guild.messageHandler(message).catch(err => console.log(err))
         }
+
+        if (message.channelId == '817828725701476403') botv_event_voting.message_handler(message)
 
         message.attachments.map(attachment => {
             attachment.url
@@ -1846,6 +1849,8 @@ client.on('messageDelete', async message => {
 client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
+
+    if (reaction.message.channel.id == '817828725701476403') botv_event_voting.reaction_handler(reaction, user)
 
     if (process.env.DEBUG_MODE==1 && user.id != '253525146923433984')
         return
