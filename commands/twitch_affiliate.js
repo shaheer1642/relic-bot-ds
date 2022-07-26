@@ -5,8 +5,8 @@ module.exports = {
 		.setName('twitch_affiliate')
 		.setDescription('Add or remove an affiliated Twitch streamer')
         .addSubcommand(subcommand =>
-            subcommand.setName('add')
-            .setDescription('Add streamer')
+            subcommand.setName('add_streamer')
+            .setDescription('Add streamer to affiliation')
             .addStringOption(option =>
                 option.setName('username')
                     .setDescription('Streamer\'s username')
@@ -16,16 +16,20 @@ module.exports = {
                     .setDescription('Message displayed when streamer is live'))
         )
         .addSubcommand(subcommand =>
-            subcommand.setName('remove')
-            .setDescription('Remove streamer')
+            subcommand.setName('remove_streamer')
+            .setDescription('Remove streamer from affiliation')
             .addStringOption(option =>
                 option.setName('username')
                     .setDescription('Streamer\'s username')
                     .setRequired(true))
         )
         .addSubcommand(subcommand =>
-            subcommand.setName('delete')
-            .setDescription('Delete affiliation on this server. Be careful, this is not revert-able')
+            subcommand.setName('add_server')
+            .setDescription('Affiliate with this server ')
+        )
+        .addSubcommand(subcommand =>
+            subcommand.setName('remove_server')
+            .setDescription('Unaffiliate this server')
         ),
     scope: 'global',
     status: 'active',
