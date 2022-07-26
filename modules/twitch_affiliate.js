@@ -1,11 +1,13 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
+
 const {ClientCredentialsAuthProvider} = require('@twurple/auth')
 const {ApiClient} = require('@twurple/api');
+
 const { WebhookClient } = require('discord.js');
 
-const authProvider = new ClientCredentialsAuthProvider(process.env.twitch_clientId, process.env.twitch_clientSecret);
-const apiClient = new ApiClient({ authProvider });
+const twitchAuthProvider = new ClientCredentialsAuthProvider(process.env.twitch_clientId, process.env.twitch_clientSecret);
+const twitchApiClient = new ApiClient({ twitchAuthProvider });
 
 const authorized_userIds = ['253525146923433984']
 
@@ -15,17 +17,17 @@ async function interaction_handler(interaction) {
             // check if authorized user
             if (authorized_userIds.includes(interaction.user.id)) {
                 // verify channel existence in db
-                ensureChannelExistence(interaction.channel.id).catch(err => interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}))
+                ensureChannelExistence(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
                 .then(() => {
                     if (interaction.options.getSubcommand() == 'add') {
-                        addStreamer(interaction.options.getString('username')).catch(err => interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}))
+                        addStreamer(interaction.options.getString('username')).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
                         .then((res) => {
                             interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
                             updateAffiliations()
                         })
                         
                     } else if (interaction.options.getSubcommand() == 'remove') {
-                        removeStreamer(interaction.options.getString('username')).catch(err => interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}))
+                        removeStreamer(interaction.options.getString('username')).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
                         .then((res) => {
                             interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
                             updateAffiliations()
@@ -70,7 +72,24 @@ async function addStreamer(username) {
 }
 async function removeStreamer(username) {
     return new Promise((resolve,reject) => {
-        resolve('not implemented yet')
+        db.query(`SELECT * FROM twitch_affiliate_streamers where username = '${username}'`).catch(err => reject(err))
+        .then(res => {
+            if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with WarframeHub`)
+            else if (res.rowCount == 1) {
+                db.query(`DELETE FROM twitch_affiliate_streamers WHERE username = '${username}'`).catch(err => reject(err))
+                .then(res => {
+                    db.query(`DELETE FROM twitch_affiliate_messages WHERE username = '${username}' RETURNING *`).catch(err => reject(err))
+                    .then(res => {
+                        res.rows.forEach(row => {
+                            client.channels.cache.get(row.channel_id).messages.fetch(row.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
+                        })
+                        resolve(`**${username}** has now been unaffiliated with WarframeHub`)
+                    })
+                })
+            } else {
+                reject('unexpected result querying db, contact developer with error code 503')
+            }
+        })
     })
 }
 async function updateAffiliations() {
