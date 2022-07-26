@@ -205,6 +205,7 @@ client.on('ready', () => {
     osiris_tts.bot_initialize()
     wfrim.bot_initialize()
     deploy_commands.bot_initialize()
+    twitch_affiliate.bot_initialize()
 })
 
 client.on('messageCreate', async message => {

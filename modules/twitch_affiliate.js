@@ -11,6 +11,15 @@ const twitchApiClient = new ApiClient({ authProvider });
 
 const authorized_userIds = ['253525146923433984','253980061969940481']
 
+
+function bot_initialize() {
+    updateAffiliations()
+    
+    setInterval(() => {
+        updateAffiliations()
+    }, 60000);
+}
+
 async function interaction_handler(interaction) {
     try {
         if (interaction.isCommand()) {
@@ -114,22 +123,49 @@ async function removeStreamer(username) {
 async function updateAffiliations() {
     try {
         const streamers = db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => console.log(err))
-        .then(async res => {
+        .then(res => {
             return res.rows
         })
         const channels = db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => console.log(err))
-        .then(async res => {
+        .then(res => {
             return res.rows
         })
         const messages = db.query(`SELECT * FROM twitch_affiliate_messages`).catch(err => console.log(err))
-        .then(async res => {
+        .then(res => {
             return res.rows
         })
 
-        streamers.forEach(streamer => {
+        var channels_data = {}
+        channels.forEach(channel => channels_data[channel.channel_id] = channel)
 
-        })
+        var streamers_data = {}
+        for (const [index,streamer] of streamers.entries()) {
+            const twitchUser = await twitchApiClient.users.getUserById(streamer.streamer_id);
+            if (twitchUser) {
+                streamers_data[streamer.streamer_id] = {
+                    username: twitchUser.name,
+                    displayName: twitchUser.displayName,
+                    description: twitchUser.description,
+                    avatarUrl: twitchUser.profilePictureUrl
+                }
+                
+            }
+        }
 
+        for (const [index,message] of messages.entries()) {
+            const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
+            webhookClient.editMessage(message.message_id, {
+                content: 'React with <emoji> to be notified when this streamer is live',
+                embed: [{
+                    author: {
+                        name: streamers_data[message.streamer_id].displayName,
+                        url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
+                        icon_url: streamers_data[message.streamer_id].avatarUrl
+                    },
+                    description: streamers_data[message.streamer_id].description,
+                }]
+            }).catch(err => console.log(err))
+        }
     } catch(e) {
         console.log(e)
     }
@@ -203,5 +239,6 @@ async function firstTimeAddServer(channelId,webhookClient) {
 }
 
 module.exports = {
-    interaction_handler
+    interaction_handler,
+    bot_initialize
 }
