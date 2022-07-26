@@ -103,12 +103,13 @@ async function removeStreamer(username) {
         .then(res => {
             if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with WarframeHub`)
             else if (res.rowCount == 1) {
-                db.query(`DELETE FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
+                db.query(`SELECT * FROM twitch_affiliate_messages WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
                 .then(res => {
-                    db.query(`DELETE FROM twitch_affiliate_messages WHERE streamer_id = '${twitchUser.id}' RETURNING *`).catch(err => reject(err))
-                    .then(res => {
-                        res.rows.forEach(row => {
-                            client.channels.cache.get(row.channel_id).messages.fetch(row.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
+                    const messages = res.rows
+                    db.query(`DELETE FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
+                    .then(() => {
+                        messages.forEach(message => {
+                            client.channels.cache.get(message.channel_id).messages.fetch(message.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
                         })
                         resolve(`**${username}** has been unaffiliated from WarframeHub`)
                     })
