@@ -58,7 +58,7 @@ async function edit_main_msg() {
             content: ' ',
             embeds: [{
                 title: 'Chat Now',
-                description: 'DO YOU WANNA CHAT WITH STRANGER?!?',
+                description: 'Do you wanna chat with a stranger?',
                 color: '#ffffff'
             }],
             components: [
@@ -66,7 +66,7 @@ async function edit_main_msg() {
                     type: 1,
                     components: [{
                         type: 2,
-                        label: 'SIGN ME UP!',
+                        label: 'Sure!',
                         style: 2,
                         custom_id: 'osiris_sign_up'
                     },{
