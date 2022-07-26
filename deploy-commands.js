@@ -10,7 +10,8 @@ async function bot_initialize() {
 	const commands = [];
 	const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 	
-	const all_guild_ids = await client.guilds.fetch().then(guilds => guilds.map(guild => guild.id)).catch(err => console.log(err))
+	const all_guild_ids = await client.guilds.fetch().then(guilds => {return guilds.map(guild => guild.id)}).catch(err => console.log(err))
+	console.log(all_guild_ids)
 
 	for (const file of commandFiles) {
 		const command = require(`./commands/${file}`);
