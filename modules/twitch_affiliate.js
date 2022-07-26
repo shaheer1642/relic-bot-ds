@@ -9,7 +9,7 @@ const { WebhookClient } = require('discord.js');
 const authProvider = new ClientCredentialsAuthProvider(process.env.twitch_clientId, process.env.twitch_clientSecret);
 const twitchApiClient = new ApiClient({ authProvider });
 
-const authorized_userIds = ['253525146923433984']
+const authorized_userIds = ['253525146923433984','253980061969940481']
 
 async function interaction_handler(interaction) {
     try {
