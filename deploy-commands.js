@@ -24,18 +24,19 @@ async function bot_initialize() {
 			}
 		}
 		// modify commands if needed
-		for (var command of commands) {
-			if (command.commandBody.name	== 'lich') {
-				command.commandBody.options[0].options[0].autocomplete = true
-				command.commandBody.options[1].options[0].autocomplete = true
+		for (var [index,command] of commands.entries()) {
+			if (command.commandBody.name == 'lich') {
+				commands[index].command.commandBody.options[0].options[0].autocomplete = true
+				commands[index].command.commandBody.options[1].options[0].autocomplete = true
 			}
 			if (command.commandBody.name == 'track') {
 				if (command.commandBody.options[0].name == 'bounties')
-					command.commandBody.options[0].options[1].autocomplete = true
+					commands[index].command.commandBody.options[0].options[1].autocomplete = true
 				if (command.commandBody.options[1].name == 'teshin')
-					command.commandBody.options[1].options[0].autocomplete = true
+					commands[index].command.commandBody.options[1].options[0].autocomplete = true
 			}
 		}
+		console.log(JSON.stringify(commands))
 	
 		commands.forEach(command => {
 			command.guildIds.forEach(guildId => {
