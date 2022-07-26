@@ -723,6 +723,7 @@ client.on('messageCreate', async message => {
                 case 'query':
                     wfm_api.user_query(message,args)
                     break
+                /*
                 case 'gpt3':
                     gpt3.completion(message,args)
                     break
@@ -732,6 +733,7 @@ client.on('messageCreate', async message => {
                 case 'gpt3reset':
                     gpt3.reset(message,args)
                     break
+                */
                 case 'graphic':
                     test_modules.canvasTest(message,args)
                     break
