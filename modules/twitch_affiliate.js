@@ -12,41 +12,45 @@ const twitchApiClient = new ApiClient({ authProvider });
 const authorized_userIds = ['253525146923433984']
 
 async function interaction_handler(interaction) {
-    if (interaction.isCommand()) {
-        if (interaction.commandName == 'twitch_affiliate') {
-            // check if authorized user
-            if (authorized_userIds.includes(interaction.user.id)) {
-                // verify channel existence in db
-                ensureChannelExistence(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
-                .then(() => {
-                    if (interaction.options.getSubcommand() == 'add_streamer') {
-                        addStreamer(interaction.options.getString('username'),interaction.options.getString('custom_message') || '').catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
-                        .then((res) => {
-                            interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
+    try {
+        if (interaction.isCommand()) {
+            if (interaction.commandName == 'twitch_affiliate') {
+                // check if authorized user
+                if (authorized_userIds.includes(interaction.user.id)) {
+                    // verify channel existence in db
+                    ensureChannelExistence(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
+                    .then(() => {
+                        if (interaction.options.getSubcommand() == 'add_streamer') {
+                            addStreamer(interaction.options.getString('username'),interaction.options.getString('custom_message') || '').catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
+                            .then((res) => {
+                                interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
+                                updateAffiliations()
+                            })
+                            
+                        } else if (interaction.options.getSubcommand() == 'remove_streamer') {
+                            removeStreamer(interaction.options.getString('username')).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
+                            .then((res) => {
+                                interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
+                                updateAffiliations()
+                            })
+                        } else if (interaction.options.getSubcommand() == 'add_server') {
+                            interaction.reply({content: `This server has now been affiliated with WarframeHub`}).catch(err => console.log(err))
                             updateAffiliations()
-                        })
-                        
-                    } else if (interaction.options.getSubcommand() == 'remove_streamer') {
-                        removeStreamer(interaction.options.getString('username')).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
-                        .then((res) => {
-                            interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
-                            updateAffiliations()
-                        })
-                    } else if (interaction.options.getSubcommand() == 'add_server') {
-                        interaction.reply({content: `This server has now been affiliated with WarframeHub`}).catch(err => console.log(err))
-                        updateAffiliations()
-                    } else if (interaction.options.getSubcommand() == 'remove_server') {
-                        removeChannelAffiliation(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
-                        .then((res) => {
-                            interaction.reply({content: `This server has been unaffiliated from WarframeHub`}).catch(err => console.log(err))
-                            updateAffiliations()
-                        })
-                    }
-                })
-            } else {
-                interaction.reply({content: 'Sorry, you are not authorized for this command'}).catch(err => console.log(err))
+                        } else if (interaction.options.getSubcommand() == 'remove_server') {
+                            removeChannelAffiliation(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
+                            .then((res) => {
+                                interaction.reply({content: `This server has been unaffiliated from WarframeHub`}).catch(err => console.log(err))
+                                updateAffiliations()
+                            })
+                        }
+                    })
+                } else {
+                    interaction.reply({content: 'Sorry, you are not authorized for this command'}).catch(err => console.log(err))
+                }
             }
         }
+    } catch(e) {
+        console.log(e)
     }
 }
 

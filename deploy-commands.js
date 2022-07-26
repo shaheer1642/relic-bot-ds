@@ -46,7 +46,11 @@ async function bot_initialize() {
 			
 			rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: all_commands })
 				.then(() => console.log(`Successfully registered application commands ${all_commands.map(command => command.name).toString()} for guild ${guildId}`))
-				.catch(err => console.log(err));
+				.catch(err => {
+					if (err.code == 50001) console.log(`Could not register application commands for guild ${guildId}: Missing Access`)
+					else console.log(err)
+				}
+				);
 		})
 
 	} catch(e) {
