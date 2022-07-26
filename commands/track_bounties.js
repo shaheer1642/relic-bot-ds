@@ -39,6 +39,6 @@ module.exports = {
                     .addChoice('Remove tracker', 'remove'))
         ),
     scope: 'global',
-    status: 'active',
+    status: 'inactive',
     command_name: '/track'
 };

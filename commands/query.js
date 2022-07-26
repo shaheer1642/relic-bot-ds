@@ -19,6 +19,6 @@ module.exports = {
 						.setDescription('Minimum price')
 						.setRequired(true))),
 	scope: 'global',
-	status: 'active',
+	status: 'inactive',
 	command_name: '/query'
 };
