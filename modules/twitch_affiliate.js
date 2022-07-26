@@ -149,7 +149,6 @@ async function updateAffiliations() {
                     description: twitchUser.description,
                     avatarUrl: twitchUser.profilePictureUrl
                 }
-                
             }
         }
 
@@ -158,12 +157,12 @@ async function updateAffiliations() {
             webhookClient.editMessage(message.message_id, {
                 content: 'React with <emoji> to be notified when this streamer is live',
                 embeds: [{
-                    title: `(${streamers_data[message.streamer_id].displayName})[https://twitch.tv/${streamers_data[message.streamer_id].username}]`,
+                    title: streamers_data[message.streamer_id].displayName,
+                    url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
                     thumbnail: {
                         url: streamers_data[message.streamer_id].avatarUrl
                     },
                     description: streamers_data[message.streamer_id].description,
-
                 }]
             }).catch(err => console.log(err))
         }
