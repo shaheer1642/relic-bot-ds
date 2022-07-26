@@ -160,7 +160,7 @@ async function firstTimeAddServer(channelId,webhookClient) {
     return new Promise((resolve,reject) => {
         // send all existing streamers messages
         db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => reject(err))
-        .then(res => {
+        .then(async res => {
             for (const [index,row] of res.rows.entries()) {
                 await webhookClient.send({
                     content: `Streamer: ${row.username} (details will be fetched and stuff)`
