@@ -170,7 +170,7 @@ async function firstTimeAddServer(channelId,webhookClient) {
                     content: `Streamer: ${row.username} (details will be fetched and stuff)`
                 }).catch(err => reject(err))
                 .then(async res => {
-                    await db.query(`INSERT INTO twitch_affiliate_messages (username,message_id,channel_id,time_added) VALUES ('${username}',${res.id},${channelId},${new Date().getTime()})`).catch(err => reject(err))
+                    await db.query(`INSERT INTO twitch_affiliate_messages (username,message_id,channel_id,time_added) VALUES ('${row.username}',${res.id},${channelId},${new Date().getTime()})`).catch(err => reject(err))
                 })
             }
         })
