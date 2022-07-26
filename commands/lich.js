@@ -71,7 +71,7 @@ module.exports = {
 					.setRequired(true))
 		),
 	scope: 'private',
-	status: 'inactive',
+	status: 'active',
 	guildIds: [
 		"865904902941048862",
 		"832677897411493949"
