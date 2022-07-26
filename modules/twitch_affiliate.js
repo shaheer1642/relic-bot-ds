@@ -57,12 +57,13 @@ async function interaction_handler(interaction) {
 async function addStreamer(username,custom_message) {
     return new Promise((resolve,reject) => {
         if (!custom_message) custom_message = ''
-
+        const twitchUser = await twitchApiClient.users.getUserByName(username);
+        if (!twitchUser) reject(`The streamer **${username}** does not exist`)
         db.query(`SELECT * FROM twitch_affiliate_streamers where username = '${username}'`).catch(err => reject(err))
         .then(res => {
             if (res.rowCount == 1) resolve(`The streamer **${username}** has already been affiliated with WarframeHub`)
             else if (res.rowCount == 0) {
-                db.query(`INSERT INTO twitch_affiliate_streamers (username,custom_message,time_added) VALUES ('${username}',NULLIF('${custom_message}', ''),${new Date().getTime()})`).catch(err => reject(err))
+                db.query(`INSERT INTO twitch_affiliate_streamers (username,streamer_id,custom_message,time_added) VALUES ('${username}','${twitchUser.id}',NULLIF('${custom_message}', ''),${new Date().getTime()})`).catch(err => reject(err))
                 .then(res => {
                     //send affiliation msg in every channel
                     db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => reject(err))
@@ -87,13 +88,15 @@ async function addStreamer(username,custom_message) {
 }
 async function removeStreamer(username) {
     return new Promise((resolve,reject) => {
-        db.query(`SELECT * FROM twitch_affiliate_streamers where username = '${username}'`).catch(err => reject(err))
+        const twitchUser = await twitchApiClient.users.getUserByName(username);
+        if (!twitchUser) reject(`The streamer **${username}** does not exist`)
+        db.query(`SELECT * FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
         .then(res => {
             if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with WarframeHub`)
             else if (res.rowCount == 1) {
-                db.query(`DELETE FROM twitch_affiliate_streamers WHERE username = '${username}'`).catch(err => reject(err))
+                db.query(`DELETE FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
                 .then(res => {
-                    db.query(`DELETE FROM twitch_affiliate_messages WHERE username = '${username}' RETURNING *`).catch(err => reject(err))
+                    db.query(`DELETE FROM twitch_affiliate_messages WHERE streamer_id = '${twitchUser.id}' RETURNING *`).catch(err => reject(err))
                     .then(res => {
                         res.rows.forEach(row => {
                             client.channels.cache.get(row.channel_id).messages.fetch(row.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
@@ -109,6 +112,27 @@ async function removeStreamer(username) {
 }
 
 async function updateAffiliations() {
+    try {
+        const streamers = db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => console.log(err))
+        .then(async res => {
+            return res.rows
+        })
+        const channels = db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => console.log(err))
+        .then(async res => {
+            return res.rows
+        })
+        const messages = db.query(`SELECT * FROM twitch_affiliate_messages`).catch(err => console.log(err))
+        .then(async res => {
+            return res.rows
+        })
+
+        streamers.forEach(streamer => {
+
+        })
+
+    } catch(e) {
+        console.log(e)
+    }
 }
 
 async function removeChannelAffiliation(channelId) {
@@ -170,7 +194,7 @@ async function firstTimeAddServer(channelId,webhookClient) {
                     content: `Streamer: ${row.username} (details will be fetched and stuff)`
                 }).catch(err => reject(err))
                 .then(async res => {
-                    await db.query(`INSERT INTO twitch_affiliate_messages (username,message_id,channel_id,time_added) VALUES ('${row.username}',${res.id},${channelId},${new Date().getTime()})`).catch(err => reject(err))
+                    await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${row.streamer_id}',${res.id},${channelId},${new Date().getTime()})`).catch(err => reject(err))
                 })
             }
         })
