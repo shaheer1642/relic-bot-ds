@@ -239,7 +239,6 @@ async function firstTimeAddServer(channelId,webhookClient) {
                 })
             }
         })
-        resolve()
     })
 }
 
