@@ -17,7 +17,7 @@ async function bot_initialize() {
 		const command = require(`./commands/${file}`);
 		if (command.status == 'active') {
 			if (command.scope == 'private')
-				commands.push({commandBody: command.data.toJSON(), guildIds: command.guildIds, name: command.command_name});
+				commands.push({commandBody: command.data.toJSON(), guildIds: JSON.parse(command.guildIds), name: command.command_name});
 			else if (command.scope == 'global')
 				commands.push({commandBody: command.data.toJSON(), guildIds: all_guild_ids, name: command.command_name});
 		}
