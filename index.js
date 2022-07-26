@@ -20,6 +20,7 @@ const worldstatealerts = require('./modules/worldstatealerts.js');
 const botv_recruit = require('./modules/botv_recruit.js');
 const botv_event_voting = require('./modules/botv_event_voting.js');
 const deploy_commands = require('./deploy-commands.js');
+const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
 const wfrim = require('./modules/wfrim.js');
 const osiris_guild_id = '905559118096531456'
@@ -1697,6 +1698,10 @@ client.on('interactionCreate', async interaction => {
         else if (interaction.commandName == 'ping') {
             interaction.reply({content: 'Pong!', ephemeral:true})
             .catch(err => console.log(err));
+        }
+
+        else if (interaction.commandName == 'twitch_affiliate') {
+            twitch_affiliate.interaction_handler(interaction)
         }
         return
     }
