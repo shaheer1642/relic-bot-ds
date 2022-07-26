@@ -221,7 +221,6 @@ async function ensureChannelExistence(channelId) {
                 reject('unexpected result querying db, contact developer with error code 501')
             }
         })
-        resolve('yes')
     })
 }
 
