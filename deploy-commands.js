@@ -31,7 +31,7 @@ async function bot_initialize() {
 		if (command.commandBody.name == 'track') {
 			if (command.commandBody.options[0].name == 'bounties')
 				command.commandBody.options[0].options[1].autocomplete = true
-			if (e.options[1].name == 'teshin')
+			if (command.commandBody.options[1].name == 'teshin')
 				command.commandBody.options[1].options[0].autocomplete = true
 		}
 	}
