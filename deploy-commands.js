@@ -36,7 +36,7 @@ async function bot_initialize() {
 					commands[index].commandBody.options[1].options[0].autocomplete = true
 			}
 		}
-		console.log(JSON.stringify(commands))
+		//console.log(JSON.stringify(commands))
 	
 		all_guild_ids.forEach(guildId => {
 			var all_commands = []
