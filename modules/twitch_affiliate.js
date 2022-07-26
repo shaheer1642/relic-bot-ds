@@ -74,7 +74,7 @@ async function addStreamer(username,custom_message) {
                                 content: `Streamer: ${username} (details will be fetched and stuff)`
                             }).catch(err => reject(err))
                             .then(async res => {
-                                await db.query(`INSERT INTO twitch_affiliate_messages (username,message_id,channel_id,time_added) VALUES ('${username}',${res.id},${row.channel_id},${new Date().getTime()})`).catch(err => reject(err))
+                                await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},${new Date().getTime()})`).catch(err => reject(err))
                             })
                         }
                         resolve(`**${username}** has now been affiliated with WarframeHub`)
