@@ -17,5 +17,8 @@ module.exports = {
 				.addNumberOption(option => 
 					option.setName('threshold')
 						.setDescription('Minimum price')
-						.setRequired(true)))
+						.setRequired(true))),
+	scope: 'global',
+	status: 'active',
+	command_name: '/query'
 };

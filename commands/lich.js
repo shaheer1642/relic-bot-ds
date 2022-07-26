@@ -69,5 +69,12 @@ module.exports = {
 				option.setName('price')
 					.setDescription('Input buy price')
 					.setRequired(true))
-		)
+		),
+	scope: 'private',
+	status: 'active',
+	guildIds: [
+		"865904902941048862",
+		"832677897411493949"
+	],
+	command_name: '/query'
 };

@@ -37,5 +37,7 @@ module.exports = {
                     .addChoice('Day', 'day')
                     .addChoice('Night', 'night')
                     .addChoice('Remove tracker', 'remove'))
-        )
+        ),
+    scope: 'global',
+    status: 'active'
 };
