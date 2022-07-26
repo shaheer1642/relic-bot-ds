@@ -156,7 +156,7 @@ async function updateAffiliations() {
             const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
             webhookClient.editMessage(message.message_id, {
                 content: 'React with <emoji> to be notified when this streamer is live',
-                embed: [{
+                embeds: [{
                     author: {
                         name: streamers_data[message.streamer_id].displayName,
                         url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
