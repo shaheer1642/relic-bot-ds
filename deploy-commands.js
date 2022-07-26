@@ -38,13 +38,17 @@ async function bot_initialize() {
 		}
 		console.log(JSON.stringify(commands))
 	
-		commands.forEach(command => {
-			command.guildIds.forEach(guildId => {
-				rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: command.commandBody })
-					.then(() => console.log(`Successfully registered application command ${command.name} for guild ${guildId}`))
-					.catch(console.error);
+		all_guild_ids.forEach(guildId => {
+			var all_commands = []
+			commands.forEach(command => {
+				if (command.guildIds.includes(guildId)) all_commands.push(command.commandBody)
 			})
+			
+			rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: all_commands })
+				.then(() => console.log(`Successfully registered application commands ${all_commands.map(command => name).toString()} for guild ${guildId}`))
+				.catch(console.error);
 		})
+
 	} catch(e) {
 		console.log(e)
 	}
