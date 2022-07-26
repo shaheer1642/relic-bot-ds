@@ -23,16 +23,16 @@ async function bot_initialize() {
 		}
 	}
 	// modify commands if needed
-	for (var e of commands) {
-		if (e.name	== 'lich') {
-			e.options[0].options[0].autocomplete = true
-			e.options[1].options[0].autocomplete = true
+	for (var command of commands) {
+		if (command.commandBody.name	== 'lich') {
+			command.commandBody.options[0].options[0].autocomplete = true
+			command.commandBody.options[1].options[0].autocomplete = true
 		}
-		if (e.name == 'track') {
-			if (e.options[0].name == 'bounties')
-				e.options[0].options[1].autocomplete = true
+		if (command.commandBody.name == 'track') {
+			if (command.commandBody.options[0].name == 'bounties')
+				command.commandBody.options[0].options[1].autocomplete = true
 			if (e.options[1].name == 'teshin')
-				e.options[1].options[0].autocomplete = true
+				command.commandBody.options[1].options[0].autocomplete = true
 		}
 	}
 
