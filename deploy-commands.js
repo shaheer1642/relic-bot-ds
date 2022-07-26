@@ -26,14 +26,14 @@ async function bot_initialize() {
 		// modify commands if needed
 		for (var [index,command] of commands.entries()) {
 			if (command.commandBody.name == 'lich') {
-				commands[index].command.commandBody.options[0].options[0].autocomplete = true
-				commands[index].command.commandBody.options[1].options[0].autocomplete = true
+				commands[index].commandBody.options[0].options[0].autocomplete = true
+				commands[index].commandBody.options[1].options[0].autocomplete = true
 			}
 			if (command.commandBody.name == 'track') {
 				if (command.commandBody.options[0].name == 'bounties')
-					commands[index].command.commandBody.options[0].options[1].autocomplete = true
+					commands[index].commandBody.options[0].options[1].autocomplete = true
 				if (command.commandBody.options[1].name == 'teshin')
-					commands[index].command.commandBody.options[1].options[0].autocomplete = true
+					commands[index].commandBody.options[1].options[0].autocomplete = true
 			}
 		}
 		console.log(JSON.stringify(commands))
