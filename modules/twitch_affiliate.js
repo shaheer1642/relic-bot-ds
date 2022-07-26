@@ -122,15 +122,15 @@ async function removeStreamer(username) {
 
 async function updateAffiliations() {
     try {
-        const streamers = db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => console.log(err))
+        const streamers = await db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => console.log(err))
         .then(res => {
             return res.rows
         })
-        const channels = db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => console.log(err))
+        const channels = await db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => console.log(err))
         .then(res => {
             return res.rows
         })
-        const messages = db.query(`SELECT * FROM twitch_affiliate_messages`).catch(err => console.log(err))
+        const messages = await db.query(`SELECT * FROM twitch_affiliate_messages`).catch(err => console.log(err))
         .then(res => {
             return res.rows
         })
