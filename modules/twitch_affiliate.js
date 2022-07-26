@@ -55,7 +55,7 @@ async function interaction_handler(interaction) {
 }
 
 async function addStreamer(username,custom_message) {
-    return new Promise((resolve,reject) => {
+    return new Promise(async (resolve,reject) => {
         if (!custom_message) custom_message = ''
         const twitchUser = await twitchApiClient.users.getUserByName(username);
         if (!twitchUser) reject(`The streamer **${username}** does not exist`)
@@ -87,7 +87,7 @@ async function addStreamer(username,custom_message) {
     })
 }
 async function removeStreamer(username) {
-    return new Promise((resolve,reject) => {
+    return new Promise(async (resolve,reject) => {
         const twitchUser = await twitchApiClient.users.getUserByName(username);
         if (!twitchUser) reject(`The streamer **${username}** does not exist`)
         db.query(`SELECT * FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
