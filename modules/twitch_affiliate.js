@@ -30,14 +30,14 @@ async function interaction_handler(interaction) {
                     ensureChannelExistence(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
                     .then(() => {
                         if (interaction.options.getSubcommand() == 'add_streamer') {
-                            addStreamer(interaction.options.getString('username'),interaction.options.getString('custom_message') || '').catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
+                            addStreamer(usernameValidate(interaction.options.getString('username')),interaction.options.getString('custom_message') || '').catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
                             .then((res) => {
                                 interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res),ephemeral: true}).catch(err => console.log(err))
                                 updateAffiliations()
                             })
                             
                         } else if (interaction.options.getSubcommand() == 'remove_streamer') {
-                            removeStreamer(interaction.options.getString('username')).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
+                            removeStreamer(usernameValidate(interaction.options.getString('username'))).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
                             .then((res) => {
                                 interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res),ephemeral: true}).catch(err => console.log(err))
                                 updateAffiliations()
@@ -236,6 +236,10 @@ async function firstTimeAddServer(channelId,webhookClient) {
         })
         resolve()
     })
+}
+
+function usernameValidate(str) {
+    return str.replace(/-/g,'')
 }
 
 module.exports = {
