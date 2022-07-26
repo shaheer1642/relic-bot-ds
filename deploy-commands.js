@@ -38,6 +38,7 @@ async function bot_initialize() {
 		}
 	
 		commands.forEach(command => {
+			console.log(`Registering application command ${command.name} for guilds ${JSON.stringify(command.guildIds)}`)
 			rest.put(Routes.applicationGuildCommands(client.user.id, command.guildIds), { body: command.commandBody })
 				.then(() => console.log(`Successfully registered application command ${command.name} for guilds ${JSON.stringify(command.guildIds)}`))
 				.catch(console.error);
