@@ -6,8 +6,8 @@ const {ApiClient} = require('@twurple/api');
 
 const { WebhookClient } = require('discord.js');
 
-const twitchAuthProvider = new ClientCredentialsAuthProvider(process.env.twitch_clientId, process.env.twitch_clientSecret);
-const twitchApiClient = new ApiClient({ twitchAuthProvider });
+const authProvider = new ClientCredentialsAuthProvider(process.env.twitch_clientId, process.env.twitch_clientSecret);
+const twitchApiClient = new ApiClient({ authProvider });
 
 const authorized_userIds = ['253525146923433984']
 
@@ -83,7 +83,7 @@ async function removeStreamer(username) {
                         res.rows.forEach(row => {
                             client.channels.cache.get(row.channel_id).messages.fetch(row.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
                         })
-                        resolve(`**${username}** has now been unaffiliated with WarframeHub`)
+                        resolve(`**${username}** has been unaffiliated from WarframeHub`)
                     })
                 })
             } else {
