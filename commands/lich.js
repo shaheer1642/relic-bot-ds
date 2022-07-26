@@ -76,5 +76,5 @@ module.exports = {
 		"865904902941048862",
 		"832677897411493949"
 	],
-	command_name: '/query'
+	command_name: '/lich'
 };

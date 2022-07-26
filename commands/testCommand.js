@@ -5,5 +5,6 @@ module.exports = {
 		.setName('ping')
 		.setDescription('Replies with Pong!'),
 	scope: 'global',
-	status: 'active'
+	status: 'active',
+    command_name: '/ping'
 };
