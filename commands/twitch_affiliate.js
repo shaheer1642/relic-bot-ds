@@ -22,8 +22,12 @@ module.exports = {
                 option.setName('username')
                     .setDescription('Streamer\'s username')
                     .setRequired(true))
+        )
+        .addSubcommand(subcommand =>
+            subcommand.setName('delete')
+            .setDescription('Delete affiliation on this server. Be careful, this is not revert-able')
         ),
     scope: 'global',
     status: 'active',
-    command_name: '/track'
+    command_name: '/twitch_affiliate'
 };

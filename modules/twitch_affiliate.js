@@ -1,7 +1,9 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {ClientCredentialsAuthProvider} = require('@twurple/auth')
-const {ApiClient} = require('@twurple/api')
+const {ApiClient} = require('@twurple/api');
+const { Routes } = require('discord-api-types');
+const { WebhookClient } = require('discord.js');
 
 const authProvider = new ClientCredentialsAuthProvider(process.env.twitch_clientId, process.env.twitch_clientSecret);
 const apiClient = new ApiClient({ authProvider });
@@ -17,9 +19,18 @@ async function interaction_handler(interaction) {
                 ensureChannelExistence(interaction.channel.id).catch(err => interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}))
                 .then(() => {
                     if (interaction.options.getSubcommand() == 'add') {
-                        interaction.reply({content: 'test_add'}).catch(err => console.log(err))
+                        addStreamer(interaction.options.getString('username')).catch(err => interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}))
+                        .then((res) => {
+                            interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
+                            updateAffiliations()
+                        })
+                        
                     } else if (interaction.options.getSubcommand() == 'remove') {
-                        interaction.reply({content: 'test_remove'}).catch(err => console.log(err))
+                        removeStreamer(interaction.options.getString('username')).catch(err => interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}))
+                        .then((res) => {
+                            interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res)}).catch(err => console.log(err))
+                            updateAffiliations()
+                        })
                     }
                 })
             } else {
@@ -27,6 +38,44 @@ async function interaction_handler(interaction) {
             }
         }
     }
+}
+
+async function addStreamer(username) {
+    return new Promise((resolve,reject) => {
+        db.query(`SELECT * FROM twitch_affiliate_streamers where username = '${username}'`).catch(err => reject(err))
+        .then(res => {
+            if (res.rowCount == 1) resolve(`The streamer **${username}** has already been affiliated with WarframeHub`)
+            else if (res.rowCount == 0) {
+                db.query(`INSERT INTO twitch_affiliate_streamers (username,time_added) VALUES ('${username}',${new Date().getTime()})`).catch(err => reject(err))
+                .then(res => {
+                    //send affiliation msg in every channel
+                    db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => reject(err))
+                    .then(async res => {
+                        for (const [index,row] of res.rows.entries()) {
+                            const webhookClient = new WebhookClient({url: row.webhook_url});
+                            await webhookClient.send({
+                                content: `Streamer: ${username} (details will be fetched and stuff)`
+                            }).catch(err => reject(err))
+                            .then(async res => {
+                                await db.query(`INSERT INTO twitch_affiliate_messages (username,message_id,channel_id,time_added) VALUES ('${username}',${res.id},${row.channel_id},${new Date().getTime()})`).catch(err => reject(err))
+                            })
+                        }
+                        resolve(`**${username}** has now been affiliated with WarframeHub`)
+                    })
+                })
+            } else {
+                reject('unexpected result querying db, contact developer with error code 502')
+            }
+        })
+    })
+}
+async function removeStreamer(username) {
+    return new Promise((resolve,reject) => {
+        resolve('not implemented yet')
+    })
+}
+async function updateAffiliations() {
+
 }
 
 async function ensureChannelExistence(channelId) {
@@ -40,14 +89,24 @@ async function ensureChannelExistence(channelId) {
                     channel.createWebhook('Twitch Affiliates (WarframeHub)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
                     .then(webhook => {
                         db.query(`INSERT INTO twitch_affiliate_channels (channel_id,webhook_url,time_added) VALUES (${channelId},'${webhook.url}',${new Date().getTime()})`).catch(err => reject(err))
-                        .then(res => resolve())
+                        .then(res => {
+                            firstTimeAdd(channelId,webhook).catch(err => reject(err))
+                            .then(() => resolve())
+                        })
                     })
                 })
             } else {
-                reject('unexpected result querying db, contact developer withe error code 501')
+                reject('unexpected result querying db, contact developer with error code 501')
             }
         })
         resolve('yes')
+    })
+}
+
+
+async function firstTimeAdd(channelId,webhook) {
+    return new Promise((resolve,reject) => {
+        resolve()
     })
 }
 
