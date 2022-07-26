@@ -239,7 +239,7 @@ async function firstTimeAddServer(channelId,webhookClient) {
 }
 
 function usernameValidate(str) {
-    return str.replace(/-/g,'')
+    return str.replace(/-/g,'').toLowerCase()
 }
 
 module.exports = {
