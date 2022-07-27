@@ -205,7 +205,7 @@ async function updateAffiliations() {
                 embeds.push({
                     description: `[${streamers_data[message.streamer_id].stream.title}](https://twitch.tv/${streamers_data[message.streamer_id].username})`,
                     fields: [{
-                        name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
+                        name: 'Stream started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                     }, {
                         name: 'Playing', value: streamers_data[message.streamer_id].stream.playing, inline: true
                     },{
