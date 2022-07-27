@@ -147,16 +147,41 @@ async function updateAffiliations() {
 
         var streamers_data = {}
         for (const [index,streamer] of streamers.entries()) {
-            const twitchUser = await twitchApiClient.users.getUserById(streamer.streamer_id);
+            const twitchUser = await twitchApiClient.users.getUserById(streamer.streamer_id).catch(err => console.log(err));
             if (twitchUser) {
                 streamers_data[streamer.streamer_id] = {
                     username: twitchUser.name,
                     displayName: twitchUser.displayName,
                     description: twitchUser.description,
-                    avatarUrl: twitchUser.profilePictureUrl
+                    avatarUrl: twitchUser.profilePictureUrl,
+                    stream: {},
+                    old_stream_status: streamer.status
                 }
             }
+            
+            await twitchUser.getStream().catch(err => console.log(err)).then(stream => {
+                if (stream) {
+                    streamers_data[streamer.streamer_id].stream = {
+                        status: 'live',
+                        startedAt: stream.startDate,
+                        playing: stream.gameName,
+                        viewCount: stream.viewers,
+                        lang: stream.language
+                    }
+                } else {
+                    streamers_data[streamer.streamer_id].stream = {
+                        status: 'offline'
+                    }
+                }
+            })
         }
+
+        var db_query = ''
+        Object.keys(streamers_data).forEach(async streamer_id => {
+            db_query += `UPDATE twitch_affiliate_streamers SET status=${streamers_data[streamer_id].stream.status};`
+        })
+
+        await db.query(db_query).catch(err => console.log(err))
 
         for (const [index,message] of messages.entries()) {
             const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
@@ -171,6 +196,12 @@ async function updateAffiliations() {
                     description: streamers_data[message.streamer_id].description,
                 }]
             }).catch(err => console.log(err))
+            // notify that user is live
+            if (streamers_data[message.streamer_id].stream.status != streamers_data[message.streamer_id].old_stream_status) {
+                if (message.notify.length > 0) {
+                    webhookClient.send(`${streamers_data[message.streamer_id].displayName} is live!\n${message.notify.map(userId => `<@${userId}>`).join(', ')}`).catch(err => console.log(err))
+                }
+            }
         }
     } catch(e) {
         console.log(e)
