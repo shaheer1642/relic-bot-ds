@@ -1872,6 +1872,10 @@ client.on('messageReactionAdd', async (reaction, user) => {
         return
     }
 
+    if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier) {
+        twitch_affiliate.reaction_handler(reaction,'add')
+    }
+
     if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
         console.log(reaction.emoji.identifier)
@@ -3642,9 +3646,13 @@ client.on('messageReactionRemove', async (reaction, user) => {
         return
 
     if (process.env.DEBUG_MODE==1 && user.id != '253525146923433984')
-    return
+        return
     if (process.env.DEBUG_MODE==2 && user.id == '253525146923433984')
-    return
+        return
+
+    if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier) {
+        twitch_affiliate.reaction_handler(reaction,'remove')
+    }
 
     if (!reaction.message.guildId) {
         if (!reaction.message.author)

@@ -20,6 +20,13 @@ function bot_initialize() {
     }, 60000);
 }
 
+const emotes = {
+    notify: {
+        string: '<:follow_twitch:1001860010877399182>',
+        identifier: 'follow_twitch:1001860010877399182'
+    }
+}
+
 async function interaction_handler(interaction) {
     try {
         if (interaction.isCommand()) {
@@ -63,6 +70,10 @@ async function interaction_handler(interaction) {
     }
 }
 
+async function reaction_handler(reaction, action) {
+
+}
+
 async function addStreamer(username,custom_message) {
     return new Promise(async (resolve,reject) => {
         if (!custom_message) custom_message = ''
@@ -83,9 +94,10 @@ async function addStreamer(username,custom_message) {
                         for (const [index,row] of res.rows.entries()) {
                             const webhookClient = new WebhookClient({url: row.webhook_url});
                             await webhookClient.send({
-                                content: `Streamer: ${username} (details will be fetched and stuff)`
+                                content: `Streamer: ${username} (fetching details...)`
                             }).catch(err => reject(err))
                             .then(async res => {
+                                client.channels.cache.get(res.channel_id).messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
                                 await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},${new Date().getTime()})`).catch(err => reject(err))
                             })
                         }
@@ -223,7 +235,7 @@ async function updateAffiliations() {
             }
 
             webhookClient.editMessage(message.message_id, {
-                content: 'React with <emoji> to be notified when this streamer is live',
+                content: `React with ${emotes.notify.string} to be notified when this streamer is live`,
                 embeds: embeds
             }).catch(err => console.log(err))
             // notify that user is live
@@ -311,5 +323,7 @@ function usernameValidate(str) {
 
 module.exports = {
     interaction_handler,
-    bot_initialize
+    bot_initialize,
+    reaction_handler,
+    emotes
 }
