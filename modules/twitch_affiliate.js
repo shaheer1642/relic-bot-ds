@@ -210,7 +210,7 @@ async function updateAffiliations() {
                         name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
                     }],
                     color: '#ff0000'
-                }:{}
+                }:{description: ''}
             ]
             }).catch(err => console.log(err))
             // notify that user is live
