@@ -165,7 +165,7 @@ async function updateAffiliations() {
                         status: 'live',
                         startedAt: new Date(stream.startDate).getTime(),
                         playing: stream.gameName == '' ? '\u200b':stream.gameName,
-                        viewCount: stream.viewers == '' ? '\u200b':stream.viewers,
+                        viewCount: stream.viewers == '' ? '\u200b':stream.viewers.toString(),
                         lang: stream.language == '' ? '\u200b':stream.language,
                     }
                 } else {
