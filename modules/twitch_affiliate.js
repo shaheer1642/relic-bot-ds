@@ -203,11 +203,11 @@ async function updateAffiliations() {
                     fields: [{
                         name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                     }, {
-                        name: 'Playing', value: streamers_data[message.streamer_id].stream.playing, inline: true
+                        name: 'Playing', value: streamers_data[message.streamer_id].stream.playing || '\u200b', inline: true
                     },{
-                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: false
+                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount || '\u200b', inline: false
                     },{
-                        name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
+                        name: 'Language', value: streamers_data[message.streamer_id].stream.lang || '\u200b', inline: true
                     }],
                     color: '#ff0000'
                 }:{description: 'test'}
