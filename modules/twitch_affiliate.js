@@ -253,8 +253,8 @@ async function updateAffiliations() {
             // notify that user is live
             if (streamers_data[message.streamer_id].stream.status != streamers_data[message.streamer_id].old_stream_status) {
                 if (streamers_data[message.streamer_id].stream.status == 'live') {
-                    if (message.notify.length > 0) {
-                        webhookClient.send(`${streamers_data[message.streamer_id].displayName} is live!\n${message.notify.map(userId => `<@${userId}>`).join(', ')}`).catch(err => console.log(err))
+                    if (message.notify.user_ids.length > 0) {
+                        webhookClient.send(`${streamers_data[message.streamer_id].displayName} is live!\n${message.notify.user_ids.map(userId => `<@${userId}>`).join(', ')}`).catch(err => console.log(err))
                     }
                 }
             }
