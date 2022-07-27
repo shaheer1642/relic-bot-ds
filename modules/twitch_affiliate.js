@@ -167,7 +167,8 @@ async function updateAffiliations() {
                         playing: stream.gameName == '' ? '\u200b':stream.gameName,
                         viewCount: stream.viewers == '' ? '\u200b':stream.viewers.toString(),
                         lang: stream.language == '' ? '\u200b':stream.language,
-                        title: stream.title
+                        title: stream.title,
+                        thumbnail: stream.thumbnailUrl
                     }
                 } else {
                     streamers_data[streamer.streamer_id].stream = {
@@ -216,6 +217,7 @@ async function updateAffiliations() {
                     },{
                         name: '\u200b', value: '\u200b', inline: true
                     },],
+                    image: {url: streamers_data[message.streamer_id].stream.thumbnail},
                     color: '#ff0000'
                 })
             }
