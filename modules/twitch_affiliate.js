@@ -190,7 +190,7 @@ async function updateAffiliations() {
             webhookClient.editMessage(message.message_id, {
                 content: 'React with <emoji> to be notified when this streamer is live',
                 embeds: [{
-                    title: (streamers_data[message.streamer_id].stream.status == 'live' ? '🔴':'') + streamers_data[message.streamer_id].displayName,
+                    title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
                     url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
                     thumbnail: {
                         url: streamers_data[message.streamer_id].avatarUrl
@@ -199,13 +199,15 @@ async function updateAffiliations() {
                     color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
                 },
                 streamers_data[message.streamer_id].stream.status == 'live' ? {
-                    description: `(Watch the Stream)[https://twitch.tv/${streamers_data[message.streamer_id].username}]`,
+                    description: `[Watch the Stream](https://twitch.tv/${streamers_data[message.streamer_id].username})`,
                     fields: [{
                         name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                     }, {
                         name: 'Playing', value: streamers_data[message.streamer_id].stream.playing, inline: true
                     },{
-                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: false
+                        name: '\u200b', value: '\u200b', inline: true
+                    },{
+                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: true
                     },{
                         name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
                     }],
