@@ -164,9 +164,9 @@ async function updateAffiliations() {
                     streamers_data[streamer.streamer_id].stream = {
                         status: 'live',
                         startedAt: new Date(stream.startDate).getTime(),
-                        playing: stream.gameName,
-                        viewCount: stream.viewers,
-                        lang: stream.language
+                        playing: stream.gameName == '' ? '\u200b':stream.gameName,
+                        viewCount: stream.viewers == '' ? '\u200b':stream.viewers,
+                        lang: stream.language == '' ? '\u200b':stream.language,
                     }
                 } else {
                     streamers_data[streamer.streamer_id].stream = {
@@ -178,7 +178,7 @@ async function updateAffiliations() {
 
         var db_query = ''
         Object.keys(streamers_data).forEach(async streamer_id => {
-            db_query += `UPDATE twitch_affiliate_streamers SET status=${streamers_data[streamer_id].stream.status} WHERE streamer_id = '${streamer_id}';`
+            db_query += `UPDATE twitch_affiliate_streamers SET status='${streamers_data[streamer_id].stream.status}' WHERE streamer_id = '${streamer_id}';`
         })
 
         await db.query(db_query).catch(err => console.log(err))
@@ -188,12 +188,12 @@ async function updateAffiliations() {
             webhookClient.editMessage(message.message_id, {
                 content: 'React with <emoji> to be notified when this streamer is live',
                 embeds: [{
-                    title: streamers_data[message.streamer_id].displayName,
+                    title: streamers_data[message.streamer_id].stream.status == 'live' ? '🔴':'' + streamers_data[message.streamer_id].displayName,
                     url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
                     thumbnail: {
                         url: streamers_data[message.streamer_id].avatarUrl
                     },
-                    description: streamers_data[message.streamer_id].description + `\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
+                    description: streamers_data[message.streamer_id].description + `\n\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
                     color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
                 },
                 streamers_data[message.streamer_id].stream.status == 'live' ? {
@@ -203,11 +203,11 @@ async function updateAffiliations() {
                     fields: [{
                         name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                     }, {
-                        name: 'Playing', value: streamers_data[message.streamer_id].stream.playing || '\u200b', inline: true
+                        name: 'Playing', value: streamers_data[message.streamer_id].stream.playing, inline: true
                     },{
-                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount || '\u200b', inline: false
+                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: false
                     },{
-                        name: 'Language', value: streamers_data[message.streamer_id].stream.lang || '\u200b', inline: true
+                        name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
                     }],
                     color: '#ff0000'
                 }:{description: 'test'}
