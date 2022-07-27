@@ -167,6 +167,7 @@ async function updateAffiliations() {
                         playing: stream.gameName == '' ? '\u200b':stream.gameName,
                         viewCount: stream.viewers == '' ? '\u200b':stream.viewers.toString(),
                         lang: stream.language == '' ? '\u200b':stream.language,
+                        title: stream.title
                     }
                 } else {
                     streamers_data[streamer.streamer_id].stream = {
@@ -187,18 +188,20 @@ async function updateAffiliations() {
 
         for (const [index,message] of messages.entries()) {
             const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
-            webhookClient.editMessage(message.message_id, {
-                content: 'React with <emoji> to be notified when this streamer is live',
-                embeds: [{
-                    title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
-                    url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
-                    thumbnail: {
-                        url: streamers_data[message.streamer_id].avatarUrl
-                    },
-                    description: streamers_data[message.streamer_id].description + `\n\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
-                    color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
+
+            var embeds = []
+            embeds.push({
+                title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
+                url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
+                thumbnail: {
+                    url: streamers_data[message.streamer_id].avatarUrl
                 },
-                streamers_data[message.streamer_id].stream.status == 'live' ? {
+                description: streamers_data[message.streamer_id].description + `\n\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
+                color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
+            })
+
+            if (streamers_data[message.streamer_id].stream.status == 'live') {
+                embeds.push({
                     description: `[Watch the Stream](https://twitch.tv/${streamers_data[message.streamer_id].username})`,
                     fields: [{
                         name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
@@ -210,10 +213,16 @@ async function updateAffiliations() {
                         name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: true
                     },{
                         name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
-                    }],
+                    },{
+                        name: '\u200b', value: '\u200b', inline: true
+                    },],
                     color: '#ff0000'
-                }:null
-            ]
+                })
+            }
+
+            webhookClient.editMessage(message.message_id, {
+                content: 'React with <emoji> to be notified when this streamer is live',
+                embeds: embeds
             }).catch(err => console.log(err))
             // notify that user is live
             if (streamers_data[message.streamer_id].stream.status != streamers_data[message.streamer_id].old_stream_status) {
