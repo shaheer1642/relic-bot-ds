@@ -254,7 +254,7 @@ async function updateAffiliations() {
             if (streamers_data[message.streamer_id].stream.status != streamers_data[message.streamer_id].old_stream_status) {
                 if (streamers_data[message.streamer_id].stream.status == 'live') {
                     if (message.notify.user_ids.length > 0) {
-                        webhookClient.send(`${streamers_data[message.streamer_id].displayName} is live!\n${message.notify.user_ids.map(userId => `<@${userId}>`).join(', ')}`)
+                        webhookClient.send(`**${streamers_data[message.streamer_id].displayName}** is live!\n${message.notify.user_ids.map(userId => `<@${userId}>`).join(', ')}`)
                         .then(msg => {
                             setTimeout(() => {
                                 webhookClient.deleteMessage(msg.id).catch(err => console.log(err))
