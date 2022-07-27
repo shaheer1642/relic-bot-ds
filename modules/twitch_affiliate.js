@@ -168,7 +168,7 @@ async function updateAffiliations() {
                         viewCount: stream.viewers == '' ? '\u200b':stream.viewers.toString(),
                         lang: stream.language == '' ? '\u200b':stream.language,
                         title: stream.title,
-                        thumbnail: stream.thumbnailUrl.replace('frame-{width}x{height}','')
+                        thumbnail: stream.thumbnailUrl.replace('-{width}x{height}','')
                     }
                 } else {
                     streamers_data[streamer.streamer_id].stream = {
