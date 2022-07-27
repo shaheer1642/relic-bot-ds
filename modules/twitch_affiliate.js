@@ -178,7 +178,7 @@ async function updateAffiliations() {
 
         var db_query = ''
         Object.keys(streamers_data).forEach(async streamer_id => {
-            db_query += `UPDATE twitch_affiliate_streamers SET status=${streamers_data[streamer_id].stream.status};`
+            db_query += `UPDATE twitch_affiliate_streamers SET status=${streamers_data[streamer_id].stream.status} WHERE streamer_id = '${streamer_id}';`
         })
 
         await db.query(db_query).catch(err => console.log(err))
@@ -199,6 +199,7 @@ async function updateAffiliations() {
                 streamers_data[message.streamer_id].stream.status == 'live' ? {
                     title: 'Watch the Stream',
                     url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
+                    description: `test`,
                     fields: [{
                         name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                     }, {
