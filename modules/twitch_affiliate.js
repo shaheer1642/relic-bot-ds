@@ -202,7 +202,7 @@ async function updateAffiliations() {
 
             if (streamers_data[message.streamer_id].stream.status == 'live') {
                 embeds.push({
-                    description: `[Watch the Stream](https://twitch.tv/${streamers_data[message.streamer_id].username})`,
+                    description: `[${streamers_data[message.streamer_id].stream.title}](https://twitch.tv/${streamers_data[message.streamer_id].username})`,
                     fields: [{
                         name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                     }, {
