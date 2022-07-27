@@ -186,28 +186,11 @@ async function updateAffiliations() {
         await db.query(db_query).catch(err => console.log(err))
 
         for (const [index,message] of messages.entries()) {
-            if (streamers_data[message.streamer_id].stream.status == 'live') {
-                console.log(JSON.stringify({
-                    title: 'Watch the Stream',
-                    url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
-                    description: `test`,
-                    fields: [{
-                        name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
-                    }, {
-                        name: 'Playing', value: streamers_data[message.streamer_id].stream.playing, inline: true
-                    },{
-                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: false
-                    },{
-                        name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
-                    }],
-                    color: '#ff0000'
-                }))
-            }
             const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
             webhookClient.editMessage(message.message_id, {
                 content: 'React with <emoji> to be notified when this streamer is live',
                 embeds: [{
-                    title: streamers_data[message.streamer_id].stream.status == 'live' ? '🔴':'' + streamers_data[message.streamer_id].displayName,
+                    title: (streamers_data[message.streamer_id].stream.status == 'live' ? '🔴':'') + streamers_data[message.streamer_id].displayName,
                     url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
                     thumbnail: {
                         url: streamers_data[message.streamer_id].avatarUrl
@@ -216,9 +199,7 @@ async function updateAffiliations() {
                     color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
                 },
                 streamers_data[message.streamer_id].stream.status == 'live' ? {
-                    title: 'Watch the Stream',
-                    url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
-                    description: `test`,
+                    description: `(Watch the Stream)[https://twitch.tv/${streamers_data[message.streamer_id].username}]`,
                     fields: [{
                         name: 'Started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                     }, {
