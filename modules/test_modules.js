@@ -966,9 +966,11 @@ async function baroArrival(message,args) {
 
 async function react(message,args) {
     // .react channel_id message_id emote
-    client.channels.cache.get(args[0]).messages.fetch(args[1]).then(msg => {
-        msg.react(args[2]).catch(err => console.log(err))
-    }).catch(err => console.log(err))
+    client.channels.fetch(args[0]).catch(err => console.log(err)).then(channel => {
+        channel.messages.fetch(args[1]).catch(err => console.log(err)).then(msg => {
+            msg.react(args[2]).catch(err => console.log(err))
+        })
+    })
 }
 
 async function edit(message,args) {
