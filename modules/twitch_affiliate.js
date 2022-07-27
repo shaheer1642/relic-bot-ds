@@ -176,6 +176,8 @@ async function updateAffiliations() {
             })
         }
 
+        console.log(JSON.stringify(streamers_data))
+
         var db_query = ''
         Object.keys(streamers_data).forEach(async streamer_id => {
             db_query += `UPDATE twitch_affiliate_streamers SET status='${streamers_data[streamer_id].stream.status}' WHERE streamer_id = '${streamer_id}';`
