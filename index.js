@@ -1873,7 +1873,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier) {
-        twitch_affiliate.reaction_handler(reaction,'add')
+        twitch_affiliate.reaction_handler(reaction,user,'add')
     }
 
     if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
@@ -3651,7 +3651,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         return
 
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier) {
-        twitch_affiliate.reaction_handler(reaction,'remove')
+        twitch_affiliate.reaction_handler(reaction,user,'remove')
     }
 
     if (!reaction.message.guildId) {

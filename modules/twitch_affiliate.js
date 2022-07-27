@@ -70,8 +70,20 @@ async function interaction_handler(interaction) {
     }
 }
 
-async function reaction_handler(reaction, action) {
-
+async function reaction_handler(reaction, user, action) {
+    if (action == 'add') {
+        db.query(`
+            UPDATE worldstatealert
+            SET notify = jsonb_set(notify, '{user_ids,999999}', '"${user.id}"', true)
+            WHERE channel_id = ${channel_id};
+        `).catch(err => console.log(err))
+    } else if (action == 'remove') {
+        db.query(`
+            UPDATE twitch_affiliate_messages
+            SET notify = jsonb_set(notify, '{user_ids}', (notify->'user_ids') - '${user.id}')
+            WHERE channel_id = ${channel_id};
+        `).catch(err => console.log(err))
+    }
 }
 
 async function addStreamer(username,custom_message) {
