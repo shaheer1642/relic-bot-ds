@@ -72,8 +72,10 @@ function interactionHandler(interaction) {
         return
     } else {
         if (interaction.customId == 'sq_custom') {
-            interaction.reply(
-                    {
+            interaction.reply({
+                components: [{
+                    type: 4,
+                    components: [{
                         title: "Create custom squad",
                         custom_id: "sq_custom_modal",
                         components: [{
@@ -98,8 +100,9 @@ function interactionHandler(interaction) {
                                 required: true
                             }]
                         }]
-                  }
-            )
+                    }]
+                }]   
+            })
             return
         } else {
             db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
@@ -349,12 +352,6 @@ function getSquadsList() {
         sq_taxi_help: {
             name: 'Taxi | Help',
             id: 'sq_taxi_help',
-            spots: 2,
-            filled: []
-        },
-        sq_mining_fishing: {
-            name: 'Mining | Fishing',
-            id: 'sq_mining_fishing',
             spots: 2,
             filled: []
         },
