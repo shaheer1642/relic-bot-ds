@@ -71,38 +71,56 @@ function interactionHandler(interaction) {
         console.log(`botv_recruit: user ${interaction.user.id} left all squads`)
         return
     } else {
-        if (getSquadsList()[interaction.customId]) {
-            if (getSquadsList()[interaction.customId].variants) {
-                interaction.reply({
-                    content: '\u200b',
-                    components: [{
+        if (interaction.customId == 'sq_custom') {
+            interaction.reply(
+                    {
+                        title: "Create",
+                        custom_id: "sq_custom_modal",
+                        components: [{
                             type: 1,
-                            components: variants_component(getSquadsList()[interaction.customId])
-                    }],
-                    ephemeral: true
-                })
-                return
-            } else {
-                db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
-                .then(res => {
-                    if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                    edit_main_msg()
-                    console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
-                    mention_users(interaction.user.id,interaction.customId)
-                }).catch(err => {
-                    if (err.code == 23505) { // duplicate key
-                        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
-                        .then(res => {
-                            if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                            edit_main_msg()
-                            console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
-                        })
-                        .catch(err => console.log(err))
-                    } else {
-                        console.log(err)
-                    }
-                })
-            }
+                            components: [{
+                                type: 4,
+                                custom_id: "sq_custom_modal_name",
+                                label: "Squad Name",
+                                style: 1,
+                                min_length: 1,
+                                max_length: 20,
+                                placeholder: "i.e. polymer bundle farm",
+                                required: true
+                            },{
+                                type: 4,
+                                custom_id: "sq_custom_modal_spots",
+                                label: "Total Spots",
+                                style: 1,
+                                min_length: 1,
+                                max_length: 2,
+                                placeholder: "i.e. 4",
+                                required: true
+                            }]
+                        }]
+                  }
+            )
+            return
+        } else {
+            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+            .then(res => {
+                if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                edit_main_msg()
+                console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
+                mention_users(interaction.user.id,interaction.customId)
+            }).catch(err => {
+                if (err.code == 23505) { // duplicate key
+                    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
+                    .then(res => {
+                        if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                        edit_main_msg()
+                        console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
+                    })
+                    .catch(err => console.log(err))
+                } else {
+                    console.log(err)
+                }
+            })
         }
     }
 }
@@ -375,83 +393,15 @@ function getSquadsList() {
             spots: 4,
             filled: []
         },
-        sq_warframe_parts: {
-            name: 'Warframe Parts',
-            variant_type: 'Warframe',
-            variants: [
-                'ash',
-                'atlas',
-                'baruuk',
-                'caliban',
-                'chroma',
-                'ember',
-                'equinox',
-                'excalibur',
-                'frost',
-                'gara',
-                'garuda',
-                'gauss',
-                'grendel',
-                'gyre',
-                'harrow',
-                'hildryn',
-                'hydroid',
-                'inaros',
-                'ivara',
-                'khora',
-                'lavos',
-                'limbo',
-                'loki',
-                'mag',
-                'mesa',
-                'mirage',
-                'nekros',
-                'nidus',
-                'nova',
-                'nyx',
-                'oberon',
-                'octavia',
-                'protea',
-                'revenant',
-                'rhino',
-                'saryn',
-                'sevagoth',
-                'titania',
-                'trinity',
-                'valkyr',
-                'vauban',
-                'wisp',
-                'xaku',
-                'yareli',
-            ],
-            id: 'sq_warframe_parts',
-            spots: 2,
-            filled: []
+        sq_custom: {
+            name: 'Create Custom Squad',
+            id: 'sq_custom'
         },
         sq_leave_all: {
             name: 'Leave All',
             id: 'sq_leave_all',
         },
     }
-}
-
-function variants_component(squad) {
-    var components = []
-    var k = 0
-    for (const [index, variant] of squad.variants.entries()) {
-        if (index % 25 == 0) {
-            k = components.push({
-                    type: 3,
-                    placeholder: 'Please choose a ' + squad.variant_type,
-                    custom_id: squad.id,
-                    min_values: 1,
-                    max_values: 1,
-                    options: []
-            }) - 1;
-        }
-        components[k].options.push({label: convertUpper(variant), value: squad.id + '_' + variant})
-    }
-    return components
 }
 
 module.exports = {
