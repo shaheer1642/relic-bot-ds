@@ -403,6 +403,18 @@ function getSquadsList() {
             spots: 2,
             filled: []
         },
+        sq_mining_fishing: {
+            name: 'Mining | Fishing',
+            id: 'sq_mining_fishing',
+            spots: 2,
+            filled: []
+        },
+        sq_index: {
+            name: 'Index',
+            id: 'sq_index',
+            spots: 4,
+            filled: []
+        },
         sq_bounties: {
             name: 'Bounties',
             id: 'sq_bounties',
