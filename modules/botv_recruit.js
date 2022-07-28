@@ -413,6 +413,12 @@ function getSquadsList() {
             spots: 4,
             filled: []
         },
+        sq_index: {
+            name: 'Profit Taker',
+            id: 'sq_profit_taker',
+            spots: 2,
+            filled: []
+        },
         sq_bounties: {
             name: 'Bounties',
             id: 'sq_bounties',
