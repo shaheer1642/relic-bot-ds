@@ -107,17 +107,19 @@ function interactionHandler(interaction) {
                 interaction.showModal({
                     title: "Create custom squad",
                     custom_id: "sq_custom_modal",
-                    components: [{
-                        type: 1,
-                        components: [{
-                            type: 4,
-                            custom_id: "sq_custom_modal_name",
-                            label: "Squad Name",
-                            style: 1,
-                            min_length: 1,
-                            max_length: 20,
-                            placeholder: "i.e. polymer bundle farm",
-                            required: true
+                    components: [
+                        {
+                            type: 1,
+                            components: [{
+                                type: 4,
+                                custom_id: "sq_custom_modal_name",
+                                label: "Squad Name",
+                                style: 1,
+                                min_length: 1,
+                                max_length: 20,
+                                placeholder: "i.e. polymer bundle farm",
+                                required: true
+                            }]
                         },{
                             type: 1,
                             components: [{
@@ -130,8 +132,9 @@ function interactionHandler(interaction) {
                                 value: 4,
                                 placeholder: "i.e. 4",
                                 required: true
-                        }]
-                    }]
+                            }]
+                        }
+                    ]
                 }).catch(err => console.log(err))
             } catch(e) {
                 console.log(e)
