@@ -197,6 +197,8 @@ async function edit_main_msg() {
     for (const key in squads) {
         if (key == 'sq_leave_all')
             continue
+        if (key.match('sq_custom'))
+            continue
         notification_options.push({
             label: squads[key].name,
             value: squads[key].id
@@ -406,12 +408,6 @@ function getSquadsList() {
         sq_leveling: {
             name: 'Leveling',
             id: 'sq_leveling',
-            spots: 4,
-            filled: []
-        },
-        sq_index: {
-            name: 'Index',
-            id: 'sq_index',
             spots: 4,
             filled: []
         },
