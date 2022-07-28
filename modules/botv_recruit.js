@@ -281,7 +281,7 @@ async function edit_main_msg() {
                 }
                 componentIndex++;
 
-                if (componentIndex % 5 == 0)
+                if (componentIndex % 3 == 0)
                     break;
             }
         }
