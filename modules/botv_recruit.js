@@ -82,26 +82,27 @@ function interactionHandler(interaction) {
                     ephemeral: true
                 })
                 return
+            } else {
+                db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+                .then(res => {
+                    if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                    edit_main_msg()
+                    console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
+                    mention_users(interaction.user.id,interaction.customId)
+                }).catch(err => {
+                    if (err.code == 23505) { // duplicate key
+                        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
+                        .then(res => {
+                            if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                            edit_main_msg()
+                            console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
+                        })
+                        .catch(err => console.log(err))
+                    } else {
+                        console.log(err)
+                    }
+                })
             }
-            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
-            .then(res => {
-                if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                edit_main_msg()
-                console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
-                mention_users(interaction.user.id,interaction.customId)
-            }).catch(err => {
-                if (err.code == 23505) { // duplicate key
-                    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
-                    .then(res => {
-                        if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                        edit_main_msg()
-                        console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
-                    })
-                    .catch(err => console.log(err))
-                } else {
-                    console.log(err)
-                }
-            })
         }
     }
 }
@@ -446,7 +447,7 @@ function variants_component(squad) {
                     min_values: 1,
                     max_values: 1,
                     options: []
-            });
+            }) - 1;
         }
         components[k].options.push({label: convertUpper(variant), value: squad.id + '_' + variant})
     }

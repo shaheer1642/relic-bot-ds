@@ -202,7 +202,7 @@ async function updateAffiliations() {
             })
         }
 
-        console.log(JSON.stringify(streamers_data))
+        //console.log(JSON.stringify(streamers_data))
 
         var db_query = ''
         Object.keys(streamers_data).forEach(async streamer_id => {
