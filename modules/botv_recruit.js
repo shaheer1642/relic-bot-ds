@@ -73,108 +73,61 @@ function interactionHandler(interaction) {
         return
     } else {
         if (interaction.customId == 'sq_custom') {
-            try {
-                /*const modal = new ModalBuilder()
-                .setCustomId('myModal')
-                .setTitle('My Modal');
-    
-                // Add components to modal
-    
-                // Create the text input components
-                const favoriteColorInput = new TextInputBuilder()
-                    .setCustomId('favoriteColorInput')
-                    // The label is the prompt the user sees for this input
-                    .setLabel("What's your favorite color?")
-                    // Short means only a single line of text
-                    .setStyle(TextInputStyle.Short);
-    
-                const hobbiesInput = new TextInputBuilder()
-                    .setCustomId('hobbiesInput')
-                    .setLabel("What's some of your favorite hobbies?")
-                    // Paragraph means multiple lines of text.
-                    .setStyle(TextInputStyle.Paragraph);
-    
-                // An action row only holds one text input,
-                // so you need one action row per text input.
-                const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
-                const secondActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
-    
-                // Add inputs to the modal
-                modal.addComponents(firstActionRow, secondActionRow);
-    
-                // Show the modal to the user
-                interaction.showModal(modal);*/
-                interaction.showModal({
-                    title: "Create custom squad",
-                    custom_id: "sq_custom_modal",
-                    components: [
-                        {
-                            type: 1,
-                            components: [{
-                                type: 4,
-                                custom_id: "sq_custom_modal_name",
-                                label: "Squad Name",
-                                style: 1,
-                                min_length: 1,
-                                max_length: 20,
-                                placeholder: "i.e. polymer bundle farm",
-                                required: true
-                            }]
-                        },{
-                            type: 1,
-                            components: [{
-                                type: 4,
-                                custom_id: "sq_custom_modal_spots",
-                                label: "Total Spots",
-                                style: 1,
-                                min_length: 1,
-                                max_length: 2,
-                                value: 4,
-                                placeholder: "i.e. 4",
-                                required: true
-                            }]
-                        }
-                    ]
-                }).catch(err => console.log(err))
-            } catch(e) {
-                console.log(e)
-            }
-    /*
-            interaction.show
-            interaction.reply({
-                components: [{
-                    type: 4,
-                    components: [{
-                        title: "Create custom squad",
-                        custom_id: "sq_custom_modal",
+            interaction.showModal({
+                title: "Create custom squad",
+                custom_id: "sq_custom_modal",
+                components: [
+                    {
+                        type: 1,
                         components: [{
-                            type: 1,
-                            components: [{
-                                type: 4,
-                                custom_id: "sq_custom_modal_name",
-                                label: "Squad Name",
-                                style: 1,
-                                min_length: 1,
-                                max_length: 20,
-                                placeholder: "i.e. polymer bundle farm",
-                                required: true
-                            },{
-                                type: 4,
-                                custom_id: "sq_custom_modal_spots",
-                                label: "Total Spots",
-                                style: 1,
-                                min_length: 1,
-                                max_length: 2,
-                                placeholder: "i.e. 4",
-                                required: true
-                            }]
+                            type: 4,
+                            custom_id: "squad_name",
+                            label: "Squad Name",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 20,
+                            placeholder: "i.e. polymer bundle farm",
+                            required: true
                         }]
-                    }]
-                }]   
+                    },{
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "squad_spots",
+                            label: "Total Spots",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 2,
+                            value: 4,
+                            placeholder: "i.e. 4",
+                            required: true
+                        }]
+                    }
+                ]
             }).catch(err => console.log(err))
-            */
             return
-        } else {
+        } else if (interaction.customId == 'sq_custom_modal') {
+            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,custom,spots,join_timestamp) VALUES (${interaction.user.id},'${interaction.fields.getTextInputValue('squad_name')}',true,${Number(interaction.fields.getTextInputValue('squad_spots'))},${new Date().getTime()})`)
+            .then(res => {
+                if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                edit_main_msg()
+                console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
+                mention_users(interaction.user.id,interaction.customId)
+            }).catch(err => {
+                if (err.code == 23505) { // duplicate key
+                    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.fields.getTextInputValue('squad_name')}'`)
+                    .then(res => {
+                        if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                        edit_main_msg()
+                        console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.fields.getTextInputValue('squad_name')}`)
+                    })
+                    .catch(err => console.log(err))
+                } else {
+                    console.log(err)
+                }
+            })
+        }
+        else {
             db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
