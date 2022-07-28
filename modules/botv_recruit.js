@@ -1,6 +1,6 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
@@ -77,7 +77,7 @@ function interactionHandler(interaction) {
                     content: '\u200b',
                     components: [{
                             type: 1,
-                            components: variants_component(interaction.customId, getSquadsList()[interaction.customId].variants)
+                            components: variants_component(getSquadsList()[interaction.customId])
                     }],
                     ephemeral: true
                 })
@@ -376,51 +376,52 @@ function getSquadsList() {
         },
         sq_warframe_parts: {
             name: 'Warframe Parts',
+            variant_type: 'Warframe',
             variants: [
-                'sq_warframe_parts$ash',
-                'sq_warframe_parts$atlas',
-                'sq_warframe_parts$baruuk',
-                'sq_warframe_parts$caliban',
-                'sq_warframe_parts$chroma',
-                'sq_warframe_parts$ember',
-                'sq_warframe_parts$equinox',
-                'sq_warframe_parts$excalibur',
-                'sq_warframe_parts$frost',
-                'sq_warframe_parts$gara',
-                'sq_warframe_parts$garuda',
-                'sq_warframe_parts$gauss',
-                'sq_warframe_parts$grendel',
-                'sq_warframe_parts$gyre',
-                'sq_warframe_parts$harrow',
-                'sq_warframe_parts$hildryn',
-                'sq_warframe_parts$hyedroid',
-                'sq_warframe_parts$inaros',
-                'sq_warframe_parts$ivara',
-                'sq_warframe_parts$khora',
-                'sq_warframe_parts$lavos',
-                'sq_warframe_parts$limbo',
-                'sq_warframe_parts$loki',
-                'sq_warframe_parts$mag',
-                'sq_warframe_parts$mesa',
-                'sq_warframe_parts$mirage',
-                'sq_warframe_parts$nekros',
-                'sq_warframe_parts$nidus',
-                'sq_warframe_parts$nova',
-                'sq_warframe_parts$nyx',
-                'sq_warframe_parts$oberon',
-                'sq_warframe_parts$octavia',
-                'sq_warframe_parts$protea',
-                'sq_warframe_parts$revenant',
-                'sq_warframe_parts$rhino',
-                'sq_warframe_parts$saryn',
-                'sq_warframe_parts$sevagoth',
-                'sq_warframe_parts$titania',
-                'sq_warframe_parts$trinity',
-                'sq_warframe_parts$valkyr',
-                'sq_warframe_parts$vauban',
-                'sq_warframe_parts$wisp',
-                'sq_warframe_parts$xaku',
-                'sq_warframe_parts$yareli',
+                'ash',
+                'atlas',
+                'baruuk',
+                'caliban',
+                'chroma',
+                'ember',
+                'equinox',
+                'excalibur',
+                'frost',
+                'gara',
+                'garuda',
+                'gauss',
+                'grendel',
+                'gyre',
+                'harrow',
+                'hildryn',
+                'hydroid',
+                'inaros',
+                'ivara',
+                'khora',
+                'lavos',
+                'limbo',
+                'loki',
+                'mag',
+                'mesa',
+                'mirage',
+                'nekros',
+                'nidus',
+                'nova',
+                'nyx',
+                'oberon',
+                'octavia',
+                'protea',
+                'revenant',
+                'rhino',
+                'saryn',
+                'sevagoth',
+                'titania',
+                'trinity',
+                'valkyr',
+                'vauban',
+                'wisp',
+                'xaku',
+                'yareli',
             ],
             id: 'sq_warframe_parts',
             spots: 2,
@@ -433,21 +434,21 @@ function getSquadsList() {
     }
 }
 
-function variants_component(squad_id, variants_list) {
+function variants_component(squad) {
     var components = []
     var k = 0
-    for (const [index, variant] of variants_list.entries()) {
+    for (const [index, variant] of squad.variants.entries()) {
         if (index % 25 == 0) {
             k = components.push({
                     type: 3,
-                    placeholder: 'Notification Settings',
-                    custom_id: interaction.customId,
+                    placeholder: 'Please choose a ' + squad.variant_type,
+                    custom_id: squad.id,
                     min_values: 1,
                     max_values: 1,
                     options: []
             });
         }
-        components[k].options.push({label: variant.split('$')[1], value: variant})
+        components[k].options.push({label: convertUpper(variant), value: squad.id + '_' + variant})
     }
     return components
 }
