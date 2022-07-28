@@ -206,6 +206,7 @@ client.on('ready', () => {
     wfrim.bot_initialize()
     deploy_commands.bot_initialize()
     twitch_affiliate.bot_initialize()
+    botv_event_voting.bot_initialize()
 })
 
 client.on('messageCreate', async message => {
