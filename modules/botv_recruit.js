@@ -236,6 +236,10 @@ async function edit_main_msg() {
                 },
                 {
                     type: 1,
+                    components: getComponents()
+                },
+                {
+                    type: 1,
                     components: [{
                         type: 3,
                         placeholder: 'Notification Settings',
@@ -281,11 +285,10 @@ async function edit_main_msg() {
                 }
                 componentIndex++;
 
-                if (componentIndex % 3 == 0)
+                if (componentIndex % 5 == 0)
                     break;
             }
         }
-        console.log(components)
         return components;
     }
 }
