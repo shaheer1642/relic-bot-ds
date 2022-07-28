@@ -74,7 +74,7 @@ function interactionHandler(interaction) {
     } else {
         if (interaction.customId == 'sq_custom') {
             try {
-                const modal = new ModalBuilder()
+                /*const modal = new ModalBuilder()
                 .setCustomId('myModal')
                 .setTitle('My Modal');
     
@@ -103,7 +103,33 @@ function interactionHandler(interaction) {
                 modal.addComponents(firstActionRow, secondActionRow);
     
                 // Show the modal to the user
-                interaction.showModal(modal);
+                interaction.showModal(modal);*/
+                interaction.showModal({
+                    title: "Create custom squad",
+                    custom_id: "sq_custom_modal",
+                    components: [{
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "sq_custom_modal_name",
+                            label: "Squad Name",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 20,
+                            placeholder: "i.e. polymer bundle farm",
+                            required: true
+                        },{
+                            type: 4,
+                            custom_id: "sq_custom_modal_spots",
+                            label: "Total Spots",
+                            style: 1,
+                            min_length: 1,
+                            max_length: 2,
+                            placeholder: "i.e. 4",
+                            required: true
+                        }]
+                    }]
+                }).catch(err => console.log(err))
             } catch(e) {
                 console.log(e)
             }
