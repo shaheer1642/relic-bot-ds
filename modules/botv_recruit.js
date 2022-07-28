@@ -165,7 +165,7 @@ async function edit_main_msg() {
         for (const [index,squad] of res.rows.entries()) {
             if (squad.custom) {
                 if (!squads[squad.squad_type]) {
-                    var name = embedScore(squad.squad_type.replace('sq_custom_',''))
+                    var name = convertUpper(squad.squad_type.replace('sq_custom_','').replace(/_/g,' '))
                     squads[squad.squad_type] = {
                         name: name,
                         id: squad.squad_type,
