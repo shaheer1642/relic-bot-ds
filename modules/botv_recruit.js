@@ -164,7 +164,7 @@ async function edit_main_msg() {
         //push custom squads to squads list
         for (const [index,squad] of res.rows.entries()) {
             if (squad.custom) {
-                if (squads[squad.squad_type]) {
+                if (!squads[squad.squad_type]) {
                     var name = embedScore(squad.squad_type.replace('sq_custom_',''))
                     squads[squad.squad_type] = {
                         name: name,
