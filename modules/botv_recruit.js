@@ -102,7 +102,7 @@ function interactionHandler(interaction) {
                         }]
                     }]
                 }]   
-            })
+            }).catch(err => console.log(err))
             return
         } else {
             db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
