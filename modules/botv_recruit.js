@@ -285,6 +285,7 @@ async function edit_main_msg() {
                     break;
             }
         }
+        console.log(components)
         return components;
     }
 }
