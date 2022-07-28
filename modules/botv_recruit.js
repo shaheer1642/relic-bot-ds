@@ -60,8 +60,9 @@ function interactionHandler(interaction) {
                 if (trackers[key].includes(interaction.user.id)) {
                     if (squads_list[key])
                         tracked_squads.push(squads_list[key].name)
-                    else 
-                        tracked_squads.push(key)
+                    else {
+                        tracked_squads.push(convertUpper(key.replace('sq_custom_','').replace(/_/g,'_')))
+                    }
                 }
             }
             var reply_msg = tracked_squads.length > 0 ? `You are now tracking the following squads:\n${tracked_squads.join('\n')}`:'You are not tracking any squads'
