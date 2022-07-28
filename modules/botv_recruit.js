@@ -74,7 +74,7 @@ function interactionHandler(interaction) {
         if (interaction.customId == 'sq_custom') {
             interaction.reply(
                     {
-                        title: "Create",
+                        title: "Create custom squad",
                         custom_id: "sq_custom_modal",
                         components: [{
                             type: 1,
@@ -215,6 +215,13 @@ async function edit_main_msg() {
                         type: 2,
                         label: squads[squad].name,
                         style: 4,
+                        custom_id: squads[squad].id
+                    })
+                } else if (squad == 'sq_custom') {
+                    components.push({
+                        type: 2,
+                        label: squads[squad].name,
+                        style: 3,
                         custom_id: squads[squad].id
                     })
                 } else {
