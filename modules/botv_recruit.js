@@ -155,16 +155,35 @@ var timeout_edit_components = null;
 async function edit_main_msg() {
     console.log('editing main msg')
     var squads = getSquadsList()
+
+
     var componentIndex = 0
 
     await db.query(`SELECT * FROM botv_recruit_members`)
     .then(async res => {
+        //push custom squads to squads list
+        for (const [index,squad] of res.rows.entries()) {
+            if (squad.custom) {
+                if (squads[squad.squad_type]) {
+                    var name = embedScore(squad.squad_type.replace('sq_custom_',''))
+                    squads[squad.squad_type] = {
+                        name: name,
+                        id: squad.squad_type,
+                        spots: squad.spots,
+                        filled: []
+                    }
+                }
+            }
+        }
+
         for (var i=0; i<res.rowCount; i++) {
             const join = res.rows[i];
-            squads[join.squad_type].filled.push(join.user_id);
-            if (squads[join.squad_type].filled.length == squads[join.squad_type].spots) {
-                open_squad(JSON.parse(JSON.stringify(squads[join.squad_type])))
-                squads[join.squad_type].filled = []
+            if (squads[join.squad_type]) {
+                squads[join.squad_type].filled.push(join.user_id);
+                if (squads[join.squad_type].filled.length == squads[join.squad_type].spots) {
+                    open_squad(JSON.parse(JSON.stringify(squads[join.squad_type])))
+                    squads[join.squad_type].filled = []
+                }
             }
         }
     }).catch(err => console.log(err))
