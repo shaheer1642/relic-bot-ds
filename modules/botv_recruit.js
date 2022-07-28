@@ -415,7 +415,7 @@ function getSquadsList() {
             spots: 4,
             filled: []
         },
-        sq_index: {
+        sq_profit_taker: {
             name: 'Profit Taker',
             id: 'sq_profit_taker',
             spots: 2,
