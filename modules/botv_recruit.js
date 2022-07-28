@@ -71,25 +71,38 @@ function interactionHandler(interaction) {
         console.log(`botv_recruit: user ${interaction.user.id} left all squads`)
         return
     } else {
-        db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
-        .then(res => {
-            if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-            edit_main_msg()
-            console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
-            mention_users(interaction.user.id,interaction.customId)
-        }).catch(err => {
-            if (err.code == 23505) { // duplicate key
-                db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
-                .then(res => {
-                    if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                    edit_main_msg()
-                    console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
+        if (getSquadsList()[interaction.customId]) {
+            if (getSquadsList()[interaction.customId].variants) {
+                interaction.reply({
+                    content: '\u200b',
+                    components: [{
+                            type: 1,
+                            components: variants_component(interaction.customId, getSquadsList()[interaction.customId].variants)
+                    }],
+                    ephemeral: true
                 })
-                .catch(err => console.log(err))
-            } else {
-                console.log(err)
+                return
             }
-        })
+            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+            .then(res => {
+                if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                edit_main_msg()
+                console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
+                mention_users(interaction.user.id,interaction.customId)
+            }).catch(err => {
+                if (err.code == 23505) { // duplicate key
+                    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
+                    .then(res => {
+                        if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
+                        edit_main_msg()
+                        console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
+                    })
+                    .catch(err => console.log(err))
+                } else {
+                    console.log(err)
+                }
+            })
+        }
     }
 }
 
@@ -361,11 +374,82 @@ function getSquadsList() {
             spots: 4,
             filled: []
         },
+        sq_warframe_parts: {
+            name: 'Warframe Parts',
+            variants: [
+                'sq_warframe_parts$ash',
+                'sq_warframe_parts$atlas',
+                'sq_warframe_parts$baruuk',
+                'sq_warframe_parts$caliban',
+                'sq_warframe_parts$chroma',
+                'sq_warframe_parts$ember',
+                'sq_warframe_parts$equinox',
+                'sq_warframe_parts$excalibur',
+                'sq_warframe_parts$frost',
+                'sq_warframe_parts$gara',
+                'sq_warframe_parts$garuda',
+                'sq_warframe_parts$gauss',
+                'sq_warframe_parts$grendel',
+                'sq_warframe_parts$gyre',
+                'sq_warframe_parts$harrow',
+                'sq_warframe_parts$hildryn',
+                'sq_warframe_parts$hyedroid',
+                'sq_warframe_parts$inaros',
+                'sq_warframe_parts$ivara',
+                'sq_warframe_parts$khora',
+                'sq_warframe_parts$lavos',
+                'sq_warframe_parts$limbo',
+                'sq_warframe_parts$loki',
+                'sq_warframe_parts$mag',
+                'sq_warframe_parts$mesa',
+                'sq_warframe_parts$mirage',
+                'sq_warframe_parts$nekros',
+                'sq_warframe_parts$nidus',
+                'sq_warframe_parts$nova',
+                'sq_warframe_parts$nyx',
+                'sq_warframe_parts$oberon',
+                'sq_warframe_parts$octavia',
+                'sq_warframe_parts$protea',
+                'sq_warframe_parts$revenant',
+                'sq_warframe_parts$rhino',
+                'sq_warframe_parts$saryn',
+                'sq_warframe_parts$sevagoth',
+                'sq_warframe_parts$titania',
+                'sq_warframe_parts$trinity',
+                'sq_warframe_parts$valkyr',
+                'sq_warframe_parts$vauban',
+                'sq_warframe_parts$wisp',
+                'sq_warframe_parts$xaku',
+                'sq_warframe_parts$yareli',
+            ],
+            id: 'sq_warframe_parts',
+            spots: 2,
+            filled: []
+        },
         sq_leave_all: {
             name: 'Leave All',
             id: 'sq_leave_all',
         },
     }
+}
+
+function variants_component(squad_id, variants_list) {
+    var components = []
+    var k = 0
+    for (const [index, variant] of variants_list.entries()) {
+        if (index % 25 == 0) {
+            k = components.push({
+                    type: 3,
+                    placeholder: 'Notification Settings',
+                    custom_id: interaction.customId,
+                    min_values: 1,
+                    max_values: 1,
+                    options: []
+            });
+        }
+        components[k].options.push({label: variant.split('$')[1], value: variant})
+    }
+    return components
 }
 
 module.exports = {

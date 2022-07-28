@@ -171,13 +171,14 @@ client.on('ready', () => {
         }).catch(err => console.log(err))
     }
 
+    /*
     //----Re-define wfm-api orders timers if any-----
     db.query(`SELECT * FROM auto_update_items`)
     .then(res => {
         if (res.rowCount > 0) {
             res.rows.forEach(async e => {
                 console.log('Setting order timer for message ' + e.message_id)
-                const message = await client.channels.cache.get(e.channel_id).messages.fetch(e.message_id)
+                const message = await client.channels.cache.get(e.channel_id).messages.fetch(e.message_id).catch(err => console.log(err))
                 var counter = 0;
                 message.edit({content: 'Auto-update has been turned on!'}).catch(err => console.log(err))
                 message.reactions.removeAll().catch(err => console.log(err))
@@ -197,6 +198,7 @@ client.on('ready', () => {
             })
         }
     }).catch(err => console.log(err))
+    */
 
     setTimeout(botv.updateMasteryDistr, 10000);
 
