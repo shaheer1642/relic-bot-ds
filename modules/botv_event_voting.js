@@ -12,6 +12,7 @@ function reaction_handler(reaction,user, action) {
     try {
         var reaction_list = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
         console.log(reaction_list)
+        console.log(reaction.emoji.identifier)
         reaction.message.fetch().catch(err => console.log(err))
         .then(message => {
             if (action == 'add') {
