@@ -268,39 +268,17 @@ async function edit_main_msg() {
                 })
             }
         }
-        /*
-        const squadsArr = Object.keys(squads)
-        for (var index=0; index<squadsArr.length; index++) {
-            const squad = squadsArr[index];
-            if (index == componentIndex) {
-                if (squad == 'sq_leave_all') {
-                    components.push({
-                        type: 2,
-                        label: squads[squad].name,
-                        style: 4,
-                        custom_id: squads[squad].id
-                    })
-                } else if (squad == 'sq_custom') {
-                    components.push({
-                        type: 2,
-                        label: squads[squad].name,
-                        style: 3,
-                        custom_id: squads[squad].id
-                    })
-                } else {
-                    components.push({
-                        type: 2,
-                        label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
-                        style: squads[squad].filled.length == 4 ? 2:squads[squad].filled.length == 3 ? 4:squads[squad].filled.length == 2 ? 3:squads[squad].filled.length == 1 ? 1:2,
-                        custom_id: squads[squad].id
-                    })
-                }
-                componentIndex++;
-
-                if (componentIndex % 5 == 0)
-                    break;
-            }
-        }*/
+        components.push({
+            type: 1,
+            components: [{
+                type: 3,
+                placeholder: 'Notification Settings',
+                custom_id: 'botv_recruit_notify',
+                min_values: 1,
+                max_values: notification_options.length,
+                options: notification_options
+            }]
+        })
         return components;
     }
 }
