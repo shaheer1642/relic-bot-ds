@@ -221,42 +221,55 @@ async function edit_main_msg() {
                 },
                 color: '#ffffff'
             }],
-            components: [
-                {
-                    type: 1,
-                    components: getComponents()
-                },
-                {
-                    type: 1,
-                    components: getComponents()
-                },
-                {
-                    type: 1,
-                    components: getComponents()
-                },
-                {
-                    type: 1,
-                    components: getComponents()
-                },
-                {
-                    type: 1,
-                    components: [{
-                        type: 3,
-                        placeholder: 'Notification Settings',
-                        custom_id: 'botv_recruit_notify',
-                        min_values: 1,
-                        max_values: notification_options.length,
-                        options: notification_options
-                    }]
-                }
-            ]
+            components: getButtonComponents()
         }).catch(err => console.log(err))
     }
 
 
-
-    function getComponents() {
+    function getButtonComponents() {
         var components = [];
+
+
+        var squadArr = []
+        Object.keys(squads).forEach(squad => {
+            if (squads[squad].id == 'sq_leave_all' || squads[squad].id == 'sq_custom') return       // return for now, push later at the end of arr
+            squadArr.push(squads[squad]);
+        })
+        squadArr.push(squads.sq_custom);
+        squadArr.push(squads.sq_leave_all);
+
+        var k = 0;
+        for (const [index,squad] of squadArr.entries()) {
+            if (index % 5 == 0) {
+                k = components.push({
+                        type: 1,
+                        components: []
+                }) - 1;
+            }
+            if (squad == 'sq_leave_all') {
+                components[k].components.push({
+                    type: 2,
+                    label: squads[squad].name,
+                    style: 4,
+                    custom_id: squads[squad].id
+                })
+            } else if (squad == 'sq_custom') {
+                components[k].components.push({
+                    type: 2,
+                    label: squads[squad].name,
+                    style: 3,
+                    custom_id: squads[squad].id
+                })
+            } else {
+                components[k].components.push({
+                    type: 2,
+                    label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
+                    style: squads[squad].filled.length == 4 ? 2:squads[squad].filled.length == 3 ? 4:squads[squad].filled.length == 2 ? 3:squads[squad].filled.length == 1 ? 1:2,
+                    custom_id: squads[squad].id
+                })
+            }
+        }
+        /*
         const squadsArr = Object.keys(squads)
         for (var index=0; index<squadsArr.length; index++) {
             const squad = squadsArr[index];
@@ -288,7 +301,7 @@ async function edit_main_msg() {
                 if (componentIndex % 5 == 0)
                     break;
             }
-        }
+        }*/
         return components;
     }
 }
