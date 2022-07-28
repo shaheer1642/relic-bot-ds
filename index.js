@@ -213,7 +213,6 @@ client.on('messageCreate', async message => {
         pins_handler(message)
         return
     }
-    
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
@@ -1860,7 +1859,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-    if (reaction.message.channel.id == '817828725701476403') botv_event_voting.reaction_handler(reaction, user)
+    if (reaction.message.channel.id == '817828725701476403') botv_event_voting.reaction_handler(reaction, user, 'add')
 
     if (process.env.DEBUG_MODE==1 && user.id != '253525146923433984')
         return
