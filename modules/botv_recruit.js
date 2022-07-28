@@ -43,24 +43,26 @@ function interactionHandler(interaction) {
                     }
                     break
                 }
-                if (trackers[value]) {
-                    if (trackers[value].includes(interaction.user.id)) {
-                        trackers[value] = trackers[value].filter(function(f) { return f !== interaction.user.id })
-                        console.log('botv_recruit: user',interaction.user.id,'is untracking',value)
-                    } else {
-                        trackers[value].push(interaction.user.id)
-                        console.log('botv_recruit: user',interaction.user.id,'is now tracking',value)
-                    }
+                if (!trackers[value])
+                    trackers[value] = []
+                if (trackers[value].includes(interaction.user.id)) {
+                    trackers[value] = trackers[value].filter(function(f) { return f !== interaction.user.id })
+                    console.log('botv_recruit: user',interaction.user.id,'is untracking',value)
                 } else {
-                    console.log('value',value,'does not exist')
+                    trackers[value].push(interaction.user.id)
+                    console.log('botv_recruit: user',interaction.user.id,'is now tracking',value)
                 }
             }
             db.query(`UPDATE botv_squads_data SET trackers='${JSON.stringify(trackers)}' WHERE id=1`).catch(err => console.log(err))
             var squads_list = getSquadsList()
             var tracked_squads = []
             for (const key in trackers) {
-                if (trackers[key].includes(interaction.user.id))
-                    tracked_squads.push(squads_list[key].name)
+                if (trackers[key].includes(interaction.user.id)) {
+                    if (squads_list[key])
+                        tracked_squads.push(squads_list[key].name)
+                    else 
+                        tracked_squads.push(key)
+                }
             }
             var reply_msg = tracked_squads.length > 0 ? `You are now tracking the following squads:\n${tracked_squads.join('\n')}`:'You are not tracking any squads'
             interaction.reply({content: reply_msg, ephemeral: true}).catch(err => console.log(err))
@@ -205,7 +207,7 @@ async function edit_main_msg() {
     for (const key in squads) {
         if (key == 'sq_leave_all')
             continue
-        if (key.match('sq_custom'))
+        if (key == 'sq_custom')
             continue
         notification_options.push({
             label: squads[key].name,
