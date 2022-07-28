@@ -107,7 +107,7 @@ function interactionHandler(interaction) {
             }).catch(err => console.log(err))
             return
         } else if (interaction.customId == 'sq_custom_modal') {
-            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,custom,spots,join_timestamp) VALUES (${interaction.user.id},'${interaction.fields.getTextInputValue('squad_name')}',true,${Number(interaction.fields.getTextInputValue('squad_spots'))},${new Date().getTime()})`)
+            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,custom,spots,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${interaction.fields.getTextInputValue('squad_name').trim().toLowerCase().replace(/ /g,'_')}',true,${Number(interaction.fields.getTextInputValue('squad_spots'))},${new Date().getTime()})`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                 edit_main_msg()
