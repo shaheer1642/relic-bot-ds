@@ -10,6 +10,7 @@ async function message_handler(message) {
 
 function reaction_handler(reaction,user, action) {
     var reaction_list = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
+    console.log(reaction_list)
     reaction.message.fetch().catch(err => console.log(err))
     .then(message => {
         if (action == 'add') {
