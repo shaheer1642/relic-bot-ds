@@ -229,7 +229,6 @@ async function edit_main_msg() {
     function getButtonComponents() {
         var components = [];
 
-
         var squadArr = []
         Object.keys(squads).forEach(squad => {
             if (squads[squad].id == 'sq_leave_all' || squads[squad].id == 'sq_custom') return       // return for now, push later at the end of arr
@@ -249,23 +248,23 @@ async function edit_main_msg() {
             if (squad == 'sq_leave_all') {
                 components[k].components.push({
                     type: 2,
-                    label: squads[squad].name,
+                    label: squad.name,
                     style: 4,
-                    custom_id: squads[squad].id
+                    custom_id: squad.id
                 })
             } else if (squad == 'sq_custom') {
                 components[k].components.push({
                     type: 2,
-                    label: squads[squad].name,
+                    label: squad.name,
                     style: 3,
-                    custom_id: squads[squad].id
+                    custom_id: squad.id
                 })
             } else {
                 components[k].components.push({
                     type: 2,
-                    label: `${squads[squad].filled.length}/${squads[squad].spots} ${squads[squad].name}`,
-                    style: squads[squad].filled.length == 4 ? 2:squads[squad].filled.length == 3 ? 4:squads[squad].filled.length == 2 ? 3:squads[squad].filled.length == 1 ? 1:2,
-                    custom_id: squads[squad].id
+                    label: `${squad.filled.length}/${squad.spots} ${squad.name}`,
+                    style: squad.filled.length == 4 ? 2:squad.filled.length == 3 ? 4:squad.filled.length == 2 ? 3:squad.filled.length == 1 ? 1:2,
+                    custom_id: squad.id
                 })
             }
         }
