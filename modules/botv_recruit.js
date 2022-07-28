@@ -245,14 +245,14 @@ async function edit_main_msg() {
                         components: []
                 }) - 1;
             }
-            if (squad == 'sq_leave_all') {
+            if (squad.id == 'sq_leave_all') {
                 components[k].components.push({
                     type: 2,
                     label: squad.name,
                     style: 4,
                     custom_id: squad.id
                 })
-            } else if (squad == 'sq_custom') {
+            } else if (squad.id == 'sq_custom') {
                 components[k].components.push({
                     type: 2,
                     label: squad.name,
