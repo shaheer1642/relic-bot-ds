@@ -950,7 +950,7 @@ client.on('interactionCreate', async interaction => {
         return
     if (process.env.DEBUG_MODE==2 && interaction.member.user.id == '253525146923433984')
         return
-
+    
     if (interaction.channelId == '950400363410915348') {
         botv_recruit.interactionHandler(interaction);
         return
@@ -960,7 +960,7 @@ client.on('interactionCreate', async interaction => {
         osiris_tts.interactionHandler(interaction);
         return
     }
-
+    
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         const discord_id = interaction.member.user.id
         var user_profile = null

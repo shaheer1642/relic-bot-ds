@@ -1,6 +1,7 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
+const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
@@ -72,6 +73,39 @@ function interactionHandler(interaction) {
         return
     } else {
         if (interaction.customId == 'sq_custom') {
+            
+            const modal = new ModalBuilder()
+            .setCustomId('myModal')
+            .setTitle('My Modal');
+
+            // Add components to modal
+
+            // Create the text input components
+            const favoriteColorInput = new TextInputBuilder()
+                .setCustomId('favoriteColorInput')
+                // The label is the prompt the user sees for this input
+                .setLabel("What's your favorite color?")
+                // Short means only a single line of text
+                .setStyle(TextInputStyle.Short);
+
+            const hobbiesInput = new TextInputBuilder()
+                .setCustomId('hobbiesInput')
+                .setLabel("What's some of your favorite hobbies?")
+                // Paragraph means multiple lines of text.
+                .setStyle(TextInputStyle.Paragraph);
+
+            // An action row only holds one text input,
+            // so you need one action row per text input.
+            const firstActionRow = new ActionRowBuilder().addComponents(favoriteColorInput);
+            const secondActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
+
+            // Add inputs to the modal
+            modal.addComponents(firstActionRow, secondActionRow);
+
+            // Show the modal to the user
+            interaction.showModal(modal);
+    /*
+            interaction.show
             interaction.reply({
                 components: [{
                     type: 4,
@@ -103,6 +137,7 @@ function interactionHandler(interaction) {
                     }]
                 }]   
             }).catch(err => console.log(err))
+            */
             return
         } else {
             db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
