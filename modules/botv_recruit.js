@@ -85,7 +85,7 @@ function interactionHandler(interaction) {
                             label: "Squad Name",
                             style: 1,
                             min_length: 1,
-                            max_length: 20,
+                            max_length: 70,
                             placeholder: "i.e. polymer bundle farm",
                             required: true
                         }]
@@ -97,7 +97,7 @@ function interactionHandler(interaction) {
                             label: "Total Spots",
                             style: 1,
                             min_length: 1,
-                            max_length: 2,
+                            max_length: 1,
                             value: 4,
                             placeholder: "i.e. 4",
                             required: true
