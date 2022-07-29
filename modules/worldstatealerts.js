@@ -1912,7 +1912,7 @@ async function baro_check() {
                     }
                     embed[emb_index].fields.push({
                         name: item.item,
-                        value: `${emotes.credits.string} ${item.credits}\n${emotes.ducats.string} ${item.ducats}`,
+                        value: `C: ${item.credits}\nD: ${item.ducats}`,
                         inline: true
                     })
                 })
