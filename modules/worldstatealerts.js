@@ -1902,7 +1902,7 @@ async function baro_check() {
                 var emb_index = 0
                 voidTrader.inventory.forEach((item, index) => {
                     //update db info about the item
-                    db.query(`UPDATE items_list SET vault_status='B',vault_timestamp=${new Date(voidTrader.activation).getTime()} WHERE item_url='${item.item.toLowerCase().replace(/ /g,'_').replace('_(intact)','')}'`).catch(err => console.log(err))
+                    db.query(`UPDATE items_list SET vault_status='B',vault_timestamp=${new Date(voidTrader.activation).getTime()} WHERE item_url='${item.item.toLowerCase().replace(/ /g,'_').replace('_(intact)','').replace(/'/g,`''`)}'`).catch(err => console.log(err))
                     if (index == 24 || index == 47) {
                         embed.push({
                             fields: [], 
