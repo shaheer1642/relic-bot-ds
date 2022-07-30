@@ -305,7 +305,7 @@ async function ensureChannelExistence(channelId) {
                     .then(webhookClient => {
                         db.query(`INSERT INTO twitch_affiliate_channels (channel_id,webhook_url,time_added) VALUES (${channelId},'${webhookClient.url}',${new Date().getTime()})`).catch(err => reject(err))
                         .then(res => {
-                            firstTimeAddServer(channelId,webhookClient).catch(err => reject(err))
+                            firstTimeAddServer(channel,webhookClient).catch(err => reject(err))
                             .then(() => resolve())
                         })
                     })
@@ -318,9 +318,8 @@ async function ensureChannelExistence(channelId) {
 }
 
 
-async function firstTimeAddServer(channelId,webhookClient) {
+async function firstTimeAddServer(channel,webhookClient) {
     return new Promise(async (resolve,reject) => {
-        const channel = await client.channels.fetch(channelId).catch(err => console.log(err))
         // send all existing streamers messages
         db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => reject(err))
         .then(async res => {
@@ -330,7 +329,7 @@ async function firstTimeAddServer(channelId,webhookClient) {
                 }).catch(err => reject(err))
                 .then(async res => {
                     channel.messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
-                    await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${row.streamer_id}',${res.id},${channelId},${new Date().getTime()})`).catch(err => reject(err))
+                    await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${row.streamer_id}',${res.id},${channel.id},${new Date().getTime()})`).catch(err => reject(err))
                 })
             }
             resolve()
