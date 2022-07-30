@@ -2922,6 +2922,7 @@ async function tb_close_orders(message, interaction) {
         console.log(item_id)
         var item_url = ''
         var item_name = ''
+        var item_rank = orders_list[i].user_rank
         var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
         .then(res => {
             if (res.rows.length==0) { //unexpected response 
@@ -2942,7 +2943,7 @@ async function tb_close_orders(message, interaction) {
         })
         if (!status)
             return Promise.resolve()
-        await trading_bot_orders_update(null,item_id,item_url,item_name,2).catch(err => console.log(err))
+        await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(err => console.log(err))
     }
     if (message)
         setTimeout(() => message.delete().catch(err => console.log(err)), 500)
