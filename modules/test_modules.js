@@ -80,7 +80,10 @@ async function trade_tut(message,args) {
             }
         ]
     }
+
+    message.channel.send(postdata).catch(err => console.log(err))
     
+    /*
     if (process.env.DEBUG_MODE == 1) {
         client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
         return
@@ -100,7 +103,7 @@ async function trade_tut(message,args) {
     .then(msg => {
         msg.edit(postdata).catch(err => console.log(err))
     })
-    .catch(err => console.log(err))
+    .catch(err => console.log(err))*/
 }
 
 async function lich_tut(message,args) {
@@ -174,7 +177,8 @@ async function lich_tut(message,args) {
             }
         ]
     }
-    
+    message.channel.send(postdata).catch(err => console.log(err))
+    /*
     if (process.env.DEBUG_MODE == 1) {
         client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
         return
@@ -189,7 +193,7 @@ async function lich_tut(message,args) {
     .then(msg => {
         msg.edit(postdata).catch(err => console.log(err))
     })
-    .catch(err => console.log(err))
+    .catch(err => console.log(err))*/
 }
 
 async function riven_tut(message,args) {
@@ -238,7 +242,8 @@ async function riven_tut(message,args) {
             }
         ]
     }
-    
+    message.channel.send(postdata).catch(err => console.log(err))
+    /*
     if (process.env.DEBUG_MODE == 1) {
         client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
         return
@@ -253,7 +258,7 @@ async function riven_tut(message,args) {
     .then(msg => {
         msg.edit(postdata).catch(err => console.log(err))
     })
-    .catch(err => console.log(err))
+    .catch(err => console.log(err))*/
 }
 
 async function ducat_template(message) {

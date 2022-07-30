@@ -6,11 +6,11 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} =
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
-const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
+const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881","1002903198316634152"]
 //const tradingBotChannels = ["892108718358007820"]
-const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
+const tradingBotLichChannels = ["906555131254956042", "892003772698611723","1002907923506274304"]
 //const tradingBotLichChannels = ["906555131254956042"]
-const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
+const tradingBotGuilds = ["865904902941048862", "832677897411493949","730808307010240572"]
 const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
 const tradingBotReactions = {
     sell: ["<:buy_1st:897556451420164096>", "<:buy_2nd:897556455098580992>", "<:buy_3rd:897556454842716160>", "<:buy_4th:897556449742426122>", "<:buy_5th:897556446235992104>"],

@@ -706,9 +706,13 @@ client.on('messageCreate', async message => {
                 case 'baro':
                     test_modules.baroArrival(message,args)
                     break
-                case 'tb_tut':
+                case 'tb_tut_trade':
                     test_modules.trade_tut(message,args)
+                    break
+                case 'tb_tut_lich':
                     test_modules.lich_tut(message,args)
+                    break
+                case 'tb_tut_riven':
                     test_modules.riven_tut(message,args)
                     break
                 case 'ducat_template':
