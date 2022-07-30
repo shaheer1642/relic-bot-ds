@@ -319,14 +319,14 @@ async function ensureChannelExistence(channelId) {
 
 
 async function firstTimeAddServer(channelId,webhookClient) {
-    return new Promise((resolve,reject) => {
+    return new Promise(async (resolve,reject) => {
         await client.channels.fetch(channelId).catch(err => console.log(err))
         // send all existing streamers messages
         db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => reject(err))
         .then(async res => {
             for (const [index,row] of res.rows.entries()) {
                 await webhookClient.send({
-                    content: `Streamer: ${row.username} (details will be fetched and stuff)`
+                    content: `Streamer: ${row.username} (fetching details...)`
                 }).catch(err => reject(err))
                 .then(async res => {
                     client.channels.cache.get(res.channel_id).messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
