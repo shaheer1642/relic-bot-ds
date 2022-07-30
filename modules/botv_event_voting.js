@@ -20,7 +20,7 @@ async function reaction_handler(reaction, user, action) {
         const message = reaction.message
         if (action == 'add') {
             if (user.id == message.author.id) {
-                reaction.remove().catch(err => console.log(err))
+                reaction.users.remove().catch(err => console.log(err))
                 return
             }
             if (reaction_list.includes(reaction.emoji.name)) {
