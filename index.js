@@ -31,20 +31,6 @@ require('./modules/gmail_client.js');
 const ducatRolesMessageId = "899402069159608320"
 const masteryRolesMessageId = "892084165405716541"
 const otherRolesMessageId = "957330415734095932"
-const userOrderLimit = 50
-const filledOrdersLimit = 500
-const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881"]
-//const tradingBotChannels = ["892108718358007820"]
-const tradingBotLichChannels = ["906555131254956042", "892003772698611723"]
-//const tradingBotLichChannels = ["906555131254956042"]
-const tradingBotGuilds = ["865904902941048862", "832677897411493949"]
-const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
-const tradingBotReactions = {
-    sell: ["<:buy_1st:897556451420164096>", "<:buy_2nd:897556455098580992>", "<:buy_3rd:897556454842716160>", "<:buy_4th:897556449742426122>", "<:buy_5th:897556446235992104>"],
-    buy: ["<:sell_1st:897556451533402132>", "<:sell_2nd:897556455190843412>", "<:sell_3rd:897556454964346981>", "<:sell_4th:897556451650842634>", "<:sell_5th:897556455371177984>"],
-    remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"],
-    success: ["<:order_success:894992959177654332>"]
-}
 const defaultReactions = {
     check: {
         string: '<:check:905884742413582347>',
@@ -112,10 +98,6 @@ const worldstatealertEmotes = [
     "latron_wraith:986655734487986207",
     "karak_wraith:986655689097244692",
 ]
-const ordersFillLogChannel = "894717126475128862"
-const tb_sellColor = '#7cb45d'
-const tb_buyColor = '#E74C3C'
-const tb_invisColor = '#71368A'
 
 client.on('ready', () => {
     //if (process.env.DEBUG_MODE == 1)
@@ -279,7 +261,7 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        if (tradingBotChannels.includes(message.channel.parentId) || tradingBotLichChannels.includes(message.channel.parentId) || tradingBotSpamChannels.includes(message.channel.parentId))
+        if (trade_bot_modules.tradingBotChannels.includes(message.channel.parentId) || trade_bot_modules.tradingBotLichChannels.includes(message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channel.parentId))
             trade_bot_modules.tb_threadHandler(message).catch(err => console.log(err))
         return Promise.resolve()
     }
@@ -338,18 +320,18 @@ client.on('messageCreate', async message => {
                         ${notify_order} Notify when orders auto-close in 3 hours
                         ${notify_remove} Notify when orders are removed if item price changes`,
                     footer: {text: `You will not receive these notfications on 'do not disturb'`},
-                    color: tb_invisColor
+                    color: trade_bot_modules.tb_invisColor
                 })
                 console.log(postdata)
                 message.channel.send(postdata).then(res => {
-                    res.react(tradingBotReactions.sell[0]).catch(err => console.log(err))
-                    res.react(tradingBotReactions.sell[1]).catch(err => console.log(err))
-                    res.react(tradingBotReactions.sell[2]).catch(err => console.log(err))
+                    res.react(trade_bot_modules.tradingBotReactions.sell[0]).catch(err => console.log(err))
+                    res.react(trade_bot_modules.tradingBotReactions.sell[1]).catch(err => console.log(err))
+                    res.react(trade_bot_modules.tradingBotReactions.sell[2]).catch(err => console.log(err))
                 }).catch(err => console.log(err))
                 return
             }
         }
-        if (tradingBotChannels.includes(message.channelId)) {
+        if (trade_bot_modules.tradingBotChannels.includes(message.channelId)) {
             var status = await trade_bot_modules.tb_user_exist(message.author.id)
             .then(async res => {
                 var status = await trade_bot_modules.tb_user_online(message)
@@ -475,7 +457,7 @@ client.on('messageCreate', async message => {
             }
             continue
         }
-        if (tradingBotLichChannels.includes(message.channelId)) {
+        if (trade_bot_modules.tradingBotLichChannels.includes(message.channelId)) {
             var status = await trade_bot_modules.tb_user_exist(message.author.id)
             .then(async res => {
                 var status = await trade_bot_modules.tb_user_online(message)
@@ -578,7 +560,7 @@ client.on('messageCreate', async message => {
             }
             continue
         }
-        if (tradingBotSpamChannels.includes(message.channelId)) {
+        if (trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
             var status = await trade_bot_modules.tb_user_exist(message.author.id)
             .then(async res => {
                 var status = await trade_bot_modules.tb_user_online(message)
@@ -802,7 +784,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 
     if (newMember.member)
         if (newMember.member.guild)
-            if (tradingBotGuilds.includes(newMember.member.guild.id)) {
+            if (trade_bot_modules.tradingBotGuilds.includes(newMember.member.guild.id)) {
                 let username = newMember.user.username;
                 if (!newMember.member.presence.status) {
                     console.log(`User ${username} has went offline.`)
@@ -1275,8 +1257,8 @@ client.on('interactionCreate', async interaction => {
             var balanceChange = 'Yes'
             if (interaction.values[0] == 'NoneNoPlat')
                 balanceChange = 'No'
-            postdata.color = order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
-            desc[5] = `**Order status:** successful ${tradingBotReactions.success[0]} (Verified by <@${interaction.user.id}>)`
+            postdata.color = order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor)
+            desc[5] = `**Order status:** successful ${trade_bot_modules.tradingBotReactions.success[0]} (Verified by <@${interaction.user.id}>)`
             desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** ${balanceChange}` : desc[7] = `**Users balance changed:** ${balanceChange}`
         }
         postdata.description = desc.join('\n')
@@ -1736,7 +1718,7 @@ client.on('messageDelete', async message => {
         return
 
     if (message.author.id == client.user.id) {
-        if (tradingBotChannels.includes(message.channelId)) {
+        if (trade_bot_modules.tradingBotChannels.includes(message.channelId)) {
             console.log(`an order message was deleted from the bot`)
             var item_id = ""
             var channel_id = ""
@@ -1798,7 +1780,7 @@ client.on('messageDelete', async message => {
                 return Promise.resolve()
             await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,1).catch(err => console.log(err))
         }
-        else if (tradingBotLichChannels.includes(message.channelId)) {
+        else if (trade_bot_modules.tradingBotLichChannels.includes(message.channelId)) {
             console.log(`a lich order message was deleted from the bot`)
             var lich_id = ""
             var channel_id = ""
@@ -1882,14 +1864,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
         twitch_affiliate.reaction_handler(reaction,user,'add')
     }
 
-    if (tradingBotChannels.includes(reaction.message.channelId) || tradingBotLichChannels.includes(reaction.message.channelId) || tradingBotSpamChannels.includes(reaction.message.channelId)) {
+    if (trade_bot_modules.tradingBotChannels.includes(reaction.message.channelId) || trade_bot_modules.tradingBotLichChannels.includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId)) {
         console.log('someone reacted with emoji 1')
         console.log(reaction.emoji.identifier)
-        if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
+        if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || trade_bot_modules.tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
             var order_type = ""
-            if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`))
+            if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`))
                 order_type = 'wts'
-            if (tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`))
+            if (trade_bot_modules.tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`))
                 order_type = 'wtb'
             console.log('someone reacted with emoji 2')
             if (!reaction.message.author)
@@ -1934,7 +1916,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             var item_rank = "unranked"
             if (reaction.message.embeds[0].title.toLowerCase().match('(maxed)'))
                 item_rank = "maxed"
-            if (tradingBotChannels.includes(reaction.message.channelId)) {
+            if (trade_bot_modules.tradingBotChannels.includes(reaction.message.channelId)) {
                 console.log('pass test 2')
                 var search_item_id = ""
                 var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
@@ -2010,11 +1992,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var color = ''
                 if (order_type == 'wts') {
                     all_orders = all_orders.sort(dynamicSort("user_price"))
-                    color = tb_sellColor
+                    color = trade_bot_modules.tb_sellColor
                 }
                 if (order_type == 'wtb') {
                     all_orders = all_orders.sort(dynamicSortDesc("user_price"))
-                    color = tb_buyColor
+                    color = trade_bot_modules.tb_buyColor
                 }
                 console.log(order_type)
                 console.log(color)
@@ -2122,7 +2104,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     // Check if rows exceed the limit
                     var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
                     .then(async res => {
-                        if (res.rowCount >= filledOrdersLimit) {
+                        if (res.rowCount >= trade_bot_modules.filledOrdersLimit) {
                             await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                         }
                         return true
@@ -2167,7 +2149,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     var postdata = {}
-                    postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                    postdata.color = all_orders[order_rank].order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor)
                     postdata.timestamp = new Date()
                     postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')
                     postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
@@ -2180,7 +2162,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         /invite ${embedScore(trader.ingame_name)}
                         /invite ${embedScore(tradee.ingame_name)}
 
-                        React with ${tradingBotReactions.success[0]} to finish this trade.
+                        React with ${trade_bot_modules.tradingBotReactions.success[0]} to finish this trade.
                         React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
                     `
                     res.send({content: ' ',embeds: [postdata]})
@@ -2190,7 +2172,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
                         .catch(err => console.log(err))
-                        open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                        open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                         open_message.react('⚠️').catch(err => console.log(err))
                         if (cross_thread)
                             res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
@@ -2204,7 +2186,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
-                            c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                            c_open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                             c_open_message.react('⚠️').catch(err => console.log(err))
                             cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
                         })
@@ -2234,7 +2216,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .catch(err => console.log(err))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
             }
-            else if (tradingBotLichChannels.includes(reaction.message.channelId)) {
+            else if (trade_bot_modules.tradingBotLichChannels.includes(reaction.message.channelId)) {
                 var lich_info = []
                 var weapon_url = reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_').trim()
                 console.log(weapon_url)
@@ -2309,11 +2291,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var color = ''
                 if (order_type == 'wts') {
                     all_orders = all_orders.sort(dynamicSort("user_price"))
-                    color = tb_sellColor
+                    color = trade_bot_modules.tb_sellColor
                 }
                 if (order_type == 'wtb') {
                     all_orders = all_orders.sort(dynamicSortDesc("user_price"))
-                    color = tb_buyColor
+                    color = trade_bot_modules.tb_buyColor
                 }
                 console.log(order_type)
                 console.log(color)
@@ -2408,7 +2390,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     // Check if rows exceed the limit
                     var status = await db.query(`SELECT * FROM filled_users_lich_orders ORDER BY trade_timestamp`)
                     .then(async res => {
-                        if (res.rowCount >= filledOrdersLimit) {
+                        if (res.rowCount >= trade_bot_modules.filledOrdersLimit) {
                             await db.query(`DELETE FROM filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                         }
                         return true
@@ -2453,7 +2435,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     var postdata = {}
-                    postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                    postdata.color = all_orders[order_rank].order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor)
                     postdata.timestamp = new Date()
                     postdata.title = all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                     postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
@@ -2468,7 +2450,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         /invite ${embedScore(trader.ingame_name)}
                         /invite ${embedScore(tradee.ingame_name)}
 
-                        React with ${tradingBotReactions.success[0]} to finish this trade.
+                        React with ${trade_bot_modules.tradingBotReactions.success[0]} to finish this trade.
                         React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
                     `
                     res.send({content: ' ',embeds: [postdata]})
@@ -2478,7 +2460,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
                         .catch(err => console.log(err))
-                        open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                        open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                         open_message.react('⚠️').catch(err => console.log(err))
                         if (cross_thread)
                             res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
@@ -2492,7 +2474,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
-                            c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                            c_open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                             c_open_message.react('⚠️').catch(err => console.log(err))
                             cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
                         })
@@ -2522,7 +2504,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 .catch(err => console.log(err))
                 setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
             }
-            else if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+            else if (trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId)) {
                 console.log('pass test 2')
                 var search_item_id = ""
                 var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
@@ -2631,11 +2613,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     var color = ''
                     if (order_type == 'wts') {
                         all_orders = all_orders.sort(dynamicSort("user_price"))
-                        color = tb_sellColor
+                        color = trade_bot_modules.tb_sellColor
                     }
                     if (order_type == 'wtb') {
                         all_orders = all_orders.sort(dynamicSortDesc("user_price"))
-                        color = tb_buyColor
+                        color = trade_bot_modules.tb_buyColor
                     }
                     console.log(order_type)
                     console.log(color)
@@ -2748,7 +2730,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         // Check if rows exceed the limit
                         var status = await db.query(`SELECT * FROM filled_users_lich_orders ORDER BY trade_timestamp`)
                         .then(async res => {
-                            if (res.rowCount >= filledOrdersLimit) {
+                            if (res.rowCount >= trade_bot_modules.filledOrdersLimit) {
                                 await db.query(`DELETE FROM filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                             }
                             return true
@@ -2793,7 +2775,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                         //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                         var postdata = {}
-                        postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                        postdata.color = all_orders[order_rank].order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor)
                         postdata.timestamp = new Date()
                         postdata.title = all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
                         postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
@@ -2808,7 +2790,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             /invite ${embedScore(trader.ingame_name)}
                             /invite ${embedScore(tradee.ingame_name)}
 
-                            React with ${tradingBotReactions.success[0]} to finish this trade.
+                            React with ${trade_bot_modules.tradingBotReactions.success[0]} to finish this trade.
                             React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
                         `
                         res.send({content: ' ',embeds: [postdata]})
@@ -2818,7 +2800,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
-                            open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                            open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                             open_message.react('⚠️').catch(err => console.log(err))
                             if (cross_thread)
                                 res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
@@ -2832,7 +2814,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                                 `)
                                 .catch(err => console.log(err))
-                                c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                                c_open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                                 c_open_message.react('⚠️').catch(err => console.log(err))
                                 cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
                             })
@@ -2929,11 +2911,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 var color = ''
                 if (order_type == 'wts') {
                     all_orders = all_orders.sort(dynamicSort("user_price"))
-                    color = tb_sellColor
+                    color = trade_bot_modules.tb_sellColor
                 }
                 if (order_type == 'wtb') {
                     all_orders = all_orders.sort(dynamicSortDesc("user_price"))
-                    color = tb_buyColor
+                    color = trade_bot_modules.tb_buyColor
                 }
                 console.log(order_type)
                 console.log(color)
@@ -3076,7 +3058,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     // Check if rows exceed the limit
                     var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
                     .then(async res => {
-                        if (res.rowCount >= filledOrdersLimit) {
+                        if (res.rowCount >= trade_bot_modules.filledOrdersLimit) {
                             await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                         }
                         return true
@@ -3121,7 +3103,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
                     var postdata = {}
-                    postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                    postdata.color = all_orders[order_rank].order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor)
                     postdata.timestamp = new Date()
                     postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')
                     postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
@@ -3134,7 +3116,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         /invite ${embedScore(trader.ingame_name)}
                         /invite ${embedScore(tradee.ingame_name)}
 
-                        React with ${tradingBotReactions.success[0]} to finish this trade.
+                        React with ${trade_bot_modules.tradingBotReactions.success[0]} to finish this trade.
                         React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
                     `
                     res.send({content: ' ',embeds: [postdata]})
@@ -3144,7 +3126,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
                         .catch(err => console.log(err))
-                        open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                        open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                         open_message.react('⚠️').catch(err => console.log(err))
                         if (cross_thread)
                             res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
@@ -3158,7 +3140,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
-                            c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
+                            c_open_message.react(trade_bot_modules.tradingBotReactions.success[0]).catch(err => console.log(err))
                             c_open_message.react('⚠️').catch(err => console.log(err))
                             cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
                         })
@@ -3193,13 +3175,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     if (reaction.message.channel.isThread()) {
-        if (tradingBotChannels.includes(reaction.message.channel.parentId) || tradingBotLichChannels.includes(reaction.message.channel.parentId) || tradingBotSpamChannels.includes(reaction.message.channel.parentId)) {
+        if (trade_bot_modules.tradingBotChannels.includes(reaction.message.channel.parentId) || trade_bot_modules.tradingBotLichChannels.includes(reaction.message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channel.parentId)) {
             if (reaction.message.channel.ownerId == client.user.id) {
                 if (!reaction.message.channel.archived) {
                     if (!reaction.message.author)
                         await reaction.message.channel.messages.fetch(reaction.message.id)
                     if (reaction.message.author.id == client.user.id) {
-                        if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
+                        if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != trade_bot_modules.tradingBotReactions.success[0]))
                             return Promise.resolve()
                         var order_data = null
                         var from_cross = false
@@ -3257,7 +3239,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         var suspicious = false
                         if (q_filledOrderTable == 'filled_users_lich_orders' && order_data.user_price > 1000)
                             suspicious = true
-                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] && !suspicious) {
+                        if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.success[0] && !suspicious) {
                             var status = await db.query(`
                             UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
                             WHERE ${q_threadId} = ${reaction.message.channel.id} AND ${q_channelId} = ${reaction.message.channel.parentId};
@@ -3361,12 +3343,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
             if (reaction.message.embeds) {
                 if (reaction.message.embeds[0]) {
                     if (reaction.message.embeds[0].title == 'Notification Settings') {
-                        if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
-                            if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[0])
+                        if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
+                            if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
                                 var status = await db.query(`UPDATE users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[1])
+                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
                                 var status = await db.query(`UPDATE users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[2])
+                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
                                 var status = await db.query(`UPDATE users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             var user_data = null
                             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
@@ -3410,7 +3392,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                     ${notify_order} Notify when orders auto-close in 3 hours
                                     ${notify_remove} Notify when orders are removed if item price changes`,
                                 footer: {text: `You will not receive these notfications on 'do not disturb'`},
-                                color: tb_invisColor
+                                color: trade_bot_modules.tb_invisColor
                             })
                             console.log(postdata)
                             reaction.message.edit(postdata).catch(err => console.log(err))
@@ -3667,12 +3649,12 @@ client.on('messageReactionRemove', async (reaction, user) => {
             if (reaction.message.embeds) {
                 if (reaction.message.embeds[0]) {
                     if (reaction.message.embeds[0].title == 'Notification Settings') {
-                        if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
-                            if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[0])
+                        if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
+                            if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
                                 var status = await db.query(`UPDATE users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[1])
+                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
                                 var status = await db.query(`UPDATE users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.sell[2])
+                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
                                 var status = await db.query(`UPDATE users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             var user_data = null
                             var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
@@ -3716,7 +3698,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                                     ${notify_order} Notify when orders auto-close in 3 hours
                                     ${notify_remove} Notify when orders are removed if item price changes`,
                                 footer: {text: `You will not receive these notfications on 'do not disturb'`},
-                                color: tb_invisColor
+                                color: trade_bot_modules.tb_invisColor
                             })
                             console.log(postdata)
                             reaction.message.edit(postdata).catch(err => console.log(err))
@@ -3947,7 +3929,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
     if (newThread.archived) {
         if (newThread.ownerId != client.user.id)
             return Promise.resolve()
-        if (!tradingBotChannels.includes(newThread.parentId) && !tradingBotLichChannels.includes(newThread.parentId) && !tradingBotSpamChannels.includes(newThread.parentId))
+        if (!trade_bot_modules.tradingBotChannels.includes(newThread.parentId) && !trade_bot_modules.tradingBotLichChannels.includes(newThread.parentId) && !trade_bot_modules.tradingBotSpamChannels.includes(newThread.parentId))
             return Promise.resolve()
         var order_data = null
         var isLich = false
@@ -4019,7 +4001,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         if (order_data.order_status == 'unsuccessful')
             order_status = `unsuccessful ⚠️ (Select the troublemaker)`
         else if (order_data.order_status == 'successful')
-            order_status = `successful ${tradingBotReactions.success[0]}`
+            order_status = `successful ${trade_bot_modules.tradingBotReactions.success[0]}`
         var reported_by = ""
         if (order_data.reporter_id)
             reported_by = `\n**Reported by:** <@${order_data.reporter_id}>`
@@ -4042,7 +4024,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                 `,
                 image: {url: order_data.lich_image_url},
                 timestamp: new Date(), 
-                color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
+                color: order_data.order_status.replace('unsuccessful',trade_bot_modules.tb_invisColor).replace('successful', order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor))
             }]
             if (order_data.order_status == 'unsuccessful') {
                 postdata.components = [{
@@ -4079,7 +4061,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
             `)
             .then(res => {
-                client.channels.cache.get(ordersFillLogChannel).send(postdata).then(log_message => {
+                client.channels.cache.get(trade_bot_modules.ordersFillLogChannel).send(postdata).then(log_message => {
                     var status = db.query(`
                     UPDATE filled_users_lich_orders
                     SET trade_log_message = ${log_message.id}
@@ -4109,7 +4091,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                     ${order_data.messages_log? order_data.messages_log.replaceAll(trader_ign,embedScore(trader_ign)).replaceAll(tradee_ign,embedScore(tradee_ign)):'Empty'}
                 `,
                 timestamp: new Date(), 
-                color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
+                color: order_data.order_status.replace('unsuccessful',trade_bot_modules.tb_invisColor).replace('successful', order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor))
             }]
             if (order_data.order_status == 'unsuccessful') {
                 postdata.components = [{
@@ -4147,7 +4129,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
             `)
             .then(res => {
-                client.channels.cache.get(ordersFillLogChannel).send(postdata).then(log_message => {
+                client.channels.cache.get(trade_bot_modules.ordersFillLogChannel).send(postdata).then(log_message => {
                     var status = db.query(`
                     UPDATE filled_users_orders
                     SET trade_log_message = ${log_message.id}

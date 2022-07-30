@@ -7,30 +7,14 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} =
 const userOrderLimit = 50
 const filledOrdersLimit = 500
 const tradingBotChannels = ["892160436881993758", "892108718358007820", "893133821313187881","1002903198316634152"]
-//const tradingBotChannels = ["892108718358007820"]
 const tradingBotLichChannels = ["906555131254956042", "892003772698611723","1002907923506274304"]
-//const tradingBotLichChannels = ["906555131254956042"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949","730808307010240572"]
-const tradingBotSpamChannels = ["892843006560981032", "892843163851563009"]
+const tradingBotSpamChannels = ["892843006560981032", "892843163851563009","1002910542928818207"]
 const tradingBotReactions = {
     sell: ["<:buy_1st:897556451420164096>", "<:buy_2nd:897556455098580992>", "<:buy_3rd:897556454842716160>", "<:buy_4th:897556449742426122>", "<:buy_5th:897556446235992104>"],
     buy: ["<:sell_1st:897556451533402132>", "<:sell_2nd:897556455190843412>", "<:sell_3rd:897556454964346981>", "<:sell_4th:897556451650842634>", "<:sell_5th:897556455371177984>"],
     remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"],
     success: ["<:order_success:894992959177654332>"]
-}
-const defaultReactions = {
-    check: {
-        string: '<:check:905884742413582347>',
-        identifier: 'check:905884742413582347'
-    },
-    update: {
-        string: '<:update:906923981855162398>',
-        identifier: 'update:906923981855162398'
-    },
-    auto_update: {
-        string: '<:auto_update:906923980852715640>',
-        identifier: 'auto_update:906923980852715640'
-    }
 }
 const ordersFillLogChannel = "894717126475128862"
 const tb_sellColor = '#7cb45d'
@@ -3098,5 +3082,15 @@ module.exports = {
     set_order_timeout,
     tb_threadHandler,
     tb_user_exist,
-    tb_user_online
+    tb_user_online,
+    tradingBotChannels,
+    tradingBotGuilds,
+    tradingBotLichChannels,
+    tradingBotSpamChannels,
+    filledOrdersLimit,
+    tradingBotReactions,
+    ordersFillLogChannel,
+    tb_sellColor,
+    tb_buyColor,
+    tb_invisColor
 }
