@@ -1,4 +1,5 @@
 const {client} = require('./discord_client.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
 
 function bot_initialize() {
     client.channels.fetch('817828725701476403').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
@@ -46,7 +47,7 @@ async function calculate_votes(message) {
             .then(messages => {
                 messages.map(message => {
                     if (!users[message.author.id])
-                        users[message.author.id] = {username: message.author.username, points: 0}
+                        users[message.author.id] = {username: message.author.username, username: 0}
                     message.reactions.cache.forEach(reaction => {
                         if (reaction.emoji.name == '1️⃣') users[message.author.id].points += reaction.count*1
                         if (reaction.emoji.name == '2️⃣') users[message.author.id].points += reaction.count*2
@@ -55,12 +56,25 @@ async function calculate_votes(message) {
                         if (reaction.emoji.name == '5️⃣') users[message.author.id].points += reaction.count*5
                     })
                 })
+
+                var users_arr = []
+                for (const userId in users) {
+                    users_arr.push({
+                        username: users[userId].username,
+                        points: users[userId].points,
+                        id: userId
+                    })
+                }
+                users_arr = users_arr.sort(dynamicSortDesc("points"));
+
                 var embeds = [{
                     description: ''
                 }]
-                for (const userId in users) {
-                    embeds[0].description += `<@${userId}> (${users[userId].username}): ${users[userId].points} points\n`
-                }
+                users_arr.forEach(user => {
+                    if (user.points > 0)
+                        embeds[0].description += `<@${user.id}>: ${user.points} points\n`
+                })
+
                 message.channel.send({
                     content: ' ',
                     embeds: embeds
