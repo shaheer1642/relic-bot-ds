@@ -93,65 +93,69 @@ async function reaction_handler(reaction, user, action) {
 async function addStreamer(username,custom_message) {
     return new Promise(async (resolve,reject) => {
         if (!custom_message) custom_message = ''
-        const twitchUser = await twitchApiClient.users.getUserByName(username);
-        if (!twitchUser) {
-            resolve(`The streamer **${username}** does not exist`)
-            return
-        }
-        db.query(`SELECT * FROM twitch_affiliate_streamers where username = '${username}'`).catch(err => reject(err))
-        .then(res => {
-            if (res.rowCount == 1) resolve(`The streamer **${username}** has already been affiliated with WarframeHub`)
-            else if (res.rowCount == 0) {
-                db.query(`INSERT INTO twitch_affiliate_streamers (username,streamer_id,custom_message,time_added) VALUES ('${username}','${twitchUser.id}',NULLIF('${custom_message}', ''),${new Date().getTime()})`).catch(err => reject(err))
-                .then(res => {
-                    //send affiliation msg in sub channels
-                    db.query(`SELECT * FROM twitch_affiliate_channels WHERE channel_type='affiliate_channel'`).catch(err => reject(err))
-                    .then(async res => {
-                        for (const [index,row] of res.rows.entries()) {
-                            const webhookClient = new WebhookClient({url: row.webhook_url});
-                            await webhookClient.send({
-                                content: `Streamer: ${username} (fetching details...)`
-                            }).catch(err => reject(err))
-                            .then(async res => {
-                                client.channels.cache.get(res.channel_id).messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
-                                await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,message_type,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
-                            })
-                        }
-                        resolve(`**${username}** has now been affiliated with WarframeHub`)
-                    })
-                })
-            } else {
-                reject('unexpected result querying db, contact developer with error code 502')
+        twitchApiClient.users.getUserByName(username).catch(err => reject(err))
+        .then(twitchUser => {
+            if (!twitchUser) {
+                resolve(`The streamer **${username}** does not exist`)
+                return
             }
-        })
+            db.query(`SELECT * FROM twitch_affiliate_streamers where username = '${username}'`).catch(err => reject(err))
+            .then(res => {
+                if (res.rowCount == 1) resolve(`The streamer **${username}** has already been affiliated with WarframeHub`)
+                else if (res.rowCount == 0) {
+                    db.query(`INSERT INTO twitch_affiliate_streamers (username,streamer_id,custom_message,time_added) VALUES ('${username}','${twitchUser.id}',NULLIF('${custom_message}', ''),${new Date().getTime()})`).catch(err => reject(err))
+                    .then(res => {
+                        //send affiliation msg in sub channels
+                        db.query(`SELECT * FROM twitch_affiliate_channels WHERE channel_type='affiliate_channel'`).catch(err => reject(err))
+                        .then(async res => {
+                            for (const [index,row] of res.rows.entries()) {
+                                const webhookClient = new WebhookClient({url: row.webhook_url});
+                                await webhookClient.send({
+                                    content: `Streamer: ${username} (fetching details...)`
+                                }).catch(err => reject(err))
+                                .then(async res => {
+                                    client.channels.cache.get(res.channel_id).messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
+                                    await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,message_type,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
+                                })
+                            }
+                            resolve(`**${username}** has now been affiliated with WarframeHub`)
+                        })
+                    })
+                } else {
+                    reject('unexpected result querying db, contact developer with error code 502')
+                }
+            })
+        });
     })
 }
 async function removeStreamer(username) {
     return new Promise(async (resolve,reject) => {
-        const twitchUser = await twitchApiClient.users.getUserByName(username);
-        if (!twitchUser) {
-            resolve(`The streamer **${username}** does not exist`)
-            return
-        }
-        db.query(`SELECT * FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
-        .then(res => {
-            if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with WarframeHub`)
-            else if (res.rowCount == 1) {
-                db.query(`SELECT * FROM twitch_affiliate_messages WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
-                .then(res => {
-                    const messages = res.rows
-                    db.query(`DELETE FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
-                    .then(() => {
-                        messages.forEach(message => {
-                            client.channels.cache.get(message.channel_id).messages.fetch(message.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
-                        })
-                        resolve(`**${username}** has been unaffiliated from WarframeHub`)
-                    })
-                })
-            } else {
-                reject('unexpected result querying db, contact developer with error code 503')
+        twitchApiClient.users.getUserByName(username).catch(err => reject(err))
+        .then(twitchUser => {
+            if (!twitchUser) {
+                resolve(`The streamer **${username}** does not exist`)
+                return
             }
-        })
+            db.query(`SELECT * FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
+            .then(res => {
+                if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with WarframeHub`)
+                else if (res.rowCount == 1) {
+                    db.query(`SELECT * FROM twitch_affiliate_messages WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
+                    .then(res => {
+                        const messages = res.rows
+                        db.query(`DELETE FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
+                        .then(() => {
+                            messages.forEach(message => {
+                                client.channels.cache.get(message.channel_id).messages.fetch(message.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
+                            })
+                            resolve(`**${username}** has been unaffiliated from WarframeHub`)
+                        })
+                    })
+                } else {
+                    reject('unexpected result querying db, contact developer with error code 503')
+                }
+            })
+        });
     })
 }
 
