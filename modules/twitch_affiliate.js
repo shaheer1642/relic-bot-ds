@@ -230,7 +230,8 @@ async function updateAffiliations() {
                 if (channel.channel_type == 'live_channel') {
                     const webhookClient = new WebhookClient({url: channel.webhook_url});
                     webhookClient.send({
-                        emebds: [{
+                        content: ' ',
+                        embeds: [{
                             author: {
                                 name: streamer_obj.displayName + ' is live!',
                                 url: `https://twitch.tv/${streamer_obj.username}`,
