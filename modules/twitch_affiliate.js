@@ -169,7 +169,7 @@ async function updateAffiliations() {
         .then(res => {
             return res.rows
         })
-        const affiliate_messages = await db.query(`SELECT * FROM twitch_affiliate_messages WHERE message_type='affiliate_message'`).catch(err => console.log(err))
+        const affiliate_messages = await db.query(`SELECT * FROM twitch_affiliate_messages`).catch(err => console.log(err))
         .then(res => {
             return res.rows
         })
@@ -207,8 +207,6 @@ async function updateAffiliations() {
                     if (stream.gameName.toLowerCase() == 'warframe') {
                         if (streamer.status == 'offline') {
                             postLiveMessage(streamers_data[streamer.streamer_id])
-                        } else if (streamer.status == 'live') {     //update the current message
-                            updateLiveMessage(streamers_data[streamer.streamer_id])
                         }
                     }
                 } else {
@@ -260,7 +258,7 @@ async function updateAffiliations() {
                         }]
                     }).catch(err => console.log(err)).then(msg => db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,guild_id,message_type,time_added) VALUES ('${streamer_obj.id}',${msg.id},${channel.channel_id},${channel.guild_id},'live_message',${new Date().getTime()})`).catch(err => console.log(err)))
                     affiliate_messages.forEach(message => {
-                        if ((message.guild_id == channel.guild_id) && (message.streamer_id == streamer_obj.id)) {
+                        if ((message.guild_id == channel.guild_id) && (message.streamer_id == streamer_obj.id) && (message.message_type == 'affiliate_message')) {
                             if (message.notify.user_ids.length > 0) {
                                 webhookClient.send(`**${streamers_data[message.streamer_id].displayName}** is live!\n${message.notify.user_ids.map(userId => `<@${userId}>`).join(', ')}`)
                                 .then(msg => {
@@ -276,9 +274,31 @@ async function updateAffiliations() {
             })
         }
 
-        function updateLiveMessage(streamer_obj) {
-            affiliate_messages.forEach(message => {
-                if ((message.message_type == 'live_message') && (message.streamer_id == streamer_obj.id)) {
+        var db_query = ''
+        Object.keys(streamers_data).forEach(async streamer_id => {
+            db_query += `UPDATE twitch_affiliate_streamers SET status='${streamers_data[streamer_id].stream.status}' WHERE streamer_id = '${streamer_id}';`
+        })
+
+        await db.query(db_query).catch(err => console.log(err))
+
+        for (const [index,message] of affiliate_messages.entries()) {
+            if (message.message_type == 'affiliate_message') {
+                const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
+    
+                webhookClient.editMessage(message.message_id, {
+                    content: `React with ${emotes.notify.string} to be notified when ${streamers_data[message.streamer_id].displayName} streams Warframe`,
+                    embeds: [{
+                        title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
+                        url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
+                        thumbnail: {
+                            url: streamers_data[message.streamer_id].avatarUrl
+                        },
+                        description: streamers_data[message.streamer_id].description + `\n\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
+                        color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
+                    }]
+                }).catch(err => console.log(err))
+            } else if (message.message_type == 'live_message') {
+                if (streamers_data[message.streamer_id].stream.status == 'live') {
                     const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
                     webhookClient.editMessage(message.message_id, {
                         content: ' ',
@@ -307,31 +327,7 @@ async function updateAffiliations() {
                         }]
                     }).catch(err => console.log(err))
                 }
-            })
-        }
-
-        var db_query = ''
-        Object.keys(streamers_data).forEach(async streamer_id => {
-            db_query += `UPDATE twitch_affiliate_streamers SET status='${streamers_data[streamer_id].stream.status}' WHERE streamer_id = '${streamer_id}';`
-        })
-
-        await db.query(db_query).catch(err => console.log(err))
-
-        for (const [index,message] of affiliate_messages.entries()) {
-            const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
-
-            webhookClient.editMessage(message.message_id, {
-                content: `React with ${emotes.notify.string} to be notified when ${streamers_data[message.streamer_id].displayName} streams Warframe`,
-                embeds: [{
-                    title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
-                    url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
-                    thumbnail: {
-                        url: streamers_data[message.streamer_id].avatarUrl
-                    },
-                    description: streamers_data[message.streamer_id].description + `\n\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
-                    color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
-                }]
-            }).catch(err => console.log(err))
+            }
         }
     } catch(e) {
         console.log(e)
