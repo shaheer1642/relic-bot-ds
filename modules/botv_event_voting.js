@@ -43,10 +43,10 @@ async function calculate_votes(message) {
         client.channels.fetch('817828725701476403').catch(err => console.log(err))
         .then(channel => {
             channel.messages.fetch().catch(err => console.log(err))
-            .then(async (messages) => {
-                await messages.map(async (message) => {
+            .then(messages => {
+                messages.map(message => {
                     if (!users[message.author.id])
-                        users[message.author.id] = {username: message.author.username, points: 0, displayName: await client.guilds.cache.get('776804537095684108').members.fetch(message.author.id).then(res => {return res.displayName})}
+                        users[message.author.id] = {username: message.author.username, points: 0}
                     message.reactions.cache.forEach(reaction => {
                         if (reaction.emoji.name == '1️⃣') users[message.author.id].points += 1
                         if (reaction.emoji.name == '2️⃣') users[message.author.id].points += 2
@@ -59,7 +59,7 @@ async function calculate_votes(message) {
                     description: ''
                 }]
                 for (const userId in users) {
-                    embeds[0].description += `<@${userId} (${users[userId].displayName}): ${users[userId].points} points>\n`
+                    embeds[0].description += `<@${userId} (${users[userId].username}): ${users[userId].points} points>\n`
                 }
                 message.channel.send({
                     content: ' ',
