@@ -198,7 +198,6 @@ client.on('messageCreate', async message => {
         pins_handler(message)
         return
     }
-    message.author.us
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()

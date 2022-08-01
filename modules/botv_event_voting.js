@@ -48,18 +48,18 @@ async function calculate_votes(message) {
                     if (!users[message.author.id])
                         users[message.author.id] = {username: message.author.username, points: 0}
                     message.reactions.cache.forEach(reaction => {
-                        if (reaction.emoji.name == '1️⃣') users[message.author.id].points += 1
-                        if (reaction.emoji.name == '2️⃣') users[message.author.id].points += 2
-                        if (reaction.emoji.name == '3️⃣') users[message.author.id].points += 3
-                        if (reaction.emoji.name == '4️⃣') users[message.author.id].points += 4
-                        if (reaction.emoji.name == '5️⃣') users[message.author.id].points += 5
+                        if (reaction.emoji.name == '1️⃣') users[message.author.id].points += reaction.count*1
+                        if (reaction.emoji.name == '2️⃣') users[message.author.id].points += reaction.count*2
+                        if (reaction.emoji.name == '3️⃣') users[message.author.id].points += reaction.count*3
+                        if (reaction.emoji.name == '4️⃣') users[message.author.id].points += reaction.count*4
+                        if (reaction.emoji.name == '5️⃣') users[message.author.id].points += reaction.count*5
                     })
                 })
                 var embeds = [{
                     description: ''
                 }]
                 for (const userId in users) {
-                    embeds[0].description += `<@${userId} (${users[userId].username}): ${users[userId].points} points>\n`
+                    embeds[0].description += `<@${userId}> (${users[userId].username}): ${users[userId].points} points\n`
                 }
                 message.channel.send({
                     content: ' ',
