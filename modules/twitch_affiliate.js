@@ -34,32 +34,34 @@ async function interaction_handler(interaction) {
                 // check if authorized user
                 if (authorized_userIds.includes(interaction.user.id)) {
                     // verify channel existence in db
-                    ensureChannelExistence(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
-                    .then(() => {
-                        if (interaction.options.getSubcommand() == 'add_streamer') {
-                            addStreamer(usernameValidate(interaction.options.getString('username')),interaction.options.getString('custom_message') || '').catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
-                            .then((res) => {
-                                interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res),ephemeral: true}).catch(err => console.log(err))
-                                updateAffiliations()
-                            })
-                            
-                        } else if (interaction.options.getSubcommand() == 'remove_streamer') {
-                            removeStreamer(usernameValidate(interaction.options.getString('username'))).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
-                            .then((res) => {
-                                interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res),ephemeral: true}).catch(err => console.log(err))
-                                updateAffiliations()
-                            })
-                        } else if (interaction.options.getSubcommand() == 'add_server') {
-                            interaction.reply({content: `This server has now been affiliated with WarframeHub`,ephemeral: true}).catch(err => console.log(err))
+                    if (interaction.options.getSubcommand() == 'add_streamer') {
+                        addStreamer(usernameValidate(interaction.options.getString('username')),interaction.options.getString('custom_message') || '').catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
+                        .then((res) => {
+                            interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res),ephemeral: true}).catch(err => console.log(err))
                             updateAffiliations()
-                        } else if (interaction.options.getSubcommand() == 'remove_server') {
-                            removeChannelAffiliation(interaction.channel.id).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
-                            .then((res) => {
-                                interaction.reply({content: `This server has been unaffiliated from WarframeHub`,ephemeral: true}).catch(err => console.log(err))
-                                updateAffiliations()
-                            })
-                        }
-                    })
+                        })
+                        
+                    } else if (interaction.options.getSubcommand() == 'remove_streamer') {
+                        removeStreamer(usernameValidate(interaction.options.getString('username'))).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`}).catch(err => console.log(err));console.log(err)})
+                        .then((res) => {
+                            interaction.reply({content: typeof res == 'string' ? res:JSON.stringify(res),ephemeral: true}).catch(err => console.log(err))
+                            updateAffiliations()
+                        })
+                    } else if (interaction.options.getSubcommand() == 'add_server') {
+                        addServerAffiliation(interaction.guild.id).then(res => {
+                            interaction.reply({content: `This server has now been affiliated with WarframeHub`,ephemeral: true}).catch(err => console.log(err))
+                        }).catch(err => {
+                            interaction.reply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
+                        })
+                        updateAffiliations()
+                    } else if (interaction.options.getSubcommand() == 'remove_server') {
+                        removeServerAffiliation(interaction.guild.id).then(res => {
+                            interaction.reply({content: `This server has been unaffiliated from WarframeHub`,ephemeral: true}).catch(err => console.log(err))
+                        }).catch(err => {
+                            interaction.reply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
+                        })
+                        updateAffiliations()
+                    }
                 } else {
                     interaction.reply({content: 'Sorry, you are not authorized for this command'}).catch(err => console.log(err))
                 }
@@ -100,7 +102,7 @@ async function addStreamer(username,custom_message) {
             else if (res.rowCount == 0) {
                 db.query(`INSERT INTO twitch_affiliate_streamers (username,streamer_id,custom_message,time_added) VALUES ('${username}','${twitchUser.id}',NULLIF('${custom_message}', ''),${new Date().getTime()})`).catch(err => reject(err))
                 .then(res => {
-                    //send affiliation msg in every channel
+                    //send affiliation msg in sub channels
                     db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => reject(err))
                     .then(async res => {
                         for (const [index,row] of res.rows.entries()) {
@@ -270,69 +272,81 @@ async function updateAffiliations() {
     }
 }
 
-async function removeChannelAffiliation(channelId) {
+async function removeServerAffiliation(guildId) {
     return new Promise((resolve,reject) => {
-        db.query(`DELETE FROM twitch_affiliate_channels WHERE channel_id = ${channelId} RETURNING *`).catch(err => reject(err))
+        db.query(`DELETE FROM twitch_affiliate_channels WHERE guild_id = ${guildId} RETURNING *`).catch(err => reject(err))
         .then(res => {
-            if (res.rowCount == 1) {
-                const webhookClient = new WebhookClient({url: res.rows[0].webhook_url});
-                webhookClient.delete().catch(err => console.log(err))
-                client.channels.fetch(channelId).catch(err => console.log(err))
-                .then(channel => {
-                    channel.messages.fetch({limit: 100}).catch(err => console.log(err))
-                    .then(messages => {
-                        messages.forEach(msg => msg.delete().catch(err => console.log(err)))
+            if (res.rowCount == 2) {
+                for (const [index,row] of res.rows.entries()) {
+                    await client.channels.fetch(row.channel_id).then(async (channel) => {
+                        await channel.parent.delete().catch(err => console.log(err))
+                        await channel.delete().catch(err => console.log(err))
                     })
-                })
+                }
                 resolve()
-            }
-            else {
-                reject('unexpected result querying db, contact developer with error code 504')
+            } else if (res.rowCount == 0) {
+                resolve('The server is currently not in affiliation with WarframeHub')
+            } else {
+                reject('Unexpected result querying db, contact developer with error code 504')
             }
         })
     })
 }
 
-async function ensureChannelExistence(channelId) {
+async function addServerAffiliation(guildId) {
     return new Promise((resolve,reject) => {
-        db.query(`SELECT * FROM twitch_affiliate_channels WHERE channel_id = ${channelId}`).catch(err => reject(err))
+        db.query(`SELECT * FROM twitch_affiliate_channels WHERE guild_id=${guildId}`).catch(err => reject(err))
         .then(res => {
-            if (res.rowCount == 1) resolve()
+            if (res.rowCount == 2) resolve('This server has already been affiliated with WarframeHub')
             else if (res.rowCount == 0) {
-                client.channels.fetch(channelId).catch(err => reject(err))
-                .then(channel => {
-                    channel.createWebhook('Twitch Affiliates (WarframeHub)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
-                    .then(webhookClient => {
-                        db.query(`INSERT INTO twitch_affiliate_channels (channel_id,webhook_url,time_added) VALUES (${channelId},'${webhookClient.url}',${new Date().getTime()})`).catch(err => reject(err))
-                        .then(res => {
-                            firstTimeAddServer(channel,webhookClient).catch(err => reject(err))
-                            .then(() => resolve())
+                client.guilds.fetch(guildId).catch(err => reject(err))
+                .then(guild => {
+                    guild.channels.create('Twitch Affiliates',{
+                        type: 'GUILD_CATEGORY',
+                    }).catch(err => reject(err)).then(category => { 
+                        guild.channels.create('•📺•streamer-on-live',{
+                            type: 'GUILD_TEXT',
+                        }).catch(err => reject(err)).then(streamerlive => {
+                            guild.channels.create('•🎙•streamer-affiliates',{
+                                type: 'GUILD_TEXT',
+                            }).catch(err => reject(err)).then(streameraff => {
+                                streamerlive.setParent(category).catch(err => reject(err))
+                                streameraff.setParent(category).catch(err => reject(err))
+                                streamerlive.createWebhook('Twitch Affiliates (WarframeHub)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
+                                .then(streamerliveWebhook => {
+                                    streameraff.createWebhook('Twitch Affiliates (WarframeHub)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
+                                    .then(streameraffWebhook => {
+                                        db.query(`
+                                            INSERT INTO twitch_affiliate_channels (channel_id,webhook_url,guild_id,channel_type,time_added) VALUES (${streamerlive.id},'${streamerliveWebhook.url}',${guildId},'live_channel',${new Date().getTime()});
+                                            INSERT INTO twitch_affiliate_channels (channel_id,webhook_url,guild_id,channel_type,time_added) VALUES (${streameraff.id},'${streameraffWebhook.url}',${guildId},'affiliate_channel',${new Date().getTime()});
+                                        `).catch(err => reject(err))
+                                        .then(res => {
+                                            // send all existing streamers messages
+                                            db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => reject(err))
+                                            .then(async res => {
+                                                for (const [index,row] of res.rows.entries()) {
+                                                    await streameraffWebhook.send({
+                                                        content: `Streamer: ${row.username} (fetching details...)`
+                                                    }).catch(err => reject(err))
+                                                    .then(async res => {
+                                                        streameraff.messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
+                                                        await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${row.streamer_id}',${res.id},${streameraff.id},${new Date().getTime()})`).catch(err => reject(err))
+                                                    })
+                                                }
+                                                await streamerliveWebhook.send({
+                                                    content: `Streamers currently live are be shown here`
+                                                }).catch(err => reject(err))
+                                                resolve()
+                                            })
+                                        })
+                                    })
+                                })
+                            })
                         })
+                        
                     })
                 })
-            } else {
-                reject('unexpected result querying db, contact developer with error code 501')
-            }
-        })
-    })
-}
-
-
-async function firstTimeAddServer(channel,webhookClient) {
-    return new Promise(async (resolve,reject) => {
-        // send all existing streamers messages
-        db.query(`SELECT * FROM twitch_affiliate_streamers`).catch(err => reject(err))
-        .then(async res => {
-            for (const [index,row] of res.rows.entries()) {
-                await webhookClient.send({
-                    content: `Streamer: ${row.username} (fetching details...)`
-                }).catch(err => reject(err))
-                .then(async res => {
-                    channel.messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
-                    await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${row.streamer_id}',${res.id},${channel.id},${new Date().getTime()})`).catch(err => reject(err))
-                })
-            }
-            resolve()
+            } else reject('Unexpected result querying db, please contact developer')
         })
     })
 }
