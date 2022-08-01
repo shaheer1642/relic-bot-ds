@@ -50,17 +50,17 @@ async function interaction_handler(interaction) {
                     } else if (interaction.options.getSubcommand() == 'add_server') {
                         await interaction.deferReply().catch(err => console.log(err))
                         addServerAffiliation(interaction.guild.id).then(res => {
-                            interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
+                            interaction.editReply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
-                            interaction.reply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
+                            interaction.editReply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
                         })
                         updateAffiliations()
                     } else if (interaction.options.getSubcommand() == 'remove_server') {
                         await interaction.deferReply().catch(err => console.log(err))
                         removeServerAffiliation(interaction.guild.id).then(res => {
-                            interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
+                            interaction.editReply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
-                            interaction.reply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
+                            interaction.editReply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
                         })
                         updateAffiliations()
                     }
