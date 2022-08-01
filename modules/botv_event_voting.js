@@ -49,11 +49,11 @@ async function calculate_votes(message) {
                     if (!users[message.author.id])
                         users[message.author.id] = {points: 0, message_url: message.url}
                     message.reactions.cache.forEach(reaction => {
-                        if (reaction.emoji.name == '1️⃣') users[message.author.id].points += reaction.count*1
-                        if (reaction.emoji.name == '2️⃣') users[message.author.id].points += reaction.count*2
-                        if (reaction.emoji.name == '3️⃣') users[message.author.id].points += reaction.count*3
-                        if (reaction.emoji.name == '4️⃣') users[message.author.id].points += reaction.count*4
-                        if (reaction.emoji.name == '5️⃣') users[message.author.id].points += reaction.count*5
+                        if (reaction.emoji.name == '1️⃣') users[message.author.id].points += (reaction.count-1)*1
+                        if (reaction.emoji.name == '2️⃣') users[message.author.id].points += (reaction.count-1)*2
+                        if (reaction.emoji.name == '3️⃣') users[message.author.id].points += (reaction.count-1)*3
+                        if (reaction.emoji.name == '4️⃣') users[message.author.id].points += (reaction.count-1)*4
+                        if (reaction.emoji.name == '5️⃣') users[message.author.id].points += (reaction.count-1)*5
                     })
                 })
 
