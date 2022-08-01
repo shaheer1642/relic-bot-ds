@@ -47,7 +47,7 @@ async function calculate_votes(message) {
             .then(messages => {
                 messages.map(message => {
                     if (!users[message.author.id])
-                        users[message.author.id] = {points: 0}
+                        users[message.author.id] = {points: 0, message_url: message.url}
                     message.reactions.cache.forEach(reaction => {
                         if (reaction.emoji.name == '1️⃣') users[message.author.id].points += reaction.count*1
                         if (reaction.emoji.name == '2️⃣') users[message.author.id].points += reaction.count*2
@@ -61,6 +61,7 @@ async function calculate_votes(message) {
                 for (const userId in users) {
                     users_arr.push({
                         points: users[userId].points,
+                        message_url: users[userId].message_url,
                         id: userId
                     })
                 }
@@ -72,7 +73,7 @@ async function calculate_votes(message) {
                 }]
                 users_arr.forEach(user => {
                     if (user.points > 0)
-                        embeds[0].description += `<@${user.id}>: ${user.points} points\n`
+                        embeds[0].description += `<@${user.id}>: ${user.points} points [submission](${user.message_url})\n`
                 })
 
                 message.channel.send({
