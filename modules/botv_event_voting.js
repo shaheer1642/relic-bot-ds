@@ -47,7 +47,7 @@ async function calculate_votes(message) {
             .then(messages => {
                 messages.map(message => {
                     if (!users[message.author.id])
-                        users[message.author.id] = {username: message.author.username, username: 0}
+                        users[message.author.id] = {username: message.author.username, points: 0}
                     message.reactions.cache.forEach(reaction => {
                         if (reaction.emoji.name == '1️⃣') users[message.author.id].points += reaction.count*1
                         if (reaction.emoji.name == '2️⃣') users[message.author.id].points += reaction.count*2
