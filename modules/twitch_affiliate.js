@@ -49,14 +49,14 @@ async function interaction_handler(interaction) {
                         })
                     } else if (interaction.options.getSubcommand() == 'add_server') {
                         addServerAffiliation(interaction.guild.id).then(res => {
-                            interaction.reply({content: `This server has now been affiliated with WarframeHub`,ephemeral: true}).catch(err => console.log(err))
+                            interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
                             interaction.reply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
                         })
                         updateAffiliations()
                     } else if (interaction.options.getSubcommand() == 'remove_server') {
                         removeServerAffiliation(interaction.guild.id).then(res => {
-                            interaction.reply({content: `This server has been unaffiliated from WarframeHub`,ephemeral: true}).catch(err => console.log(err))
+                            interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
                             interaction.reply({content: `Sorry, some error occured\n${err}`,ephemeral: false}).catch(err => console.log(err))
                         })
@@ -103,7 +103,7 @@ async function addStreamer(username,custom_message) {
                 db.query(`INSERT INTO twitch_affiliate_streamers (username,streamer_id,custom_message,time_added) VALUES ('${username}','${twitchUser.id}',NULLIF('${custom_message}', ''),${new Date().getTime()})`).catch(err => reject(err))
                 .then(res => {
                     //send affiliation msg in sub channels
-                    db.query(`SELECT * FROM twitch_affiliate_channels`).catch(err => reject(err))
+                    db.query(`SELECT * FROM twitch_affiliate_channels WHERE channel_type='affiliate_channel'`).catch(err => reject(err))
                     .then(async res => {
                         for (const [index,row] of res.rows.entries()) {
                             const webhookClient = new WebhookClient({url: row.webhook_url});
@@ -275,7 +275,7 @@ async function updateAffiliations() {
 async function removeServerAffiliation(guildId) {
     return new Promise((resolve,reject) => {
         db.query(`DELETE FROM twitch_affiliate_channels WHERE guild_id = ${guildId} RETURNING *`).catch(err => reject(err))
-        .then(res => {
+        .then(async res => {
             if (res.rowCount == 2) {
                 for (const [index,row] of res.rows.entries()) {
                     await client.channels.fetch(row.channel_id).then(async (channel) => {
@@ -283,7 +283,7 @@ async function removeServerAffiliation(guildId) {
                         await channel.delete().catch(err => console.log(err))
                     })
                 }
-                resolve()
+                resolve('The server is has been unaffiliated from WarframeHub')
             } else if (res.rowCount == 0) {
                 resolve('The server is currently not in affiliation with WarframeHub')
             } else {
@@ -336,7 +336,7 @@ async function addServerAffiliation(guildId) {
                                                 await streamerliveWebhook.send({
                                                     content: `Streamers currently live are be shown here`
                                                 }).catch(err => reject(err))
-                                                resolve()
+                                                resolve('This server has now been affiliated with WarframeHub')
                                             })
                                         })
                                     })
