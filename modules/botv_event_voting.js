@@ -43,8 +43,8 @@ async function calculate_votes(message) {
         client.channels.fetch('817828725701476403').catch(err => console.log(err))
         .then(channel => {
             channel.messages.fetch().catch(err => console.log(err))
-            .then(messages => {
-                messages.map(async (message) => {
+            .then(async (messages) => {
+                await messages.map(async (message) => {
                     if (!users[message.author.id])
                         users[message.author.id] = {username: message.author.username, points: 0, displayName: await client.guilds.cache.get('776804537095684108').members.fetch(message.author.id).then(res => {return res.displayName})}
                     message.reactions.cache.forEach(reaction => {
