@@ -99,7 +99,7 @@ async function addStreamer(username,custom_message) {
                 resolve(`The streamer **${username}** does not exist`)
                 return
             }
-            db.query(`SELECT * FROM twitch_affiliate_streamers where username = '${username}'`).catch(err => reject(err))
+            db.query(`SELECT * FROM twitch_affiliate_streamers where streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
             .then(res => {
                 if (res.rowCount == 1) resolve(`The streamer **${username}** has already been affiliated with WarframeHub`)
                 else if (res.rowCount == 0) {
@@ -115,7 +115,7 @@ async function addStreamer(username,custom_message) {
                                 }).catch(err => reject(err))
                                 .then(async res => {
                                     client.channels.cache.get(res.channel_id).messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
-                                    await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,message_type,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
+                                    await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,guild_id,message_type,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},${row.guild.id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
                                 })
                             }
                             resolve(`**${username}** has now been affiliated with WarframeHub`)
@@ -169,7 +169,7 @@ async function updateAffiliations() {
         .then(res => {
             return res.rows
         })
-        const messages = await db.query(`SELECT * FROM twitch_affiliate_messages`).catch(err => console.log(err))
+        const affiliate_messages = await db.query(`SELECT * FROM twitch_affiliate_messages WHERE message_type='affiliate_message'`).catch(err => console.log(err))
         .then(res => {
             return res.rows
         })
@@ -182,6 +182,7 @@ async function updateAffiliations() {
             const twitchUser = await twitchApiClient.users.getUserById(streamer.streamer_id).catch(err => console.log(err));
             if (twitchUser) {
                 streamers_data[streamer.streamer_id] = {
+                    id: streamer.streamer_id,
                     username: twitchUser.name,
                     displayName: twitchUser.displayName,
                     description: twitchUser.description,
@@ -202,15 +203,73 @@ async function updateAffiliations() {
                         title: stream.title,
                         thumbnail: stream.thumbnailUrl.replace('-{width}x{height}','')
                     }
+
+                    if (streamer.status == 'offline') {
+                        postLiveMessage(streamers_data[streamer.streamer_id])
+                    }
                 } else {
                     streamers_data[streamer.streamer_id].stream = {
                         status: 'offline'
+                    }
+
+                    if (streamer.status == 'live') {
+                        db.query(`DELETE FROM twitch_affiliate_messages WHERE message_type = 'live_message' AND streamer_id = '${streamer.streamer_id}' RETURNING *`)
+                        .then(res => {
+                            for (const [index,row] of res.rows.entries()) {
+                                const webhookClient = new WebhookClient({url: channels_data[row.channel_id].webhook_url});
+                                webhookClient.deleteMessage(row.message_id).catch(err => console.log(err))
+                            }
+                        }).catch(err => console.log(err))
                     }
                 }
             })
         }
 
-        //console.log(JSON.stringify(streamers_data))
+        function postLiveMessage(streamer_obj) {
+            channels.forEach(channel => {
+                if (channel.channel_type == 'live_channel') {
+                    const webhookClient = new WebhookClient({url: channel.webhook_url});
+                    webhookClient.send({
+                        emebds: [{
+                            author: {
+                                name: streamer_obj.displayName + ' is live!',
+                                url: `https://twitch.tv/${streamer_obj.username}`,
+                                icon_url: streamer_obj.avatarUrl,
+                            },
+                            description: `[${streamer_obj.stream.title}](https://twitch.tv/${streamer_obj.username})`,
+                            fields: [{
+                                name: 'Stream started', value: `<t:${Math.round(streamer_obj.stream.startedAt / 1000)}:R>`, inline: true
+                            }, {
+                                name: 'Playing', value: streamer_obj.stream.playing, inline: true
+                            },{
+                                name: '\u200b', value: '\u200b', inline: true
+                            },{
+                                name: 'Viewers', value: streamer_obj.stream.viewCount, inline: true
+                            },{
+                                name: 'Language', value: streamer_obj.stream.lang, inline: true
+                            },{
+                                name: '\u200b', value: '\u200b', inline: true
+                            },],
+                            image: {url: streamer_obj.stream.thumbnail},
+                            color: '#ff0000'
+                        }]
+                    }).catch(err => console.log(err)).then(msg => db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,guild_id,message_type,time_added) VALUES ('${streamer_obj.id}',${msg.id},${channel.channel_id},${channel.guild_id},'live_message',${new Date().getTime()})`).catch(err => console.log(err)))
+                    affiliate_messages.forEach(message => {
+                        if ((message.guild_id == channel.guild_id) && (message.streamer_id == streamer_obj.id)) {
+                            if (message.notify.user_ids.length > 0) {
+                                webhookClient.send(`**${streamers_data[message.streamer_id].displayName}** is live!\n${message.notify.user_ids.map(userId => `<@${userId}>`).join(', ')}`)
+                                .then(msg => {
+                                    setTimeout(() => {
+                                        webhookClient.deleteMessage(msg.id).catch(err => console.log(err))
+                                    }, 10000);
+                                })
+                                .catch(err => console.log(err))
+                            }
+                        }
+                    })
+                }
+            })
+        }
 
         var db_query = ''
         Object.keys(streamers_data).forEach(async streamer_id => {
@@ -219,59 +278,21 @@ async function updateAffiliations() {
 
         await db.query(db_query).catch(err => console.log(err))
 
-        for (const [index,message] of messages.entries()) {
+        for (const [index,message] of affiliate_messages.entries()) {
             const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
-
-            var embeds = []
-            embeds.push({
-                title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
-                url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
-                thumbnail: {
-                    url: streamers_data[message.streamer_id].avatarUrl
-                },
-                description: streamers_data[message.streamer_id].description + `\n\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
-                color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
-            })
-
-            if (streamers_data[message.streamer_id].stream.status == 'live') {
-                embeds.push({
-                    description: `[${streamers_data[message.streamer_id].stream.title}](https://twitch.tv/${streamers_data[message.streamer_id].username})`,
-                    fields: [{
-                        name: 'Stream started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
-                    }, {
-                        name: 'Playing', value: streamers_data[message.streamer_id].stream.playing, inline: true
-                    },{
-                        name: '\u200b', value: '\u200b', inline: true
-                    },{
-                        name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: true
-                    },{
-                        name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
-                    },{
-                        name: '\u200b', value: '\u200b', inline: true
-                    },],
-                    image: {url: streamers_data[message.streamer_id].stream.thumbnail},
-                    color: '#ff0000'
-                })
-            }
 
             webhookClient.editMessage(message.message_id, {
                 content: `React with ${emotes.notify.string} to be notified when this streamer is live`,
-                embeds: embeds
+                embeds: [{
+                    title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
+                    url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
+                    thumbnail: {
+                        url: streamers_data[message.streamer_id].avatarUrl
+                    },
+                    description: streamers_data[message.streamer_id].description + `\n\nUser is currently ${streamers_data[message.streamer_id].stream.status}`,
+                    color: streamers_data[message.streamer_id].stream.status == 'live' ? '#ff0000':'#9511d6'
+                }]
             }).catch(err => console.log(err))
-            // notify that user is live
-            if (streamers_data[message.streamer_id].stream.status != streamers_data[message.streamer_id].old_stream_status) {
-                if (streamers_data[message.streamer_id].stream.status == 'live') {
-                    if (message.notify.user_ids.length > 0) {
-                        webhookClient.send(`**${streamers_data[message.streamer_id].displayName}** is live!\n${message.notify.user_ids.map(userId => `<@${userId}>`).join(', ')}`)
-                        .then(msg => {
-                            setTimeout(() => {
-                                webhookClient.deleteMessage(msg.id).catch(err => console.log(err))
-                            }, 10000);
-                        })
-                        .catch(err => console.log(err))
-                    }
-                }
-            }
         }
     } catch(e) {
         console.log(e)
@@ -337,7 +358,7 @@ async function addServerAffiliation(guildId) {
                                                     }).catch(err => reject(err))
                                                     .then(async res => {
                                                         streameraff.messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
-                                                        await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,message_type,time_added) VALUES ('${row.streamer_id}',${res.id},${streameraff.id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
+                                                        await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,guild_id,message_type,time_added) VALUES ('${row.streamer_id}',${res.id},${streameraff.id},${streameraff.guild.id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
                                                     })
                                                 }
                                                 await streamerliveWebhook.send({
