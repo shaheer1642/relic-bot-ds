@@ -66,6 +66,7 @@ async function calculate_votes(message) {
                     })
                 }
                 users_arr = users_arr.sort(dynamicSortDesc("points"));
+                console.log(JSON.stringify(users_arr))
 
                 var embeds = [{
                     description: ''
