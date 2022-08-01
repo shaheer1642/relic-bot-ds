@@ -55,14 +55,16 @@ async function calculate_votes(message) {
                 })
             })
         })
-            message.channel.send({
-                content: ' ',
-                embeds: [{
-                    description: users.map((user,userId) => {
-                        return `<@${userId} (${user.displayName}): ${user.points} points>\n`
-                    })
-                }]
-            }).catch(err => console.log(err))
+        var embeds = [{
+            description: ''
+        }]
+        for (const userId in users) {
+            embeds[0].description += `<@${userId} (${users[userId].displayName}): ${users[userId].points} points>\n`
+        }
+        message.channel.send({
+            content: ' ',
+            embeds: embeds
+        }).catch(err => console.log(err))
     })
 }
 
