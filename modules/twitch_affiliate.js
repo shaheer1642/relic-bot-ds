@@ -112,7 +112,7 @@ async function addStreamer(username,custom_message) {
                             }).catch(err => reject(err))
                             .then(async res => {
                                 client.channels.cache.get(res.channel_id).messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
-                                await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},${new Date().getTime()})`).catch(err => reject(err))
+                                await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,message_type,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
                             })
                         }
                         resolve(`**${username}** has now been affiliated with WarframeHub`)
@@ -330,7 +330,7 @@ async function addServerAffiliation(guildId) {
                                                     }).catch(err => reject(err))
                                                     .then(async res => {
                                                         streameraff.messages.fetch(res.id).then(msg => msg.react(emotes.notify.string).catch(err => console.log(err))).catch(err => console.log(err))
-                                                        await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,time_added) VALUES ('${row.streamer_id}',${res.id},${streameraff.id},${new Date().getTime()})`).catch(err => reject(err))
+                                                        await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,message_type,time_added) VALUES ('${row.streamer_id}',${res.id},${streameraff.id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
                                                     })
                                                 }
                                                 await streamerliveWebhook.send({
