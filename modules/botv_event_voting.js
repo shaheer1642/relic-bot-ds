@@ -55,17 +55,17 @@ async function calculate_votes(message) {
                         if (reaction.emoji.name == '5️⃣') users[message.author.id].points += 5
                     })
                 })
+                var embeds = [{
+                    description: ''
+                }]
+                for (const userId in users) {
+                    embeds[0].description += `<@${userId} (${users[userId].displayName}): ${users[userId].points} points>\n`
+                }
+                message.channel.send({
+                    content: ' ',
+                    embeds: embeds
+                }).catch(err => console.log(err))
             })
-            var embeds = [{
-                description: ''
-            }]
-            for (const userId in users) {
-                embeds[0].description += `<@${userId} (${users[userId].displayName}): ${users[userId].points} points>\n`
-            }
-            message.channel.send({
-                content: ' ',
-                embeds: embeds
-            }).catch(err => console.log(err))
         })
     } catch (e) {
         console.log(e)
