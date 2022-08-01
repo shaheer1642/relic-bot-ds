@@ -140,13 +140,17 @@ async function removeStreamer(username) {
             .then(res => {
                 if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with WarframeHub`)
                 else if (res.rowCount == 1) {
-                    db.query(`SELECT * FROM twitch_affiliate_messages WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
+                    db.query(`SELECT * FROM twitch_affiliate_messages WHERE streamer_id = '${twitchUser.id}' 
+                    JOIN twitch_affiliate_channels ON twitch_affiliate_messages.channel_id = twitch_affiliate_channels.channel_id;
+                    `).catch(err => reject(err))
                     .then(res => {
                         const messages = res.rows
                         db.query(`DELETE FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
                         .then(() => {
                             messages.forEach(message => {
-                                client.channels.cache.get(message.channel_id).messages.fetch(message.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
+                                const webhookClient = new WebhookClient({url: message.webhook_url});
+                                webhookClient.deleteMessage(message.message_id).catch(err => console.log(err))
+                                //client.channels.cache.get(message.channel_id).messages.fetch(message.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
                             })
                             resolve(`**${username}** has been unaffiliated from WarframeHub`)
                         })
@@ -169,13 +173,15 @@ async function updateAffiliations() {
         .then(res => {
             return res.rows
         })
-        const affiliate_messages = await db.query(`SELECT * FROM twitch_affiliate_messages`).catch(err => console.log(err))
+        const affiliate_messages = await db.query(`SELECT * FROM twitch_affiliate_messages JOIN twitch_affiliate_channels ON twitch_affiliate_messages.channel_id = twitch_affiliate_channels.channel_id`).catch(err => console.log(err))
         .then(res => {
             return res.rows
         })
 
         var channels_data = {}
-        channels.forEach(channel => channels_data[channel.channel_id] = channel)
+        channels.forEach(channel => {
+            channels_data[channel.channel_id] = channel
+        })
 
         var streamers_data = {}
         for (const [index,streamer] of streamers.entries()) {
@@ -283,7 +289,7 @@ async function updateAffiliations() {
 
         for (const [index,message] of affiliate_messages.entries()) {
             if (message.message_type == 'affiliate_message') {
-                const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
+                const webhookClient = new WebhookClient({url: message.webhook_url});
     
                 webhookClient.editMessage(message.message_id, {
                     content: `React with ${emotes.notify.string} to be notified when ${streamers_data[message.streamer_id].displayName} streams Warframe`,
@@ -299,7 +305,7 @@ async function updateAffiliations() {
                 }).catch(err => console.log(err))
             } else if (message.message_type == 'live_message') {
                 if (streamers_data[message.streamer_id].stream.status == 'live') {
-                    const webhookClient = new WebhookClient({url: channels_data[message.channel_id].webhook_url});
+                    const webhookClient = new WebhookClient({url: message.webhook_url});
                     webhookClient.editMessage(message.message_id, {
                         content: ' ',
                         embeds: [{
@@ -415,7 +421,7 @@ async function addServerAffiliation(guildId) {
 }
 
 function usernameValidate(str) {
-    return str.replace(/-/g,'').toLowerCase()
+    return str.replace(/-/g,'').replace(/ /g,'').toLowerCase()
 }
 
 module.exports = {
