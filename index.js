@@ -198,6 +198,7 @@ client.on('messageCreate', async message => {
         pins_handler(message)
         return
     }
+    message.author.us
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
@@ -752,6 +753,9 @@ client.on('messageCreate', async message => {
                     break
                 case 'getserverstats':
                     discord_server_modules.computeServerStats(message,args)
+                    break
+                case 'getpoints': 
+                    botv_event_voting.calculate_votes(message)
                     break
                 ///*----------------------
                 case 'test':

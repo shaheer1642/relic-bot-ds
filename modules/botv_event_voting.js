@@ -37,8 +37,38 @@ async function reaction_handler(reaction, user, action) {
     }
 }
 
+async function calculate_votes(message) {
+    var users = {}
+    client.channels.fetch('817828725701476403').catch(err => console.log(err))
+    .then(channel => {
+        channel.messages.fetch().catch(err => console.log(err))
+        .then(messages => {
+            messages.map(async (message) => {
+                if (!users[message.author.id])
+                    users[message.author.id] = {username: message.author.username, points: 0, displayName: await client.guilds.cache.get('776804537095684108').members.fetch(message.author.id).then(res => {return res.displayName})}
+                message.reactions.map(reaction => {
+                    if (reaction.name == '1️⃣') users[message.author.id].points += 1
+                    if (reaction.name == '2️⃣') users[message.author.id].points += 2
+                    if (reaction.name == '3️⃣') users[message.author.id].points += 3
+                    if (reaction.name == '4️⃣') users[message.author.id].points += 4
+                    if (reaction.name == '5️⃣') users[message.author.id].points += 5
+                })
+            })
+        })
+            message.channel.send({
+                content: ' ',
+                embeds: [{
+                    description: users.map((user,userId) => {
+                        return `<@${userId} (${user.displayName}): ${user.points} points>\n`
+                    })
+                }]
+            }).catch(err => console.log(err))
+    })
+}
+
 module.exports = {
     bot_initialize,
     message_handler,
-    reaction_handler
+    reaction_handler,
+    calculate_votes
 }
