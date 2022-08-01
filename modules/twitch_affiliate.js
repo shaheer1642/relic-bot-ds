@@ -304,25 +304,25 @@ async function updateAffiliations() {
                         content: ' ',
                         embeds: [{
                             author: {
-                                name: streamer_obj.displayName + ' is live!',
-                                url: `https://twitch.tv/${streamer_obj.username}`,
-                                icon_url: streamer_obj.avatarUrl,
+                                name: streamers_data[message.streamer_id].displayName + ' is live!',
+                                url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
+                                icon_url: streamers_data[message.streamer_id].avatarUrl,
                             },
-                            description: `[${streamer_obj.stream.title}](https://twitch.tv/${streamer_obj.username})`,
+                            description: `[${streamers_data[message.streamer_id].stream.title}](https://twitch.tv/${streamers_data[message.streamer_id].username})`,
                             fields: [{
-                                name: 'Stream started', value: `<t:${Math.round(streamer_obj.stream.startedAt / 1000)}:R>`, inline: true
+                                name: 'Stream started', value: `<t:${Math.round(streamers_data[message.streamer_id].stream.startedAt / 1000)}:R>`, inline: true
                             }, {
-                                name: 'Playing', value: streamer_obj.stream.playing, inline: true
+                                name: 'Playing', value: streamers_data[message.streamer_id].stream.playing, inline: true
                             },{
                                 name: '\u200b', value: '\u200b', inline: true
                             },{
-                                name: 'Viewers', value: streamer_obj.stream.viewCount, inline: true
+                                name: 'Viewers', value: streamers_data[message.streamer_id].stream.viewCount, inline: true
                             },{
-                                name: 'Language', value: streamer_obj.stream.lang, inline: true
+                                name: 'Language', value: streamers_data[message.streamer_id].stream.lang, inline: true
                             },{
                                 name: '\u200b', value: '\u200b', inline: true
                             },],
-                            image: {url: streamer_obj.stream.thumbnail},
+                            image: {url: streamers_data[message.streamer_id].stream.thumbnail},
                             color: '#ff0000'
                         }]
                     }).catch(err => console.log(err))
