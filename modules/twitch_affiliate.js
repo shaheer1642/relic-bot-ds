@@ -48,6 +48,7 @@ async function interaction_handler(interaction) {
                             updateAffiliations()
                         })
                     } else if (interaction.options.getSubcommand() == 'add_server') {
+                        interaction.deferUpdate().catch(err => console.log(err))
                         addServerAffiliation(interaction.guild.id).then(res => {
                             interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
@@ -55,6 +56,7 @@ async function interaction_handler(interaction) {
                         })
                         updateAffiliations()
                     } else if (interaction.options.getSubcommand() == 'remove_server') {
+                        interaction.deferUpdate().catch(err => console.log(err))
                         removeServerAffiliation(interaction.guild.id).then(res => {
                             interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
@@ -335,7 +337,7 @@ async function addServerAffiliation(guildId) {
                                                     })
                                                 }
                                                 await streamerliveWebhook.send({
-                                                    content: `Streamers currently live are be shown here`
+                                                    content: `Streamers currently live are shown here`
                                                 }).catch(err => reject(err))
                                                 resolve(`This server has now been affiliated with WarframeHub. View affiliates in <#${streameraff.id}>`)
                                             })
