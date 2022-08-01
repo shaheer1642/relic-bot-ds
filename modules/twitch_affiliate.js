@@ -279,7 +279,8 @@ async function removeServerAffiliation(guildId) {
             if (res.rowCount == 2) {
                 for (const [index,row] of res.rows.entries()) {
                     await client.channels.fetch(row.channel_id).then(async (channel) => {
-                        await channel.parent.delete().catch(err => console.log(err))
+                        if (channel.parent)
+                            await channel.parent.delete().catch(err => console.log(err))
                         await channel.delete().catch(err => console.log(err))
                     })
                 }
@@ -336,7 +337,7 @@ async function addServerAffiliation(guildId) {
                                                 await streamerliveWebhook.send({
                                                     content: `Streamers currently live are be shown here`
                                                 }).catch(err => reject(err))
-                                                resolve('This server has now been affiliated with WarframeHub')
+                                                resolve(`This server has now been affiliated with WarframeHub. View affiliates in <#${streameraff.id}>`)
                                             })
                                         })
                                     })
