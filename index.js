@@ -785,18 +785,11 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
     if (newMember.member)
         if (newMember.member.guild)
             if (trade_bot_modules.tradingBotGuilds.includes(newMember.member.guild.id)) {
-                let username = newMember.user.username;
-                if (!newMember.member.presence.status) {
-                    console.log(`User ${username} has went offline.`)
+                if (!newMember.member.presence.status || newMember.member.presence.status == 'offline') {
                     await offline_orders_update(newMember).catch(err => console.log(err))
                 }
-                else if (newMember.member.presence.status == 'offline') {
-                    console.log(`User ${username} has went offline.`)
-                    await offline_orders_update(newMember).catch(err => console.log(err))
-                }
-                else if (newMember.member.presence.status == 'online')
-                    console.log(`User ${username} has come online.`)
-                return Promise.resolve()
+                return
+
                 async function offline_orders_update(newMember) {
                     var user_data = null
                     var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${newMember.user.id}`)
@@ -928,7 +921,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     .catch(err => console.log(err))
                 }
             }
-    return Promise.resolve()
+    return
 })
 
 client.on('interactionCreate', async interaction => {

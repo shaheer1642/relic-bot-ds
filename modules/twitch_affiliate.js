@@ -48,7 +48,7 @@ async function interaction_handler(interaction) {
                             updateAffiliations()
                         })
                     } else if (interaction.options.getSubcommand() == 'add_server') {
-                        interaction.deferUpdate().catch(err => console.log(err))
+                        await interaction.deferReply().catch(err => console.log(err))
                         addServerAffiliation(interaction.guild.id).then(res => {
                             interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
@@ -56,7 +56,7 @@ async function interaction_handler(interaction) {
                         })
                         updateAffiliations()
                     } else if (interaction.options.getSubcommand() == 'remove_server') {
-                        interaction.deferUpdate().catch(err => console.log(err))
+                        await interaction.deferReply().catch(err => console.log(err))
                         removeServerAffiliation(interaction.guild.id).then(res => {
                             interaction.reply({content: res,ephemeral: true}).catch(err => console.log(err))
                         }).catch(err => {
