@@ -317,7 +317,7 @@ async function interaction_handler(interaction) {
                 // check if authorized user
                 if (authorized_userIds.includes(interaction.user.id)) {
                     if (interaction.options.getSubcommand() == 'add_streamer') {
-                        console.log('autocomplete (twitch_affiliate add_streamer)')
+                        console.log(`autocomplete (twitch_affiliate add_streamer) query: ${interaction.options.getString('country')}`)
                         const country_text = interaction.options.getString('country')
                         if (!country_text)
                             return
@@ -328,6 +328,7 @@ async function interaction_handler(interaction) {
                             if (country.name.toLowerCase().match(country_text.toLowerCase()))
                                 postdata.push({name: country.name, value: country.code})
                         }
+                        console.log(`postdata: ${JSON.stringify(postdata)}`)
                         interaction.respond(postdata).catch(err => console.log(err))
                         return
                     }
