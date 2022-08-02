@@ -559,7 +559,7 @@ async function updateAffiliations() {
                 webhookClient.editMessage(message.message_id, {
                     content: `React with ${emotes.notify.string} to be notified when ${streamers_data[message.streamer_id].displayName} streams Warframe`,
                     embeds: [{
-                        title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':(streamers_data[message.streamer_id].country_code == 'null'? '':` :flag_${streamers_data[message.streamer_id].country_code.toLowerCase()}:`)),
+                        title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':` :flag_${streamers_data[message.streamer_id].country_code.toLowerCase()}:`),
                         url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
                         thumbnail: {
                             url: streamers_data[message.streamer_id].avatarUrl
