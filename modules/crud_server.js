@@ -7,7 +7,6 @@ function message_create(message) {
             message.delete().catch(err => console.log(err))
         }, 500);
     }
-        
 }
 
 module.exports = {
