@@ -5,7 +5,7 @@ function message_create(message) {
     if (text.match(' ong ') || text.match(' ong. ') || text.match(' ong! ') || text.match(' ong') || text.match(' ong.') || text.match(' ong!') || text == 'ong' || text == 'ong.' || text == 'ong?' || text == 'ong!') {
         setTimeout(() => {
             message.delete().catch(err => console.log(err))
-        }, 1000);
+        }, 500);
     }
         
 }
