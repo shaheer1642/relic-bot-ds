@@ -323,9 +323,9 @@ async function interaction_handler(interaction) {
                             return
                         var postdata = [];
                         for (const [index,country] of countries.entries()) {
-                            if (index == 25)
+                            if (postdata.length == 25)
                                 break
-                            if (country.name.toLowerCase().match(country_text.toLowerCase()))
+                            if (country.name.toLowerCase().match(country_text.trim().toLowerCase()))
                                 postdata.push({name: country.name, value: country.code})
                         }
                         console.log(`postdata: ${JSON.stringify(postdata)}`)
