@@ -313,22 +313,22 @@ async function interaction_handler(interaction) {
             }
         }
         if (interaction.isAutocomplete()) {
-
             if (interaction.commandName == 'twitch_affiliate') {
                 // check if authorized user
                 if (authorized_userIds.includes(interaction.user.id)) {
                     if (interaction.options.getSubcommand() == 'add_streamer') {
+                        console.log('autocomplete (twitch_affiliate add_streamer)')
                         const country_text = interaction.options.getString('country')
                         if (!country_text)
                             return
-                        var postdata = []
+                        var postdata = [];
                         for (const [index,country] of countries) {
                             if (index == 25)
                                 break
-                            postdata.push({name: country.name, value: country.code})
+                            if (country.name.toLowerCase().match(country_text.toLowerCase()))
+                                postdata.push({name: country.name, value: country.code})
                         }
                         interaction.respond(postdata).catch(err => console.log(err))
-                        console.log('autocomplete (twitch_affiliate add_streamer)')
                         return
                     }
                 }
