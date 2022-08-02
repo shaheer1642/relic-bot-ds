@@ -222,6 +222,9 @@ client.on('messageCreate', async message => {
         if (message.guild.id == '967721532262580294') {
             crud_server.message_create(message)
         }
+        if (message.guild.id == '832677897411493949') {
+            crud_server.message_create(message)
+        }
 
         if (message.channelId == '817828725701476403') botv_event_voting.message_handler(message)
 
