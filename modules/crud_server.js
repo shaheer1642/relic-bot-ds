@@ -2,8 +2,12 @@ const {client} = require('./discord_client.js');
 
 function message_create(message) {
     var text = message.content.toLowerCase()
-    if (text.match(' ong ') || text.match(' ong. ') || text.match(' ong! ') || text.match(' ong') || text.match(' ong.') || text.match(' ong!') || text == 'ong' || text == 'ong.' || text == 'ong?' || text == 'ong!')
-        message.delete().catch(err => console.log(err))
+    if (text.match(' ong ') || text.match(' ong. ') || text.match(' ong! ') || text.match(' ong') || text.match(' ong.') || text.match(' ong!') || text == 'ong' || text == 'ong.' || text == 'ong?' || text == 'ong!') {
+        setTimeout(() => {
+            message.delete().catch(err => console.log(err))
+        }, 1000);
+    }
+        
 }
 
 module.exports = {
