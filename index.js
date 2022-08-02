@@ -18,6 +18,7 @@ const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
 const botv_recruit = require('./modules/botv_recruit.js');
+const crud_server = require('./modules/crud_server.js');
 const botv_event_voting = require('./modules/botv_event_voting.js');
 const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
@@ -216,6 +217,10 @@ client.on('messageCreate', async message => {
     if (message.guild) {
         if (message.guild.id==osiris_guild_id) {
             osiris_guild.messageHandler(message).catch(err => console.log(err))
+        }
+
+        if (message.guild.id == '967721532262580294') {
+            crud_server.message_create(message)
         }
 
         if (message.channelId == '817828725701476403') botv_event_voting.message_handler(message)
