@@ -1,7 +1,8 @@
 const {client} = require('./discord_client.js');
 
 function message_create(message) {
-    if (message.content.match(' ong ') || message.content.match(' ong. ') || message.content == 'ong' || message.content == 'ong.' || message.content == 'ong?')
+    var text = message.content.toLowerCase()
+    if (text.match(' ong ') || text.match(' ong. ') || text.match(' ong! ') || text.match(' ong') || text.match(' ong.') || text.match(' ong!') || text == 'ong' || text == 'ong.' || text == 'ong?' || text == 'ong!')
         message.delete().catch(err => console.log(err))
 }
 
