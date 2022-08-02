@@ -319,8 +319,6 @@ async function interaction_handler(interaction) {
                     if (interaction.options.getSubcommand() == 'add_streamer') {
                         console.log(`autocomplete (twitch_affiliate add_streamer) query: ${interaction.options.getString('country')}`)
                         const country_text = interaction.options.getString('country')
-                        if (!country_text)
-                            return
                         var postdata = [];
                         for (const [index,country] of countries.entries()) {
                             if (postdata.length == 25)
