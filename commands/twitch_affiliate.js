@@ -12,8 +12,9 @@ module.exports = {
                     .setDescription('Streamer\'s username')
                     .setRequired(true))
             .addStringOption(option =>
-                option.setName('custom_message')
-                    .setDescription('Message displayed when streamer is live'))
+                option.setName('country')
+                    .setDescription('Choose country')
+                    .setRequired(true))
         )
         .addSubcommand(subcommand =>
             subcommand.setName('remove_streamer')

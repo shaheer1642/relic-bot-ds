@@ -35,6 +35,10 @@ async function bot_initialize() {
 				if (command.commandBody.options[1].name == 'teshin')
 					commands[index].commandBody.options[1].options[0].autocomplete = true
 			}
+			if (command.commandBody.name == 'twitch_affiliate') {
+				if (command.commandBody.options[0].name == 'add_streamer')
+					commands[index].commandBody.options[0].options[1].autocomplete = true
+			}
 		}
 		//console.log(JSON.stringify(commands))
 	
