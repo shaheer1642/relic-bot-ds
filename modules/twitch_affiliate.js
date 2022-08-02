@@ -322,7 +322,7 @@ async function interaction_handler(interaction) {
                         if (!country_text)
                             return
                         var postdata = [];
-                        for (const [index,country] of countries) {
+                        for (const [index,country] of countries.entries()) {
                             if (index == 25)
                                 break
                             if (country.name.toLowerCase().match(country_text.toLowerCase()))
