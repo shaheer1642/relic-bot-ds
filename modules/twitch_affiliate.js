@@ -457,6 +457,7 @@ async function updateAffiliations() {
                     displayName: twitchUser.displayName,
                     description: twitchUser.description,
                     avatarUrl: twitchUser.profilePictureUrl,
+                    country_code: streamer.country_code,
                     stream: {},
                     old_stream_status: streamer.status
                 }
@@ -558,7 +559,7 @@ async function updateAffiliations() {
                 webhookClient.editMessage(message.message_id, {
                     content: `React with ${emotes.notify.string} to be notified when ${streamers_data[message.streamer_id].displayName} streams Warframe`,
                     embeds: [{
-                        title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':''),
+                        title: streamers_data[message.streamer_id].displayName + (streamers_data[message.streamer_id].stream.status == 'live' ? ' 🔴':`:flag_${streamers_data[message.streamer_id].country_code.toLowerCase()}:`),
                         url: `https://twitch.tv/${streamers_data[message.streamer_id].username}`,
                         thumbnail: {
                             url: streamers_data[message.streamer_id].avatarUrl
