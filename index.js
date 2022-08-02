@@ -942,6 +942,11 @@ client.on('interactionCreate', async interaction => {
         osiris_tts.interactionHandler(interaction);
         return
     }
+
+    if (interaction.commandName == 'twitch_affiliate') {
+        twitch_affiliate.interaction_handler(interaction)
+        return
+    }
     
     if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
         const discord_id = interaction.member.user.id
@@ -1683,13 +1688,9 @@ client.on('interactionCreate', async interaction => {
         }
     
         else if (interaction.commandName == 'ping') {
-            interaction.reply({content: 'Pong!', ephemeral:true})
-            .catch(err => console.log(err));
+            interaction.reply({content: 'Pong!', ephemeral:true}).catch(err => console.log(err));
         }
 
-        else if (interaction.commandName == 'twitch_affiliate') {
-            twitch_affiliate.interaction_handler(interaction)
-        }
         return
     }
     return;
