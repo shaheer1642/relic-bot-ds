@@ -222,7 +222,7 @@ async function edit_main_msg() {
     console.log(JSON.stringify(notification_options))
 
     function edit_components() {
-        channel.messages.cache.get('995482866614009876').edit({
+        channel.messages.cache.get('1004739559269085225').edit({
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
