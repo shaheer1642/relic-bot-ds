@@ -5,6 +5,8 @@ const {client} = require('./modules/discord_client.js');
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
 async function bot_initialize() {
+    if (process.env.DEBUG_MODE == 1)
+		return
 	try {
 		console.log('Registering application commands...')
 		
