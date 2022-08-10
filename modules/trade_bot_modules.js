@@ -35,7 +35,7 @@ function bot_initialize() {
         client.channels.fetch(channel_id).catch(err => console.log(err))
         .then(channel => channel.messages.fetch().catch(err => console.log(err)))
     }
-    for (const channel_id of tradingBotLichChannels.entries()) {
+    for (const [index,channel_id] of tradingBotLichChannels.entries()) {
         client.channels.fetch(channel_id).catch(err => console.log(err))
         .then(channel => channel.messages.fetch().catch(err => console.log(err)))
     }
@@ -4245,7 +4245,7 @@ async function tb_close_orders(message, interaction) {
             setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
         return
     }
-    for (const order of orders_list.entries()) {
+    for (const [index,order] of orders_list.entries()) {
         var item_id = order.item_id
         console.log(item_id)
         var item_url = ''
