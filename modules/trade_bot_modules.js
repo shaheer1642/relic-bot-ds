@@ -8,7 +8,7 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} =
 const userOrderLimit = 50
 const filledOrdersLimit = 500
 const tradingBotChannels = {
-    //'1002903198316634152': 'https://discord.com/api/webhooks/1007039028522135622/mXRTsyhJbjmLjVKOpGlFoKAbsvFxiRIlzdCYVckXt4mKmOgM4_fs6hU74TMvrsD_keG6',
+    '1002903198316634152': 'https://discord.com/api/webhooks/1007039028522135622/mXRTsyhJbjmLjVKOpGlFoKAbsvFxiRIlzdCYVckXt4mKmOgM4_fs6hU74TMvrsD_keG6',
     '892108718358007820': 'https://discord.com/api/webhooks/1007039248475619451/2V7ECVsPH747ZxB_AOi_M6ZyMDkXx3zAvthbjypvA9pjzMKDQeXMSRuyhPOuQpqh7EKu',
     '892160436881993758': 'https://discord.com/api/webhooks/1007039441577189449/S1gpg01AA76-J_FuZAHEgJhzfWVqk_KDhKAmQqQzYmlLr0FSN-AMnax-pUDJxGtAt0JI',
 }
