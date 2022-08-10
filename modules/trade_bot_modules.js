@@ -2145,7 +2145,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 
         if (wh_msg_id) {
             if (embeds.length==0) {
-                var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${msg.id} AND user_rank = '${item_rank}'`)
+                var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${wh_msg_id} AND user_rank = '${item_rank}'`)
                 .then(res => webhookClient.deleteMessage(wh_msg_id).catch(err => console.log(err)))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
             }
