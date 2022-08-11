@@ -728,9 +728,6 @@ async function edit(message,args) {
 }
 
 module.exports = {
-    trade_tut,
-    lich_tut,
-    riven_tut,
     ducat_template,
     getMessage,
     launchNuke,
