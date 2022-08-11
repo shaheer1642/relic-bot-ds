@@ -338,7 +338,7 @@ client.on('messageCreate', async message => {
                 return
             }
         }
-        if (Object.keys(tradingBotChannels).includes(message.channelId) || tradingBotLichChannels.includes(message.channelId) || tradingBotSpamChannels.includes(message.channelId)) {
+        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || trade_bot_modules.tradingBotLichChannels.includes(message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
             trade_bot_modules.message_handler(message,multiMessage)
             continue;
         }
