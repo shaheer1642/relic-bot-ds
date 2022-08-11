@@ -340,6 +340,10 @@ client.on('messageCreate', async message => {
         }
         if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || trade_bot_modules.tradingBotLichChannels.includes(message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
             trade_bot_modules.message_handler(message,multiMessage)
+            if (index == (multiMessageArr.length-1)) {
+                console.log(`All requests executed for user ${message.author.username}`)
+                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            }
             continue;
         }
         if (message.guild) {
