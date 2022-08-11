@@ -53,9 +53,8 @@ async function message_handler(message, multiMessage) {
         if (command == 'tb_tut_trade') trade_tut(message,args)
         else if (command == 'tb_tut_lich') lich_tut(message,args)
         else if (command == 'tb_tut_riven') riven_tut(message,args)
-        return
     }
-    
+
     if (Object.keys(tradingBotChannels).includes(message.channelId)) {
         var status = await tb_user_exist(message.author.id)
         .then(async res => {
