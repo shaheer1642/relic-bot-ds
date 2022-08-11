@@ -273,7 +273,7 @@ client.on('messageCreate', async message => {
     }
 
     const multiMessageArr = message.content.split('\n')
-    for (const multiMessage of multiMessageArr.entries()) {
+    for (const [index,multiMessage] of multiMessageArr.entries()) {
 
         if (!message.guild) {
             const args = multiMessage.trim().split(/ +/g)
