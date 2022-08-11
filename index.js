@@ -262,20 +262,21 @@ client.on('messageCreate', async message => {
                 else
                     console.log(`closed kekfunc`)
             }
-            return Promise.resolve()
+            return
         }
     }
 
     if (message.channel.isThread()) {
         if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channel.parentId) || trade_bot_modules.tradingBotLichChannels.includes(message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channel.parentId))
             trade_bot_modules.tb_threadHandler(message).catch(err => console.log(err))
-        return Promise.resolve()
+        return
     }
 
-    let commandsArr = message.content.split('\n')
-    for(var commandsArrIndex=0;commandsArrIndex<commandsArr.length;commandsArrIndex++) {
+    const multiMessageArr = message.content.split('\n')
+    for (const multiMessage of multiMessageArr.entries()) {
+
         if (!message.guild) {
-            const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
+            const args = multiMessage.trim().split(/ +/g)
             if ((args[0] && args[1]) && ((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
                 trade_bot_modules.trading_bot_registeration(message.author.id)
                 .then(res => message.channel.send(res).catch(err => console.log(err)))
@@ -337,311 +338,35 @@ client.on('messageCreate', async message => {
                 return
             }
         }
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId)) {
-            var status = await trade_bot_modules.tb_user_exist(message.author.id)
-            .then(async res => {
-                var status = await trade_bot_modules.tb_user_online(message)
-                .catch(err => {
-                    return false
-                })
-                if (!status)
-                    return false
-                return true
-            })
-            .catch(err => {
-                message.author.send(err).catch(err => console.log(err))
-                message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                return false
-            })
-            if (!status)
-                return
-                
-            const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
-            const command = args.shift()
-    
-            if (command.toLowerCase() == 'wts' || command.toLowerCase() == 'wtb') {
-                /*
-                if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
-                    message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return
-                }
-                */
-                if (!args[0]) {
-                    message.channel.send('⚠️ Please provide an item name ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                    continue
-                }
-                const c_args = commandsArr[commandsArrIndex].replace(command,'').toLowerCase().trim().split(/,/g)
-                for (var k=0;k<c_args.length;k++) {
-                    var func = await trade_bot_modules.trading_bot(message,c_args[k].toLowerCase().trim().split(/ +/g),command.toLowerCase()).then(() => console.log(`executed request ${commandsArr[commandsArrIndex]} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
-                }
-                console.log(`commandsArrIndex = ${commandsArrIndex}`)
-                if (commandsArrIndex == (commandsArr.length-1)) {
-                    console.log(`All requests executed for user ${message.author.username}`)
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                }
-            }
-            else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-                trade_bot_modules.tb_activate_orders(message).catch(err => console.log(err))
-                return
-            }
-            else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
-                if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
-                    var active_orders = []
-                    var status =  await db.query(`SELECT * FROM messages_ids`)
-                    .then(res => {
-                        if (res.rows.length == 0) {
-                            message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                            return false
-                        }
-                        active_orders = res.rows
-                        db.query(`DELETE FROM messages_ids`)
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-                        return false
-                    })
-                    if (!status)
-                        return Promise.resolve()
-                    var status = await db.query(`UPDATE users_orders set visibility=false`)
-                    .then(res => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-                        return false
-                    })
-                    if (!status)
-                        return Promise.resolve()
-                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg =>{
-                        return msg
-                    }).catch(err => console.log(err))
-                    
-                    for (var i=0;i<active_orders.length;i++) {
-                        var item_id = active_orders[i].item_id
-                        var c = client.channels.cache.get(active_orders[i].channel_id)
-                        var msg = c.messages.cache.get(active_orders[i].message_id)
-                        if (!msg) {
-                            var status = await c.messages.fetch(active_orders[i].message_id).then(mNew => {
-                                msg = mNew
-                                return true
-                            })
-                            .catch(err => {     //maybe message does not exist in discord anymore, so continue
-                                console.log(err)
-                                return false
-                            })
-                            if (!status)
-                                continue
-                        }
-                        msg.delete().catch(err => console.log(err))
-                    }
-                    message.delete().catch(err => console.log(err))
-                    purgeMessage.delete().catch(err => console.log(err))
-                    return Promise.resolve()
-                }
-                else {
-                    message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return Promise.resolve()
-                }
-            }
-            else if (command=='close' && (args[0]=='all')) {
-                trade_bot_modules.tb_close_orders(message).catch(err => console.log(err))
-                return
-            }
-            else {
-                message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-            }
-            continue
+        if (Object.keys(tradingBotChannels).includes(message.channelId) || tradingBotLichChannels.includes(message.channelId) || tradingBotSpamChannels.includes(message.channelId)) {
+            trade_bot_modules.message_handler(message,multiMessage)
+            continue;
         }
-        if (trade_bot_modules.tradingBotLichChannels.includes(message.channelId)) {
-            var status = await trade_bot_modules.tb_user_exist(message.author.id)
-            .then(async res => {
-                var status = await trade_bot_modules.tb_user_online(message)
-                .catch(err => {
-                    return false
-                })
-                if (!status)
-                    return false
-                return true
-            })
-            .catch(err => {
-                message.author.send(err).catch(err => console.log(err))
-                message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                return false
-            })
-            if (!status)
-                return
-
-            const args = commandsArr[commandsArrIndex].trim().split(/ +/g)
-            const command = args.shift()
-    
-            if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-                trade_bot_modules.tb_activate_lich_orders(message).catch(err => console.log(err))
-                return
-            }
-            else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
-                if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
-                    var active_orders = []
-                    var status =  await db.query(`SELECT * FROM lich_messages_ids`)
-                    .then(res => {
-                        if (res.rows.length == 0) {
-                            message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                            return false
-                        }
-                        active_orders = res.rows
-                        db.query(`DELETE FROM lich_messages_ids`).catch(err => console.log(err))
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        message.channel.send(`☠️ Error fetching active lich orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-                        return false
-                    })
-                    if (!status)
-                        return Promise.resolve()
-                    var status = await db.query(`UPDATE users_lich_orders set visibility=false`)
-                    .then(res => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        message.channel.send(`☠️ Error updating lich orders info in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                        setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
-                        return false
-                    })
-                    if (!status)
-                        return Promise.resolve()
-                    purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg => {
-                        return msg
-                    }).catch(err => console.log(err))
-                    
-                    for (var i=0;i<active_orders.length;i++) {
-                        var item_id = active_orders[i].item_id
-                        var c = client.channels.cache.get(active_orders[i].channel_id)
-                        var msg = c.messages.cache.get(active_orders[i].message_id)
-                        if (!msg) {
-                            var status = await c.messages.fetch(active_orders[i].message_id).then(mNew => {
-                                msg = mNew
-                                return true
-                            })
-                            .catch(err => {     //maybe message does not exist in discord anymore, so continue
-                                console.log(err)
-                                return false
-                            })
-                            if (!status)
-                                continue
-                        }
-                        msg.delete().catch(err => console.log(err))
-                    }
-                    message.delete().catch(err => console.log(err))
-                    purgeMessage.delete().catch(err => console.log(err))
-                    return Promise.resolve()
-                }
-                else {
-                    message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-                    return Promise.resolve()
-                }
-            }
-            else if (command=='close' && (args[0]=='all')) {
-                trade_bot_modules.tb_close_lich_orders(message).catch(err => console.log(err))
-                return
-            }
-            else {
-                message.channel.send('Invalid command. List of commands:\n`/lich`\n`my orders`\n`close all`').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
-            }
-            continue
-        }
-        if (trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
-            var status = await trade_bot_modules.tb_user_exist(message.author.id)
-            .then(async res => {
-                var status = await trade_bot_modules.tb_user_online(message)
-                .catch(err => {
-                    return false
-                })
-                if (!status)
-                    return false
-                return true
-            })
-            .catch(err => {
-                message.author.send(err).catch(err => console.log(err))
-                message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-                return false
-            })
-            if (!status)
-                return
-
-            const args = commandsArr[commandsArrIndex].trim().toLowerCase().split(/ +/g)
-            if ((args[0] == "my" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile")) || (commandsArr[commandsArrIndex] == 'profile')) {
-                trade_bot_modules.trading_bot_user_orders(message.author.id,message.author.id,1)
-                .then(res => {
-                    message.channel.send(res).catch(err => console.log(err))
-                })
-                .catch(err => console.log(err))
-            }
-            else if (args[0] == "user" && (args[1] == "orders" || args[1] == "order" || args[1] == "profile" )) {
-                var ingame_name = args[2]
-                trade_bot_modules.trading_bot_user_orders(message.author.id,ingame_name,2)
-                .then(res => {
-                    message.channel.send(res).catch(err => console.log(err))
-                })
-                .catch(err => console.log(err))
-            }
-            else if (args[0] == "orders" || args[0] == "order" || args[0] == "profile" ) {
-                var ingame_name = args[1]
-                trade_bot_modules.trading_bot_user_orders(message.author.id,ingame_name,2)
-                .then(res => {
-                    message.channel.send(res).catch(err => console.log(err))
-                })
-                .catch(err => console.log(err))
-            }
-            else if (args[0] == "wts" || args[0] == "wtb") {
-                trade_bot_modules.trading_bot_item_orders(message,args).catch(err => console.log(err))
-            }
-            else if (commandsArr[commandsArrIndex].toLowerCase() == 'leaderboard') {
-                trade_bot_modules.leaderboard(message)
-                return
-            }
-            continue
-        }
-        const args2 = commandsArr[commandsArrIndex].replace(/\./g,'').trim().split(/ +/g)
-        if (message.guild)
-            if (args2[1] && !args2[1].match(/\?/g) && !args2[1].match(':') && !(args2[1].length > 3) && (!args2[2] || args2[2]=='relic') && !args2[3])
-                switch(args2[0].toLowerCase()) {
+        if (message.guild) {
+            const args = multiMessage.replace(/\./g,'').trim().split(/ +/g)
+            if (args[1] && !args[1].match(/\?/g) && !args[1].match(':') && !(args[1].length > 3) && (!args[2] || args[2]=='relic') && !args[3]) {
+                switch(args[0].toLowerCase()) {
                     case 'lith':
-                        wfm_api.relics(message,args2)
+                        wfm_api.relics(message,args)
                         break
                     case 'meso':
-                        wfm_api.relics(message,args2)
+                        wfm_api.relics(message,args)
                         break
                     case 'neo':
-                        wfm_api.relics(message,args2)
+                        wfm_api.relics(message,args)
                         break
                     case 'axi':
-                        wfm_api.relics(message,args2)
+                        wfm_api.relics(message,args)
                         break
                 }
+            }
+        }
 
-        if (commandsArr[commandsArrIndex].indexOf(config.prefix) != 0)
+        if (multiMessage.indexOf(config.prefix) != 0)
             continue
 
         //parse arguments
-        const args = commandsArr[commandsArrIndex].slice(config.prefix.length).trim().split(/ +/g)
+        const args = multiMessage.slice(config.prefix.length).trim().split(/ +/g)
 
         //define command
         const command = args.shift().toLowerCase();
@@ -693,15 +418,6 @@ client.on('messageCreate', async message => {
                     break
                 case 'baro':
                     test_modules.baroArrival(message,args)
-                    break
-                case 'tb_tut_trade':
-                    test_modules.trade_tut(message,args)
-                    break
-                case 'tb_tut_lich':
-                    test_modules.lich_tut(message,args)
-                    break
-                case 'tb_tut_riven':
-                    test_modules.riven_tut(message,args)
                     break
                 case 'ducat_template':
                     test_modules.ducat_template(message)
@@ -779,7 +495,7 @@ client.on('messageCreate', async message => {
             }
         continue
     }
-    return Promise.resolve()
+    return
 })
 
 client.on("messageUpdate", function(oldMessage, newMessage) {

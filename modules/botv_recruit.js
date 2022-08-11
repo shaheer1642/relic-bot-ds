@@ -3,7 +3,6 @@ if (process.env.DEBUG_MODE == 1)
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
-const { ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
