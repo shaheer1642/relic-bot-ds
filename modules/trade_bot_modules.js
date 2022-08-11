@@ -92,11 +92,6 @@ async function message_handler(message, multiMessage) {
             for (var k=0;k<c_args.length;k++) {
                 var func = await trading_bot(message,c_args[k].toLowerCase().trim().split(/ +/g),command.toLowerCase()).then(() => console.log(`executed request ${multiMessage} for user ${message.author.username}`)).catch(err => console.log(`Some error occured updating order`))
             }
-            console.log(`commandsArrIndex = ${commandsArrIndex}`)
-            if (commandsArrIndex == (commandsArr.length-1)) {
-                console.log(`All requests executed for user ${message.author.username}`)
-                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-            }
         }
         else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
             tb_activate_orders(message).catch(err => console.log(err))
