@@ -4827,15 +4827,15 @@ async function lich_tut(message,args) {
                 components: [
                     {
                         type: 2,
-                        label: "Post Lich Order",
-                        style: 3,
-                        custom_id: "tb_post_lich_order"
-                    },
-                    {
-                        type: 2,
                         label: "Verify",
                         style: 1,
                         custom_id: "tb_verify"
+                    },
+                    {
+                        type: 2,
+                        label: "Post Lich Order",
+                        style: 3,
+                        custom_id: "tb_post_lich_order"
                     },
                     {
                         type: 2,
