@@ -2,9 +2,11 @@ const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./extras.js');
 
 function bot_initialize() {
+    return
     client.channels.fetch('817828725701476403').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
 }
 async function message_handler(message) {
+    return
     await message.react('1️⃣').catch(err => console.log(err))
     await message.react('2️⃣').catch(err => console.log(err))
     await message.react('3️⃣').catch(err => console.log(err))
@@ -13,6 +15,7 @@ async function message_handler(message) {
 }
 
 async function reaction_handler(reaction, user, action) {
+    return
     try {
         var reaction_list = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣']
         //console.log(reaction_list)
@@ -39,6 +42,7 @@ async function reaction_handler(reaction, user, action) {
 }
 
 async function calculate_votes(message) {
+    return
     try {
         var users = {}
         client.channels.fetch('817828725701476403').catch(err => console.log(err))
