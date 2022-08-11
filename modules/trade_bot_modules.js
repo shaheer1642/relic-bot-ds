@@ -7,8 +7,7 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} =
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
-var tradingBotChannels = {
-}
+var tradingBotChannels = {}
 const tradingBotLichChannels = ["906555131254956042", "892003772698611723","1002907923506274304"]
 const tradingBotGuilds = ["865904902941048862", "832677897411493949","730808307010240572"]
 const tradingBotSpamChannels = ["1006277986607177768", "892843163851563009","1002910542928818207"]
@@ -24,9 +23,17 @@ const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
-function bot_initialize() {
+async function bot_initialize() {
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
+    
+    await db.query(`SELECT * FROM tb_channels`).catch(err => console.log(err))
+    .then(res => {
+        res.rows.forEach(row => {
+            if (row.type == 'general_trades')
+                tradingBotChannels[row.channel_id] = row.webhook_url
+        })
+    })
 
     for (const channel_id in tradingBotChannels) {
         client.channels.fetch(channel_id).catch(err => console.log(err))
@@ -37,13 +44,6 @@ function bot_initialize() {
         .then(channel => channel.messages.fetch().catch(err => console.log(err)))
     }
 
-    db.query(`SELECT * FROM tb_channels`).catch(err => console.log(err))
-    .then(res => {
-        res.rows.forEach(row => {
-            if (row.type == 'general_trades')
-                tradingBotChannels[row.channel_id] = row.webhook_url
-        })
-    })
 }
 
 async function reaction_handler(reaction, user, action) {
