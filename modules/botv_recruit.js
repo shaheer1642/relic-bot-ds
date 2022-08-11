@@ -21,9 +21,9 @@ setInterval(() => {     // check every 5m for squads timeouts
     }).catch(err => console.log(err))
 }, 300000);
 
-function bot_initialize() {
-    client.channels.fetch('950400363410915348').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-    client.guilds.fetch('776804537095684108').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+async function bot_initialize() {
+    await client.channels.fetch('950400363410915348').then(async (channel) => await channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+    await client.guilds.fetch('776804537095684108').then(async (guild) => await guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
     edit_main_msg()
 }
 
