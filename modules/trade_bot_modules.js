@@ -3479,18 +3479,29 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
         }],
         color: tb_invisColor
     })
+    postdata.embeds.push({
+        title: 'Sell Orders',
+        fields: [{
+            name:'\u200b',value:'\u200b',inline:true
+        },{
+            name:'\u200b',value:'\u200b',inline:true
+        },{
+            name:'\u200b',value:'\u200b',inline:true
+        }],
+        color: tb_sellColor
+    })
+    postdata.embeds.push({
+        title: 'Buy Orders',
+        fields: [{
+            name:'\u200b',value:'\u200b',inline:true
+        },{
+            name:'\u200b',value:'\u200b',inline:true
+        },{
+            name:'\u200b',value:'\u200b',inline:true
+        }],
+        color: tb_buyColor
+    })
     if (sell_items.length != 0) {
-        postdata.embeds.push({
-            title: 'Sell Orders',
-            fields: [{
-                name:'\u200b',value:'\u200b',inline:true
-            },{
-                name:'\u200b',value:'\u200b',inline:true
-            },{
-                name:'\u200b',value:'\u200b',inline:true
-            }],
-            color: tb_sellColor
-        })
         //----find pad length---
         var pad = 0
         sell_items.forEach(e => {
@@ -3514,17 +3525,6 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
         })
     }
     if (buy_items.length != 0) {
-        postdata.embeds.push({
-            title: 'Buy Orders',
-            fields: [{
-                name:'\u200b',value:'\u200b',inline:true
-            },{
-                name:'\u200b',value:'\u200b',inline:true
-            },{
-                name:'\u200b',value:'\u200b',inline:true
-            }],
-            color: tb_buyColor
-        })
         //----find pad length---
         var pad = 0
         buy_items.forEach(e => {
