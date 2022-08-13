@@ -256,7 +256,7 @@ client.on('messageCreate', async message => {
     }
 
     if (message.channel.isThread()) {
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channel.parentId) || trade_bot_modules.tradingBotLichChannels.includes(message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channel.parentId))
+        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channel.parentId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channel.parentId))
             trade_bot_modules.tb_threadHandler(message).catch(err => console.log(err))
         return
     }
@@ -327,11 +327,11 @@ client.on('messageCreate', async message => {
                 return
             }
         }
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || trade_bot_modules.tradingBotLichChannels.includes(message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
+        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
             trade_bot_modules.message_handler(message,multiMessage)
             if (index == (multiMessageArr.length-1)) {
                 console.log(`All requests executed for user ${message.author.username}`)
-                if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || trade_bot_modules.tradingBotLichChannels.includes(message.channelId))
+                if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId))
                     setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
             }
             continue;
@@ -1488,7 +1488,7 @@ client.on('messageDelete', async message => {
                 return Promise.resolve()
             await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,1).catch(err => console.log(err))
         }
-        else if (trade_bot_modules.tradingBotLichChannels.includes(message.channelId)) {
+        else if (Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId)) {
             console.log(`a lich order message was deleted from the bot`)
             var lich_id = ""
             var channel_id = ""
@@ -1567,12 +1567,12 @@ client.on('messageReactionAdd', async (reaction, user) => {
         twitch_affiliate.reaction_handler(reaction,user,'add')
     }
 
-    if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channelId) || trade_bot_modules.tradingBotLichChannels.includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId)) {
+    if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId)) {
         trade_bot_modules.reaction_handler(reaction, user, 'add')
     }
 
     if (reaction.message.channel.isThread()) {
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channel.parentId) || trade_bot_modules.tradingBotLichChannels.includes(reaction.message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channel.parentId)) {
+        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channel.parentId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channel.parentId)) {
             if (reaction.message.channel.ownerId == client.user.id) {
                 if (!reaction.message.channel.archived) {
                     if (!reaction.message.author)
@@ -2321,7 +2321,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
     if (newThread.archived) {
         if (newThread.ownerId != client.user.id)
             return Promise.resolve()
-        if (!Object.keys(trade_bot_modules.tradingBotChannels).includes(newThread.parentId) && !trade_bot_modules.tradingBotLichChannels.includes(newThread.parentId) && !trade_bot_modules.tradingBotSpamChannels.includes(newThread.parentId))
+        if (!Object.keys(trade_bot_modules.tradingBotChannels).includes(newThread.parentId) && !Object.keys(trade_bot_modules.tradingBotLichChannels).includes(newThread.parentId) && !trade_bot_modules.tradingBotSpamChannels.includes(newThread.parentId))
             return Promise.resolve()
         var order_data = null
         var isLich = false
