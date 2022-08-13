@@ -3053,7 +3053,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         console.log(`editing for channel ${multiCid}`)
         var wh_msg_id = null
 
-        await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
+        var status = await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item 
                 wh_msg_id = null
