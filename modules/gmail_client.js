@@ -165,7 +165,7 @@ async function gmail_api_call(auth) {
                             })
                         }
                         if (res.rowCount == 0) {
-                            var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name) values (${xx_discord},'${temp[4]}')`).then(res => {
+                            var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${temp[4]}',${new Date().getTime()})`).then(res => {
                                 user.send('Welcome **' + temp[4] + '**! Your account has been verified.').catch(err => console.log(err + '\nError sending dm to user.'))
                                 return true
                             })
