@@ -3049,7 +3049,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     
     //update msgs
     for(const multiCid in tradingBotLichChannels) {
-        const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
+        const webhookClient = new WebhookClient({url: tradingBotLichChannels[multiCid]});
         console.log(`editing for channel ${multiCid}`)
         var wh_msg_id = null
 
