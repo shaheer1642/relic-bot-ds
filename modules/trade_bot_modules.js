@@ -3340,30 +3340,34 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
     .then(async res => {
         if (res.rows.length == 0) {
-            status_msg = `⚠️ <@${user_id}> The given user is not registered with the bot. ⚠️`
-            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${ingame_name}`)
-            .then(res => {
-                if (res.rows.length == 0)
+            if (Number(ingame_name)) {
+                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${ingame_name}`)
+                .then(res => {
+                    if (res.rows.length == 0)
+                        return false
+                    else if (res.rows.length > 1) {
+                        status_msg = `<@${user_id}> More than one search result for that id.`
+                        return false
+                    }
+                    else {
+                        discord_id = res.rows[0].discord_id
+                        ingame_name = res.rows[0].ingame_name
+                        user_profile = res.rows[0]
+                        return true
+                    }
+                }).catch (err => {
+                    console.log(err)
+                    status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500.1 ☠️`
                     return false
-                else if (res.rows.length > 1) {
-                    status_msg = `<@${user_id}> More than one search result for that id.`
-                    return false
-                }
-                else {
-                    discord_id = res.rows[0].discord_id
-                    ingame_name = res.rows[0].ingame_name
-                    user_profile = res.rows[0]
+                })
+                if (status)
                     return true
-                }
-            })
-            .catch (err => {
-                console.log(err)
-                status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500.1 ☠️`
+                status_msg = `⚠️ <@${user_id}> The given user is not registered with the bot. ⚠️`
                 return false
-            })
-            if (status)
-                return true
-            return false
+            } else {
+                status_msg = `⚠️ <@${user_id}> The given user is not registered with the bot. ⚠️`
+                return false
+            }
         }
         else if (res.rows.length > 1) {
             status_msg = `<@${user_id}> More than one search result for that username.`
