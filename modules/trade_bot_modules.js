@@ -110,7 +110,7 @@ async function message_handler(message, multiMessage) {
                         return false
                     }
                     active_orders = res.rows
-                    db.query(`DELETE FROM messages_ids`)
+                    db.query(`DELETE FROM messages_ids`).catch(err => console.log(err))
                     return true
                 })
                 .catch(err => {
@@ -3097,7 +3097,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         if (wh_msg_id) {
             if (embeds.length==0) {
                 await db.query(`DELETE FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}' AND message_id = ${wh_msg_id}`)
-                .then(res => msg.delete().catch(err => console.log(err)))
+                .then(res => webhookClient.deleteMessage(wh_msg_id).catch(err => console.log(err)))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
             }
             else {
