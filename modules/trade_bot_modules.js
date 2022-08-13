@@ -3341,7 +3341,7 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     .then(async res => {
         if (res.rows.length == 0) {
             status_msg = `⚠️ <@${user_id}> The given user is not registered with the bot. ⚠️`
-            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = '${ingame_name}'`)
+            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${ingame_name}`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
