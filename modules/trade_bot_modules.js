@@ -303,7 +303,7 @@ async function message_handler(message, multiMessage) {
             .catch(err => console.log(err))
         }
         else if (command == "user" && (args[0] == "orders" || args[0] == "order" || args[0] == "profile" )) {
-            var ingame_name = args[2]
+            var ingame_name = args[1]
             trading_bot_user_orders(message.author.id,ingame_name,2)
             .then(res => {
                 message.channel.send(res).catch(err => console.log(err))
@@ -311,7 +311,7 @@ async function message_handler(message, multiMessage) {
             .catch(err => console.log(err))
         }
         else if (command == "orders" || command == "order" || command == "profile" ) {
-            var ingame_name = args[1]
+            var ingame_name = args[0]
             trading_bot_user_orders(message.author.id,ingame_name,2)
             .then(res => {
                 message.channel.send(res).catch(err => console.log(err))
