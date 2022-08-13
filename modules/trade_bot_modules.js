@@ -2561,7 +2561,7 @@ async function trading_lich_bot(interaction) {
         return Promise.resolve()
 
     //----retrieve lich info----
-    var lich_info = []
+    var lich_info = {}
     var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
     .then(res => {
         if (res.rowCount != 1) {

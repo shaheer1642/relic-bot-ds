@@ -227,15 +227,27 @@ const colors = {
     global_upgrades: '#f00a0a',
     invasions: '#f0692b'
 }
-//----set timers----
-var baroTimer = setTimeout(baro_check,10000)
-var cyclesTimer = setTimeout(cycles_check,11000)
-var arbitrationTimer = setTimeout(arbitration_check,12000)
-var fissuresTimer = setTimeout(fissures_check,13000)
-var teshinTimer = setTimeout(teshin_check,14000)
-var alertsTimer = setTimeout(alerts_check,15000)
-var global_upgrades_timer = setTimeout(global_upgrades_check, 16000)
-var invasions_timer = setTimeout(invasions_check, 9000)
+
+var baroTimer
+var cyclesTimer
+var arbitrationTimer
+var fissuresTimer
+var teshinTimer
+var alertsTimer
+var global_upgrades_timer
+var invasions_timer
+
+function bot_initialize() {
+    //----set timers----
+    baroTimer = setTimeout(baro_check,10000)
+    cyclesTimer = setTimeout(cycles_check,11000)
+    arbitrationTimer = setTimeout(arbitration_check,12000)
+    fissuresTimer = setTimeout(fissures_check,13000)
+    teshinTimer = setTimeout(teshin_check,14000)
+    alertsTimer = setTimeout(alerts_check,15000)
+    global_upgrades_timer = setTimeout(global_upgrades_check, 16000)
+    invasions_timer = setTimeout(invasions_check, 9000)
+}
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
@@ -2958,4 +2970,4 @@ async function invasions_check() {
     })
 }
 
-module.exports = {wssetup,setupReaction};
+module.exports = {wssetup,setupReaction,bot_initialize};

@@ -101,8 +101,6 @@ const worldstatealertEmotes = [
 ]
 
 client.on('ready', () => {
-    //if (process.env.DEBUG_MODE == 1)
-    //    test_modules.riven_tut()
 
     console.log(`Bot has started.`)
     inform_dc(`Bot has started.`)
@@ -111,6 +109,8 @@ client.on('ready', () => {
 
     console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
     
+    deploy_commands.bot_initialize()
+
     if (process.env.DEBUG_MODE==1)
         return
 
@@ -187,9 +187,9 @@ client.on('ready', () => {
     botv_recruit.bot_initialize()
     osiris_tts.bot_initialize()
     wfrim.bot_initialize()
-    deploy_commands.bot_initialize()
     twitch_affiliate.bot_initialize()
     botv_event_voting.bot_initialize()
+    worldstatealerts.bot_initialize()
 })
 
 client.on('messageCreate', async message => {
@@ -200,17 +200,6 @@ client.on('messageCreate', async message => {
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
-
-    if (process.env.DEBUG_MODE==1 && message.author.id != '253525146923433984')
-        return
-        
-    if (process.env.DEBUG_MODE==2 && message.author.id == '253525146923433984') {
-        message.react('❎')
-        .then(() => {
-            setTimeout(() => message.reactions.resolve('❎').users.remove(client.user.id).catch(err => console.log(err)), 5000)
-        }).catch(err => console.log(err))
-        return
-    }
 
     if (message.guild) {
         if (message.guild.id==osiris_guild_id) {
@@ -655,11 +644,6 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 })
 
 client.on('interactionCreate', async interaction => {
-    if (process.env.DEBUG_MODE==1 && interaction.member.user.id != '253525146923433984')
-        return
-    if (process.env.DEBUG_MODE==2 && interaction.member.user.id == '253525146923433984')
-        return
-    
     if (interaction.channelId == '950400363410915348') {
         botv_recruit.interactionHandler(interaction);
         return
@@ -1574,11 +1558,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
     if (reaction.message.channel.id == '817828725701476403') botv_event_voting.reaction_handler(reaction, user, 'add')
 
-    if (process.env.DEBUG_MODE==1 && user.id != '253525146923433984')
-        return
-    if (process.env.DEBUG_MODE==2 && user.id == '253525146923433984')
-        return
-
     if (reaction.message.guildId == osiris_guild_id) {
         osiris_guild.reactionAddHandler(reaction,user).catch(err => console.log(err))
         return
@@ -2049,11 +2028,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 client.on('messageReactionRemove', async (reaction, user) => {
     if (user.bot)
-        return
-
-    if (process.env.DEBUG_MODE==1 && user.id != '253525146923433984')
-        return
-    if (process.env.DEBUG_MODE==2 && user.id == '253525146923433984')
         return
 
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier) {

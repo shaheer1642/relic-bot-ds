@@ -5,8 +5,6 @@ const {client} = require('./modules/discord_client.js');
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
 async function bot_initialize() {
-    if (process.env.DEBUG_MODE == 1)
-		return
 	try {
 		console.log('Registering application commands...')
 		
@@ -15,6 +13,24 @@ async function bot_initialize() {
 		
 		const all_guild_ids = await client.guilds.fetch().then(guilds => {return guilds.map(guild => guild.id)}).catch(err => console.log(err))
 		console.log(all_guild_ids)
+
+		if (process.env.DEBUG_MODE == 1) {
+			if (true) {
+				// delete prev registered slash commands
+				all_guild_ids.forEach(guildId => {
+					rest.get(Routes.applicationGuildCommands(client.user.id, guildId))
+					.then(data => {
+						const promises = [];
+						for (const command of data) {
+							const deleteUrl = `${Routes.applicationGuildCommands(client.user.id, guildId)}/${command.id}`;
+							promises.push(rest.delete(deleteUrl).then(res => console.log('deleted command',command.id)));
+						}
+						return Promise.all(promises);
+					});
+				})
+				return
+			}
+		}
 	
 		for (const file of commandFiles) {
 			const command = require(`./commands/${file}`);
