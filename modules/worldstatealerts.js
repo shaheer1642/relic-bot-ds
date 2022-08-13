@@ -1903,6 +1903,7 @@ async function baro_check() {
                     color: colors.baro
                 }]
                 var emb_index = 0
+                voidTrader.inventory.sort(dynamicSort("item"))
                 voidTrader.inventory.forEach((item, index) => {
                     //update db info about the item
                     db.query(`UPDATE items_list SET vault_status='B',vault_timestamp=${new Date(voidTrader.activation).getTime()} WHERE item_url='${item.item.toLowerCase().replace(/ /g,'_').replace('_(intact)','').replace(/'/g,`''`)}'`).catch(err => console.log(err))
