@@ -199,12 +199,31 @@ async function guildMemberAdd(member) {
     await member.roles.add(role1).catch(err => console.log(err))
     await member.roles.add(role2)
     .then (response => {
-        console.log(JSON.stringify(response))
         mod_log(`Assigned roles <@&${role1.id}>, <@&${role2.id}> to user <@${member.id}>`,'#FFFF00')
     }).catch(function (error) {
         console.log(`${error} Error adding role ${role2.name} for user ${member.user.username}`)
         inform_dc(`Error adding role ${role2.name} for user ${member.displayName}`)
     })
+}
+
+async function reaction_handler(reaction,user,action) {
+    if (action == 'add') {
+        if (reaction.message.channel.id == '996313144341303327') {
+            client.guilds.cache.get('776804537095684108').members.fetch(user.id)
+            .then(member => {
+                const role = member.roles.cache.find(role => role.name.toLowerCase() == 'new members')
+                if (role) {
+                    member.roles.remove(role)
+                    .then (response => {
+                        mod_log(`Removed role <@&${role.id}> from user <@${member.id}>`,'#ff0000')
+                    }).catch(function (error) {
+                        console.log(`${error} Error removing role ${role.name} from user ${member.user.username}`)
+                        inform_dc(`Error removing role ${role.name} from user ${member.displayName}`)
+                    })
+                }
+            }).catch(err => console.log(err))
+        }
+    }
 }
 
 module.exports = {
@@ -214,4 +233,5 @@ module.exports = {
     bot_initialize,
     message_handler,
     guildMemberAdd,
+    reaction_handler
 }
