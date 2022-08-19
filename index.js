@@ -1560,8 +1560,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
     if (reaction.message.guildId == osiris_guild_id) {
         osiris_guild.reactionAddHandler(reaction,user).catch(err => console.log(err))
+    }
+
+    if (reaction.message.guildId == '776804537095684108') {
+        botv.reaction_handler(reaction,user,'add')
         return
     }
+
+    user.id
 
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier) {
         twitch_affiliate.reaction_handler(reaction,user,'add')
