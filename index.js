@@ -2277,40 +2277,8 @@ client.on('guildMemberAdd', async member => {
     if (process.env.DEBUG_MODE==1)
         return
 
-    await member.fetch().catch(err => console.log(err))
-
-    if (member.guild.id == "776804537095684108" && !member.user.bot) {      //For BotV
-        const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
-        const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
-        const embed = new MessageEmbed()
-            .setFooter(member.displayName, member.user.displayAvatarURL())
-            .setColor('RANDOM')
-            .addFields({
-                name: 'Account information',
-                value: '**• ID:** ' + member.user.id + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
-                inline: true
-            },{
-                name: 'Member information',
-                value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined + `\n**• Profile:** <@${member.user.id}>`,
-                inline: true
-            })
-            .setTimestamp()
-        member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]})
-        .catch(err => {
-            console.log(err + '\nError sending member welcome message.')
-            inform_dc('Error sending member welcome message.')
-        });
-        
-        const role = member.guild.roles.cache.find(role => role.name === 'Members')
-        member.roles.add(role)
-        .then (response => {
-            console.log(JSON.stringify(response))
-            mod_log(`Assigned role <@&${role.id}> to user <@${member.id}>`,'#FFFF00')
-        })
-        .catch(function (error) {
-            console.log(`${error} Error adding role ${role.name} for user ${member.user.username}`)
-            inform_dc(`Error adding role ${role.name} for user ${member.displayName}`)
-        })
+    if (member.guild.id == "776804537095684108") {      //For BotV
+        botv.guildMemberAdd(member)
     }
 });
 

@@ -1,5 +1,5 @@
 const {client} = require('./discord_client.js');
-const { MessageAttachment, Message } = require('discord.js');
+const { MessageAttachment, Message, MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
 
@@ -169,10 +169,49 @@ async function guildMemberUpdate(oldMember, newMember) {
     }
 }
 
+async function guildMemberAdd(member) {
+    if (member.user.bot)
+        return
+    member = await member.fetch().catch(err => console.log(err))
+    const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
+    const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
+    const embed = new MessageEmbed()
+        .setFooter({text: member.displayName, iconURL: member.user.displayAvatarURL()})
+        .setColor('RANDOM')
+        .addFields({
+            name: 'Account information',
+            value: '**• ID:** ' + member.user.id + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
+            inline: true
+        },{
+            name: 'Member information',
+            value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined + `\n**• Profile:** <@${member.user.id}>`,
+            inline: true
+        })
+        .setTimestamp()
+    member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]})
+    .catch(err => {
+        console.log(err + '\nError sending member welcome message.')
+        inform_dc('Error sending member welcome message.')
+    });
+    
+    const role1 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'members')
+    const role2 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'new members')
+    await member.roles.add(role1).catch(err => console.log(err))
+    await member.roles.add(role2)
+    .then (response => {
+        console.log(JSON.stringify(response))
+        mod_log(`Assigned roles <@&${role1.id}>, <@&${role2.id}> to user <@${member.id}>`,'#FFFF00')
+    }).catch(function (error) {
+        console.log(`${error} Error adding role ${role2.name} for user ${member.user.username}`)
+        inform_dc(`Error adding role ${role2.name} for user ${member.displayName}`)
+    })
+}
+
 module.exports = {
     updateMasteryDistr,
     messageUpdate,
     guildMemberUpdate,
     bot_initialize,
-    message_handler
+    message_handler,
+    guildMemberAdd,
 }
