@@ -5,6 +5,8 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mo
 
 const admin_channelId = '870385402916249611'
 const report_channelId = '1000036014867353711'
+const masteryRolesMessageId = "892084165405716541"
+const otherRolesMessageId = "957330415734095932"
 
 function bot_initialize() {
     client.guilds.cache.get('776804537095684108').members.fetch().catch(err => console.log(err))
@@ -222,6 +224,220 @@ async function reaction_handler(reaction,user,action) {
                     })
                 }
             }).catch(err => console.log(err))
+        }
+        
+        if (reaction.message.id == masteryRolesMessageId) {
+            if (reaction.emoji.id == "892062162376327198") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 8+')
+                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
+                    .then(() => {
+                        mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                    })
+                    .catch(err => {
+                        mod_log(`Error assigning role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                        console.log(err)
+                    })
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                    user.send('Error occured adding role. Please try again.\nError Code: 500')
+                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+                })
+            }
+            else if (reaction.emoji.id == "892062164813225994") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 16+')
+                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                    user.send('Error occured adding role. Please try again.\nError Code: 500')
+                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+                })
+            }
+            else if (reaction.emoji.id == "892062164389625898") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 20+')
+                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                    user.send('Error occured adding role. Please try again.\nError Code: 500')
+                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+                })
+            }
+            else if (reaction.emoji.id == "892062165115224074") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 25+')
+                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                    user.send('Error occured adding role. Please try again.\nError Code: 500')
+                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+                })
+            }
+            else if (reaction.emoji.id == "892062165501087765") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 30+')
+                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                    user.send('Error occured adding role. Please try again.\nError Code: 500')
+                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+                })
+            }
+            else
+                reaction.users.remove(user.id);
+            updateMasteryDistr().catch(err => console.log(err))
+        }
+        if (reaction.message.id == otherRolesMessageId) {
+            if (reaction.emoji.id == "957325143699501156") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'Lost Ark')
+                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
+                    .then(() => {
+                        mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                    })
+                    .catch(err => {
+                        mod_log(`Error assigning role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
+                        console.log(err)
+                    })
+                })
+                .catch(function (error) {
+                    console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
+                    user.send('Error occured adding role. Please try again.\nError Code: 500')
+                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
+                })
+            }
+        }
+
+        if (reaction.emoji.name == "🎉") {      //removing giveaway reactions for hiatus members
+            if (!reaction.message.author)
+                var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
+            if (reaction.message.channelId != "793207311891562556")     //only giveaway channel
+                return
+            if (reaction.message.author.id != "294882584201003009")    //only for giveaway bot
+                return
+            if (!reaction.message.content.match(':yay:'))    //is giveaway hosting message
+                return
+            if (reaction.message.guild.members.cache.get(user.id).roles.cache.find(r => r.name == "On hiatus"))   //has hiatus role
+                {reaction.message.reactions.resolve("🎉").users.remove(user.id);console.log('removed giveaway reaction for hiatus member')}
+            else if (!reaction.message.guild.members.cache.get(user.id).roles.cache.find(r => r.name == "Clan Member") && !reaction.message.guild.members.cache.get(user.id).roles.cache.find(r => r.name == "Alliance"))   //does not have clan member role  
+                {reaction.message.reactions.resolve("🎉").users.remove(user.id);console.log('removed giveaway reaction for non-clan member')}
+        }
+    }
+    if (action == 'remove') {
+        if (reaction.message.id == masteryRolesMessageId) {
+            if (reaction.emoji.id == "892062162376327198") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 8+')
+                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
+                })
+                .catch(function (error) {
+                    user.send('Error occured removing role. Please try again.\nError Code: 500')
+                    inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
+                })
+            }
+            else if (reaction.emoji.id == "892062164813225994") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 16+')
+                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
+                })
+                .catch(function (error) {
+                    user.send('Error occured removing role. Please try again.\nError Code: 500')
+                    inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
+                })
+            }
+            else if (reaction.emoji.id == "892062164389625898") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 20+')
+                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
+                })
+                .catch(function (error) {
+                    user.send('Error occured removing role. Please try again.\nError Code: 500')
+                    inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
+                })
+            }
+            else if (reaction.emoji.id == "892062165115224074") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 25+')
+                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
+                })
+                .catch(function (error) {
+                    user.send('Error occured removing role. Please try again.\nError Code: 500')
+                    inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
+                })
+            }
+            else if (reaction.emoji.id == "892062165501087765") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 30+')
+                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
+                })
+                .catch(function (error) {
+                    user.send('Error occured removing role. Please try again.\nError Code: 500')
+                    inform_dc(`Error removing role ${role.name} from user ${user.username} `)
+                })
+            }
+            updateMasteryDistr().catch(err => console.log(err))
+        }
+        if (reaction.message.id == otherRolesMessageId) {
+            if (reaction.emoji.id == "957325143699501156") {
+                const role = reaction.message.guild.roles.cache.find(role => role.name === 'Lost Ark')
+                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                .then (response => {
+                    console.log(JSON.stringify(response))
+                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                    .catch(err => console.log(err))
+                    mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
+                })
+                .catch(function (error) {
+                    user.send('Error occured removing role. Please try again.\nError Code: 500')
+                    inform_dc(`Error removing role ${role.name} from user ${user.username} `) 
+                })
+            }
         }
     }
 }
