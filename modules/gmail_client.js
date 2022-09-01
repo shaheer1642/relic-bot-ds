@@ -145,7 +145,7 @@ async function gmail_api_call(auth) {
                 return part.mimeType == 'text/html';
             });
             for (var j=0; j<ids_list.length; j++) {
-                const xx_id = ids_list[j].forumns_auth_token ? ids_list[j].forumns_auth_token : ids_list[j].id
+                const xx_id = ids_list[j].forums_auth_token ? ids_list[j].forums_auth_token : ids_list[j].id
                 const xx_discord = ids_list[j].discord_id
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
