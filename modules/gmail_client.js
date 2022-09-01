@@ -147,12 +147,13 @@ async function gmail_api_call(auth) {
             for (var j=0; j<ids_list.length; j++) {
                 const xx_id = ids_list[j].forumns_auth_token ? ids_list[j].forumns_auth_token : ids_list[j].id
                 const xx_discord = ids_list[j].discord_id
+                console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
                     const user = client.users.cache.get(xx_discord)
                     await db.query(`DELETE FROM users_unverified WHERE id = '${xx_id}'`).catch(err => console.log(err))
                     const temp = res.data.snippet.split(' ')
                     //---Check if user already exists
-                    db.query(`UPDATE hubapp_users SET forums_username='${temp[4]}, forums_verified=true WHERE discord_id=${xx_discord}'`).catch(console.error)
+                    db.query(`UPDATE hubapp_users SET forums_username='${temp[4]}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
                     var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${xx_discord}`).then(async res => {
                         if (res.rowCount > 1) {
                             user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 500')
