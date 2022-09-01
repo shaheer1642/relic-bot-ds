@@ -155,35 +155,40 @@ async function gmail_api_call(auth) {
                 const xx_discord = ids_list[j].discord_id
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
-                    const user = client.users.cache.get(xx_discord)
+                    const user = await client.users.fetch(xx_discord).catch(console.error)
                     await db.query(`DELETE FROM users_unverified WHERE id = '${xx_id}'`).catch(err => console.log(err))
                     const temp = res.data.snippet.split(' ')
                     //---Check if user already exists
-                    db.query(`UPDATE hubapp_users SET forums_username='${temp[4]}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
+                    await db.query(`UPDATE hubapp_users SET forums_username='${temp[4]}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
                     var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${xx_discord}`).then(async res => {
                         if (res.rowCount > 1) {
-                            user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 500')
+                            if (user)
+                                user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 500')
                             return false
                         }
                         if (res.rowCount == 1) {
                             var status = await db.query(`UPDATE users_list SET ingame_name='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
-                                user.send('Your ign has been updated to **' + temp[4] + '**!').catch(err => console.log(err + '\nError sending dm to user.'))
+                                if (user)
+                                    user.send('Your ign has been updated to **' + temp[4] + '**!').catch(err => console.log(err + '\nError sending dm to user.'))
                                 return true
                             })
                             .catch (err => {
                                 console.log(err)
-                                user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 501').catch(err => console.log(err + '\nError sending dm to user.'))
+                                if (user)
+                                    user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 501').catch(err => console.log(err + '\nError sending dm to user.'))
                                 return false
                             })
                         }
                         if (res.rowCount == 0) {
                             var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${temp[4]}',${new Date().getTime()})`).then(res => {
-                                user.send('Welcome **' + temp[4] + '**! Your account has been verified.').catch(err => console.log(err + '\nError sending dm to user.'))
+                                if (user)
+                                    user.send('Welcome **' + temp[4] + '**! Your account has been verified.').catch(err => console.log(err + '\nError sending dm to user.'))
                                 return true
                             })
                             .catch (err => {
                                 console.log(err)
-                                user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 502').catch(err => console.log(err + '\nError sending dm to user.'))
+                                if (user)
+                                    user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 502').catch(err => console.log(err + '\nError sending dm to user.'))
                                 return false
                             })
                         }
@@ -191,7 +196,8 @@ async function gmail_api_call(auth) {
                     })
                     .catch (err => {
                         console.log(err)
-                        user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 503')
+                        if (user)
+                            user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 503')
                         .catch(err => console.log(err + '\nError sending dm to user.'))
                         return false
                     })
