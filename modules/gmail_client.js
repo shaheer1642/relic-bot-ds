@@ -115,7 +115,7 @@ async function gmail_api_call(auth) {
         }).catch(err => console.log(err))
         await db.query(`SELECT * FROM hubapp_users`)
         .then(res => {
-            ids_list = [...ids_list, res.rows]
+            ids_list = [...ids_list, ...res.rows]
         }).catch(err => console.log(err))
         console.log(ids_list)
         for(var i=0;i<msgs.data.messages.length; i++) {
