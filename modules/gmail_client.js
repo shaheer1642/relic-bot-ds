@@ -115,7 +115,12 @@ async function gmail_api_call(auth) {
         }).catch(err => console.log(err))
         await db.query(`SELECT * FROM hubapp_users`)
         .then(res => {
-            ids_list = [...ids_list, ...res.rows]
+            res.rows.forEach(row => {
+                ids_list.push({
+                    id: row.forums_auth_token,
+                    discord_id: row.discord_id
+                })
+            })
         }).catch(err => console.log(err))
         console.log(ids_list)
         for(var i=0;i<msgs.data.messages.length; i++) {
@@ -146,7 +151,7 @@ async function gmail_api_call(auth) {
                 return part.mimeType == 'text/html';
             });
             for (var j=0; j<ids_list.length; j++) {
-                const xx_id = ids_list[j].forums_auth_token ? ids_list[j].forums_auth_token : ids_list[j].id
+                const xx_id = ids_list[j].id
                 const xx_discord = ids_list[j].discord_id
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
