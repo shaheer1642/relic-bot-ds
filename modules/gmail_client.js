@@ -117,6 +117,7 @@ async function gmail_api_call(auth) {
         .then(res => {
             ids_list = [...ids_list, res.rows]
         }).catch(err => console.log(err))
+        console.log(ids_list)
         for(var i=0;i<msgs.data.messages.length; i++) {
             const msg = msgs.data.messages[i]
             //first mark msg as read
