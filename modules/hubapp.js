@@ -10,6 +10,7 @@ const channel_ids = {
 const bot_id = '891606903136862239'
 
 function message_create(message) {
+    console.log('[hubapp] message create')
     db.query(`
         INSERT INTO hub_recruitbot_squads (message_id,channel_id,category,embed,content,timestamp)
         VALUES
@@ -18,6 +19,7 @@ function message_create(message) {
 }
 
 function message_update(message) {
+    console.log('[hubapp] message update')
     db.query(`
         UPDATE hub_recruitbot_squads SET
         embed = '${JSON.stringify(message.embeds)}',
@@ -27,6 +29,7 @@ function message_update(message) {
 }
 
 function message_delete(message) {
+    console.log('[hubapp] message delete')
     db.query(`
         DELETE FROM hub_recruitbot_squads
         WHERE message_id = ${message.id}
