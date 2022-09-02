@@ -1,0 +1,42 @@
+const {db} = require('./db_connection.js');
+const {client} = require('./discord_client.js');
+
+const channel_ids = {
+    '901799370071101460': 'relics',
+    '901799369941073940': 'farming',
+    '901799369974616094': 'progression',
+    '901799369647484979': 'bosses'
+}
+const bot_id = '891606903136862239'
+
+function message_create(message) {
+    db.query(`
+        INSERT INTO hub_recruitbot_squads (message_id,channel_id,category,embed,content,timestamp)
+        VALUES
+        (${message.id},${message.channel.id},'${channel_ids[message.channel.id]}','${JSON.stringify(message.embeds)}','${message.content}',${message.createdTimestamp})
+    `).catch(console.error)
+}
+
+function message_update(message) {
+    db.query(`
+        UPDATE hub_recruitbot_squads SET
+        embed = '${JSON.stringify(message.embeds)}',
+        content = '${message.content}',
+        WHERE message_id = ${message.id}
+    `).catch(console.error)
+}
+
+function message_delete(message) {
+    db.query(`
+        DELETE FROM hub_recruitbot_squads
+        WHERE message_id = ${message.id}
+    `).catch(console.error)
+}
+
+module.exports = {
+    bot_id,
+    channel_ids,
+    message_create,
+    message_update,
+    message_delete
+}

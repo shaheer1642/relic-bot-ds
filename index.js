@@ -14,6 +14,7 @@ const {pins_handler} = require('./modules/pins_handler.js');
 const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
+const hubapp = require('./modules/hubapp.js');
 const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
@@ -196,6 +197,10 @@ client.on('messageCreate', async message => {
         pins_handler(message)
         return
     }
+
+    if (message.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(message.channel.id))
+        hubapp.message_create(message)
+
     //prevent botception
     if (message.author.bot)
         return Promise.resolve()
@@ -494,6 +499,9 @@ client.on('messageCreate', async message => {
 client.on("messageUpdate", function(oldMessage, newMessage) {
     if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
+
+    if (message.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(message.channel.id))
+        hubapp.message_create(message)
 });
 
 client.on('presenceUpdate', async (oldMember,newMember) => {
@@ -1418,8 +1426,12 @@ client.on('shardError', error => {
 });
 
 client.on('messageDelete', async message => {
+    
+    if (message.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(message.channel.id))
+        hubapp.message_create(message)
+
     if (!message.author)
-        return Promise.resolve()
+        return
 
     if (process.env.DEBUG_MODE==1)
         return
@@ -1548,7 +1560,7 @@ client.on('messageDelete', async message => {
             trade_bot_modules.trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
         }
     }
-    return Promise.resolve()
+    return
 })
 
 client.on('messageReactionAdd', async (reaction, user) => {

@@ -1,6 +1,5 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 const osiris_guild_id = '905559118096531456'
 const osiris_channels = {
     owner_chat : '905647811939426325'
