@@ -503,7 +503,7 @@ client.on("messageUpdate", async function(oldMessage, newMessage) {
     if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
 
-    if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id))
+    if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id) && !hubapp.ignore_messages_ids.includes(newMessage.id))
         hubapp.message_update(newMessage)
 });
 
