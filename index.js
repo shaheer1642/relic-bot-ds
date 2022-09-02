@@ -497,6 +497,9 @@ client.on('messageCreate', async message => {
 })
 
 client.on("messageUpdate", async function(oldMessage, newMessage) {
+    if (process.env.DEBUG_MODE==1)
+        return
+        
     if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
 
@@ -1433,14 +1436,19 @@ client.on('shardError', error => {
 
 client.on('messageDelete', async message => {
     
-    if (message.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(message.channel.id))
-        hubapp.message_delete(message)
+    if (process.env.DEBUG_MODE==1)
+        return
+
+    if (Object.keys(hubapp.channel_ids).includes(message.channel.id)) {
+        if (!message.author && !message.author.id)
+            message = await message.fetch().catch(console.error)
+        if (message.author.id == hubapp.bot_id)
+            hubapp.message_delete(message)
+    }
 
     if (!message.author)
         return
 
-    if (process.env.DEBUG_MODE==1)
-        return
 
     if (message.author.id == client.user.id) {
         if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId)) {
