@@ -500,8 +500,8 @@ client.on("messageUpdate", function(oldMessage, newMessage) {
     if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
 
-    if (message.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(message.channel.id))
-        hubapp.message_create(message)
+    if (newMessage.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(newMessage.channel.id))
+        hubapp.message_create(newMessage)
 });
 
 client.on('presenceUpdate', async (oldMember,newMember) => {
