@@ -9,6 +9,8 @@ const channel_ids = {
 }
 const bot_id = '891606903136862239'
 
+const ignore_messages_ids = ['914139916206735360']
+
 function message_create(message) {
     console.log('[hubapp] message create')
     db.query(`
@@ -39,6 +41,7 @@ function message_delete(message) {
 module.exports = {
     bot_id,
     channel_ids,
+    ignore_messages_ids,
     message_create,
     message_update,
     message_delete

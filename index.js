@@ -501,10 +501,12 @@ client.on("messageUpdate", async function(oldMessage, newMessage) {
         botv.messageUpdate(oldMessage, newMessage)
 
     if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id)) {
-        if (!newMessage.author && !newMessage.author.id)
-            newMessage = await newMessage.fetch().catch(console.error)
-        if (newMessage.author.id == hubapp.bot_id)
-            hubapp.message_update(newMessage)
+        if (!hubapp.ignore_messages_ids.includes(newMessage.id)) {
+            if (!newMessage.author && !newMessage.author.id)
+                newMessage = await newMessage.fetch().catch(console.error)
+            if (newMessage.author.id == hubapp.bot_id)
+                hubapp.message_update(newMessage)
+        }
     }
 });
 
