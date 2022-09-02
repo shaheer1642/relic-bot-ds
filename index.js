@@ -496,12 +496,16 @@ client.on('messageCreate', async message => {
     return
 })
 
-client.on("messageUpdate", function(oldMessage, newMessage) {
+client.on("messageUpdate", async function(oldMessage, newMessage) {
     if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
 
-    if (newMessage.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(newMessage.channel.id))
-        hubapp.message_update(newMessage)
+    if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id)) {
+        if (!newMessage.author && !newMessage.author.id)
+            newMessage = await newMessage.fetch().catch(console.error)
+        if (newMessage.author.id == hubapp.bot_id)
+            hubapp.message_update(newMessage)
+    }
 });
 
 client.on('presenceUpdate', async (oldMember,newMember) => {
