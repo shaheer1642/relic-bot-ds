@@ -23,7 +23,7 @@ function message_update(message) {
     db.query(`
         UPDATE hub_recruitbot_squads SET
         embed = '${JSON.stringify(message.embeds)}',
-        content = '${message.content}',
+        content = '${message.content}'
         WHERE message_id = ${message.id}
     `).catch(console.error)
 }
