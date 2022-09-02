@@ -501,7 +501,7 @@ client.on("messageUpdate", function(oldMessage, newMessage) {
         botv.messageUpdate(oldMessage, newMessage)
 
     if (newMessage.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(newMessage.channel.id))
-        hubapp.message_create(newMessage)
+        hubapp.message_update(newMessage)
 });
 
 client.on('presenceUpdate', async (oldMember,newMember) => {
@@ -1428,7 +1428,7 @@ client.on('shardError', error => {
 client.on('messageDelete', async message => {
     
     if (message.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(message.channel.id))
-        hubapp.message_create(message)
+        hubapp.message_delete(message)
 
     if (!message.author)
         return
