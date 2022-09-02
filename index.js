@@ -1441,7 +1441,7 @@ client.on('messageDelete', async message => {
 
     if (Object.keys(hubapp.channel_ids).includes(message.channel.id)) {
         if (!message.author || !message.author.id)
-            message = await message.fetch().catch(console.error)
+            message = await client.channels.cache.get(message.channel.id).messages.fetch(message.id).catch(console.error)
         if (message.author.id == hubapp.bot_id)
             hubapp.message_delete(message)
     }
