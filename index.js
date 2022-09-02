@@ -503,14 +503,8 @@ client.on("messageUpdate", async function(oldMessage, newMessage) {
     if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
 
-    if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id)) {
-        if (!hubapp.ignore_messages_ids.includes(newMessage.id)) {
-            if (!newMessage.author || !newMessage.author.id)
-                newMessage = await newMessage.fetch().catch(console.error)
-            if (newMessage.author.id == hubapp.bot_id)
-                hubapp.message_update(newMessage)
-        }
-    }
+    if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id))
+        hubapp.message_update(newMessage)
 });
 
 client.on('presenceUpdate', async (oldMember,newMember) => {
@@ -1439,16 +1433,11 @@ client.on('messageDelete', async message => {
     if (process.env.DEBUG_MODE==1)
         return
 
-    if (Object.keys(hubapp.channel_ids).includes(message.channel.id)) {
-        if (!message.author || !message.author.id)
-            message = await client.channels.cache.get(message.channel.id).messages.fetch(message.id).catch(console.error)
-        if (message.author.id == hubapp.bot_id)
-            hubapp.message_delete(message)
-    }
+    if (Object.keys(hubapp.channel_ids).includes(message.channel.id))
+        hubapp.message_delete(message)
 
     if (!message.author)
         return
-
 
     if (message.author.id == client.user.id) {
         if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId)) {
