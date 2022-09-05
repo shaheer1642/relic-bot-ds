@@ -903,10 +903,10 @@ client.on('interactionCreate', async interaction => {
         })
         if (!status)
             return Promise.resolve()
-        var q_table = 'filled_users_orders'
+        var q_table = 'tradebot_filled_users_orders'
         var q_return = 'order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp'
         if (interaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
-            var q_table = 'filled_users_lich_orders'
+            var q_table = 'tradebot_filled_users_lich_orders'
             var q_return = 'order_owner,order_filler,lich_id,element,damage,ephemera,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp'
         }
         var order_data = {}
@@ -1597,11 +1597,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             return Promise.resolve()
                         var order_data = null
                         var from_cross = false
-                        var q_filledOrderTable = 'filled_users_orders'
+                        var q_filledOrderTable = 'tradebot_filled_users_orders'
                         var q_return = 'order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp'
                         if (reaction.message.embeds[0]) {
                             if (reaction.message.embeds[0].description.match(/\*\*Trade type:\*\* Lich/)) {
-                                var q_filledOrderTable = 'filled_users_lich_orders'
+                                var q_filledOrderTable = 'tradebot_filled_users_lich_orders'
                                 var q_return = 'order_owner,order_filler,lich_id,element,damage,ephemera,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp'
                             }
                         }
@@ -1649,7 +1649,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             var q_channelId = 'cross_channel_id'
                         }
                         var suspicious = false
-                        if (q_filledOrderTable == 'filled_users_lich_orders' && order_data.user_price > 1000)
+                        if (q_filledOrderTable == 'tradebot_filled_users_lich_orders' && order_data.user_price > 1000)
                             suspicious = true
                         if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.success[0] && !suspicious) {
                             var status = await db.query(`
@@ -1695,7 +1695,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             .catch(err => console.log(err))
                             //remove order from owner profile
                             var query = `DELETE FROM tradebot_users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
-                            if (q_filledOrderTable == 'filled_users_lich_orders')
+                            if (q_filledOrderTable == 'tradebot_filled_users_lich_orders')
                                 query = `DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
                             db.query(query)
                             .then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`))
