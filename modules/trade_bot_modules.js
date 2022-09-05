@@ -3719,7 +3719,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
     var all_orders = []
     var status = await db.query(`
-    SELECT * FROM users_orders
+    SELECT * FROM tradebot_users_orders
     JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
     JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
     WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
