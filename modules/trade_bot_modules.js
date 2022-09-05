@@ -2277,7 +2277,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
     JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
     WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = 'wts' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
-    ORDER BY tradebot_users_orders.user_price ASC,users_orders.update_timestamp`)
+    ORDER BY tradebot_users_orders.user_price ASC,tradebot_users_orders.update_timestamp`)
     .then(res => {
         if (res.rows.length == 0)
             return true
@@ -2329,7 +2329,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
     JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
     WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = 'wtb' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
-    ORDER BY tradebot_users_orders.user_price DESC,users_orders.update_timestamp`)
+    ORDER BY tradebot_users_orders.user_price DESC,tradebot_users_orders.update_timestamp`)
     .then(res => {
         if (res.rows.length == 0)
             return true
@@ -2702,7 +2702,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
     JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
     WHERE tradebot_users_lich_orders.lich_id = '${lich_info.lich_id}' AND tradebot_users_lich_orders.order_type = 'wts' AND tradebot_users_lich_orders.visibility = true
-    ORDER BY tradebot_users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
+    ORDER BY tradebot_users_lich_orders.user_price ASC,tradebot_users_lich_orders.update_timestamp`)
     .then(async res => {
         if (res.rows.length != 0) {
             for (var j=0;j<res.rows.length;j++) {
@@ -2874,7 +2874,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
     JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
     WHERE tradebot_users_lich_orders.lich_id = '${lich_info.lich_id}' AND tradebot_users_lich_orders.order_type = 'wtb' AND tradebot_users_lich_orders.visibility = true
-    ORDER BY tradebot_users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
+    ORDER BY tradebot_users_lich_orders.user_price DESC,tradebot_users_lich_orders.update_timestamp`)
     .then(async res => {
         if (res.rows.length != 0) {
             for (var j=0;j<res.rows.length;j++) {
