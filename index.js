@@ -2097,9 +2097,9 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         var order_data = null
         var isLich = false
         var status = await db.query(`
-        SELECT * FROM filled_users_orders
-        JOIN items_list ON filled_users_orders.item_id = items_list.id
-        WHERE filled_users_orders.thread_id = ${newThread.id} AND filled_users_orders.channel_id = ${newThread.parentId} AND filled_users_orders.archived = false
+        SELECT * FROM tradebot_filled_users_orders
+        JOIN items_list ON tradebot_filled_users_orders.item_id = items_list.id
+        WHERE tradebot_filled_users_orders.thread_id = ${newThread.id} AND tradebot_filled_users_orders.channel_id = ${newThread.parentId} AND tradebot_filled_users_orders.archived = false
         `)
         .then(res => {
             if (res.rows.length == 0)
@@ -2113,9 +2113,9 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         })
         if (!status) {
             var status = await db.query(`
-            SELECT * FROM filled_users_lich_orders
-            JOIN lich_list ON filled_users_lich_orders.lich_id = lich_list.lich_id
-            WHERE filled_users_lich_orders.thread_id = ${newThread.id} AND filled_users_lich_orders.channel_id = ${newThread.parentId} AND filled_users_lich_orders.archived = false
+            SELECT * FROM tradebot_filled_users_lich_orders
+            JOIN lich_list ON tradebot_filled_users_lich_orders.lich_id = lich_list.lich_id
+            WHERE tradebot_filled_users_lich_orders.thread_id = ${newThread.id} AND tradebot_filled_users_lich_orders.channel_id = ${newThread.parentId} AND tradebot_filled_users_lich_orders.archived = false
             `)
             .then(res => {
                 if (res.rows.length == 0)
@@ -2226,7 +2226,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
             .then(res => {
                 client.channels.cache.get(trade_bot_modules.ordersFillLogChannel).send(postdata).then(log_message => {
                     var status = db.query(`
-                    UPDATE filled_users_lich_orders
+                    UPDATE tradebot_filled_users_lich_orders
                     SET trade_log_message = ${log_message.id}
                     WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
                     `)
@@ -2287,14 +2287,14 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                 }]
             }
             var status = await db.query(`
-            UPDATE filled_users_orders
+            UPDATE tradebot_filled_users_orders
             SET archived = true
             WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
             `)
             .then(res => {
                 client.channels.cache.get(trade_bot_modules.ordersFillLogChannel).send(postdata).then(log_message => {
                     var status = db.query(`
-                    UPDATE filled_users_orders
+                    UPDATE tradebot_filled_users_orders
                     SET trade_log_message = ${log_message.id}
                     WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
                     `).catch(err => console.log(err))

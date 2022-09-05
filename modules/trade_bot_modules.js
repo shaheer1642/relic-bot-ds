@@ -581,7 +581,7 @@ async function reaction_handler(reaction, user, action) {
                         return
                     }
                     var status = await db.query(`
-                    INSERT INTO filled_users_orders
+                    INSERT INTO tradebot_filled_users_orders
                     (thread_id,channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
                     VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                     `)
@@ -660,7 +660,7 @@ async function reaction_handler(reaction, user, action) {
                     }
                     , 900000)
                     setTimeout(() => {
-                        db.query(`SELECT * FROM filled_users_orders
+                        db.query(`SELECT * FROM tradebot_filled_users_orders
                         WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
                         `)
                         .then(foundThread => {
@@ -867,7 +867,7 @@ async function reaction_handler(reaction, user, action) {
                         return
                     }
                     var status = await db.query(`
-                    INSERT INTO filled_users_lich_orders
+                    INSERT INTO tradebot_filled_users_lich_orders
                     (thread_id,channel_id,order_owner,order_filler,lich_id,order_type,user_price,element,damage,ephemera,lich_name,lich_image_url,cross_thread_id,cross_channel_id,trade_timestamp)
                     VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].lich_id}','${order_type}',${all_orders[order_rank].user_price},'${all_orders[order_rank].element}',${all_orders[order_rank].damage},${all_orders[order_rank].ephemera},'${all_orders[order_rank].lich_name}','${all_orders[order_rank].lich_image_url}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                     `)
@@ -948,7 +948,7 @@ async function reaction_handler(reaction, user, action) {
                     }
                     , 900000)
                     setTimeout(() => {
-                        db.query(`SELECT * FROM filled_users_lich_orders
+                        db.query(`SELECT * FROM tradebot_filled_users_lich_orders
                         WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
                         `)
                         .then(foundThread => {
@@ -1207,7 +1207,7 @@ async function reaction_handler(reaction, user, action) {
                             return
                         }
                         var status = await db.query(`
-                        INSERT INTO filled_users_lich_orders
+                        INSERT INTO tradebot_filled_users_lich_orders
                         (thread_id,channel_id,order_owner,order_filler,lich_id,order_type,user_price,element,damage,ephemera,lich_name,lich_image_url,cross_thread_id,cross_channel_id,trade_timestamp)
                         VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].lich_id}','${order_type}',${all_orders[order_rank].user_price},'${all_orders[order_rank].element}',${all_orders[order_rank].damage},${all_orders[order_rank].ephemera},'${all_orders[order_rank].lich_name}','${all_orders[order_rank].lich_image_url}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                         `)
@@ -1288,7 +1288,7 @@ async function reaction_handler(reaction, user, action) {
                         }
                         , 900000)
                         setTimeout(() => {
-                            db.query(`SELECT * FROM filled_users_lich_orders
+                            db.query(`SELECT * FROM tradebot_filled_users_lich_orders
                             WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
                             `)
                             .then(foundThread => {
@@ -1535,7 +1535,7 @@ async function reaction_handler(reaction, user, action) {
                         return
                     }
                     var status = await db.query(`
-                    INSERT INTO filled_users_orders
+                    INSERT INTO tradebot_filled_users_orders
                     (thread_id,channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
                     VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                     `)
@@ -1614,7 +1614,7 @@ async function reaction_handler(reaction, user, action) {
                     }
                     , 900000)
                     setTimeout(() => {
-                        db.query(`SELECT * FROM filled_users_orders
+                        db.query(`SELECT * FROM tradebot_filled_users_orders
                         WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
                         `)
                         .then(foundThread => {
@@ -2009,7 +2009,7 @@ async function trading_bot(message,args,command) {
                             return Promise.reject()
                         }
                         var status = await db.query(`
-                        INSERT INTO filled_users_orders
+                        INSERT INTO tradebot_filled_users_orders
                         (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
                         VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},'${item_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
                         `)
@@ -2087,7 +2087,7 @@ async function trading_bot(message,args,command) {
                         }
                         , 900000)
                         setTimeout(() => {
-                            db.query(`SELECT * FROM filled_users_orders
+                            db.query(`SELECT * FROM tradebot_filled_users_orders
                             WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
                             `)
                             .then(foundThread => {
@@ -4125,7 +4125,7 @@ async function tb_threadHandler(message) {
     var from_cross = false
     var isLich = false
     var status = await db.query(`
-    SELECT * FROM filled_users_orders
+    SELECT * FROM tradebot_filled_users_orders
     WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
     `)
     .then(res => {
@@ -4140,7 +4140,7 @@ async function tb_threadHandler(message) {
     })
     if (!status) {
         var status2 = await db.query(`
-        SELECT * FROM filled_users_orders
+        SELECT * FROM tradebot_filled_users_orders
         WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
         `)
         .then(res => {
@@ -4156,7 +4156,7 @@ async function tb_threadHandler(message) {
         })
         if (!status2) {
             var status = await db.query(`
-            SELECT * FROM filled_users_lich_orders
+            SELECT * FROM tradebot_filled_users_lich_orders
             WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId} AND archived = false
             `)
             .then(res => {
@@ -4172,7 +4172,7 @@ async function tb_threadHandler(message) {
             })
             if (!status) {
                 var status2 = await db.query(`
-                SELECT * FROM filled_users_lich_orders
+                SELECT * FROM tradebot_filled_users_lich_orders
                 WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId} AND archived = false
                 `)
                 .then(res => {
