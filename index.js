@@ -278,7 +278,7 @@ client.on('messageCreate', async message => {
             }
             else if (args[0].toLowerCase() == 'notifications' || args[0].toLowerCase() == 'notification') {
                 var user_data = null
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+                var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
                 .then(res => {
                     if (res.rows.length==0) {
                         message.author.send({content: "⚠️ Your in-game name is not registered with the bot ⚠️"}).catch(err => console.log(err))
@@ -521,7 +521,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 
                 async function offline_orders_update(newMember) {
                     var user_data = null
-                    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${newMember.user.id}`)
+                    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${newMember.user.id}`)
                     .then(res => {
                         if (res.rows.length == 0) {     //user does not exist in the db
                             console.log('User does not exist in db')
@@ -540,7 +540,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                     })
                     if (!status)
                         return Promise.resolve()
-                    db.query(`SELECT * FROM users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                    db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
                     .then(res => {
                         if (res.rows.length == 0) {     //no visible orders at the time
                             console.log('No visible items orders at the time')
@@ -548,7 +548,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                         }
                         else if (res.rows.length > 0) {     //visible orders found
                             var orders_list = res.rows
-                            db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                            db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
                             .then(async res => {
                                 if (res.rowCount == 0)
                                     return
@@ -596,7 +596,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                         }
                     })
                     .catch(err => console.log(err))
-                    db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                    db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
                     .then(res => {
                         if (res.rows.length == 0) {     //no visible orders at the time
                             console.log('No visible lich orders at the time')
@@ -604,7 +604,7 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
                         }
                         else if (res.rows.length > 0) {     //visible orders found
                             var orders_list = res.rows
-                            db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
+                            db.query(`UPDATE tradebot_users_lich_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
                             .then(async res => {
                                 if (res.rowCount == 0)
                                     return
@@ -673,7 +673,7 @@ client.on('interactionCreate', async interaction => {
         const discord_id = interaction.member.user.id
         var user_profile = null
         var ingame_name = ""
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
+        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
         .then(res => {
             if (res.rows.length == 0) {
                 console.log(`User does not exist in db`)
@@ -722,7 +722,7 @@ client.on('interactionCreate', async interaction => {
             //----check if order was visible----
             var visibility = false
             var all_orders = null
-            var status = await db.query(`SELECT * FROM users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
+            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
             .then(res => {
                 all_orders = res.rows
                 if (res.rows[0])
@@ -739,7 +739,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
-            var status = await db.query(`DELETE FROM users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
+            var status = await db.query(`DELETE FROM tradebot_users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
             .then(res => {
                 return true
             })
@@ -767,7 +767,7 @@ client.on('interactionCreate', async interaction => {
         const discord_id = interaction.member.user.id
         var user_profile = null
         var ingame_name = ""
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
+        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
         .then(res => {
             if (res.rows.length == 0) {
                 console.log(`User does not exist in db`)
@@ -813,7 +813,7 @@ client.on('interactionCreate', async interaction => {
             //----check if order was visible----
             var visibility = false
             var all_orders = null
-            var status = await db.query(`SELECT * FROM users_lich_orders WHERE users_lich_orders.discord_id=${discord_id} AND users_lich_orders.lich_id='${lich_info.lich_id}'`)
+            var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE users_lich_orders.discord_id=${discord_id} AND users_lich_orders.lich_id='${lich_info.lich_id}'`)
             .then(res => {
                 all_orders = res.rows
                 if (res.rows[0])
@@ -830,7 +830,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 continue
-            var status = await db.query(`DELETE FROM users_lich_orders WHERE users_lich_orders.discord_id=${discord_id} AND users_lich_orders.lich_id='${lich_info.lich_id}'`)
+            var status = await db.query(`DELETE FROM tradebot_users_lich_orders WHERE users_lich_orders.discord_id=${discord_id} AND users_lich_orders.lich_id='${lich_info.lich_id}'`)
             .then(res => {
                 return true
             })
@@ -888,7 +888,7 @@ client.on('interactionCreate', async interaction => {
 
     else if (interaction.customId == 'staff_trade_verification' && interaction.componentType == 'SELECT_MENU') {
         await interaction.deferUpdate()
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
+        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${interaction.user.id}`)
         .then(res => {
             if (res.rows.length == 0)
                 return false
@@ -994,13 +994,13 @@ client.on('interactionCreate', async interaction => {
             //update plat balance for users
             if (order_data.order_type == 'wts') {
                 var status = db.query(`
-                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+                UPDATE tradebot_users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
                 WHERE discord_id = ${(order_data.order_owner)}
                 `)
                 .then(res => console.log(`updated plat balance for seller`))
                 .catch(err => console.log(err))
                 var status = db.query(`
-                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+                UPDATE tradebot_users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
                 WHERE discord_id = ${(order_data.order_filler)}
                 `)
                 .then(res => console.log(`updated plat balance for buyer`))
@@ -1008,13 +1008,13 @@ client.on('interactionCreate', async interaction => {
             }
             else if (order_data.order_type == 'wtb') {
                 var status = db.query(`
-                UPDATE users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+                UPDATE tradebot_users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
                 WHERE discord_id = ${(order_data.order_owner)}
                 `)
                 .then(res => console.log(`updated plat balance for buyer`))
                 .catch(err => console.log(err))
                 var status = db.query(`
-                UPDATE users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+                UPDATE tradebot_users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
                 WHERE discord_id = ${(order_data.order_filler)}
                 `)
                 .then(res => console.log(`updated plat balance for seller`))
@@ -1444,7 +1444,7 @@ client.on('messageDelete', async message => {
             console.log(`an order message was deleted from the bot`)
             var item_id = ""
             var channel_id = ""
-            var status = await db.query(`SELECT * FROM messages_ids WHERE message_id = ${message.id}`)
+            var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE message_id = ${message.id}`)
             .then(async res => {
                 if (res.rows.length==0) {
                     console.log(`no message id found in db`)
@@ -1457,7 +1457,7 @@ client.on('messageDelete', async message => {
                 else {
                     item_id = res.rows[0].item_id
                     channel_id = res.rows[0].channel_id
-                    var status = await db.query(`DELETE FROM messages_ids WHERE message_id = ${message.id}`)
+                    var status = await db.query(`DELETE FROM tradebot_messages_ids WHERE message_id = ${message.id}`)
                     .then(res => {
                         return true
                     })
@@ -1506,7 +1506,7 @@ client.on('messageDelete', async message => {
             console.log(`a lich order message was deleted from the bot`)
             var lich_id = ""
             var channel_id = ""
-            var status = await db.query(`SELECT * FROM lich_messages_ids WHERE message_id = ${message.id}`)
+            var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE message_id = ${message.id}`)
             .then(async res => {
                 if (res.rows.length==0) {
                     console.log(`no message id found in db`)
@@ -1519,7 +1519,7 @@ client.on('messageDelete', async message => {
                 else {
                     lich_id = res.rows[0].lich_id
                     channel_id = res.rows[0].channel_id
-                    var status = await db.query(`DELETE FROM lich_messages_ids WHERE message_id = ${message.id}`)
+                    var status = await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE message_id = ${message.id}`)
                     .then(res => {
                         return true
                     })
@@ -1686,17 +1686,17 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                 var q_fillerPlat = 'plat_gained'
                             }
                             db.query(`
-                            UPDATE users_list SET ${q_ownerPlat} = ${q_ownerPlat} + ${Number(order_data.user_price)}
+                            UPDATE tradebot_users_list SET ${q_ownerPlat} = ${q_ownerPlat} + ${Number(order_data.user_price)}
                             WHERE discord_id = ${(order_data.order_owner)};
-                            UPDATE users_list SET ${q_fillerPlat} = ${q_fillerPlat} + ${Number(order_data.user_price)}
+                            UPDATE tradebot_users_list SET ${q_fillerPlat} = ${q_fillerPlat} + ${Number(order_data.user_price)}
                             WHERE discord_id = ${(order_data.order_filler)};
                             `)
                             .then(res => console.log(`updated plat balance for seller and buyer`))
                             .catch(err => console.log(err))
                             //remove order from owner profile
-                            var query = `DELETE FROM users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
+                            var query = `DELETE FROM tradebot_users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
                             if (q_filledOrderTable == 'filled_users_lich_orders')
-                                query = `DELETE FROM users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
+                                query = `DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
                             db.query(query)
                             .then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`))
                             .catch(err => console.log(err))
@@ -1757,13 +1757,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     if (reaction.message.embeds[0].title == 'Notification Settings') {
                         if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
                             if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
-                                var status = await db.query(`UPDATE users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                                var status = await db.query(`UPDATE tradebot_users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
-                                var status = await db.query(`UPDATE users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                                var status = await db.query(`UPDATE tradebot_users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
-                                var status = await db.query(`UPDATE users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                                var status = await db.query(`UPDATE tradebot_users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             var user_data = null
-                            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+                            var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
                             .then(res => {
                                 if (res.rows.length==0) {
                                     message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
@@ -1935,13 +1935,13 @@ client.on('messageReactionRemove', async (reaction, user) => {
                     if (reaction.message.embeds[0].title == 'Notification Settings') {
                         if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
                             if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
-                                var status = await db.query(`UPDATE users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                                var status = await db.query(`UPDATE tradebot_users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
-                                var status = await db.query(`UPDATE users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                                var status = await db.query(`UPDATE tradebot_users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
-                                var status = await db.query(`UPDATE users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+                                var status = await db.query(`UPDATE tradebot_users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
                             var user_data = null
-                            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+                            var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
                             .then(res => {
                                 if (res.rows.length==0) {
                                     message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
@@ -2133,7 +2133,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         }
         var trader_ign = ''
         var tradee_ign = ''
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${order_data.order_owner}`)
+        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${order_data.order_owner}`)
         .then(res => {
             if (res.rows.length == 0)
                 return false
@@ -2146,7 +2146,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
         })
         if (!status)
             return Promise.resolve()
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${order_data.order_filler}`)
+        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${order_data.order_filler}`)
         .then(res => {
             if (res.rows.length == 0)
                 return false
@@ -2220,7 +2220,7 @@ client.on('threadUpdate', async (oldThread,newThread) => {
                 }]
             }
             var status = await db.query(`
-            UPDATE filled_users_lich_orders SET archived = true
+            UPDATE tradebot_filled_users_lich_orders SET archived = true
             WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
             `)
             .then(res => {

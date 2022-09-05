@@ -27,7 +27,7 @@ async function bot_initialize() {
     //----Set timeouts for orders if any----
     td_set_orders_timeouts().catch(err => console.log(err))
     
-    await db.query(`SELECT * FROM tb_channels`).catch(err => console.log(err))
+    await db.query(`SELECT * FROM tradebot_channels`).catch(err => console.log(err))
     .then(res => {
         res.rows.forEach(row => {
             if (row.type == 'general_trades')
@@ -121,7 +121,7 @@ async function message_handler(message, multiMessage) {
                 })
                 if (!status)
                     return Promise.resolve()
-                var status = await db.query(`UPDATE users_orders set visibility=false`)
+                var status = await db.query(`UPDATE tradebot_users_orders set visibility=false`)
                 .then(res => {
                     return true
                 })
@@ -221,7 +221,7 @@ async function message_handler(message, multiMessage) {
                 })
                 if (!status)
                     return Promise.resolve()
-                var status = await db.query(`UPDATE users_lich_orders set visibility=false`)
+                var status = await db.query(`UPDATE tradebot_users_lich_orders set visibility=false`)
                 .then(res => {
                     return true
                 })
@@ -348,7 +348,7 @@ async function reaction_handler(reaction, user, action) {
             var trader = {}
             trader.discord_id = null
             trader.ingame_name = null
-            var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${user.id}`)
+            var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
@@ -404,7 +404,7 @@ async function reaction_handler(reaction, user, action) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
+                var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
@@ -425,8 +425,8 @@ async function reaction_handler(reaction, user, action) {
                 console.log('break test')
                 var status = await db.query(`
                 SELECT * FROM messages_ids
-                JOIN users_orders ON messages_ids.item_id = users_orders.item_id
-                JOIN users_list ON users_orders.discord_id = users_list.discord_id
+                JOIN tradebot_users_orders ON messages_ids.item_id = users_orders.item_id
+                JOIN tradebot_users_list ON users_orders.discord_id = users_list.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
                 WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
                 ORDER BY users_list.ingame_name`)
@@ -514,7 +514,7 @@ async function reaction_handler(reaction, user, action) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
+                var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
                 .then(res => {
                     return true
                 })
@@ -564,10 +564,10 @@ async function reaction_handler(reaction, user, action) {
                         }
                     }
                     // Check if rows exceed the limit
-                    var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
+                    var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
                     .then(async res => {
                         if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                         }
                         return true
                     })
@@ -630,7 +630,7 @@ async function reaction_handler(reaction, user, action) {
                     res.send({content: ' ',embeds: [postdata]})
                     .then(open_message => {
                         var status = db.query(`
-                        UPDATE filled_users_orders set trade_open_message = ${open_message.id}
+                        UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
                         .catch(err => console.log(err))
@@ -644,7 +644,7 @@ async function reaction_handler(reaction, user, action) {
                         cross_thread.send({content: ' ',embeds: [postdata]})
                         .then(c_open_message => {
                             var status = db.query(`
-                            UPDATE filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                            UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
@@ -703,7 +703,7 @@ async function reaction_handler(reaction, user, action) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var status = await db.query(`SELECT * FROM lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
+                var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
@@ -724,8 +724,8 @@ async function reaction_handler(reaction, user, action) {
     
                 var status = await db.query(`
                 SELECT * FROM lich_messages_ids
-                JOIN users_lich_orders ON lich_messages_ids.lich_id = users_lich_orders.lich_id
-                JOIN users_list ON users_lich_orders.discord_id = users_list.discord_id
+                JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = users_lich_orders.lich_id
+                JOIN tradebot_users_list ON users_lich_orders.discord_id = users_list.discord_id
                 JOIN lich_list ON users_lich_orders.lich_id = lich_list.lich_id
                 WHERE lich_messages_ids.message_id = ${check_msg_id} AND users_lich_orders.visibility = true AND users_lich_orders.order_type = '${order_type}'
                 ORDER BY users_list.ingame_name`)
@@ -800,7 +800,7 @@ async function reaction_handler(reaction, user, action) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
+                var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
                 .then(res => {
                     return true
                 })
@@ -850,10 +850,10 @@ async function reaction_handler(reaction, user, action) {
                         }
                     }
                     // Check if rows exceed the limit
-                    var status = await db.query(`SELECT * FROM filled_users_lich_orders ORDER BY trade_timestamp`)
+                    var status = await db.query(`SELECT * FROM tradebot_filled_users_lich_orders ORDER BY trade_timestamp`)
                     .then(async res => {
                         if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                         }
                         return true
                     })
@@ -918,7 +918,7 @@ async function reaction_handler(reaction, user, action) {
                     res.send({content: ' ',embeds: [postdata]})
                     .then(open_message => {
                         var status = db.query(`
-                        UPDATE filled_users_lich_orders SET trade_open_message = ${open_message.id}
+                        UPDATE tradebot_filled_users_lich_orders SET trade_open_message = ${open_message.id}
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
                         .catch(err => console.log(err))
@@ -932,7 +932,7 @@ async function reaction_handler(reaction, user, action) {
                         cross_thread.send({content: ' ',embeds: [postdata]})
                         .then(c_open_message => {
                             var status = db.query(`
-                            UPDATE filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
+                            UPDATE tradebot_filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
@@ -1014,7 +1014,7 @@ async function reaction_handler(reaction, user, action) {
                     return Promise.resolve()
                 }
                 if (isLich) {
-                    var status = await db.query(`SELECT * FROM lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
+                    var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
                     .then(res => {
                         if (res.rows.length == 0) {
                             reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
@@ -1040,8 +1040,8 @@ async function reaction_handler(reaction, user, action) {
                     }
                     var status = await db.query(`
                     SELECT * FROM lich_messages_ids
-                    JOIN users_lich_orders ON lich_messages_ids.lich_id = users_lich_orders.lich_id
-                    JOIN users_list ON users_lich_orders.discord_id = users_list.discord_id
+                    JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = users_lich_orders.lich_id
+                    JOIN tradebot_users_list ON users_lich_orders.discord_id = users_list.discord_id
                     JOIN lich_list ON users_lich_orders.lich_id = lich_list.lich_id
                     WHERE lich_messages_ids.message_id = ${check_msg_id} AND users_lich_orders.visibility = true AND users_lich_orders.order_type = '${order_type}'
                     ORDER BY users_list.ingame_name`)
@@ -1131,7 +1131,7 @@ async function reaction_handler(reaction, user, action) {
                         setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                         return Promise.resolve()
                     }
-                    var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
+                    var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
                     .then(res => {
                         return true
                     })
@@ -1190,10 +1190,10 @@ async function reaction_handler(reaction, user, action) {
                             }
                         }
                         // Check if rows exceed the limit
-                        var status = await db.query(`SELECT * FROM filled_users_lich_orders ORDER BY trade_timestamp`)
+                        var status = await db.query(`SELECT * FROM tradebot_filled_users_lich_orders ORDER BY trade_timestamp`)
                         .then(async res => {
                             if (res.rowCount >= filledOrdersLimit) {
-                                await db.query(`DELETE FROM filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                                await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                             }
                             return true
                         })
@@ -1258,7 +1258,7 @@ async function reaction_handler(reaction, user, action) {
                         res.send({content: ' ',embeds: [postdata]})
                         .then(open_message => {
                             var status = db.query(`
-                            UPDATE filled_users_lich_orders SET trade_open_message = ${open_message.id}
+                            UPDATE tradebot_filled_users_lich_orders SET trade_open_message = ${open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
@@ -1272,7 +1272,7 @@ async function reaction_handler(reaction, user, action) {
                             cross_thread.send({content: ' ',embeds: [postdata]})
                             .then(c_open_message => {
                                 var status = db.query(`
-                                UPDATE filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
+                                UPDATE tradebot_filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
                                 WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                                 `)
                                 .catch(err => console.log(err))
@@ -1307,7 +1307,7 @@ async function reaction_handler(reaction, user, action) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return
                 }
-                var status = await db.query(`SELECT * FROM messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
+                var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
@@ -1336,8 +1336,8 @@ async function reaction_handler(reaction, user, action) {
                 console.log('break test')
                 var status = await db.query(`
                 SELECT * FROM messages_ids
-                JOIN users_orders ON messages_ids.item_id = users_orders.item_id
-                JOIN users_list ON users_orders.discord_id = users_list.discord_id
+                JOIN tradebot_users_orders ON messages_ids.item_id = users_orders.item_id
+                JOIN tradebot_users_list ON users_orders.discord_id = users_list.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
                 WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
                 ORDER BY users_list.ingame_name`)
@@ -1458,7 +1458,7 @@ async function reaction_handler(reaction, user, action) {
                     setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
                     return Promise.resolve()
                 }
-                var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
+                var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
                 .then(res => {
                     return true
                 })
@@ -1518,10 +1518,10 @@ async function reaction_handler(reaction, user, action) {
                         }
                     }
                     // Check if rows exceed the limit
-                    var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
+                    var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
                     .then(async res => {
                         if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                         }
                         return true
                     })
@@ -1584,7 +1584,7 @@ async function reaction_handler(reaction, user, action) {
                     res.send({content: ' ',embeds: [postdata]})
                     .then(open_message => {
                         var status = db.query(`
-                        UPDATE filled_users_orders set trade_open_message = ${open_message.id}
+                        UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
                         .catch(err => console.log(err))
@@ -1598,7 +1598,7 @@ async function reaction_handler(reaction, user, action) {
                         cross_thread.send({content: ' ',embeds: [postdata]})
                         .then(c_open_message => {
                             var status = db.query(`
-                            UPDATE filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                            UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(err => console.log(err))
@@ -1639,7 +1639,7 @@ async function reaction_handler(reaction, user, action) {
 
 async function check_user(message) {
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
         .then(res => {
             if (res.rowCount==0) {
                 message.channel.send(`⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`).catch(err => console.log(err))
@@ -1662,7 +1662,7 @@ async function check_user(message) {
 
 async function leaderboard(message) {
     var all_users = null
-    var status = await db.query(`SELECT * FROM users_list ORDER BY plat_gained DESC,plat_spent DESC,ingame_name`)
+    var status = await db.query(`SELECT * FROM tradebot_users_list ORDER BY plat_gained DESC,plat_spent DESC,ingame_name`)
     .then(res => {
         if (res.rows.length == 0) {
             message.channel.send('No users found in the DB currently')
@@ -1764,7 +1764,7 @@ async function trading_bot(message,args,command) {
     }
     console.log(price)
     var ingame_name = ''
-    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
     .then(res => {
         if (res.rows.length == 0)
             return false
@@ -1777,7 +1777,7 @@ async function trading_bot(message,args,command) {
         if (err.response)
             console.log(err.response.data)
         console.log(err)
-        console.log('Retrieving Database -> users_list error')
+        console.log('Retrieving Database -> tradebot_users_list error')
         message.channel.send({content: "Some error occured retrieving database info.\nError code: 500"})
         return false
     })
@@ -1885,8 +1885,8 @@ async function trading_bot(message,args,command) {
             if (command == 'wts') {
                 //----check if wts price is lower than active buy order
                 var status = await db.query(`
-                SELECT * FROM users_orders 
-                JOIN users_list ON users_list.discord_id = users_orders.discord_id
+                SELECT * FROM tradebot_users_orders 
+                JOIN tradebot_users_list ON users_list.discord_id = users_orders.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
                 WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wtb' AND users_orders.user_rank = '${item_rank}'
                 ORDER BY users_orders.user_price DESC, users_orders.update_timestamp`)
@@ -1916,8 +1916,8 @@ async function trading_bot(message,args,command) {
                 //----check if wtb price is higher than active sell order
                 var all_orders = null
                 var status = await db.query(`
-                SELECT * FROM users_orders 
-                JOIN users_list ON users_list.discord_id = users_orders.discord_id
+                SELECT * FROM tradebot_users_orders 
+                JOIN tradebot_users_list ON users_list.discord_id = users_orders.discord_id
                 JOIN items_list ON users_orders.item_id = items_list.id
                 WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wts' AND users_orders.user_rank = '${item_rank}'
                 ORDER BY users_orders.user_price, users_orders.update_timestamp`)
@@ -1946,7 +1946,7 @@ async function trading_bot(message,args,command) {
             if (open_trade) {
                 console.log(all_orders)
                 if (trader.discord_id != tradee.discord_id) {
-                    var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}' AND user_rank = '${item_rank}'`)
+                    var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}' AND user_rank = '${item_rank}'`)
                     .then(res => {
                         return true
                     })
@@ -1993,10 +1993,10 @@ async function trading_bot(message,args,command) {
                             }
                         }
                         // Check if rows exceed the limit
-                        var status = await db.query(`SELECT * FROM filled_users_orders ORDER BY trade_timestamp`)
+                        var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
                         .then(async res => {
                             if (res.rowCount >= filledOrdersLimit) {
-                                await db.query(`DELETE FROM filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                                await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
                             }
                             return true
                         })
@@ -2057,7 +2057,7 @@ async function trading_bot(message,args,command) {
                         res.send({content: ' ',embeds: [postdata]})
                         .then(open_message => {
                             var status = db.query(`
-                            UPDATE filled_users_orders set trade_open_message = ${open_message.id}
+                            UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
                             `)
                             .catch(err => console.log(err))
@@ -2071,7 +2071,7 @@ async function trading_bot(message,args,command) {
                             cross_thread.send({content: ' ',embeds: [postdata]})
                             .then(c_open_message => {
                                 var status = db.query(`
-                                UPDATE filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                                UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
                                 WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
                                 `)
                                 .catch(err => console.log(err))
@@ -2109,7 +2109,7 @@ async function trading_bot(message,args,command) {
         }
     }
     if (list_low) {
-        var status = await db.query(`SELECT * FROM users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}' AND user_rank = '${item_rank}'`)
+        var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}' AND user_rank = '${item_rank}'`)
         .then(res => {
             var all_orders = res.rows
             if (res.rows.length > 0) {
@@ -2175,11 +2175,11 @@ async function trading_bot(message,args,command) {
         return Promise.reject()
     }
     //----verify order in DB----
-    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+    var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
             //Check if user has more than limited orders
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id}`)
+            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id}`)
             .then(res => {
                 if (res.rowCount >= userOrderLimit) {
                     message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
@@ -2194,7 +2194,7 @@ async function trading_bot(message,args,command) {
             })
             if (!status)
                 return false
-            var status = await db.query(`INSERT INTO users_orders (discord_id,item_id,order_type,user_price,user_rank,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},'${item_rank}',true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
+            var status = await db.query(`INSERT INTO tradebot_users_orders (discord_id,item_id,order_type,user_price,user_rank,visibility,origin_channel_id,origin_guild_id,update_timestamp) VALUES (${originMessage.author.id},'${item_id}','${command}',${price},'${item_rank}',true,${originMessage.channel.id},${originMessage.guild.id},${new Date().getTime()})`)
             .then(res => {
                 return true
             })
@@ -2215,7 +2215,7 @@ async function trading_bot(message,args,command) {
             return false
         }
         else {     //----update existing order in DB----
-            var status = await db.query(`UPDATE users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+            var status = await db.query(`UPDATE tradebot_users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
             .then(res => {
                 return true
             })
@@ -2246,7 +2246,7 @@ async function trading_bot(message,args,command) {
     const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
     .then(res => {
         var user_order = null
-        db.query(`SELECT * FROM users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
+        db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
         .then(res => {
             if (res.rows.length == 0)
                 return false 
@@ -2273,8 +2273,8 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 
     //----construct embed----
     var status = await db.query(`
-    SELECT * FROM users_orders 
-    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    SELECT * FROM tradebot_users_orders 
+    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
     JOIN items_list ON users_orders.item_id=items_list.id 
     WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true AND user_rank = '${item_rank}'
     ORDER BY users_orders.user_price ASC,users_orders.update_timestamp`)
@@ -2325,8 +2325,8 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     if (!status)
         return Promise.reject()
     var status = await db.query(`
-    SELECT * FROM users_orders 
-    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    SELECT * FROM tradebot_users_orders 
+    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
     JOIN items_list ON users_orders.item_id=items_list.id 
     WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true AND user_rank = '${item_rank}'
     ORDER BY users_orders.user_price DESC,users_orders.update_timestamp`)
@@ -2388,7 +2388,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         console.log(`editing for channel ${multiCid}`)
         var wh_msg_id = null
 
-        var status = await db.query(`SELECT * FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+        var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item 
                 wh_msg_id = null
@@ -2410,7 +2410,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                         return true
                     })
                     .catch(async err => {     //maybe message does not exist in discord anymore
-                        await db.query(`DELETE FROM messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid} AND user_rank = '${item_rank}'`).catch(err => console.log(err))
+                        await db.query(`DELETE FROM tradebot_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid} AND user_rank = '${item_rank}'`).catch(err => console.log(err))
                         wh_msg_id = null
                         console.log(err)
                         return true
@@ -2433,7 +2433,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 
         if (wh_msg_id) {
             if (embeds.length==0) {
-                var status = await db.query(`DELETE FROM messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${wh_msg_id} AND user_rank = '${item_rank}'`)
+                var status = await db.query(`DELETE FROM tradebot_messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${wh_msg_id} AND user_rank = '${item_rank}'`)
                 .then(res => webhookClient.deleteMessage(wh_msg_id).catch(err => console.log(err)))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
             }
@@ -2468,7 +2468,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             await webhookClient.send({content: ' ', embeds: embeds})
             .then(async wh_msg => {
                 const cl_msg = client.channels.cache.get(wh_msg.channel_id).messages.cache.get(wh_msg.id)
-                var status = await db.query(`INSERT INTO messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${wh_msg.id},'${item_rank}')`)
+                var status = await db.query(`INSERT INTO tradebot_messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${wh_msg.id},'${item_rank}')`)
                 .then(res => {
                     return true
                 })
@@ -2478,7 +2478,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     return false
                 })
                 if (!status) {
-                    var status = db.query(`SELECT * from messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+                    var status = db.query(`SELECT * from tradebot_messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
                     .then(async res => {
                         if (res.rows.length == 0) {
                             if (originMessage) {
@@ -2536,7 +2536,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
 
 async function trading_lich_bot(interaction) {
     var ingame_name = ''
-    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${interaction.user.id}`)
+    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${interaction.user.id}`)
     .then(res => {
         if (res.rows.length == 0)
             return 0
@@ -2546,7 +2546,7 @@ async function trading_lich_bot(interaction) {
         }
     })
     .catch(err => {
-        console.log(err + 'Retrieving Database -> users_list error')
+        console.log(err + 'Retrieving Database -> tradebot_users_list error')
         interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(err => console.log(err))
         return 2
     })
@@ -2583,18 +2583,18 @@ async function trading_lich_bot(interaction) {
     if (interaction.options.getString('name'))
         q_lichName = interaction.options.getString('name')
     //----verify order in DB----
-    await db.query(`DELETE FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(err => console.log(err))
-    var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
+    await db.query(`DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(err => console.log(err))
+    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
             //Check if user has more than limited orders
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${interaction.user.id}`)
+            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${interaction.user.id}`)
             .then(async tab1 => {
                 if (tab1.rowCount >= userOrderLimit) {
                     interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
                     return false
                 }
-                var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id}`)
+                var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id}`)
                 .then(tab2 => {
                     if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
                         interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
@@ -2617,7 +2617,7 @@ async function trading_lich_bot(interaction) {
             })
             if (!status)
                 return false
-            var status = await db.query(`INSERT INTO users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
+            var status = await db.query(`INSERT INTO tradebot_users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
                 ${interaction.user.id},
                 '${lich_info.lich_id}',
                 '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
@@ -2673,7 +2673,7 @@ async function trading_lich_bot(interaction) {
     await trading_lich_orders_update(interaction, lich_info, 1)
     .then(res => {
         var user_order = null
-        db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
+        db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
         .then(res => {
             if (res.rows.length == 0)
                 return false 
@@ -2698,8 +2698,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     var noOfBuyers = 0
     //----construct embed----
     await db.query(`
-    SELECT * FROM users_lich_orders 
-    JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+    SELECT * FROM tradebot_users_lich_orders 
+    JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
     JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
     WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
     ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
@@ -2852,7 +2852,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                                 attachment_url = attachment.url
                             })
                         }).catch(err => console.log(err))
-                        await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                        await db.query(`UPDATE tradebot_users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
                     }
                     
                     embed.image.url = attachment_url
@@ -2870,8 +2870,8 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         return Promise.reject()
     })
     await db.query(`
-    SELECT * FROM users_lich_orders 
-    JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+    SELECT * FROM tradebot_users_lich_orders 
+    JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
     JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
     WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
     ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
@@ -3022,7 +3022,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                                 attachment_url = attachment.url
                             })
                         }).catch(err => console.log(err))
-                        await db.query(`UPDATE users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                        await db.query(`UPDATE tradebot_users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
                     }
                     
                     embed.image.url = attachment_url
@@ -3053,7 +3053,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         console.log(`editing for channel ${multiCid}`)
         var wh_msg_id = null
 
-        var status = await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
+        var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
         .then(async res => {
             if (res.rows.length == 0) {  //no message for this item 
                 wh_msg_id = null
@@ -3073,7 +3073,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         return true
                     })
                     .catch(async err => {     //maybe message does not exist in discord anymore
-                        await db.query(`DELETE FROM lich_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
+                        await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
                         wh_msg_id = null
                         console.log(err)
                         return true
@@ -3096,7 +3096,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
 
         if (wh_msg_id) {
             if (embeds.length==0) {
-                await db.query(`DELETE FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}' AND message_id = ${wh_msg_id}`)
+                await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}' AND message_id = ${wh_msg_id}`)
                 .then(res => webhookClient.deleteMessage(wh_msg_id).catch(err => console.log(err)))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
             }
@@ -3129,7 +3129,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             await webhookClient.send({content: ' ', embeds: embeds})
             .then(async wh_msg => {
                 const cl_msg = client.channels.cache.get(wh_msg.channel_id).messages.cache.get(wh_msg.id)
-                var status = await db.query(`INSERT INTO lich_messages_ids (channel_id,lich_id,message_id) VALUES (${multiCid},'${lich_info.lich_id}',${wh_msg.id})`)
+                var status = await db.query(`INSERT INTO tradebot_lich_messages_ids (channel_id,lich_id,message_id) VALUES (${multiCid},'${lich_info.lich_id}',${wh_msg.id})`)
                 .then(res => {
                     return true
                 })
@@ -3139,7 +3139,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     return false
                 })
                 if (!status) {
-                    var status = db.query(`SELECT * from lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
+                    var status = db.query(`SELECT * from tradebot_lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
                     .then(async res => {
                         if (res.rows.length == 0) {
                             if (interaction)
@@ -3191,143 +3191,6 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             })
         }
     }
-    /*
-    for(const multiCid in tradingBotLichChannels) {
-        console.log(`editing for channel ${multiCid}`)
-        var msg = null
-
-        await db.query(`SELECT * FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
-        .then(async res => {
-            if (res.rows.length == 0) {  //no message for this item
-                msg = null
-            }
-            else if (res.rows.length > 1) {
-                console.log(`Detected more than one message for lich ${lich_info.weapon_url} in channel ${multiCid}`)
-                if (interaction)
-                    interaction.reply({content: `☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
-                return Promise.reject()
-            }
-            else {
-                var c = client.channels.cache.get(multiCid)
-                var m = c.messages.cache.get(res.rows[0].message_id)
-                if (!m) {
-                    await c.messages.fetch(res.rows[0].message_id).then(mNew => {
-                        msg = mNew
-                    })
-                    .catch(async err => {     //maybe message does not exist in discord anymore
-                        console.log(err)
-                        await db.query(`DELETE FROM lich_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
-                        msg = null
-                    })
-                }
-                else
-                    msg = m
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            return Promise.reject()
-        })
-        if (msg) {
-            if (embeds.length==0) {
-                await db.query(`DELETE FROM lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}' AND message_id = ${msg.id}`)
-                .then(res => msg.delete().catch(err => console.log(err)))
-                .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
-            }
-            else {
-                var status = msg.edit({content: ' ',embeds: embeds})
-                .then(msg => {
-                    msg.reactions.removeAll()
-                    .then(() => {
-                        for (var i=0;i<noOfSellers;i++) {
-                            msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
-                        }
-                        for (var i=0;i<noOfBuyers;i++) {
-                            msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
-                        }
-                    })
-                    .catch(err => console.log(err))
-                    return true
-                })
-                .catch(err => {
-                    if (interaction)
-                        interaction.reply({content: `☠️ Error editing existing orders in channel <#${multiCid}>.\nError code: 505\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
-                    console.log(err)
-                    return false
-                })
-                if (!status)
-                    return Promise.reject()
-            }
-        }
-        else {
-            if (update_type != 1)
-                continue
-            if (embeds.length == 0)
-                return Promise.reject()
-            await client.channels.cache.get(multiCid).send({content: ' ', embeds: embeds})
-            .then(async msg => {
-                var status = await db.query(`INSERT INTO lich_messages_ids (channel_id,lich_id,message_id) VALUES (${multiCid},'${lich_info.lich_id}',${msg.id})`)
-                .then(res => {
-                    if (res.rowCount != 1) {
-                        setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
-                        return Promise.reject('Unexpected error inserting message id into db during lich command')
-                    }
-                    msg.reactions.removeAll()
-                    .then(() => {
-                        for (var i=0;i<noOfSellers;i++) {
-                            msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
-                        }
-                        for (var i=0;i<noOfBuyers;i++) {
-                            msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
-                        }
-                    }).catch(err => console.log(err))
-                })
-                .catch(async err => {     //might be a dublicate message
-                    console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${lich_info.lich_id}`)
-                    setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)
-                    await db.query(`SELECT * from lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}'`)
-                    .then(async res => {
-                        if (res.rows.length == 0) {
-                            if (interaction)
-                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
-                            return Promise.reject()
-                        }
-                        var msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
-                        await msg.edit({content: ' ', embeds: embeds}).then(async () => {
-                            msg.reactions.removeAll()
-                            .then(() => {
-                                for (var i=0;i<noOfSellers;i++) {
-                                    msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
-                                }
-                                for (var i=0;i<noOfBuyers;i++) {
-                                    msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
-                                }
-                            }).catch(err => console.log(err))
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            if (interaction)
-                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
-                            return Promise.reject()
-                        })
-                    }).catch(err => {
-                        if (interaction)
-                            interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
-                        console.log(err)
-                        return Promise.reject()
-                    })
-                })
-            })
-            .catch(err => {
-                console.log(err)
-                if (interaction) {
-                    interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
-                }
-                return Promise.reject()
-            })
-        }
-    }
-    */
     console.log(`edited for all channels, returning`)
     return Promise.resolve()
 }
@@ -3337,11 +3200,11 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     var user_profile = {}
     var discord_id = ""
     var status_msg = ""
-    var status = await db.query(`SELECT * FROM users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
+    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE LOWER(ingame_name) = '${ingame_name.toLowerCase()}'`)
     .then(async res => {
         if (res.rows.length == 0) {
             if (Number(ingame_name)) {
-                var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${ingame_name}`)
+                var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${ingame_name}`)
                 .then(res => {
                     if (res.rows.length == 0)
                         return false
@@ -3389,9 +3252,9 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
         return {content: status_msg, ephemeral: true}
     var item_orders = null
     var lich_orders = null
-    var status = await db.query(`SELECT * FROM users_orders 
+    var status = await db.query(`SELECT * FROM tradebot_users_orders 
     JOIN items_list ON users_orders.item_id=items_list.id 
-    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
     WHERE users_orders.discord_id = ${discord_id}`)
     .then(res => {
         item_orders = res.rows
@@ -3403,9 +3266,9 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     })
     if (!status)
         return {content: 'Error occured retrieving db records'}
-    var status = await db.query(`SELECT * FROM users_lich_orders 
+    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders 
     JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-    JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+    JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
     WHERE users_lich_orders.discord_id = ${discord_id}`)
     .then(res => {
         lich_orders = res.rows
@@ -3584,7 +3447,7 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
 async function trading_bot_item_orders(message,args,request_type = 1) {
     if (request_type == 1) {
         var ingame_name = ""
-        var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
         .then(res => {
             if (res.rows.length==0) {
                 status_message = `⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`
@@ -3704,7 +3567,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         var status = await db.query(`
         SELECT * FROM users_lich_orders
         JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-        JOIN users_list ON users_lich_orders.discord_id=users_list.discord_id 
+        JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
         WHERE users_lich_orders.lich_id = '${lich_id}' AND users_lich_orders.order_type = '${order_type}'
         ORDER BY users_lich_orders.update_timestamp
         `)
@@ -3858,7 +3721,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     var status = await db.query(`
     SELECT * FROM users_orders
     JOIN items_list ON users_orders.item_id=items_list.id 
-    JOIN users_list ON users_orders.discord_id=users_list.discord_id 
+    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
     WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
     ORDER BY users_orders.update_timestamp
     `)
@@ -3987,13 +3850,13 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
 async function trading_bot_registeration(discord_id) {
     return new Promise((resolve, reject) => {
         var postdata = {content: ' ', embeds: [], ephemeral: true}
-        db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`).then(res => {
+        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`).then(res => {
             if (res.rows.length != 0)
                 postdata.content += 'Note: Your ign has already been verified. It will be updated upon re-verification\n'
             const uni_id = generateId()
-            db.query(`DELETE FROM users_unverified where discord_id = ${discord_id}`)
+            db.query(`DELETE FROM tradebot_users_unverified where discord_id = ${discord_id}`)
             .then(() => {
-                db.query(`INSERT INTO users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
+                db.query(`INSERT INTO tradebot_users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
                 .then(res => {
                     postdata.content += 
 `**Please follow these steps to verify your account:**
@@ -4030,7 +3893,7 @@ Message: Hi
 
 async function td_set_orders_timeouts() {
     var all_orders = null
-    var status = await db.query(`SELECT * FROM users_orders WHERE visibility = true`)
+    var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE visibility = true`)
     .then(res => {
         if (res.rows.length == 0)
             return false 
@@ -4049,7 +3912,7 @@ async function td_set_orders_timeouts() {
             set_order_timeout(all_orders[i],after3h,currTime)
         }
     }
-    var status = await db.query(`SELECT * FROM users_lich_orders WHERE visibility = true`)
+    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE visibility = true`)
     .then(res => {
         if (res.rows.length == 0)
             return false 
@@ -4074,7 +3937,7 @@ async function td_set_orders_timeouts() {
 async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich_info = {}) {
     if (isLich) {
         setTimeout(async () => {
-            var status = await db.query(`UPDATE users_lich_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND visibility=true`)
+            var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND visibility=true`)
             .then(res => {
                 if (res.rowCount != 1)
                     return false
@@ -4100,7 +3963,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                         color: '#FFFFFF'
                     })
                     console.log(postdata)
-                    var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
+                    var status = await db.query(`SELECT * from tradebot_users_list WHERE discord_id = ${all_orders.discord_id}`)
                     .then(async res => {
                         if (res.rows.length == 0)
                             return false
@@ -4151,7 +4014,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
             var item_id = all_orders.item_id
             var item_rank = all_orders.user_rank
             var order_type = all_orders.order_type
-            var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}' AND visibility=true`)
+            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}' AND visibility=true`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false
@@ -4163,7 +4026,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
             })
             if (!status)
                 return
-            var status = await db.query(`UPDATE users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}'`)
+            var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND user_rank='${item_rank}'`)
             .then(res => {
                 return true
             })
@@ -4202,7 +4065,7 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                     color: '#FFFFFF'
                 })
                 console.log(postdata)
-                var status = await db.query(`SELECT * from users_list WHERE discord_id = ${all_orders.discord_id}`)
+                var status = await db.query(`SELECT * from tradebot_users_list WHERE discord_id = ${all_orders.discord_id}`)
                 .then(async res => {
                     if (res.rows.length == 0)
                         return false
@@ -4338,7 +4201,7 @@ async function tb_threadHandler(message) {
     if (!order_data.messages_log)
         order_data.messages_log = []
     var ingame_name = ""
-    var status = await db.query(`SELECT * FROM users_list WHERE discord_id = ${message.author.id}`)
+    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
     .then(res => {
         if (res.rows.length == 0)
             return false
@@ -4363,7 +4226,7 @@ async function tb_threadHandler(message) {
     if (!from_cross) {
         if (isLich) {
             var status = await db.query(`
-            UPDATE filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            UPDATE tradebot_filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
             WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
             `)
             .catch(err => {
@@ -4372,7 +4235,7 @@ async function tb_threadHandler(message) {
         }
         else {
             var status = await db.query(`
-            UPDATE filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            UPDATE tradebot_filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
             WHERE thread_id = ${message.channel.id} AND channel_id = ${message.channel.parentId}
             `)
             .catch(err => {
@@ -4383,7 +4246,7 @@ async function tb_threadHandler(message) {
     else {
         if (isLich) {
             var status = await db.query(`
-            UPDATE filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            UPDATE tradebot_filled_users_lich_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
             WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
             `)
             .catch(err => {
@@ -4392,7 +4255,7 @@ async function tb_threadHandler(message) {
         }
         else {
             var status = await db.query(`
-            UPDATE filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
+            UPDATE tradebot_filled_users_orders SET messages_log = '${order_data.messages_log.replace(/'/g,`''`)}'
             WHERE cross_thread_id = ${message.channel.id} AND cross_channel_id = ${message.channel.parentId}
             `)
             .catch(err => {
@@ -4416,7 +4279,7 @@ async function tb_updateDmCacheOrder(msg,discord_id) {
         channel_id: msg.channelId,
         timestamp: new Date().getTime()
     }
-    await db.query(`UPDATE users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
+    await db.query(`UPDATE tradebot_users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
 }
 
 async function tb_activate_orders(message, interaction) {
@@ -4429,7 +4292,7 @@ async function tb_activate_orders(message, interaction) {
         return
     var items_ids = []
     var status_msg = ''
-    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id=${user_id}`)
+    var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id=${user_id}`)
     .then(res => {
         if (res.rows.length==0) {
             status_msg = `❕ <@${user_id}> No orders found on your profile. ❕`
@@ -4453,7 +4316,7 @@ async function tb_activate_orders(message, interaction) {
         return
     }
     //set all orders as visible for this user
-    var status = await db.query(`UPDATE users_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${user_id}`)
+    var status = await db.query(`UPDATE tradebot_users_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${user_id}`)
     .then(res => {
         return true
     })
@@ -4505,7 +4368,7 @@ async function tb_activate_orders(message, interaction) {
         await trading_bot_orders_update(null,item_id,item_url,item_name,1,item_rank)
         .then(res => {
             var user_order = null
-            db.query(`SELECT * FROM users_orders WHERE discord_id = ${user_id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
+            db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${user_id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
             .then(res => {
                 if (res.rows.length == 0)
                     return false 
@@ -4541,7 +4404,7 @@ async function tb_activate_lich_orders(message, interaction) {
     //continue
     var user_orders = []
     var status_msg = ''
-    var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id=${user_id}`)
+    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id=${user_id}`)
     .then(res => {
         if (res.rows.length==0) {
             status_msg = `❕ <@${user_id}> No lich orders found on your profile. ❕`
@@ -4565,7 +4428,7 @@ async function tb_activate_lich_orders(message, interaction) {
         return
     }
     //set all orders as visible for this user
-    var status = await db.query(`UPDATE users_lich_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${user_id}`)
+    var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=true, update_timestamp = ${new Date().getTime()} WHERE discord_id=${user_id}`)
     .then(res => {
         return true
     })
@@ -4611,7 +4474,7 @@ async function tb_activate_lich_orders(message, interaction) {
         console.log(`updating lich order ${lich_info.weapon_url} for ${user_id}`)
         await trading_lich_orders_update(null,lich_info, 1)
         .then(async () => {
-            await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${user_id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
+            await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${user_id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
             .then(async res => {
                 if (res.rows.length == 0)
                     return false 
@@ -4645,7 +4508,7 @@ async function tb_close_orders(message, interaction) {
     else 
         return
     var orders_list = []
-    var status = await db.query(`SELECT * FROM users_orders WHERE discord_id = ${user_id} AND visibility = true`)
+    var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${user_id} AND visibility = true`)
     .then(res => {
         if (res.rows.length == 0) {     //no visible orders at the time
             console.log('No visible orders at the time')
@@ -4665,7 +4528,7 @@ async function tb_close_orders(message, interaction) {
             setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
         return
     }
-    var status = await db.query(`UPDATE users_orders SET visibility = false WHERE discord_id = ${user_id} AND visibility = true`)
+    var status = await db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE discord_id = ${user_id} AND visibility = true`)
     .then(res => {
         if (res.rowCount == 0)
             return false
@@ -4723,7 +4586,7 @@ async function tb_close_lich_orders(message, interaction) {
         return
     var user_data = null
     var orders_list = []
-    var status = await db.query(`SELECT * FROM users_lich_orders WHERE discord_id = ${user_id} AND visibility = true`)
+    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${user_id} AND visibility = true`)
     .then(res => {
         if (res.rows.length == 0) {     //no visible orders at the time
             console.log('No visible orders at the time')
@@ -4743,7 +4606,7 @@ async function tb_close_lich_orders(message, interaction) {
             setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
         return
     }
-    var status = await db.query(`UPDATE users_lich_orders SET visibility = false WHERE discord_id = ${user_id}`)
+    var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility = false WHERE discord_id = ${user_id}`)
     .then(res => {
         if (res.rowCount == 0)
             return false
@@ -4784,7 +4647,7 @@ async function tb_close_lich_orders(message, interaction) {
 
 async function tb_user_exist(discord_id) {
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM users_list WHERE discord_id = ${discord_id}`)
+        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
         .then(async res => {
             if (res.rowCount==0) {
                 await trading_bot_registeration(discord_id)

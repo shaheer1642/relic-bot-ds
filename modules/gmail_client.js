@@ -109,7 +109,7 @@ async function gmail_api_call(auth) {
     if (msgs.data.resultSizeEstimate > 0) {
         //Read all msgs
         var ids_list = []
-        await db.query(`SELECT * FROM users_unverified`)
+        await db.query(`SELECT * FROM tradebot_users_unverified`)
         .then(res => {
             ids_list = res.rows
         }).catch(err => console.log(err))
@@ -156,18 +156,18 @@ async function gmail_api_call(auth) {
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
                     const user = await client.users.fetch(xx_discord).catch(console.error)
-                    await db.query(`DELETE FROM users_unverified WHERE id = '${xx_id}'`).catch(err => console.log(err))
+                    await db.query(`DELETE FROM tradebot_users_unverified WHERE id = '${xx_id}'`).catch(err => console.log(err))
                     const temp = res.data.snippet.split(' ')
                     await db.query(`UPDATE hubapp_users SET forums_username='${temp[4]}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
                     //---Check if user already exists
-                    var status = await db.query(`SELECT * FROM users_list WHERE discord_id=${xx_discord}`).then(async res => {
+                    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id=${xx_discord}`).then(async res => {
                         if (res.rowCount > 1) {
                             if (user)
                                 user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 500')
                             return false
                         }
                         if (res.rowCount == 1) {
-                            var status = await db.query(`UPDATE users_list SET ingame_name='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
+                            var status = await db.query(`UPDATE tradebot_users_list SET ingame_name='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
                                 if (user)
                                     user.send('Your ign has been updated to **' + temp[4] + '**!').catch(console.error)
                                 return true
@@ -180,7 +180,7 @@ async function gmail_api_call(auth) {
                             })
                         }
                         if (res.rowCount == 0) {
-                            var status = await db.query(`INSERT INTO users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${temp[4]}',${new Date().getTime()})`).then(res => {
+                            var status = await db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${temp[4]}',${new Date().getTime()})`).then(res => {
                                 if (user)
                                     user.send('Welcome **' + temp[4] + '**! Your account has been verified.').catch(console.error)
                                 return true
