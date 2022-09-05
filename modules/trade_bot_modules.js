@@ -3565,7 +3565,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         const weapon_name = weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
         var all_orders = []
         var status = await db.query(`
-        SELECT * FROM users_lich_orders
+        SELECT * FROM tradebot_users_lich_orders
         JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
         JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
         WHERE tradebot_users_lich_orders.lich_id = '${lich_id}' AND tradebot_users_lich_orders.order_type = '${order_type}'
