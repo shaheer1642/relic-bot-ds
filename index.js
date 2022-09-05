@@ -722,7 +722,7 @@ client.on('interactionCreate', async interaction => {
             //----check if order was visible----
             var visibility = false
             var all_orders = null
-            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
+            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE tradebot_users_orders.discord_id=${discord_id} AND tradebot_users_orders.item_id='${item_id}'`)
             .then(res => {
                 all_orders = res.rows
                 if (res.rows[0])
@@ -739,7 +739,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 return
-            var status = await db.query(`DELETE FROM tradebot_users_orders WHERE users_orders.discord_id=${discord_id} AND users_orders.item_id='${item_id}'`)
+            var status = await db.query(`DELETE FROM tradebot_users_orders WHERE tradebot_users_orders.discord_id=${discord_id} AND tradebot_users_orders.item_id='${item_id}'`)
             .then(res => {
                 return true
             })
@@ -813,7 +813,7 @@ client.on('interactionCreate', async interaction => {
             //----check if order was visible----
             var visibility = false
             var all_orders = null
-            var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE users_lich_orders.discord_id=${discord_id} AND users_lich_orders.lich_id='${lich_info.lich_id}'`)
+            var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE tradebot_users_lich_orders.discord_id=${discord_id} AND tradebot_users_lich_orders.lich_id='${lich_info.lich_id}'`)
             .then(res => {
                 all_orders = res.rows
                 if (res.rows[0])
@@ -830,7 +830,7 @@ client.on('interactionCreate', async interaction => {
             })
             if (!status)
                 continue
-            var status = await db.query(`DELETE FROM tradebot_users_lich_orders WHERE users_lich_orders.discord_id=${discord_id} AND users_lich_orders.lich_id='${lich_info.lich_id}'`)
+            var status = await db.query(`DELETE FROM tradebot_users_lich_orders WHERE tradebot_users_lich_orders.discord_id=${discord_id} AND tradebot_users_lich_orders.lich_id='${lich_info.lich_id}'`)
             .then(res => {
                 return true
             })

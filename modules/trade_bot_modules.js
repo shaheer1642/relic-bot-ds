@@ -102,7 +102,7 @@ async function message_handler(message, multiMessage) {
         else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
             if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
                 var active_orders = []
-                var status =  await db.query(`SELECT * FROM messages_ids`)
+                var status =  await db.query(`SELECT * FROM tradebot_messages_ids`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
@@ -110,7 +110,7 @@ async function message_handler(message, multiMessage) {
                         return false
                     }
                     active_orders = res.rows
-                    db.query(`DELETE FROM messages_ids`).catch(err => console.log(err))
+                    db.query(`DELETE FROM tradebot_messages_ids`).catch(err => console.log(err))
                     return true
                 })
                 .catch(err => {
@@ -202,7 +202,7 @@ async function message_handler(message, multiMessage) {
         else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
             if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
                 var active_orders = []
-                var status =  await db.query(`SELECT * FROM lich_messages_ids`)
+                var status =  await db.query(`SELECT * FROM tradebot_lich_messages_ids`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
@@ -210,7 +210,7 @@ async function message_handler(message, multiMessage) {
                         return false
                     }
                     active_orders = res.rows
-                    db.query(`DELETE FROM lich_messages_ids`).catch(err => console.log(err))
+                    db.query(`DELETE FROM tradebot_lich_messages_ids`).catch(err => console.log(err))
                     return true
                 })
                 .catch(err => {
@@ -424,12 +424,12 @@ async function reaction_handler(reaction, user, action) {
                 }
                 console.log('break test')
                 var status = await db.query(`
-                SELECT * FROM messages_ids
-                JOIN tradebot_users_orders ON messages_ids.item_id = users_orders.item_id
-                JOIN tradebot_users_list ON users_orders.discord_id = users_list.discord_id
-                JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
-                ORDER BY users_list.ingame_name`)
+                SELECT * FROM tradebot_messages_ids
+                JOIN tradebot_users_orders ON tradebot_messages_ids.item_id = tradebot_users_orders.item_id
+                JOIN tradebot_users_list ON tradebot_users_orders.discord_id = tradebot_users_list.discord_id
+                JOIN items_list ON tradebot_users_orders.item_id = items_list.id
+                WHERE tradebot_messages_ids.message_id = ${check_msg_id} AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
+                ORDER BY tradebot_users_list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
@@ -723,12 +723,12 @@ async function reaction_handler(reaction, user, action) {
                 }
     
                 var status = await db.query(`
-                SELECT * FROM lich_messages_ids
-                JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = users_lich_orders.lich_id
-                JOIN tradebot_users_list ON users_lich_orders.discord_id = users_list.discord_id
-                JOIN lich_list ON users_lich_orders.lich_id = lich_list.lich_id
-                WHERE lich_messages_ids.message_id = ${check_msg_id} AND users_lich_orders.visibility = true AND users_lich_orders.order_type = '${order_type}'
-                ORDER BY users_list.ingame_name`)
+                SELECT * FROM tradebot_lich_messages_ids
+                JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = tradebot_users_lich_orders.lich_id
+                JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id = tradebot_users_list.discord_id
+                JOIN lich_list ON tradebot_users_lich_orders.lich_id = lich_list.lich_id
+                WHERE lich_messages_ids.message_id = ${check_msg_id} AND tradebot_users_lich_orders.visibility = true AND tradebot_users_lich_orders.order_type = '${order_type}'
+                ORDER BY tradebot_users_list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
@@ -1039,12 +1039,12 @@ async function reaction_handler(reaction, user, action) {
                         return
                     }
                     var status = await db.query(`
-                    SELECT * FROM lich_messages_ids
-                    JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = users_lich_orders.lich_id
-                    JOIN tradebot_users_list ON users_lich_orders.discord_id = users_list.discord_id
-                    JOIN lich_list ON users_lich_orders.lich_id = lich_list.lich_id
-                    WHERE lich_messages_ids.message_id = ${check_msg_id} AND users_lich_orders.visibility = true AND users_lich_orders.order_type = '${order_type}'
-                    ORDER BY users_list.ingame_name`)
+                    SELECT * FROM tradebot_lich_messages_ids
+                    JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = tradebot_users_lich_orders.lich_id
+                    JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id = tradebot_users_list.discord_id
+                    JOIN lich_list ON tradebot_users_lich_orders.lich_id = lich_list.lich_id
+                    WHERE lich_messages_ids.message_id = ${check_msg_id} AND tradebot_users_lich_orders.visibility = true AND tradebot_users_lich_orders.order_type = '${order_type}'
+                    ORDER BY tradebot_users_list.ingame_name`)
                     .then(res => {
                         if (res.rows.length == 0) {
                             reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
@@ -1335,12 +1335,12 @@ async function reaction_handler(reaction, user, action) {
                 }
                 console.log('break test')
                 var status = await db.query(`
-                SELECT * FROM messages_ids
-                JOIN tradebot_users_orders ON messages_ids.item_id = users_orders.item_id
-                JOIN tradebot_users_list ON users_orders.discord_id = users_list.discord_id
-                JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE messages_ids.message_id = ${check_msg_id} AND users_orders.visibility = true AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
-                ORDER BY users_list.ingame_name`)
+                SELECT * FROM tradebot_messages_ids
+                JOIN tradebot_users_orders ON tradebot_messages_ids.item_id = tradebot_users_orders.item_id
+                JOIN tradebot_users_list ON tradebot_users_orders.discord_id = tradebot_users_list.discord_id
+                JOIN items_list ON tradebot_users_orders.item_id = items_list.id
+                WHERE tradebot_messages_ids.message_id = ${check_msg_id} AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
+                ORDER BY tradebot_users_list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
@@ -1886,10 +1886,10 @@ async function trading_bot(message,args,command) {
                 //----check if wts price is lower than active buy order
                 var status = await db.query(`
                 SELECT * FROM tradebot_users_orders 
-                JOIN tradebot_users_list ON users_list.discord_id = users_orders.discord_id
-                JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wtb' AND users_orders.user_rank = '${item_rank}'
-                ORDER BY users_orders.user_price DESC, users_orders.update_timestamp`)
+                JOIN tradebot_users_list ON tradebot_users_list.discord_id = tradebot_users_orders.discord_id
+                JOIN items_list ON tradebot_users_orders.item_id = items_list.id
+                WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = 'wtb' AND tradebot_users_orders.user_rank = '${item_rank}'
+                ORDER BY tradebot_users_orders.user_price DESC, tradebot_users_orders.update_timestamp`)
                 .then(res => {
                     if (res.rows.length > 0)
                         all_orders = res.rows
@@ -1917,10 +1917,10 @@ async function trading_bot(message,args,command) {
                 var all_orders = null
                 var status = await db.query(`
                 SELECT * FROM tradebot_users_orders 
-                JOIN tradebot_users_list ON users_list.discord_id = users_orders.discord_id
-                JOIN items_list ON users_orders.item_id = items_list.id
-                WHERE users_orders.item_id = '${item_id}' AND users_orders.visibility = true AND users_orders.order_type = 'wts' AND users_orders.user_rank = '${item_rank}'
-                ORDER BY users_orders.user_price, users_orders.update_timestamp`)
+                JOIN tradebot_users_list ON tradebot_users_list.discord_id = tradebot_users_orders.discord_id
+                JOIN items_list ON tradebot_users_orders.item_id = items_list.id
+                WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = 'wts' AND tradebot_users_orders.user_rank = '${item_rank}'
+                ORDER BY tradebot_users_orders.user_price, tradebot_users_orders.update_timestamp`)
                 .then(res => {
                     if (res.rows.length > 0)
                         all_orders = res.rows
@@ -2274,10 +2274,10 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     //----construct embed----
     var status = await db.query(`
     SELECT * FROM tradebot_users_orders 
-    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
-    JOIN items_list ON users_orders.item_id=items_list.id 
-    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wts' AND users_orders.visibility = true AND user_rank = '${item_rank}'
-    ORDER BY users_orders.user_price ASC,users_orders.update_timestamp`)
+    JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
+    JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
+    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = 'wts' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
+    ORDER BY tradebot_users_orders.user_price ASC,users_orders.update_timestamp`)
     .then(res => {
         if (res.rows.length == 0)
             return true
@@ -2326,10 +2326,10 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         return Promise.reject()
     var status = await db.query(`
     SELECT * FROM tradebot_users_orders 
-    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
-    JOIN items_list ON users_orders.item_id=items_list.id 
-    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = 'wtb' AND users_orders.visibility = true AND user_rank = '${item_rank}'
-    ORDER BY users_orders.user_price DESC,users_orders.update_timestamp`)
+    JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
+    JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
+    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = 'wtb' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
+    ORDER BY tradebot_users_orders.user_price DESC,users_orders.update_timestamp`)
     .then(res => {
         if (res.rows.length == 0)
             return true
@@ -2699,10 +2699,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     //----construct embed----
     await db.query(`
     SELECT * FROM tradebot_users_lich_orders 
-    JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
-    JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-    WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wts' AND users_lich_orders.visibility = true
-    ORDER BY users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
+    JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
+    JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
+    WHERE tradebot_users_lich_orders.lich_id = '${lich_info.lich_id}' AND tradebot_users_lich_orders.order_type = 'wts' AND tradebot_users_lich_orders.visibility = true
+    ORDER BY tradebot_users_lich_orders.user_price ASC,users_lich_orders.update_timestamp`)
     .then(async res => {
         if (res.rows.length != 0) {
             for (var j=0;j<res.rows.length;j++) {
@@ -2871,10 +2871,10 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     })
     await db.query(`
     SELECT * FROM tradebot_users_lich_orders 
-    JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
-    JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-    WHERE users_lich_orders.lich_id = '${lich_info.lich_id}' AND users_lich_orders.order_type = 'wtb' AND users_lich_orders.visibility = true
-    ORDER BY users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
+    JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
+    JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
+    WHERE tradebot_users_lich_orders.lich_id = '${lich_info.lich_id}' AND tradebot_users_lich_orders.order_type = 'wtb' AND tradebot_users_lich_orders.visibility = true
+    ORDER BY tradebot_users_lich_orders.user_price DESC,users_lich_orders.update_timestamp`)
     .then(async res => {
         if (res.rows.length != 0) {
             for (var j=0;j<res.rows.length;j++) {
@@ -3253,9 +3253,9 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     var item_orders = null
     var lich_orders = null
     var status = await db.query(`SELECT * FROM tradebot_users_orders 
-    JOIN items_list ON users_orders.item_id=items_list.id 
-    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
-    WHERE users_orders.discord_id = ${discord_id}`)
+    JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
+    JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
+    WHERE tradebot_users_orders.discord_id = ${discord_id}`)
     .then(res => {
         item_orders = res.rows
         return true
@@ -3267,9 +3267,9 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     if (!status)
         return {content: 'Error occured retrieving db records'}
     var status = await db.query(`SELECT * FROM tradebot_users_lich_orders 
-    JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-    JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
-    WHERE users_lich_orders.discord_id = ${discord_id}`)
+    JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
+    JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
+    WHERE tradebot_users_lich_orders.discord_id = ${discord_id}`)
     .then(res => {
         lich_orders = res.rows
         return true
@@ -3566,10 +3566,10 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         var all_orders = []
         var status = await db.query(`
         SELECT * FROM users_lich_orders
-        JOIN lich_list ON users_lich_orders.lich_id=lich_list.lich_id 
-        JOIN tradebot_users_list ON users_lich_orders.discord_id=users_list.discord_id 
-        WHERE users_lich_orders.lich_id = '${lich_id}' AND users_lich_orders.order_type = '${order_type}'
-        ORDER BY users_lich_orders.update_timestamp
+        JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
+        JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
+        WHERE tradebot_users_lich_orders.lich_id = '${lich_id}' AND tradebot_users_lich_orders.order_type = '${order_type}'
+        ORDER BY tradebot_users_lich_orders.update_timestamp
         `)
         .then(res => {
             if (res.rows.length == 0) {
@@ -3720,10 +3720,10 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     var all_orders = []
     var status = await db.query(`
     SELECT * FROM users_orders
-    JOIN items_list ON users_orders.item_id=items_list.id 
-    JOIN tradebot_users_list ON users_orders.discord_id=users_list.discord_id 
-    WHERE users_orders.item_id = '${item_id}' AND users_orders.order_type = '${order_type}' AND users_orders.user_rank = '${item_rank}'
-    ORDER BY users_orders.update_timestamp
+    JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
+    JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
+    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
+    ORDER BY tradebot_users_orders.update_timestamp
     `)
     .then(res => {
         if (res.rows.length == 0) {
