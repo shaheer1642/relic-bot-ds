@@ -1582,7 +1582,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier)
         twitch_affiliate.reaction_handler(reaction,user,'add')
 
-    if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId)) {
+    if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId) || (reaction.message.channel.isThread() && trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channel.parentId))) {
         trade_bot_modules.reaction_handler(reaction, user, 'add')
     }
 
