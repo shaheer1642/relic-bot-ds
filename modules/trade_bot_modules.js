@@ -3993,7 +3993,7 @@ async function tb_threadHandler(message) {
         sentMessage += attachment.url + '\n'
     })
     sentMessage = sentMessage.trim()
-    await db.query(`
+    db.query(`
         UPDATE tradebot_filled_users_orders
         SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, timestamp: new Date().getTime()})}]'::jsonb
         WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
@@ -4005,7 +4005,7 @@ async function tb_threadHandler(message) {
     `).then(res => {
         console.log(res[0].rows)
         console.log(res[1].rows)
-        if (res[0].rowCount == res[1].rowCount == 0) {
+        if (res[0].rowCount == 0 && res[1].rowCount == 0) {
             message.delete().catch(console.error)
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
             return
