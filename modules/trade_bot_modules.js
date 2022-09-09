@@ -4836,9 +4836,9 @@ db.on('notification', async (notification) => {
                         reason: 'Trade opened.'
                     }).then(async owner_channel_thread => {
                         db.query(`UPDATE tradebot_filled_users_orders set thread_id = ${owner_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
-                        setTimeout(() => owner_channel.messages.fetch(owner_channel_thread.id).delete().catch(console.error), 5000)
+                        setTimeout(() => owner_channel.messages.fetch(owner_channel_thread.id).then(message => message.delete().catch(console.error)).catch(console.error), 5000)
                         var filler_channel_thread = null
-                        if (payload.owner_channel_id != payload.filler_channel_id) {
+                        if (payload.owner_channel_id.toString() != payload.filler_channel_id.toString()) {
                             console.log('channels not equal',payload.owner_channel_id,payload.filler_channel_id)
                             const filler_channel = await client.channels.fetch(payload.filler_channel_id).catch(console.error)
                             await filler_channel.threads.create({
@@ -4848,11 +4848,11 @@ db.on('notification', async (notification) => {
                             }).then(res => {
                                 filler_channel_thread = res
                                 db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
-                                setTimeout(() => filler_channel_thread.messages.fetch(filler_channel_thread.id).delete().catch(console.error), 5000)
+                                setTimeout(() => filler_channel_thread.messages.fetch(filler_channel_thread.id).then(message => message.delete().catch(console.error)).catch(console.error), 5000)
                             }).catch(console.error)
                         }
                         console.log('thread created')
-                        client.users.fetch(payload.order_owner).send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)
+                        client.users.fetch(payload.order_owner).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
                         const postdata = {
                             color: payload.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor),
                             timestamp: new Date(),
