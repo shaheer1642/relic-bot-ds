@@ -459,6 +459,12 @@ function getSquadsList() {
             spots: 4,
             filled: []
         },
+        sq_archon_hunt: {
+            name: 'Archon Hunt',
+            id: 'sq_archon_hunt',
+            spots: 4,
+            filled: []
+        },
         sq_custom: {
             name: 'Create Custom Squad',
             id: 'sq_custom'
