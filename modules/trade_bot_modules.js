@@ -1416,11 +1416,10 @@ async function reaction_handler(reaction, user, action) {
                         `
                         res.send({content: ' ',embeds: [postdata]})
                         .then(open_message => {
-                            var status = db.query(`
-                            UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
-                            WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
-                            `)
-                            .catch(console.error)
+                            db.query(`
+                                UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
+                                WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
+                            `).catch(console.error)
                             open_message.react(tradingBotReactions.success[0]).catch(console.error)
                             open_message.react('⚠️').catch(console.error)
                             if (cross_thread)
@@ -1430,39 +1429,35 @@ async function reaction_handler(reaction, user, action) {
                         if (cross_thread) {
                             cross_thread.send({content: ' ',embeds: [postdata]})
                             .then(c_open_message => {
-                                var status = db.query(`
-                                UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
-                                WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
-                                `)
-                                .catch(console.error)
+                                db.query(`
+                                    UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                                    WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
+                                `).catch(console.error)
                                 c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
                                 c_open_message.react('⚠️').catch(console.error)
                                 cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
-                            })
+                            }).catch(console.error)
                         }
                         setTimeout(() => {
                             res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
                             if (cross_thread) 
                                 cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                        }
-                        , 900000)
+                        }, 900000)
                         setTimeout(() => {
-                            db.query(`SELECT * FROM tradebot_filled_users_orders
-                            WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
-                            `)
-                            .then(foundThread => {
+                            db.query(`
+                                SELECT * FROM tradebot_filled_users_orders
+                                WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
+                            `).then(foundThread => {
                                 if (foundThread.rows.length == 0)
                                     return
                                 if (foundThread.rows.length > 1)
                                     return
-                                res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                                .catch(console.error)
+                                res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
                                 if (cross_thread)
                                     cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
-                            })
+                            }).catch(console.error)
                         }, 720000)
-                    })
-                    .catch(console.error)
+                    }).catch(console.error)
                     setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                 }
                 return Promise.resolve()
@@ -1472,7 +1467,7 @@ async function reaction_handler(reaction, user, action) {
             if (reaction.message.channel.ownerId == client.user.id) {
                 if (!reaction.message.channel.archived) {
                     if (!reaction.message.author)
-                        await reaction.message.channel.messages.fetch(reaction.message.id)
+                        reaction.message = await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
                     if (reaction.message.author.id == client.user.id) {
                         if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
                             return Promise.resolve()
@@ -1489,14 +1484,12 @@ async function reaction_handler(reaction, user, action) {
                         var status = await db.query(`
                             SELECT * FROM ${q_filledOrderTable}
                             WHERE thread_id = ${reaction.message.channel.id} AND trade_open_message = ${reaction.message.id} AND archived = false
-                        `)
-                        .then(res => {
+                        `).then(res => {
                             if (res.rows.length != 1)
                                 return false
                             order_data = res.rows[0]
                             return true
-                        })
-                        .catch(err => {
+                        }).catch(err => {
                             console.log(err)
                             return false
                         })
@@ -1504,15 +1497,13 @@ async function reaction_handler(reaction, user, action) {
                             var status2 = await db.query(`
                                 SELECT * FROM ${q_filledOrderTable}
                                 WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_trade_open_message = ${reaction.message.id} AND archived = false
-                            `)
-                            .then(res => {
+                            `).then(res => {
                                 if (res.rows.length != 1)
                                     return false
                                 from_cross = true
                                 order_data = res.rows[0]
                                 return true
-                            })
-                            .catch(err => {
+                            }).catch(err => {
                                 console.log(err)
                                 return false
                             })
@@ -1581,8 +1572,7 @@ async function reaction_handler(reaction, user, action) {
                                 const channel = client.channels.cache.get(order_data.thread_id)
                                 channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
                             }
-                        }
-                        else if (reaction.emoji.name == '⚠️' || suspicious) {
+                        } else if (reaction.emoji.name == '⚠️' || suspicious) {
                             db.query(`
                                 UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious ? null:user.id}, suspicious = ${suspicious}
                                 WHERE ${q_threadId} = ${reaction.message.channel.id}

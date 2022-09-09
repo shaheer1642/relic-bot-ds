@@ -9,7 +9,7 @@ const masteryRolesMessageId = "892084165405716541"
 const otherRolesMessageId = "957330415734095932"
 
 function bot_initialize() {
-    client.guilds.cache.get('776804537095684108').members.fetch().catch(err => console.log(err))
+    client.guilds.cache.get('776804537095684108').members.fetch().catch(console.error)
 }
 
 function message_handler(message) {
@@ -18,7 +18,7 @@ function message_handler(message) {
 }
 
 function generate_report(message) {
-    message.channel.send('Your issue has been recorded. Thanks for your feedback!\nIn-case of any enquiry on the report, please contact any admin').catch(err => console.log(err)).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000));
+    message.channel.send('Your issue has been recorded. Thanks for your feedback!\nIn-case of any enquiry on the report, please contact any admin').catch(console.error).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000));
     setTimeout(() => {
         message.delete().catch(err => {
             console.log(err);
@@ -142,21 +142,23 @@ React to this message with desired emoji to obtain your mastery role.
                         },
                     }],
                     files: [file]
-                }).catch(err => console.log(err))
-            }).catch(err => console.log(err))
+                }).catch(console.error)
+            }).catch(console.error)
         })
-    }).catch(err => console.log(err))
+    }).catch(console.error)
 }
 
 async function messageUpdate(oldMessage, newMessage) {
     if (newMessage.channel.id == "793207311891562556") {
         if (!newMessage.author)
-            await newMessage.channel.messages.fetch(newMessage.id).catch(err => console.log(err))
+            newMessage = await newMessage.channel.messages.fetch(newMessage.id).catch(console.error)
         if (newMessage.author.id == "294882584201003009") {
-            client.channels.cache.get('964217621266456586').send({
-                content: ' ',
-                embeds: newMessage.embeds
-            }).catch(err => console.log(err))
+            if (newMessage.embeds[0].description.match('Ended:')) {
+                client.channels.cache.get('964217621266456586').send({
+                    content: ' ',
+                    embeds: newMessage.embeds
+                }).catch(console.error)
+            }
         }
     }
 }
@@ -174,7 +176,7 @@ async function guildMemberUpdate(oldMember, newMember) {
 async function guildMemberAdd(member) {
     if (member.user.bot)
         return
-    member = await member.fetch().catch(err => console.log(err))
+    member = await member.fetch().catch(console.error)
     const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
     const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
     const embed = new MessageEmbed()
@@ -198,7 +200,7 @@ async function guildMemberAdd(member) {
     
     const role1 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'members')
     const role2 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'new members')
-    await member.roles.add(role1).catch(err => console.log(err))
+    await member.roles.add(role1).catch(console.error)
     await member.roles.add(role2)
     .then (response => {
         mod_log(`Assigned roles <@&${role1.id}>, <@&${role2.id}> to user <@${member.id}>`,'#FFFF00')
@@ -223,7 +225,7 @@ async function reaction_handler(reaction,user,action) {
                         inform_dc(`Error removing role ${role.name} from user ${member.displayName}`)
                     })
                 }
-            }).catch(err => console.log(err))
+            }).catch(console.error)
         }
         
         if (reaction.message.id == masteryRolesMessageId) {
@@ -253,7 +255,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
                 })
                 .catch(function (error) {
@@ -268,7 +270,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
                 })
                 .catch(function (error) {
@@ -283,7 +285,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
                 })
                 .catch(function (error) {
@@ -298,7 +300,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`,'#2ECC71')
                 })
                 .catch(function (error) {
@@ -309,7 +311,7 @@ async function reaction_handler(reaction,user,action) {
             }
             else
                 reaction.users.remove(user.id);
-            updateMasteryDistr().catch(err => console.log(err))
+            updateMasteryDistr().catch(console.error)
         }
         if (reaction.message.id == otherRolesMessageId) {
             if (reaction.emoji.id == "957325143699501156") {
@@ -357,7 +359,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
                 })
                 .catch(function (error) {
@@ -371,7 +373,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
                 })
                 .catch(function (error) {
@@ -385,7 +387,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
                 })
                 .catch(function (error) {
@@ -399,7 +401,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
                 })
                 .catch(function (error) {
@@ -413,7 +415,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
                 })
                 .catch(function (error) {
@@ -421,7 +423,7 @@ async function reaction_handler(reaction,user,action) {
                     inform_dc(`Error removing role ${role.name} from user ${user.username} `)
                 })
             }
-            updateMasteryDistr().catch(err => console.log(err))
+            updateMasteryDistr().catch(console.error)
         }
         if (reaction.message.id == otherRolesMessageId) {
             if (reaction.emoji.id == "957325143699501156") {
@@ -430,7 +432,7 @@ async function reaction_handler(reaction,user,action) {
                 .then (response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`,'#E74C3C')
                 })
                 .catch(function (error) {
