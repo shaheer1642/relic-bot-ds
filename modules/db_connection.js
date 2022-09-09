@@ -15,11 +15,6 @@ db.connect().then(async res => {
     process.exit(1)
 });
 
-db.on('notification', msg => {
-    console.log('db notification')
-    console.log(msg.payload)
-})
-
 db.on('error', err => {
     console.log('=============== DB Connection error. ==============')
     console.log(err)

@@ -4815,16 +4815,16 @@ db.on('notification', async (notification) => {
 
     if (notification.channel == 'tradebot_filled_users_orders_insert') {
         const owner_channel = await client.channels.fetch(payload.owner_channel_id).catch(console.error)
-        db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${payload.order_owner} AND item_id = '${payload.item_id}' AND order_type = '${payload.order_type}'`)
+        db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${payload.order_owner} AND item_id = '${payload.item_id}' AND order_type = '${payload.order_type}';`)
         .then(res => {
-            db.query(`SELECT * FROM items_list WHERE id='${payload.item_id}'`)
-            .catch(console.error).then(res => {
+            db.query(`SELECT * FROM items_list WHERE id='${payload.item_id}';`)
+            .then(res => {
                 const item_data = res.rows[0]
                 db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${payload.order_owner} OR discord_id = ${payload.order_filler};`)
-                .catch(console.error).then(res => {
+                .then(res => {
                     const user_data = {}
                     res.rows.forEach(row => user_data[row.discord_id] = row)
-                    const threadName = `${convertUpper(item_data.item_url)} (${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
+                    var threadName = `${convertUpper(item_data.item_url)} (${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
                     if (threadName.length > 99) {
                         console.log(`${threadName} thread's name is longer than 99`)
                         threadName = `(${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
@@ -4835,10 +4835,11 @@ db.on('notification', async (notification) => {
                         autoArchiveDuration: 60,
                         reason: 'Trade opened.'
                     }).then(async owner_channel_thread => {
-                        db.query(`UPDATE tradebot_filled_users_orders set thread_id = ${owner_channel_thread.id} WHERE order_id = '${payload.order_id}'`)
-                        setTimeout(() => owner_channel.messages.cache.get(owner_channel_thread.id).delete().catch(console.error), 5000)
+                        db.query(`UPDATE tradebot_filled_users_orders set thread_id = ${owner_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
+                        setTimeout(() => owner_channel.messages.fetch(owner_channel_thread.id).delete().catch(console.error), 5000)
                         var filler_channel_thread = null
                         if (payload.owner_channel_id != payload.filler_channel_id) {
+                            console.log('channels not equal',payload.owner_channel_id,payload.filler_channel_id)
                             const filler_channel = await client.channels.fetch(payload.filler_channel_id).catch(console.error)
                             await filler_channel.threads.create({
                                 name: threadName,
@@ -4846,12 +4847,12 @@ db.on('notification', async (notification) => {
                                 reason: 'Trade opened.'
                             }).then(res => {
                                 filler_channel_thread = res
-                                db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE order_id = '${payload.order_id}'`)
-                                setTimeout(() => filler_channel_thread.messages.cache.get(filler_channel_thread.id).delete().catch(console.error), 5000)
+                                db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
+                                setTimeout(() => filler_channel_thread.messages.fetch(filler_channel_thread.id).delete().catch(console.error), 5000)
                             }).catch(console.error)
                         }
                         console.log('thread created')
-                        client.users.cache.get(payload.order_owner).send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)
+                        client.users.fetch(payload.order_owner).send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)
                         const postdata = {
                             color: payload.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor),
                             timestamp: new Date(),
@@ -4904,10 +4905,9 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
                                 filler_channel_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
                         }, 720000)
                     }).catch(console.error)
-                })
-            })
-        })
-        .catch(console.error)
+                }).catch(console.error)
+            }).catch(console.error)
+        }).catch(console.error)
     }
 })
 
