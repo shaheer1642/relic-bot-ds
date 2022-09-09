@@ -153,7 +153,7 @@ async function messageUpdate(oldMessage, newMessage) {
         if (!newMessage.author)
             newMessage = await newMessage.channel.messages.fetch(newMessage.id).catch(console.error)
         if (newMessage.author.id == "294882584201003009") {
-            if (newMessage.embeds[0].description.match('Ended:')) {
+            if (newMessage.embeds.length == 1 && newMessage.embeds[0].description.match('Ended:')) {
                 client.channels.cache.get('964217621266456586').send({
                     content: ' ',
                     embeds: newMessage.embeds
