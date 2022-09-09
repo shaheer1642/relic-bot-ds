@@ -4852,7 +4852,7 @@ db.on('notification', async (notification) => {
                             }).catch(console.error)
                         }
                         console.log('thread created')
-                        client.users.fetch(payload.order_owner).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
+                        client.users.fetch(payload.order_owner.toString()).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
                         const postdata = {
                             color: payload.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor),
                             timestamp: new Date(),
