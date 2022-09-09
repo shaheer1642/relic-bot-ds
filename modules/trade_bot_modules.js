@@ -3992,25 +3992,28 @@ async function tb_threadHandler(message) {
     message.attachments.map(attachment => {
         sentMessage += attachment.url + '\n'
     })
+    sentMessage = sentMessage.trim()
     await db.query(`
         UPDATE tradebot_filled_users_orders
         SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, timestamp: new Date().getTime()})}]'::jsonb
-        WHERE thread_id = ${message.channel.id} AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
+        WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
         RETURNING *;
         UPDATE tradebot_filled_users_lich_orders
         SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, timestamp: new Date().getTime()})}]'::jsonb
-        WHERE thread_id = ${message.channel.id} AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
+        WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
         RETURNING *;
     `).then(res => {
+        console.log(res[0].rows)
+        console.log(res[1].rows)
         if (res[0].rowCount == res[1].rowCount == 0) {
             message.delete().catch(console.error)
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
             return
         }
         var order_data = null
-        if (res[0].rows.length == 1)
+        if (res[0].rowCount == 1)
             order_data = res[0].rows[0]
-        else if (res[1].rows.length == 1)
+        else if (res[1].rowCount == 1)
             order_data = res[1].rows[0]
         else
             return
