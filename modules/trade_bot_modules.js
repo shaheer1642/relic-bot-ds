@@ -1536,21 +1536,16 @@ async function reaction_handler(reaction, user, action) {
                                 UPDATE ${q_filledOrderTable} SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
                                 WHERE ${q_threadId} = ${reaction.message.channel.id}
                                 RETURNING ${q_return};
-                            `)
-                            .then(async res => {
+                            `).then(async res => {
                                 if (res[1].rowCount == 1) {
                                     await db.query(`
-                                    UPDATE tradebot_users_list
-                                    SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
-                                    WHERE discord_id = ${(order_data.order_owner)} OR discord_id = ${(order_data.order_filler)}
-                                    `)
-                                    .catch(err => {
-                                        console.log(err)
-                                    })
+                                        UPDATE tradebot_users_list
+                                        SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
+                                        WHERE discord_id = ${(order_data.order_owner)} OR discord_id = ${(order_data.order_filler)}
+                                    `).catch(console.error)
                                 }
                                 return true
-                            })
-                            .catch(err => {
+                            }).catch(err => {
                                 console.log(err)
                                 return false
                             })
@@ -1568,15 +1563,12 @@ async function reaction_handler(reaction, user, action) {
                                 WHERE discord_id = ${(order_data.order_owner)};
                                 UPDATE tradebot_users_list SET ${q_fillerPlat} = ${q_fillerPlat} + ${Number(order_data.user_price)}
                                 WHERE discord_id = ${(order_data.order_filler)};
-                            `).then(res => console.log(`updated plat balance for seller and buyer`))
-                            .catch(console.error)
+                            `).then(res => console.log(`updated plat balance for seller and buyer`)).catch(console.error)
                             //remove order from owner profile
                             var query = `DELETE FROM tradebot_users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
                             if (q_filledOrderTable == 'tradebot_filled_users_lich_orders')
                                 query = `DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
-                            db.query(query)
-                            .then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`))
-                            .catch(console.error)
+                            db.query(query).then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`)).catch(console.error)
                             //-------
                             if (!from_cross) {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
@@ -1584,8 +1576,7 @@ async function reaction_handler(reaction, user, action) {
                                     const channel = client.channels.cache.get(order_data.cross_thread_id)
                                     channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
                                 }
-                            }
-                            else {
+                            } else {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
                                 const channel = client.channels.cache.get(order_data.thread_id)
                                 channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
@@ -1650,7 +1641,7 @@ ${isLich ? `**Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(
 **Thread:** <#${newThread.id}>
 **Server:** ${newThread.guild.name}
 **-----Chat Log-----**
-${order_data.messages_log.length > 0? order_data.messages_log.map(message => `**${embedScore(userData[message.discord_id].ingame_name)}**: ${embedScore(message)}`).join('\n'):'Empty'}`,
+${order_data.messages_log.length > 0? order_data.messages_log.map(obj => `**${embedScore(userData[obj.discord_id].ingame_name)}**: ${embedScore(obj.message)}`).join('\n'):'Empty'}`,
                     image: {url: isLich ? order_data.lich_image_url:''},
                     timestamp: new Date(), 
                     color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
