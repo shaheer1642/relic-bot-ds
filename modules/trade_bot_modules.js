@@ -536,7 +536,7 @@ async function reaction_handler(reaction, user, action) {
                 db.query(`
                     INSERT INTO tradebot_filled_users_orders
                     (order_id,filler_channel_id,owner_channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,trade_timestamp)
-                    VALUES ('${uuid.v1()}',${res.id},${reaction.message.channel.id},${all_orders[order_rank].origin_channel_id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${new Date().getTime()})
+                    VALUES ('${uuid.v1()}',${reaction.message.channel.id},${all_orders[order_rank].origin_channel_id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${new Date().getTime()})
                 `).catch(err => {
                     console.log(err)
                     reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
