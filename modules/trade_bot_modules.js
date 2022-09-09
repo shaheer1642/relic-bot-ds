@@ -4003,8 +4003,6 @@ async function tb_threadHandler(message) {
         WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
         RETURNING *;
     `).then(res => {
-        console.log(res[0].rows)
-        console.log(res[1].rows)
         if (res[0].rowCount == 0 && res[1].rowCount == 0) {
             message.delete().catch(console.error)
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
@@ -4729,10 +4727,9 @@ db.on('notification', async (notification) => {
                         reason: 'Trade opened.'
                     }).then(async owner_channel_thread => {
                         db.query(`UPDATE tradebot_filled_users_orders set thread_id = ${owner_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
-                        setTimeout(() => owner_channel.messages.fetch(owner_channel_thread.id).then(message => message.delete().catch(console.error)).catch(console.error), 5000)
+                        setTimeout(() => owner_channel.messages.cache.get(owner_channel_thread.id).delete().catch(console.error), 5000)
                         var filler_channel_thread = null
                         if (payload.owner_channel_id.toString() != payload.filler_channel_id.toString()) {
-                            console.log('channels not equal',payload.owner_channel_id,payload.filler_channel_id)
                             const filler_channel = await client.channels.fetch(payload.filler_channel_id).catch(console.error)
                             await filler_channel.threads.create({
                                 name: threadName,
@@ -4741,7 +4738,7 @@ db.on('notification', async (notification) => {
                             }).then(res => {
                                 filler_channel_thread = res
                                 db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
-                                setTimeout(() => filler_channel_thread.messages.fetch(filler_channel_thread.id).then(message => message.delete().catch(console.error)).catch(console.error), 5000)
+                                setTimeout(() => filler_channel.messages.cache.get(filler_channel_thread.id).delete().catch(console.error), 5000)
                             }).catch(console.error)
                         }
                         console.log('thread created')
