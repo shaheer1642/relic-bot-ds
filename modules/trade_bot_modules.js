@@ -4255,16 +4255,6 @@ async function tb_user_online(message,interaction) {
     })
 }
 
-function generateId() {
-    let ID = "";
-    let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for ( var i = 0; i < 12; i++ ) {
-      ID += characters.charAt(Math.floor(Math.random() * 36));
-    }
-    return ID;
-}
-
-
 async function trade_tut(message,args) {
     if (message)
         if (message.author.id != '253525146923433984') {
@@ -4514,6 +4504,192 @@ async function riven_tut(message,args) {
     message.channel.send(postdata).catch(console.error)
 }
 
+async function thread_update_handler(oldThread,newThread) {
+    var order_data = null
+    var status = await db.query(`
+        SELECT * FROM tradebot_filled_users_orders
+        JOIN items_list ON tradebot_filled_users_orders.item_id = items_list.id
+        WHERE tradebot_filled_users_orders.thread_id = ${newThread.id};
+        SELECT * FROM tradebot_filled_users_lich_orders
+        JOIN lich_list ON tradebot_filled_users_lich_orders.lich_id = lich_list.lich_id
+        WHERE tradebot_filled_users_lich_orders.thread_id = ${newThread.id};
+    `).then(async res => {
+        var order_data = null
+        var isLich = false
+        if (res[0].rowCount == 1) {
+            order_data = res[0].rows[0]
+        } else if (res[1].rowCount == 1) {
+            isLich = true
+            order_data = res[1].rows[0]
+        } else {
+            return
+        }
+        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${order_data.order_owner} OR discord_id = ${order_data.order_filler};`)
+        .then(async res => {
+            if (res.rowCount != 2)
+                return
+            const userData = {}
+            res.rows.forEach(row => userData[row.discord_id] = row)
+            var order_status = ""
+            if (order_data.order_status == 'unsuccessful')
+                order_status = `unsuccessful ⚠️ (Select the troublemaker)`
+            else if (order_data.order_status == 'successful')
+                order_status = `successful ${trade_bot_modules.tradingBotReactions.success[0]}`
+            var reported_by = ""
+            if (order_data.reporter_id)
+                reported_by = `\n**Reported by:** <@${order_data.reporter_id}>`
+            if (isLich) {
+                var postdata = {}
+                postdata.content = order_data.suspicious ? '🛑 Bot has detected a suspicious trade. Require verification 🛑':' '
+                postdata.embeds = [{
+                    description: `
+                        A lich order has been filled and thread archived
+                        **Created by:** <@${order_data.order_owner}> (${embedScore(userData[order_data.order_owner].ingame_name)}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
+                        **Filled by:** <@${order_data.order_filler}> (${embedScore(userData[order_data.order_filler].ingame_name)}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
+                        **Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+                        **Price:** ${order_data.user_price}<:platinum:881692607791648778>
+                        **Order status:** ${order_status} ${reported_by}
+                        **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
+                        **Thread:** <#${newThread.id}>
+                        **Server:** ${newThread.guild.name}
+                        **-----Chat Log-----**
+                        ${order_data.messages_log.length > 0? order_data.messages_log.map(message => `**${embedScore(userData[message.discord_id].ingame_name)}**: ${embedScore(message)}`).join('\n')
+                        :'Empty'}
+                    `,
+                    image: {url: order_data.lich_image_url},
+                    timestamp: new Date(), 
+                    color: order_data.order_status.replace('unsuccessful',trade_bot_modules.tb_invisColor).replace('successful', order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor))
+                }]
+                if (order_data.order_status == 'unsuccessful') {
+                    postdata.components = [{
+                        type: 1,
+                        components: [{
+                            type: 3,
+                            placeholder: 'Select the troublemaker',
+                            custom_id: 'staff_trade_verification',
+                            min_values: 1,
+                            max_values: 1,
+                            options: [
+                                {
+                                    label: '🛑 ' + userData[order_data.order_owner].ingame_name,
+                                    value: order_data.order_owner
+                                },
+                                {
+                                    label: '🛑 ' + userData[order_data.order_filler].ingame_name,
+                                    value: order_data.order_filler
+                                },
+                                {
+                                    label: "None. All clear (change plat balance)",
+                                    value: "NonePlat"
+                                },
+                                {
+                                    label: "None. All clear (No change)",
+                                    value: "NoneNoPlat"
+                                }
+                            ]
+                        }]
+                    }]
+                }
+                var status = await db.query(`
+                UPDATE tradebot_filled_users_lich_orders SET archived = true
+                WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
+                `)
+                .then(res => {
+                    client.channels.cache.get(trade_bot_modules.ordersFillLogChannel).send(postdata).then(log_message => {
+                        var status = db.query(`
+                        UPDATE tradebot_filled_users_lich_orders
+                        SET trade_log_message = ${log_message.id}
+                        WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
+                        `)
+                    }).catch(err => console.log(err))
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            }
+            else {
+                var postdata = {}
+                postdata.content = " "
+                postdata.embeds = [{
+                    description: `
+                        An order has been filled and thread archived
+                        **Created by:** <@${order_data.order_owner}> (${embedScore(userData[order_data.order_owner].ingame_name)}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
+                        **Filled by:** <@${order_data.order_filler}> (${embedScore(userData[order_data.order_filler].ingame_name)}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
+                        **Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + order_data.user_rank.replace('unranked','').replace('maxed',' (maxed)')}
+                        **Price:** ${order_data.user_price}<:platinum:881692607791648778>
+                        **Order status:** ${order_status} ${reported_by}
+                        **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
+                        **Thread:** <#${newThread.id}>
+                        **Server:** ${newThread.guild.name}
+                        **-----Chat Log-----**
+                        ${order_data.messages_log.length > 0? order_data.messages_log.map(message => `**${embedScore(userData[message.discord_id].ingame_name)}**: ${embedScore(message)}`).join('\n')
+                        :'Empty'}
+                    `,
+                    timestamp: new Date(), 
+                    color: order_data.order_status.replace('unsuccessful',trade_bot_modules.tb_invisColor).replace('successful', order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor))
+                }]
+                if (order_data.order_status == 'unsuccessful') {
+                    postdata.components = [{
+                        type: 1,
+                        components: [{
+                            type: 3,
+                            placeholder: 'Select the troublemaker',
+                            custom_id: 'staff_trade_verification',
+                            min_values: 1,
+                            max_values: 1,
+                            options: [
+                                {
+                                    label: '🛑 ' + userData[order_data.order_owner].ingame_name,
+                                    value: order_data.order_owner
+                                },
+                                {
+                                    label: '🛑 ' + userData[order_data.order_filler].ingame_name,
+                                    value: order_data.order_filler
+                                },
+                                {
+                                    label: "None. All clear (change plat balance)",
+                                    value: "NonePlat"
+                                },
+                                {
+                                    label: "None. All clear (No change)",
+                                    value: "NoneNoPlat"
+                                }
+                            ]
+                        }]
+                    }]
+                }
+                var status = await db.query(`
+                UPDATE tradebot_filled_users_orders
+                SET archived = true
+                WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
+                `)
+                .then(res => {
+                    client.channels.cache.get(trade_bot_modules.ordersFillLogChannel).send(postdata).then(log_message => {
+                        var status = db.query(`
+                        UPDATE tradebot_filled_users_orders
+                        SET trade_log_message = ${log_message.id}
+                        WHERE thread_id = ${newThread.id} AND channel_id = ${newThread.parentId}
+                        `).catch(err => console.log(err))
+                    }).catch(err => console.log(err))
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            }
+        }).catch(console.error)
+    }).catch(console.error)
+}
+
+function generateId() {
+    let ID = "";
+    let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    for ( var i = 0; i < 12; i++ ) {
+      ID += characters.charAt(Math.floor(Math.random() * 36));
+    }
+    return ID;
+}
+
+
 
 db.on('notification', async (notification) => {
     console.log('db notification')
@@ -4641,6 +4817,7 @@ module.exports = {
     tb_user_online,
     reaction_handler,
     message_handler,
+    thread_update_handler,
     tradingBotChannels,
     tradingBotGuilds,
     tradingBotLichChannels,
