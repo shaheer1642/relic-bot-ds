@@ -1474,7 +1474,7 @@ async function reaction_handler(reaction, user, action) {
                     if (!reaction.message.author)
                         await reaction.message.channel.messages.fetch(reaction.message.id)
                     if (reaction.message.author.id == client.user.id) {
-                        if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != trade_bot_modules.tradingBotReactions.success[0]))
+                        if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
                             return Promise.resolve()
                         var order_data = null
                         var from_cross = false
@@ -1529,7 +1529,7 @@ async function reaction_handler(reaction, user, action) {
                         var suspicious = false
                         if (q_filledOrderTable == 'tradebot_filled_users_lich_orders' && order_data.user_price > 1000)
                             suspicious = true
-                        if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.success[0] && !suspicious) {
+                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] && !suspicious) {
                             var status = await db.query(`
                             UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
                             WHERE ${q_threadId} = ${reaction.message.channel.id};
@@ -4696,7 +4696,7 @@ async function thread_update_handler(oldThread,newThread) {
                         **Filled by:** <@${order_data.order_filler}> (${embedScore(userData[order_data.order_filler].ingame_name)}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
                         ${isLich ? `**Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}`:`**Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + order_data.user_rank.replace('unranked','').replace('maxed',' (maxed)')}`}
                         **Price:** ${order_data.user_price}<:platinum:881692607791648778>
-                        **Order status:** ${order_data.order_status == 'unsuccessful' ? `unsuccessful ⚠️ (Select the troublemaker)`:`successful ${trade_bot_modules.tradingBotReactions.success[0]}`} ${order_data.reporter_id ? `\n**Reported by:** <@${order_data.reporter_id}>`:''}
+                        **Order status:** ${order_data.order_status == 'unsuccessful' ? `unsuccessful ⚠️ (Select the troublemaker)`:`successful ${tradingBotReactions.success[0]}`} ${order_data.reporter_id ? `\n**Reported by:** <@${order_data.reporter_id}>`:''}
                         **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
                         **Thread:** <#${newThread.id}>
                         **Server:** ${newThread.guild.name}
@@ -4705,7 +4705,7 @@ async function thread_update_handler(oldThread,newThread) {
                     `,
                     image: {url: isLich ? order_data.lich_image_url:''},
                     timestamp: new Date(), 
-                    color: order_data.order_status.replace('unsuccessful',trade_bot_modules.tb_invisColor).replace('successful', order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor))
+                    color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
                 }]
                 if (order_data.order_status == 'unsuccessful') {
                     postdata.components = [{
@@ -4739,7 +4739,7 @@ async function thread_update_handler(oldThread,newThread) {
                 }
                 db.query(`UPDATE ${query_table} SET archived = true WHERE thread_id = ${newThread.id}`)
                 .then(res => {
-                    client.channels.cache.get(trade_bot_modules.ordersFillLogChannel).send(postdata).then(log_message => {
+                    client.channels.cache.get(ordersFillLogChannel).send(postdata).then(log_message => {
                         db.query(`UPDATE ${query_table} SET trade_log_message = ${log_message.id} WHERE thread_id = ${newThread.id}`).catch(console.error)
                     }).catch(console.error)
                 }).catch(console.error)
