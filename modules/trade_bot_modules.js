@@ -333,7 +333,6 @@ async function message_handler(message, multiMessage) {
 
 async function reaction_handler(reaction, user, action) {
     if (action == 'add') {
-        console.log('someone reacted with emoji 1')
         console.log(reaction.emoji.identifier)
         if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
             var order_type = ""
@@ -341,549 +340,54 @@ async function reaction_handler(reaction, user, action) {
                 order_type = 'wts'
             if (tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`))
                 order_type = 'wtb'
-            console.log('someone reacted with emoji 2')
             if (!reaction.message.author)
                 reaction.message = await client.channels.cache.get(reaction.message.channel.id).messages.fetch(reaction.message.id).catch(console.error);
-            var tradee = {}
-            tradee.discord_id = null
-            tradee.ingame_name = null
-            var trader = {}
-            trader.discord_id = null
-            trader.ingame_name = null
-            var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
-            .then(res => {
-                if (res.rows.length == 0)
-                    return false
-                else {
-                    tradee.discord_id = res.rows[0].discord_id
-                    tradee.ingame_name = res.rows[0].ingame_name
-                    return true
-                }
-            })
-            .catch (err => {
-                console.log(err)
-                return false
-            })
-            if (!status) {
-                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 10000))
-                user.send({content: "Type the following command to register your ign:\nverify ign"})
-                .catch(err=> {
-                    console.log(err)
-                    reaction.message.channel.send({content: `<@${user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot`}).then(msg => setTimeout(() => msg.delete(), 10000))
-                })
-                return Promise.resolve()
+            var tradee = {
+                discord_id: null,
+                ingame_name: null
             }
-            console.log('pass test 1')
-            var all_orders = []
-            var check_msg_id = reaction.message.id
-            var item_rank = "unranked"
-            if (reaction.message.embeds[0].title.toLowerCase().match('(maxed)'))
-                item_rank = "maxed"
-            if (Object.keys(tradingBotChannels).includes(reaction.message.channelId)) {
-                console.log('pass test 2')
-                var search_item_id = ""
-                var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
-                console.log(item_url)
-                var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${item_url}'`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        console.log('found 0 items')
-                        return false
-                    }
-                    if (res.rows.length > 1) {
-                        console.log('found more than one items')
-                        return false
-                    }
-                    search_item_id = res.rows[0].id
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
-                        reaction.message.delete().catch(console.error)
-                        return false
-                    }
-                    check_msg_id = res.rows[0].message_id
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank).catch(console.error)
-                    return
-                }
-                console.log('break test')
-                var status = await db.query(`
-                SELECT * FROM tradebot_messages_ids
-                JOIN tradebot_users_orders ON tradebot_messages_ids.item_id = tradebot_users_orders.item_id
-                JOIN tradebot_users_list ON tradebot_users_orders.discord_id = tradebot_users_list.discord_id
-                JOIN items_list ON tradebot_users_orders.item_id = items_list.id
-                WHERE tradebot_messages_ids.message_id = ${check_msg_id} AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
-                ORDER BY tradebot_users_list.ingame_name`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                        return false
-                    }
-                    else {
-                        all_orders = res.rows
-                        return true
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
-                    return
-                }
-                console.log('message id found')
-                var color = ''
-                if (order_type == 'wts') {
-                    all_orders = all_orders.sort(dynamicSort("user_price"))
-                    color = tb_sellColor
-                }
-                if (order_type == 'wtb') {
-                    all_orders = all_orders.sort(dynamicSortDesc("user_price"))
-                    color = tb_buyColor
-                }
-                console.log(order_type)
-                console.log(color)
-                var order_rank = -1
-                var temp = reaction.emoji.identifier.split('_')
-                order_rank = Number(temp[1].charAt(0)) - 1
-                console.log(order_rank)
-                if (order_rank == -1) {
-                    console.log('that trader does not exist in db check #1')
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                if (!all_orders[order_rank]) {
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
-                    return
-                }
-                trader.ingame_name = all_orders[order_rank].ingame_name
-                trader.discord_id = all_orders[order_rank].discord_id
-                console.log(trader.ingame_name + ' ' + trader.discord_id)
-                //----verify trader on discord side-----
-                var match_trade = false
-                if (reaction.message.embeds[0]) {
-                    console.log('has embed 0')
-                    console.log(reaction.message.embeds[0].fields[0].name)
-                    if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
-                            match_trade = true
-                    }
-                    else {
-                        if (reaction.message.embeds[1]) {
-                            console.log('has embed 1')
-                            console.log(reaction.message.embeds[1].fields[0].name)
-                            if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                                if (reaction.message.embeds[1].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
-                                    match_trade = true
-                            }
-                        }
-                    }
-                }
-                if (!match_trade) {
-                    console.log('that trader does not exist in db check #2')
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
-                    return
-                }
-                console.log('exact trader found')
-                //----------------
-                if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
-                    console.log('cannot trade yourself')
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                // Check if rows exceed the limit
-                var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
-                .then(async res => {
-                    if (res.rowCount >= filledOrdersLimit) {
-                        await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
-                    }
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                })
-                if (!status) {
-                    res.delete()
-                    return
-                }
-                db.query(`
-                    INSERT INTO tradebot_filled_users_orders
-                    (order_id,filler_channel_id,owner_channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,trade_timestamp)
-                    VALUES ('${uuid.v1()}',${reaction.message.channel.id},${all_orders[order_rank].origin_channel_id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${new Date().getTime()})
-                `).catch(err => {
-                    console.log(err)
-                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                })
-                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+            var trader = {
+                discord_id: null,
+                ingame_name: null
             }
-            else if (Object.keys(tradingBotLichChannels).includes(reaction.message.channelId)) {
-                var lich_info = []
-                var weapon_url = reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_').trim()
-                console.log(weapon_url)
-                var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${weapon_url}'`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        console.log('found 0 items')
-                        return false
-                    }
-                    if (res.rows.length > 1) {
-                        console.log('found more than one items')
-                        return false
-                    }
-                    lich_info = res.rows[0]
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
-                        reaction.message.delete().catch(console.error)
-                        return false
-                    }
-                    check_msg_id = res.rows[0].message_id
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    trading_lich_orders_update(null,lich_info,1).catch(console.error)
-                    return Promise.resolve()
-                }
-    
-                var status = await db.query(`
-                SELECT * FROM tradebot_lich_messages_ids
-                JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = tradebot_users_lich_orders.lich_id
-                JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id = tradebot_users_list.discord_id
-                JOIN lich_list ON tradebot_users_lich_orders.lich_id = lich_list.lich_id
-                WHERE lich_messages_ids.message_id = ${check_msg_id} AND tradebot_users_lich_orders.visibility = true AND tradebot_users_lich_orders.order_type = '${order_type}'
-                ORDER BY tradebot_users_list.ingame_name`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                        return false
-                    }
-                    else {
-                        all_orders = res.rows
-                        return true
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
-                    return
-                }
-                console.log('message id found')
-                var color = ''
-                if (order_type == 'wts') {
-                    all_orders = all_orders.sort(dynamicSort("user_price"))
-                    color = tb_sellColor
-                }
-                if (order_type == 'wtb') {
-                    all_orders = all_orders.sort(dynamicSortDesc("user_price"))
-                    color = tb_buyColor
-                }
-                console.log(order_type)
-                console.log(color)
-                var order_rank = -1
-                var temp = reaction.emoji.identifier.split('_')
-                order_rank = Number(temp[1].charAt(0)) - 1
-                console.log(order_rank)
-                if (order_rank == -1) {
-                    console.log('that trader does not exist in db check #1')
-                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
-                    return
-                }
-                if (!all_orders[order_rank]) {
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
-                    return
-                }
-                trader.ingame_name = all_orders[order_rank].ingame_name
-                trader.discord_id = all_orders[order_rank].discord_id
-                console.log(trader.ingame_name + ' ' + trader.discord_id)
-                //----verify trader on discord side-----
-                var match_trade = false
-                reaction.message.embeds.forEach(e => {
-                    if (e.image.url.match(trader.discord_id))
-                        if (e.description.match(reaction.emoji.identifier))
-                            match_trade = true
-                })
-                if (!match_trade) {
-                    console.log('that trader does not exist in db check #2')
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
-                    return
-                }
-                console.log('exact trader found')
-                //----------------
-                if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
-                    console.log('cannot trade yourself')
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
-                .then(res => {
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                var threadName = `${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
-                if (threadName.length > 99) {
-                    console.log(`${threadName} thread's name is longer than 99`)
-                    threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
-                }
-                trading_lich_orders_update(null,all_orders[order_rank],2).catch(console.error)
-                await reaction.message.channel.threads.create({
-                    name: threadName,
-                    autoArchiveDuration: 60,
-                    reason: 'Trade opened.'
-                })
-                .then(async res => {
-                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
-                    console.log(res)
-                    var cross_thread = null
-                    var cross_channel = null
-                    var cross_thread_id = null
-                    var cross_channel_id = null
-                    if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
-                        const guild = client.guilds.cache.get(reaction.message.guild.id)
-                        if (!guild.members.cache.find(member => member.id == all_orders[order_rank].discord_id)) {
-                            cross_channel =  client.channels.cache.get(all_orders[order_rank].origin_channel_id)
-                            await cross_channel.threads.create({
-                                name: threadName,
-                                autoArchiveDuration: 60,
-                                reason: 'Trade opened.'
-                            })
-                            .then(async crossRes => {
-                                cross_thread = crossRes
-                                cross_thread_id = crossRes.id
-                                cross_channel_id = crossRes.parentId
-                                setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
-                            })
-                            .catch(console.error)
-                        }
-                    }
-                    // Check if rows exceed the limit
-                    var status = await db.query(`SELECT * FROM tradebot_filled_users_lich_orders ORDER BY trade_timestamp`)
-                    .then(async res => {
-                        if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
-                        }
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                        return false
-                    })
-                    if (!status) {
-                        res.delete()
-                        return
-                    }
-                    var status = await db.query(`
-                    INSERT INTO tradebot_filled_users_lich_orders
-                    (thread_id,channel_id,order_owner,order_filler,lich_id,order_type,user_price,element,damage,ephemera,lich_name,lich_image_url,cross_thread_id,cross_channel_id,trade_timestamp)
-                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].lich_id}','${order_type}',${all_orders[order_rank].user_price},'${all_orders[order_rank].element}',${all_orders[order_rank].damage},${all_orders[order_rank].ephemera},'${all_orders[order_rank].lich_name}','${all_orders[order_rank].lich_image_url}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
-                    `)
+            tb_user_exist(user.id).then(async () => {
+                console.log('pass test 1')
+                var all_orders = []
+                var check_msg_id = reaction.message.id
+                var item_rank = "unranked"
+                if (reaction.message.embeds[0].title.toLowerCase().match('(maxed)'))
+                    item_rank = "maxed"
+                if (Object.keys(tradingBotChannels).includes(reaction.message.channelId)) {
+                    console.log('pass test 2')
+                    var search_item_id = ""
+                    var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
+                    console.log(item_url)
+                    var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${item_url}'`)
                     .then(res => {
+                        if (res.rows.length == 0) {
+                            console.log('found 0 items')
+                            return false
+                        }
+                        if (res.rows.length > 1) {
+                            console.log('found more than one items')
+                            return false
+                        }
+                        search_item_id = res.rows[0].id
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
-                        res.delete()
-                        return
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        return Promise.resolve()
                     }
-                    console.log('thread created')
-                    await res.members.add(trader.discord_id).catch(console.error)
-                    await res.members.add(tradee.discord_id).catch(console.error)
-                    if (cross_thread) {
-                        await cross_thread.members.add(trader.discord_id).catch(console.error)
-                        await cross_thread.members.add(tradee.discord_id).catch(console.error)
-                    }
-                    var owner_refer = res.id
-                    if (cross_thread)
-                        owner_refer = cross_thread.id
-                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
-                    var postdata = {}
-                    postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
-                    postdata.timestamp = new Date()
-                    postdata.title = all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                    postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
-                    postdata.image = {url: all_orders[order_rank].lich_image_url}
-                    postdata.description = `
-                        **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
-                        **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
-                        **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
-                        **Trade type:** Lich
-                        **Weapon:** ${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
-    
-                        /invite ${embedScore(trader.ingame_name)}
-                        /invite ${embedScore(tradee.ingame_name)}
-    
-                        React with ${tradingBotReactions.success[0]} to finish this trade.
-                        React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
-                    `
-                    res.send({content: ' ',embeds: [postdata]})
-                    .then(open_message => {
-                        var status = db.query(`
-                        UPDATE tradebot_filled_users_lich_orders SET trade_open_message = ${open_message.id}
-                        WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
-                        `)
-                        .catch(console.error)
-                        open_message.react(tradingBotReactions.success[0]).catch(console.error)
-                        open_message.react('⚠️').catch(console.error)
-                        if (cross_thread)
-                            res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
-                    })
-                    .catch(console.error)
-                    if (cross_thread) {
-                        cross_thread.send({content: ' ',embeds: [postdata]})
-                        .then(c_open_message => {
-                            var status = db.query(`
-                            UPDATE tradebot_filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
-                            WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
-                            `)
-                            .catch(console.error)
-                            c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
-                            c_open_message.react('⚠️').catch(console.error)
-                            cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
-                        })
-                    }
-                    setTimeout(() => {
-                        res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                        if (cross_thread) 
-                            cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                    }
-                    , 900000)
-                    setTimeout(() => {
-                        db.query(`SELECT * FROM tradebot_filled_users_lich_orders
-                        WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
-                        `)
-                        .then(foundThread => {
-                            if (foundThread.rows.length == 0)
-                                return
-                            if (foundThread.rows.length > 1)
-                                return
-                            res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                            .catch(console.error)
-                            if (cross_thread)
-                                cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
-                        })
-                    }, 720000)
-                })
-                .catch(console.error)
-                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-            }
-            else if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
-                console.log('pass test 2')
-                var search_item_id = ""
-                var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
-                console.log(item_url)
-                var isLich = false
-                var lich_info = {}
-                var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${item_url}'`)
-                .then(async res => {
-                    if (res.rows.length == 0) {
-                        var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${item_url}'`)
-                        .then(res => {
-                            if (res.rows.length == 0) {
-                                console.log('found 0 lich')
-                                return false
-                            }
-                            if (res.rows.length > 1) {
-                                console.log('found more than one lich')
-                                return false
-                            }
-                            isLich = true
-                            lich_info = res.rows[0]
-                            return true
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return false
-                        })
-                        if (!status)
-                            return false
-                        return true
-                    }
-                    if (res.rows.length > 1) {
-                        console.log('found more than one items')
-                        return false
-                    }
-                    search_item_id = res.rows[0].id
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                if (isLich) {
-                    var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
+                    var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
                     .then(res => {
                         if (res.rows.length == 0) {
                             reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+                            reaction.message.delete().catch(console.error)
                             return false
                         }
                         check_msg_id = res.rows[0].message_id
@@ -894,22 +398,16 @@ async function reaction_handler(reaction, user, action) {
                         return false
                     })
                     if (!status) {
-                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                        var args = []
-                        if (order_type == 'wts')
-                            args.push('wtb')
-                        else 
-                            args.push('wtb')
-                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank).catch(console.error)
                         return
                     }
+                    console.log('break test')
                     var status = await db.query(`
-                    SELECT * FROM tradebot_lich_messages_ids
-                    JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = tradebot_users_lich_orders.lich_id
-                    JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id = tradebot_users_list.discord_id
-                    JOIN lich_list ON tradebot_users_lich_orders.lich_id = lich_list.lich_id
-                    WHERE lich_messages_ids.message_id = ${check_msg_id} AND tradebot_users_lich_orders.visibility = true AND tradebot_users_lich_orders.order_type = '${order_type}'
+                    SELECT * FROM tradebot_messages_ids
+                    JOIN tradebot_users_orders ON tradebot_messages_ids.item_id = tradebot_users_orders.item_id
+                    JOIN tradebot_users_list ON tradebot_users_orders.discord_id = tradebot_users_list.discord_id
+                    JOIN items_list ON tradebot_users_orders.item_id = items_list.id
+                    WHERE tradebot_messages_ids.message_id = ${check_msg_id} AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
                     ORDER BY tradebot_users_list.ingame_name`)
                     .then(res => {
                         if (res.rows.length == 0) {
@@ -928,13 +426,7 @@ async function reaction_handler(reaction, user, action) {
                     })
                     if (!status) {
                         setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                        var args = []
-                        if (order_type == 'wts')
-                            args.push('wtb')
-                        else 
-                            args.push('wtb')
-                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
                         return
                     }
                     console.log('message id found')
@@ -961,13 +453,7 @@ async function reaction_handler(reaction, user, action) {
                     if (!all_orders[order_rank]) {
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                        var args = []
-                        if (order_type == 'wts')
-                            args.push('wtb')
-                        else 
-                            args.push('wtb')
-                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
                         return
                     }
                     trader.ingame_name = all_orders[order_rank].ingame_name
@@ -975,19 +461,169 @@ async function reaction_handler(reaction, user, action) {
                     console.log(trader.ingame_name + ' ' + trader.discord_id)
                     //----verify trader on discord side-----
                     var match_trade = false
-                    if (reaction.message.embeds[0].fields[2].value.match(trader.discord_id))
-                        match_trade = true
+                    if (reaction.message.embeds[0]) {
+                        console.log('has embed 0')
+                        console.log(reaction.message.embeds[0].fields[0].name)
+                        if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
+                            if (reaction.message.embeds[0].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
+                                match_trade = true
+                        }
+                        else {
+                            if (reaction.message.embeds[1]) {
+                                console.log('has embed 1')
+                                console.log(reaction.message.embeds[1].fields[0].name)
+                                if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
+                                    if (reaction.message.embeds[1].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
+                                        match_trade = true
+                                }
+                            }
+                        }
+                    }
                     if (!match_trade) {
                         console.log('that trader does not exist in db check #2')
                         reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                        var args = []
-                        if (order_type == 'wts')
-                            args.push('wtb')
-                        else 
-                            args.push('wtb')
-                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
+                        return
+                    }
+                    console.log('exact trader found')
+                    //----------------
+                    if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
+                        console.log('cannot trade yourself')
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        return Promise.resolve()
+                    }
+                    // Check if rows exceed the limit
+                    db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
+                    .then(async res => {
+                        if (res.rowCount >= filledOrdersLimit)
+                            db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id}`).catch(console.error)
+                        return true
+                    }).catch(console.error)
+                    db.query(`
+                        INSERT INTO tradebot_filled_users_orders
+                        (order_id,filler_channel_id,owner_channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,trade_timestamp)
+                        VALUES ('${uuid.v1()}',${reaction.message.channel.id},${all_orders[order_rank].origin_channel_id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${new Date().getTime()})
+                    `).catch(err => {
+                        console.log(err)
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding filled order in db.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        return false
+                    })
+                }
+                else if (Object.keys(tradingBotLichChannels).includes(reaction.message.channelId)) {
+                    var lich_info = []
+                    var weapon_url = reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_').trim()
+                    console.log(weapon_url)
+                    var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${weapon_url}'`)
+                    .then(res => {
+                        if (res.rows.length == 0) {
+                            console.log('found 0 items')
+                            return false
+                        }
+                        if (res.rows.length > 1) {
+                            console.log('found more than one items')
+                            return false
+                        }
+                        lich_info = res.rows[0]
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        return Promise.resolve()
+                    }
+                    var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
+                    .then(res => {
+                        if (res.rows.length == 0) {
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+                            reaction.message.delete().catch(console.error)
+                            return false
+                        }
+                        check_msg_id = res.rows[0].message_id
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        trading_lich_orders_update(null,lich_info,1).catch(console.error)
+                        return Promise.resolve()
+                    }
+        
+                    var status = await db.query(`
+                    SELECT * FROM tradebot_lich_messages_ids
+                    JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = tradebot_users_lich_orders.lich_id
+                    JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id = tradebot_users_list.discord_id
+                    JOIN lich_list ON tradebot_users_lich_orders.lich_id = lich_list.lich_id
+                    WHERE lich_messages_ids.message_id = ${check_msg_id} AND tradebot_users_lich_orders.visibility = true AND tradebot_users_lich_orders.order_type = '${order_type}'
+                    ORDER BY tradebot_users_list.ingame_name`)
+                    .then(res => {
+                        if (res.rows.length == 0) {
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            return false
+                        }
+                        else {
+                            all_orders = res.rows
+                            return true
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        return false
+                    })
+                    if (!status) {
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        trading_lich_orders_update(null,lich_info,2).catch(console.error)
+                        return
+                    }
+                    console.log('message id found')
+                    var color = ''
+                    if (order_type == 'wts') {
+                        all_orders = all_orders.sort(dynamicSort("user_price"))
+                        color = tb_sellColor
+                    }
+                    if (order_type == 'wtb') {
+                        all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+                        color = tb_buyColor
+                    }
+                    console.log(order_type)
+                    console.log(color)
+                    var order_rank = -1
+                    var temp = reaction.emoji.identifier.split('_')
+                    order_rank = Number(temp[1].charAt(0)) - 1
+                    console.log(order_rank)
+                    if (order_rank == -1) {
+                        console.log('that trader does not exist in db check #1')
+                        trading_lich_orders_update(null,lich_info,2).catch(console.error)
+                        return
+                    }
+                    if (!all_orders[order_rank]) {
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        trading_lich_orders_update(null,lich_info,2).catch(console.error)
+                        return
+                    }
+                    trader.ingame_name = all_orders[order_rank].ingame_name
+                    trader.discord_id = all_orders[order_rank].discord_id
+                    console.log(trader.ingame_name + ' ' + trader.discord_id)
+                    //----verify trader on discord side-----
+                    var match_trade = false
+                    reaction.message.embeds.forEach(e => {
+                        if (e.image.url.match(trader.discord_id))
+                            if (e.description.match(reaction.emoji.identifier))
+                                match_trade = true
+                    })
+                    if (!match_trade) {
+                        console.log('that trader does not exist in db check #2')
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        trading_lich_orders_update(null,lich_info,2).catch(console.error)
                         return
                     }
                     console.log('exact trader found')
@@ -1016,15 +652,6 @@ async function reaction_handler(reaction, user, action) {
                         threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                     }
                     trading_lich_orders_update(null,all_orders[order_rank],2).catch(console.error)
-                    var args = []
-                    var tempp = all_orders[order_rank].order_type
-                    if (tempp == 'wts')
-                        tempp = 'wtb'
-                    else 
-                        tempp = 'wts'
-                    args.push(tempp)
-                    args.push(all_orders[order_rank].weapon_url)
-                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                     await reaction.message.channel.threads.create({
                         name: threadName,
                         autoArchiveDuration: 60,
@@ -1114,10 +741,10 @@ async function reaction_handler(reaction, user, action) {
                             **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
                             **Trade type:** Lich
                             **Weapon:** ${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
-    
+        
                             /invite ${embedScore(trader.ingame_name)}
                             /invite ${embedScore(tradee.ingame_name)}
-    
+        
                             React with ${tradingBotReactions.success[0]} to finish this trade.
                             React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
                         `
@@ -1171,334 +798,675 @@ async function reaction_handler(reaction, user, action) {
                     })
                     .catch(console.error)
                     setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return
                 }
-                var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
-                        return false
-                    }
-                    check_msg_id = res.rows[0].message_id
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    var args = []
-                    if (order_type == 'wts')
-                        args.push('wtb')
-                    else 
-                        args.push('wtb')
-                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                    if (item_rank == 'maxed')
-                        args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
-                    return
-                }
-                console.log('break test')
-                var status = await db.query(`
-                SELECT * FROM tradebot_messages_ids
-                JOIN tradebot_users_orders ON tradebot_messages_ids.item_id = tradebot_users_orders.item_id
-                JOIN tradebot_users_list ON tradebot_users_orders.discord_id = tradebot_users_list.discord_id
-                JOIN items_list ON tradebot_users_orders.item_id = items_list.id
-                WHERE tradebot_messages_ids.message_id = ${check_msg_id} AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
-                ORDER BY tradebot_users_list.ingame_name`)
-                .then(res => {
-                    if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                        return false
-                    }
-                    else {
-                        all_orders = res.rows
-                        return true
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    var args = []
-                    if (order_type == 'wts')
-                        args.push('wtb')
-                    else 
-                        args.push('wtb')
-                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                    if (item_rank == 'maxed')
-                        args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
-                    return Promise.resolve()
-                }
-                console.log('message id found')
-                var color = ''
-                if (order_type == 'wts') {
-                    all_orders = all_orders.sort(dynamicSort("user_price"))
-                    color = tb_sellColor
-                }
-                if (order_type == 'wtb') {
-                    all_orders = all_orders.sort(dynamicSortDesc("user_price"))
-                    color = tb_buyColor
-                }
-                console.log(order_type)
-                console.log(color)
-                var order_rank = -1
-                var temp = reaction.emoji.identifier.split('_')
-                order_rank = Number(temp[1].charAt(0)) - 1
-                console.log(order_rank)
-                if (order_rank == -1) {
-                    console.log('that trader does not exist in db check #1')
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    var args = []
-                    if (order_type == 'wts')
-                        args.push('wtb')
-                    else 
-                        args.push('wtb')
-                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                    if (item_rank == 'maxed')
-                        args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
-                    return
-                }
-                if (!all_orders[order_rank]) {
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    var args = []
-                    if (order_type == 'wts')
-                        args.push('wtb')
-                    else 
-                        args.push('wtb')
-                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                    if (item_rank == 'maxed')
-                        args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
-                    return
-                }
-                trader.ingame_name = all_orders[order_rank].ingame_name
-                trader.discord_id = all_orders[order_rank].discord_id
-                console.log(trader.ingame_name + ' ' + trader.discord_id)
-                //----verify trader on discord side-----
-                var match_trade = false
-                if (reaction.message.embeds[0]) {
-                    console.log('has embed 0')
-                    console.log(reaction.message.embeds[0].fields[0].name)
-                    if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                        if (reaction.message.embeds[0].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
-                            match_trade = true
-                    }
-                    else {
-                        if (reaction.message.embeds[1]) {
-                            console.log('has embed 1')
-                            console.log(reaction.message.embeds[1].fields[0].name)
-                            if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
-                                if (reaction.message.embeds[1].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
-                                    match_trade = true
-                            }
-                        }
-                    }
-                }
-                if (!match_trade) {
-                    console.log('that trader does not exist in db check #2')
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    var args = []
-                    if (order_type == 'wts')
-                        args.push('wtb')
-                    else 
-                        args.push('wtb')
-                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                    if (item_rank == 'maxed')
-                        args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
-                    return
-                }
-                console.log('exact trader found')
-                //----------------
-                if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
-                    console.log('cannot trade yourself')
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
-                .then(res => {
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                })
-                if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-                    return Promise.resolve()
-                }
-                var threadName = `${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
-                if (threadName.length > 99) {
-                    console.log(`${threadName} thread's name is longer than 99`)
-                    threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
-                }
-                trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
-                var args = []
-                var tempp = all_orders[order_rank].order_type
-                if (order_type == 'wts')
-                    args.push('wtb')
-                else 
-                    args.push('wts')
-                args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                if (item_rank == 'maxed')
-                    args.push(item_rank)
-                trading_bot_item_orders(reaction.message,args,2).catch(console.error)
-                const thread = await reaction.message.channel.threads.create({
-                    name: threadName,
-                    autoArchiveDuration: 60,
-                    reason: 'Trade opened.'
-                })
-                .then(async res => {
-                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
-                    console.log(res)
-                    var cross_thread = null
-                    var cross_channel = null
-                    var cross_thread_id = null
-                    var cross_channel_id = null
-                    if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
-                        const guild = client.guilds.cache.get(reaction.message.guild.id)
-                        if (!guild.members.cache.find(member => member.id == all_orders[order_rank].discord_id)) {
-                            cross_channel =  client.channels.cache.get(all_orders[order_rank].origin_channel_id)
-                            await cross_channel.threads.create({
-                                name: threadName,
-                                autoArchiveDuration: 60,
-                                reason: 'Trade opened.'
-                            })
-                            .then(async crossRes => {
-                                cross_thread = crossRes
-                                cross_thread_id = crossRes.id
-                                cross_channel_id = crossRes.parentId
-                                setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
-                            })
-                            .catch(console.error)
-                        }
-                    }
-                    // Check if rows exceed the limit
-                    var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
+                else if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
+                    console.log('pass test 2')
+                    var search_item_id = ""
+                    var item_url = reaction.message.embeds[0].title.toLowerCase().replace(' (maxed)','').replace(/ /g,'_').trim()
+                    console.log(item_url)
+                    var isLich = false
+                    var lich_info = {}
+                    var status = await db.query(`SELECT * FROM items_list WHERE item_url = '${item_url}'`)
                     .then(async res => {
-                        if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
+                        if (res.rows.length == 0) {
+                            var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${item_url}'`)
+                            .then(res => {
+                                if (res.rows.length == 0) {
+                                    console.log('found 0 lich')
+                                    return false
+                                }
+                                if (res.rows.length > 1) {
+                                    console.log('found more than one lich')
+                                    return false
+                                }
+                                isLich = true
+                                lich_info = res.rows[0]
+                                return true
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                return false
+                            })
+                            if (!status)
+                                return false
+                            return true
                         }
+                        if (res.rows.length > 1) {
+                            console.log('found more than one items')
+                            return false
+                        }
+                        search_item_id = res.rows[0].id
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
-                        res.delete()
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        return Promise.resolve()
+                    }
+                    if (isLich) {
+                        var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
+                        .then(res => {
+                            if (res.rows.length == 0) {
+                                reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+                                return false
+                            }
+                            check_msg_id = res.rows[0].message_id
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status) {
+                            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                            var args = []
+                            if (order_type == 'wts')
+                                args.push('wtb')
+                            else 
+                                args.push('wtb')
+                            args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                            trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                            return
+                        }
+                        var status = await db.query(`
+                        SELECT * FROM tradebot_lich_messages_ids
+                        JOIN tradebot_users_lich_orders ON lich_messages_ids.lich_id = tradebot_users_lich_orders.lich_id
+                        JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id = tradebot_users_list.discord_id
+                        JOIN lich_list ON tradebot_users_lich_orders.lich_id = lich_list.lich_id
+                        WHERE lich_messages_ids.message_id = ${check_msg_id} AND tradebot_users_lich_orders.visibility = true AND tradebot_users_lich_orders.order_type = '${order_type}'
+                        ORDER BY tradebot_users_list.ingame_name`)
+                        .then(res => {
+                            if (res.rows.length == 0) {
+                                reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                                return false
+                            }
+                            else {
+                                all_orders = res.rows
+                                return true
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            return false
+                        })
+                        if (!status) {
+                            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                            var args = []
+                            if (order_type == 'wts')
+                                args.push('wtb')
+                            else 
+                                args.push('wtb')
+                            args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                            trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                            return
+                        }
+                        console.log('message id found')
+                        var color = ''
+                        if (order_type == 'wts') {
+                            all_orders = all_orders.sort(dynamicSort("user_price"))
+                            color = tb_sellColor
+                        }
+                        if (order_type == 'wtb') {
+                            all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+                            color = tb_buyColor
+                        }
+                        console.log(order_type)
+                        console.log(color)
+                        var order_rank = -1
+                        var temp = reaction.emoji.identifier.split('_')
+                        order_rank = Number(temp[1].charAt(0)) - 1
+                        console.log(order_rank)
+                        if (order_rank == -1) {
+                            console.log('that trader does not exist in db check #1')
+                            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                            return Promise.resolve()
+                        }
+                        if (!all_orders[order_rank]) {
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                            var args = []
+                            if (order_type == 'wts')
+                                args.push('wtb')
+                            else 
+                                args.push('wtb')
+                            args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                            trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                            return
+                        }
+                        trader.ingame_name = all_orders[order_rank].ingame_name
+                        trader.discord_id = all_orders[order_rank].discord_id
+                        console.log(trader.ingame_name + ' ' + trader.discord_id)
+                        //----verify trader on discord side-----
+                        var match_trade = false
+                        if (reaction.message.embeds[0].fields[2].value.match(trader.discord_id))
+                            match_trade = true
+                        if (!match_trade) {
+                            console.log('that trader does not exist in db check #2')
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                            var args = []
+                            if (order_type == 'wts')
+                                args.push('wtb')
+                            else 
+                                args.push('wtb')
+                            args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                            trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                            return
+                        }
+                        console.log('exact trader found')
+                        //----------------
+                        if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
+                            console.log('cannot trade yourself')
+                            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                            return Promise.resolve()
+                        }
+                        var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
+                        .then(res => {
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            return false
+                        })
+                        if (!status) {
+                            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                            return Promise.resolve()
+                        }
+                        var threadName = `${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
+                        if (threadName.length > 99) {
+                            console.log(`${threadName} thread's name is longer than 99`)
+                            threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
+                        }
+                        trading_lich_orders_update(null,all_orders[order_rank],2).catch(console.error)
+                        var args = []
+                        var tempp = all_orders[order_rank].order_type
+                        if (tempp == 'wts')
+                            tempp = 'wtb'
+                        else 
+                            tempp = 'wts'
+                        args.push(tempp)
+                        args.push(all_orders[order_rank].weapon_url)
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        await reaction.message.channel.threads.create({
+                            name: threadName,
+                            autoArchiveDuration: 60,
+                            reason: 'Trade opened.'
+                        })
+                        .then(async res => {
+                            setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
+                            console.log(res)
+                            var cross_thread = null
+                            var cross_channel = null
+                            var cross_thread_id = null
+                            var cross_channel_id = null
+                            if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
+                                const guild = client.guilds.cache.get(reaction.message.guild.id)
+                                if (!guild.members.cache.find(member => member.id == all_orders[order_rank].discord_id)) {
+                                    cross_channel =  client.channels.cache.get(all_orders[order_rank].origin_channel_id)
+                                    await cross_channel.threads.create({
+                                        name: threadName,
+                                        autoArchiveDuration: 60,
+                                        reason: 'Trade opened.'
+                                    })
+                                    .then(async crossRes => {
+                                        cross_thread = crossRes
+                                        cross_thread_id = crossRes.id
+                                        cross_channel_id = crossRes.parentId
+                                        setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
+                                    })
+                                    .catch(console.error)
+                                }
+                            }
+                            // Check if rows exceed the limit
+                            var status = await db.query(`SELECT * FROM tradebot_filled_users_lich_orders ORDER BY trade_timestamp`)
+                            .then(async res => {
+                                if (res.rowCount >= filledOrdersLimit) {
+                                    await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
+                                }
+                                return true
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                                return false
+                            })
+                            if (!status) {
+                                res.delete()
+                                return
+                            }
+                            var status = await db.query(`
+                            INSERT INTO tradebot_filled_users_lich_orders
+                            (thread_id,channel_id,order_owner,order_filler,lich_id,order_type,user_price,element,damage,ephemera,lich_name,lich_image_url,cross_thread_id,cross_channel_id,trade_timestamp)
+                            VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].lich_id}','${order_type}',${all_orders[order_rank].user_price},'${all_orders[order_rank].element}',${all_orders[order_rank].damage},${all_orders[order_rank].ephemera},'${all_orders[order_rank].lich_name}','${all_orders[order_rank].lich_image_url}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
+                            `)
+                            .then(res => {
+                                return true
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                                return false
+                            })
+                            if (!status) {
+                                res.delete()
+                                return
+                            }
+                            console.log('thread created')
+                            await res.members.add(trader.discord_id).catch(console.error)
+                            await res.members.add(tradee.discord_id).catch(console.error)
+                            if (cross_thread) {
+                                await cross_thread.members.add(trader.discord_id).catch(console.error)
+                                await cross_thread.members.add(tradee.discord_id).catch(console.error)
+                            }
+                            var owner_refer = res.id
+                            if (cross_thread)
+                                owner_refer = cross_thread.id
+                            client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
+                            //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                            //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                            var postdata = {}
+                            postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                            postdata.timestamp = new Date()
+                            postdata.title = all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+                            postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
+                            postdata.image = {url: all_orders[order_rank].lich_image_url}
+                            postdata.description = `
+                                **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
+                                **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
+                                **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
+                                **Trade type:** Lich
+                                **Weapon:** ${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+        
+                                /invite ${embedScore(trader.ingame_name)}
+                                /invite ${embedScore(tradee.ingame_name)}
+        
+                                React with ${tradingBotReactions.success[0]} to finish this trade.
+                                React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
+                            `
+                            res.send({content: ' ',embeds: [postdata]})
+                            .then(open_message => {
+                                var status = db.query(`
+                                UPDATE tradebot_filled_users_lich_orders SET trade_open_message = ${open_message.id}
+                                WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
+                                `)
+                                .catch(console.error)
+                                open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                                open_message.react('⚠️').catch(console.error)
+                                if (cross_thread)
+                                    res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
+                            })
+                            .catch(console.error)
+                            if (cross_thread) {
+                                cross_thread.send({content: ' ',embeds: [postdata]})
+                                .then(c_open_message => {
+                                    var status = db.query(`
+                                    UPDATE tradebot_filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
+                                    WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
+                                    `)
+                                    .catch(console.error)
+                                    c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                                    c_open_message.react('⚠️').catch(console.error)
+                                    cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
+                                })
+                            }
+                            setTimeout(() => {
+                                res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                                if (cross_thread) 
+                                    cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                            }
+                            , 900000)
+                            setTimeout(() => {
+                                db.query(`SELECT * FROM tradebot_filled_users_lich_orders
+                                WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
+                                `)
+                                .then(foundThread => {
+                                    if (foundThread.rows.length == 0)
+                                        return
+                                    if (foundThread.rows.length > 1)
+                                        return
+                                    res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
+                                    .catch(console.error)
+                                    if (cross_thread)
+                                        cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                                })
+                            }, 720000)
+                        })
+                        .catch(console.error)
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         return
                     }
+                    var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
+                    .then(res => {
+                        if (res.rows.length == 0) {
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+                            return false
+                        }
+                        check_msg_id = res.rows[0].message_id
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        if (item_rank == 'maxed')
+                            args.push(item_rank)
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        return
+                    }
+                    console.log('break test')
                     var status = await db.query(`
-                    INSERT INTO tradebot_filled_users_orders
-                    (thread_id,channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
-                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
-                    `)
+                    SELECT * FROM tradebot_messages_ids
+                    JOIN tradebot_users_orders ON tradebot_messages_ids.item_id = tradebot_users_orders.item_id
+                    JOIN tradebot_users_list ON tradebot_users_orders.discord_id = tradebot_users_list.discord_id
+                    JOIN items_list ON tradebot_users_orders.item_id = items_list.id
+                    WHERE tradebot_messages_ids.message_id = ${check_msg_id} AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
+                    ORDER BY tradebot_users_list.ingame_name`)
+                    .then(res => {
+                        if (res.rows.length == 0) {
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            return false
+                        }
+                        else {
+                            all_orders = res.rows
+                            return true
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        return false
+                    })
+                    if (!status) {
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        if (item_rank == 'maxed')
+                            args.push(item_rank)
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        return Promise.resolve()
+                    }
+                    console.log('message id found')
+                    var color = ''
+                    if (order_type == 'wts') {
+                        all_orders = all_orders.sort(dynamicSort("user_price"))
+                        color = tb_sellColor
+                    }
+                    if (order_type == 'wtb') {
+                        all_orders = all_orders.sort(dynamicSortDesc("user_price"))
+                        color = tb_buyColor
+                    }
+                    console.log(order_type)
+                    console.log(color)
+                    var order_rank = -1
+                    var temp = reaction.emoji.identifier.split('_')
+                    order_rank = Number(temp[1].charAt(0)) - 1
+                    console.log(order_rank)
+                    if (order_rank == -1) {
+                        console.log('that trader does not exist in db check #1')
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        if (item_rank == 'maxed')
+                            args.push(item_rank)
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        return
+                    }
+                    if (!all_orders[order_rank]) {
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        if (item_rank == 'maxed')
+                            args.push(item_rank)
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        return
+                    }
+                    trader.ingame_name = all_orders[order_rank].ingame_name
+                    trader.discord_id = all_orders[order_rank].discord_id
+                    console.log(trader.ingame_name + ' ' + trader.discord_id)
+                    //----verify trader on discord side-----
+                    var match_trade = false
+                    if (reaction.message.embeds[0]) {
+                        console.log('has embed 0')
+                        console.log(reaction.message.embeds[0].fields[0].name)
+                        if (reaction.message.embeds[0].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
+                            if (reaction.message.embeds[0].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
+                                match_trade = true
+                        }
+                        else {
+                            if (reaction.message.embeds[1]) {
+                                console.log('has embed 1')
+                                console.log(reaction.message.embeds[1].fields[0].name)
+                                if (reaction.message.embeds[1].fields[0].name.match(order_type.replace('wts','Sellers').replace('wtb','Buyers'))) {
+                                    if (reaction.message.embeds[1].fields[0].value.toLowerCase().replaceAll('\\','').match(`<:${reaction.emoji.identifier.toLowerCase()}> ${trader.ingame_name.toLowerCase()}`))
+                                        match_trade = true
+                                }
+                            }
+                        }
+                    }
+                    if (!match_trade) {
+                        console.log('that trader does not exist in db check #2')
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        var args = []
+                        if (order_type == 'wts')
+                            args.push('wtb')
+                        else 
+                            args.push('wtb')
+                        args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                        if (item_rank == 'maxed')
+                            args.push(item_rank)
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                        return
+                    }
+                    console.log('exact trader found')
+                    //----------------
+                    if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
+                        console.log('cannot trade yourself')
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        return Promise.resolve()
+                    }
+                    var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
                     .then(res => {
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
-                        res.delete()
-                        return
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                        return Promise.resolve()
                     }
-                    console.log('thread created')
-                    await res.members.add(trader.discord_id).catch(console.error)
-                    await res.members.add(tradee.discord_id).catch(console.error)
-                    if (cross_thread) {
-                        await cross_thread.members.add(trader.discord_id).catch(console.error)
-                        await cross_thread.members.add(tradee.discord_id).catch(console.error)
+                    var threadName = `${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
+                    if (threadName.length > 99) {
+                        console.log(`${threadName} thread's name is longer than 99`)
+                        threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                     }
-                    var owner_refer = res.id
-                    if (cross_thread)
-                        owner_refer = cross_thread.id
-                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
-                    var postdata = {}
-                    postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
-                    postdata.timestamp = new Date()
-                    postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')
-                    postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
-                    postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[order_rank].icon_url}
-                    postdata.description = `
-                        **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
-                        **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
-                        **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
-    
-                        /invite ${embedScore(trader.ingame_name)}
-                        /invite ${embedScore(tradee.ingame_name)}
-    
-                        React with ${tradingBotReactions.success[0]} to finish this trade.
-                        React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
-                    `
-                    res.send({content: ' ',embeds: [postdata]})
-                    .then(open_message => {
-                        var status = db.query(`
-                        UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
-                        WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
-                        `)
-                        .catch(console.error)
-                        open_message.react(tradingBotReactions.success[0]).catch(console.error)
-                        open_message.react('⚠️').catch(console.error)
-                        if (cross_thread)
-                            res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
+                    trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
+                    var args = []
+                    var tempp = all_orders[order_rank].order_type
+                    if (order_type == 'wts')
+                        args.push('wtb')
+                    else 
+                        args.push('wts')
+                    args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
+                    if (item_rank == 'maxed')
+                        args.push(item_rank)
+                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
+                    const thread = await reaction.message.channel.threads.create({
+                        name: threadName,
+                        autoArchiveDuration: 60,
+                        reason: 'Trade opened.'
                     })
-                    .catch(console.error)
-                    if (cross_thread) {
-                        cross_thread.send({content: ' ',embeds: [postdata]})
-                        .then(c_open_message => {
+                    .then(async res => {
+                        setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
+                        console.log(res)
+                        var cross_thread = null
+                        var cross_channel = null
+                        var cross_thread_id = null
+                        var cross_channel_id = null
+                        if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
+                            const guild = client.guilds.cache.get(reaction.message.guild.id)
+                            if (!guild.members.cache.find(member => member.id == all_orders[order_rank].discord_id)) {
+                                cross_channel =  client.channels.cache.get(all_orders[order_rank].origin_channel_id)
+                                await cross_channel.threads.create({
+                                    name: threadName,
+                                    autoArchiveDuration: 60,
+                                    reason: 'Trade opened.'
+                                })
+                                .then(async crossRes => {
+                                    cross_thread = crossRes
+                                    cross_thread_id = crossRes.id
+                                    cross_channel_id = crossRes.parentId
+                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
+                                })
+                                .catch(console.error)
+                            }
+                        }
+                        // Check if rows exceed the limit
+                        var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
+                        .then(async res => {
+                            if (res.rowCount >= filledOrdersLimit) {
+                                await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
+                            }
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            return false
+                        })
+                        if (!status) {
+                            res.delete()
+                            return
+                        }
+                        var status = await db.query(`
+                        INSERT INTO tradebot_filled_users_orders
+                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
+                        VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
+                        `)
+                        .then(res => {
+                            return true
+                        })
+                        .catch(err => {
+                            console.log(err)
+                            reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            return false
+                        })
+                        if (!status) {
+                            res.delete()
+                            return
+                        }
+                        console.log('thread created')
+                        await res.members.add(trader.discord_id).catch(console.error)
+                        await res.members.add(tradee.discord_id).catch(console.error)
+                        if (cross_thread) {
+                            await cross_thread.members.add(trader.discord_id).catch(console.error)
+                            await cross_thread.members.add(tradee.discord_id).catch(console.error)
+                        }
+                        var owner_refer = res.id
+                        if (cross_thread)
+                            owner_refer = cross_thread.id
+                        client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
+                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                        var postdata = {}
+                        postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
+                        postdata.timestamp = new Date()
+                        postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')
+                        postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
+                        postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[order_rank].icon_url}
+                        postdata.description = `
+                            **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
+                            **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
+                            **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
+        
+                            /invite ${embedScore(trader.ingame_name)}
+                            /invite ${embedScore(tradee.ingame_name)}
+        
+                            React with ${tradingBotReactions.success[0]} to finish this trade.
+                            React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
+                        `
+                        res.send({content: ' ',embeds: [postdata]})
+                        .then(open_message => {
                             var status = db.query(`
-                            UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                            UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
                             .catch(console.error)
-                            c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
-                            c_open_message.react('⚠️').catch(console.error)
-                            cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
-                        })
-                    }
-                    setTimeout(() => {
-                        res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                        if (cross_thread) 
-                            cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                    }
-                    , 900000)
-                    setTimeout(() => {
-                        db.query(`SELECT * FROM tradebot_filled_users_orders
-                        WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
-                        `)
-                        .then(foundThread => {
-                            if (foundThread.rows.length == 0)
-                                return
-                            if (foundThread.rows.length > 1)
-                                return
-                            res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                            .catch(console.error)
+                            open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                            open_message.react('⚠️').catch(console.error)
                             if (cross_thread)
-                                cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                         })
-                    }, 720000)
-                })
-                .catch(console.error)
-                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
-            }
-            return Promise.resolve()
+                        .catch(console.error)
+                        if (cross_thread) {
+                            cross_thread.send({content: ' ',embeds: [postdata]})
+                            .then(c_open_message => {
+                                var status = db.query(`
+                                UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
+                                WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
+                                `)
+                                .catch(console.error)
+                                c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                                c_open_message.react('⚠️').catch(console.error)
+                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
+                            })
+                        }
+                        setTimeout(() => {
+                            res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                            if (cross_thread) 
+                                cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                        }
+                        , 900000)
+                        setTimeout(() => {
+                            db.query(`SELECT * FROM tradebot_filled_users_orders
+                            WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
+                            `)
+                            .then(foundThread => {
+                                if (foundThread.rows.length == 0)
+                                    return
+                                if (foundThread.rows.length > 1)
+                                    return
+                                res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
+                                .catch(console.error)
+                                if (cross_thread)
+                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                            })
+                        }, 720000)
+                    })
+                    .catch(console.error)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                }
+                return Promise.resolve()
+            }).catch(console.error)
         }
     }
 }
@@ -1810,165 +1778,15 @@ async function trading_bot(message,args,command) {
                 }
             }
             if (open_trade) {
-                console.log(all_orders)
                 if (trader.discord_id != tradee.discord_id) {
-                    var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${item_id}' AND order_type = '${target_order_type}' AND user_rank = '${item_rank}'`)
-                    .then(res => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status) {
-                        return Promise.resolve()
-                    }
-                    var threadName = `${item_name} (${trader.ingame_name})x(${tradee.ingame_name})`
-                    if (threadName.length > 99) {
-                        console.log(`${threadName} thread's name is longer than 99`)
-                        threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
-                    }
-                    trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(console.error)
-                    const thread = await message.channel.threads.create({
-                        name: threadName,
-                        autoArchiveDuration: 60,
-                        reason: 'Trade opened.'
-                    })
-                    .then(async res => {
-                        setTimeout(() => message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
-                        var cross_thread = null
-                        var cross_channel = null
-                        var cross_thread_id = null
-                        var cross_channel_id = null
-                        if (message.guild.id != all_orders[0].origin_guild_id) {
-                            const guild = client.guilds.cache.get(message.guild.id)
-                            if (!guild.members.cache.find(member => member.id == all_orders[0].discord_id)) {
-                                cross_channel =  client.channels.cache.get(all_orders[0].origin_channel_id)
-                                await cross_channel.threads.create({
-                                    name: threadName,
-                                    autoArchiveDuration: 60,
-                                    reason: 'Trade opened.'
-                                })
-                                .then(async crossRes => {
-                                    cross_thread = crossRes
-                                    cross_thread_id = crossRes.id
-                                    cross_channel_id = crossRes.parentId
-                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
-                                })
-                                .catch(console.error)
-                            }
-                        }
-                        // Check if rows exceed the limit
-                        var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
-                        .then(async res => {
-                            if (res.rowCount >= filledOrdersLimit) {
-                                await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
-                            }
-                            return true
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return false
-                        })
-                        if (!status) {
-                            res.delete()
-                            return Promise.reject()
-                        }
-                        var status = await db.query(`
+                    await db.query(`
                         INSERT INTO tradebot_filled_users_orders
-                        (thread_id,channel_id,order_owner,order_filler,item_id,order_type,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
-                        VALUES (${res.id},${message.channel.id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}',${price},'${item_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
-                        `)
-                        .then(res => {
-                            return true
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            return false
-                        })
-                        if (!status) {
-                            res.delete()
-                            return Promise.reject()
-                        }
-                        console.log('thread created')
-                        await res.members.add(trader.discord_id).catch(console.error)
-                        await res.members.add(tradee.discord_id).catch(console.error)
-                        if (cross_thread) {
-                            await cross_thread.members.add(trader.discord_id).catch(console.error)
-                            await cross_thread.members.add(tradee.discord_id).catch(console.error)
-                        }
-                        var owner_refer = res.id
-                        if (cross_thread)
-                            owner_refer = cross_thread.id
-                        client.users.cache.get(trader.discord_id).send(`You have received a **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${item_name + all_orders[0].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
-                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
-                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
-                        var postdata = {}
-                        postdata.color = target_order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
-                        postdata.timestamp = new Date()
-                        postdata.title = item_name + all_orders[0].user_rank.replace('unranked','').replace('maxed',' (maxed)')
-                        postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
-                        postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[0].icon_url}
-                        postdata.description = `
-                            **${target_order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
-                            **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
-                            **Price:** ${price}<:platinum:881692607791648778>
-
-                            /invite ${trader.ingame_name}
-                            /invite ${tradee.ingame_name}
-
-                            React with ${tradingBotReactions.success[0]} to finish this trade.
-                            React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
-                        `
-                        res.send({content: ' ',embeds: [postdata]})
-                        .then(open_message => {
-                            var status = db.query(`
-                            UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
-                            WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
-                            `)
-                            .catch(console.error)
-                            open_message.react(tradingBotReactions.success[0]).catch(console.error)
-                            open_message.react('⚠️').catch(console.error)
-                            if (cross_thread)
-                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
-                        })
-                        .catch(console.error)
-                        if (cross_thread) {
-                            cross_thread.send({content: ' ',embeds: [postdata]})
-                            .then(c_open_message => {
-                                var status = db.query(`
-                                UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
-                                WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
-                                `)
-                                .catch(console.error)
-                                c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
-                                c_open_message.react('⚠️').catch(console.error)
-                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
-                            })
-                        }
-                        setTimeout(() => {
-                            res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                            if (cross_thread) 
-                                cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                        }
-                        , 900000)
-                        setTimeout(() => {
-                            db.query(`SELECT * FROM tradebot_filled_users_orders
-                            WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
-                            `)
-                            .then(foundThread => {
-                                if (foundThread.rows.length == 0)
-                                    return
-                                if (foundThread.rows.length > 1)
-                                    return
-                                res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                                .catch(console.error)
-                                if (cross_thread)
-                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
-                            })
-                        }, 720000)
+                        (order_id,filler_channel_id,owner_channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,trade_timestamp)
+                        VALUES ('${uuid.v1()}',${message.channel.id},${all_orders[0].origin_channel_id},${trader.discord_id},${tradee.discord_id},'${item_id}','${target_order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${price},'${item_rank}',${new Date().getTime()})
+                    `).catch(err => {
+                        console.log(err)
+                        message.channel.send(`☠️ <@${tradee.discord_id}> Error adding filled order in db.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     })
-                    .catch(console.error)
                     return Promise.resolve()
                 }
             }
@@ -2109,7 +1927,7 @@ async function trading_bot(message,args,command) {
     if (!status)
         return Promise.reject()
     //------------------
-    const func = await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
+    await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
     .then(res => {
         var user_order = null
         db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
@@ -2125,8 +1943,7 @@ async function trading_bot(message,args,command) {
         .catch(err => {
             console.log(err)
         })
-    })
-    .catch(err => console.log('Error occured midway of updating orders'))
+    }).catch(err => console.log('Error occured midway of updating orders'))
     return Promise.resolve()
 }
 
@@ -4405,9 +4222,9 @@ async function tb_close_lich_orders(message, interaction) {
 async function tb_user_exist(discord_id) {
     return new Promise((resolve, reject) => {
         db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
-        .then(async res => {
+        .then(res => {
             if (res.rowCount==0) {
-                await trading_bot_registeration(discord_id)
+                trading_bot_registeration(discord_id)
                 .then(res => reject(res))
                 .catch(err => reject(res))
             }
