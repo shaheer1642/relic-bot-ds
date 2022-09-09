@@ -1588,7 +1588,7 @@ async function reaction_handler(reaction, user, action) {
                                 WHERE ${q_threadId} = ${reaction.message.channel.id}
                             `).then(res => {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                if (from_cross && order_data.cross_thread_id)
+                                if (order_data.cross_thread_id)
                                     client.channels.cache.get(order_data.cross_thread_id).setArchived(true,`Trade successful. Archived by ${user.id}`)
                             }).catch(console.error)
                         }
