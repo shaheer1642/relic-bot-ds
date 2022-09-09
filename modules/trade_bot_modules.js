@@ -4807,14 +4807,14 @@ async function riven_tut(message,args) {
 }
 
 
-db.on('notification', (notification) => {
+db.on('notification', async (notification) => {
     console.log('db notification')
     console.log(notification.payload)
     console.log(notification.channel)
     const payload = JSONbig.parse(notification.payload);
 
     if (notification.channel == 'tradebot_filled_users_orders_insert') {
-        const owner_channel = client.channels.cache.get(payload.owner_channel_id)
+        const owner_channel = await client.channels.fetch(payload.owner_channel_id).catch(console.error)
         db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${payload.order_owner} AND item_id = '${payload.item_id}' AND order_type = '${payload.order_type}'`)
         .then(res => {
             db.query(`SELECT * FROM items_list WHERE id='${payload.item_id}'`)
@@ -4839,17 +4839,16 @@ db.on('notification', (notification) => {
                         setTimeout(() => owner_channel.messages.cache.get(owner_channel_thread.id).delete().catch(console.error), 5000)
                         var filler_channel_thread = null
                         if (payload.owner_channel_id != payload.filler_channel_id) {
-                            const filler_channel = client.channels.cache.get(payload.filler_channel_id)
+                            const filler_channel = await client.channels.fetch(payload.filler_channel_id).catch(console.error)
                             await filler_channel.threads.create({
                                 name: threadName,
                                 autoArchiveDuration: 60,
                                 reason: 'Trade opened.'
-                            }).catch(console.error)
-                            .then(res => {
+                            }).then(res => {
                                 filler_channel_thread = res
                                 db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE order_id = '${payload.order_id}'`)
                                 setTimeout(() => filler_channel_thread.messages.cache.get(filler_channel_thread.id).delete().catch(console.error), 5000)
-                            })
+                            }).catch(console.error)
                         }
                         console.log('thread created')
                         client.users.cache.get(payload.order_owner).send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)
