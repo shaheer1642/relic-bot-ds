@@ -18,10 +18,12 @@
     "fs": "^0.0.1-security",
     "googleapis": "^89.0.0",
     "jsdom": "^19.0.0",
+    "json-bigint": "^1.0.0",
     "nodemon": "^2.0.15",
     "pg": "^8.7.1",
     "request-promise": "^4.2.6",
     "rimraf": "^3.0.2",
+    "uuid": "^9.0.0",
     "warframe-worldstate-parser": "^2.23.1"
   },
   "engines": {

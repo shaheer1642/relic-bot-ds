@@ -3,7 +3,9 @@ const {client} = require('./discord_client.js');
 const Canvas = require('canvas')
 const db_modules = require('./db_modules.js');
 const { WebhookClient } = require('discord.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
+const JSONbig = require('json-bigint');
+const uuid = require('uuid');
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
@@ -25,9 +27,9 @@ const u_order_close_time = 10800000
 
 async function bot_initialize() {
     //----Set timeouts for orders if any----
-    td_set_orders_timeouts().catch(err => console.log(err))
+    td_set_orders_timeouts().catch(console.error)
     
-    await db.query(`SELECT * FROM tradebot_channels`).catch(err => console.log(err))
+    await db.query(`SELECT * FROM tradebot_channels`).catch(console.error)
     .then(res => {
         res.rows.forEach(row => {
             if (row.type == 'general_trades')
@@ -38,12 +40,12 @@ async function bot_initialize() {
     })
 
     for (const channel_id in tradingBotChannels) {
-        client.channels.fetch(channel_id).catch(err => console.log(err))
-        .then(channel => channel.messages.fetch().catch(err => console.log(err)))
+        client.channels.fetch(channel_id).catch(console.error)
+        .then(channel => channel.messages.fetch().catch(console.error))
     }
     for (const channel_id in tradingBotLichChannels) {
-        client.channels.fetch(channel_id).catch(err => console.log(err))
-        .then(channel => channel.messages.fetch().catch(err => console.log(err)))
+        client.channels.fetch(channel_id).catch(console.error)
+        .then(channel => channel.messages.fetch().catch(console.error))
     }
 }
 
@@ -69,9 +71,9 @@ async function message_handler(message, multiMessage) {
             return true
         })
         .catch(err => {
-            message.author.send(err).catch(err => console.log(err))
-            message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            message.author.send(err).catch(console.error)
+            message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 2000)
             return false
         })
         if (!status)
@@ -80,14 +82,14 @@ async function message_handler(message, multiMessage) {
         if (command.toLowerCase() == 'wts' || command.toLowerCase() == 'wtb') {
             /*
             if (message.author.id != '253525146923433984' && message.author.id != '892087497998348349' && message.author.id != '212952630350184449') {
-                message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                message.channel.send('🛑 Trading is disabled right now. Please try again later <:ItsFreeRealEstate:892141191301328896>').then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
+                setTimeout(() => message.delete().catch(console.error), 5000)
                 return
             }
             */
             if (!args[0]) {
-                message.channel.send('⚠️ Please provide an item name ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+                message.channel.send('⚠️ Please provide an item name ⚠️').then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error)
+                setTimeout(() => message.delete().catch(console.error), 2000)
                 return
             }
             const c_args = multiMessage.replace(command,'').toLowerCase().trim().split(/,/g)
@@ -96,7 +98,7 @@ async function message_handler(message, multiMessage) {
             }
         }
         else if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-            tb_activate_orders(message).catch(err => console.log(err))
+            tb_activate_orders(message).catch(console.error)
             return
         }
         else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
@@ -105,18 +107,18 @@ async function message_handler(message, multiMessage) {
                 var status =  await db.query(`SELECT * FROM tradebot_messages_ids`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                        message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000))
+                        setTimeout(() => message.delete().catch(console.error), 5000)
                         return false
                     }
                     active_orders = res.rows
-                    db.query(`DELETE FROM tradebot_messages_ids`).catch(err => console.log(err))
+                    db.query(`DELETE FROM tradebot_messages_ids`).catch(console.error)
                     return true
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                    message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
                 if (!status)
@@ -127,15 +129,15 @@ async function message_handler(message, multiMessage) {
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                    message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
                 if (!status)
                     return Promise.resolve()
                 purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg =>{
                     return msg
-                }).catch(err => console.log(err))
+                }).catch(console.error)
                 
                 for (var i=0;i<active_orders.length;i++) {
                     var item_id = active_orders[i].item_id
@@ -153,25 +155,25 @@ async function message_handler(message, multiMessage) {
                         if (!status)
                             continue
                     }
-                    msg.delete().catch(err => console.log(err))
+                    msg.delete().catch(console.error)
                 }
-                message.delete().catch(err => console.log(err))
-                purgeMessage.delete().catch(err => console.log(err))
+                message.delete().catch(console.error)
+                purgeMessage.delete().catch(console.error)
                 return Promise.resolve()
             }
             else {
                 message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                setTimeout(() => message.delete().catch(console.error), 5000)
                 return Promise.resolve()
             }
         }
         else if (command=='close' && (args[0]=='all')) {
-            tb_close_orders(message).catch(err => console.log(err))
+            tb_close_orders(message).catch(console.error)
             return
         }
         else {
-            message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            message.channel.send('Invalid command.\n**Usage example:**\nwts volt prime 200p\nwtb volt prime 180p').then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 5000)
         }
         return
     }
@@ -187,16 +189,16 @@ async function message_handler(message, multiMessage) {
             return true
         })
         .catch(err => {
-            message.author.send(err).catch(err => console.log(err))
-            message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            message.author.send(err).catch(console.error)
+            message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 2000)
             return false
         })
         if (!status)
             return
 
         if (command=='my' && (args[0]=='orders' || args[0]=='order')) {
-            tb_activate_lich_orders(message).catch(err => console.log(err))
+            tb_activate_lich_orders(message).catch(console.error)
             return
         }
         else if (command=='purge' && (args[0]=='orders' || args[0]=='order')) {
@@ -205,18 +207,18 @@ async function message_handler(message, multiMessage) {
                 var status =  await db.query(`SELECT * FROM tradebot_lich_messages_ids`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000))
-                        setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                        message.channel.send(`No visible orders found at the moment.`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000))
+                        setTimeout(() => message.delete().catch(console.error), 5000)
                         return false
                     }
                     active_orders = res.rows
-                    db.query(`DELETE FROM tradebot_lich_messages_ids`).catch(err => console.log(err))
+                    db.query(`DELETE FROM tradebot_lich_messages_ids`).catch(console.error)
                     return true
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error fetching active lich orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                    message.channel.send(`☠️ Error fetching active lich orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
                 if (!status)
@@ -227,15 +229,15 @@ async function message_handler(message, multiMessage) {
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error updating lich orders info in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 10000)
+                    message.channel.send(`☠️ Error updating lich orders info in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
                 if (!status)
                     return Promise.resolve()
                 purgeMessage = await message.channel.send(`Purging ${active_orders.length} messages from all servers. Please wait...`).then(msg => {
                     return msg
-                }).catch(err => console.log(err))
+                }).catch(console.error)
                 
                 for (var i=0;i<active_orders.length;i++) {
                     var item_id = active_orders[i].item_id
@@ -253,25 +255,25 @@ async function message_handler(message, multiMessage) {
                         if (!status)
                             continue
                     }
-                    msg.delete().catch(err => console.log(err))
+                    msg.delete().catch(console.error)
                 }
-                message.delete().catch(err => console.log(err))
-                purgeMessage.delete().catch(err => console.log(err))
+                message.delete().catch(console.error)
+                purgeMessage.delete().catch(console.error)
                 return Promise.resolve()
             }
             else {
                 message.channel.send('🛑 You do not have permission to use this command 🛑').then(msg => setTimeout(() => msg.delete(), 5000))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                setTimeout(() => message.delete().catch(console.error), 5000)
                 return Promise.resolve()
             }
         }
         else if (command=='close' && (args[0]=='all')) {
-            tb_close_lich_orders(message).catch(err => console.log(err))
+            tb_close_lich_orders(message).catch(console.error)
             return
         }
         else {
-            message.channel.send('Invalid command. List of commands:\n`/lich`\n`my orders`\n`close all`').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            message.channel.send('Invalid command. List of commands:\n`/lich`\n`my orders`\n`close all`').then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 5000)
         }
         return
     }
@@ -287,9 +289,9 @@ async function message_handler(message, multiMessage) {
             return true
         })
         .catch(err => {
-            message.author.send(err).catch(err => console.log(err))
-            message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            message.author.send(err).catch(console.error)
+            message.channel.send(`🛑 <@${message.author.id}> Your account has not been verified. Please check your DMs or click the verify button above 🛑`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 2000)
             return false
         })
         if (!status)
@@ -298,28 +300,28 @@ async function message_handler(message, multiMessage) {
         if ((command == "my" && (args[0] == "orders" || args[0] == "order" || args[0] == "profile")) || (multiMessage == 'profile')) {
             trading_bot_user_orders(message.author.id,message.author.id,1)
             .then(res => {
-                message.channel.send(res).catch(err => console.log(err))
+                message.channel.send(res).catch(console.error)
             })
-            .catch(err => console.log(err))
+            .catch(console.error)
         }
         else if (command == "user" && (args[0] == "orders" || args[0] == "order" || args[0] == "profile" )) {
             var ingame_name = args[1]
             trading_bot_user_orders(message.author.id,ingame_name,2)
             .then(res => {
-                message.channel.send(res).catch(err => console.log(err))
+                message.channel.send(res).catch(console.error)
             })
-            .catch(err => console.log(err))
+            .catch(console.error)
         }
         else if (command == "orders" || command == "order" || command == "profile" ) {
             var ingame_name = args[0]
             trading_bot_user_orders(message.author.id,ingame_name,2)
             .then(res => {
-                message.channel.send(res).catch(err => console.log(err))
+                message.channel.send(res).catch(console.error)
             })
-            .catch(err => console.log(err))
+            .catch(console.error)
         }
         else if (command == "wts" || command == "wtb") {
-            trading_bot_item_orders(message,args).catch(err => console.log(err))
+            trading_bot_item_orders(message,args).catch(console.error)
         }
         else if (multiMessage.toLowerCase() == 'leaderboard') {
             leaderboard(message)
@@ -341,7 +343,7 @@ async function reaction_handler(reaction, user, action) {
                 order_type = 'wtb'
             console.log('someone reacted with emoji 2')
             if (!reaction.message.author)
-                reaction.message = await client.channels.cache.get(reaction.message.channel.id).messages.fetch(reaction.message.id).catch(err => console.log(err));
+                reaction.message = await client.channels.cache.get(reaction.message.channel.id).messages.fetch(reaction.message.id).catch(console.error);
             var tradee = {}
             tradee.discord_id = null
             tradee.ingame_name = null
@@ -363,7 +365,7 @@ async function reaction_handler(reaction, user, action) {
                 return false
             })
             if (!status) {
-                setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                 reaction.message.channel.send({content: `<@${user.id}> Your in-game name is not registered with the bot. Please check your dms`}).then(msg => setTimeout(() => msg.delete(), 10000))
                 user.send({content: "Type the following command to register your ign:\nverify ign"})
                 .catch(err=> {
@@ -401,14 +403,14 @@ async function reaction_handler(reaction, user, action) {
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-                        reaction.message.delete().catch(err => console.log(err))
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+                        reaction.message.delete().catch(console.error)
                         return false
                     }
                     check_msg_id = res.rows[0].message_id
@@ -419,7 +421,7 @@ async function reaction_handler(reaction, user, action) {
                     return false
                 })
                 if (!status) {
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank).catch(err => console.log(err))
+                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),1,item_rank).catch(console.error)
                     return
                 }
                 console.log('break test')
@@ -432,7 +434,7 @@ async function reaction_handler(reaction, user, action) {
                 ORDER BY tradebot_users_list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     }
                     else {
@@ -442,12 +444,12 @@ async function reaction_handler(reaction, user, action) {
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
                     return
                 }
                 console.log('message id found')
@@ -468,13 +470,13 @@ async function reaction_handler(reaction, user, action) {
                 console.log(order_rank)
                 if (order_rank == -1) {
                     console.log('that trader does not exist in db check #1')
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 if (!all_orders[order_rank]) {
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
                     return
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
@@ -502,181 +504,45 @@ async function reaction_handler(reaction, user, action) {
                 }
                 if (!match_trade) {
                     console.log('that trader does not exist in db check #2')
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                    trading_bot_orders_update(null,search_item_id,item_url,item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
                     return
                 }
                 console.log('exact trader found')
                 //----------------
                 if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
                     console.log('cannot trade yourself')
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
-                var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
-                .then(res => {
+                // Check if rows exceed the limit
+                var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
+                .then(async res => {
+                    if (res.rowCount >= filledOrdersLimit) {
+                        await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
+                    }
                     return true
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    return Promise.resolve()
+                    res.delete()
+                    return
                 }
-                var threadName = `${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
-                if (threadName.length > 99) {
-                    console.log(`${threadName} thread's name is longer than 99`)
-                    threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
-                }
-                trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
-                const thread = await reaction.message.channel.threads.create({
-                    name: threadName,
-                    autoArchiveDuration: 60,
-                    reason: 'Trade opened.'
-                })
-                .then(async res => {
-                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
-                    console.log(res)
-                    var cross_thread = null
-                    var cross_channel = null
-                    var cross_thread_id = null
-                    var cross_channel_id = null
-                    if (reaction.message.guild.id != all_orders[order_rank].origin_guild_id) {
-                        const guild = client.guilds.cache.get(reaction.message.guild.id)
-                        if (!guild.members.cache.find(member => member.id == all_orders[order_rank].discord_id)) {
-                            cross_channel =  client.channels.cache.get(all_orders[order_rank].origin_channel_id)
-                            await cross_channel.threads.create({
-                                name: threadName,
-                                autoArchiveDuration: 60,
-                                reason: 'Trade opened.'
-                            })
-                            .then(async crossRes => {
-                                cross_thread = crossRes
-                                cross_thread_id = crossRes.id
-                                cross_channel_id = crossRes.parentId
-                                setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
-                            })
-                            .catch(err => console.log(err))
-                        }
-                    }
-                    // Check if rows exceed the limit
-                    var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
-                    .then(async res => {
-                        if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
-                        }
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                        return false
-                    })
-                    if (!status) {
-                        res.delete()
-                        return
-                    }
-                    var status = await db.query(`
+                db.query(`
                     INSERT INTO tradebot_filled_users_orders
-                    (thread_id,channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,cross_thread_id,cross_channel_id,trade_timestamp)
-                    VALUES (${res.id},${reaction.message.channel.id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${cross_thread_id},${cross_channel_id},${new Date().getTime()})
-                    `)
-                    .then(res => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                        return false
-                    })
-                    if (!status) {
-                        res.delete()
-                        return
-                    }
-                    console.log('thread created')
-                    await res.members.add(trader.discord_id).catch(err => console.log(err))
-                    await res.members.add(tradee.discord_id).catch(err => console.log(err))
-                    if (cross_thread) {
-                        await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
-                        await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
-                    }
-                    var owner_refer = res.id
-                    if (cross_thread)
-                        owner_refer = cross_thread.id
-                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
-                    var postdata = {}
-                    postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
-                    postdata.timestamp = new Date()
-                    postdata.title = all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')
-                    postdata.footer = {text: `This trade will be auto-closed in 15 minutes\n\u200b`}
-                    postdata.thumbnail =  {url: 'https://warframe.market/static/assets/' + all_orders[order_rank].icon_url}
-                    postdata.description = `
-                        **${order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${trader.discord_id}>
-                        **${order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${tradee.discord_id}>
-                        **Price:** ${all_orders[order_rank].user_price}<:platinum:881692607791648778>
-    
-                        /invite ${embedScore(trader.ingame_name)}
-                        /invite ${embedScore(tradee.ingame_name)}
-    
-                        React with ${tradingBotReactions.success[0]} to finish this trade.
-                        React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)
-                    `
-                    res.send({content: ' ',embeds: [postdata]})
-                    .then(open_message => {
-                        var status = db.query(`
-                        UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
-                        WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
-                        `)
-                        .catch(err => console.log(err))
-                        open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                        open_message.react('⚠️').catch(err => console.log(err))
-                        if (cross_thread)
-                            res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
-                    })
-                    .catch(err => console.log(err))
-                    if (cross_thread) {
-                        cross_thread.send({content: ' ',embeds: [postdata]})
-                        .then(c_open_message => {
-                            var status = db.query(`
-                            UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
-                            WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
-                            `)
-                            .catch(err => console.log(err))
-                            c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                            c_open_message.react('⚠️').catch(err => console.log(err))
-                            cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
-                        })
-                    }
-                    setTimeout(() => {
-                        res.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                        if (cross_thread) 
-                            cross_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
-                    }
-                    , 900000)
-                    setTimeout(() => {
-                        db.query(`SELECT * FROM tradebot_filled_users_orders
-                        WHERE thread_id = ${res.id} AND channel_id = ${res.parentId} AND archived = false
-                        `)
-                        .then(foundThread => {
-                            if (foundThread.rows.length == 0)
-                                return
-                            if (foundThread.rows.length > 1)
-                                return
-                            res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                            .catch(err => console.log(err))
-                            if (cross_thread)
-                                cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
-                        })
-                    }, 720000)
+                    (order_id,filler_channel_id,owner_channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,trade_timestamp)
+                    VALUES ('${uuid.v1()}',${res.id},${reaction.message.channel.id},${all_orders[order_rank].origin_channel_id},${trader.discord_id},${tradee.discord_id},'${all_orders[order_rank].item_id}','${order_type}','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${all_orders[order_rank].user_price},'${all_orders[order_rank].user_rank}',${new Date().getTime()})
+                `).catch(err => {
+                    console.log(err)
+                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    return false
                 })
-                .catch(err => console.log(err))
-                setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
             }
             else if (Object.keys(tradingBotLichChannels).includes(reaction.message.channelId)) {
                 var lich_info = []
@@ -700,14 +566,14 @@ async function reaction_handler(reaction, user, action) {
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-                        reaction.message.delete().catch(err => console.log(err))
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+                        reaction.message.delete().catch(console.error)
                         return false
                     }
                     check_msg_id = res.rows[0].message_id
@@ -718,7 +584,7 @@ async function reaction_handler(reaction, user, action) {
                     return false
                 })
                 if (!status) {
-                    trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
+                    trading_lich_orders_update(null,lich_info,1).catch(console.error)
                     return Promise.resolve()
                 }
     
@@ -731,7 +597,7 @@ async function reaction_handler(reaction, user, action) {
                 ORDER BY tradebot_users_list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     }
                     else {
@@ -741,12 +607,12 @@ async function reaction_handler(reaction, user, action) {
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
                     return
                 }
                 console.log('message id found')
@@ -767,13 +633,13 @@ async function reaction_handler(reaction, user, action) {
                 console.log(order_rank)
                 if (order_rank == -1) {
                     console.log('that trader does not exist in db check #1')
-                    trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
                     return
                 }
                 if (!all_orders[order_rank]) {
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
                     return
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
@@ -788,16 +654,16 @@ async function reaction_handler(reaction, user, action) {
                 })
                 if (!match_trade) {
                     console.log('that trader does not exist in db check #2')
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
-                    trading_lich_orders_update(null,lich_info,2).catch(err => console.log(err))
+                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+                    trading_lich_orders_update(null,lich_info,2).catch(console.error)
                     return
                 }
                 console.log('exact trader found')
                 //----------------
                 if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
                     console.log('cannot trade yourself')
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
@@ -806,11 +672,11 @@ async function reaction_handler(reaction, user, action) {
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 var threadName = `${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
@@ -818,14 +684,14 @@ async function reaction_handler(reaction, user, action) {
                     console.log(`${threadName} thread's name is longer than 99`)
                     threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                 }
-                trading_lich_orders_update(null,all_orders[order_rank],2).catch(err => console.log(err))
+                trading_lich_orders_update(null,all_orders[order_rank],2).catch(console.error)
                 await reaction.message.channel.threads.create({
                     name: threadName,
                     autoArchiveDuration: 60,
                     reason: 'Trade opened.'
                 })
                 .then(async res => {
-                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
                     console.log(res)
                     var cross_thread = null
                     var cross_channel = null
@@ -844,22 +710,22 @@ async function reaction_handler(reaction, user, action) {
                                 cross_thread = crossRes
                                 cross_thread_id = crossRes.id
                                 cross_channel_id = crossRes.parentId
-                                setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
+                                setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
                             })
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                         }
                     }
                     // Check if rows exceed the limit
                     var status = await db.query(`SELECT * FROM tradebot_filled_users_lich_orders ORDER BY trade_timestamp`)
                     .then(async res => {
                         if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
                         }
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
@@ -876,7 +742,7 @@ async function reaction_handler(reaction, user, action) {
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
@@ -884,18 +750,18 @@ async function reaction_handler(reaction, user, action) {
                         return
                     }
                     console.log('thread created')
-                    await res.members.add(trader.discord_id).catch(err => console.log(err))
-                    await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                    await res.members.add(trader.discord_id).catch(console.error)
+                    await res.members.add(tradee.discord_id).catch(console.error)
                     if (cross_thread) {
-                        await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
-                        await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
+                        await cross_thread.members.add(trader.discord_id).catch(console.error)
+                        await cross_thread.members.add(tradee.discord_id).catch(console.error)
                     }
                     var owner_refer = res.id
                     if (cross_thread)
                         owner_refer = cross_thread.id
-                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
+                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
                     var postdata = {}
                     postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                     postdata.timestamp = new Date()
@@ -921,13 +787,13 @@ async function reaction_handler(reaction, user, action) {
                         UPDATE tradebot_filled_users_lich_orders SET trade_open_message = ${open_message.id}
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
-                        .catch(err => console.log(err))
-                        open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                        open_message.react('⚠️').catch(err => console.log(err))
+                        .catch(console.error)
+                        open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                        open_message.react('⚠️').catch(console.error)
                         if (cross_thread)
-                            res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                            res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                     })
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     if (cross_thread) {
                         cross_thread.send({content: ' ',embeds: [postdata]})
                         .then(c_open_message => {
@@ -935,10 +801,10 @@ async function reaction_handler(reaction, user, action) {
                             UPDATE tradebot_filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
-                            .catch(err => console.log(err))
-                            c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                            c_open_message.react('⚠️').catch(err => console.log(err))
-                            cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                            .catch(console.error)
+                            c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                            c_open_message.react('⚠️').catch(console.error)
+                            cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                         })
                     }
                     setTimeout(() => {
@@ -957,14 +823,14 @@ async function reaction_handler(reaction, user, action) {
                             if (foundThread.rows.length > 1)
                                 return
                             res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                             if (cross_thread)
-                                cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
+                                cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
                         })
                     }, 720000)
                 })
-                .catch(err => console.log(err))
-                setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                .catch(console.error)
+                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
             }
             else if (tradingBotSpamChannels.includes(reaction.message.channelId)) {
                 console.log('pass test 2')
@@ -1010,14 +876,14 @@ async function reaction_handler(reaction, user, action) {
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 if (isLich) {
                     var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE lich_id = '${lich_info.lich_id}'`)
                     .then(res => {
                         if (res.rows.length == 0) {
-                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
                             return false
                         }
                         check_msg_id = res.rows[0].message_id
@@ -1028,14 +894,14 @@ async function reaction_handler(reaction, user, action) {
                         return false
                     })
                     if (!status) {
-                        setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         var args = []
                         if (order_type == 'wts')
                             args.push('wtb')
                         else 
                             args.push('wtb')
                         args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                         return
                     }
                     var status = await db.query(`
@@ -1047,7 +913,7 @@ async function reaction_handler(reaction, user, action) {
                     ORDER BY tradebot_users_list.ingame_name`)
                     .then(res => {
                         if (res.rows.length == 0) {
-                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                            reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                             return false
                         }
                         else {
@@ -1057,18 +923,18 @@ async function reaction_handler(reaction, user, action) {
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
-                        setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         var args = []
                         if (order_type == 'wts')
                             args.push('wtb')
                         else 
                             args.push('wtb')
                         args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                         return
                     }
                     console.log('message id found')
@@ -1089,19 +955,19 @@ async function reaction_handler(reaction, user, action) {
                     console.log(order_rank)
                     if (order_rank == -1) {
                         console.log('that trader does not exist in db check #1')
-                        setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         return Promise.resolve()
                     }
                     if (!all_orders[order_rank]) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                        setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         var args = []
                         if (order_type == 'wts')
                             args.push('wtb')
                         else 
                             args.push('wtb')
                         args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                         return
                     }
                     trader.ingame_name = all_orders[order_rank].ingame_name
@@ -1113,22 +979,22 @@ async function reaction_handler(reaction, user, action) {
                         match_trade = true
                     if (!match_trade) {
                         console.log('that trader does not exist in db check #2')
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                        setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         var args = []
                         if (order_type == 'wts')
                             args.push('wtb')
                         else 
                             args.push('wtb')
                         args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
-                        trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                        trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                         return
                     }
                     console.log('exact trader found')
                     //----------------
                     if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
                         console.log('cannot trade yourself')
-                        setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         return Promise.resolve()
                     }
                     var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND lich_id = '${all_orders[order_rank].lich_id}' AND order_type = '${order_type}'`)
@@ -1137,11 +1003,11 @@ async function reaction_handler(reaction, user, action) {
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
-                        setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                        setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                         return Promise.resolve()
                     }
                     var threadName = `${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
@@ -1149,7 +1015,7 @@ async function reaction_handler(reaction, user, action) {
                         console.log(`${threadName} thread's name is longer than 99`)
                         threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                     }
-                    trading_lich_orders_update(null,all_orders[order_rank],2).catch(err => console.log(err))
+                    trading_lich_orders_update(null,all_orders[order_rank],2).catch(console.error)
                     var args = []
                     var tempp = all_orders[order_rank].order_type
                     if (tempp == 'wts')
@@ -1158,14 +1024,14 @@ async function reaction_handler(reaction, user, action) {
                         tempp = 'wts'
                     args.push(tempp)
                     args.push(all_orders[order_rank].weapon_url)
-                    trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                     await reaction.message.channel.threads.create({
                         name: threadName,
                         autoArchiveDuration: 60,
                         reason: 'Trade opened.'
                     })
                     .then(async res => {
-                        setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+                        setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
                         console.log(res)
                         var cross_thread = null
                         var cross_channel = null
@@ -1184,22 +1050,22 @@ async function reaction_handler(reaction, user, action) {
                                     cross_thread = crossRes
                                     cross_thread_id = crossRes.id
                                     cross_channel_id = crossRes.parentId
-                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
+                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
                                 })
-                                .catch(err => console.log(err))
+                                .catch(console.error)
                             }
                         }
                         // Check if rows exceed the limit
                         var status = await db.query(`SELECT * FROM tradebot_filled_users_lich_orders ORDER BY trade_timestamp`)
                         .then(async res => {
                             if (res.rowCount >= filledOrdersLimit) {
-                                await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                                await db.query(`DELETE FROM tradebot_filled_users_lich_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
                             }
                             return true
                         })
                         .catch(err => {
                             console.log(err)
-                            reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                            reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                             return false
                         })
                         if (!status) {
@@ -1216,7 +1082,7 @@ async function reaction_handler(reaction, user, action) {
                         })
                         .catch(err => {
                             console.log(err)
-                            reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                            reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                             return false
                         })
                         if (!status) {
@@ -1224,18 +1090,18 @@ async function reaction_handler(reaction, user, action) {
                             return
                         }
                         console.log('thread created')
-                        await res.members.add(trader.discord_id).catch(err => console.log(err))
-                        await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                        await res.members.add(trader.discord_id).catch(console.error)
+                        await res.members.add(tradee.discord_id).catch(console.error)
                         if (cross_thread) {
-                            await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
-                            await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
+                            await cross_thread.members.add(trader.discord_id).catch(console.error)
+                            await cross_thread.members.add(tradee.discord_id).catch(console.error)
                         }
                         var owner_refer = res.id
                         if (cross_thread)
                             owner_refer = cross_thread.id
-                        client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
-                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
-                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                        client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
+                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
                         var postdata = {}
                         postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                         postdata.timestamp = new Date()
@@ -1261,13 +1127,13 @@ async function reaction_handler(reaction, user, action) {
                             UPDATE tradebot_filled_users_lich_orders SET trade_open_message = ${open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
-                            .catch(err => console.log(err))
-                            open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                            open_message.react('⚠️').catch(err => console.log(err))
+                            .catch(console.error)
+                            open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                            open_message.react('⚠️').catch(console.error)
                             if (cross_thread)
-                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                         })
-                        .catch(err => console.log(err))
+                        .catch(console.error)
                         if (cross_thread) {
                             cross_thread.send({content: ' ',embeds: [postdata]})
                             .then(c_open_message => {
@@ -1275,10 +1141,10 @@ async function reaction_handler(reaction, user, action) {
                                 UPDATE tradebot_filled_users_lich_orders set cross_trade_open_message = ${c_open_message.id}
                                 WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                                 `)
-                                .catch(err => console.log(err))
-                                c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                                c_open_message.react('⚠️').catch(err => console.log(err))
-                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                                .catch(console.error)
+                                c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                                c_open_message.react('⚠️').catch(console.error)
+                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                             })
                         }
                         setTimeout(() => {
@@ -1297,20 +1163,20 @@ async function reaction_handler(reaction, user, action) {
                                 if (foundThread.rows.length > 1)
                                     return
                                 res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                                .catch(err => console.log(err))
+                                .catch(console.error)
                                 if (cross_thread)
-                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
+                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
                             })
                         }, 720000)
                     })
-                    .catch(err => console.log(err))
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    .catch(console.error)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return
                 }
                 var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${search_item_id}' AND user_rank = '${item_rank}'`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> Could not find message_id for that order. It might be removed by the owner. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
                         return false
                     }
                     check_msg_id = res.rows[0].message_id
@@ -1321,7 +1187,7 @@ async function reaction_handler(reaction, user, action) {
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     var args = []
                     if (order_type == 'wts')
                         args.push('wtb')
@@ -1330,7 +1196,7 @@ async function reaction_handler(reaction, user, action) {
                     args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                     if (item_rank == 'maxed')
                         args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                     return
                 }
                 console.log('break test')
@@ -1343,7 +1209,7 @@ async function reaction_handler(reaction, user, action) {
                 ORDER BY tradebot_users_list.ingame_name`)
                 .then(res => {
                     if (res.rows.length == 0) {
-                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     }
                     else {
@@ -1353,11 +1219,11 @@ async function reaction_handler(reaction, user, action) {
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ Error finding trade message record in db. Please try again\nError code: 500\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     var args = []
                     if (order_type == 'wts')
                         args.push('wtb')
@@ -1366,7 +1232,7 @@ async function reaction_handler(reaction, user, action) {
                     args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                     if (item_rank == 'maxed')
                         args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                     return Promise.resolve()
                 }
                 console.log('message id found')
@@ -1387,7 +1253,7 @@ async function reaction_handler(reaction, user, action) {
                 console.log(order_rank)
                 if (order_rank == -1) {
                     console.log('that trader does not exist in db check #1')
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     var args = []
                     if (order_type == 'wts')
                         args.push('wtb')
@@ -1396,12 +1262,12 @@ async function reaction_handler(reaction, user, action) {
                     args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                     if (item_rank == 'maxed')
                         args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                     return
                 }
                 if (!all_orders[order_rank]) {
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     var args = []
                     if (order_type == 'wts')
                         args.push('wtb')
@@ -1410,7 +1276,7 @@ async function reaction_handler(reaction, user, action) {
                     args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                     if (item_rank == 'maxed')
                         args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                     return
                 }
                 trader.ingame_name = all_orders[order_rank].ingame_name
@@ -1438,8 +1304,8 @@ async function reaction_handler(reaction, user, action) {
                 }
                 if (!match_trade) {
                     console.log('that trader does not exist in db check #2')
-                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    reaction.message.channel.send(`⚠️ <@${tradee.discord_id}> That order no longer exists in the db. Please try another offer ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     var args = []
                     if (order_type == 'wts')
                         args.push('wtb')
@@ -1448,14 +1314,14 @@ async function reaction_handler(reaction, user, action) {
                     args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                     if (item_rank == 'maxed')
                         args.push(item_rank)
-                    trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                    trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                     return
                 }
                 console.log('exact trader found')
                 //----------------
                 if (trader.discord_id == tradee.discord_id) {       //cannot trade to yourself
                     console.log('cannot trade yourself')
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${trader.discord_id} AND item_id = '${all_orders[order_rank].item_id}' AND order_type = '${order_type}'`)
@@ -1464,11 +1330,11 @@ async function reaction_handler(reaction, user, action) {
                 })
                 .catch(err => {
                     console.log(err)
-                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error updating db regarding thread.\nError code: 503\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     return false
                 })
                 if (!status) {
-                    setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                    setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                     return Promise.resolve()
                 }
                 var threadName = `${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${trader.ingame_name})x(${tradee.ingame_name})`
@@ -1476,7 +1342,7 @@ async function reaction_handler(reaction, user, action) {
                     console.log(`${threadName} thread's name is longer than 99`)
                     threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                 }
-                trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(err => console.log(err))
+                trading_bot_orders_update(null,all_orders[order_rank].item_id,all_orders[order_rank].item_url,all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()),2,item_rank).catch(console.error)
                 var args = []
                 var tempp = all_orders[order_rank].order_type
                 if (order_type == 'wts')
@@ -1486,14 +1352,14 @@ async function reaction_handler(reaction, user, action) {
                 args.push(reaction.message.embeds[0].title.toLowerCase().replace(/ /g,'_'))
                 if (item_rank == 'maxed')
                     args.push(item_rank)
-                trading_bot_item_orders(reaction.message,args,2).catch(err => console.log(err))
+                trading_bot_item_orders(reaction.message,args,2).catch(console.error)
                 const thread = await reaction.message.channel.threads.create({
                     name: threadName,
                     autoArchiveDuration: 60,
                     reason: 'Trade opened.'
                 })
                 .then(async res => {
-                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+                    setTimeout(() => reaction.message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
                     console.log(res)
                     var cross_thread = null
                     var cross_channel = null
@@ -1512,22 +1378,22 @@ async function reaction_handler(reaction, user, action) {
                                 cross_thread = crossRes
                                 cross_thread_id = crossRes.id
                                 cross_channel_id = crossRes.parentId
-                                setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
+                                setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
                             })
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                         }
                     }
                     // Check if rows exceed the limit
                     var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
                     .then(async res => {
                         if (res.rowCount >= filledOrdersLimit) {
-                            await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                            await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
                         }
                         return true
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error deleting info from db regarding older threads.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
@@ -1544,7 +1410,7 @@ async function reaction_handler(reaction, user, action) {
                     })
                     .catch(err => {
                         console.log(err)
-                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                        reaction.message.channel.send(`☠️ <@${tradee.discord_id}> Error adding info to db regarding thread.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         return false
                     })
                     if (!status) {
@@ -1552,18 +1418,18 @@ async function reaction_handler(reaction, user, action) {
                         return
                     }
                     console.log('thread created')
-                    await res.members.add(trader.discord_id).catch(err => console.log(err))
-                    await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                    await res.members.add(trader.discord_id).catch(console.error)
+                    await res.members.add(tradee.discord_id).catch(console.error)
                     if (cross_thread) {
-                        await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
-                        await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
+                        await cross_thread.members.add(trader.discord_id).catch(console.error)
+                        await cross_thread.members.add(tradee.discord_id).catch(console.error)
                     }
                     var owner_refer = res.id
                     if (cross_thread)
                         owner_refer = cross_thread.id
-                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
-                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                    client.users.cache.get(trader.discord_id).send(`You have received a **${order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${all_orders[order_rank].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + all_orders[order_rank].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
+                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                    //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
                     var postdata = {}
                     postdata.color = all_orders[order_rank].order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                     postdata.timestamp = new Date()
@@ -1587,13 +1453,13 @@ async function reaction_handler(reaction, user, action) {
                         UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
                         WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                         `)
-                        .catch(err => console.log(err))
-                        open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                        open_message.react('⚠️').catch(err => console.log(err))
+                        .catch(console.error)
+                        open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                        open_message.react('⚠️').catch(console.error)
                         if (cross_thread)
-                            res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                            res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                     })
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     if (cross_thread) {
                         cross_thread.send({content: ' ',embeds: [postdata]})
                         .then(c_open_message => {
@@ -1601,10 +1467,10 @@ async function reaction_handler(reaction, user, action) {
                             UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${reaction.message.channel.id}
                             `)
-                            .catch(err => console.log(err))
-                            c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                            c_open_message.react('⚠️').catch(err => console.log(err))
-                            cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                            .catch(console.error)
+                            c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                            c_open_message.react('⚠️').catch(console.error)
+                            cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                         })
                     }
                     setTimeout(() => {
@@ -1623,14 +1489,14 @@ async function reaction_handler(reaction, user, action) {
                             if (foundThread.rows.length > 1)
                                 return
                             res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                             if (cross_thread)
-                                cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
+                                cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
                         })
                     }, 720000)
                 })
-                .catch(err => console.log(err))
-                setTimeout(() => reaction.users.remove(user.id).catch(err => console.log(err)), 1000)
+                .catch(console.error)
+                setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
             }
             return Promise.resolve()
         }
@@ -1642,10 +1508,10 @@ async function check_user(message) {
         db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
         .then(res => {
             if (res.rowCount==0) {
-                message.channel.send(`⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`).catch(err => console.log(err))
+                message.channel.send(`⚠️ <@${message.author.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`).catch(console.error)
                 message.author.send({content: "Type the following command to register your ign:\nverify ign"})
                 .catch(err => {
-                    message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
+                    message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(console.error)
                     reject(err)
                 })
                 reject('User not found.')
@@ -1654,7 +1520,7 @@ async function check_user(message) {
             resolve(res.rows[0])
         })
         .catch(err => {
-            message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`).catch(err => console.log(err))
+            message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`).catch(console.error)
             reject(err)
         })
     })
@@ -1759,7 +1625,7 @@ async function trading_bot(message,args,command) {
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
     }
     if (price < 0) {
-        message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 5000))).catch(err => console.log(err))
+        message.channel.send('⚠️ Price cannot be negative ⚠️').then(msg => setTimeout(() => msg.delete().catch(err => console.log(err), 5000))).catch(console.error)
         return Promise.resolve()
     }
     console.log(price)
@@ -1786,9 +1652,9 @@ async function trading_bot(message,args,command) {
         try {
             message.author.send({content: "Type the following command to register your ign:\nverify ign"})
         } catch (err) {
-            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
+            message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
         }
-        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        //setTimeout(() => message.delete().catch(console.error), 5000)
         return Promise.resolve()
     }
     //---------------
@@ -1852,17 +1718,17 @@ async function trading_bot(message,args,command) {
         }
     }
     if (arrItems.length==0) {
-        message.channel.send("⚠️ Item **" + d_item_url + "** either does not exist or is an unsupported item at the moment. ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+        message.channel.send("⚠️ Item **" + d_item_url + "** either does not exist or is an unsupported item at the moment. ⚠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
         return Promise.resolve()
     }
     if (arrItems.length > 1) {
-        message.channel.send("⚠️ More than one search results detected for the item **" + d_item_url + "**, cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        message.channel.send("⚠️ More than one search results detected for the item **" + d_item_url + "**, cannot process this request. Please provide a valid item name ⚠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error); 
         return Promise.resolve()
     }
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].id
     if (!arrItems[0].rank && isMaxed) {
-        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err)); 
+        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error); 
         return Promise.resolve()
     }
     var item_rank = 'unranked'
@@ -1900,7 +1766,7 @@ async function trading_bot(message,args,command) {
                     return false
                 })
                 if (!status) {
-                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(err => console.log(err)); 
+                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(console.error); 
                     return Promise.reject()
                 }
                 if (all_orders) {
@@ -1931,7 +1797,7 @@ async function trading_bot(message,args,command) {
                     return false
                 })
                 if (!status) {
-                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(err => console.log(err)); 
+                    message.channel.send("☠️ Something went wrong retreiving buy orders\nError code: 502 ☠️").catch(console.error); 
                     return Promise.reject()
                 }
                 if (all_orders) {
@@ -1962,14 +1828,14 @@ async function trading_bot(message,args,command) {
                         console.log(`${threadName} thread's name is longer than 99`)
                         threadName = `(${trader.ingame_name})x(${tradee.ingame_name})`
                     }
-                    trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(err => console.log(err))
+                    trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(console.error)
                     const thread = await message.channel.threads.create({
                         name: threadName,
                         autoArchiveDuration: 60,
                         reason: 'Trade opened.'
                     })
                     .then(async res => {
-                        setTimeout(() => message.channel.messages.cache.get(res.id).delete().catch(err => console.log(err)), 5000)
+                        setTimeout(() => message.channel.messages.cache.get(res.id).delete().catch(console.error), 5000)
                         var cross_thread = null
                         var cross_channel = null
                         var cross_thread_id = null
@@ -1987,16 +1853,16 @@ async function trading_bot(message,args,command) {
                                     cross_thread = crossRes
                                     cross_thread_id = crossRes.id
                                     cross_channel_id = crossRes.parentId
-                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(err => console.log(err)), 5000)
+                                    setTimeout(() => cross_channel.messages.cache.get(crossRes.id).delete().catch(console.error), 5000)
                                 })
-                                .catch(err => console.log(err))
+                                .catch(console.error)
                             }
                         }
                         // Check if rows exceed the limit
                         var status = await db.query(`SELECT * FROM tradebot_filled_users_orders ORDER BY trade_timestamp`)
                         .then(async res => {
                             if (res.rowCount >= filledOrdersLimit) {
-                                await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(err => console.log(err))
+                                await db.query(`DELETE FROM tradebot_filled_users_orders WHERE thread_id = ${res.rows[0].thread_id} AND channel_id = ${res.rows[0].channel_id}`).catch(console.error)
                             }
                             return true
                         })
@@ -2025,18 +1891,18 @@ async function trading_bot(message,args,command) {
                             return Promise.reject()
                         }
                         console.log('thread created')
-                        await res.members.add(trader.discord_id).catch(err => console.log(err))
-                        await res.members.add(tradee.discord_id).catch(err => console.log(err))
+                        await res.members.add(trader.discord_id).catch(console.error)
+                        await res.members.add(tradee.discord_id).catch(console.error)
                         if (cross_thread) {
-                            await cross_thread.members.add(trader.discord_id).catch(err => console.log(err))
-                            await cross_thread.members.add(tradee.discord_id).catch(err => console.log(err))
+                            await cross_thread.members.add(trader.discord_id).catch(console.error)
+                            await cross_thread.members.add(tradee.discord_id).catch(console.error)
                         }
                         var owner_refer = res.id
                         if (cross_thread)
                             owner_refer = cross_thread.id
-                        client.users.cache.get(trader.discord_id).send(`You have received a **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${item_name + all_orders[0].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(err => console.log(err))
-                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
-                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(err => console.log(err))
+                        client.users.cache.get(trader.discord_id).send(`You have received a **${target_order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${item_name + all_orders[0].user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_refer}> to trade`).catch(console.error)
+                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
+                        //client.users.cache.get(trader.discord_id).send(`_ _`).then(res => res.delete()).catch(console.error)
                         var postdata = {}
                         postdata.color = target_order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor)
                         postdata.timestamp = new Date()
@@ -2060,13 +1926,13 @@ async function trading_bot(message,args,command) {
                             UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
                             WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
                             `)
-                            .catch(err => console.log(err))
-                            open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                            open_message.react('⚠️').catch(err => console.log(err))
+                            .catch(console.error)
+                            open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                            open_message.react('⚠️').catch(console.error)
                             if (cross_thread)
-                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                                res.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                         })
-                        .catch(err => console.log(err))
+                        .catch(console.error)
                         if (cross_thread) {
                             cross_thread.send({content: ' ',embeds: [postdata]})
                             .then(c_open_message => {
@@ -2074,10 +1940,10 @@ async function trading_bot(message,args,command) {
                                 UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${c_open_message.id}
                                 WHERE thread_id = ${res.id} AND channel_id = ${message.channel.id}
                                 `)
-                                .catch(err => console.log(err))
-                                c_open_message.react(tradingBotReactions.success[0]).catch(err => console.log(err))
-                                c_open_message.react('⚠️').catch(err => console.log(err))
-                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(err => console.log(err))
+                                .catch(console.error)
+                                c_open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                                c_open_message.react('⚠️').catch(console.error)
+                                cross_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
                             })
                         }
                         setTimeout(() => {
@@ -2096,13 +1962,13 @@ async function trading_bot(message,args,command) {
                                 if (foundThread.rows.length > 1)
                                     return
                                 res.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'})
-                                .catch(err => console.log(err))
+                                .catch(console.error)
                                 if (cross_thread)
-                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(err => console.log(err))
+                                    cross_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
                             })
                         }, 720000)
                     })
-                    .catch(err => console.log(err))
+                    .catch(console.error)
                     return Promise.resolve()
                 }
             }
@@ -2128,7 +1994,7 @@ async function trading_bot(message,args,command) {
             return false
         })
         if (!status) {
-            message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500\nContact MrSofty#7926 ☠️").catch(err => console.log(err)); 
+            message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500\nContact MrSofty#7926 ☠️").catch(console.error); 
             return Promise.reject()
         }
     }
@@ -2154,24 +2020,24 @@ async function trading_bot(message,args,command) {
         return false
     })
     if (!status) {
-        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
         return Promise.reject()
     }
     if (avg_price == null || avg_price == "null") {
-        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+        message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
         return Promise.reject()
     }
     if (!price) {
         price = avg_price
     }
     if (price > (avg_price*1.2)) {
-        message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+        //setTimeout(() => message.delete().catch(console.error), 5000)
         return Promise.reject()
     }
     else if (price < (avg_price*0.8)) {
-        message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
-        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+        message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
+        //setTimeout(() => message.delete().catch(console.error), 5000)
         return Promise.reject()
     }
     //----verify order in DB----
@@ -2182,14 +2048,14 @@ async function trading_bot(message,args,command) {
             var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id}`)
             .then(res => {
                 if (res.rowCount >= userOrderLimit) {
-                    message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
+                    message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                     return false
                 }
                 return true
             })
             .catch(err => {
                 console.log(err)
-                originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err));
+                originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
                 return false
             })
             if (!status)
@@ -2200,8 +2066,8 @@ async function trading_bot(message,args,command) {
             })
             .catch(err => {
                 if (err.code == '23505') {
-                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    setTimeout(() => originMessage.delete().catch(console.error), 10000)
                 }
                 console.log(err)
                 return false
@@ -2210,8 +2076,8 @@ async function trading_bot(message,args,command) {
                 return false
         }
         else if (res.rows.length > 1) {
-            originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+            setTimeout(() => originMessage.delete().catch(console.error), 10000)
             return false
         }
         else {     //----update existing order in DB----
@@ -2220,8 +2086,8 @@ async function trading_bot(message,args,command) {
                 return true
             })
             .catch(err => {
-                originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                setTimeout(() => originMessage.delete().catch(console.error), 10000)
                 console.log(err)
                 return false
             })
@@ -2234,8 +2100,8 @@ async function trading_bot(message,args,command) {
     })
     .catch(err => {
         if (err.code == '23505') {
-            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+            setTimeout(() => originMessage.delete().catch(console.error), 10000)
         }
         console.log(err)
         return false
@@ -2316,8 +2182,8 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     .catch(err => {
         console.log(err)
         if (originMessage) {
-            originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-            setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            originMessage.channel.send(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+            setTimeout(() => originMessage.delete().catch(console.error), 10000)
         }
         console.log(`☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
         return false
@@ -2367,8 +2233,8 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
     })
     .catch(err => {
         if (originMessage) {
-            originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+            originMessage.channel.send(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                setTimeout(() => originMessage.delete().catch(console.error), 10000)
         }
         console.log(`☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926`)
         console.log(err)
@@ -2397,8 +2263,8 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
             else if (res.rows.length > 1) {
                 console.log(`Detected more than one message for item ${item_name} in channel ${multiCid}`)
                 if (originMessage) {
-                    originMessage.channel.send(`☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                    //setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                    originMessage.channel.send(`☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                    //setTimeout(() => originMessage.delete().catch(console.error), 10000)
                 }
                 return false
             }
@@ -2410,7 +2276,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                         return true
                     })
                     .catch(async err => {     //maybe message does not exist in discord anymore
-                        await db.query(`DELETE FROM tradebot_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid} AND user_rank = '${item_rank}'`).catch(err => console.log(err))
+                        await db.query(`DELETE FROM tradebot_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid} AND user_rank = '${item_rank}'`).catch(console.error)
                         wh_msg_id = null
                         console.log(err)
                         return true
@@ -2434,25 +2300,25 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
         if (wh_msg_id) {
             if (embeds.length==0) {
                 var status = await db.query(`DELETE FROM tradebot_messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND message_id = ${wh_msg_id} AND user_rank = '${item_rank}'`)
-                .then(res => webhookClient.deleteMessage(wh_msg_id).catch(err => console.log(err)))
+                .then(res => webhookClient.deleteMessage(wh_msg_id).catch(console.error))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for item ${item_id}`))
             }
             else {
                 webhookClient.editMessage(wh_msg_id, {content: ' ',embeds: embeds})
                 .then(async wh_msg => {
                     const cl_msg = client.channels.cache.get(wh_msg.channel_id).messages.cache.get(wh_msg.id)
-                    await cl_msg.reactions.removeAll().catch(err => console.log(err))
+                    await cl_msg.reactions.removeAll().catch(console.error)
                     for (var i=0;i<noOfSellers;i++) {
-                        cl_msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                        cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
                     }
                     for (var i=0;i<noOfBuyers;i++) {
-                        cl_msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                        cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
                     }
                 })
                 .catch(err => {
                     if (originMessage) {
-                        originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                        setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                        originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(console.error);
+                        setTimeout(() => originMessage.delete().catch(console.error), 10000)
                     }
                     console.log(err)
                     return
@@ -2474,7 +2340,7 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                 })
                 .catch(err => {     //might be a dublicate message
                     console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`)
-                    setTimeout(() => webhookClient.deleteMessage(wh_msg.id).catch(err => console.log(err)), 5000)
+                    setTimeout(() => webhookClient.deleteMessage(wh_msg.id).catch(console.error), 5000)
                     return false
                 })
                 if (!status) {
@@ -2482,26 +2348,26 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     .then(async res => {
                         if (res.rows.length == 0) {
                             if (originMessage) {
-                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                                setTimeout(() => originMessage.delete().catch(console.error), 10000)
                             }
                             return false
                         }
                         const cl_msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
                         var status = await webhookClient.editMessage(res.rows[0].message_id, {content: ' ', embeds: embeds}).then(async () => {
-                            await cl_msg.reactions.removeAll().catch(err => console.log(err))
+                            await cl_msg.reactions.removeAll().catch(console.error)
                             for (var i=0;i<noOfSellers;i++) {
-                                cl_msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                                cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
                             }
                             for (var i=0;i<noOfBuyers;i++) {
-                                cl_msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                                cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
                             }
                             return true
                         })
                         .catch(err => {
                             if (originMessage) {
-                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err));
-                                setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                                setTimeout(() => originMessage.delete().catch(console.error), 10000)
                             }
                             console.log(err)
                             return false
@@ -2512,19 +2378,19 @@ async function trading_bot_orders_update(originMessage,item_id,item_url,item_nam
                     if (!status)
                         return Promise.reject()
                 }
-                await cl_msg.reactions.removeAll().catch(err => console.log(err))
+                await cl_msg.reactions.removeAll().catch(console.error)
                 for (var i=0;i<noOfSellers;i++) {
-                    cl_msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                    cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
                 }
                 for (var i=0;i<noOfBuyers;i++) {
-                    cl_msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                    cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
                 }
             })
             .catch(err => {
                 console.log(err)
                 if (originMessage) {
-                    originMessage.channel.send(`☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(err => console.log(err));
-                    setTimeout(() => originMessage.delete().catch(err => console.log(err)), 10000)
+                    originMessage.channel.send(`☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(console.error);
+                    setTimeout(() => originMessage.delete().catch(console.error), 10000)
                 }
                 return Promise.reject()
             })
@@ -2547,15 +2413,15 @@ async function trading_lich_bot(interaction) {
     })
     .catch(err => {
         console.log(err + 'Retrieving Database -> tradebot_users_list error')
-        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(err => console.log(err))
+        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(console.error)
         return 2
     })
     if (status == 0) {
-        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: true}).catch(err => console.log(err))
+        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: true}).catch(console.error)
         interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
         .catch(err => {
             console.log(err)
-            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: true}).catch(err => console.log(err))
+            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: true}).catch(console.error)
         })
         return Promise.resolve()
     }
@@ -2567,7 +2433,7 @@ async function trading_lich_bot(interaction) {
     var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
     .then(res => {
         if (res.rowCount != 1) {
-            interaction.reply({content: `☠️ Error retrieving lich info from DB.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: `☠️ Error retrieving lich info from DB.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
             return false
         }
         lich_info = res.rows[0]
@@ -2583,7 +2449,7 @@ async function trading_lich_bot(interaction) {
     if (interaction.options.getString('name'))
         q_lichName = interaction.options.getString('name')
     //----verify order in DB----
-    await db.query(`DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(err => console.log(err))
+    await db.query(`DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(console.error)
     var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
     .then(async res => {
         if (res.rows.length == 0) {     //----insert order in DB----
@@ -2591,13 +2457,13 @@ async function trading_lich_bot(interaction) {
             var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${interaction.user.id}`)
             .then(async tab1 => {
                 if (tab1.rowCount >= userOrderLimit) {
-                    interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                    interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(console.error)
                     return false
                 }
                 var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id}`)
                 .then(tab2 => {
                     if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
-                        interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                        interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(console.error)
                         return false
                     }
                     return true
@@ -2612,7 +2478,7 @@ async function trading_lich_bot(interaction) {
             })
             .catch(err => {
                 console.log(err)
-                interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
                 return false
             })
             if (!status)
@@ -2638,7 +2504,7 @@ async function trading_lich_bot(interaction) {
             .catch(err => {
                 console.log(err)
                 if (err.code == '23505') {
-                    interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                    interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: true}).catch(console.error)
                 }
                 return false
             })
@@ -2646,14 +2512,14 @@ async function trading_lich_bot(interaction) {
                 return false
         }
         else if (res.rows.length > 0) {
-            interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
             return false
         }
         return true
     })
     .catch(err => {
         console.log(err)
-        interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+        interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
         return false
     })
     if (!status)
@@ -2661,11 +2527,11 @@ async function trading_lich_bot(interaction) {
     //----------------
 
     if (!interaction.member.presence) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order ⚠️`, ephemeral: true}).catch(err => console.log(err))
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order ⚠️`, ephemeral: true}).catch(console.error)
         return Promise.resolve()
     }
     if (interaction.member.presence.status == `offline`) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order  ⚠️`, ephemeral: true}).catch(err => console.log(err))
+        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order  ⚠️`, ephemeral: true}).catch(console.error)
         return Promise.resolve()
         //test
     }
@@ -2687,7 +2553,7 @@ async function trading_lich_bot(interaction) {
             console.log(err)
         })
     })
-    .catch(err => console.log(err))
+    .catch(console.error)
 
     return Promise.resolve()
 }
@@ -2851,12 +2717,12 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             res.attachments.map(attachment => {
                                 attachment_url = attachment.url
                             })
-                        }).catch(err => console.log(err))
-                        await db.query(`UPDATE tradebot_users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                        }).catch(console.error)
+                        await db.query(`UPDATE tradebot_users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(console.error)
                     }
                     
                     embed.image.url = attachment_url
-                }).catch(err => console.log(err))
+                }).catch(console.error)
                 //================
                 embeds.push(embed)
             }
@@ -2866,7 +2732,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     .catch(err => {
         console.log(err)
         if (interaction)
-            interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
         return Promise.reject()
     })
     await db.query(`
@@ -3021,12 +2887,12 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             res.attachments.map(attachment => {
                                 attachment_url = attachment.url
                             })
-                        }).catch(err => console.log(err))
-                        await db.query(`UPDATE tradebot_users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(err => console.log(err))
+                        }).catch(console.error)
+                        await db.query(`UPDATE tradebot_users_lich_orders SET lich_image_url = '${attachment_url}' WHERE discord_id = ${res.rows[j].discord_id} AND lich_id = '${res.rows[j].lich_id}'`).catch(console.error)
                     }
                     
                     embed.image.url = attachment_url
-                }).catch(err => console.log(err))
+                }).catch(console.error)
                 //================
                 embeds.push(embed)
             }
@@ -3036,7 +2902,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     .catch(err => {
         console.log(err)
         if (interaction)
-            interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
         return Promise.reject()
     })
     embeds.forEach((element,index) => {
@@ -3062,7 +2928,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             else if (res.rows.length > 1) {
                 console.log(`Detected more than one message for lich ${lich_info.weapon_url} in channel ${multiCid}`)
                 if (interaction)
-                    interaction.reply({content: `☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                    interaction.reply({content: `☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
                 return false
             }
             else {
@@ -3073,7 +2939,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                         return true
                     })
                     .catch(async err => {     //maybe message does not exist in discord anymore
-                        await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(err => console.log(err))
+                        await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE message_id = ${res.rows[0].message_id} AND channel_id = ${multiCid}`).catch(console.error)
                         wh_msg_id = null
                         console.log(err)
                         return true
@@ -3097,24 +2963,24 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         if (wh_msg_id) {
             if (embeds.length==0) {
                 await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE channel_id = ${multiCid} AND lich_id = '${lich_info.lich_id}' AND message_id = ${wh_msg_id}`)
-                .then(res => webhookClient.deleteMessage(wh_msg_id).catch(err => console.log(err)))
+                .then(res => webhookClient.deleteMessage(wh_msg_id).catch(console.error))
                 .catch(err => console.log(err + `Error deleting message id from db for channel ${multiCid} for lich ${lich_info.lich_id}`))
             }
             else {
                 webhookClient.editMessage(wh_msg_id, {content: ' ',embeds: embeds})
                 .then(async wh_msg => {
                     const cl_msg = client.channels.cache.get(wh_msg.channel_id).messages.cache.get(wh_msg.id)
-                    await cl_msg.reactions.removeAll().catch(err => console.log(err))
+                    await cl_msg.reactions.removeAll().catch(console.error)
                     for (var i=0;i<noOfSellers;i++) {
-                        cl_msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                        cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
                     }
                     for (var i=0;i<noOfBuyers;i++) {
-                        cl_msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                        cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
                     }
                 })
                 .catch(err => {
                     if (interaction)
-                        interaction.reply({content: `☠️ Error editing existing orders in channel <#${multiCid}>.\nError code: 505\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                        interaction.reply({content: `☠️ Error editing existing orders in channel <#${multiCid}>.\nError code: 505\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
                     console.log(err)
                     return
                 })
@@ -3135,7 +3001,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 })
                 .catch(err => {     //might be a dublicate message
                     console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${lich_info.lich_id}`)
-                    setTimeout(() => webhookClient.deleteMessage(wh_msg.id).catch(err => console.log(err)), 5000)
+                    setTimeout(() => webhookClient.deleteMessage(wh_msg.id).catch(console.error), 5000)
                     return false
                 })
                 if (!status) {
@@ -3143,23 +3009,23 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                     .then(async res => {
                         if (res.rows.length == 0) {
                             if (interaction)
-                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(console.error)
                             return false
                         }
                         const cl_msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
                         var status = await webhookClient.editMessage(res.rows[0].message_id, {content: ' ', embeds: embeds}).then(async () => {
-                            await cl_msg.reactions.removeAll().catch(err => console.log(err))
+                            await cl_msg.reactions.removeAll().catch(console.error)
                             for (var i=0;i<noOfSellers;i++) {
-                                cl_msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                                cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
                             }
                             for (var i=0;i<noOfBuyers;i++) {
-                                cl_msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                                cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
                             }
                             return true
                         })
                         .catch(err => {
                             if (interaction)
-                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                                interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(console.error)
                             console.log(err)
                             return false
                         })
@@ -3167,25 +3033,25 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                             return false
                     }).catch(err => {
                         if (interaction)
-                            interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                            interaction.reply({content: `⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`, ephemeral: true}).catch(console.error)
                         console.log(err)
                         return Promise.reject()
                     })
                     if (!status)
                         return Promise.reject()
                 }
-                await cl_msg.reactions.removeAll().catch(err => console.log(err))
+                await cl_msg.reactions.removeAll().catch(console.error)
                 for (var i=0;i<noOfSellers;i++) {
-                    cl_msg.react(tradingBotReactions.sell[i]).catch(err => console.log(err))
+                    cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
                 }
                 for (var i=0;i<noOfBuyers;i++) {
-                    cl_msg.react(tradingBotReactions.buy[i]).catch(err => console.log(err))
+                    cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
                 }
             })
             .catch(err => {
                 console.log(err)
                 if (interaction) {
-                    interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(err => console.log(err))
+                    interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
                 }
                 return Promise.reject()
             })
@@ -3454,7 +3320,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
                 message.author.send({content: "Type the following command to register your ign:\nverify ign"})
                 .catch(err => {
                     console.log(err)
-                    message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(err => console.log(err))
+                    message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).catch(console.error)
                 })
                 return false
             }
@@ -3467,7 +3333,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             return false
         })
         if (!status) {
-            message.channel.send(status_message).catch(err => console.log(err))
+            message.channel.send(status_message).catch(console.error)
             return Promise.resolve()
         }
     }
@@ -3526,8 +3392,8 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     }
     var isLich = false
     if (arrItems.length > 1) {
-        message.channel.send(`❕ More than one search results detected for the item **${d_item_url}**, cannot process this request. Please provide a valid item name ❕`).catch(err => console.log(err)); 
-        //setTimeout(() => message.delete().catch(err => console.log(err)), 5000) 
+        message.channel.send(`❕ More than one search results detected for the item **${d_item_url}**, cannot process this request. Please provide a valid item name ❕`).catch(console.error); 
+        //setTimeout(() => message.delete().catch(console.error), 5000) 
         return Promise.resolve()
     }
     if (arrItems.length==0) {
@@ -3554,7 +3420,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             return Promise.reject()
         }
         if (status == 2) {
-            message.channel.send(`❕ Item **${d_item_url}** either does not exist or is not a tradable item. ❕`).catch(err => console.log(err));
+            message.channel.send(`❕ Item **${d_item_url}** either does not exist or is not a tradable item. ❕`).catch(console.error);
             return Promise.resolve()
         }
     }
@@ -3573,7 +3439,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         `)
         .then(res => {
             if (res.rows.length == 0) {
-                message.channel.send(`❕ <@${message.author.id}> No orders found for that lich at this moment. ❕`).catch(err => console.log(err))
+                message.channel.send(`❕ <@${message.author.id}> No orders found for that lich at this moment. ❕`).catch(console.error)
                 return false
             }
             else {
@@ -3583,7 +3449,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
         .catch(err => {
             console.log(err)
-            message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
+            message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(console.error)
             return false
         })
         if (!status)
@@ -3672,7 +3538,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             })
         }
         if (postdata.embeds.length == 0) {
-            message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
+            message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(console.error)
             return Promise.reject()
         }
         postdata.embeds[0].title = weapon_name
@@ -3683,12 +3549,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             message.channel.send(postdata)
             .then(msg => {
                 for (var j=0;j<noOfTraders;j++) {
-                    msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                    msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(console.error)
                 }
             })
             .catch(err => {
                 console.log(err)
-                message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
+                message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(console.error)
             })
         }
         else if (request_type == 2) {
@@ -3696,12 +3562,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             .then(res => {
                 message.reactions.removeAll()
                 for (var j=0;j<noOfTraders;j++) {
-                    message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                    message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(console.error)
                 }
             })
             .catch(err => {
                 console.log(err)
-                message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(err => console.log(err))
+                message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(console.error)
             })
         }
         return Promise.resolve()
@@ -3710,7 +3576,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     const item_url = arrItems[0].item_url
     const item_id = arrItems[0].id
     if (!arrItems[0].rank && isMaxed) {
-        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").catch(err => console.log(err));
+        message.channel.send("⚠️ Item **" + d_item_url + "**, does not have a rank ⚠️").catch(console.error);
         return Promise.resolve()
     }
     var item_rank = 'unranked'
@@ -3727,7 +3593,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     `)
     .then(res => {
         if (res.rows.length == 0) {
-            message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(err => console.log(err))
+            message.channel.send(`❕ <@${message.author.id}> No orders found for that item at this moment. ❕`).catch(console.error)
             return false
         }
         else {
@@ -3737,7 +3603,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     })
     .catch(err => {
         console.log(err)
-        message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(err => console.log(err))
+        message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(console.error)
         return false
     })
     if (!status)
@@ -3812,7 +3678,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
     }
     if (postdata.embeds.length == 0) {
-        message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(err => console.log(err))
+        message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(console.error)
         return Promise.reject()
     }
     postdata.embeds[0].title = item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)')
@@ -3823,12 +3689,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         message.channel.send(postdata)
         .then(msg => {
             for (var j=0;j<noOfTraders;j++) {
-                msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                msg.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(console.error)
             }
         })
         .catch(err => {
             console.log(err)
-            message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(err => console.log(err))
+            message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(console.error)
         })
     }
     else if (request_type == 2) {
@@ -3836,12 +3702,12 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         .then(res => {
             message.reactions.removeAll()
             for (var j=0;j<noOfTraders;j++) {
-                message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(err => console.log(err))
+                message.react(tradingBotReactions[(order_type.replace('wts','sell').replace('wtb','buy'))][j]).catch(console.error)
             }
         })
         .catch(err => {
             console.log(err)
-            message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(err => console.log(err))
+            message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(console.error)
         })
     }
     return Promise.resolve()
@@ -3977,11 +3843,11 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                                 .then(async msg => {
                                     msg.content = " "
                                     msg.embeds[0].description += `\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')})**`
-                                    await msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
+                                    await msg.edit({content: msg.content, embeds: msg.embeds}).catch(console.error)
                                 })
-                                .catch(err => console.log(err))
+                                .catch(console.error)
                             })
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                             return true
                         }
                         const user = client.users.cache.get(all_orders.discord_id)
@@ -3989,10 +3855,10 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                             if (user_presc) {
                                 if (user_presc.status != 'dnd')
-                                    await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                                    await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
                             }
                             else
-                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
                             return true
                         }
                     })
@@ -4079,11 +3945,11 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                             .then(async msg => {
                                 msg.content = " "
                                 msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} (${order_type.replace('wts','Sell').replace('wtb','Buy')})**`
-                                await msg.edit({content: msg.content, embeds: msg.embeds}).catch(err => console.log(err))
+                                await msg.edit({content: msg.content, embeds: msg.embeds}).catch(console.error)
                             })
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                         })
-                        .catch(err => console.log(err))
+                        .catch(console.error)
                         return true
                     }
                     const user = client.users.cache.get(all_orders.discord_id)
@@ -4091,10 +3957,10 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
                         var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
                         if (user_presc) {
                             if (user_presc.status != 'dnd')
-                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
                         }
                         else
-                            await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(err => console.log(err))
+                            await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
                         return true
                     }
                 })
@@ -4193,9 +4059,9 @@ async function tb_threadHandler(message) {
         }
     }
     if ((message.author.id != order_data.order_owner) && (message.author.id != order_data.order_filler)) {
-        message.delete().catch(err => console.log(err))
-        client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(err => console.log(err))
-        //message.channel.members.remove(message.author.id).then(res => console.log(res)).catch(err => console.log(err))
+        message.delete().catch(console.error)
+        client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
+        //message.channel.members.remove(message.author.id).then(res => console.log(res)).catch(console.error)
         return Promise.resolve()
     }
     if (!order_data.messages_log)
@@ -4265,11 +4131,11 @@ async function tb_threadHandler(message) {
     }
     if (from_cross) {
         const thread = client.channels.cache.get(order_data.thread_id)
-        thread.send(`**${ingame_name}:** ${sentMessage}`).catch(err => console.log(err))
+        thread.send(`**${ingame_name}:** ${sentMessage}`).catch(console.error)
     }
     else if (order_data.cross_thread_id) {
         const thread = client.channels.cache.get(order_data.cross_thread_id)
-        thread.send(`**${ingame_name}:** ${sentMessage}`).catch(err => console.log(err))
+        thread.send(`**${ingame_name}:** ${sentMessage}`).catch(console.error)
     }
 }
 
@@ -4279,7 +4145,7 @@ async function tb_updateDmCacheOrder(msg,discord_id) {
         channel_id: msg.channelId,
         timestamp: new Date().getTime()
     }
-    await db.query(`UPDATE tradebot_users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(err => console.log(err))
+    await db.query(`UPDATE tradebot_users_list SET extras = jsonb_set(extras, '{dm_cache_order}', '${JSON.stringify(postdata)}', false) WHERE discord_id = ${discord_id}`).catch(console.error)
 }
 
 async function tb_activate_orders(message, interaction) {
@@ -4308,11 +4174,11 @@ async function tb_activate_orders(message, interaction) {
     })
     if (!status) {
         if (message) {
-            message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 5000)
         }
         else
-            interaction.reply({content: status_msg, embeds: [], ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: status_msg, embeds: [], ephemeral: true}).catch(console.error)
         return
     }
     //set all orders as visible for this user
@@ -4326,11 +4192,11 @@ async function tb_activate_orders(message, interaction) {
     })
     if (!status) {
         if (message) {
-            message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 5000)
         }
         else 
-            interaction.reply({content: `☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`, embeds: [], ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: `☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`, embeds: [], ephemeral: true}).catch(console.error)
         return
     }
     for (var items_ids_index=0;items_ids_index<items_ids.length;items_ids_index++) {
@@ -4357,11 +4223,11 @@ async function tb_activate_orders(message, interaction) {
         })
         if (!status) {
             if (message) {
-                message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
+                setTimeout(() => message.delete().catch(console.error), 5000)
             }
             else
-                interaction.reply({content: `☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`, embeds: [], ephemeral: true}).catch(err => console.log(err))
+                interaction.reply({content: `☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502`, embeds: [], ephemeral: true}).catch(console.error)
             return
         }
         console.log(`updating orders ${item_name} for ${user_id}`)
@@ -4390,7 +4256,7 @@ async function tb_activate_orders(message, interaction) {
         })
     }
     if (message)
-        message.delete().catch(err => console.log(err))
+        message.delete().catch(console.error)
 }
 
 async function tb_activate_lich_orders(message, interaction) {
@@ -4420,11 +4286,11 @@ async function tb_activate_lich_orders(message, interaction) {
     })
     if (!status) {
         if (message) {
-            message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            message.channel.send(status_msg).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 5000)
         }
         else
-            interaction.reply({content: status_msg, embeds: [], ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: status_msg, embeds: [], ephemeral: true}).catch(console.error)
         return
     }
     //set all orders as visible for this user
@@ -4438,11 +4304,11 @@ async function tb_activate_lich_orders(message, interaction) {
     })
     if (!status) {
         if (message) {
-            message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-            setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+            message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
+            setTimeout(() => message.delete().catch(console.error), 5000)
         }
         else
-            interaction.reply({content: `☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`, embeds: [], ephemeral: true}).catch(err => console.log(err))
+            interaction.reply({content: `☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`, embeds: [], ephemeral: true}).catch(console.error)
         return
     }
     for (var i=0;i<user_orders.length;i++) {
@@ -4464,11 +4330,11 @@ async function tb_activate_lich_orders(message, interaction) {
         })
         if (!status) {
             if (message) {
-                message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
+                setTimeout(() => message.delete().catch(console.error), 5000)
             }
             else
-                interaction.reply({content: `☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502 ☠️`, embeds: [], ephemeral: true}).catch(err => console.log(err))
+                interaction.reply({content: `☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502 ☠️`, embeds: [], ephemeral: true}).catch(console.error)
             return
         }
         console.log(`updating lich order ${lich_info.weapon_url} for ${user_id}`)
@@ -4482,7 +4348,7 @@ async function tb_activate_lich_orders(message, interaction) {
                 var currTime = new Date().getTime()
                 var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
                 console.log(after3h - currTime)
-                await set_order_timeout(user_order[0],after3h,currTime,true,lich_info).catch(err => console.log(err))
+                await set_order_timeout(user_order[0],after3h,currTime,true,lich_info).catch(console.error)
             })
             .catch(err => {
                 console.log(err)
@@ -4495,7 +4361,7 @@ async function tb_activate_lich_orders(message, interaction) {
         })
     }
     if (message)
-        message.delete().catch(err => console.log(err))
+        message.delete().catch(console.error)
     return
 }
 
@@ -4525,7 +4391,7 @@ async function tb_close_orders(message, interaction) {
     })
     if (!status) {
         if (message)
-            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            setTimeout(() => message.delete().catch(console.error), 2000)
         return
     }
     var status = await db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE discord_id = ${user_id} AND visibility = true`)
@@ -4540,7 +4406,7 @@ async function tb_close_orders(message, interaction) {
     })
     if (!status) {
         if (message)
-            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            setTimeout(() => message.delete().catch(console.error), 2000)
         return
     }
     for (const [index,order] of orders_list.entries()) {
@@ -4569,10 +4435,10 @@ async function tb_close_orders(message, interaction) {
         })
         if (!status)
             return Promise.resolve()
-        await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(err => console.log(err))
+        await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).catch(console.error)
     }
     if (message)
-        setTimeout(() => message.delete().catch(err => console.log(err)), 500)
+        setTimeout(() => message.delete().catch(console.error), 500)
     return
 }
 
@@ -4603,7 +4469,7 @@ async function tb_close_lich_orders(message, interaction) {
     })
     if (!status) {
         if (message)
-            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            setTimeout(() => message.delete().catch(console.error), 2000)
         return
     }
     var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility = false WHERE discord_id = ${user_id}`)
@@ -4618,7 +4484,7 @@ async function tb_close_lich_orders(message, interaction) {
     })
     if (!status) {
         if (message)
-            setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+            setTimeout(() => message.delete().catch(console.error), 2000)
         return
     }
     for (var i=0;i<orders_list.length;i++) {
@@ -4641,7 +4507,7 @@ async function tb_close_lich_orders(message, interaction) {
         })
     }
     if (message)
-        setTimeout(() => message.delete().catch(err => console.log(err)), 500)
+        setTimeout(() => message.delete().catch(console.error), 500)
     return
 }
 
@@ -4666,14 +4532,14 @@ async function tb_user_online(message,interaction) {
     return new Promise((resolve, reject) => {
         if (interaction) {
             if (!interaction.member.presence || interaction.member.presence.status == 'offline') {
-                interaction.reply({content: `⚠️ Your discord status must be online to use the bot. ⚠️`, ephemeral: true}).catch(err => console.log(err))
+                interaction.reply({content: `⚠️ Your discord status must be online to use the bot. ⚠️`, ephemeral: true}).catch(console.error)
                 reject('user not online')
             }
         }
         if (message) {
             if (!message.member.presence || message.member.presence.status == 'offline') {
-                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 5000)).catch(err => console.log(err))
-                setTimeout(() => message.delete().catch(err => console.log(err)), 5000)
+                message.channel.send(`⚠️ Your discord status must be online to use the bot ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error)
+                setTimeout(() => message.delete().catch(console.error), 5000)
                 reject('user not online')
             }
         }
@@ -4694,7 +4560,7 @@ function generateId() {
 async function trade_tut(message,args) {
     if (message)
         if (message.author.id != '253525146923433984') {
-            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
+            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(console.error)
             return
         }
 
@@ -4770,35 +4636,35 @@ async function trade_tut(message,args) {
         ]
     }
 
-    message.channel.send(postdata).catch(err => console.log(err))
+    message.channel.send(postdata).catch(console.error)
     
     /*
     if (process.env.DEBUG_MODE == 1) {
-        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
+        client.channels.cache.get('864199722676125757').send(postdata).catch(console.error)
         return
     }
 
     client.channels.cache.get('892160436881993758').messages.fetch('893138411861446676')
     .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
+        msg.edit(postdata).catch(console.error)
     })
-    .catch(err => console.log(err))
+    .catch(console.error)
     client.channels.cache.get('893133821313187881').messages.fetch('893138412301860865')
     .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
+        msg.edit(postdata).catch(console.error)
     })
-    .catch(err => console.log(err))
+    .catch(console.error)
     client.channels.cache.get('892108718358007820').messages.fetch('893138411995689080')
     .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
+        msg.edit(postdata).catch(console.error)
     })
-    .catch(err => console.log(err))*/
+    .catch(console.error)*/
 }
 
 async function lich_tut(message,args) {
     if (message)
         if (message.author.id != '253525146923433984') {
-            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
+            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(console.error)
             return
         }
 
@@ -4872,29 +4738,29 @@ async function lich_tut(message,args) {
             }
         ]
     }
-    message.channel.send(postdata).catch(err => console.log(err))
+    message.channel.send(postdata).catch(console.error)
     /*
     if (process.env.DEBUG_MODE == 1) {
-        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
+        client.channels.cache.get('864199722676125757').send(postdata).catch(console.error)
         return
     }
 
     client.channels.cache.get('892003772698611723').messages.fetch('914453068978978842')
     .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
+        msg.edit(postdata).catch(console.error)
     })
-    .catch(err => console.log(err))
+    .catch(console.error)
     client.channels.cache.get('906555131254956042').messages.fetch('914453068983201884')
     .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
+        msg.edit(postdata).catch(console.error)
     })
-    .catch(err => console.log(err))*/
+    .catch(console.error)*/
 }
 
 async function riven_tut(message,args) {
     if (message)
         if (message.author.id != '253525146923433984') {
-            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(err => console.log(err))
+            message.channel.send('<:LMFAOOOO:909820191314149396>').catch(console.error)
             return
         }
 
@@ -4937,24 +4803,114 @@ async function riven_tut(message,args) {
             }
         ]
     }
-    message.channel.send(postdata).catch(err => console.log(err))
-    /*
-    if (process.env.DEBUG_MODE == 1) {
-        client.channels.cache.get('864199722676125757').send(postdata).catch(err => console.log(err))
-        return
-    }
-    
-    client.channels.cache.get('892003731523113063').messages.fetch('929501491356639292')
-    .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))
-    client.channels.cache.get('929499295751737455').messages.fetch('929501491310510120')
-    .then(msg => {
-        msg.edit(postdata).catch(err => console.log(err))
-    })
-    .catch(err => console.log(err))*/
+    message.channel.send(postdata).catch(console.error)
 }
+
+
+db.on('notification', (notification) => {
+    console.log('db notification')
+    console.log(notification.payload)
+    console.log(notification.channel)
+    const payload = JSONbig.parse(notification.payload);
+
+    if (notification.channel == 'tradebot_filled_users_orders_insert') {
+        const owner_channel = client.channels.cache.get(payload.owner_channel_id)
+        db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${payload.order_owner} AND item_id = '${payload.item_id}' AND order_type = '${payload.order_type}'`)
+        .then(res => {
+            db.query(`SELECT * FROM items_list WHERE id='${payload.item_id}'`)
+            .catch(console.error).then(res => {
+                const item_data = res.rows[0]
+                db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${payload.order_owner} OR discord_id = ${payload.order_filler};`)
+                .catch(console.error).then(res => {
+                    const user_data = {}
+                    res.rows.forEach(row => user_data[row.discord_id] = row)
+                    const threadName = `${convertUpper(item_data.item_url)} (${user_data[order_owner].ingame_name})x(${user_data[order_filler].ingame_name})`
+                    if (threadName.length > 99) {
+                        console.log(`${threadName} thread's name is longer than 99`)
+                        threadName = `(${user_data[order_owner].ingame_name})x(${user_data[order_filler].ingame_name})`
+                    }
+                    trading_bot_orders_update(null,payload.item_id,item_data.item_url,convertUpper(item_data.item_url),2,payload.user_rank).catch(console.error)
+                    owner_channel.threads.create({
+                        name: threadName,
+                        autoArchiveDuration: 60,
+                        reason: 'Trade opened.'
+                    }).then(async owner_channel_thread => {
+                        db.query(`UPDATE tradebot_filled_users_orders set thread_id = ${owner_channel_thread.id} WHERE order_id = '${payload.order_id}'`)
+                        setTimeout(() => owner_channel.messages.cache.get(owner_channel_thread.id).delete().catch(console.error), 5000)
+                        var filler_channel_thread = null
+                        if (payload.owner_channel_id != payload.filler_channel_id) {
+                            const filler_channel = client.channels.cache.get(payload.filler_channel_id)
+                            await filler_channel.threads.create({
+                                name: threadName,
+                                autoArchiveDuration: 60,
+                                reason: 'Trade opened.'
+                            }).catch(console.error)
+                            .then(res => {
+                                filler_channel_thread = res
+                                db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE order_id = '${payload.order_id}'`)
+                                setTimeout(() => filler_channel_thread.messages.cache.get(filler_channel_thread.id).delete().catch(console.error), 5000)
+                            })
+                        }
+                        console.log('thread created')
+                        client.users.cache.get(payload.order_owner).send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)
+                        const postdata = {
+                            color: payload.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor),
+                            timestamp: new Date(),
+                            title: convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                            footer: {text: `This trade will be auto-closed in 15 minutes\n\u200b`},
+                            thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                            description: 
+`**${payload.order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${payload.order_owner}>
+**${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${payload.order_filler}>
+**Price:** ${payload.user_price}<:platinum:881692607791648778>
+
+/invite ${embedScore(user_data[payload.order_owner].ingame_name)}
+/invite ${embedScore(user_data[payload.order_filler].ingame_name)}
+
+React with ${tradingBotReactions.success[0]} to finish this trade.
+React with ⚠️ to report the trader (Please type the reason of report and include screenshots evidence in this chat before reporting)`
+                        }
+                        owner_channel_thread.send({content: `<@${payload.order_owner}> <@${payload.order_filler}>`,embeds: [postdata]})
+                        .then(open_message => {
+                            db.query(`
+                                UPDATE tradebot_filled_users_orders set trade_open_message = ${open_message.id}
+                                WHERE order_id = '${payload.order_id}'
+                            `)
+                            .catch(console.error)
+                            open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                            open_message.react('⚠️').catch(console.error)
+                            if (filler_channel_thread)
+                                owner_channel_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
+                        }).catch(console.error)
+                        if (filler_channel_thread) {
+                            filler_channel_thread.send({content: `<@${payload.order_owner}> <@${payload.order_filler}>`,embeds: [postdata]})
+                            .then(open_message => {
+                                db.query(`
+                                UPDATE tradebot_filled_users_orders set cross_trade_open_message = ${open_message.id}
+                                WHERE order_id = '${payload.order_id}'
+                                `).catch(console.error)
+                                open_message.react(tradingBotReactions.success[0]).catch(console.error)
+                                open_message.react('⚠️').catch(console.error)
+                                filler_channel_thread.send('This is a cross-server communication. Any message you send here would be sent to your trader and vice versa. You may start writing').catch(console.error)
+                            }).catch(console.error)
+                        }
+                        setTimeout(() => {
+                            owner_channel_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                            if (filler_channel_thread) 
+                                filler_channel_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                        }, 900000)
+                        setTimeout(() => {
+                            owner_channel_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                            if (filler_channel_thread)
+                                filler_channel_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                        }, 720000)
+                    }).catch(console.error)
+                })
+            })
+        })
+        .catch(console.error)
+    }
+})
 
 module.exports = {
     bot_initialize,
