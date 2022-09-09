@@ -342,12 +342,12 @@ async function reaction_handler(reaction, user, action) {
                 order_type = 'wtb'
             if (!reaction.message.author)
                 reaction.message = await client.channels.cache.get(reaction.message.channel.id).messages.fetch(reaction.message.id).catch(console.error);
-            var tradee = {
+            var trader = {
                 discord_id: null,
                 ingame_name: null
             }
-            var trader = {
-                discord_id: null,
+            var tradee = {
+                discord_id: user.id,
                 ingame_name: null
             }
             tb_user_exist(user.id).then(async () => {
