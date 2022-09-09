@@ -4824,10 +4824,10 @@ db.on('notification', (notification) => {
                 .catch(console.error).then(res => {
                     const user_data = {}
                     res.rows.forEach(row => user_data[row.discord_id] = row)
-                    const threadName = `${convertUpper(item_data.item_url)} (${user_data[order_owner].ingame_name})x(${user_data[order_filler].ingame_name})`
+                    const threadName = `${convertUpper(item_data.item_url)} (${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
                     if (threadName.length > 99) {
                         console.log(`${threadName} thread's name is longer than 99`)
-                        threadName = `(${user_data[order_owner].ingame_name})x(${user_data[order_filler].ingame_name})`
+                        threadName = `(${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
                     }
                     trading_bot_orders_update(null,payload.item_id,item_data.item_url,convertUpper(item_data.item_url),2,payload.user_rank).catch(console.error)
                     owner_channel.threads.create({
