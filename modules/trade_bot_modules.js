@@ -1592,31 +1592,14 @@ async function reaction_handler(reaction, user, action) {
                             }
                         }
                         else if (reaction.emoji.name == '⚠️' || suspicious) {
-                            var status = await db.query(`
-                                UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious? null:user.id}, suspicious = ${suspicious}
+                            db.query(`
+                                UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious ? null:user.id}, suspicious = ${suspicious}
                                 WHERE ${q_threadId} = ${reaction.message.channel.id}
-                            `)
-                            .then(res => {
-                                return true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                return false
-                            })
-                            if (!status)
-                                return Promise.resolve()
-                            if (!from_cross) {
+                            `).then(res => {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                if (order_data.cross_thread_id) {
-                                    const channel = client.channels.cache.get(order_data.cross_thread_id)
-                                    channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                }
-                            }
-                            else {
-                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                const channel = client.channels.cache.get(order_data.thread_id)
-                                channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                            }
+                                if (from_cross && order_data.cross_thread_id)
+                                    client.channels.cache.get(order_data.cross_thread_id).setArchived(true,`Trade successful. Archived by ${user.id}`)
+                            }).catch(console.error)
                         }
                         return Promise.resolve()
                     }
