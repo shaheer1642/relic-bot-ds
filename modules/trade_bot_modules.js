@@ -1520,7 +1520,7 @@ async function reaction_handler(reaction, user, action) {
                                 return Promise.resolve()
                         }
                         if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
-                            reaction.users.remove(user.id).catch(err => console.log(err))
+                            reaction.users.remove(user.id).catch(console.error)
                             return Promise.resolve()
                         }
                         var q_threadId = 'thread_id'
@@ -1570,14 +1570,14 @@ async function reaction_handler(reaction, user, action) {
                             WHERE discord_id = ${(order_data.order_filler)};
                             `)
                             .then(res => console.log(`updated plat balance for seller and buyer`))
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                             //remove order from owner profile
                             var query = `DELETE FROM tradebot_users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
                             if (q_filledOrderTable == 'tradebot_filled_users_lich_orders')
                                 query = `DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
                             db.query(query)
                             .then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`))
-                            .catch(err => console.log(err))
+                            .catch(console.error)
                             //-------
                             if (!from_cross) {
                                 reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
