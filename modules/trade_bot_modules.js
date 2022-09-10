@@ -4789,14 +4789,19 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
                             }).catch(console.error)
                         }
                         setTimeout(() => {
-                            owner_channel_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                            owner_channel_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`).catch(console.error)
                             if (filler_channel_thread) 
-                                filler_channel_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`)
+                                filler_channel_thread.setArchived(true,`Trade expired without user response. Archived by ${client.user.id}`).catch(console.error)
                         }, 900000)
                         setTimeout(() => {
-                            owner_channel_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
-                            if (filler_channel_thread)
-                                filler_channel_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                            db.query(`SELECT * FROM tradebot_filled_users_orders WHERE thread_id = ${owner_channel_thread.id} AND archived = false`)
+                            .then(res => {
+                                if (res.rowCount == 1) {
+                                    owner_channel_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                                    if (filler_channel_thread)
+                                        filler_channel_thread.send({content: 'This trade will be auto-closed in 3 minutes. Please react with the appropriate emote above to close it properly'}).catch(console.error)
+                                }
+                            }).catch(console.error)
                         }, 720000)
                     }).catch(console.error)
                 }).catch(console.error)
