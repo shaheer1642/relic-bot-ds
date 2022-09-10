@@ -50,6 +50,39 @@ async function bot_initialize() {
 }
 
 async function message_handler(message, multiMessage) {
+    if (message.channel.isThread()) {
+        if (message.channel.ownerId != client.user.id)
+            return Promise.resolve()
+        if (message.channel.archived)
+            return Promise.resolve()
+        if (message.author.id == client.user.id)
+            return Promise.resolve()
+        console.log(`message sent in an active thread`)
+        var sentMessage = ''
+        sentMessage += message.content + '\n'
+        message.attachments.map(attachment => {
+            sentMessage += attachment.url + '\n'
+        })
+        sentMessage = sentMessage.trim()
+        db.query(`
+            UPDATE tradebot_filled_users_orders
+            SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id,timestamp: new Date().getTime()})}]'::jsonb
+            WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
+            RETURNING *;
+            UPDATE tradebot_filled_users_lich_orders
+            SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id, timestamp: new Date().getTime()})}]'::jsonb
+            WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
+            RETURNING *;
+        `).then(res => {
+            if (res[0].rowCount == 0 && res[1].rowCount == 0) {
+                message.delete().catch(console.error)
+                client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
+                return
+            }
+        }).catch(console.error)
+        return
+    }
+
     const args = multiMessage.trim().toLowerCase().split(/ +/g)
     const command = args.shift()
 
@@ -4001,38 +4034,6 @@ async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich
     }
 }
 
-async function tb_threadHandler(message) {
-    if (message.channel.ownerId != client.user.id)
-        return Promise.resolve()
-    if (message.channel.archived)
-        return Promise.resolve()
-    if (message.author.id == client.user.id)
-        return Promise.resolve()
-    console.log(`message sent in an active thread`)
-    var sentMessage = ''
-    sentMessage += message.content + '\n'
-    message.attachments.map(attachment => {
-        sentMessage += attachment.url + '\n'
-    })
-    sentMessage = sentMessage.trim()
-    db.query(`
-        UPDATE tradebot_filled_users_orders
-        SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id,timestamp: new Date().getTime()})}]'::jsonb
-        WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
-        RETURNING *;
-        UPDATE tradebot_filled_users_lich_orders
-        SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id, timestamp: new Date().getTime()})}]'::jsonb
-        WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
-        RETURNING *;
-    `).then(res => {
-        if (res[0].rowCount == 0 && res[1].rowCount == 0) {
-            message.delete().catch(console.error)
-            client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
-            return
-        }
-    }).catch(console.error)
-}
-
 async function tb_updateDmCacheOrder(msg,discord_id) {
     const postdata = {
         msg_id: msg.id,
@@ -4852,7 +4853,6 @@ module.exports = {
     trading_bot_registeration,
     td_set_orders_timeouts,
     set_order_timeout,
-    tb_threadHandler,
     tb_user_exist,
     tb_user_online,
     reaction_handler,

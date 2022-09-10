@@ -261,7 +261,7 @@ client.on('messageCreate', async message => {
 
     if (message.channel.isThread()) {
         if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channel.parentId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channel.parentId))
-            trade_bot_modules.tb_threadHandler(message).catch(err => console.log(err))
+            trade_bot_modules.message_handler(message).catch(err => console.log(err))
         return
     }
 
