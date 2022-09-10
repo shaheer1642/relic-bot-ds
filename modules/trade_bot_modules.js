@@ -4813,6 +4813,23 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
                         channel.send({content: `**${res.rows[0].ingame_name}**: ${embedScore(payload.message.message)}`}).catch(console.error)
                 }).catch(console.error)
             }
+        } else if (payload.message.platform == 'hubapp') {
+            const thread_id = payload.thread_id
+            const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
+            db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${payload.message.discord_id}`)
+            .then(res => {
+                if (res.rowCount == 1)
+                    channel.send({content: `**${res.rows[0].ingame_name}**: ${embedScore(payload.message.message)}`}).catch(console.error)
+            }).catch(console.error)
+            if (payload.cross_thread_id != null) {
+                const thread_id = payload.cross_thread_id
+                const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
+                db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${payload.message.discord_id}`)
+                .then(res => {
+                    if (res.rowCount == 1)
+                        channel.send({content: `**${res.rows[0].ingame_name}**: ${embedScore(payload.message.message)}`}).catch(console.error)
+                }).catch(console.error)
+            }
         }
     }
 })
