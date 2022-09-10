@@ -4017,11 +4017,11 @@ async function tb_threadHandler(message) {
     sentMessage = sentMessage.trim()
     db.query(`
         UPDATE tradebot_filled_users_orders
-        SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, timestamp: new Date().getTime()})}]'::jsonb
+        SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id,timestamp: new Date().getTime()})}]'::jsonb
         WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
         RETURNING *;
         UPDATE tradebot_filled_users_lich_orders
-        SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, timestamp: new Date().getTime()})}]'::jsonb
+        SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id, timestamp: new Date().getTime()})}]'::jsonb
         WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
         RETURNING *;
     `).then(res => {
@@ -4029,25 +4029,6 @@ async function tb_threadHandler(message) {
             message.delete().catch(console.error)
             client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
             return
-        }
-        var order_data = null
-        if (res[0].rowCount == 1)
-            order_data = res[0].rows[0]
-        else if (res[1].rowCount == 1)
-            order_data = res[1].rows[0]
-        else
-            return
-        if (order_data.cross_thread_id) {
-            db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
-            .then(async res => {
-                if (res.rowCount != 1) return
-                const ingame_name = res.rows[0].ingame_name
-                const fetch_thread = order_data.cross_thread_id == message.channel.id ? order_data.thread_id : order_data.cross_thread_id
-                var thread = client.channels.cache.get(fetch_thread)
-                if (!thread)
-                    thread = await client.channels.fetch(fetch_thread).catch(console.error)
-                thread.send(`**${ingame_name}:** ${sentMessage}`).catch(console.error)
-            }).catch(console.error)
         }
     }).catch(console.error)
 }
@@ -4820,6 +4801,19 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
                 }).catch(console.error)
             }).catch(console.error)
         }).catch(console.error)
+    }
+    if (notification.channel == 'tradebot_filled_users_orders_update_new_message') {
+        if (payload.message.platform == 'discord') {
+            if (payload.cross_thread_id != null) {
+                const thread_id = payload.message.thread_id == payload.thread_id ? payload.cross_thread_id : payload.thread_id
+                const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
+                db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${payload.message.discord_id}`)
+                .then(res => {
+                    if (res.rowCount == 1)
+                        channel.send({content: `**${res.rows[0].ingame_name}**: ${embedScore(payload.message.message)}`}).catch(console.error)
+                }).catch(console.error)
+            }
+        }
     }
 })
 
