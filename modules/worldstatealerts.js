@@ -238,6 +238,7 @@ var global_upgrades_timer
 var invasions_timer
 
 function bot_initialize() {
+    if (client.user.id == '1018482171037626378') return
     //----set timers----
     baroTimer = setTimeout(baro_check,10000)
     cyclesTimer = setTimeout(cycles_check,11000)
