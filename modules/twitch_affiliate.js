@@ -258,11 +258,13 @@ const countries = [
 ]
 
 function bot_initialize() {
-    updateAffiliations()
-    
-    setInterval(() => {
+    if (client.guilds.cache.get('865904902941048862')) {
         updateAffiliations()
-    }, 60000);
+        
+        setInterval(() => {
+            updateAffiliations()
+        }, 60000);
+    }
 }
 
 const emotes = {

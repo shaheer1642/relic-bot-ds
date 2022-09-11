@@ -9,11 +9,9 @@ const masteryRolesMessageId = "892084165405716541"
 const otherRolesMessageId = "957330415734095932"
 
 function bot_initialize() {
-    try {
+    if (client.guilds.cache.get('776804537095684108')) {
         client.guilds.cache.get('776804537095684108').members.fetch().catch(console.error)
         setTimeout(updateMasteryDistr, 10000);
-    } catch (e) {
-        console.log(e)
     }
 }
 
