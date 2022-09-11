@@ -6,24 +6,26 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, c
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
-setInterval(() => {     // check every 5m for squads timeouts
-    db.query(`SELECT * FROM botv_recruit_members`)
-    .then(async res => {
-        for (var i=0; i<res.rowCount; i++) {
-            squad = res.rows[i]
-            if ((new Date().getTime() - squad.join_timestamp) > squad_timeout) {
-                console.log(`botv_recruit: timing out squad ${squad.user_id} ${squad.squad_type}`)
-                await db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${squad.user_id} AND squad_type = '${squad.squad_type}'`)
-            }
-        }
-        edit_main_msg()
-    }).catch(err => console.log(err))
-}, 300000);
 
 async function bot_initialize() {
-    await client.channels.fetch('950400363410915348').then(async (channel) => await channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-    await client.guilds.fetch('776804537095684108').then(async (guild) => await guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-    edit_main_msg()
+    if (client.guilds.cache.get('776804537095684108')) {
+        await client.channels.fetch('950400363410915348').then(async (channel) => await channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+        await client.guilds.fetch('776804537095684108').then(async (guild) => await guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+        setInterval(() => {     // check every 5m for squads timeouts
+            db.query(`SELECT * FROM botv_recruit_members`)
+            .then(async res => {
+                for (var i=0; i<res.rowCount; i++) {
+                    squad = res.rows[i]
+                    if ((new Date().getTime() - squad.join_timestamp) > squad_timeout) {
+                        console.log(`botv_recruit: timing out squad ${squad.user_id} ${squad.squad_type}`)
+                        await db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${squad.user_id} AND squad_type = '${squad.squad_type}'`)
+                    }
+                }
+                edit_main_msg()
+            }).catch(err => console.log(err))
+        }, 300000);
+        edit_main_msg()
+    }
 }
 
 function send_msg(msg, args) {

@@ -7,6 +7,13 @@ var Ducat_Update_Timer = null
 const botv_guild_id = "776804537095684108"
 const relicStocks_guild_id = "765542868265730068"
 
+function bot_initialize() {
+    if (client.guilds.cache.get(botv_guild_id) && client.guilds.cache.get(relicStocks_guild_id)) {
+        //----Ducat updater timeout----
+        Ducat_Update_Timer = setTimeout(dc_ducat_update, 1); //execute every 5m, immediate the first time
+    }
+}
+
 async function dc_ducat_update() {
     var all_items = []
     var status = await db.query(`SELECT * FROM items_list WHERE ducat = 100 AND sell_price < 16 ORDER BY sell_price DESC, item_url`)
@@ -502,4 +509,4 @@ axiosRetry(axios, {
     },
 });
 
-module.exports = {dc_ducat_update,bought,updateDucatForced}
+module.exports = {dc_ducat_update,bought,updateDucatForced,bot_initialize}

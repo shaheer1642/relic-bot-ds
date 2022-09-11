@@ -7,6 +7,14 @@ const osiris_channels = {
 
 var emote_list = []
 
+function bot_initialize() {
+    if (client.guilds.cache.get(osiris_guild_id)) {
+        setInterval(dbUpdate, 3600000);     //every hour
+        setInterval(editMsg, 60000);        //every minute
+        setTimeout(dbUpdate, -1);
+    }
+}
+
 async function dbUpdate() {
     client.guilds.fetch(osiris_guild_id)
     .then(guild => {
@@ -141,5 +149,6 @@ module.exports = {
     dbUpdate,
     editMsg,
     messageHandler,
-    reactionAddHandler
+    reactionAddHandler,
+    bot_initialize
 }

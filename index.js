@@ -11,7 +11,6 @@ const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
 //const gpt3 = require('./modules/gpt3.js');
 const {pins_handler} = require('./modules/pins_handler.js');
-const trackers = require('./modules/trackers.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
 const hubapp = require('./modules/hubapp.js');
@@ -114,23 +113,6 @@ client.on('ready', () => {
     if (process.env.DEBUG_MODE==1)
         return
 
-    //----Bounty timer---
-    setImmediate(trackers.bounty_check,-1)
-
-    //----Teshin timer---
-    setImmediate(trackers.teshin_check,-1)
-
-    //----Cetus timer---
-    setImmediate(trackers.cetus_check,-1)
-
-    //----Ducat updater timeout----
-    ducat_updater.Ducat_Update_Timer = setTimeout(ducat_updater.dc_ducat_update, 1); //execute every 5m, immediate the first time
-
-    //----Osiris timer----
-    setInterval(osiris_guild.dbUpdate, 3600000);     //every hour
-    setInterval(osiris_guild.editMsg, 60000);        //every minute
-    setTimeout(osiris_guild.dbUpdate, -1);
-
     /*
     //----Re-define wfm-api orders timers if any-----
     db.query(`SELECT * FROM auto_update_items`)
@@ -160,8 +142,7 @@ client.on('ready', () => {
     }).catch(err => console.log(err))
     */
 
-    setTimeout(botv.updateMasteryDistr, 10000);
-
+    osiris_guild.bot_initialize()
     trade_bot_modules.bot_initialize()
     botv.bot_initialize()
     botv_recruit.bot_initialize()
@@ -170,6 +151,7 @@ client.on('ready', () => {
     twitch_affiliate.bot_initialize()
     botv_event_voting.bot_initialize()
     worldstatealerts.bot_initialize()
+    ducat_updater.bot_initialize()
 })
 
 client.on('messageCreate', async message => {
