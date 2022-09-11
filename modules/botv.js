@@ -9,7 +9,11 @@ const masteryRolesMessageId = "892084165405716541"
 const otherRolesMessageId = "957330415734095932"
 
 function bot_initialize() {
-    client.guilds.cache.get('776804537095684108').members.fetch().catch(console.error)
+    try {
+        client.guilds.cache.get('776804537095684108').members.fetch().catch(console.error)
+    } catch (e) {
+        console.log(e)
+    }
 }
 
 function message_handler(message) {
