@@ -131,26 +131,6 @@ client.on('ready', () => {
     setInterval(osiris_guild.editMsg, 60000);        //every minute
     setTimeout(osiris_guild.dbUpdate, -1);
 
-    if (process.env.DEBUG_MODE!=1) {
-        setTimeout(() => {
-            //----flush terminate msgs----
-            db.query(`SELECT * FROM process_terminate_flush`)
-            .then(res => {
-                db.query(`DELETE FROM process_terminate_flush`).catch(err => console.log(err))
-                res.rows.forEach(e => {
-                    client.channels.cache.get(e.channel_id).messages.fetch(e.msg_id)
-                    .then(msg => msg.delete().catch(err => console.log(err)))
-                    .catch(err => console.log(err))
-                })
-            }).catch(err => console.log(err))
-        }, 30000);
-        //----update db url on discord----
-        client.channels.cache.get('857773009314119710').messages.fetch('889201568321257472')
-        .then(msg => {
-            msg.edit(process.env.DATABASE_URL)
-        }).catch(err => console.log(err))
-    }
-
     /*
     //----Re-define wfm-api orders timers if any-----
     db.query(`SELECT * FROM auto_update_items`)
