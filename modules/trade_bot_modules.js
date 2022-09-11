@@ -26,26 +26,28 @@ const tb_invisColor = '#71368A'
 const u_order_close_time = 10800000
 
 async function bot_initialize() {
-    //----Set timeouts for orders if any----
-    td_set_orders_timeouts().catch(console.error)
-    
-    await db.query(`SELECT * FROM tradebot_channels`).catch(console.error)
-    .then(res => {
-        res.rows.forEach(row => {
-            if (row.type == 'general_trades')
-                tradingBotChannels[row.channel_id] = row.webhook_url
-            if (row.type == 'lich_trades')
-                tradingBotLichChannels[row.channel_id] = row.webhook_url
+    if (client.guilds.cache.get('865904902941048862')) {
+        //----Set timeouts for orders if any----
+        td_set_orders_timeouts().catch(console.error)
+        
+        await db.query(`SELECT * FROM tradebot_channels`).catch(console.error)
+        .then(res => {
+            res.rows.forEach(row => {
+                if (row.type == 'general_trades')
+                    tradingBotChannels[row.channel_id] = row.webhook_url
+                if (row.type == 'lich_trades')
+                    tradingBotLichChannels[row.channel_id] = row.webhook_url
+            })
         })
-    })
-
-    for (const channel_id in tradingBotChannels) {
-        client.channels.fetch(channel_id).catch(console.error)
-        .then(channel => channel.messages.fetch().catch(console.error))
-    }
-    for (const channel_id in tradingBotLichChannels) {
-        client.channels.fetch(channel_id).catch(console.error)
-        .then(channel => channel.messages.fetch().catch(console.error))
+    
+        for (const channel_id in tradingBotChannels) {
+            client.channels.fetch(channel_id).catch(console.error)
+            .then(channel => channel.messages.fetch().catch(console.error))
+        }
+        for (const channel_id in tradingBotLichChannels) {
+            client.channels.fetch(channel_id).catch(console.error)
+            .then(channel => channel.messages.fetch().catch(console.error))
+        }
     }
 }
 
