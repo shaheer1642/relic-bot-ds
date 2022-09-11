@@ -147,6 +147,7 @@ client.on('ready', () => {
     botv.bot_initialize()
     botv_recruit.bot_initialize()
     osiris_tts.bot_initialize()
+    osiris_guild.bot_initialize()
     wfrim.bot_initialize()
     twitch_affiliate.bot_initialize()
     botv_event_voting.bot_initialize()

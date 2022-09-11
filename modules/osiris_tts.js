@@ -4,13 +4,15 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 
-setInterval(() => {     // check every 5m for squads timeouts
-    edit_main_msg()
-}, 300000);
 
 function bot_initialize() {
-    client.channels.fetch('996418373137219595').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-    client.guilds.fetch('905559118096531456').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+    if (client.guilds.cache.get('905559118096531456')) {
+        client.channels.fetch('996418373137219595').then(channel => channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+        client.guilds.fetch('905559118096531456').then(guild => guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
+        setInterval(() => {     // check every 5m for squads timeouts
+            edit_main_msg()
+        }, 300000);
+    }
 }
 
 function interactionHandler(interaction) {
