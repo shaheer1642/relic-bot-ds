@@ -3,13 +3,10 @@ const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
 
 async function bot_initialize() {
-    try {
+    if (client.guilds.cache.get('765542868265730068')) {
         await client.channels.cache.get('997821173641519204').messages.fetch().catch(err => console.log(err))
         update_msg()
         setInterval(update_msg, 300000);
-    }
-    catch (e) {
-        console.log(e)
     }
 }
 
