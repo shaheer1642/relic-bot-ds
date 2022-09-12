@@ -4893,8 +4893,11 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
             }
         }
     }
-    if (notification.channel == 'tradebot_users_orders_insert' || notification.channel == 'tradebot_users_orders_update' || notification.channel == 'tradebot_users_orders_delete') {
+    if (notification.channel == 'tradebot_users_orders_insert' || notification.channel == 'tradebot_users_orders_delete') {
         trading_bot_orders_update(payload)
+    }
+    if (notification.channel == 'tradebot_users_orders_update') {
+        trading_bot_orders_update(payload[0])
     }
 })
 
