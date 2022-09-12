@@ -12,13 +12,14 @@ db.connect().then(async res => {
     db.query('LISTEN tradebot_filled_users_orders_insert').catch(console.error)
     db.query('LISTEN tradebot_filled_users_orders_update_new_message').catch(console.error)
     db.query('LISTEN tradebot_filled_users_orders_update_archived').catch(console.error)
-}).catch(err => {
-    console.log('DB Connection failure.\n' + err)
-    process.exit(1)
-});
+})
 
 db.on('error', err => {
     console.log('=============== DB Connection error. ==============')
     console.log(err)
+    db.connect().then(() => {
+        console.log('DB Connection established.')
+    })
 })
+
 module.exports = {db};
