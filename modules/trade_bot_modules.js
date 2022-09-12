@@ -2324,9 +2324,7 @@ async function trading_bot_orders_update(user_order_obj) {
     db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
     .then(res => {
         const message_list = {}
-        for (const message of res.rows.entries()) {
-            message_list[message.channel_id] = message
-        }
+        res.rows.forEach(row => message_list[row.channel_id] = row)
         console.log('message_list',message_list)
         for(const multiCid in tradingBotChannels) {
             const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
