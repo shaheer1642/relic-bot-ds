@@ -4788,21 +4788,24 @@ db.on('notification', async (notification) => {
                         autoArchiveDuration: 60,
                         reason: 'Trade opened.'
                     }).then(async owner_channel_thread => {
-                        db.query(`UPDATE tradebot_filled_users_orders set thread_id = ${owner_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
+                        db.query(`UPDATE tradebot_filled_users_orders set thread_id = ${owner_channel_thread.id} WHERE receipt_id = '${payload.receipt_id}'`).catch(console.error)
                         setTimeout(() => owner_channel.messages.cache.get(owner_channel_thread.id).delete().catch(console.error), 5000)
                         var filler_channel_thread = null
                         if (payload.owner_channel_id.toString() != payload.filler_channel_id.toString()) {
-                            const filler_channel = client.channels.cache.get(payload.filler_channel_id) || await client.channels.fetch(payload.filler_channel_id).catch(console.error)
-                            if (!filler_channel) return
-                            await filler_channel.threads.create({
-                                name: threadName,
-                                autoArchiveDuration: 60,
-                                reason: 'Trade opened.'
-                            }).then(res => {
-                                filler_channel_thread = res
-                                db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE order_id = '${payload.order_id}'`).catch(console.error)
-                                setTimeout(() => filler_channel.messages.cache.get(filler_channel_thread.id).delete().catch(console.error), 5000)
-                            }).catch(console.error)
+                            if (payload.filler_channel_id) {
+                                const filler_channel = client.channels.cache.get(payload.filler_channel_id) || await client.channels.fetch(payload.filler_channel_id).catch(console.error)
+                                if (filler_channel) {
+                                    await filler_channel.threads.create({
+                                        name: threadName,
+                                        autoArchiveDuration: 60,
+                                        reason: 'Trade opened.'
+                                    }).then(res => {
+                                        filler_channel_thread = res
+                                        db.query(`UPDATE tradebot_filled_users_orders set cross_thread_id = ${filler_channel_thread.id} WHERE receipt_id = '${payload.receipt_id}'`).catch(console.error)
+                                        setTimeout(() => filler_channel.messages.cache.get(filler_channel_thread.id).delete().catch(console.error), 5000)
+                                    }).catch(console.error)
+                                }
+                            }
                         }
                         console.log('thread created')
                         client.users.fetch(payload.order_owner.toString()).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.user_rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
