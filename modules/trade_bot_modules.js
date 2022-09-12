@@ -378,6 +378,7 @@ async function reaction_handler(reaction, user, action) {
                         if (res.rowCount == 1) {
                             console.log('message id found')
                             const db_message = res.rows[0]
+                            console.log('db_message',db_message)
                             const order_id = db_message.orders_data[`<:${reaction.emoji.identifier}>`]
                             if (order_id) {
                                 console.log('order id found')
@@ -393,6 +394,8 @@ async function reaction_handler(reaction, user, action) {
                                                 VALUES ('${order_data.order_id}','${uuid.v1()}',${reaction.message.channel.id},${order_data.origin_channel_id},${order_data.discord_id},${user.id},'${order_data.item_id}','${order_data.order_type}','{"${order_data.discord_id}": 0, "${user.id}": 0}',${order_data.user_price},'${order_data.user_rank}',${new Date().getTime()})
                                             `).catch(console.error)
                                         }
+                                    } else {
+                                        console.log('order is either invisible or does not exist in db')
                                     }
                                 }).catch(console.error)
                             } else {
