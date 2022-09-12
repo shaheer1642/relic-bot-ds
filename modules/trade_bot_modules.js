@@ -2332,10 +2332,6 @@ async function trading_bot_orders_update(user_order_obj) {
             }
             else if (res.rows.length > 1) {
                 console.log(`Detected more than one message for item ${item_name} in channel ${multiCid}`)
-                if (originMessage) {
-                    originMessage.channel.send(`☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    //setTimeout(() => originMessage.delete().catch(console.error), 10000)
-                }
                 return false
             }
             else {
@@ -2386,18 +2382,12 @@ async function trading_bot_orders_update(user_order_obj) {
                     }
                 })
                 .catch(err => {
-                    if (originMessage) {
-                        originMessage.channel.send(`☠️ Error editing existing orders in channel.\nError code: 505\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(console.error);
-                        setTimeout(() => originMessage.delete().catch(console.error), 10000)
-                    }
                     console.log(err)
                     return
                 })
             }
         }
         else {
-            if (update_type != 1)
-                continue
             if (embeds.length == 0)
                 return Promise.reject()
                 
@@ -2407,8 +2397,7 @@ async function trading_bot_orders_update(user_order_obj) {
                 var status = await db.query(`INSERT INTO tradebot_messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${wh_msg.id},'${item_rank}')`)
                 .then(res => {
                     return true
-                })
-                .catch(err => {     //might be a dublicate message
+                }).catch(err => {     //might be a dublicate message
                     console.log(err + `Error inserting new message id into db for channel ${multiCid} for item ${item_id}`)
                     setTimeout(() => webhookClient.deleteMessage(wh_msg.id).catch(console.error), 5000)
                     return false
@@ -2417,10 +2406,6 @@ async function trading_bot_orders_update(user_order_obj) {
                     var status = db.query(`SELECT * from tradebot_messages_ids WHERE channel_id = ${multiCid} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
                     .then(async res => {
                         if (res.rows.length == 0) {
-                            if (originMessage) {
-                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                                setTimeout(() => originMessage.delete().catch(console.error), 10000)
-                            }
                             return false
                         }
                         const cl_msg = client.channels.cache.get(multiCid).messages.cache.get(res.rows[0].message_id)
@@ -2435,10 +2420,6 @@ async function trading_bot_orders_update(user_order_obj) {
                             return true
                         })
                         .catch(err => {
-                            if (originMessage) {
-                                originMessage.channel.send(`⚠️ Cannot post **${item_name}** order in channel <#${multiCid}> due to channel messages conflict in the db. Please try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                                setTimeout(() => originMessage.delete().catch(console.error), 10000)
-                            }
                             console.log(err)
                             return false
                         })
@@ -2446,7 +2427,7 @@ async function trading_bot_orders_update(user_order_obj) {
                             return false
                     })
                     if (!status)
-                        return Promise.reject()
+                        return
                 }
                 await cl_msg.reactions.removeAll().catch(console.error)
                 for (var i=0;i<noOfSellers;i++) {
@@ -2455,14 +2436,9 @@ async function trading_bot_orders_update(user_order_obj) {
                 for (var i=0;i<noOfBuyers;i++) {
                     cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
                 }
-            })
-            .catch(err => {
+            }).catch(err => {
                 console.log(err)
-                if (originMessage) {
-                    originMessage.channel.send(`☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete(), 10000)).catch(console.error);
-                    setTimeout(() => originMessage.delete().catch(console.error), 10000)
-                }
-                return Promise.reject()
+                return
             })
         }
     }
