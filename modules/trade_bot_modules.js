@@ -2219,15 +2219,46 @@ async function trading_bot_orders_update(user_order_obj) {
 
     //----construct embed----
     var status = await db.query(`
-    SELECT * FROM tradebot_users_orders 
-    JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
-    JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
-    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = 'wts' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
-    ORDER BY tradebot_users_orders.user_price ASC,tradebot_users_orders.update_timestamp`)
-    .then(res => {
+        SELECT * FROM tradebot_users_orders 
+        JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id
+        WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
+        ORDER BY tradebot_users_orders.update_timestamp ASC
+    `).then(res => {
         if (res.rows.length == 0)
             return true
         else {
+            var sell_orders = []
+            var buy_orders = []
+            res.rows.forEach(row => {
+                if (row.order_type == 'wts')
+                    sell_orders.push(row)
+                else if (row.order_type == 'wtb')
+                    buy_orders.push(row)
+            })
+            sell_orders = sell_orders.sort(dynamicSort("user_price"))
+            buy_orders = buy_orders.sort(dynamicSortDesc("user_price"))
+
+            if (sell_orders.length > 0) {
+                embeds.push({
+                    title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                    thumbnail: {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                    url: `https://warframe.market/items/${item_url}`,
+                    fields: [
+                        {
+                            name: 'Sellers',
+                            value: sell_orders.map(seller => `${seller.ingame_name}`),
+                            inline: true
+                        },{name: '\u200b',value:'\u200b',inline:true},
+                        {
+                            name: 'Prices',
+                            value: emb_prices,
+                            inline: true
+                        },
+                    ],
+                    color: '#7cb45d'
+                })
+            }
+
             var emb_sellers = ''
             var emb_prices = ''
             for (var j=0;j<res.rows.length;j++) {
