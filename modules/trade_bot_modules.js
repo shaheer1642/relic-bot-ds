@@ -397,11 +397,7 @@ async function reaction_handler(reaction, user, action) {
                                 db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id = '${order_id}'`).catch(console.error)
                             }
                         } else {
-                            const channel = client.channels.cache.get(reaction.message.channel.id) || await client.channels.fetch(reaction.message.channel.id).catch(console.error)
-                            if (channel) {
-                                const message = channel.messages.cache.get(reaction.message.id) || await channel.messages.fetch(reaction.message.id).catch(console.error)
-                                if (message) message.delete().catch(console.error)
-                            }
+                            new WebhookClient({url: tradingBotChannels[reaction.message.channel.id]}).deleteMessage(reaction.message.id).catch(console.error)
                         }
                     }).catch(console.error)
                 }
@@ -1844,12 +1840,6 @@ async function trading_bot(message,args,command) {
             args.splice(index, 1);
         }
     }
-    /*
-    if (args[args.length-1] == 'auto') {
-        list_low = true
-        args.pop()
-    }
-    */
     if (args[args.length-1].match(/[0-9]/) && (!args[args.length-1].match(/[a-zA-Z]/) || args[args.length-1].match(/p$/) || args[args.length-1].match(/pl$/) || args[args.length-1].match(/plat$/))) {
         args[args.length-1] = args[args.length-1].replace('plat','').replace('pl','').replace('p','')
         var price = Math.round(Number(args.pop().replace(/[^0-9.\-]/gi, "")))
@@ -1884,7 +1874,6 @@ async function trading_bot(message,args,command) {
         } catch (err) {
             message.channel.send({content: `🛑 <@${message.author.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`}).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
         }
-        //setTimeout(() => message.delete().catch(console.error), 5000)
         return Promise.resolve()
     }
     //---------------
@@ -2216,8 +2205,6 @@ async function trading_bot(message,args,command) {
 
 async function trading_bot_orders_update(user_order_obj) {
     var embeds = []
-    var noOfSellers = 0
-    var noOfBuyers = 0
 
     const item_id = user_order_obj.item_id
     const item_rank = user_order_obj.user_rank
