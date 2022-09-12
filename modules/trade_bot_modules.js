@@ -1965,7 +1965,6 @@ async function trading_bot(message,args,command) {
     if (isMaxed)
         item_rank = 'maxed'
     const item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-    const originGuild = message.guild.name
     const originMessage = message
     if (price) {
         if (price != 0) {
@@ -2120,6 +2119,7 @@ async function trading_bot(message,args,command) {
         //setTimeout(() => message.delete().catch(console.error), 5000)
         return Promise.reject()
     }
+    console.log('verifying order in db')
     //----verify order in DB----
     var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
     .then(async res => {
