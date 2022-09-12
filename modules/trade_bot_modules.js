@@ -1583,9 +1583,9 @@ async function reaction_handler(reaction, user, action) {
                             suspicious = true
                         if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] && !suspicious) {
                             var status = await db.query(`
-                                UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true)
+                                UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true), archived = true
                                 WHERE ${q_threadId} = ${reaction.message.channel.id};
-                                UPDATE ${q_filledOrderTable} SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true)
+                                UPDATE ${q_filledOrderTable} SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true), archived = true
                                 WHERE ${q_threadId} = ${reaction.message.channel.id}
                                 RETURNING ${q_return};
                             `).then(async res => {
@@ -1622,26 +1622,11 @@ async function reaction_handler(reaction, user, action) {
                                 query = `DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
                             db.query(query).then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`)).catch(console.error)
                             //-------
-                            if (!from_cross) {
-                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                if (order_data.cross_thread_id) {
-                                    const channel = client.channels.cache.get(order_data.cross_thread_id)
-                                    channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                }
-                            } else {
-                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                const channel = client.channels.cache.get(order_data.thread_id)
-                                channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                            }
                         } else if (reaction.emoji.name == '⚠️' || suspicious) {
                             db.query(`
-                                UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious ? null:user.id}, suspicious = ${suspicious}
+                                UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious ? null:user.id}, suspicious = ${suspicious}, archived = true
                                 WHERE ${q_threadId} = ${reaction.message.channel.id}
-                            `).then(res => {
-                                reaction.message.channel.setArchived(true,`Trade successful. Archived by ${user.id}`)
-                                if (order_data.cross_thread_id)
-                                    client.channels.cache.get(order_data.cross_thread_id).setArchived(true,`Trade successful. Archived by ${user.id}`)
-                            }).catch(console.error)
+                            `).catch(console.error)
                         }
                         return Promise.resolve()
                     }
