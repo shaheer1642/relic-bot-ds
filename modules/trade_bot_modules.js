@@ -4859,8 +4859,6 @@ ${isLich ? `**Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(
 **Price:** ${order_data.user_price}<:platinum:881692607791648778>
 **Order status:** ${order_data.order_status == 'unsuccessful' ? `unsuccessful ⚠️ (Select the troublemaker)`:`successful ${tradingBotReactions.success[0]}`} ${order_data.reporter_id ? `\n**Reported by:** <@${order_data.reporter_id}>`:''}
 **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
-**Thread:** <#${newThread.id}>
-**Server:** ${newThread.guild.name}
 **-----Chat Log-----**
 ${order_data.messages_log.length > 0? order_data.messages_log.map(obj => `**${embedScore(userData[obj.discord_id].ingame_name)}**: ${embedScore(obj.message)}`).join('\n'):'Empty'}`,
                         image: {url: isLich ? order_data.lich_image_url:''},
