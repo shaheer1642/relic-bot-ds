@@ -370,22 +370,35 @@ async function reaction_handler(reaction, user, action) {
     if (action == 'add') {
         console.log(reaction.emoji.identifier)
         if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
-            var order_type = ""
-            if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`))
-                order_type = 'wts'
-            if (tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`))
-                order_type = 'wtb'
-            if (!reaction.message.author)
-                reaction.message = await client.channels.cache.get(reaction.message.channel.id).messages.fetch(reaction.message.id).catch(console.error);
-            var trader = {
-                discord_id: null,
-                ingame_name: null
-            }
-            var tradee = {
-                discord_id: user.id,
-                ingame_name: null
-            }
-            tb_user_exist(user.id).then(async () => {
+            setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
+            tb_user_exist(user.id).then(() => {
+                if (Object.keys(tradingBotChannels).includes(reaction.message.channelId)) {
+                    db.query(`SELECT * FROM tradebot_messages_ids WHERE message_id = ${reaction.message.id} AND channel_id = ${reaction.message.channel.id}`)
+                    .then(res => {
+                        if (res.rowCount == 1) {
+                            const db_message = res.rows[0]
+                            const order_id = db_message.orders_data[`<:${reaction.emoji.identifier}>`]
+                            if (order_id) {
+                                db.query(`SELECT * FROM tradebot_users_orders WHERE visibility = true AND order_id = '${order_id}'`)
+                                .then(res => {
+                                    if (res.rowCount == 1) {
+                                        const order_data = res.rows[0]
+                                        if (order_data.discord_id != user.id) {
+                                            db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id = '${order_id}'`).catch(console.error)
+                                            db.query(`
+                                                INSERT INTO tradebot_filled_users_orders
+                                                (order_id,receipt_id,filler_channel_id,owner_channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,trade_timestamp)
+                                                VALUES ('${order_data.order_id}','${uuid.v1()}',${reaction.message.channel.id},${order_data.origin_channel_id},${order_data.discord_id},${user.id},'${order_data.item_id}','${order_data.order_type}','{"${order_data.discord_id}": 0, "${user.id}": 0}',${order_data.user_price},'${order_data.user_rank}',${new Date().getTime()})
+                                            `).catch(console.error)
+                                        }
+                                    }
+                                }).catch(console.error)
+                            }
+                        }
+                    }).catch(console.error)
+                }
+                
+                /*
                 console.log('pass test 1')
                 var all_orders = []
                 var check_msg_id = reaction.message.id
@@ -1496,6 +1509,7 @@ async function reaction_handler(reaction, user, action) {
                     setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
                 }
                 return Promise.resolve()
+                */
             }).catch(console.error)
         }
         if (reaction.message.channel.isThread()) {
