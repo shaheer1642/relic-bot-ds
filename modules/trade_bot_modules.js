@@ -2209,12 +2209,12 @@ async function trading_bot_orders_update(user_order_obj) {
         console.log(err)
         return false
     })
+    if (!status)
+        return
 
     const item_url = item_data.item_url
     const item_name = convertUpper(item_url)
 
-    if (!status)
-        return
 
     //----construct embed----
     var status = await db.query(`
