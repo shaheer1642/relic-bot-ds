@@ -2265,12 +2265,12 @@ async function trading_bot_orders_update(user_order_obj) {
                     fields: [
                         {
                             name: 'Buyers',
-                            value: sell_orders.map((buyer,index) => `${tradingBotReactions.buy[index]} ${embedScore(buyer.ingame_name)}`).join('\n'),
+                            value: buy_orders.map((buyer,index) => `${tradingBotReactions.buy[index]} ${embedScore(buyer.ingame_name)}`).join('\n'),
                             inline: true
                         },{name: '\u200b',value:'\u200b',inline:true},
                         {
                             name: 'Prices',
-                            value: sell_orders.map((buyer,index) => `${buyer.user_price}<:platinum:881692607791648778>`).join('\n'),
+                            value: buy_orders.map((buyer,index) => `${buyer.user_price}<:platinum:881692607791648778>`).join('\n'),
                             inline: true
                         },
                     ],
