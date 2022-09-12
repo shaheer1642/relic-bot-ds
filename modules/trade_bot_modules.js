@@ -378,7 +378,6 @@ async function reaction_handler(reaction, user, action) {
                         if (res.rowCount == 1) {
                             console.log('message id found')
                             const db_message = res.rows[0]
-                            console.log('db_message',db_message)
                             const order_id = db_message.orders_data[`<:${reaction.emoji.identifier}>`]
                             if (order_id) {
                                 console.log('order id found')
@@ -393,6 +392,8 @@ async function reaction_handler(reaction, user, action) {
                                                 (order_id,receipt_id,filler_channel_id,owner_channel_id,order_owner,order_filler,item_id,order_type,order_rating,user_price,user_rank,trade_timestamp)
                                                 VALUES ('${order_data.order_id}','${uuid.v1()}',${reaction.message.channel.id},${order_data.origin_channel_id},${order_data.discord_id},${user.id},'${order_data.item_id}','${order_data.order_type}','{"${order_data.discord_id}": 0, "${user.id}": 0}',${order_data.user_price},'${order_data.user_rank}',${new Date().getTime()})
                                             `).catch(console.error)
+                                        } else {
+                                            console.log('cannot trade to yourself')
                                         }
                                     } else {
                                         console.log('order is either invisible or does not exist in db')
@@ -4759,6 +4760,12 @@ db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
 
     if (notification.channel == 'tradebot_filled_users_orders_insert') {
+        if (payload.owner_channel_id == null && payload.filler_channel_id == null)
+            return
+        if (payload.owner_channel_id == null && payload.filler_channel_id != null) {
+            payload.owner_channel_id = payload.filler_channel_id
+            payload.filler_channel_id = null
+        }
         const owner_channel = client.channels.cache.get(payload.owner_channel_id) || await client.channels.fetch(payload.owner_channel_id).catch(console.error)
         if (!owner_channel) return
         db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${payload.order_owner} AND item_id = '${payload.item_id}' AND order_type = '${payload.order_type}';`)
