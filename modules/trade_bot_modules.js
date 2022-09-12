@@ -2286,6 +2286,7 @@ async function trading_bot_orders_update(user_order_obj) {
         buy_orders.forEach((buyer,index) => orders_data[tradingBotReactions.buy[index]] = buyer.order_id)
 
         console.log('embeds',embeds)
+        console.log('orders_data',orders_data)
 
         db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
         .then(res => {
