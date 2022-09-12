@@ -2318,7 +2318,66 @@ async function trading_bot_orders_update(user_order_obj) {
         embeds[1].thumbnail = null
     }
 
+    db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+    .then(res => {
+        const message_list = {}
+        for (const message of res.rows.entries()) {
+            message_list[message.channel_id] = message
+        }
+        for(const multiCid in tradingBotChannels) {
+            const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
+            if (embeds.length==0) {
+                if (message_list[multiCid]) {
+                    db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+                    .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
+                    .catch(err => console.error)
+                }
+            } else if (!message_list[multiCid]) {
+                webhookClient.send({content: ' ', embeds: embeds})
+                .then(async wh_msg => {
+                    db.query(`INSERT INTO tradebot_messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${wh_msg.id},'${item_rank}')`)
+                    .then(async res => {
+                        const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
+                        if (channel) {
+                            const message = channel.messages.cache.get(wh_msg.id) || await channel.messages.fetch(wh_msg.id).catch(console.eror)
+                            if (message) {
+                                message.reactions.removeAll()
+                                .then(() => {
+                                    for (var i=0;i<noOfSellers;i++) {
+                                        cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
+                                    }
+                                    for (var i=0;i<noOfBuyers;i++) {
+                                        cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
+                                    }
+                                }).catch(console.error)
+                            }
+                        }
+                    }).catch(console.error)
+                }).catch(console.error)
+            } else {
+                webhookClient.editMessage(message_list[multiCid].message_id, {content: ' ', embeds: embeds}).then(async () => {
+                    const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
+                    if (channel) {
+                        const message = channel.messages.cache.get(message_list[multiCid].message_id) || await channel.messages.fetch(message_list[multiCid].message_id).catch(console.eror)
+                        if (message) {
+                            message.reactions.removeAll()
+                            .then(() => {
+                                for (var i=0;i<noOfSellers;i++) {
+                                    cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
+                                }
+                                for (var i=0;i<noOfBuyers;i++) {
+                                    cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
+                                }
+                            }).catch(console.error)
+                        }
+                    }
+                })
+            }
+        }
+    }).catch(console.error)
+
     //update msgs
+    /*
     for(const multiCid in tradingBotChannels) {
         const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
         console.log(`editing for channel ${multiCid}`)
@@ -2441,7 +2500,7 @@ async function trading_bot_orders_update(user_order_obj) {
                 return
             })
         }
-    }
+    } */
     console.log(`edited for all channels, returning`)
     return Promise.resolve()
 }
