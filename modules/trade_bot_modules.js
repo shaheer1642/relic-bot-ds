@@ -372,13 +372,15 @@ async function reaction_handler(reaction, user, action) {
         if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
             setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
             tb_user_exist(user.id).then(() => {
-                if (Object.keys(tradingBotChannels).includes(reaction.message.channelId)) {
+                if (Object.keys(tradingBotChannels).includes(reaction.message.channel.id)) {
                     db.query(`SELECT * FROM tradebot_messages_ids WHERE message_id = ${reaction.message.id} AND channel_id = ${reaction.message.channel.id}`)
                     .then(async res => {
                         if (res.rowCount == 1) {
+                            console.log('message id found')
                             const db_message = res.rows[0]
                             const order_id = db_message.orders_data[`<:${reaction.emoji.identifier}>`]
                             if (order_id) {
+                                console.log('order id found')
                                 db.query(`SELECT * FROM tradebot_users_orders WHERE visibility = true AND order_id = '${order_id}'`)
                                 .then(res => {
                                     if (res.rowCount == 1) {
@@ -394,6 +396,7 @@ async function reaction_handler(reaction, user, action) {
                                     }
                                 }).catch(console.error)
                             } else {
+                                console.log('order id does not exist')
                                 db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id = '${order_id}'`).catch(console.error)
                             }
                         } else {
