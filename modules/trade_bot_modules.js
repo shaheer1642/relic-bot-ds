@@ -397,6 +397,7 @@ async function reaction_handler(reaction, user, action) {
                                 db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id = '${order_id}'`).catch(console.error)
                             }
                         } else {
+                            console.log('message id does not exist')
                             new WebhookClient({url: tradingBotChannels[reaction.message.channel.id]}).deleteMessage(reaction.message.id).catch(console.error)
                         }
                     }).catch(console.error)
