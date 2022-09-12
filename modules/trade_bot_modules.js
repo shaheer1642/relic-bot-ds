@@ -393,11 +393,13 @@ async function reaction_handler(reaction, user, action) {
                                         }
                                     }
                                 }).catch(console.error)
+                            } else {
+                                db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id = '${order_id}'`).catch(console.error)
                             }
                         }
                     }).catch(console.error)
                 }
-                
+
                 /*
                 console.log('pass test 1')
                 var all_orders = []
