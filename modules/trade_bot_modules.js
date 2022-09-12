@@ -2254,7 +2254,7 @@ async function trading_bot_orders_update(user_order_obj) {
                             inline: true
                         },
                     ],
-                    color: '#7cb45d'
+                    color: tb_sellColor
                 })
             }
             if (buy_orders.length > 0) {
@@ -2274,7 +2274,7 @@ async function trading_bot_orders_update(user_order_obj) {
                             inline: true
                         },
                     ],
-                    color: '#7cb45d'
+                    color: tb_buyColor
                 })
             }
             
