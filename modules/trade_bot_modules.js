@@ -2373,7 +2373,7 @@ async function trading_bot_orders_update(user_order_obj) {
                             }).catch(console.error)
                         }
                     }
-                })
+                }).catch(console.error)
             }
         }
     }).catch(console.error)
