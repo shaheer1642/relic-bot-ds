@@ -2223,109 +2223,87 @@ async function trading_bot_orders_update(user_order_obj) {
         WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
         ORDER BY tradebot_users_orders.update_timestamp ASC
     `).then(res => {
-        if (res.rows.length == 0)
-            return true
-        else {
-            var sell_orders = []
-            var buy_orders = []
-            res.rows.forEach(row => {
-                if (row.order_type == 'wts')
-                    sell_orders.push(row)
-                else if (row.order_type == 'wtb')
-                    buy_orders.push(row)
+        var sell_orders = []
+        var buy_orders = []
+        res.rows.forEach(row => {
+            if (row.order_type == 'wts')
+                sell_orders.push(row)
+            else if (row.order_type == 'wtb')
+                buy_orders.push(row)
+        })
+        sell_orders = sell_orders.sort(dynamicSort("user_price"))
+        buy_orders = buy_orders.sort(dynamicSortDesc("user_price"))
+
+        if (sell_orders.length > 0) {
+            embeds.push({
+                title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                thumbnail: {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                url: `https://warframe.market/items/${item_url}`,
+                fields: [
+                    {
+                        name: 'Sellers',
+                        value: sell_orders.map((seller,index) => `${tradingBotReactions.sell[index]} ${embedScore(seller.ingame_name)}`).join('\n'),
+                        inline: true
+                    },{name: '\u200b',value:'\u200b',inline:true},
+                    {
+                        name: 'Prices',
+                        value: sell_orders.map((seller,index) => `${seller.user_price}<:platinum:881692607791648778>`).join('\n'),
+                        inline: true
+                    },
+                ],
+                color: tb_sellColor
             })
-            sell_orders = sell_orders.sort(dynamicSort("user_price"))
-            buy_orders = buy_orders.sort(dynamicSortDesc("user_price"))
+        }
+        if (buy_orders.length > 0) {
+            embeds.push({
+                title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                thumbnail: {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                url: `https://warframe.market/items/${item_url}`,
+                fields: [
+                    {
+                        name: 'Buyers',
+                        value: buy_orders.map((buyer,index) => `${tradingBotReactions.buy[index]} ${embedScore(buyer.ingame_name)}`).join('\n'),
+                        inline: true
+                    },{name: '\u200b',value:'\u200b',inline:true},
+                    {
+                        name: 'Prices',
+                        value: buy_orders.map((buyer,index) => `${buyer.user_price}<:platinum:881692607791648778>`).join('\n'),
+                        inline: true
+                    },
+                ],
+                color: tb_buyColor
+            })
+        }
+        
+        if (embeds[1]) {
+            embeds[1].title = null
+            embeds[1].url = null
+            embeds[1].thumbnail = null
+        }
 
-            if (sell_orders.length > 0) {
-                embeds.push({
-                    title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
-                    thumbnail: {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
-                    url: `https://warframe.market/items/${item_url}`,
-                    fields: [
-                        {
-                            name: 'Sellers',
-                            value: sell_orders.map((seller,index) => `${tradingBotReactions.sell[index]} ${embedScore(seller.ingame_name)}`).join('\n'),
-                            inline: true
-                        },{name: '\u200b',value:'\u200b',inline:true},
-                        {
-                            name: 'Prices',
-                            value: sell_orders.map((seller,index) => `${seller.user_price}<:platinum:881692607791648778>`).join('\n'),
-                            inline: true
-                        },
-                    ],
-                    color: tb_sellColor
-                })
-            }
-            if (buy_orders.length > 0) {
-                embeds.push({
-                    title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
-                    thumbnail: {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
-                    url: `https://warframe.market/items/${item_url}`,
-                    fields: [
-                        {
-                            name: 'Buyers',
-                            value: buy_orders.map((buyer,index) => `${tradingBotReactions.buy[index]} ${embedScore(buyer.ingame_name)}`).join('\n'),
-                            inline: true
-                        },{name: '\u200b',value:'\u200b',inline:true},
-                        {
-                            name: 'Prices',
-                            value: buy_orders.map((buyer,index) => `${buyer.user_price}<:platinum:881692607791648778>`).join('\n'),
-                            inline: true
-                        },
-                    ],
-                    color: tb_buyColor
-                })
-            }
-            
-            if (embeds[1]) {
-                embeds[1].title = null
-                embeds[1].url = null
-                embeds[1].thumbnail = null
-            }
+        console.log('embeds',embeds)
 
-            console.log('embeds',embeds)
-
-            db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
-            .then(res => {
-                const message_list = {}
-                res.rows.forEach(row => message_list[row.channel_id] = row)
-                console.log('message_list',message_list)
-                for(const multiCid in tradingBotChannels) {
-                    const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
-                    if (embeds.length==0) {
-                        if (message_list[multiCid]) {
-                            db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
-                            .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
-                            .catch(err => console.error)
-                        }
-                    } else if (!message_list[multiCid]) {
-                        webhookClient.send({content: ' ', embeds: embeds})
-                        .then(async wh_msg => {
-                            db.query(`INSERT INTO tradebot_messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${wh_msg.id},'${item_rank}')`)
-                            .then(async res => {
-                                const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
-                                if (channel) {
-                                    const message = channel.messages.cache.get(wh_msg.id) || await channel.messages.fetch(wh_msg.id).catch(console.eror)
-                                    if (message) {
-                                        message.reactions.removeAll()
-                                        .then(() => {
-                                            sell_orders.forEach((seller,index) => {
-                                                message.react(tradingBotReactions.sell[index]).catch(console.error)
-                                            })
-                                            buy_orders.forEach((buyer,index) => {
-                                                message.react(tradingBotReactions.buy[index]).catch(console.error)
-                                            })
-                                        }).catch(console.error)
-                                    }
-                                }
-                            }).catch(console.error)
-                        }).catch(console.error)
-                    } else {
-                        webhookClient.editMessage(message_list[multiCid].message_id, {content: ' ', embeds: embeds}).then(async () => {
+        db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+        .then(res => {
+            const message_list = {}
+            res.rows.forEach(row => message_list[row.channel_id] = row)
+            console.log('message_list',message_list)
+            for(const multiCid in tradingBotChannels) {
+                const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
+                if (embeds.length==0) {
+                    if (message_list[multiCid]) {
+                        db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+                        .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
+                        .catch(err => console.error)
+                    }
+                } else if (!message_list[multiCid]) {
+                    webhookClient.send({content: ' ', embeds: embeds})
+                    .then(async wh_msg => {
+                        db.query(`INSERT INTO tradebot_messages_ids (channel_id,item_id,message_id,user_rank) VALUES (${multiCid},'${item_id}',${wh_msg.id},'${item_rank}')`)
+                        .then(async res => {
                             const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
                             if (channel) {
-                                const message = channel.messages.cache.get(message_list[multiCid].message_id) || await channel.messages.fetch(message_list[multiCid].message_id).catch(console.eror)
+                                const message = channel.messages.cache.get(wh_msg.id) || await channel.messages.fetch(wh_msg.id).catch(console.eror)
                                 if (message) {
                                     message.reactions.removeAll()
                                     .then(() => {
@@ -2339,11 +2317,28 @@ async function trading_bot_orders_update(user_order_obj) {
                                 }
                             }
                         }).catch(console.error)
-                    }
+                    }).catch(console.error)
+                } else {
+                    webhookClient.editMessage(message_list[multiCid].message_id, {content: ' ', embeds: embeds}).then(async () => {
+                        const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
+                        if (channel) {
+                            const message = channel.messages.cache.get(message_list[multiCid].message_id) || await channel.messages.fetch(message_list[multiCid].message_id).catch(console.eror)
+                            if (message) {
+                                message.reactions.removeAll()
+                                .then(() => {
+                                    sell_orders.forEach((seller,index) => {
+                                        message.react(tradingBotReactions.sell[index]).catch(console.error)
+                                    })
+                                    buy_orders.forEach((buyer,index) => {
+                                        message.react(tradingBotReactions.buy[index]).catch(console.error)
+                                    })
+                                }).catch(console.error)
+                            }
+                        }
+                    }).catch(console.error)
                 }
-            }).catch(console.error)
-        }
-        return true
+            }
+        }).catch(console.error)
     }).catch(console.error)
     
 
