@@ -1375,6 +1375,10 @@ client.on('interactionCreate', async interaction => {
             interaction.reply({content: 'Pong!', ephemeral:true}).catch(err => console.log(err));
         }
 
+        else if (interaction.commandName == 'fissures') {
+            worldstatealerts.interaction_handler(interaction)
+        }
+
         return
     }
     return;

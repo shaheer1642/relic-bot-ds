@@ -250,6 +250,103 @@ function bot_initialize() {
     invasions_timer = setTimeout(invasions_check, 9000)
 }
 
+async function interaction_handler(interaction) {
+    if (interaction.commandName == 'fissures') {
+        axios('http://content.warframe.com/dynamic/worldState.php')
+        .then( worldstateData => {
+            const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures;
+            
+            if (fissures) {
+                var fissures_list = {normal: [], steelPath: [], voidStorm: []}
+                fissures.forEach(fissure => {
+                    if (fissure.isStorm)
+                        fissures_list.voidStorm.push(fissure)
+                    else if (fissure.isHard) 
+                        fissures_list.steelPath.push(fissure)
+                    else
+                        fissures_list.normal.push(fissure)
+                })
+                fissures_list.normal.sort(dynamicSort("tierNum"))
+                fissures_list.steelPath.sort(dynamicSort("tierNum"))
+                fissures_list.voidStorm.sort(dynamicSort("tierNum"))
+    
+                var embed1 = {
+                    title: "Fissures",
+                    fields: [{
+                        name: "Tier",
+                        value: "",
+                        inline: true
+                    },{
+                        name: "Mission",
+                        value: "",
+                        inline: true
+                    },{
+                        name: "Expires",
+                        value: "",
+                        inline: true
+                    }],
+                    color: colors.fissures
+                }
+                var embed2 = {
+                    title: "Steel Path Fissures",
+                    fields: [{
+                        name: "Tier",
+                        value: "",
+                        inline: true
+                    },{
+                        name: "Mission",
+                        value: "",
+                        inline: true
+                    },{
+                        name: "Expires",
+                        value: "",
+                        inline: true
+                    }],
+                    color: colors.fissures
+                }
+                var embed3 = {
+                    title: "Railjack Fissures",
+                    fields: [{
+                        name: "Tier",
+                        value: "",
+                        inline: true
+                    },{
+                        name: "Mission",
+                        value: "",
+                        inline: true
+                    },{
+                        name: "Expires",
+                        value: "",
+                        inline: true
+                    }],
+                    color: colors.fissures
+                }
+    
+                fissures_list.normal.forEach(fissure => {
+                    embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+                    embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                    embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                })
+                fissures_list.steelPath.forEach(fissure => {
+                    embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+                    embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                    embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                })
+                fissures_list.voidStorm.forEach(fissure => {
+                    embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+                    embed3.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                    embed3.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                })
+
+                interaction.reply({
+                    content: ' ',
+                    embeds: [embed1, embed2, embed3]
+                }).catch(console.error)
+            }
+        }).catch(console.error)
+    }
+}
+
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
         message.channel.send('You do not have access to this command').catch(err => console.log(err))
@@ -2996,4 +3093,4 @@ async function invasions_check() {
     })
 }
 
-module.exports = {wssetup,setupReaction,bot_initialize};
+module.exports = {wssetup,setupReaction,bot_initialize,interaction_handler};
