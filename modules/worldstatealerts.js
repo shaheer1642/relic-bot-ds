@@ -2376,7 +2376,7 @@ async function fissures_check() {
                 }],
                 color: colors.fissures
             }
-            var embed1 = {
+            var embed2 = {
                 title: "Steel Path Fissures",
                 fields: [{
                     name: "Tier",
