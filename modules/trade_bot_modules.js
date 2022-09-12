@@ -4760,11 +4760,11 @@ db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
 
     if (notification.channel == 'tradebot_filled_users_orders_insert') {
-        if (payload.owner_channel_id == null && payload.filler_channel_id == null)
+        if (!payload.owner_channel_id && !payload.filler_channel_id)
             return
-        if (payload.owner_channel_id == null && payload.filler_channel_id != null) {
+        if (!payload.owner_channel_id && payload.filler_channel_id) {
             payload.owner_channel_id = payload.filler_channel_id
-            payload.filler_channel_id = null
+            payload.filler_channel_id = 0
         }
         const owner_channel = client.channels.cache.get(payload.owner_channel_id) || await client.channels.fetch(payload.owner_channel_id).catch(console.error)
         if (!owner_channel) return
