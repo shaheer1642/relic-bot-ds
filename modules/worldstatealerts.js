@@ -2340,7 +2340,7 @@ async function fissures_check() {
             if (res.rowCount == 0)
                 return
 
-            var fissures_list = {normal: [], voidStorm: []}
+            var fissures_list = {normal: [], steelPath: [], voidStorm: []}
             var min_expiry = new Date().getTime() + 3600000
             fissures.forEach(fissure => {
                 var expiry = new Date(fissure.expiry).getTime()
@@ -2349,11 +2349,14 @@ async function fissures_check() {
                         min_expiry = expiry
                     if (fissure.isStorm)
                         fissures_list.voidStorm.push(fissure)
+                    else if (fissure.isHard) 
+                        fissures_list.steelPath.push(fissure)
                     else
                         fissures_list.normal.push(fissure)
                 }
             })
             fissures_list.normal.sort(dynamicSort("tierNum"))
+            fissures_list.steelPath.sort(dynamicSort("tierNum"))
             fissures_list.voidStorm.sort(dynamicSort("tierNum"))
 
             var embed1 = {
@@ -2373,7 +2376,24 @@ async function fissures_check() {
                 }],
                 color: colors.fissures
             }
-            var embed2 = {
+            var embed1 = {
+                title: "Steel Path Fissures",
+                fields: [{
+                    name: "Tier",
+                    value: "",
+                    inline: true
+                },{
+                    name: "Mission",
+                    value: "",
+                    inline: true
+                },{
+                    name: "Expires",
+                    value: "",
+                    inline: true
+                }],
+                color: colors.fissures
+            }
+            var embed3 = {
                 title: "Railjack Fissures",
                 fields: [{
                     name: "Tier",
@@ -2393,13 +2413,18 @@ async function fissures_check() {
 
             fissures_list.normal.forEach(fissure => {
                 embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
-                embed1.fields[1].value += `${fissure.isHard ? '[SP]':''} ${fissure.missionType} - ${fissure.node}\n`
+                embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
-            fissures_list.voidStorm.forEach(fissure => {
+            fissures_list.steelPath.forEach(fissure => {
                 embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+            })
+            fissures_list.voidStorm.forEach(fissure => {
+                embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+                embed3.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                embed3.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
 
             res.rows.forEach(row => {
@@ -2407,7 +2432,7 @@ async function fissures_check() {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.fissures_alert).then(msg => {
                         msg.edit({
                             content: ' ',
-                            embeds: [embed1, embed2]
+                            embeds: [embed1, embed2, embed3]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
                 }
