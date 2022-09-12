@@ -2204,6 +2204,7 @@ async function trading_bot_orders_update(user_order_obj) {
             item_data = res.rows[0]
             return true
         }
+        console.log('0 items for id',item_id)
         return false
     }).catch((err) => {
         console.log(err)
