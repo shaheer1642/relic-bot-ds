@@ -2347,10 +2347,10 @@ async function trading_bot_orders_update(user_order_obj) {
                                 message.reactions.removeAll()
                                 .then(() => {
                                     for (var i=0;i<noOfSellers;i++) {
-                                        cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
+                                        message.react(tradingBotReactions.sell[i]).catch(console.error)
                                     }
                                     for (var i=0;i<noOfBuyers;i++) {
-                                        cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
+                                        message.react(tradingBotReactions.buy[i]).catch(console.error)
                                     }
                                 }).catch(console.error)
                             }
@@ -2366,10 +2366,10 @@ async function trading_bot_orders_update(user_order_obj) {
                             message.reactions.removeAll()
                             .then(() => {
                                 for (var i=0;i<noOfSellers;i++) {
-                                    cl_msg.react(tradingBotReactions.sell[i]).catch(console.error)
+                                    message.react(tradingBotReactions.sell[i]).catch(console.error)
                                 }
                                 for (var i=0;i<noOfBuyers;i++) {
-                                    cl_msg.react(tradingBotReactions.buy[i]).catch(console.error)
+                                    message.react(tradingBotReactions.buy[i]).catch(console.error)
                                 }
                             }).catch(console.error)
                         }
