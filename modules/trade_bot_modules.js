@@ -19,7 +19,7 @@ const tradingBotReactions = {
     remove: ["<:remove_sell_order:892836452944183326>","<:remove_buy_order:892836450578616331>"],
     success: ["<:order_success:894992959177654332>"]
 }
-const ordersFillLogChannel = "894717126475128862"
+const ordersFillLogChannel = "864199722676125757"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
