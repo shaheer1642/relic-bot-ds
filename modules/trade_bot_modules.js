@@ -374,7 +374,7 @@ async function reaction_handler(reaction, user, action) {
             tb_user_exist(user.id).then(() => {
                 if (Object.keys(tradingBotChannels).includes(reaction.message.channelId)) {
                     db.query(`SELECT * FROM tradebot_messages_ids WHERE message_id = ${reaction.message.id} AND channel_id = ${reaction.message.channel.id}`)
-                    .then(res => {
+                    .then(async res => {
                         if (res.rowCount == 1) {
                             const db_message = res.rows[0]
                             const order_id = db_message.orders_data[`<:${reaction.emoji.identifier}>`]
@@ -395,6 +395,12 @@ async function reaction_handler(reaction, user, action) {
                                 }).catch(console.error)
                             } else {
                                 db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id = '${order_id}'`).catch(console.error)
+                            }
+                        } else {
+                            const channel = client.channels.cache.get(reaction.message.channel.id) || await client.channels.fetch(reaction.message.channel.id).catch(console.error)
+                            if (channel) {
+                                const message = channel.messages.cache.get(reaction.message.id) || await channel.messages.fetch(reaction.message.id).catch(console.error)
+                                if (message) message.delete().catch(console.error)
                             }
                         }
                     }).catch(console.error)
