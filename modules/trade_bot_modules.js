@@ -2314,7 +2314,7 @@ async function trading_bot_orders_update(user_order_obj) {
                                                 message.react(tradingBotReactions.sell[index]).catch(console.error)
                                             })
                                             buy_orders.forEach((buyer,index) => {
-                                                message.react(tradingBotReactions.sell[index]).catch(console.error)
+                                                message.react(tradingBotReactions.buy[index]).catch(console.error)
                                             })
                                         }).catch(console.error)
                                     }
@@ -2333,7 +2333,7 @@ async function trading_bot_orders_update(user_order_obj) {
                                             message.react(tradingBotReactions.sell[index]).catch(console.error)
                                         })
                                         buy_orders.forEach((buyer,index) => {
-                                            message.react(tradingBotReactions.sell[index]).catch(console.error)
+                                            message.react(tradingBotReactions.buy[index]).catch(console.error)
                                         })
                                     }).catch(console.error)
                                 }
