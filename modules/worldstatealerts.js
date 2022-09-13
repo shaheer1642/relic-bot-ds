@@ -340,10 +340,105 @@ async function interaction_handler(interaction) {
 
                 interaction.reply({
                     content: ' ',
-                    embeds: [embed1, embed2, embed3]
+                    embeds: [embed1, embed2, embed3],
                 }).catch(console.error)
             }
         }).catch(console.error)
+    }
+    if (interaction.customId == 'worldstatealerts_fissures_show_modal') {
+        interaction.showModal({
+            title: "Create custom squad",
+            custom_id: "worldstatealerts_fissures_tracker_add",
+            components: [
+                {
+                    type: 1,
+                    components: [{
+                        type: 4,
+                        custom_id: "relic_type",
+                        label: "Relic Type",
+                        style: 1,
+                        min_length: 1,
+                        max_length: 10,
+                        placeholder: "i.e. neo",
+                        required: true
+                    }]
+                },{
+                    type: 1,
+                    components: [{
+                        type: 4,
+                        custom_id: "mission_type",
+                        label: "Mission Type",
+                        style: 1,
+                        min_length: 1,
+                        max_length: 10,
+                        placeholder: "i.e. defense",
+                        required: true
+                    }]
+                },{
+                    type: 1,
+                    components: [{
+                        type: 4,
+                        custom_id: "fissure_type",
+                        label: "Fissure Type",
+                        style: 1,
+                        min_length: 1,
+                        max_length: 10,
+                        placeholder: "normal | steel path | railjack",
+                        required: true
+                    }]
+                },{
+                    type: 1,
+                    components: [{
+                        type: 4,
+                        custom_id: "planet",
+                        label: "Planet (optional)",
+                        style: 1,
+                        min_length: 1,
+                        max_length: 10,
+                        placeholder: "i.e. sedna",
+                        required: false
+                    }]
+                },{
+                    type: 1,
+                    components: [{
+                        type: 4,
+                        custom_id: "node",
+                        label: "Node (optional)",
+                        style: 1,
+                        min_length: 1,
+                        max_length: 10,
+                        placeholder: "i.e. hydron",
+                        required: false
+                    }]
+                }
+            ]
+        }).catch(console.error)
+    }
+    if (interaction.customId == 'worldstatealerts_fissures_tracker_add') {
+        const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type'))
+        const relic_type = LU(interaction.fields.getTextInputValue('relic_type'))
+        const mission_type = LU(interaction.fields.getTextInputValue('mission_type'))
+        const planet = LU(interaction.fields.getTextInputValue('planet'))
+        const node = LU(interaction.fields.getTextInputValue('node'))
+        const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? planet:''}`
+        console.log(tracker_id)
+        db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id};`)
+        .then(res => {
+            if (res.rowCount == 1) {
+                const fissures_users = res.rows[0].fissures_users
+                if (!fissures_users[tracker_id])
+                    fissures_users[tracker_id] = {users: [], last_appeared: 0}
+                if (!fissures_users[tracker_id].users.includes(interaction.user.id))
+                    fissures_users[tracker_id].users.push(interaction.user.id)
+                db.query(`UPDATE worldstatealert SET fissures_users = '${JSON.stringify(fissures_users)}' WHERE channel_id = ${interaction.channel.id};`)
+                .then(res => {
+                    interaction.reply({content: `Added tracker ${tracker_id}`, ephemeral: true}).catch(err => console.log(err))
+                }).catch(console.error)
+            }
+        }).catch(console.error)
+        function LU(text) {
+            return text.trim().toLowerCase().replace(/ /g,'_')
+        }
     }
 }
 
@@ -2437,6 +2532,9 @@ async function fissures_check() {
             if (res.rowCount == 0)
                 return
 
+            var users = {}
+            var ping_users = {}
+
             var fissures_list = {normal: [], steelPath: [], voidStorm: []}
             var min_expiry = new Date().getTime() + 3600000
             fissures.forEach(fissure => {
@@ -2508,30 +2606,110 @@ async function fissures_check() {
                 color: colors.fissures
             }
 
+            
+            function LU(text) {
+                return text.trim().toLowerCase().replace(/ /g,'_')
+            }
+
+            var ping_string = ''
+
+            function user_trackers(tracker_id,activation) {
+                res.rows.forEach(row => {
+                    if (row.fissures_users[tracker_id]) {
+                        row.fissures_users[tracker_id].users.forEach(user => {
+                            if (!users[row.channel_id])
+                                users[row.channel_id] = []
+                            if (!users[row.channel_id].includes(`<@${user}>`))
+                                users[row.channel_id].push(`<@${user}>`)
+                            if (row.fissures_users[tracker_id].last_appeared != activation) {
+                                db.query(`
+                                    UPDATE worldstatealert
+                                    SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},last_appeared}', '${activation}', true)
+                                    WHERE channel_id = ${row.channel_id};
+                                `).catch(console.error)
+                                ping_string += tracker_id + ' '
+                                if (!ping_users[row.channel_id])
+                                    ping_users[row.channel_id] = []
+                                if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                                    // get user discord status
+                                    const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                    if (!user_presc || user_presc.status == 'offline') {
+                                        if (!row.ping_filter.offline.includes(user)) {
+                                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                                ping_users[row.channel_id].push(`<@${user}>`)
+                                        }
+                                    } else if (user_presc.status == 'dnd') {
+                                        if (!row.ping_filter.dnd.includes(user)) {
+                                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                                ping_users[row.channel_id].push(`<@${user}>`)
+                                        }
+                                    } else {
+                                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                            ping_users[row.channel_id].push(`<@${user}>`)
+                                    }
+                                } else {
+                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                        ping_users[row.channel_id].push(`<@${user}>`)
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+
             fissures_list.normal.forEach(fissure => {
+
                 embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
+                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
+                
             })
             fissures_list.steelPath.forEach(fissure => {
                 embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                user_trackers(`steel_path_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
+                user_trackers(`steel_path_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
             })
             fissures_list.voidStorm.forEach(fissure => {
                 embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed3.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed3.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
+                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
             })
 
             res.rows.forEach(row => {
                 if (row.fissures_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.fissures_alert).then(msg => {
                         msg.edit({
-                            content: ' ',
-                            embeds: [embed1, embed2, embed3]
+                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            embeds: [embed1, embed2, embed3],
+                            components: [
+                                {
+                                    type: 1,
+                                    components: [
+                                        {
+                                            type: 2,
+                                            label: "Track Fissures",
+                                            style: 1,
+                                            custom_id: "worldstatealerts_fissures_show_modal"
+                                        },{
+                                            type: 2,
+                                            label: "Show Trackers",
+                                            style: 1,
+                                            custom_id: "worldstatealerts_fissures_show_trackers"
+                                        },
+                                    ]
+                        
+                                }
+                            ]
                         }).catch(err => console.log(err))
                     }).catch(err => console.log(err))
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
+                        client.channels.cache.get(row.channel_id).send(`${ping_string} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
                 }
             })
 
