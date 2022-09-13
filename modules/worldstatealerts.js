@@ -2761,7 +2761,7 @@ async function fissures_check() {
                                             custom_id: "worldstatealerts_fissures_show_modal"
                                         },{
                                             type: 2,
-                                            label: "Show Trackers (Coming Soon™)",
+                                            label: "Show Trackers",
                                             style: 1,
                                             custom_id: "worldstatealerts_fissures_show_trackers"
                                         },
