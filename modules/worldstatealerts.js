@@ -505,6 +505,8 @@ function construct_your_fissures_embed(fissures_users, user_id) {
         }
       ]
     }
+
+    return embed
 }
 
 async function wssetup(message,args) {
