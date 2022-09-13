@@ -489,7 +489,7 @@ async function interaction_handler(interaction) {
                       value:
                         trackers.length > 0
                           ? trackers
-                              .map(tracker => fissure.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(fissure.last_appeared/1000) + ':R>')
+                              .map(tracker => tracker.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(tracker.last_appeared/1000) + ':R>')
                               .join('\n')
                           : '\u200b',
                       inline: true
