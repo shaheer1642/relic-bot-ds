@@ -347,7 +347,7 @@ async function interaction_handler(interaction) {
     }
     if (interaction.customId == 'worldstatealerts_fissures_show_modal') {
         interaction.showModal({
-            title: "Create custom squad",
+            title: "Track Fissures",
             custom_id: "worldstatealerts_fissures_tracker_add",
             components: [
                 {
