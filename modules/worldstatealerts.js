@@ -415,9 +415,9 @@ async function interaction_handler(interaction) {
         }).catch(console.error)
     }
     if (interaction.customId == 'worldstatealerts_fissures_tracker_add') {
-        const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type'))
+        const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type').replace('steelpath','steel path'))
         const relic_type = LU(interaction.fields.getTextInputValue('relic_type'))
-        const mission_type = LU(interaction.fields.getTextInputValue('mission_type'))
+        const mission_type = LU(interaction.fields.getTextInputValue('mission_type').replace('defence','defense'))
         const planet = LU(interaction.fields.getTextInputValue('planet'))
         const node = LU(interaction.fields.getTextInputValue('node'))
         const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? planet:''}`
