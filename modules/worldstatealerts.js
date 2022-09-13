@@ -452,13 +452,66 @@ async function interaction_handler(interaction) {
             }
         }).catch(console.error)
     }
+    if (interaction.customId == 'worldstatealerts_fissures_tracker_remove') {
+        var query = ''
+        interaction.values.forEach(tracker_id => {
+            query += `UPDATE worldstatealert SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},users}', (fissures_users->'${tracker_id}'->'users') - '${interaction.user.id}') WHERE channel_id = ${interaction.channel.id};`
+        })
+        console.log(query)
+        db.query(query)
+        .then((res) => {
+            if (res.rowCount > 0) {
+                db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id}`)
+                .then(res => {
+                    if (res.rowCount == 1) {
+                        console.log(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id))
+                        interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
+                    }
+                }).catch(console.error)
+            }
+        }).catch(console.error)
+        console.log(interaction.values)
+    }
+
+    if (interaction.customId == 'worldstatealerts_fissures_tracker_remove_all') {
+        db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id}`)
+        .then(res => {
+            if (res.rowCount == 1) {
+                const fissures_users = res.rows[0].fissures_users
+                var trackers = []
+                for (const tracker_id in fissures_users) {
+                    if (fissures_users[tracker_id].users.includes(interaction.user.id)) {
+                        trackers.push(tracker_id)
+                    }
+                }
+                var query = ''
+                trackers.forEach(tracker_id => {
+                    query += `UPDATE worldstatealert SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},users}', (fissures_users->'${tracker_id}'->'users') - '${interaction.user.id}') WHERE channel_id = ${interaction.channel.id};`
+                })
+                console.log(query)
+                db.query(query)
+                .then((res) => {
+                    if (res.rowCount > 0) {
+                        db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id}`)
+                        .then(res => {
+                            if (res.rowCount == 1) {
+                                console.log(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id))
+                                interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
+                            }
+                        }).catch(console.error)
+                    }
+                }).catch(console.error)
+                console.log(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id))
+                interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
+            }
+        }).catch(console.error)
+    }
 }
 
 function construct_your_fissures_embed(fissures_users, user_id) {
     try {
         var trackers = []
         for (const tracker_id in fissures_users) {
-            
             if (fissures_users[tracker_id].users.includes(user_id)) {
                 trackers.push({
                     tracker_id: tracker_id,
@@ -507,22 +560,42 @@ function construct_your_fissures_embed(fissures_users, user_id) {
             color: '#ffffff'
         }
 
-        const componenets = [
+        const component_options = trackers.reduce((arr,tracker,index) => {
+            if (index < 25) {
+                arr.push({
+                    label: tracker.fissure_type + ' ' + tracker.fissure_name,
+                    value: tracker.tracker_id,
+                    emoji: {
+                        name: emotes[tracker.fissure_name.split(' ')[0]].identifier.split(':')[0],
+                        id: emotes[tracker.fissure_name.split(' ')[0]].identifier.split(':')[1],
+                    }
+                })
+            }
+            return arr
+        },[])
+
+        const components = [
             {
                 type: 1,
                 components: [
                     {
                         type: 3,
                         custom_id: "worldstatealerts_fissures_tracker_remove",
-                        options: trackers.map(tracker => {
-                            return {
-                                label: tracker.tracker_id,
-                                value: tracker.fissure_type + ' ' + tracker.fissure_name,
-                            }
-                        }),
+                        options: component_options,
                         placeholder: "Choose a tracker to remove",
                         min_values: 1,
-                        max_values: 25
+                        max_values: component_options.length
+                    }
+                ]
+            },
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: "Remove All",
+                        style: 4,
+                        custom_id: "worldstatealerts_fissures_tracker_remove_all"
                     }
                 ]
             }
@@ -531,7 +604,7 @@ function construct_your_fissures_embed(fissures_users, user_id) {
         return {
             content: ' ',
             embeds: [embed],
-            componenets: componenets,
+            components: component_options.length > 0 ? components:[],
             ephemeral: true
         }
     } catch (e) {
