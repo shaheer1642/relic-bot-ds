@@ -357,8 +357,8 @@ async function interaction_handler(interaction) {
                         custom_id: "relic_type",
                         label: "Relic Type",
                         style: 1,
-                        min_length: 1,
-                        max_length: 10,
+                        min_length: 3,
+                        max_length: 7,
                         placeholder: "i.e. neo",
                         required: true
                     }]
@@ -369,8 +369,8 @@ async function interaction_handler(interaction) {
                         custom_id: "mission_type",
                         label: "Mission Type",
                         style: 1,
-                        min_length: 1,
-                        max_length: 10,
+                        min_length: 3,
+                        max_length: 20,
                         placeholder: "i.e. defense",
                         required: true
                     }]
@@ -381,7 +381,7 @@ async function interaction_handler(interaction) {
                         custom_id: "fissure_type",
                         label: "Fissure Type",
                         style: 1,
-                        min_length: 1,
+                        min_length: 6,
                         max_length: 10,
                         placeholder: "normal | steel path | railjack",
                         required: true
@@ -394,7 +394,7 @@ async function interaction_handler(interaction) {
                         label: "Planet (optional)",
                         style: 1,
                         min_length: 1,
-                        max_length: 10,
+                        max_length: 20,
                         placeholder: "i.e. sedna",
                         required: false
                     }]
@@ -406,7 +406,7 @@ async function interaction_handler(interaction) {
                         label: "Node (optional)",
                         style: 1,
                         min_length: 1,
-                        max_length: 10,
+                        max_length: 25,
                         placeholder: "i.e. hydron",
                         required: false
                     }]
