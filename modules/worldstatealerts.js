@@ -448,9 +448,7 @@ async function interaction_handler(interaction) {
         db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id};`)
         .then(res => {
             if (res.rowCount == 1) {
-                interaction.reply({
-                    content: ' ', embeds: [construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)], ephemeral: true
-                }).catch(console.error)
+                interaction.reply(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
             }
         }).catch(console.error)
     }
@@ -463,11 +461,12 @@ function construct_your_fissures_embed(fissures_users, user_id) {
             
             if (fissures_users[tracker_id].users.includes(user_id)) {
                 trackers.push({
-                  fissure_type: convertUpper(tracker_id.split('_')[0]),
-                  fissure_name: convertUpper(
-                    tracker_id.replace(`${tracker_id.split('_')[0]}_`, '')
-                  ),
-                  last_appeared: fissures_users[tracker_id].last_appeared
+                    tracker_id: tracker_id,
+                    fissure_type: convertUpper(tracker_id.split('_')[0]),
+                    fissure_name: convertUpper(
+                        tracker_id.replace(`${tracker_id.split('_')[0]}_`, '')
+                    ),
+                    last_appeared: fissures_users[tracker_id].last_appeared
                 })
             }
         }
@@ -476,38 +475,65 @@ function construct_your_fissures_embed(fissures_users, user_id) {
         trackers = trackers.sort(dynamicSort('fissure_type'))
         
         const embed = {
-          title: 'Your Fissure Trackers',
-          fields: [
-            {
-              name: 'Type',
-              value:
-                trackers.length > 0
-                  ? trackers.map(tracker => tracker.fissure_type).join('\n')
-                  : '\u200b',
-              inline: true
-            },
-            {
-              name: 'Fissure',
-              value:
-                trackers.length > 0
-                  ? trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0]].string} ${tracker.fissure_name}`).join('\n')
-                  : '\u200b',
-              inline: true
-            },
-            {
-              name: 'Last Appeared',
-              value:
-                trackers.length > 0
-                  ? trackers
-                      .map(tracker => tracker.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(tracker.last_appeared/1000) + ':R>')
-                      .join('\n')
-                  : '\u200b',
-              inline: true
-            }
-          ],
-          color: '#ffffff'
+            title: 'Your Fissure Trackers',
+            fields: [
+                {
+                name: 'Type',
+                value:
+                    trackers.length > 0
+                    ? trackers.map(tracker => tracker.fissure_type).join('\n')
+                    : '\u200b',
+                inline: true
+                },
+                {
+                name: 'Fissure',
+                value:
+                    trackers.length > 0
+                    ? trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0]].string} ${tracker.fissure_name}`).join('\n')
+                    : '\u200b',
+                inline: true
+                },
+                {
+                name: 'Last Appeared',
+                value:
+                    trackers.length > 0
+                    ? trackers
+                        .map(tracker => tracker.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(tracker.last_appeared/1000) + ':R>')
+                        .join('\n')
+                    : '\u200b',
+                inline: true
+                }
+            ],
+            color: '#ffffff'
         }
-        return embed
+
+        const componenets = [
+            {
+                type: 1,
+                components: [
+                    {
+                        type: 3,
+                        custom_id: "worldstatealerts_fissures_tracker_remove",
+                        options: trackers.map(tracker => {
+                            return {
+                                label: tracker.tracker_id,
+                                value: tracker.fissure_type + ' ' + tracker.fissure_name,
+                            }
+                        }),
+                        placeholder: "Choose a tracker to remove",
+                        min_values: 1,
+                        max_values: 25
+                    }
+                ]
+            }
+        ]
+
+        return {
+            content: ' ',
+            embeds: [embed],
+            componenets: componenets,
+            ephemeral: true
+        }
     } catch (e) {
         console.log(e)
         return {description: 'Sorry, an error occured constructing embed'}
