@@ -2694,7 +2694,7 @@ async function fissures_check() {
                                         {
                                             type: 2,
                                             label: "Track Fissures",
-                                            style: 1,
+                                            style: 3,
                                             custom_id: "worldstatealerts_fissures_show_modal"
                                         },{
                                             type: 2,
