@@ -618,7 +618,19 @@ function construct_your_fissures_embed(fissures_users, user_id) {
         return {
             content: ' ',
             embeds: [embed],
-            components: component_options.length > 0 ? components:[],
+            components: component_options.length > 0 ? components : [
+                {
+                    type: 1,
+                    components: [
+                        {
+                            type: 2,
+                            label: "Add Tracker",
+                            style: 3,
+                            custom_id: "worldstatealerts_fissures_show_modal"
+                        }
+                    ]
+                }
+            ],
             ephemeral: true
         }
     } catch (e) {
