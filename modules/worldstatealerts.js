@@ -2875,7 +2875,7 @@ async function fissures_check() {
                         }).catch(console.error)
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`${ping_string.trim()} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                        client.channels.cache.get(row.channel_id).send(`${ping_string.trim()} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 60000)).catch(console.error)
                 }
             })
 
