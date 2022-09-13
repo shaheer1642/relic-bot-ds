@@ -2793,7 +2793,7 @@ async function fissures_check() {
                                     SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},last_appeared}', '${new Date(fissure.activation).getTime()}', true)
                                     WHERE channel_id = ${row.channel_id};
                                 `).catch(console.error)
-                                ping_string += `${fissure.tier} ${fissure.missionType} - ${fissure.node} `
+                                ping_string += `${fissure.isHard ? '[SP] ':''}${fissure.tier} ${fissure.missionType} - ${fissure.node} `
                                 if (!ping_users[row.channel_id])
                                     ping_users[row.channel_id] = []
                                 if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
