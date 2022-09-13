@@ -457,56 +457,60 @@ async function interaction_handler(interaction) {
 }
 
 function construct_your_fissures_embed(fissures_users, user_id) {
-    var trackers = []
-    for (const tracker_id in fissures_users) {
+    try {
+        var trackers = []
+        for (const tracker_id in fissures_users) {
+            
+            if (fissures_users[tracker_id].users.includes(user_id)) {
+                trackers.push({
+                  fissure_type: convertUpper(tracker_id.split('_')[0]),
+                  fissure_name: convertUpper(
+                    tracker_id.replace(`${tracker_id.split('_')[0]}_`, '')
+                  ),
+                  last_appeared: fissures_users[tracker_id].last_appeared
+                })
+            }
+        }
         
-        if (fissures_users[tracker_id].users.includes(user_id)) {
-            trackers.push({
-              fissure_type: convertUpper(tracker_id.split('_')[0]),
-              fissure_name: convertUpper(
-                tracker_id.replace(`${tracker_id.split('_')[0]}_`, '')
-              ),
-              last_appeared: fissures_users[tracker_id].last_appeared
-            })
+        trackers = trackers.sort(dynamicSort('fissure_name'))
+        trackers = trackers.sort(dynamicSort('fissure_type'))
+        
+        const embed = {
+          title: 'Your Fissure Trackers',
+          fields: [
+            {
+              name: 'Type',
+              value:
+                trackers.length > 0
+                  ? trackers.map(tracker => tracker.fissure_type).join('\n')
+                  : '\u200b',
+              inline: true
+            },
+            {
+              name: 'Fissure',
+              value:
+                trackers.length > 0
+                  ? trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0].toLowerCase()].string} ${tracker.fissure_name}`).join('\n')
+                  : '\u200b',
+              inline: true
+            },
+            {
+              name: 'Last Appeared',
+              value:
+                trackers.length > 0
+                  ? trackers
+                      .map(tracker => tracker.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(tracker.last_appeared/1000) + ':R>')
+                      .join('\n')
+                  : '\u200b',
+              inline: true
+            }
+          ]
         }
+        return embed
+    } catch (e) {
+        console.log(e)
+        return {description: 'Sorry, an error occured constructing embed'}
     }
-    
-    trackers = trackers.sort(dynamicSort('fissure_name'))
-    trackers = trackers.sort(dynamicSort('fissure_type'))
-    
-    const embed = {
-      title: 'Your Fissure Trackers',
-      fields: [
-        {
-          name: 'Type',
-          value:
-            trackers.length > 0
-              ? trackers.map(tracker => tracker.fissure_type).join('\n')
-              : '\u200b',
-          inline: true
-        },
-        {
-          name: 'Fissure',
-          value:
-            trackers.length > 0
-              ? trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0].toLowerCase()].string} ${tracker.fissure_name}`).join('\n')
-              : '\u200b',
-          inline: true
-        },
-        {
-          name: 'Last Appeared',
-          value:
-            trackers.length > 0
-              ? trackers
-                  .map(tracker => tracker.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(tracker.last_appeared/1000) + ':R>')
-                  .join('\n')
-              : '\u200b',
-          inline: true
-        }
-      ]
-    }
-
-    return embed
 }
 
 async function wssetup(message,args) {
