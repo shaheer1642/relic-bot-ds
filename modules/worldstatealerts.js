@@ -602,13 +602,9 @@ function construct_your_fissures_embed(fissures_users, user_id) {
                     {
                         type: 2,
                         label: "Add Tracker",
-                        style: 2,
-                        custom_id: "worldstatealerts_fissures_show_trackers"
-                    }
-                ]
-            },{
-                type: 1,
-                components: [
+                        style: 3,
+                        custom_id: "worldstatealerts_fissures_show_modal"
+                    },
                     {
                         type: 2,
                         label: "Remove All",
