@@ -617,6 +617,9 @@ client.on('presenceUpdate', async (oldMember,newMember) => {
 })
 
 client.on('interactionCreate', async interaction => {
+
+    worldstatealerts.interaction_handler(interaction)
+    
     if (interaction.channelId == '950400363410915348') {
         botv_recruit.interactionHandler(interaction);
         return
@@ -1373,10 +1376,6 @@ client.on('interactionCreate', async interaction => {
     
         else if (interaction.commandName == 'ping') {
             interaction.reply({content: 'Pong!', ephemeral:true}).catch(err => console.log(err));
-        }
-
-        else if (interaction.commandName == 'fissures') {
-            worldstatealerts.interaction_handler(interaction)
         }
 
         return
