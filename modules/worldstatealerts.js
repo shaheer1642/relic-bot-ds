@@ -415,7 +415,7 @@ async function interaction_handler(interaction) {
         }).catch(console.error)
     }
     if (interaction.customId == 'worldstatealerts_fissures_tracker_add') {
-        const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type').replace('steelpath','steel path'))
+        const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type').replace('steel path','steelpath'))
         const relic_type = LU(interaction.fields.getTextInputValue('relic_type'))
         const mission_type = LU(interaction.fields.getTextInputValue('mission_type').replace('defence','defense').replace('exterminate','extermination'))
         const planet = LU(interaction.fields.getTextInputValue('planet'))
@@ -443,6 +443,65 @@ async function interaction_handler(interaction) {
         function LU(text) {
             return text.trim().toLowerCase().replace(/ /g,'_')
         }
+    }
+    if (interaction.customId == 'worldstatealerts_fissures_show_trackers') {
+        db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id};`)
+        .then(res => {
+            if (res.rowCount == 1) {
+                const fissures_users = res.rows[0].fissures_users
+                var trackers = []
+                for (const tracker_id in fissures_users) {
+                  //console.log(tracker_id)
+                  if (fissures_users[tracker_id].users.includes(interaction.user.id))
+                    trackers.push({
+                      fissure_type: tracker_id.split('_')[0],
+                      fissure_name: convertUpper(
+                        tracker_id.replace(`${tracker_id.split('_')[0]}_`, '')
+                      ),
+                      last_appeared: fissures_users[tracker_id].last_appeared
+                    })
+                }
+                
+                trackers = trackers.sort(dynamicSort('fissure_name'))
+                trackers = trackers.sort(dynamicSort('fissure_type'))
+                
+                const embed = {
+                  title: 'Your Fissure Trackers',
+                  fields: [
+                    {
+                      name: 'Type',
+                      value:
+                        trackers.length > 0
+                          ? trackers.map(tracker => tracker.fissure_type).join('\n')
+                          : '\u200b',
+                      inline: true
+                    },
+                    {
+                      name: 'Fissure',
+                      value:
+                        trackers.length > 0
+                          ? trackers.map(tracker => tracker.fissure_name).join('\n')
+                          : '\u200b',
+                      inline: true
+                    },
+                    {
+                      name: 'Last Appeared',
+                      value:
+                        trackers.length > 0
+                          ? trackers
+                              .map(tracker => '<t:' + tracker.last_appeared + ':R>')
+                              .join('\n')
+                          : '\u200b',
+                      inline: true
+                    }
+                  ]
+                }
+                
+                interaction.reply({
+                    content: ' ', embeds: [embed], ephemeral: true
+                }).catch(console.error)
+            }
+        }).catch(console.error)
     }
 }
 
@@ -2674,8 +2733,8 @@ async function fissures_check() {
                 embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
-                user_trackers(`steel_path_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
-                user_trackers(`steel_path_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
+                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
+                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
             })
             fissures_list.voidStorm.forEach(fissure => {
                 embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
