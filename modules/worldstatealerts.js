@@ -2779,7 +2779,7 @@ async function fissures_check() {
 
             var ping_string = ''
 
-            function user_trackers(tracker_id,activation) {
+            function user_trackers(tracker_id,fissure) {
                 res.rows.forEach(row => {
                     if (row.fissures_users[tracker_id]) {
                         row.fissures_users[tracker_id].users.forEach(user => {
@@ -2787,13 +2787,13 @@ async function fissures_check() {
                                 users[row.channel_id] = []
                             if (!users[row.channel_id].includes(`<@${user}>`))
                                 users[row.channel_id].push(`<@${user}>`)
-                            if (row.fissures_users[tracker_id].last_appeared != activation) {
+                            if (row.fissures_users[tracker_id].last_appeared != new Date(fissure.activation).getTime()) {
                                 db.query(`
                                     UPDATE worldstatealert
-                                    SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},last_appeared}', '${activation}', true)
+                                    SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},last_appeared}', '${new Date(fissure.activation).getTime()}', true)
                                     WHERE channel_id = ${row.channel_id};
                                 `).catch(console.error)
-                                ping_string += tracker_id + ' '
+                                ping_string += `${fissure.tier} ${fissure.missionType} - ${fissure.node} `
                                 if (!ping_users[row.channel_id])
                                     ping_users[row.channel_id] = []
                                 if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
@@ -2828,23 +2828,23 @@ async function fissures_check() {
                 embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
-                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
-                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
+                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
                 
             })
             fissures_list.steelPath.forEach(fissure => {
                 embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
-                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
-                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
+                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
             fissures_list.voidStorm.forEach(fissure => {
                 embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed3.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed3.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
-                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`, new Date(fissure.activation).getTime())
-                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, new Date(fissure.activation).getTime())
+                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
 
             res.rows.forEach(row => {
@@ -2875,7 +2875,7 @@ async function fissures_check() {
                         }).catch(console.error)
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`${ping_string} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                        client.channels.cache.get(row.channel_id).send(`${ping_string.trim()} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
 
