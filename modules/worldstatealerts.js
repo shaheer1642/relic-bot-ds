@@ -414,7 +414,7 @@ async function interaction_handler(interaction) {
             ]
         }).catch(console.error)
     }
-    if (interaction.customId == 'worldstatealerts_fissures_tracker_add') {
+    else if (interaction.customId == 'worldstatealerts_fissures_tracker_add') {
         const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type').replace('steel path','steelpath'))
         const relic_type = LU(interaction.fields.getTextInputValue('relic_type'))
         const mission_type = LU(interaction.fields.getTextInputValue('mission_type').replace('defence','defense').replace('exterminate','extermination'))
@@ -444,7 +444,7 @@ async function interaction_handler(interaction) {
             return text.trim().toLowerCase().replace(/ /g,'_')
         }
     }
-    if (interaction.customId == 'worldstatealerts_fissures_show_trackers') {
+    else if (interaction.customId == 'worldstatealerts_fissures_show_trackers') {
         db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id};`)
         .then(res => {
             if (res.rowCount == 1) {
@@ -452,7 +452,7 @@ async function interaction_handler(interaction) {
             }
         }).catch(console.error)
     }
-    if (interaction.customId == 'worldstatealerts_fissures_tracker_remove') {
+    else if (interaction.customId == 'worldstatealerts_fissures_tracker_remove') {
         var query = ''
         interaction.values.forEach(tracker_id => {
             query += `UPDATE worldstatealert SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},users}', (fissures_users->'${tracker_id}'->'users') - '${interaction.user.id}') WHERE channel_id = ${interaction.channel.id};`
@@ -472,8 +472,7 @@ async function interaction_handler(interaction) {
         }).catch(console.error)
         console.log(interaction.values)
     }
-
-    if (interaction.customId == 'worldstatealerts_fissures_tracker_remove_all') {
+    else if (interaction.customId == 'worldstatealerts_fissures_tracker_remove_all') {
         db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id}`)
         .then(res => {
             if (res.rowCount == 1) {
@@ -491,15 +490,13 @@ async function interaction_handler(interaction) {
                 console.log(query)
                 db.query(query)
                 .then((res) => {
-                    if (res.rowCount > 0) {
-                        db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id}`)
-                        .then(res => {
-                            if (res.rowCount == 1) {
-                                console.log(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id))
-                                interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
-                            }
-                        }).catch(console.error)
-                    }
+                    db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id}`)
+                    .then(res => {
+                        if (res.rowCount == 1) {
+                            console.log(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id))
+                            interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
+                        }
+                    }).catch(console.error)
                 }).catch(console.error)
                 console.log(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id))
                 interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
