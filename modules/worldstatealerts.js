@@ -420,6 +420,10 @@ async function interaction_handler(interaction) {
         const mission_type = LU(interaction.fields.getTextInputValue('mission_type').replace('defence','defense').replace('extermination','exterminate'))
         const planet = LU(interaction.fields.getTextInputValue('planet'))
         const node = LU(interaction.fields.getTextInputValue('node'))
+        if ((planet && !node) || (node && !planet)) {
+            interaction.reply({content: `Please put the planet name as well as the node, not just one of them`, ephemeral: true}).catch(console.error)
+            return
+        }
         const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? planet:''}`
         console.log(tracker_id)
         db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id};`)
@@ -432,7 +436,7 @@ async function interaction_handler(interaction) {
                     fissures_users[tracker_id].users.push(interaction.user.id)
                 db.query(`UPDATE worldstatealert SET fissures_users = '${JSON.stringify(fissures_users)}' WHERE channel_id = ${interaction.channel.id};`)
                 .then(res => {
-                    interaction.reply({content: `Added tracker ${tracker_id}`, ephemeral: true}).catch(err => console.log(err))
+                    interaction.reply({content: `Added tracker ${tracker_id}`, ephemeral: true}).catch(console.error)
                 }).catch(console.error)
             }
         }).catch(console.error)
@@ -444,7 +448,7 @@ async function interaction_handler(interaction) {
 
 async function wssetup(message,args) {
     if (!access_ids.includes(message.author.id)) {
-        message.channel.send('You do not have access to this command').catch(err => console.log(err))
+        message.channel.send('You do not have access to this command').catch(console.error)
         return
     }
     message.channel.send({
@@ -454,16 +458,16 @@ async function wssetup(message,args) {
             description: '1️⃣ Baro Alert\n2️⃣ Open World Cycles\n3️⃣ Arbitration\n4️⃣ Fissures\n5️⃣ Teshin Rotation (Steel Path)\n6️⃣ Notification Settings\n7️⃣ Alerts\n8️⃣ Event Booster\n9️⃣ Invasions'
         }]
     }).then(msg => {
-        msg.react('1️⃣').catch(err => console.log(err))
-        msg.react('2️⃣').catch(err => console.log(err))
-        msg.react('3️⃣').catch(err => console.log(err))
-        msg.react('4️⃣').catch(err => console.log(err))
-        msg.react('5️⃣').catch(err => console.log(err))
-        msg.react('6️⃣').catch(err => console.log(err))
-        msg.react('7️⃣').catch(err => console.log(err))
-        msg.react('8️⃣').catch(err => console.log(err))
-        msg.react('9️⃣').catch(err => console.log(err))
-    }).catch(err => console.log(err))
+        msg.react('1️⃣').catch(console.error)
+        msg.react('2️⃣').catch(console.error)
+        msg.react('3️⃣').catch(console.error)
+        msg.react('4️⃣').catch(console.error)
+        msg.react('5️⃣').catch(console.error)
+        msg.react('6️⃣').catch(console.error)
+        msg.react('7️⃣').catch(console.error)
+        msg.react('8️⃣').catch(console.error)
+        msg.react('9️⃣').catch(console.error)
+    }).catch(console.error)
 }
 
 async function setupReaction(reaction,user,type) {
@@ -472,7 +476,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -490,7 +494,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ----- baroAlert 
@@ -501,16 +505,16 @@ async function setupReaction(reaction,user,type) {
                 color: colors.baro
             }]
         }).then(msg => {
-            msg.react(emotes.baro.string).catch(err => console.log(err))
-            db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            msg.react(emotes.baro.string).catch(console.error)
+            db.query(`UPDATE worldstatealert SET baro_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
         // ----- baroRole
         reaction.message.guild.roles.create({
             name: 'Baro Alert',
             reason: 'Automatic role creation',
         }).then(role => {
-            db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        }).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET baro_role = ${role.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+        }).catch(console.error)
         clearTimeout(baroTimer)
         var timer = 10000
         baroTimer = setTimeout(baro_check, 10000)
@@ -521,7 +525,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -539,7 +543,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ----- cyclesAlert
@@ -551,14 +555,14 @@ async function setupReaction(reaction,user,type) {
                 color: colors.cycles
             }]
         }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET cycles_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            await msg.react("☀️").catch(err => console.log(err))
-            await msg.react("🌙").catch(err => console.log(err))
-            await msg.react("❄️").catch(err => console.log(err))
-            await msg.react("🔥").catch(err => console.log(err))
-            await msg.react(emotes.fass.string).catch(err => console.log(err))
-            await msg.react(emotes.vome.string).catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            db.query(`UPDATE worldstatealert SET cycles_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+            await msg.react("☀️").catch(console.error)
+            await msg.react("🌙").catch(console.error)
+            await msg.react("❄️").catch(console.error)
+            await msg.react("🔥").catch(console.error)
+            await msg.react(emotes.fass.string).catch(console.error)
+            await msg.react(emotes.vome.string).catch(console.error)
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
         clearTimeout(cyclesTimer)
         var timer = 10000
@@ -569,7 +573,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -587,7 +591,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ---- arbitrationAlert
@@ -599,15 +603,15 @@ async function setupReaction(reaction,user,type) {
                 color: colors.arbitration
             }]
         }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET arbitration_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            await msg.react(emotes.defection.string).catch(err => console.log(err))
-            await msg.react(emotes.defense.string).catch(err => console.log(err))
-            await msg.react(emotes.interception.string).catch(err => console.log(err))
-            await msg.react(emotes.salvage.string).catch(err => console.log(err))
-            await msg.react(emotes.survival.string).catch(err => console.log(err))
-            await msg.react(emotes.excavation.string).catch(err => console.log(err))
-            await msg.react(emotes.disruption.string).catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            db.query(`UPDATE worldstatealert SET arbitration_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+            await msg.react(emotes.defection.string).catch(console.error)
+            await msg.react(emotes.defense.string).catch(console.error)
+            await msg.react(emotes.interception.string).catch(console.error)
+            await msg.react(emotes.salvage.string).catch(console.error)
+            await msg.react(emotes.survival.string).catch(console.error)
+            await msg.react(emotes.excavation.string).catch(console.error)
+            await msg.react(emotes.disruption.string).catch(console.error)
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
         clearTimeout(arbitrationTimer)
         var timer = 10000
@@ -618,7 +622,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -636,7 +640,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ---- fissuresAlert
@@ -652,8 +656,8 @@ async function setupReaction(reaction,user,type) {
                 color: colors.fissures
             }]
         }).then(async msg => {
-            db.query(`UPDATE worldstatealert SET fissures_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            db.query(`UPDATE worldstatealert SET fissures_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
         clearTimeout(fissuresTimer)
         var timer = 10000
@@ -664,7 +668,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -682,7 +686,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ---- teshinAlert
@@ -694,16 +698,16 @@ async function setupReaction(reaction,user,type) {
                 color: colors.teshin
             }]
         }).then(async msg => {
-            await db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            await msg.react(emotes.umbra_forma.string).catch(err => console.log(err))
-            await msg.react(emotes.kuva.string).catch(err => console.log(err))
-            await msg.react(emotes.kitgun_riven.string).catch(err => console.log(err))
-            await msg.react(emotes.forma.string).catch(err => console.log(err))
-            await msg.react(emotes.zaw_riven.string).catch(err => console.log(err))
-            await msg.react(emotes.endo.string).catch(err => console.log(err))
-            await msg.react(emotes.rifle_riven.string).catch(err => console.log(err))
-            await msg.react(emotes.shotgun_riven.string).catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await db.query(`UPDATE worldstatealert SET teshin_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+            await msg.react(emotes.umbra_forma.string).catch(console.error)
+            await msg.react(emotes.kuva.string).catch(console.error)
+            await msg.react(emotes.kitgun_riven.string).catch(console.error)
+            await msg.react(emotes.forma.string).catch(console.error)
+            await msg.react(emotes.zaw_riven.string).catch(console.error)
+            await msg.react(emotes.endo.string).catch(console.error)
+            await msg.react(emotes.rifle_riven.string).catch(console.error)
+            await msg.react(emotes.shotgun_riven.string).catch(console.error)
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
         clearTimeout(teshinTimer)
         var timer = 10000
@@ -714,7 +718,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -732,7 +736,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ---- notificationSettings
@@ -744,15 +748,15 @@ async function setupReaction(reaction,user,type) {
                 color: colors.notification
             }]
         }).then(async msg => {
-            await msg.react('🔴').catch(err => console.log(err))
-            await msg.react('🟣').catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await msg.react('🔴').catch(console.error)
+            await msg.react('🟣').catch(console.error)
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
     }
     if (reaction.emoji.name == "7️⃣" && type=="add") {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -770,7 +774,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ---- alerts 
@@ -782,12 +786,12 @@ async function setupReaction(reaction,user,type) {
                 color: colors.alerts
             }]
         }).then(async msg => {
-            await db.query(`UPDATE worldstatealert SET alerts_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            await msg.react(emotes.orokin_reactor.string).catch(err => console.log(err))
-            await msg.react(emotes.orokin_catalyst.string).catch(err => console.log(err))
-            await msg.react(emotes.umbra_forma.string).catch(err => console.log(err))
-            await msg.react(emotes.forma.string).catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await db.query(`UPDATE worldstatealert SET alerts_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+            await msg.react(emotes.orokin_reactor.string).catch(console.error)
+            await msg.react(emotes.orokin_catalyst.string).catch(console.error)
+            await msg.react(emotes.umbra_forma.string).catch(console.error)
+            await msg.react(emotes.forma.string).catch(console.error)
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
         clearTimeout(alertsTimer)
         var timer = 10000
@@ -798,7 +802,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -816,7 +820,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ---- alerts 
@@ -828,12 +832,12 @@ async function setupReaction(reaction,user,type) {
                 color: colors.global_upgrades
             }]
         }).then(async msg => {
-            await db.query(`UPDATE worldstatealert SET global_upgrades_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            await msg.react(emotes.affinity_booster.string).catch(err => console.log(err))
-            await msg.react(emotes.credit_booster.string).catch(err => console.log(err))
-            await msg.react(emotes.resource_booster.string).catch(err => console.log(err))
-            await msg.react(emotes.resource_chance_booster.string).catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await db.query(`UPDATE worldstatealert SET global_upgrades_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+            await msg.react(emotes.affinity_booster.string).catch(console.error)
+            await msg.react(emotes.credit_booster.string).catch(console.error)
+            await msg.react(emotes.resource_booster.string).catch(console.error)
+            await msg.react(emotes.resource_chance_booster.string).catch(console.error)
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
         clearTimeout(global_upgrades_timer)
         var timer = 10000
@@ -844,7 +848,7 @@ async function setupReaction(reaction,user,type) {
         if (!access_ids.includes(user.id))
             return
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Worldstate Alerts Setup")
@@ -862,7 +866,7 @@ async function setupReaction(reaction,user,type) {
             return false
         })
         if (!status) {
-            reaction.message.channel.send('Some error occured').catch(err => console.log(err))
+            reaction.message.channel.send('Some error occured').catch(console.error)
             return
         }
         // ---- alerts 
@@ -874,23 +878,23 @@ async function setupReaction(reaction,user,type) {
                 color: colors.invasions
             }]
         }).then(async msg => {
-            await db.query(`UPDATE worldstatealert SET invasions_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
-            await msg.react(emotes.forma.string).catch(err => console.log(err))
-            await msg.react(emotes.orokin_catalyst.string).catch(err => console.log(err))
-            await msg.react(emotes.orokin_reactor.string).catch(err => console.log(err))
-            await msg.react(emotes.fieldron.string).catch(err => console.log(err))
-            await msg.react(emotes.detonite_injector.string).catch(err => console.log(err))
-            await msg.react(emotes.mutagen_mass.string).catch(err => console.log(err))
-            await msg.react(emotes.exilus_adapter_blueprint.string).catch(err => console.log(err))
-            await msg.react(emotes.mutalist_alad_v_nav_coordinate.string).catch(err => console.log(err))
-            await msg.react(emotes.snipetron_vandal.string).catch(err => console.log(err))
-            await msg.react(emotes.dera_vandal.string).catch(err => console.log(err))
-            await msg.react(emotes.twin_vipers_wraith.string).catch(err => console.log(err))
-            await msg.react(emotes.sheev.string).catch(err => console.log(err))
-            await msg.react(emotes.latron_wraith.string).catch(err => console.log(err))
-            await msg.react(emotes.karak_wraith.string).catch(err => console.log(err))
-            await msg.react(emotes.strun_wraith.string).catch(err => console.log(err))
-        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(err => console.log(err))})
+            await db.query(`UPDATE worldstatealert SET invasions_alert = ${msg.id} WHERE channel_id = ${channel_id}`).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
+            await msg.react(emotes.forma.string).catch(console.error)
+            await msg.react(emotes.orokin_catalyst.string).catch(console.error)
+            await msg.react(emotes.orokin_reactor.string).catch(console.error)
+            await msg.react(emotes.fieldron.string).catch(console.error)
+            await msg.react(emotes.detonite_injector.string).catch(console.error)
+            await msg.react(emotes.mutagen_mass.string).catch(console.error)
+            await msg.react(emotes.exilus_adapter_blueprint.string).catch(console.error)
+            await msg.react(emotes.mutalist_alad_v_nav_coordinate.string).catch(console.error)
+            await msg.react(emotes.snipetron_vandal.string).catch(console.error)
+            await msg.react(emotes.dera_vandal.string).catch(console.error)
+            await msg.react(emotes.twin_vipers_wraith.string).catch(console.error)
+            await msg.react(emotes.sheev.string).catch(console.error)
+            await msg.react(emotes.latron_wraith.string).catch(console.error)
+            await msg.react(emotes.karak_wraith.string).catch(console.error)
+            await msg.react(emotes.strun_wraith.string).catch(console.error)
+        }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
         clearTimeout(invasions_timer)
         var timer = 10000
@@ -940,7 +944,7 @@ async function setupReaction(reaction,user,type) {
     if (reaction.emoji.name == emotes.day.string) {
         console.log('day reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Open World Cycles")
@@ -950,19 +954,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{day,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Day cycle").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{day}', (cycles_users->'day') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Day cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Day cycle").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.name == emotes.night.string) {
         console.log('night reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Open World Cycles")
@@ -972,19 +976,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{night,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Night cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Night cycle").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{night}', (cycles_users->'night') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Night cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Night cycle").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.name == emotes.cold.string) {
         console.log('cold reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Open World Cycles")
@@ -994,19 +998,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{cold,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Cold cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Cold cycle").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{cold}', (cycles_users->'cold') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Cold cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Cold cycle").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.name == emotes.warm.string) {
         console.log('warm reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Open World Cycles")
@@ -1016,19 +1020,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{warm,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Warm cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Warm cycle").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{warm}', (cycles_users->'warm') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Warm cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Warm cycle").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.fass.identifier) {
         console.log('fass reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Open World Cycles")
@@ -1038,19 +1042,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{fass,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Fass cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Fass cycle").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{fass}', (cycles_users->'fass') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Fass cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Fass cycle").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.vome.identifier) {
         console.log('vome reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Open World Cycles")
@@ -1060,19 +1064,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{vome,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Vome cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Vome cycle").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET cycles_users = jsonb_set(cycles_users, '{vome}', (cycles_users->'vome') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Vome cycle").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Vome cycle").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.defection.identifier) {
         console.log('defection reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Arbitration")
@@ -1082,19 +1086,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{defection,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Arbitration defection").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Arbitration defection").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{defection}', (arbitration_users->'defection') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Arbitration defection").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Arbitration defection").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.defense.identifier) {
         console.log('defense reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Arbitration")
@@ -1104,19 +1108,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{defense,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Arbitration defense").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Arbitration defense").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{defense}', (arbitration_users->'defense') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Arbitration defense").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Arbitration defense").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.interception.identifier) {
         console.log('interception reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Arbitration")
@@ -1126,19 +1130,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{interception,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Arbitration interception").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Arbitration interception").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{interception}', (arbitration_users->'interception') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Arbitration interception").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Arbitration interception").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.salvage.identifier) {
         console.log('salvage reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Arbitration")
@@ -1148,19 +1152,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{salvage,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Arbitration salvage").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Arbitration salvage").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{salvage}', (arbitration_users->'salvage') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Arbitration salvage").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Arbitration salvage").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.survival.identifier) {
         console.log('survival reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Arbitration")
@@ -1170,19 +1174,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{survival,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Arbitration survival").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Arbitration survival").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{survival}', (arbitration_users->'survival') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Arbitration survival").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Arbitration survival").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.excavation.identifier) {
         console.log('excavation reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Arbitration")
@@ -1192,19 +1196,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{excavation,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Arbitration excavation").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Arbitration excavation").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{excavation}', (arbitration_users->'excavation') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Arbitration excavation").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Arbitration excavation").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.disruption.identifier) {
         console.log('disruption reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Arbitration")
@@ -1214,19 +1218,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{disruption,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Arbitration disruption").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Arbitration disruption").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET arbitration_users = jsonb_set(arbitration_users, '{disruption}', (arbitration_users->'disruption') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Arbitration disruption").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Arbitration disruption").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.umbra_forma.identifier) {
         console.log('umbra_forma reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title == "Teshin Rotation (Steel Path)") {
@@ -1235,13 +1239,13 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET teshin_users = jsonb_set(teshin_users, '{umbra_forma,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Teshin umbra_forma").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET teshin_users = jsonb_set(teshin_users, '{umbra_forma}', (teshin_users->'umbra_forma') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Teshin umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Teshin umbra_forma").catch(console.error)).catch(console.error)
             }
         }
         if (reaction.message.embeds[0].title == "Alerts") {
@@ -1250,20 +1254,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{umbra_forma,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Alerts umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Alerts umbra_forma").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{umbra_forma}', (alerts_users->'umbra_forma') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Alerts umbra_forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Alerts umbra_forma").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.kuva.identifier) {
         console.log('kuva reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
@@ -1273,19 +1277,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{kuva,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin kuva").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Teshin kuva").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{kuva}', (teshin_users->'kuva') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin kuva").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Teshin kuva").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.kitgun_riven.identifier) {
         console.log('kitgun_riven reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
@@ -1295,19 +1299,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{kitgun_riven,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin kitgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Teshin kitgun_riven").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{kitgun_riven}', (teshin_users->'kitgun_riven') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin kitgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Teshin kitgun_riven").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.forma.identifier) {
         console.log('forma reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title == "Teshin Rotation (Steel Path)") {
@@ -1316,13 +1320,13 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET teshin_users = jsonb_set(teshin_users, '{forma,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Teshin forma").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET teshin_users = jsonb_set(teshin_users, '{forma}', (teshin_users->'forma') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Teshin forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Teshin forma").catch(console.error)).catch(console.error)
             }
         }
         if (reaction.message.embeds[0].title == "Alerts") {
@@ -1331,13 +1335,13 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{forma,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Alerts forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Alerts forma").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{forma}', (alerts_users->'forma') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Alerts forma").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Alerts forma").catch(console.error)).catch(console.error)
             }
         }
         if (reaction.message.embeds[0].title == "Invasions") {
@@ -1346,20 +1350,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{forma_blueprint,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions forma blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions forma blueprint").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{forma_blueprint}', (invasions_users->'forma_blueprint') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions forma blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions forma blueprint").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.zaw_riven.identifier) {
         console.log('zaw_riven reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
@@ -1369,19 +1373,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{zaw_riven,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin zaw_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Teshin zaw_riven").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{zaw_riven}', (teshin_users->'zaw_riven') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin zaw_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Teshin zaw_riven").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.endo.identifier) {
         console.log('endo reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
@@ -1391,19 +1395,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{endo,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin endo").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Teshin endo").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{endo}', (teshin_users->'endo') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin endo").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Teshin endo").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.rifle_riven.identifier) {
         console.log('rifle_riven reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
@@ -1413,19 +1417,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{rifle_riven,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin rifle_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Teshin rifle_riven").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{rifle_riven}', (teshin_users->'rifle_riven') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin rifle_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Teshin rifle_riven").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.shotgun_riven.identifier) {
         console.log('shotgun_riven reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Teshin Rotation (Steel Path)")
@@ -1435,19 +1439,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{shotgun_riven,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Teshin shotgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Teshin shotgun_riven").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET teshin_users = jsonb_set(teshin_users, '{shotgun_riven}', (teshin_users->'shotgun_riven') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Teshin shotgun_riven").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Teshin shotgun_riven").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.name == "🔴") {
         console.log('dnd reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Notification Settings")
@@ -1457,19 +1461,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET ping_filter = jsonb_set(ping_filter, '{dnd,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Disabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Disabled pinging on DnD").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET ping_filter = jsonb_set(ping_filter, '{dnd}', (ping_filter->'dnd') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Re-enabled pinging on DnD").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Re-enabled pinging on DnD").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.name == "🟣") {
         console.log('offline/invisible reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Notification Settings")
@@ -1479,19 +1483,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET ping_filter = jsonb_set(ping_filter, '{offline,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Disabled pinging on invisible/offline").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Disabled pinging on invisible/offline").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET ping_filter = jsonb_set(ping_filter, '{offline}', (ping_filter->'offline') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Re-enabled pinging on invisible/offline").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Re-enabled pinging on invisible/offline").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.affinity_booster.identifier) {
         console.log('affinity_booster reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Event Booster")
@@ -1501,19 +1505,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Affinity Event Booster").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{affinity_booster}', (global_upgrades_users->'affinity_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Affinity Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Affinity Event Booster").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.credit_booster.identifier) {
         console.log('credit_booster reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Event Booster")
@@ -1523,19 +1527,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Credits Event Booster").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{credit_booster}', (global_upgrades_users->'credit_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Credits Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Credits Event Booster").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.resource_booster.identifier) {
         console.log('resource_booster reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Event Booster")
@@ -1545,19 +1549,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_amount_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Resource Event Booster").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_amount_booster}', (global_upgrades_users->'resource_drop_amount_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Resource Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Resource Event Booster").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.resource_chance_booster.identifier) {
         console.log('resource_chance_booster reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         if (reaction.message.embeds[0].title != "Event Booster")
@@ -1567,19 +1571,19 @@ async function setupReaction(reaction,user,type) {
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_chance_booster,999999}', '"${user.id}"', true)
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Added tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Added tracker: Resource Chance Event Booster").catch(console.error)).catch(console.error)
         } else if (type == "remove") {
             db.query(`
                 UPDATE worldstatealert
                 SET global_upgrades_users = jsonb_set(global_upgrades_users, '{resource_drop_chance_booster}', (global_upgrades_users->'resource_drop_chance_booster') - '${user.id}')
                 WHERE channel_id = ${channel_id};
-            `).then(() => user.send("Removed tracker: Resource Chance Event Booster").catch(err => console.log(err))).catch(err => console.log(err))
+            `).then(() => user.send("Removed tracker: Resource Chance Event Booster").catch(console.error)).catch(console.error)
         }
     }
     if (reaction.emoji.identifier == emotes.orokin_reactor.identifier) {
         console.log('orokin_reactor reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
             
@@ -1589,13 +1593,13 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Alerts Orokin Reactor").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{orokin_reactor}', (alerts_users->'orokin_reactor') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Alerts Orokin Reactor").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Alerts Orokin Reactor").catch(console.error)).catch(console.error)
             }
         }
         if (reaction.message.embeds[0].title == "Invasions") {
@@ -1604,20 +1608,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{orokin_reactor_blueprint,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions orokin catalyst blueprint").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{orokin_reactor_blueprint}', (invasions_users->'orokin_reactor_blueprint') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions orokin catalyst blueprint").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.orokin_catalyst.identifier) {
         console.log('orokin_catalyst reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
             
@@ -1627,13 +1631,13 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Alerts Orokin Catalyst").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET alerts_users = jsonb_set(alerts_users, '{orokin_catalyst}', (alerts_users->'orokin_catalyst') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Alerts Orokin Catalyst").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Alerts Orokin Catalyst").catch(console.error)).catch(console.error)
             }
         }
         
@@ -1643,20 +1647,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{orokin_catalyst_blueprint,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions orokin catalyst blueprint").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{orokin_catalyst_blueprint}', (invasions_users->'orokin_catalyst_blueprint') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions orokin catalyst blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions orokin catalyst blueprint").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.exilus_adapter_blueprint.identifier) {
         console.log('exilus_adapter_blueprint reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1666,20 +1670,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{exilus_adapter_blueprint,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions exilus adapter blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions exilus adapter blueprint").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{exilus_adapter_blueprint}', (invasions_users->'exilus_adapter_blueprint') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions exilus adapter blueprint").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions exilus adapter blueprint").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.fieldron.identifier) {
         console.log('fieldron reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1689,20 +1693,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{fieldron,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions fieldron").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions fieldron").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{fieldron}', (invasions_users->'fieldron') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions fieldron").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions fieldron").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.detonite_injector.identifier) {
         console.log('detonite_injector reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1712,20 +1716,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{detonite_injector,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions detonite injector").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions detonite injector").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{detonite_injector}', (invasions_users->'detonite_injector') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions detonite injector").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions detonite injector").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.mutagen_mass.identifier) {
         console.log('mutagen_mass reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1735,20 +1739,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{mutagen_mass,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions mutagen mass").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions mutagen mass").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{mutagen_mass}', (invasions_users->'mutagen_mass') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions mutagen mass").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions mutagen mass").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.mutalist_alad_v_nav_coordinate.identifier) {
         console.log('mutalist_alad_v_nav_coordinate reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1758,20 +1762,20 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{mutalist_alad_v_nav_coordinate,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions mutalist alad v nav coordinate").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions mutalist alad v nav coordinate").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{mutalist_alad_v_nav_coordinate}', (invasions_users->'mutalist_alad_v_nav_coordinate') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions mutalist alad v nav coordinate").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions mutalist alad v nav coordinate").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.snipetron_vandal.identifier) {
         console.log('snipetron_vandal reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1790,7 +1794,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_receiver,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions snipetron vandal").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions snipetron vandal").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
@@ -1805,14 +1809,14 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{snipetron_vandal_receiver}', (invasions_users->'snipetron_vandal_receiver') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions snipetron vandal").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions snipetron vandal").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.dera_vandal.identifier) {
         console.log('dera_vandal reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1831,7 +1835,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_receiver,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions dera vandal").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions dera vandal").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
@@ -1846,14 +1850,14 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{dera_vandal_receiver}', (invasions_users->'dera_vandal_receiver') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions dera vandal").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions dera vandal").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.twin_vipers_wraith.identifier) {
         console.log('twin_vipers_wraith reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1872,7 +1876,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_receivers,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions twin vipers wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions twin vipers wraith").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
@@ -1887,14 +1891,14 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{twin_vipers_wraith_receivers}', (invasions_users->'twin_vipers_wraith_receivers') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions twin vipers wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions twin vipers wraith").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.sheev.identifier) {
         console.log('sheev reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1913,7 +1917,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{sheev_heatsink,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions sheev").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions sheev").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
@@ -1928,14 +1932,14 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{sheev_heatsink}', (invasions_users->'sheev_heatsink') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions sheev").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions sheev").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.latron_wraith.identifier) {
         console.log('latron_wraith reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1954,7 +1958,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_receiver,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions latron wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions latron wraith").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
@@ -1969,14 +1973,14 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{latron_wraith_receiver}', (invasions_users->'latron_wraith_receiver') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions latron wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions latron wraith").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.karak_wraith.identifier) {
         console.log('karak_wraith reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -1995,7 +1999,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_receiver,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions karak wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions karak wraith").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
@@ -2010,14 +2014,14 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{karak_wraith_receiver}', (invasions_users->'karak_wraith_receiver') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions karak wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions karak wraith").catch(console.error)).catch(console.error)
             }
         }
     }
     if (reaction.emoji.identifier == emotes.strun_wraith.identifier) {
         console.log('strun_wraith reaction')
         if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id).catch(err => console.log(err))
+            await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
         if (reaction.message.author.id != client.user.id)
             return
         
@@ -2036,7 +2040,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_receiver,999999}', '"${user.id}"', true)
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Added tracker: Invasions strun wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Added tracker: Invasions strun wraith").catch(console.error)).catch(console.error)
             } else if (type == "remove") {
                 db.query(`
                     UPDATE worldstatealert
@@ -2051,7 +2055,7 @@ async function setupReaction(reaction,user,type) {
                     UPDATE worldstatealert
                     SET invasions_users = jsonb_set(invasions_users, '{strun_wraith_receiver}', (invasions_users->'strun_wraith_receiver') - '${user.id}')
                     WHERE channel_id = ${channel_id};
-                `).then(() => user.send("Removed tracker: Invasions strun wraith").catch(err => console.log(err))).catch(err => console.log(err))
+                `).then(() => user.send("Removed tracker: Invasions strun wraith").catch(console.error)).catch(console.error)
             }
         }
     }
@@ -2095,10 +2099,10 @@ async function baro_check() {
                 return
             if (voidTrader.active) {
                 if (res.rows[0].baro_status == false) {
-                    db.query(`UPDATE worldstatealert SET baro_status = true`).catch(err => console.log(err))
+                    db.query(`UPDATE worldstatealert SET baro_status = true`).catch(console.error)
                     res.rows.forEach(row => {
                         if (row.baro_alert)
-                            client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                            client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                     })
                 }
                 var embed = [{
@@ -2111,7 +2115,7 @@ async function baro_check() {
                 voidTrader.inventory.sort(dynamicSort("item"))
                 voidTrader.inventory.forEach((item, index) => {
                     //update db info about the item
-                    db.query(`UPDATE items_list SET vault_status='B',vault_timestamp=${new Date(voidTrader.activation).getTime()} WHERE item_url='${item.item.toLowerCase().replace(/ /g,'_').replace('_(intact)','').replace(/'/g,`''`)}'`).catch(err => console.log(err))
+                    db.query(`UPDATE items_list SET vault_status='B',vault_timestamp=${new Date(voidTrader.activation).getTime()} WHERE item_url='${item.item.toLowerCase().replace(/ /g,'_').replace('_(intact)','').replace(/'/g,`''`)}'`).catch(console.error)
                     if (index % 24 == 0) {
                         embed.push({
                             fields: [], 
@@ -2132,12 +2136,12 @@ async function baro_check() {
                             msg.edit({
                                 content: `<@&${row.baro_role}>`,
                                 embeds: embed
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
+                            }).catch(console.error)
+                        }).catch(console.error)
                     }
                 })
             } else {
-                db.query(`UPDATE worldstatealert SET baro_status = false`).catch(err => console.log(err))
+                db.query(`UPDATE worldstatealert SET baro_status = false`).catch(console.error)
                 res.rows.forEach(row => {
                     if (row.baro_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
@@ -2148,12 +2152,12 @@ async function baro_check() {
                                     description: `React with ${emotes.baro.string} to be notified when baro arrives\n\nNext arrival <t:${new Date(voidTrader.activation).getTime() / 1000}:R>\n**Node:** ${voidTrader.location}`,
                                     color: colors.baro
                                 }]
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
+                            }).catch(console.error)
+                        }).catch(console.error)
                     }
                 })
             }
-        }).catch(err => console.log(err))
+        }).catch(console.error)
         if (voidTrader.active) {
             var timer = (new Date(voidTrader.expiry).getTime() - new Date().getTime()) + 120000
             baroTimer = setTimeout(baro_check, timer)
@@ -2201,7 +2205,7 @@ async function cycles_check() {
             var ping_users = {}
             var cycles_changed = []
             // ----- cetus check 
-            await db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(err => console.log(err))
+            await db.query(`UPDATE worldstatealert SET cetus_status = '${cetusCycle.state}'`).catch(console.error)
             res.rows.forEach(row => {
                 row.cycles_users[cetusCycle.state].forEach(user => {
                     if (!users[row.channel_id])
@@ -2238,7 +2242,7 @@ async function cycles_check() {
                 })
             })
             // ----- vallis check
-            await db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(err => console.log(err))
+            await db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(console.error)
             res.rows.forEach(row => {
                 row.cycles_users[vallisCycle.state].forEach(user => {
                     if (!users[row.channel_id])
@@ -2275,7 +2279,7 @@ async function cycles_check() {
                 })
             })
             // ----- cambion check
-            await db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(err => console.log(err))
+            await db.query(`UPDATE worldstatealert SET cambion_status = '${cambionCycle.active}'`).catch(console.error)
             res.rows.forEach(row => {
                 row.cycles_users[cambionCycle.active].forEach(user => {
                     if (!users[row.channel_id])
@@ -2339,13 +2343,13 @@ async function cycles_check() {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
-                        }).catch(err => console.log(err))
-                    }).catch(err => console.log(err))
+                        }).catch(console.error)
+                    }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
-        }).catch(err => console.log(err))
+        }).catch(console.error)
         var expiry = new Date(cetusCycle.expiry).getTime()
         if (expiry > new Date(vallisCycle.expiry).getTime())
             expiry = new Date(vallisCycle.expiry).getTime()
@@ -2445,7 +2449,7 @@ async function arbitration_check() {
                 return
             }
             // -----
-            db.query(`UPDATE worldstatealert SET arbitration_mission = '${mission}_${arbitration.enemy}'`).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET arbitration_mission = '${mission}_${arbitration.enemy}'`).catch(console.error)
             res.rows.forEach(row => {
                 row.arbitration_users[mission].forEach(user => {
                     if (!users[row.channel_id])
@@ -2494,13 +2498,13 @@ async function arbitration_check() {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
-                        }).catch(err => console.log(err))
-                    }).catch(err => console.log(err))
+                        }).catch(console.error)
+                    }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Arbitration ${arbitration.type} has started ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Arbitration ${arbitration.type} has started ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
-        }).catch(err => console.log(err))
+        }).catch(console.error)
         
         var timer = new Date(arbitration.expiry).getTime() - new Date().getTime()
         arbitrationTimer = setTimeout(arbitration_check, timer)
@@ -2706,10 +2710,10 @@ async function fissures_check() {
                         
                                 }
                             ]
-                        }).catch(err => console.log(err))
-                    }).catch(err => console.log(err))
+                        }).catch(console.error)
+                    }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`${ping_string} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`${ping_string} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
 
@@ -2757,7 +2761,7 @@ async function teshin_check() {
 
             const currentReward = teshin_item_replace(steelPath.currentReward.name)
 
-            db.query(`UPDATE worldstatealert SET teshin_rotation = '${currentReward}'`).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET teshin_rotation = '${currentReward}'`).catch(console.error)
             
             var users = {}
             var ping_users = {}
@@ -2821,10 +2825,10 @@ async function teshin_check() {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
-                        }).catch(err => console.log(err))
-                    }).catch(err => console.log(err))
+                        }).catch(console.error)
+                    }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Teshin rotation: ${steelPath.currentReward.name} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Teshin rotation: ${steelPath.currentReward.name} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
 
@@ -2839,7 +2843,7 @@ async function teshin_check() {
                 .replace("Rifle Riven Mod","rifle_riven")
                 .replace("Shotgun Riven Mod","shotgun_riven")
             }
-        }).catch(err => console.log(err))
+        }).catch(console.error)
         
         var timer = (new Date(steelPath.expiry).getTime() - new Date().getTime())
         teshinTimer = setTimeout(teshin_check, timer)
@@ -2868,7 +2872,7 @@ async function alerts_check() {
                 var timer = 3600000
                 alertsTimer = setTimeout(alerts_check, timer)
                 console.log(`alerts_check: no data available, reset in ${msToTime(timer)}`)
-                db.query(`UPDATE worldstatealert SET alerts_rewards = '[]'`).catch(err => console.log(err))
+                db.query(`UPDATE worldstatealert SET alerts_rewards = '[]'`).catch(console.error)
                 res.rows.forEach(row => {
                     if (row.alerts_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
@@ -2879,8 +2883,8 @@ async function alerts_check() {
                                     description: `React to subscribe to specific rewards\n\nNo alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
                                     color: colors.alerts
                                 }]
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
+                            }).catch(console.error)
+                        }).catch(console.error)
                     }
                 })
                 return
@@ -2929,7 +2933,7 @@ async function alerts_check() {
                 })
             })
 
-            db.query(`UPDATE worldstatealert SET alerts_rewards = '${JSON.stringify(alerts_rewards)}'`).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET alerts_rewards = '${JSON.stringify(alerts_rewards)}'`).catch(console.error)
 
             var embed = {
                 title: 'Alerts',
@@ -2961,16 +2965,16 @@ async function alerts_check() {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
-                        }).catch(err => console.log(err))
-                    }).catch(err => console.log(err))
+                        }).catch(console.error)
+                    }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Alert reward: ${convertUpper(alerts_rewards.join(', '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Alert reward: ${convertUpper(alerts_rewards.join(', '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
             var timer = 3600000
             alertsTimer = setTimeout(alerts_check, timer)
             console.log(`alerts_check invokes in ${msToTime(timer)}`)
-        }).catch(err => console.log(err))
+        }).catch(console.error)
     })
     .catch(err => {
         console.log(err)
@@ -3004,8 +3008,8 @@ async function global_upgrades_check() {
                                     footer: {text: 'Note: This alert is unstable at the moment'},
                                     color: colors.global_upgrades
                                 }]
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
+                            }).catch(console.error)
+                        }).catch(console.error)
                     }
                 })
                 return
@@ -3027,8 +3031,8 @@ async function global_upgrades_check() {
                                     footer: {text: 'Note: This alert is unstable at the moment'},
                                     color: colors.global_upgrades
                                 }]
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
+                            }).catch(console.error)
+                        }).catch(console.error)
                     }
                 })
                 return
@@ -3052,7 +3056,7 @@ async function global_upgrades_check() {
                 )
             })
 
-            db.query(`UPDATE worldstatealert SET active_booster = '${JSON.stringify(active_booster)}'`).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET active_booster = '${JSON.stringify(active_booster)}'`).catch(console.error)
             
             var users = {}
             var ping_users = {}
@@ -3095,17 +3099,17 @@ async function global_upgrades_check() {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
-                        }).catch(err => console.log(err))
-                    }).catch(err => console.log(err))
+                        }).catch(console.error)
+                    }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Event booster: ${convertUpper(active_booster.toString())} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Event booster: ${convertUpper(active_booster.toString())} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
             var timer = 3600000
             global_upgrades_timer = setTimeout(global_upgrades_check, timer)
             console.log('global_upgrades_check invokes in ' + msToTime(timer))
             return
-        }).catch(err => console.log(err))
+        }).catch(console.error)
     })
     .catch(err => {
         console.log(err)
@@ -3138,8 +3142,8 @@ async function invasions_check() {
                                     description: `React to subscribe to specific rewards\n\n${emotes.forma.string} Forma BP${'\u3000'.repeat(5)}${emotes.orokin_catalyst.string} Orokin Catalyst BP${'\u3000'.repeat(5)}${emotes.orokin_reactor.string} Orokin Reactor BP\n${emotes.fieldron.string} Fieldron${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.detonite_injector.string} Detonite Injector${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.mutagen_mass.string} Mutagen Mass\n${emotes.exilus_adapter_blueprint.string} Exilus Adapater BP${'\u3000'.repeat(1)}${'\u202F'.repeat(2)}${emotes.mutalist_alad_v_nav_coordinate.string} Mutalist Alad V Nav Coordinate\n${emotes.snipetron_vandal.string} Snipetron Vandal BP & Parts${'\u3000'.repeat(5)}${emotes.dera_vandal.string} Dera Vandal BP & Parts\n${emotes.twin_vipers_wraith.string} Twin Vipers Wraith BP & Parts${'\u3000'.repeat(4)}${'\u202F'.repeat(1)}${emotes.sheev.string} Sheev BP & Parts\n${emotes.latron_wraith.string} Latron Wraith BP & Parts${'\u3000'.repeat(6)}${'\u202F'.repeat(3)}${emotes.karak_wraith.string} Karak Wraith BP & Parts\n${emotes.strun_wraith.string} Strun Wraith BP & Parts`,                
                                     color: colors.invasions
                                 }]
-                            }).catch(err => console.log(err))
-                        }).catch(err => console.log(err))
+                            }).catch(console.error)
+                        }).catch(console.error)
                     }
                 })
                 return
@@ -3180,7 +3184,7 @@ async function invasions_check() {
 
             })
 
-            db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(err => console.log(err))
+            db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(console.error)
 
             invasions_rewards.forEach(active_reward => {
                 active_reward_key = active_reward.split('_')
@@ -3241,10 +3245,10 @@ async function invasions_check() {
                         msg.edit({
                             content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
                             embeds: [embed]
-                        }).catch(err => console.log(err))
-                    }).catch(err => console.log(err))
+                        }).catch(console.error)
+                    }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Invasion reward: ${convertUpper(ping_rewards.join(', ').replace(/_/g,' '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000)).catch(err => console.log(err))
+                        client.channels.cache.get(row.channel_id).send(`Invasion reward: ${convertUpper(ping_rewards.join(', ').replace(/_/g,' '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                 }
             })
 
@@ -3263,7 +3267,7 @@ async function invasions_check() {
             var timer = 300000
             invasions_timer = setTimeout(invasions_check, timer)
             console.log('invasions_check invokes in ' + msToTime(timer))
-        }).catch(err => console.log(err))
+        }).catch(console.error)
     })
     .catch(err => {
         console.log(err)
