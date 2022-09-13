@@ -498,8 +498,6 @@ async function interaction_handler(interaction) {
                         }
                     }).catch(console.error)
                 }).catch(console.error)
-                console.log(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id))
-                interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users, interaction.user.id)).catch(console.error)
             }
         }).catch(console.error)
     }
