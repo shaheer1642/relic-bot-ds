@@ -504,7 +504,8 @@ function construct_your_fissures_embed(fissures_users, user_id) {
                   : '\u200b',
               inline: true
             }
-          ]
+          ],
+          color: '#ffffff'
         }
         return embed
     } catch (e) {
