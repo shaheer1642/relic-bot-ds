@@ -633,7 +633,9 @@ function construct_your_fissures_embed(fissures_users, user_id) {
         }
     } catch (e) {
         console.log(e)
-        return {description: 'Sorry, an error occured constructing embed'}
+        return {
+            content: 'Sorry, an eror occured constructing embed',
+        }
     }
 }
 
