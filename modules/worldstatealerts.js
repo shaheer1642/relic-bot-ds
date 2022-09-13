@@ -383,7 +383,7 @@ async function interaction_handler(interaction) {
                         style: 1,
                         min_length: 6,
                         max_length: 10,
-                        placeholder: "normal | steel path | railjack",
+                        placeholder: "normal | steelpath | railjack",
                         required: true
                     }]
                 },{
@@ -454,7 +454,7 @@ async function interaction_handler(interaction) {
                   //console.log(tracker_id)
                   if (fissures_users[tracker_id].users.includes(interaction.user.id))
                     trackers.push({
-                      fissure_type: tracker_id.split('_')[0],
+                      fissure_type: convertUpper(tracker_id.split('_')[0]),
                       fissure_name: convertUpper(
                         tracker_id.replace(`${tracker_id.split('_')[0]}_`, '')
                       ),
@@ -489,7 +489,7 @@ async function interaction_handler(interaction) {
                       value:
                         trackers.length > 0
                           ? trackers
-                              .map(tracker => '<t:' + tracker.last_appeared + ':R>')
+                              .map(tracker => fissure.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(fissure.last_appeared/1000) + ':R>')
                               .join('\n')
                           : '\u200b',
                       inline: true
