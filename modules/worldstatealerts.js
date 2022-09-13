@@ -434,9 +434,23 @@ async function interaction_handler(interaction) {
                     fissures_users[tracker_id] = {users: [], last_appeared: 0}
                 if (!fissures_users[tracker_id].users.includes(interaction.user.id))
                     fissures_users[tracker_id].users.push(interaction.user.id)
-                db.query(`UPDATE worldstatealert SET fissures_users = '${JSON.stringify(fissures_users)}' WHERE channel_id = ${interaction.channel.id};`)
+                db.query(`UPDATE worldstatealert SET fissures_users = '${JSON.stringify(fissures_users)}' WHERE channel_id = ${interaction.channel.id} RETURNING fissures_users;`)
                 .then(res => {
-                    interaction.reply({content: `Added tracker ${tracker_id}`, ephemeral: true}).catch(console.error)
+                    if (res.rowCount == 1) {
+                        if (interaction.message) {
+                            if (interaction.message.embeds[0]) {
+                                if (interaction.message.embeds[0].title == 'Your Fissure Trackers') {
+                                    interaction.update(construct_your_fissures_embed(res.rows[0].fissures_users,interaction.user.id)).catch(console.error)
+                                } else {
+                                    interaction.reply(construct_your_fissures_embed(res.rows[0].fissures_users,interaction.user.id)).catch(console.error)
+                                }
+                            } else {
+                                interaction.reply(construct_your_fissures_embed(res.rows[0].fissures_users,interaction.user.id)).catch(console.error)
+                            }
+                        } else {
+                            interaction.reply(construct_your_fissures_embed(res.rows[0].fissures_users,interaction.user.id)).catch(console.error)
+                        }
+                    }
                 }).catch(console.error)
             }
         }).catch(console.error)
@@ -582,8 +596,17 @@ function construct_your_fissures_embed(fissures_users, user_id) {
                         max_values: component_options.length
                     }
                 ]
-            },
-            {
+            },{
+                type: 1,
+                components: [
+                    {
+                        type: 2,
+                        label: "Add Tracker",
+                        style: 2,
+                        custom_id: "worldstatealerts_fissures_show_trackers"
+                    }
+                ]
+            },{
                 type: 1,
                 components: [
                     {
@@ -2824,7 +2847,6 @@ async function fissures_check() {
             }
 
             fissures_list.normal.forEach(fissure => {
-
                 embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
