@@ -696,7 +696,8 @@ async function updateDatabaseItem(db_items_list,item,index) {
                 db_items_list[i].volume_sold = volume_sold
                 db_items_list[i].rank = rank
                 db_items_list[i].ducat = ducat_value
-                db_items_list[i].relics = relics
+                db_items_list[i].relics = (warframe_items_primes[item.item_url])? `'${JSON.stringify(warframe_items_primes[item.item_url].relics)}'`:null,
+                db_items_list[i].rewards = (warframe_items_relics[item.item_url])? `'${JSON.stringify(warframe_items_relics[item.item_url].rewards)}'`:null,
                 db_items_list[i].icon_url = (icon_url == '') ? null:icon_url
                 db_items_list[i].update_timestamp = new Date().getTime()
                 break
