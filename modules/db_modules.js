@@ -111,7 +111,13 @@ warframe_items_drops.forEach(drop => {
                 }
             }
         }
-        const item_url = drop.type.toLowerCase().trim().replace(/ /g,'_').replace('_chassis_blueprint','_chassis').replace('_systems_blueprint','_systems').replace('_neuroptics_blueprint','_neuroptics')
+        const item_url = drop.type.toLowerCase().trim()
+            .replace(/ /g,'_')
+            .replace('_chassis_blueprint','_chassis')
+            .replace('_systems_blueprint','_systems')
+            .replace('_neuroptics_blueprint','_neuroptics')
+            .replace('_harness_blueprint','_harness')
+            .replace('_wings_blueprint','_wings');
         const rarity = drop.chance == 0.2533 ? 'common':drop.chance == 0.11 ? 'uncommon':drop.chance == 0.02 ? 'rare':'unknown'
         if (rarity == 'unknown') {
             console.log('rarity could not be determined for drop',drop)
