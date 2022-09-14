@@ -875,21 +875,22 @@ async function backupItemsList() {
     })
     var buffer_items_list = Buffer.from(JSON.stringify(items_list), 'utf8');
     const message = await wh_dbManager.fetchMessage('904790735499448350').catch(err => console.log(err))
-    wh_dbManager.deleteMessage(message.content).catch(err => console.log(err))
-    wh_dbManager.send({
-        content: " ",
-        files: [
-            {
-                attachment: buffer_items_list,
-                name: 'items_list.json'
-            }
-        ]
-    })
-    .then(res => {
-        wh_dbManager.editMessage('904790735499448350', {
-            content: res.id
+    if (message) {
+        wh_dbManager.deleteMessage(message.content).catch(err => console.log(err))
+        wh_dbManager.send({
+            content: " ",
+            files: [
+                {
+                    attachment: buffer_items_list,
+                    name: 'items_list.json'
+                }
+            ]
+        }).then(res => {
+            wh_dbManager.editMessage('904790735499448350', {
+                content: res.id
+            }).catch(err => console.log(err))
         }).catch(err => console.log(err))
-    }).catch(err => console.log(err))
+    }
 }
 
 async function dc_update_msgs() {
