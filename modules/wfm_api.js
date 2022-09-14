@@ -503,6 +503,8 @@ async function relics(message,args) {
         for (var i=0; i < relic_drops.rewards.common.length; i++) {
             var str = relic_drops.rewards.common[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
             value1 += ":brown_circle: " + str + "\u205F\u205F\u205F\u205F\u205F\n"
+            if (relic_drops.rewards.common[i] == 'forma_blueprint')
+                value2 += "\n", value3 += "\n"
             items_list.forEach(element => {
                 if (element.item_url ==  relic_drops.rewards.common[i]) {
                     value2 += element.sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
@@ -511,12 +513,12 @@ async function relics(message,args) {
                 }
             })
         }
-        if (relic_drops.rewards.common.length < 3)
-            value1 += ":brown_circle: Forma Blueprint\n", value2 += "\n", value3 += "\n"
         for (var i=0; i < relic_drops.rewards.uncommon.length; i++)
         {
             var str = relic_drops.rewards.uncommon[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
             value1 += ":white_circle: " + str + "\u205F\u205F\u205F\u205F\u205F\n"
+            if (relic_drops.rewards.uncommon[i] == 'forma_blueprint')
+                value2 += "\n", value3 += "\n"
             items_list.forEach(element => {
                 if (element.item_url ==  relic_drops.rewards.uncommon[i]) {
                     value2 += element.sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
@@ -525,12 +527,12 @@ async function relics(message,args) {
                 }
             })
         }
-        if (relic_drops.rewards.uncommon.length < 2)
-            value1 += ":white_circle: Forma Blueprint\n", value2 += "\n", value3 += "\n"
         for (var i=0; i < relic_drops.rewards.rare.length; i++)
         {
             var str = relic_drops.rewards.rare[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
             value1 += ":yellow_circle: " + str + "\u205F\u205F\u205F\u205F\u205F\n"
+            if (relic_drops.rewards.rare[i] == 'forma_blueprint')
+                value2 += "\n", value3 += "\n"
             items_list.forEach(element => {
                 if (element.item_url ==  relic_drops.rewards.rare[i]) {
                     value2 += element.sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
@@ -539,8 +541,6 @@ async function relics(message,args) {
                 }
             })
         }
-        if (relic_drops.rewards.rare.length < 1)
-            value1 += ":yellow_circle: Forma Blueprint\n", value2 += "\n", value3 += "\n"
         value1 = value1.substring(0, value1.length - 1)
         value2 = value2.substring(0, value2.length - 1)
         var relic_name = d_item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
