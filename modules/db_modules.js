@@ -4,7 +4,7 @@ const {db} = require('./db_connection.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
 const {WebhookClient} = require('discord.js');
 const {client,tickcount} = require('./discord_client.js');
-const fs = require('fs')
+const Items = require('warframe-items')
 const vaultExclusiveRelics = [
     "lith_c8_relic",
     "lith_t6_relic",
@@ -78,6 +78,64 @@ const vaultExpectedRelics = [
 var DB_Updating = false
 var DB_Update_Timer = null
 const wh_dbManager = new WebhookClient({url: process.env.DISCORD_WH_DBMANAGER});
+
+
+var warframe_items_items = new Items()
+var warframe_items_drops = []
+const warframe_items_relics = {}
+const warframe_items_primes = {}
+
+warframe_items_items.forEach(item => {
+    if (item.components) {
+        item.components.forEach(component => {
+            if (component.drops) {
+                component.drops.forEach(drop => {
+                    if (drop.location) {
+                        if (drop.location.match('Relic') && !drop.location.match('(Exceptional)') && !drop.location.match('(Flawless)') && !drop.location.match('(Radiant)'))
+                            warframe_items_drops.push(drop)
+                    }
+                })
+            }
+        })
+    }
+});
+warframe_items_drops.forEach(drop => {
+    const relic_url = drop.location.toLowerCase().trim().replace(/ /g,'_')
+    if (relic_url.match('lith_') || relic_url.match('meso_') || relic_url.match('neo_') || relic_url.match('axi_') || relic_url.match('requiem_')) {
+        if (!warframe_items_relics[relic_url]) {
+            warframe_items_relics[relic_url] = {
+                rewards: {
+                    common: [],
+                    uncommon: [],
+                    rare: []
+                }
+            }
+        }
+        const item_url = drop.type.toLowerCase().trim().replace(/ /g,'_')
+        const rarity = drop.chance == 0.2533 ? 'common':drop.chance == 0.11 ? 'uncommon':drop.chance == 0.02 ? 'rare':'unknown'
+        if (rarity == 'unknown') {
+            console.log('rarity could not be determined for drop',drop)
+        }
+        if (!warframe_items_relics[relic_url].rewards[rarity].includes(item_url)) {
+            const new_length = warframe_items_relics[relic_url].rewards[rarity].push(item_url)
+            warframe_items_relics[relic_url].rewards[rarity].sort()
+            if (rarity == 'common' && new_length > 3) console.log(relic_url,'exceeds rarity',rarity,'length of 3')
+            if (rarity == 'uncommon' && new_length > 2) console.log(relic_url,'exceeds rarity',rarity,'length of 2')
+            if (rarity == 'rare' && new_length > 1) console.log(relic_url,'exceeds rarity',rarity,'length of 1')
+        }
+        if (item_url.match('prime')) {
+            if (!warframe_items_primes[item_url]) {
+                warframe_items_primes[item_url] = {
+                    relics: []
+                }
+            }
+            if (!warframe_items_primes[item_url].relics.includes(relic_url))
+                warframe_items_primes[item_url].relics.push(relic_url)
+        }
+    }
+})
+warframe_items_items = []
+warframe_items_drops = []
 
 setUpdateTimer()
 backupItemsList()
@@ -402,16 +460,11 @@ async function updateDatabaseItem(db_items_list,item,index) {
         console.log('volume sold: ' + volume_sold)
         //--------------------
         var ducat_value = null
-        var relics = null
         var icon_url = ''
         var status = Object.keys(itemOrders.data.include.item.items_in_set).some(function (k) {
             if (itemOrders.data.include.item.items_in_set[k].id == item.id) {
                 if (itemOrders.data.include.item.items_in_set[k].ducats)
                     ducat_value = itemOrders.data.include.item.items_in_set[k].ducats
-                if (itemOrders.data.include.item.items_in_set[k].en.drop) { 
-                    if (itemOrders.data.include.item.items_in_set[k].en.drop.length!=0)
-                        relics = itemOrders.data.include.item.items_in_set[k].en.drop
-                }
                 if (itemOrders.data.include.item.items_in_set[k].sub_icon)
                     icon_url = itemOrders.data.include.item.items_in_set[k].sub_icon
                 else if (itemOrders.data.include.item.items_in_set[k].icon)
@@ -436,55 +489,6 @@ async function updateDatabaseItem(db_items_list,item,index) {
             })
         }
         console.log(JSON.stringify(items_in_set))
-        //----update relic rewards----
-        if (relics)
-            if (relics.length != 0) {
-                console.log(`Scanning relic rewards...`)
-                for (var j=0;j<relics.length;j++) {
-                    var temp = relics[j].name.split(" ")
-                    const rarity = temp.pop().replace("(","").replace(")","").toLowerCase()
-                    //----add to DB----
-                    let itemIndex = []
-                    var exists = Object.keys(db_items_list).some(function (k) {
-                        if (db_items_list[k].item_url == relics[j].link) {
-                            itemIndex = k
-                            if (!db_items_list[k].rewards)
-                                return false
-                            if (db_items_list[k].rewards[(rarity)]) {
-                                if (db_items_list[k].rewards[(rarity)].includes(item.item_url))
-                                    return true
-                            }
-                            //if (JSON.stringify(db_items_list[k].rewards).match(item.item_url))
-                            //    return true
-                            return false
-                        }
-                    })
-                    if (!exists) {
-                        console.log(`Reward does not exist, updating DB...`)
-                        if (!db_items_list[itemIndex].rewards)
-                            db_items_list[itemIndex].rewards = {}
-                        if (!db_items_list[itemIndex].rewards[(rarity)])
-                            db_items_list[itemIndex].rewards[(rarity)] = []
-                        db_items_list[itemIndex].rewards[(rarity)].push(item.item_url)
-                        var status = await db.query(`
-                        UPDATE items_list 
-                        SET rewards = '${JSON.stringify(db_items_list[itemIndex].rewards)}'
-                        WHERE item_url='${relics[j].link}'`)
-                        .then( () => {
-                            return true
-                        })
-                        .catch (err => {
-                            if (err.response)
-                                console.log(err.response.data)
-                            console.log(err)
-                            console.log('Error updating DB item rewards')
-                            return false
-                        });
-                        if (!status)
-                            return false
-                    }
-                }
-            }
         //----scanning relics vault status
         var vault_status = ''
         if (item.tags.includes("relic") && !item.tags.includes("requiem")) {
@@ -647,22 +651,24 @@ async function updateDatabaseItem(db_items_list,item,index) {
         }
         //---------------------
         console.log(`Updating DB item detail...`)
-        var status = await db.query(`UPDATE items_list SET 
-            sell_price = ${sellAvgPrice},
-            sell_last_90 = ${sellAvgPrice_90},
-            buy_price = ${buyAvgPrice},
-            buy_last_90 = ${buyAvgPrice_90},
-            maxed_sell_price = ${maxedSellAvgPrice},
-            maxed_sell_last_90 = ${maxedSellAvgPrice_90},
-            maxed_buy_price = ${maxedBuyAvgPrice},
-            maxed_buy_last_90 = ${maxedBuyAvgPrice_90},
-            volume_sold = ${volume_sold},
-            rank = ${rank},
-            ducat = ${ducat_value},
-            relics = ${(relics)? `'${JSON.stringify(relics)}'`:null},
-            icon_url = NULLIF('${icon_url}', ''),
-            items_in_set = ${(items_in_set)? `'${JSON.stringify(items_in_set)}'`:null},
-            update_timestamp = ${new Date().getTime()}
+        var status = await db.query(`
+            UPDATE items_list SET 
+                sell_price = ${sellAvgPrice},
+                sell_last_90 = ${sellAvgPrice_90},
+                buy_price = ${buyAvgPrice},
+                buy_last_90 = ${buyAvgPrice_90},
+                maxed_sell_price = ${maxedSellAvgPrice},
+                maxed_sell_last_90 = ${maxedSellAvgPrice_90},
+                maxed_buy_price = ${maxedBuyAvgPrice},
+                maxed_buy_last_90 = ${maxedBuyAvgPrice_90},
+                volume_sold = ${volume_sold},
+                rank = ${rank},
+                ducat = ${ducat_value},
+                relics = ${(warframe_items_primes[item.item_url])? `'${JSON.stringify(warframe_items_primes[item.item_url].relics)}'`:null},
+                rewards = ${(warframe_items_relics[item.item_url])? `'${JSON.stringify(warframe_items_relics[item.item_url].rewards)}'`:null},
+                icon_url = NULLIF('${icon_url}', ''),
+                items_in_set = ${(items_in_set)? `'${JSON.stringify(items_in_set)}'`:null},
+                update_timestamp = ${new Date().getTime()}
             WHERE id = '${item.id}'`)
         .then( () => {
             return true
@@ -913,7 +919,7 @@ async function dc_update_msgs() {
             var relics = ''
             if (element.relics) {
                 element.relics.forEach(relic => {
-                    relics += relic.link.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '/'
+                    relics += relic.replace(/_relic/g, '').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + '/'
                 })
                 relics = relics.substring(0, relics.length - 1);
             }

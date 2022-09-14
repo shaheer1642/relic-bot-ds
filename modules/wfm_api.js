@@ -627,7 +627,7 @@ async function relics(message,args) {
         {
             var relic_drops = null
             items_list.forEach(element => {
-                if (element.item_url ==  part_info.relics[l].link)
+                if (element.item_url ==  part_info.relics[l])
                     relic_drops = element
             })
             var vault_status = ''
@@ -646,10 +646,10 @@ async function relics(message,args) {
                 value += ":brown_circle: " + str1 + "\n"
                 if (relic_drops.rewards.common[m] == arrItemsUrl[i])
                 {
-                    var relic_name = part_info.relics[l].link
+                    var relic_name = part_info.relics[l]
                     let temp = relic_name.split("_")
                     var relic_tier = temp[0]
-                    best_common[relic_tier].push(part_info.relics[l].link)
+                    best_common[relic_tier].push(part_info.relics[l])
                 }
             }
             if (relic_drops.rewards.common.length < 3)
@@ -662,10 +662,10 @@ async function relics(message,args) {
                 value += ":white_circle: " + str1 + "\n"
                 if (relic_drops.rewards.uncommon[m] == arrItemsUrl[i])
                 {
-                    var relic_name = part_info.relics[l].link
+                    var relic_name = part_info.relics[l]
                     let temp = relic_name.split("_")
                     var relic_tier = temp[0]
-                    best_uncommon[relic_tier].push(part_info.relics[l].link)
+                    best_uncommon[relic_tier].push(part_info.relics[l])
                 }
             }
             if (relic_drops.rewards.uncommon.length < 2)
@@ -678,16 +678,16 @@ async function relics(message,args) {
                 value += ":yellow_circle: " + str1 + "\n"
                 if (relic_drops.rewards.rare[m] == arrItemsUrl[i])
                 {
-                    var relic_name = part_info.relics[l].link
+                    var relic_name = part_info.relics[l]
                     let temp = relic_name.split("_")
                     var relic_tier = temp[0]
-                    best_rare[relic_tier].push(part_info.relics[l].link)
+                    best_rare[relic_tier].push(part_info.relics[l])
                 }
             }
             if (relic_drops.rewards.rare.length < 1)
                 value += ":yellow_circle: Forma Blueprint\n"
             value = value.substring(0, value.length - 1)
-            var relic_name = part_info.relics[l].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+            var relic_name = part_info.relics[l].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
             if ((JSON.stringify(postdata[X])).length + JSON.stringify({name: "`" + relic_name + "`", value: value, inline: true}).length > 6000)
             {
                 // Create new array key for another message
@@ -759,7 +759,7 @@ async function relics(message,args) {
         relics_timestamps = relics_timestamps.sort(dynamicSortDesc("vault_timestamp"))
         console.log(JSON.stringify(relics_timestamps))
         if (relics_timestamps.length >= 1)
-            postdata[X].embeds[j].footer.text = "Best Relic: " + relics_timestamps[0].link.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(" Relic",'')
+            postdata[X].embeds[j].footer.text = "Best Relic: " + relics_timestamps[0].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace(" Relic",'')
         i++
         j++
     }
