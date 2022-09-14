@@ -475,9 +475,9 @@ async function relics(message,args) {
             d_item_url += "_relic"
         let postdata = {content: " ", embeds: []}
         //----
-        var value1 = ""
-        var value2 = ""
-        var value3 = ""
+        var value1 = "\u200b"
+        var value2 = "\u200b"
+        var value3 = "\u200b"
         var drops_value = 0
         var relic_drops = null
         var vault_status = ''
