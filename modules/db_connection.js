@@ -4,7 +4,8 @@ var db = new DB.Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false
-    }
+    },
+    keepAlive: true
 })
 
 db.connect().then(async res => {
