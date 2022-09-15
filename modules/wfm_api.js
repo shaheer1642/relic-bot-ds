@@ -1,6 +1,6 @@
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime, convertUpper} = require('./extras.js');
 const {client,tickcount} = require('./discord_client.js');
 const db_modules = require('./db_modules.js');
 const {db} = require('./db_connection.js');
@@ -478,7 +478,7 @@ async function relics(message,args) {
     {
         if (!d_item_url.match("relic"))
             d_item_url += "_relic"
-        let postdata = {content: " ", embeds: []}
+        var postdata = {content: " ", embeds: []}
         //----
         var value1 = "\u200b"
         var value2 = "\u200b"
@@ -486,11 +486,9 @@ async function relics(message,args) {
         var drops_value = 0
         var relic_drops = null
         var vault_status = ''
-        items_list.forEach(element => {
-            if (element.item_url == d_item_url.toLowerCase())
-                relic_drops = element
-        })
-        if (!relic_drops) {
+        if (items_list[d_item_url]) {
+            relic_drops = items_list[d_item_url]
+        } else {
             message.channel.send(`Could not find the relic named **${d_item_url}**`).catch(err => console.log(err))
             return
         }
@@ -505,46 +503,35 @@ async function relics(message,args) {
             return
         }
         //----
-        for (var i=0; i < relic_drops.rewards.common.length; i++) {
-            var str = relic_drops.rewards.common[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-            value1 += ":brown_circle: " + str + "\u205F\u205F\u205F\u205F\u205F\n"
-            if (relic_drops.rewards.common[i] == 'forma_blueprint')
+        for (const item_url of relic_drops.rewards.common) {
+            value1 += `:brown_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
+            if (item_url == 'forma_blueprint')
                 value2 += "\n", value3 += "\n"
-            items_list.forEach(element => {
-                if (element.item_url ==  relic_drops.rewards.common[i]) {
-                    value2 += element.sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
-                    value3 += element.ducat + "d\n"
-                    drops_value += element.sell_price
-                }
-            })
+            else {
+                value2 += items_list[item_url].sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
+                value3 += items_list[item_url].ducat + "d\n"
+                drops_value += items_list[item_url].sell_price
+            }
         }
-        for (var i=0; i < relic_drops.rewards.uncommon.length; i++)
-        {
-            var str = relic_drops.rewards.uncommon[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-            value1 += ":white_circle: " + str + "\u205F\u205F\u205F\u205F\u205F\n"
-            if (relic_drops.rewards.uncommon[i] == 'forma_blueprint')
+        for (const item_url of relic_drops.rewards.uncommon) {
+            value1 += `:white_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
+            if (item_url == 'forma_blueprint')
                 value2 += "\n", value3 += "\n"
-            items_list.forEach(element => {
-                if (element.item_url ==  relic_drops.rewards.uncommon[i]) {
-                    value2 += element.sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
-                    value3 += element.ducat + "d\n"
-                    drops_value += element.sell_price
-                }
-            })
+            else {
+                value2 += items_list[item_url].sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
+                value3 += items_list[item_url].ducat + "d\n"
+                drops_value += items_list[item_url].sell_price
+            }
         }
-        for (var i=0; i < relic_drops.rewards.rare.length; i++)
-        {
-            var str = relic_drops.rewards.rare[i].replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()).replace("Blueprint", "BP")
-            value1 += ":yellow_circle: " + str + "\u205F\u205F\u205F\u205F\u205F\n"
-            if (relic_drops.rewards.rare[i] == 'forma_blueprint')
+        for (const item_url of relic_drops.rewards.rare) {
+            value1 += `:yellow_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
+            if (item_url == 'forma_blueprint')
                 value2 += "\n", value3 += "\n"
-            items_list.forEach(element => {
-                if (element.item_url ==  relic_drops.rewards.rare[i]) {
-                    value2 += element.sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
-                    value3 += element.ducat + "d\n"
-                    drops_value += element.sell_price
-                }
-            })
+            else {
+                value2 += items_list[item_url].sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
+                value3 += items_list[item_url].ducat + "d\n"
+                drops_value += items_list[item_url].sell_price
+            }
         }
         value1 = value1.substring(0, value1.length - 1)
         value2 = value2.substring(0, value2.length - 1)
