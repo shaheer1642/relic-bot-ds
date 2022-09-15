@@ -117,7 +117,8 @@ warframe_items_drops.forEach(drop => {
             .replace('_systems_blueprint','_systems')
             .replace('_neuroptics_blueprint','_neuroptics')
             .replace('_harness_blueprint','_harness')
-            .replace('_wings_blueprint','_wings');
+            .replace('_wings_blueprint','_wings')
+            .replace('_&_','_and_');
         const rarity = drop.chance == 0.2533 ? 'common':drop.chance == 0.11 ? 'uncommon':drop.chance == 0.02 ? 'rare':'unknown'
         if (rarity == 'unknown') {
             console.log('rarity could not be determined for drop',drop)
@@ -197,33 +198,43 @@ async function updateDatabaseItems(up_origin = null) {
             console.log('Retrieving DB items list success.')
             console.log('Scanning DB items list...')
             for (var i=0; i<wfm_items_list.data.payload.items.length;i++) {
+                const item_url = wfm_items_list.data.payload.items[i].url_name.toLowerCase().trim()
+                    .replace(/ /g,'_')
+                    .replace('_chassis_blueprint','_chassis')
+                    .replace('_systems_blueprint','_systems')
+                    .replace('_neuroptics_blueprint','_neuroptics')
+                    .replace('_harness_blueprint','_harness')
+                    .replace('_wings_blueprint','_wings')
+                    .replace('_&_','_and_');
+                const raw_item_url = wfm_items_list.data.payload.items[i].url_name
+                const item_id = wfm_items_list.data.payload.items[i].id
                 //console.log(`Scanning item ${wfm_items_list.data.payload.items[i].url_name} (${i+1}/${wfm_items_list.data.payload.items.length})`)
                 var exists = Object.keys(db_items_list).some(function(k) {
-                    if (Object.values(db_items_list[k]).includes(wfm_items_list.data.payload.items[i].id))
+                    if (Object.values(db_items_list[k]).includes(item_id))
                         return true
                 });
                 if (!exists) {
-                    console.log(`${wfm_items_list.data.payload.items[i].url_name} is not in the DB.`)
-                    console.log(`Adding ${wfm_items_list.data.payload.items[i].url_name} to the DB...`)
-                    var status = await db.query(`INSERT INTO items_list (id,item_url) VALUES ('${wfm_items_list.data.payload.items[i].id}', '${wfm_items_list.data.payload.items[i].url_name}')`)
+                    console.log(`${item_url} is not in the DB.`)
+                    console.log(`Adding ${item_url} to the DB...`)
+                    var status = await db.query(`INSERT INTO items_list (id,item_url) VALUES ('${item_id}', '${item_url}')`)
                     .then(() => {
-                        console.log(`Susccessfully inserted ${wfm_items_list.data.payload.items[i].url_name} into DB.`)
+                        console.log(`Susccessfully inserted ${item_url} into DB.`)
                         return 1
                     })
                     .catch (err => {
                         if (err.response)
                             console.log(err.response.data)
                         console.log(err)
-                        console.log(`Error inserting ${wfm_items_list.data.payload.items[i].url_name} into DB.`)
+                        console.log(`Error inserting ${item_url} into DB.`)
                         return 0
                     })
                     console.log('Retrieving item info...')
-                    var status = await axios("https://api.warframe.market/v1/items/" + wfm_items_list.data.payload.items[i].url_name)
+                    var status = await axios("https://api.warframe.market/v1/items/" + raw_item_url)
                     .then(async itemInfo => {
                         console.log('Retrieving item info success.')
                         let tags = []
                         var status = Object.keys(itemInfo.data.payload.item.items_in_set).some(function (k) {
-                            if (itemInfo.data.payload.item.items_in_set[k].id == wfm_items_list.data.payload.items[i].id) {
+                            if (itemInfo.data.payload.item.items_in_set[k].id == item_id) {
                                 tags = itemInfo.data.payload.item.items_in_set[k].tags
                                 return true
                             }
@@ -232,8 +243,8 @@ async function updateDatabaseItems(up_origin = null) {
                             console.log('Error occured assigning tags.\nError code: ' + status)
                             return 0
                         }
-                        console.log(`Updating tags for ${wfm_items_list.data.payload.items[i].url_name}...`)
-                        var status = await db.query(`UPDATE items_list SET tags = '${JSON.stringify(tags)}' WHERE id = '${wfm_items_list.data.payload.items[i].id}'`)
+                        console.log(`Updating tags for ${item_url}...`)
+                        var status = await db.query(`UPDATE items_list SET tags = '${JSON.stringify(tags)}' WHERE id = '${item_id}'`)
                         .then(() => {
                             console.log('Tags updated.')
                             return 1
