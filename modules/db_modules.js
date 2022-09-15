@@ -216,7 +216,7 @@ async function updateDatabaseItems(up_origin = null) {
                 if (!exists) {
                     console.log(`${item_url} is not in the DB.`)
                     console.log(`Adding ${item_url} to the DB...`)
-                    var status = await db.query(`INSERT INTO items_list (id,item_url) VALUES ('${item_id}', '${item_url}')`)
+                    var status = await db.query(`INSERT INTO items_list (id,item_url,raw_item_url) VALUES ('${item_id}', '${item_url}','${raw_item_url}')`)
                     .then(() => {
                         console.log(`Susccessfully inserted ${item_url} into DB.`)
                         return 1
@@ -424,8 +424,8 @@ async function updateDatabaseItem(db_items_list,item,index) {
     if (!db)
         return Promise.reject()
     if (index)
-        console.log(`Retrieving statistics for ${item.item_url} (${index+1}/${db_items_list.length})...`)
-    var status = await axios(`https://api.warframe.market/v1/items/${item.item_url}/statistics?include=item`)
+        console.log(`Retrieving statistics for ${item.raw_item_url} (${index+1}/${db_items_list.length})...`)
+    var status = await axios(`https://api.warframe.market/v1/items/${item.raw_item_url}/statistics?include=item`)
     .then(async itemOrders => {
         //-----sell avg-----
         var sellAvgPrice = null
@@ -721,8 +721,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
             }
         }
         return true
-    })
-    .catch(err => {
+    }).catch(err => {
         console.log(err)
         console.log('Error retrieving statistics.')
         return false

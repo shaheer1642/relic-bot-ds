@@ -453,15 +453,20 @@ async function relics(message,args) {
     d_item_url = d_item_url.substring(0, d_item_url.length - 1);
     d_item_url = d_item_url.replace('_p_','_prime_')
     d_item_url = d_item_url.replace(/_bp$/,'_blueprint')
-    let items_list = []
+    var items_list = {}
     console.log('Retrieving Database -> items_list')
     var status = await db.query(`SELECT * FROM items_list ORDER BY item_url`)
     .then(res => {
-        items_list = res.rows
-        console.log('Retrieving Database -> items_list success')
-        return true
-    })
-    .catch (err => {
+        if (res.rowCount > 0) {
+            res.rows.forEach(row => {
+                items_list[row.item_url] = row
+            })
+            console.log('Retrieving Database -> items_list success')
+            return true
+        }
+        console.log('Retrieving Database -> rowCount is 0')
+        return false
+    }).catch (err => {
         console.log(err)
         console.log('Retrieving Database -> items_list error')
         message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"}).catch(err => console.log(err))
