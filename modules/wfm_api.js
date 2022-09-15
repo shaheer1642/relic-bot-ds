@@ -565,11 +565,11 @@ async function relics(message,args) {
     var foundItem = 0
     let arrItemsUrl = []
     var primeFlag = 0
-    items_list.forEach(element => {
-        if (element.item_url.match('^' + d_item_url + '\W*'))
+    Object.keys(items_list).forEach(element => {
+        if (items_list[element].item_url.match('^' + d_item_url + '\W*'))
         {
-            if ((element.item_url.match("prime")) && (!element.item_url.match("set")))
-                arrItemsUrl.push(element.item_url);
+            if ((items_list[element].item_url.match("prime")) && (!items_list[element].item_url.match("set")))
+                arrItemsUrl.push(items_list[element].item_url);
         }
     })
     if (arrItemsUrl.length==0)
@@ -594,12 +594,8 @@ async function relics(message,args) {
     for (var k=0; k < arrItemsUrl.length; k++)
     {
         console.log(arrItemsUrl[i])
-        var part_info = null
+        var part_info = part_info = items_list[arrItemsUrl[i]]
         var vault_status = ''
-        items_list.forEach(element => {
-            if (element.item_url == arrItemsUrl[i])
-                part_info = element
-        })
         if (part_info.vault_status)
             vault_status = ' (' + part_info.vault_status + ')'
         if (!part_info.relics) {
@@ -620,11 +616,7 @@ async function relics(message,args) {
         //-----
         for (var l=0; l < part_info.relics.length; l++)
         {
-            var relic_drops = null
-            items_list.forEach(element => {
-                if (element.item_url ==  part_info.relics[l])
-                    relic_drops = element
-            })
+            var relic_drops = items_list[part_info.relics[l]]
             var vault_status = ''
             if (!relic_drops.rewards) {
                 message.channel.send(`No drops data available for **${d_item_url}**`).catch(err => console.log(err))
