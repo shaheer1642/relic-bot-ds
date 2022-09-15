@@ -504,31 +504,33 @@ async function relics(message,args) {
         }
         //----
         for (const item_url of relic_drops.rewards.common) {
-            console.log(item_url)
-            value1 += `:brown_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
-            if (item_url == 'forma_blueprint')
+            if (item_url == 'forma_blueprint') {
+                value1 += `:brown_circle: ${convertUpper(item_url).replace("Blueprint", "BP")}\u205F\u205F\u205F\u205F\u205F\n`
                 value2 += "\n", value3 += "\n"
-            else {
+            } else {
+                value1 += `:brown_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
                 value2 += items_list[item_url].sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
                 value3 += items_list[item_url].ducat + "d\n"
                 drops_value += items_list[item_url].sell_price
             }
         }
         for (const item_url of relic_drops.rewards.uncommon) {
-            value1 += `:white_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
-            if (item_url == 'forma_blueprint')
+            if (item_url == 'forma_blueprint') {
+                value1 += `:white_circle: ${convertUpper(item_url).replace("Blueprint", "BP")}\u205F\u205F\u205F\u205F\u205F\n`
                 value2 += "\n", value3 += "\n"
-            else {
+            } else {
+                value1 += `:white_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
                 value2 += items_list[item_url].sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
                 value3 += items_list[item_url].ducat + "d\n"
                 drops_value += items_list[item_url].sell_price
             }
         }
         for (const item_url of relic_drops.rewards.rare) {
-            value1 += `:yellow_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
-            if (item_url == 'forma_blueprint')
+            if (item_url == 'forma_blueprint') {
+                value1 += `:yellow_circle: ${convertUpper(item_url).replace("Blueprint", "BP")}\u205F\u205F\u205F\u205F\u205F\n`
                 value2 += "\n", value3 += "\n"
-            else {
+            } else {
+                value1 += `:yellow_circle: ${convertUpper(item_url).replace("Blueprint", "BP")} ${items_list[item_url].vault_status? `(${items_list[item_url].vault_status})`:''}\u205F\u205F\u205F\u205F\u205F\n`
                 value2 += items_list[item_url].sell_price + "p\u205F\u205F\u205F\u205F\u205F\n"
                 value3 += items_list[item_url].ducat + "d\n"
                 drops_value += items_list[item_url].sell_price
