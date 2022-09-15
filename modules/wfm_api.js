@@ -586,7 +586,7 @@ async function relics(message,args) {
     var X = 0
     var i = 0
     var j = 0
-    let postdata = []
+    var postdata = []
     postdata[X] = {content: " ", embeds: []}
     for (var k=0; k < arrItemsUrl.length; k++)
     {
