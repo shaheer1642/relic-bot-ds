@@ -2313,7 +2313,7 @@ async function create_lich_image(user_order_obj) {
     return new Promise((resolve,reject) => {
         if (user_order_obj.order_data.lich_image_url)
             return resolve(user_order_obj.order_data.lich_image_url)
-        Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+        Canvas.loadImage('https://warframe.market/static/assets/' + user_order_obj.icon_url)
         .then(async img1 => {
             
             // Create image on canvas
