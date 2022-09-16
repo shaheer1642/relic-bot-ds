@@ -1883,7 +1883,7 @@ async function trading_bot(message,args,command) {
                     SELECT * FROM tradebot_users_orders 
                     JOIN tradebot_users_list ON tradebot_users_list.discord_id = tradebot_users_orders.discord_id
                     JOIN items_list ON tradebot_users_orders.item_id = items_list.id
-                    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = 'wtb' AND tradebot_users_orders.user_rank = '${item_rank}'
+                    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = 'wtb'
                     ORDER BY tradebot_users_orders.user_price DESC, tradebot_users_orders.update_timestamp`)
                     .then(res => {
                         if (res.rows.length > 0)
@@ -1914,7 +1914,7 @@ async function trading_bot(message,args,command) {
                     SELECT * FROM tradebot_users_orders 
                     JOIN tradebot_users_list ON tradebot_users_list.discord_id = tradebot_users_orders.discord_id
                     JOIN items_list ON tradebot_users_orders.item_id = items_list.id
-                    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = 'wts' AND tradebot_users_orders.user_rank = '${item_rank}'
+                    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND tradebot_users_orders.order_type = 'wts'
                     ORDER BY tradebot_users_orders.user_price, tradebot_users_orders.update_timestamp`)
                     .then(res => {
                         if (res.rows.length > 0)
@@ -1954,7 +1954,7 @@ async function trading_bot(message,args,command) {
             }
         }
         if (list_low) {
-            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}' AND user_rank = '${item_rank}'`)
+            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE item_id = '${item_id}' AND visibility = true AND order_type = '${command}'`)
             .then(res => {
                 var all_orders = res.rows
                 if (res.rows.length > 0) {
@@ -2034,8 +2034,7 @@ async function trading_bot(message,args,command) {
             origin_guild_id = EXCLUDED.origin_guild_id, 
             platform = EXCLUDED.platform,
             update_timestamp = EXCLUDED.update_timestamp;
-        `)
-        .then(async res => {
+        `).then(async res => {
             return Promise.resolve()
         }).catch(err => {
             originMessage.channel.send(`☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
@@ -2049,7 +2048,7 @@ async function trading_bot_orders_update(user_order_obj) {
     var embeds = []
 
     const item_id = user_order_obj.item_id
-    const item_rank = user_order_obj.user_rank
+    const item_rank = user_order_obj.order_data.rank
     var item_data = {}
 
     var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
@@ -2074,7 +2073,7 @@ async function trading_bot_orders_update(user_order_obj) {
     db.query(`
         SELECT * FROM tradebot_users_orders 
         JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id
-        WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true AND user_rank = '${item_rank}'
+        WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true
         ORDER BY tradebot_users_orders.update_timestamp ASC
     `).then(res => {
         var sell_orders = []
@@ -2142,7 +2141,7 @@ async function trading_bot_orders_update(user_order_obj) {
         console.log('embeds',embeds)
         console.log('orders_data',orders_data)
 
-        db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+        db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
         .then(res => {
             const message_list = {}
             res.rows.forEach(row => message_list[row.channel_id] = row)
@@ -2151,7 +2150,7 @@ async function trading_bot_orders_update(user_order_obj) {
                 const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
                 if (embeds.length==0) {
                     if (message_list[multiCid]) {
-                        db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+                        db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
                         .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
                         .catch(err => console.error)
                     }
@@ -3527,7 +3526,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     SELECT * FROM tradebot_users_orders
     JOIN items_list ON tradebot_users_orders.item_id=items_list.id 
     JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id 
-    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = '${order_type}' AND tradebot_users_orders.user_rank = '${item_rank}'
+    WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.order_type = '${order_type}'
     ORDER BY tradebot_users_orders.update_timestamp
     `)
     .then(res => {
