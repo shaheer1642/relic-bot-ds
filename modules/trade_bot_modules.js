@@ -2054,15 +2054,15 @@ async function trading_bot_orders_update(user_order_obj) {
         var embeds = []
         var sell_orders = []
         var buy_orders = []
+        const item_id = user_order_obj.item_id
+        const item_rank = res.rows[0]?.order_data.rank || 'unranked'
+        const item_type = res.rows[0]?.item_type
+        const item_url = res.rows[0]?.item_url || res.rows[0]?.weapon_url
+        const icon_url = res.rows[0]?.icon_url
+        const item_name = item_url ? convertUpper(item_url):''
 
         if (res.rowCount > 0) {
             console.log(res.rows[0])
-            const item_id = res.rows[0].item_id
-            const item_rank = res.rows[0].order_data.rank || 'unranked'
-            const item_type = res.rows[0].item_type
-            const item_url = res.rows[0].item_url || res.rows[0].weapon_url
-            const icon_url = res.rows[0].icon_url
-            const item_name = convertUpper(item_url)
 
             res.rows.forEach(row => {
                 if (row.order_type == 'wts')
