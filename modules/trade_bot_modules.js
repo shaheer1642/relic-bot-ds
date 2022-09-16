@@ -3929,7 +3929,6 @@ async function tb_close_orders(message, interaction) {
     return
 }
 
-/*
 async function tb_close_lich_orders(message, interaction) {
     var user_id = 0
     if (message)
@@ -3998,7 +3997,6 @@ async function tb_close_lich_orders(message, interaction) {
         setTimeout(() => message.delete().catch(console.error), 500)
     return
 }
-*/
 
 async function tb_user_exist(discord_id) {
     return new Promise((resolve, reject) => {
