@@ -2062,8 +2062,6 @@ async function trading_bot_orders_update(user_order_obj) {
         const item_name = item_url ? convertUpper(item_url):''
 
         if (res.rowCount > 0) {
-            console.log(res.rows[0])
-
             res.rows.forEach(row => {
                 if (row.order_type == 'wts')
                     sell_orders.push(row)
@@ -2161,6 +2159,7 @@ async function trading_bot_orders_update(user_order_obj) {
             res.rows.forEach(row => message_list[row.channel_id] = row)
             console.log('message_list',message_list)
             const channels = item_type == 'item' ? tradingBotChannels : item_type == 'lich' ? tradingBotLichChannels : {}
+            console.log(channels)
             for(const multiCid in channels) {
                 const webhookClient = new WebhookClient({url: channels[multiCid]});
                 if (embeds.length==0) {
