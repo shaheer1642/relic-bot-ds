@@ -2157,8 +2157,9 @@ async function trading_bot_orders_update(user_order_obj) {
                 const message_list = {}
                 res.rows.forEach(row => message_list[row.channel_id] = row)
                 console.log('message_list',message_list)
-                for(const multiCid in tradingBotChannels) {
-                    const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
+                const channels = item_type == 'item' ? tradingBotChannels : item_type == 'lich' ? tradingBotLichChannels : {}
+                for(const multiCid in channels) {
+                    const webhookClient = new WebhookClient({url: channels[multiCid]});
                     if (embeds.length==0) {
                         if (message_list[multiCid]) {
                             db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
