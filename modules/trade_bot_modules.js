@@ -2052,6 +2052,7 @@ async function trading_bot_orders_update(user_order_obj) {
         ORDER BY tradebot_users_orders.update_timestamp ASC
     `).then(async res => {
         if (res.rowCount > 0) {
+            console.log(res.rows[0])
             const item_id = res.rows[0].item_id
             const item_rank = res.rows[0].order_data.rank || 'unranked'
             const item_type = res.rows[0].item_type
