@@ -1,6 +1,6 @@
 const DB = require('pg');
 
-var db = new DB.Client({
+const db = new DB.Client({
     connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false
@@ -23,12 +23,6 @@ db.connect().then(async res => {
 db.on('error', err => {
     console.log('=============== DB Connection error. ==============')
     console.log(err)
-    db = new DB.Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false
-        }
-    }).connect().then(() => console.log('DB Connection established.'))
 })
 
 setInterval(() => {
