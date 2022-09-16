@@ -2158,7 +2158,7 @@ async function trading_bot_orders_update(user_order_obj) {
             const message_list = {}
             res.rows.forEach(row => message_list[row.channel_id] = row)
             console.log('message_list',message_list)
-            const channels = item_type == 'item' ? tradingBotChannels : item_type == 'lich' ? tradingBotLichChannels : {}
+            const channels = item_type == 'item' ? tradingBotChannels : item_type == 'lich' ? tradingBotLichChannels : {} 
             console.log('channels',channels)
             for(const multiCid in channels) {
                 const webhookClient = new WebhookClient({url: channels[multiCid]});
