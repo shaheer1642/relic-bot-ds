@@ -2046,7 +2046,8 @@ async function trading_bot_orders_update(user_order_obj) {
     db.query(`
         SELECT * FROM tradebot_users_orders 
         JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id
-        JOIN items_list ON items_list.id = tradebot_users_orders.item_id
+        ${user_order_obj.item_type == 'item' ? 'JOIN items_list ON items_list.id = tradebot_users_orders.item_id'
+        :user_order_obj.item_type == 'lich ' ? 'JOIN lich_list ON lich_list.lich_id = tradebot_users_orders.item_id':''}
         WHERE tradebot_users_orders.item_id = '${user_order_obj.item_id}' AND tradebot_users_orders.visibility = true
         ORDER BY tradebot_users_orders.update_timestamp ASC
     `).then(async res => {
@@ -2216,7 +2217,7 @@ async function trading_bot_orders_update(user_order_obj) {
                     }
                 }
             }).catch(console.error)
-        }
+        } else console.log(res.rowCount,'rows queried')
     }).catch(console.error)
     console.log(`edited for all channels, returning`)
     return Promise.resolve()
