@@ -2441,6 +2441,7 @@ async function create_lich_image(user_order_obj) {
                     name: `canvas_t${user_order_obj.discord_id}_p${user_order_obj.user_price}.png`
                 }]
             }).then(res => {
+                console.log(res.attachments)
                 const attachment_url = res.attachments[0].url
                 db.query(`
                     UPDATE tradebot_users_orders SET 
