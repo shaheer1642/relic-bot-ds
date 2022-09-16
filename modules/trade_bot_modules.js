@@ -2051,6 +2051,10 @@ async function trading_bot_orders_update(user_order_obj) {
         WHERE tradebot_users_orders.item_id = '${user_order_obj.item_id}' AND tradebot_users_orders.visibility = true
         ORDER BY tradebot_users_orders.update_timestamp ASC
     `).then(async res => {
+        var embeds = []
+        var sell_orders = []
+        var buy_orders = []
+
         if (res.rowCount > 0) {
             console.log(res.rows[0])
             const item_id = res.rows[0].item_id
@@ -2060,9 +2064,6 @@ async function trading_bot_orders_update(user_order_obj) {
             const icon_url = res.rows[0].icon_url
             const item_name = convertUpper(item_url)
 
-            var embeds = []
-            var sell_orders = []
-            var buy_orders = []
             res.rows.forEach(row => {
                 if (row.order_type == 'wts')
                     sell_orders.push(row)
@@ -2145,81 +2146,81 @@ async function trading_bot_orders_update(user_order_obj) {
                     })
                 }
             }
-    
-            const orders_data = {}
-            sell_orders.forEach((seller,index) => orders_data[tradingBotReactions.sell[index]] = seller.order_id)
-            buy_orders.forEach((buyer,index) => orders_data[tradingBotReactions.buy[index]] = buyer.order_id)
-    
-            console.log('embeds',embeds)
-            console.log('orders_data',orders_data)
-    
-            db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
-            .then(res => {
-                const message_list = {}
-                res.rows.forEach(row => message_list[row.channel_id] = row)
-                console.log('message_list',message_list)
-                const channels = item_type == 'item' ? tradingBotChannels : item_type == 'lich' ? tradingBotLichChannels : {}
-                for(const multiCid in channels) {
-                    const webhookClient = new WebhookClient({url: channels[multiCid]});
-                    if (embeds.length==0) {
-                        if (message_list[multiCid]) {
-                            db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
-                            .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
-                            .catch(err => console.error)
-                        }
-                    } else if (!message_list[multiCid]) {
-                        webhookClient.send({content: ' ', embeds: embeds})
-                        .then(async wh_msg => {
-                            db.query(`
-                                INSERT INTO tradebot_messages_ids 
-                                (channel_id,item_id,message_id,orders_data) 
-                                VALUES (${multiCid},'${item_id}',${wh_msg.id},'${JSON.stringify(orders_data)}')
-                            `).then(async res => {
-                                const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
-                                if (channel) {
-                                    const message = channel.messages.cache.get(wh_msg.id) || await channel.messages.fetch(wh_msg.id).catch(console.eror)
-                                    if (message) {
-                                        message.reactions.removeAll()
-                                        .then(() => {
-                                            sell_orders.forEach((seller,index) => {
-                                                message.react(tradingBotReactions.sell[index]).catch(console.error)
-                                            })
-                                            buy_orders.forEach((buyer,index) => {
-                                                message.react(tradingBotReactions.buy[index]).catch(console.error)
-                                            })
-                                        }).catch(console.error)
-                                    }
-                                }
-                            }).catch(console.error)
-                        }).catch(console.error)
-                    } else {
-                        db.query(`
-                            UPDATE tradebot_messages_ids 
-                            SET orders_data = '${JSON.stringify(orders_data)}'
-                            WHERE message_id = ${message_list[multiCid].message_id} AND channel_id = ${multiCid}
-                        `).then(res => {
-                            webhookClient.editMessage(message_list[multiCid].message_id, {content: ' ', embeds: embeds}).then(async () => {
-                                const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
-                                if (channel) {
-                                    const message = channel.messages.cache.get(message_list[multiCid].message_id) || await channel.messages.fetch(message_list[multiCid].message_id).catch(console.eror)
-                                    if (message) {
-                                        message.reactions.removeAll()
-                                        .then(() => {
-                                            sell_orders.forEach((seller,index) => {
-                                                message.react(tradingBotReactions.sell[index]).catch(console.error)
-                                            })
-                                            buy_orders.forEach((buyer,index) => {
-                                                message.react(tradingBotReactions.buy[index]).catch(console.error)
-                                            })
-                                        }).catch(console.error)
-                                    }
-                                }
-                            }).catch(console.error)
-                        }).catch(console.error)
-                    }
-                }
-            }).catch(console.error)
         } else console.log(res.rowCount,'rows queried')
+
+        const orders_data = {}
+        sell_orders.forEach((seller,index) => orders_data[tradingBotReactions.sell[index]] = seller.order_id)
+        buy_orders.forEach((buyer,index) => orders_data[tradingBotReactions.buy[index]] = buyer.order_id)
+
+        console.log('embeds',embeds)
+        console.log('orders_data',orders_data)
+
+        db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
+        .then(res => {
+            const message_list = {}
+            res.rows.forEach(row => message_list[row.channel_id] = row)
+            console.log('message_list',message_list)
+            const channels = item_type == 'item' ? tradingBotChannels : item_type == 'lich' ? tradingBotLichChannels : {}
+            for(const multiCid in channels) {
+                const webhookClient = new WebhookClient({url: channels[multiCid]});
+                if (embeds.length==0) {
+                    if (message_list[multiCid]) {
+                        db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
+                        .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
+                        .catch(err => console.error)
+                    }
+                } else if (!message_list[multiCid]) {
+                    webhookClient.send({content: ' ', embeds: embeds})
+                    .then(async wh_msg => {
+                        db.query(`
+                            INSERT INTO tradebot_messages_ids 
+                            (channel_id,item_id,message_id,orders_data) 
+                            VALUES (${multiCid},'${item_id}',${wh_msg.id},'${JSON.stringify(orders_data)}')
+                        `).then(async res => {
+                            const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
+                            if (channel) {
+                                const message = channel.messages.cache.get(wh_msg.id) || await channel.messages.fetch(wh_msg.id).catch(console.eror)
+                                if (message) {
+                                    message.reactions.removeAll()
+                                    .then(() => {
+                                        sell_orders.forEach((seller,index) => {
+                                            message.react(tradingBotReactions.sell[index]).catch(console.error)
+                                        })
+                                        buy_orders.forEach((buyer,index) => {
+                                            message.react(tradingBotReactions.buy[index]).catch(console.error)
+                                        })
+                                    }).catch(console.error)
+                                }
+                            }
+                        }).catch(console.error)
+                    }).catch(console.error)
+                } else {
+                    db.query(`
+                        UPDATE tradebot_messages_ids 
+                        SET orders_data = '${JSON.stringify(orders_data)}'
+                        WHERE message_id = ${message_list[multiCid].message_id} AND channel_id = ${multiCid}
+                    `).then(res => {
+                        webhookClient.editMessage(message_list[multiCid].message_id, {content: ' ', embeds: embeds}).then(async () => {
+                            const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
+                            if (channel) {
+                                const message = channel.messages.cache.get(message_list[multiCid].message_id) || await channel.messages.fetch(message_list[multiCid].message_id).catch(console.eror)
+                                if (message) {
+                                    message.reactions.removeAll()
+                                    .then(() => {
+                                        sell_orders.forEach((seller,index) => {
+                                            message.react(tradingBotReactions.sell[index]).catch(console.error)
+                                        })
+                                        buy_orders.forEach((buyer,index) => {
+                                            message.react(tradingBotReactions.buy[index]).catch(console.error)
+                                        })
+                                    }).catch(console.error)
+                                }
+                            }
+                        }).catch(console.error)
+                    }).catch(console.error)
+                }
+            }
+        }).catch(console.error)
     }).catch(console.error)
     console.log(`edited for all channels, returning`)
     return Promise.resolve()
