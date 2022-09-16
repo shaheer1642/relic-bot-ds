@@ -2319,7 +2319,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             // Create image on canvas
             const canvas = new Canvas.createCanvas(1000,1000)
             const ctx = canvas.getContext('2d');
-            ctx.font = '20px Arial';
+            ctx.font = '20px Consolas';
     
             //lich and trader name modification
             //const trader_name = twoLiner(user_order_obj.ingame_name,15)
@@ -2435,6 +2435,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
               ctx.fillRect(x1-2.5,y1-2.5,5,5);
             }
     
+            /*
             client.channels.cache.get('912395290701602866').send({
                 content: `canvas_t${discord_id}_p${user_price}.png`,
                 files: [{
@@ -2443,7 +2444,17 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
                 }]
             }).then(res => {
                 resolve(res.attachments.map(attachment => attachment)[0].url)
-            }).catch((err) => reject(err))
+            }).catch((err) => reject(err))*/
+
+            const webhookClient = new WebhookClient({url: 'https://discord.com/api/webhooks/1020434538184319076/2op1q6orOunUROoEdRjDiEGu4e0kZzkx9ShetUdIMq-MNwAKztyDwYuymf1ajMivXnIT'}).send({
+              content: `canvas_t${discord_id}_p${user_price}.png`,
+              files: [{
+                  attachment: ctx.canvas.toBuffer(),
+                  name: `canvas_t${discord_id}_p${user_price}.png`
+              }]
+            }).then(res => {
+                resolve(res.attachments.map(attachment => attachment)[0].url)
+            }).catch(console.err)
         }).catch((err) => reject(err))
     })
 }
