@@ -2378,11 +2378,11 @@ async function trading_lich_bot(interaction) {
             platform = EXCLUDED.platform,
             update_timestamp = EXCLUDED.update_timestamp;
         `).then(async res => {
-            return resolve()
+            return Promise.resolve()
         }).catch(err => {
-            originMessage.channel.send(`☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
             console.log(err)
-            return reject()
+            interaction.reply({content: `☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+            return Promise.reject()
         })
     })
 }
