@@ -22,6 +22,10 @@ const cetusHints = [
     'Check pinned messages for current cycle you are tracking!'
 ]
 
+setTimeout(() => {
+    bounty_check()
+}, 1000);
+
 async function bounty_check() {
     console.log('bounty check')
     axios('http://content.warframe.com/dynamic/worldState.php')
@@ -125,7 +129,7 @@ async function bounty_check() {
         setTimeout(bounty_check,60000)
     })
 }
-
+/*
 async function teshin_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
@@ -330,6 +334,7 @@ async function cetus_check() {
         setTimeout(cetus_check,60000)
     })
 }
+*/
 
 axiosRetry(axios, {
     retries: 50, // number of retries
@@ -345,5 +350,3 @@ axiosRetry(axios, {
             return error
     },
 });
-
-module.exports = {bounty_check,teshin_check,cetus_check};

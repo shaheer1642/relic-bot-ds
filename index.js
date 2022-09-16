@@ -28,6 +28,7 @@ const osiris_guild_id = '905559118096531456'
 const botv_guild_id = '776804537095684108'
 const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
+require('./modules/trackers.js');
 
 const ducatRolesMessageId = "899402069159608320"
 
