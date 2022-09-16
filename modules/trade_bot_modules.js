@@ -2358,7 +2358,7 @@ async function trading_lich_bot(interaction) {
                 '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
                 'lich',
                 ${interaction.options.getInteger('price')},
-                '${JSON.stringify({element: interaction.options.getString('element'),damage: interaction.options.getNumber('damage'),ephemera: interaction.options.getBoolean('ephemera'),lich_name: q_lichName,})}'
+                '${JSON.stringify({element: interaction.options.getString('element'),damage: interaction.options.getNumber('damage'),ephemera: interaction.options.getBoolean('ephemera'),lich_name: q_lichName,})}',
                 true,
                 ${interaction.channel.id},
                 ${interaction.guild.id},
@@ -2378,11 +2378,11 @@ async function trading_lich_bot(interaction) {
             platform = EXCLUDED.platform,
             update_timestamp = EXCLUDED.update_timestamp;
         `).then(async res => {
-            return Promise.resolve()
+            return resolve()
         }).catch(err => {
             console.log(err)
             interaction.reply({content: `☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-            return Promise.reject()
+            return reject()
         })
     })
 }
