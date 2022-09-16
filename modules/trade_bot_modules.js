@@ -2011,12 +2011,10 @@ async function trading_bot(message,args,command) {
         }
         if (price > (avg_price*1.2)) {
             message.channel.send(`⚠️ Your price is a lot **greater than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry lowering it`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
-            //setTimeout(() => message.delete().catch(console.error), 5000)
             return Promise.reject()
         }
         else if (price < (avg_price*0.8)) {
             message.channel.send(`⚠️ Your price is a lot **lower than** the average **${command.replace('wts','sell').replace('wtb','buy')}** price of **${avg_price}** for **${item_name}** ⚠️\nTry increasing it`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
-            //setTimeout(() => message.delete().catch(console.error), 5000)
             return Promise.reject()
         }
         db.query(`
@@ -2035,11 +2033,11 @@ async function trading_bot(message,args,command) {
             platform = EXCLUDED.platform,
             update_timestamp = EXCLUDED.update_timestamp;
         `).then(async res => {
-            return Promise.resolve()
+            return resolve()
         }).catch(err => {
             originMessage.channel.send(`☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
             console.log(err)
-            return Promise.reject()
+            return reject()
         })
     })
 }
@@ -2212,161 +2210,181 @@ async function trading_bot_orders_update(user_order_obj) {
 }
 
 async function trading_lich_bot(interaction) {
-    var ingame_name = ''
-    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${interaction.user.id}`)
-    .then(res => {
-        if (res.rows.length == 0)
-            return 0
-        else {
-            ingame_name = res.rows[0].ingame_name
-            return 1
-        }
-    })
-    .catch(err => {
-        console.log(err + 'Retrieving Database -> tradebot_users_list error')
-        interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(console.error)
-        return 2
-    })
-    if (status == 0) {
-        interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: true}).catch(console.error)
-        interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
-        .catch(err => {
-            console.log(err)
-            interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: true}).catch(console.error)
+    return new Promise(async (resolve,reject) => {
+        var ingame_name = ''
+        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${interaction.user.id}`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return 0
+            else {
+                ingame_name = res.rows[0].ingame_name
+                return 1
+            }
         })
-        return Promise.resolve()
-    }
-    if (status == 2)
-        return Promise.resolve()
-
-    //----retrieve lich info----
-    var lich_info = {}
-    var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
-    .then(res => {
-        if (res.rowCount != 1) {
-            interaction.reply({content: `☠️ Error retrieving lich info from DB.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-            return false
+        .catch(err => {
+            console.log(err + 'Retrieving Database -> tradebot_users_list error')
+            interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(console.error)
+            return 2
+        })
+        if (status == 0) {
+            interaction.reply({content: `⚠️ <@${interaction.user.id}> Your in-game name is not registered with the bot. Please check your dms ⚠️`, ephemeral: true}).catch(console.error)
+            interaction.user.send({content: "Type the following command to register your ign:\nverify ign"})
+            .catch(err => {
+                console.log(err)
+                interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: true}).catch(console.error)
+            })
+            return Promise.resolve()
         }
-        lich_info = res.rows[0]
-        return true
-    })
-    .catch(err => {
-        console.log(err); return false
-    })
-    if (!status)
-        return Promise.reject()
-    //----stats dynamic vars----
-    var q_lichName = ''
-    if (interaction.options.getString('name'))
-        q_lichName = interaction.options.getString('name')
-    //----verify order in DB----
-    await db.query(`DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(console.error)
-    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
-    .then(async res => {
-        if (res.rows.length == 0) {     //----insert order in DB----
-            //Check if user has more than limited orders
-            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${interaction.user.id}`)
-            .then(async tab1 => {
-                if (tab1.rowCount >= userOrderLimit) {
-                    interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(console.error)
-                    return false
-                }
-                var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id}`)
-                .then(tab2 => {
-                    if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
+        if (status == 2)
+            return Promise.resolve()
+    
+        //----retrieve lich info----
+        var lich_info = {}
+        var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
+        .then(res => {
+            if (res.rowCount != 1) {
+                interaction.reply({content: `☠️ Error retrieving lich info from DB.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                return false
+            }
+            lich_info = res.rows[0]
+            return true
+        })
+        .catch(err => {
+            console.log(err); return false
+        })
+        if (!status)
+            return Promise.reject()
+        //----stats dynamic vars----
+        var q_lichName = ''
+        if (interaction.options.getString('name'))
+            q_lichName = interaction.options.getString('name')
+        //----verify order in DB----
+        await db.query(`DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(console.error)
+        var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
+        .then(async res => {
+            if (res.rows.length == 0) {     //----insert order in DB----
+                //Check if user has more than limited orders
+                var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${interaction.user.id}`)
+                .then(async tab1 => {
+                    if (tab1.rowCount >= userOrderLimit) {
                         interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(console.error)
                         return false
                     }
+                    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id}`)
+                    .then(tab2 => {
+                        if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
+                            interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(console.error)
+                            return false
+                        }
+                        return true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status)
+                        return false
                     return true
                 })
                 .catch(err => {
                     console.log(err)
+                    interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
                     return false
                 })
                 if (!status)
                     return false
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                var status = await db.query(`INSERT INTO tradebot_users_lich_orders 
+                (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,lich_name,origin_channel_id,origin_guild_id,update_timestamp) 
+                VALUES (
+                    ${interaction.user.id},
+                    '${lich_info.lich_id}',
+                    '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
+                    ${interaction.options.getInteger('price')},
+                    true,
+                    '${interaction.options.getString('element')}',
+                    ${interaction.options.getNumber('damage')},
+                    ${interaction.options.getBoolean('ephemera')},
+                    NULLIF('${q_lichName}', ''),
+                    ${interaction.channel.id},
+                    ${interaction.guild.id},
+                    ${new Date().getTime()})
+                    `)
+                .then(res => {
+                    if (res.rowCount == 1)
+                        return true
+                    return false
+                })
+                .catch(err => {
+                    console.log(err)
+                    if (err.code == '23505') {
+                        interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: true}).catch(console.error)
+                    }
+                    return false
+                })
+                if (!status)
+                    return false
+            }
+            else if (res.rows.length > 0) {
+                interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
                 return false
-            })
-            if (!status)
-                return false
-            var status = await db.query(`INSERT INTO tradebot_users_lich_orders (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,lich_name,origin_channel_id,origin_guild_id,update_timestamp) VALUES (
-                ${interaction.user.id},
-                '${lich_info.lich_id}',
-                '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
-                ${interaction.options.getInteger('price')},
-                true,
-                '${interaction.options.getString('element')}',
-                ${interaction.options.getNumber('damage')},
-                ${interaction.options.getBoolean('ephemera')},
-                NULLIF('${q_lichName}', ''),
-                ${interaction.channel.id},
-                ${interaction.guild.id},
-                ${new Date().getTime()})`)
-            .then(res => {
-                if (res.rowCount == 1)
-                    return true
-                return false
-            })
-            .catch(err => {
-                console.log(err)
-                if (err.code == '23505') {
-                    interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: true}).catch(console.error)
-                }
-                return false
-            })
-            if (!status)
-                return false
-        }
-        else if (res.rows.length > 0) {
-            interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-            return false
-        }
-        return true
-    })
-    .catch(err => {
-        console.log(err)
-        interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-        return false
-    })
-    if (!status)
-        return Promise.reject()
-    //----------------
-
-    if (!interaction.member.presence) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order ⚠️`, ephemeral: true}).catch(console.error)
-        return Promise.resolve()
-    }
-    if (interaction.member.presence.status == `offline`) {
-        interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order  ⚠️`, ephemeral: true}).catch(console.error)
-        return Promise.resolve()
-        //test
-    }
-
-    await trading_lich_orders_update(interaction, lich_info, 1)
-    .then(res => {
-        var user_order = null
-        db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}' AND visibility = true`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false 
-            user_order = res.rows
-            var currTime = new Date().getTime()
-            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
-            console.log(after3h - currTime)
-            set_order_timeout(user_order[0],after3h,currTime,true,lich_info)
+            }
+            return true
         })
         .catch(err => {
             console.log(err)
+            interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+            return false
+        })
+        if (!status)
+            return Promise.reject()
+        //----------------
+    
+        if (!interaction.member.presence) {
+            interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order ⚠️`, ephemeral: true}).catch(console.error)
+            return Promise.resolve()
+        }
+        if (interaction.member.presence.status == `offline`) {
+            interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order  ⚠️`, ephemeral: true}).catch(console.error)
+            return Promise.resolve()
+            //test
+        }
+        db.query(`
+            INSERT INTO tradebot_users_orders 
+            (order_id,discord_id,item_id,order_type,item_type,user_price,order_data,visibility,origin_channel_id,origin_guild_id,platform,update_timestamp,creation_timestamp) 
+            VALUES (
+                '${uuid.v1()}',
+                ${interaction.user.id},
+                '${lich_info.lich_id}',
+                '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
+                'lich',
+                ${interaction.options.getInteger('price')},
+                '${JSON.stringify({element: interaction.options.getString('element'),damage: interaction.options.getNumber('damage'),ephemera: interaction.options.getBoolean('ephemera'),lich_name: q_lichName,})}'
+                true,
+                ${interaction.channel.id},
+                ${interaction.guild.id},
+                'discord',
+                ${new Date().getTime()},
+                ${new Date().getTime()}
+            )
+            ON CONFLICT (discord_id,item_id) 
+            DO UPDATE SET 
+            order_type = EXCLUDED.order_type, 
+            item_type = EXCLUDED.item_type, 
+            user_price = EXCLUDED.user_price, 
+            order_data = EXCLUDED.order_data, 
+            visibility = EXCLUDED.visibility, 
+            origin_channel_id = EXCLUDED.origin_channel_id, 
+            origin_guild_id = EXCLUDED.origin_guild_id, 
+            platform = EXCLUDED.platform,
+            update_timestamp = EXCLUDED.update_timestamp;
+        `).then(async res => {
+            return resolve()
+        }).catch(err => {
+            originMessage.channel.send(`☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+            console.log(err)
+            return reject()
         })
     })
-    .catch(console.error)
-
-    return Promise.resolve()
 }
 
 async function trading_lich_orders_update(interaction, lich_info, update_type) {
@@ -3915,6 +3933,7 @@ async function tb_activate_lich_orders(message, interaction) {
         message.delete().catch(console.error)
     return
 }
+
 async function tb_close_orders(message, interaction) {
     var user_id = 0
     if (message)
