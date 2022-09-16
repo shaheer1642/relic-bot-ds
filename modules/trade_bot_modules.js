@@ -2018,99 +2018,29 @@ async function trading_bot(message,args,command) {
         //setTimeout(() => message.delete().catch(console.error), 5000)
         return Promise.reject()
     }
-    console.log('verifying order in db')
-    //----verify order in DB----
-    var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
+    db.query(`
+        INSERT INTO tradebot_users_orders 
+        (order_id,discord_id,item_id,order_type,item_type,user_price,order_data,visibility,origin_channel_id,origin_guild_id,platform,update_timestamp,creation_timestamp) 
+        VALUES ('${uuid.v1()}',${originMessage.author.id},'${item_id}','${command}','item',${price},'${JSON.stringify({rank: item_rank})}',true,${originMessage.channel.id},${originMessage.guild.id},'discord',${new Date().getTime()},${new Date().getTime()})
+        ON CONFLICT (discord_id,item_id) 
+        DO UPDATE SET 
+        order_type = EXCLUDED.order_type, 
+        item_type = EXCLUDED.item_type, 
+        user_price = EXCLUDED.user_price, 
+        order_data = EXCLUDED.order_data, 
+        visibility = EXCLUDED.visibility, 
+        origin_channel_id = EXCLUDED.origin_channel_id, 
+        origin_guild_id = EXCLUDED.origin_guild_id, 
+        platform = EXCLUDED.platform
+        update_timestamp = EXCLUDED.update_timestamp;
+    `)
     .then(async res => {
-        if (res.rows.length == 0) {     //----insert order in DB----
-            //Check if user has more than limited orders
-            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id}`)
-            .then(res => {
-                if (res.rowCount >= userOrderLimit) {
-                    message.channel.send(`⚠️ <@${originMessage.author.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    return false
-                }
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(console.error);
-                return false
-            })
-            if (!status)
-                return false
-            var status = await db.query(`
-                INSERT INTO tradebot_users_orders 
-                (order_id,discord_id,item_id,order_type,user_price,user_rank,visibility,origin_channel_id,origin_guild_id,platform,update_timestamp) 
-                VALUES ('${uuid.v1()}',${originMessage.author.id},'${item_id}','${command}',${price},'${item_rank}',true,${originMessage.channel.id},${originMessage.guild.id},'discord',${new Date().getTime()})
-            `).then(res => {
-                return true
-            })
-            .catch(err => {
-                if (err.code == '23505') {
-                    originMessage.channel.send(`☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                    setTimeout(() => originMessage.delete().catch(console.error), 10000)
-                }
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return false
-        }
-        else if (res.rows.length > 1) {
-            originMessage.channel.send(`☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-            setTimeout(() => originMessage.delete().catch(console.error), 10000)
-            return false
-        }
-        else {     //----update existing order in DB----
-            var status = await db.query(`UPDATE tradebot_users_orders SET user_price = ${price}, visibility = true, order_type = '${command}',origin_channel_id = ${originMessage.channel.id},origin_guild_id = ${originMessage.guild.id},update_timestamp = ${new Date().getTime()} WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}'`)
-            .then(res => {
-                return true
-            })
-            .catch(err => {
-                originMessage.channel.send(`☠️ Error updating order in DB.\nError code: 502\nPlease contact MrSofty#7926`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-                setTimeout(() => originMessage.delete().catch(console.error), 10000)
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return false
-        }
-        if (!status)
-            return false
-        return true
-    })
-    .catch(err => {
-        if (err.code == '23505') {
-            originMessage.channel.send(`☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
-            setTimeout(() => originMessage.delete().catch(console.error), 10000)
-        }
+        return Promise.resolve()
+    }).catch(err => {
+        originMessage.channel.send(`☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
         console.log(err)
-        return false
-    })
-    if (!status)
         return Promise.reject()
-    //------------------
-    /*
-    await trading_bot_orders_update(originMessage,item_id,item_url,item_name,1,item_rank)
-    .then(res => {
-        var user_order = null
-        db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${originMessage.author.id} AND item_id = '${item_id}' AND user_rank = '${item_rank}' AND visibility = true`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false 
-            user_order = res.rows
-            var currTime = new Date().getTime()
-            var after3h = currTime + (u_order_close_time - (currTime - user_order[0].update_timestamp))
-            console.log(after3h - currTime)
-            set_order_timeout(user_order[0],after3h,currTime)
-        })
-        .catch(err => {
-            console.log(err)
-        })
-    }).catch(err => console.log('Error occured midway of updating orders'))
-    return Promise.resolve()
-    */
+    })
 }
 
 async function trading_bot_orders_update(user_order_obj) {
