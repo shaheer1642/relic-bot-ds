@@ -2317,13 +2317,15 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
         .then(async img1 => {
             
             // Create image on canvas
-            var canvas = new Canvas.createCanvas(1000,1000)
-            , ctx = canvas.getContext('2d');
+            const canvas = new Canvas.createCanvas(1000,1000)
+            const ctx = canvas.getContext('2d');
             ctx.font = '20px Arial';
     
             //lich and trader name modification
             //const trader_name = twoLiner(user_order_obj.ingame_name,15)
             //const lich_name = twoLiner(lich_name,30)
+            username = twoLiner(username,15)
+            lich_name = twoLiner(lich_name,30)
             const name_width = ctx.measureText(username).width
     
             // Coordinates
