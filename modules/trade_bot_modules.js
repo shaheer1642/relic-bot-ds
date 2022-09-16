@@ -2043,167 +2043,180 @@ async function trading_bot(message,args,command) {
 }
 
 async function trading_bot_orders_update(user_order_obj) {
-    var embeds = []
-
-    const item_id = user_order_obj.item_id
-    const item_rank = user_order_obj.order_data.rank
-    var item_data = {}
-
-    var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-    .then(res => {
-        if (res.rowCount == 1) {
-            item_data = res.rows[0]
-            return true
-        }
-        console.log('0 items for id',item_id)
-        return false
-    }).catch((err) => {
-        console.log(err)
-        return false
-    })
-    if (!status)
-        return
-
-    const item_url = item_data.item_url
-    const item_name = convertUpper(item_url)
-
-    //----construct embed----
     db.query(`
         SELECT * FROM tradebot_users_orders 
         JOIN tradebot_users_list ON tradebot_users_orders.discord_id=tradebot_users_list.discord_id
-        WHERE tradebot_users_orders.item_id = '${item_id}' AND tradebot_users_orders.visibility = true
+        JOIN items_list ON items_list.id = tradebot_users_orders.item_id
+        WHERE tradebot_users_orders.item_id = '${user_order_obj.item_id}' AND tradebot_users_orders.visibility = true
         ORDER BY tradebot_users_orders.update_timestamp ASC
-    `).then(res => {
-        var sell_orders = []
-        var buy_orders = []
-        res.rows.forEach(row => {
-            if (row.order_type == 'wts')
-                sell_orders.push(row)
-            else if (row.order_type == 'wtb')
-                buy_orders.push(row)
-        })
-        sell_orders = sell_orders.sort(dynamicSort("user_price"))
-        buy_orders = buy_orders.sort(dynamicSortDesc("user_price"))
+    `).then(async res => {
+        if (res.rowCount > 0) {
+            const item_id = res.rows[0].item_id
+            const item_rank = res.rows[0].order_data.rank || 'unranked'
+            const item_type = res.rows[0].item_type
+            const item_url = res.rows[0].item_url || res.rows[0].weapon_url
+            const icon_url = res.rows[0].icon_url
+            const item_name = convertUpper(item_url)
 
-        if (sell_orders.length > 0) {
-            embeds.push({
-                title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
-                thumbnail: {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
-                url: `https://warframe.market/items/${item_url}`,
-                fields: [
-                    {
-                        name: 'Sellers',
-                        value: sell_orders.map((seller,index) => `${tradingBotReactions.sell[index]} ${embedScore(seller.ingame_name)}`).join('\n'),
-                        inline: true
-                    },{name: '\u200b',value:'\u200b',inline:true},
-                    {
-                        name: 'Prices',
-                        value: sell_orders.map((seller,index) => `${seller.user_price}<:platinum:881692607791648778>`).join('\n'),
-                        inline: true
-                    },
-                ],
-                color: tb_sellColor
+            var embeds = []
+            var sell_orders = []
+            var buy_orders = []
+            res.rows.forEach(row => {
+                if (row.order_type == 'wts')
+                    sell_orders.push(row)
+                else if (row.order_type == 'wtb')
+                    buy_orders.push(row)
             })
-        }
-        if (buy_orders.length > 0) {
-            embeds.push({
-                title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
-                thumbnail: {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
-                url: `https://warframe.market/items/${item_url}`,
-                fields: [
-                    {
-                        name: 'Buyers',
-                        value: buy_orders.map((buyer,index) => `${tradingBotReactions.buy[index]} ${embedScore(buyer.ingame_name)}`).join('\n'),
-                        inline: true
-                    },{name: '\u200b',value:'\u200b',inline:true},
-                    {
-                        name: 'Prices',
-                        value: buy_orders.map((buyer,index) => `${buyer.user_price}<:platinum:881692607791648778>`).join('\n'),
-                        inline: true
-                    },
-                ],
-                color: tb_buyColor
-            })
-        }
-        
-        if (embeds[1]) {
-            embeds[1].title = null
-            embeds[1].url = null
-            embeds[1].thumbnail = null
-        }
-
-        const orders_data = {}
-        sell_orders.forEach((seller,index) => orders_data[tradingBotReactions.sell[index]] = seller.order_id)
-        buy_orders.forEach((buyer,index) => orders_data[tradingBotReactions.buy[index]] = buyer.order_id)
-
-        console.log('embeds',embeds)
-        console.log('orders_data',orders_data)
-
-        db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
-        .then(res => {
-            const message_list = {}
-            res.rows.forEach(row => message_list[row.channel_id] = row)
-            console.log('message_list',message_list)
-            for(const multiCid in tradingBotChannels) {
-                const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
-                if (embeds.length==0) {
-                    if (message_list[multiCid]) {
-                        db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
-                        .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
-                        .catch(err => console.error)
-                    }
-                } else if (!message_list[multiCid]) {
-                    webhookClient.send({content: ' ', embeds: embeds})
-                    .then(async wh_msg => {
-                        db.query(`
-                            INSERT INTO tradebot_messages_ids 
-                            (channel_id,item_id,message_id,orders_data) 
-                            VALUES (${multiCid},'${item_id}',${wh_msg.id},'${JSON.stringify(orders_data)}')
-                        `).then(async res => {
-                            const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
-                            if (channel) {
-                                const message = channel.messages.cache.get(wh_msg.id) || await channel.messages.fetch(wh_msg.id).catch(console.eror)
-                                if (message) {
-                                    message.reactions.removeAll()
-                                    .then(() => {
-                                        sell_orders.forEach((seller,index) => {
-                                            message.react(tradingBotReactions.sell[index]).catch(console.error)
-                                        })
-                                        buy_orders.forEach((buyer,index) => {
-                                            message.react(tradingBotReactions.buy[index]).catch(console.error)
-                                        })
-                                    }).catch(console.error)
-                                }
-                            }
-                        }).catch(console.error)
-                    }).catch(console.error)
-                } else {
-                    db.query(`
-                        UPDATE tradebot_messages_ids 
-                        SET orders_data = '${JSON.stringify(orders_data)}'
-                        WHERE message_id = ${message_list[multiCid].message_id} AND channel_id = ${multiCid}
-                    `).then(res => {
-                        webhookClient.editMessage(message_list[multiCid].message_id, {content: ' ', embeds: embeds}).then(async () => {
-                            const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
-                            if (channel) {
-                                const message = channel.messages.cache.get(message_list[multiCid].message_id) || await channel.messages.fetch(message_list[multiCid].message_id).catch(console.eror)
-                                if (message) {
-                                    message.reactions.removeAll()
-                                    .then(() => {
-                                        sell_orders.forEach((seller,index) => {
-                                            message.react(tradingBotReactions.sell[index]).catch(console.error)
-                                        })
-                                        buy_orders.forEach((buyer,index) => {
-                                            message.react(tradingBotReactions.buy[index]).catch(console.error)
-                                        })
-                                    }).catch(console.error)
-                                }
-                            }
-                        }).catch(console.error)
-                    }).catch(console.error)
+            sell_orders = sell_orders.sort(dynamicSort("user_price"))
+            buy_orders = buy_orders.sort(dynamicSortDesc("user_price"))
+            if (item_type == 'item') {
+                if (sell_orders.length > 0) {
+                    embeds.push({
+                        title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                        thumbnail: {url: 'https://warframe.market/static/assets/' + icon_url},
+                        url: `https://warframe.market/items/${item_url}`,
+                        fields: [
+                            {
+                                name: 'Sellers',
+                                value: sell_orders.map((seller,index) => `${tradingBotReactions.sell[index]} ${embedScore(seller.ingame_name)}`).join('\n'),
+                                inline: true
+                            },{name: '\u200b',value:'\u200b',inline:true},
+                            {
+                                name: 'Prices',
+                                value: sell_orders.map((seller,index) => `${seller.user_price}<:platinum:881692607791648778>`).join('\n'),
+                                inline: true
+                            },
+                        ],
+                        color: tb_sellColor
+                    })
+                }
+                if (buy_orders.length > 0) {
+                    embeds.push({
+                        title: item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)'),
+                        thumbnail: {url: 'https://warframe.market/static/assets/' + icon_url},
+                        url: `https://warframe.market/items/${item_url}`,
+                        fields: [
+                            {
+                                name: 'Buyers',
+                                value: buy_orders.map((buyer,index) => `${tradingBotReactions.buy[index]} ${embedScore(buyer.ingame_name)}`).join('\n'),
+                                inline: true
+                            },{name: '\u200b',value:'\u200b',inline:true},
+                            {
+                                name: 'Prices',
+                                value: buy_orders.map((buyer,index) => `${buyer.user_price}<:platinum:881692607791648778>`).join('\n'),
+                                inline: true
+                            },
+                        ],
+                        color: tb_buyColor
+                    })
+                }
+                
+                if (embeds[1]) {
+                    embeds[1].title = null
+                    embeds[1].url = null
+                    embeds[1].thumbnail = null
                 }
             }
-        }).catch(console.error)
+            else if (item_type == 'lich') {
+                for(const [index,order] of sell_orders.entries()) {
+                    const attachment_url = await create_lich_image(order).catch(console.error)
+                    if (!attachment_url) return
+                    embeds.push({
+                        title: item_name,
+                        description: tradingBotReactions.sell[index],
+                        url: `https://warframe.market/auctions/search?type=${item_url.match('kuva_')? 'lich':'sister'}&weapon_url_name=${item_url}`,
+                        fields: [],
+                        color: '#7cb45d',
+                        image: {url: attachment_url}
+                    })
+                }
+                for(const [index,order] of buy_orders.entries()) {
+                    const attachment_url = await create_lich_image(order).catch(console.error)
+                    if (!attachment_url) return
+                    embeds.push({
+                        title: item_name,
+                        description: tradingBotReactions.sell[index],
+                        url: `https://warframe.market/auctions/search?type=${item_url.match('kuva_')? 'lich':'sister'}&weapon_url_name=${item_url}`,
+                        fields: [],
+                        color: '#7cb45d',
+                        image: {url: attachment_url}
+                    })
+                }
+            }
+    
+            const orders_data = {}
+            sell_orders.forEach((seller,index) => orders_data[tradingBotReactions.sell[index]] = seller.order_id)
+            buy_orders.forEach((buyer,index) => orders_data[tradingBotReactions.buy[index]] = buyer.order_id)
+    
+            console.log('embeds',embeds)
+            console.log('orders_data',orders_data)
+    
+            db.query(`SELECT * FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
+            .then(res => {
+                const message_list = {}
+                res.rows.forEach(row => message_list[row.channel_id] = row)
+                console.log('message_list',message_list)
+                for(const multiCid in tradingBotChannels) {
+                    const webhookClient = new WebhookClient({url: tradingBotChannels[multiCid]});
+                    if (embeds.length==0) {
+                        if (message_list[multiCid]) {
+                            db.query(`DELETE FROM tradebot_messages_ids WHERE item_id = '${item_id}'`)
+                            .then(res => webhookClient.deleteMessage(message_list[multiCid].message_id).catch(console.error))
+                            .catch(err => console.error)
+                        }
+                    } else if (!message_list[multiCid]) {
+                        webhookClient.send({content: ' ', embeds: embeds})
+                        .then(async wh_msg => {
+                            db.query(`
+                                INSERT INTO tradebot_messages_ids 
+                                (channel_id,item_id,message_id,orders_data) 
+                                VALUES (${multiCid},'${item_id}',${wh_msg.id},'${JSON.stringify(orders_data)}')
+                            `).then(async res => {
+                                const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
+                                if (channel) {
+                                    const message = channel.messages.cache.get(wh_msg.id) || await channel.messages.fetch(wh_msg.id).catch(console.eror)
+                                    if (message) {
+                                        message.reactions.removeAll()
+                                        .then(() => {
+                                            sell_orders.forEach((seller,index) => {
+                                                message.react(tradingBotReactions.sell[index]).catch(console.error)
+                                            })
+                                            buy_orders.forEach((buyer,index) => {
+                                                message.react(tradingBotReactions.buy[index]).catch(console.error)
+                                            })
+                                        }).catch(console.error)
+                                    }
+                                }
+                            }).catch(console.error)
+                        }).catch(console.error)
+                    } else {
+                        db.query(`
+                            UPDATE tradebot_messages_ids 
+                            SET orders_data = '${JSON.stringify(orders_data)}'
+                            WHERE message_id = ${message_list[multiCid].message_id} AND channel_id = ${multiCid}
+                        `).then(res => {
+                            webhookClient.editMessage(message_list[multiCid].message_id, {content: ' ', embeds: embeds}).then(async () => {
+                                const channel = client.channels.cache.get(multiCid) || await client.channels.fetch(multiCid).catch(console.eror)
+                                if (channel) {
+                                    const message = channel.messages.cache.get(message_list[multiCid].message_id) || await channel.messages.fetch(message_list[multiCid].message_id).catch(console.eror)
+                                    if (message) {
+                                        message.reactions.removeAll()
+                                        .then(() => {
+                                            sell_orders.forEach((seller,index) => {
+                                                message.react(tradingBotReactions.sell[index]).catch(console.error)
+                                            })
+                                            buy_orders.forEach((buyer,index) => {
+                                                message.react(tradingBotReactions.buy[index]).catch(console.error)
+                                            })
+                                        }).catch(console.error)
+                                    }
+                                }
+                            }).catch(console.error)
+                        }).catch(console.error)
+                    }
+                }
+            }).catch(console.error)
+        }
     }).catch(console.error)
     console.log(`edited for all channels, returning`)
     return Promise.resolve()
@@ -2254,100 +2267,6 @@ async function trading_lich_bot(interaction) {
         })
         if (!status)
             return Promise.reject()
-        //----stats dynamic vars----
-        var q_lichName = ''
-        if (interaction.options.getString('name'))
-            q_lichName = interaction.options.getString('name')
-        //----verify order in DB----
-        await db.query(`DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`).catch(console.error)
-        var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id} AND lich_id = '${lich_info.lich_id}'`)
-        .then(async res => {
-            if (res.rows.length == 0) {     //----insert order in DB----
-                //Check if user has more than limited orders
-                var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${interaction.user.id}`)
-                .then(async tab1 => {
-                    if (tab1.rowCount >= userOrderLimit) {
-                        interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(console.error)
-                        return false
-                    }
-                    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${interaction.user.id}`)
-                    .then(tab2 => {
-                        if ((tab2.rowCount + tab1.rowCount) >= userOrderLimit) {
-                            interaction.reply({content: `⚠️ <@${interaction.user.id}> You have reached the limit of ${userOrderLimit} orders on your account. Please remove some and try again ⚠️`, ephemeral: true}).catch(console.error)
-                            return false
-                        }
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status)
-                        return false
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    interaction.reply({content: `☠️ Error retrieving DB orders.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-                    return false
-                })
-                if (!status)
-                    return false
-                var status = await db.query(`INSERT INTO tradebot_users_lich_orders 
-                (discord_id,lich_id,order_type,user_price,visibility,element,damage,ephemera,lich_name,origin_channel_id,origin_guild_id,update_timestamp) 
-                VALUES (
-                    ${interaction.user.id},
-                    '${lich_info.lich_id}',
-                    '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
-                    ${interaction.options.getInteger('price')},
-                    true,
-                    '${interaction.options.getString('element')}',
-                    ${interaction.options.getNumber('damage')},
-                    ${interaction.options.getBoolean('ephemera')},
-                    NULLIF('${q_lichName}', ''),
-                    ${interaction.channel.id},
-                    ${interaction.guild.id},
-                    ${new Date().getTime()})
-                    `)
-                .then(res => {
-                    if (res.rowCount == 1)
-                        return true
-                    return false
-                })
-                .catch(err => {
-                    console.log(err)
-                    if (err.code == '23505') {
-                        interaction.reply({content: `☠️ Error: Duplicate order insertion in the DB. Please contact MrSofty#7926 or any admin with access to the DB\nError code: 23505 ☠️`, ephemeral: true}).catch(console.error)
-                    }
-                    return false
-                })
-                if (!status)
-                    return false
-            }
-            else if (res.rows.length > 0) {
-                interaction.reply({content: `☠️ Unexpected response received from DB.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-                return false
-            }
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.reply({content: `☠️ Error retrieving DB orders.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-            return false
-        })
-        if (!status)
-            return Promise.reject()
-        //----------------
-    
-        if (!interaction.member.presence) {
-            interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order ⚠️`, ephemeral: true}).catch(console.error)
-            return Promise.resolve()
-        }
-        if (interaction.member.presence.status == `offline`) {
-            interaction.reply({content: `⚠️ Your discord status must be online to use the bot. Use the command \`my orders\` in <#892003772698611723> to post your lich order  ⚠️`, ephemeral: true}).catch(console.error)
-            return Promise.resolve()
-            //test
-        }
         db.query(`
             INSERT INTO tradebot_users_orders 
             (order_id,discord_id,item_id,order_type,item_type,user_price,order_data,visibility,origin_channel_id,origin_guild_id,platform,update_timestamp,creation_timestamp) 
@@ -2358,7 +2277,7 @@ async function trading_lich_bot(interaction) {
                 '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
                 'lich',
                 ${interaction.options.getInteger('price')},
-                '${JSON.stringify({element: interaction.options.getString('element'),damage: interaction.options.getNumber('damage'),ephemera: interaction.options.getBoolean('ephemera'),lich_name: q_lichName,})}',
+                '${JSON.stringify({element: interaction.options.getString('element'),damage: interaction.options.getNumber('damage'),ephemera: interaction.options.getBoolean('ephemera'),lich_name: interaction.options.getString('name') || '',})}',
                 true,
                 ${interaction.channel.id},
                 ${interaction.guild.id},
@@ -2387,13 +2306,156 @@ async function trading_lich_bot(interaction) {
     })
 }
 
+async function create_lich_image(user_order_obj) {
+    return new Promise((resolve,reject) => {
+        if (user_order_obj.order_data.lich_image_url)
+            return resolve(user_order_obj.order_data.lich_image_url)
+        Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
+        .then(async img1 => {
+            
+            // Create image on canvas
+            var canvas = new Canvas.createCanvas(1000,1000)
+            , ctx = canvas.getContext('2d');
+            ctx.font = '20px Arial';
+    
+            //lich and trader name modification
+            const trader_name = twoLiner(user_order_obj.ingame_name,15)
+            const lich_name = twoLiner(user_order_obj.order_data.lich_name,30)
+            const name_width = ctx.measureText(trader_name).width
+    
+            // Coordinates
+            var tlX = (name_width < 80) ? 80:name_width
+            , tlY = 70
+    
+            , trX = tlX + img1.width
+            , trY = tlY
+    
+            , blX = tlX
+            , blY = tlY + img1.height
+    
+            , brX = blX + img1.width
+            , brY = blY
+    
+            , twc = trX
+            , thc = brY
+          
+            ctx.drawImage(img1, tlX, tlY);
+            ctx.fillStyle = '#ffffff';
+            
+            textC = draw(`${trader_name}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
+            drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
+            textC = draw(`${user_order_obj.user_price}p`, tlX+70, tlY-50, 25);
+            drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
+            textC = draw(`${user_order_obj.order_data.damage}%`, trX+20, ((trY+brY)/2)-((trY+brY)/2)*0.3, 20);
+            const img2 = await Canvas.loadImage(`./icons/d_${user_order_obj.order_data.element}.png`)
+            ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
+            twc += 32
+            drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
+            textC = draw(`${lich_name}`, blX+40, blY+30,16);
+            drawLineCurve(textC.tlX-10,textC.tlY+8,blX+10,textC.tlY+8,blX+10, blY+10)
+            textC = draw(`${user_order_obj.order_data.ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
+            drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
+          
+            var tempctx = ctx.getImageData(0,0,twc,thc)
+            ctx.canvas.width = twc
+            ctx.canvas.height = thc - 7
+            ctx.putImageData(tempctx,0,0)
+          
+            function draw(text, x, y, size=10, color = user_order_obj.weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
+                ctx.font = size + 'px Arial';
+                ctx.fillStyle = color;
+                ctx.fillText(text, x, y);
+                var cords = ctx.measureText(text)
+                var cordsH = ctx.measureText('M')
+                if (x+cords.width > twc)
+                    twc = x+cords.width
+                if (y+cordsH.width > thc)
+                    thc = y+cordsH.width
+                if (text.match('\n'))
+                  thc += cordsH.width + 5
+                //note that the filltext uses bottom left as reference for drawing text
+                var cordss = {
+                  tlX: x,
+                  tlY: y-cordsH.width,
+                  trX: x+cords.width,
+                  trY: y-cordsH.width,
+                  blX: x, 
+                  blY: y,
+                  brX: x+cords.width,
+                  brY: y
+                }
+                //console.log(cordss.tlX + 'x' + cordss.tlY)
+                //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
+                //ctx.fillRect(cordss.trX,cordss.trY,3,3);
+                //ctx.fillRect(cordss.blX,cordss.blY,3,3);
+                //ctx.fillRect(cordss.brX,cordss.brY,3,3);
+                
+                return cordss
+            }
+          
+            function twoLiner(text,width) {
+                var fl = text.substring(0,width)
+                var ll = text.substring(width,text.length)
+                if (!ll)
+                    return text
+                if (ll.length < fl.length) {
+                  while (ctx.measureText(ll).width <= ctx.measureText(fl).width)
+                    ll = ' ' + ll + ' '
+                }
+                else if (ll.length > fl.length) {
+                  while (ctx.measureText(ll).width >= ctx.measureText(fl).width)
+                    fl = ' ' + fl + ' '
+                }
+                return fl + '\n' + ll
+            }
+    
+            function drawLineCurve(x1,y1,x2,y2,x3,y3) {
+              ctx.beginPath();
+              ctx.moveTo(x1,y1);
+              ctx.lineTo(x2,y2);
+              ctx.lineTo(x3,y3);
+              ctx.strokeStyle = user_order_obj.weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+              ctx.lineWidth = 2;
+              ctx.stroke();
+              ctx.fillRect(x1-2.5,y1-2.5,5,5);
+            }
+          
+            function drawLineStr(x1,y1,x2,y2) {
+              ctx.beginPath();
+              ctx.moveTo(x1,y1);
+              ctx.lineTo(x2,y2);
+              ctx.strokeStyle = user_order_obj.weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+              ctx.lineWidth = 2;
+              ctx.stroke();
+              ctx.fillRect(x1-2.5,y1-2.5,5,5);
+            }
+    
+            client.channels.cache.get('912395290701602866').send({
+                content: `canvas_t${user_order_obj.discord_id}_p${user_order_obj.user_price}.png`,
+                files: [{
+                    attachment: ctx.canvas.toBuffer(),
+                    name: `canvas_t${user_order_obj.discord_id}_p${user_order_obj.user_price}.png`
+                }]
+            }).then(res => {
+                const attachment_url = res.attachments[0].url
+                db.query(`
+                    UPDATE tradebot_users_orders SET 
+                    order_data = jsonb_set(order_data, '{lich_image_url}', '"${attachment_url}"', true)
+                    WHERE order_id = '${user_order_obj.order_id}'
+                `).then(res => resolve(attachment_url))
+                .catch((err) => reject(err))
+            }).catch((err) => reject(err))
+        }).catch((err) => reject(err))
+    })
+}
+
 async function trading_lich_orders_update(interaction, lich_info, update_type) {
     var embeds = []
     var noOfSellers = 0
     var noOfBuyers = 0
     //----construct embed----
     await db.query(`
-    SELECT * FROM tradebot_users_lich_orders 
+    SELECT * FROM tradebot_users_orders 
     JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
     JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
     WHERE tradebot_users_lich_orders.lich_id = '${lich_info.lich_id}' AND tradebot_users_lich_orders.order_type = 'wts' AND tradebot_users_lich_orders.visibility = true
@@ -2414,6 +2476,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             
                 await Canvas.loadImage('https://warframe.market/static/assets/' + lich_info.icon_url)
                 .then(async img1 => {
+
                     // Create image on canvas
                     var canvas = new Canvas.createCanvas(1000,1000)
                     , ctx = canvas.getContext('2d');
@@ -2565,11 +2628,11 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
         return Promise.reject()
     })
     await db.query(`
-    SELECT * FROM tradebot_users_lich_orders 
-    JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
-    JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
-    WHERE tradebot_users_lich_orders.lich_id = '${lich_info.lich_id}' AND tradebot_users_lich_orders.order_type = 'wtb' AND tradebot_users_lich_orders.visibility = true
-    ORDER BY tradebot_users_lich_orders.user_price DESC,tradebot_users_lich_orders.update_timestamp`)
+        SELECT * FROM tradebot_users_lich_orders 
+        JOIN tradebot_users_list ON tradebot_users_lich_orders.discord_id=tradebot_users_list.discord_id 
+        JOIN lich_list ON tradebot_users_lich_orders.lich_id=lich_list.lich_id 
+        WHERE tradebot_users_lich_orders.lich_id = '${lich_info.lich_id}' AND tradebot_users_lich_orders.order_type = 'wtb' AND tradebot_users_lich_orders.visibility = true
+        ORDER BY tradebot_users_lich_orders.user_price DESC,tradebot_users_lich_orders.update_timestamp`)
     .then(async res => {
         if (res.rows.length != 0) {
             for (var j=0;j<res.rows.length;j++) {
@@ -4463,10 +4526,16 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
         }
     }
     if (notification.channel == 'tradebot_users_orders_insert' || notification.channel == 'tradebot_users_orders_delete') {
-        trading_bot_orders_update(payload)
+        if (payload.item_type == 'item')
+            trading_bot_orders_update(payload)
+        else if (payload.item_type == 'lich')
+            trading_lich_orders_update(payload)
     }
     if (notification.channel == 'tradebot_users_orders_update') {
-        trading_bot_orders_update(payload[0])
+        if (payload[0].item_type == 'item')
+            trading_bot_orders_update(payload[0])
+        else if (payload[0].item_type == 'lich')
+            trading_lich_orders_update(payload[0])
     }
     if (notification.channel == 'tradebot_filled_users_orders_update_archived') {
         if (payload.thread_id) {
