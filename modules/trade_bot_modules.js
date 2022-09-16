@@ -2442,7 +2442,7 @@ async function create_lich_image(user_order_obj) {
                 }]
             }).then(res => {
                 console.log(res.attachments)
-                const attachment_url = res.attachments.map()[0].url
+                const attachment_url = res.attachments.map(attachment => attachment)[0].url
                 db.query(`
                     UPDATE tradebot_users_orders SET 
                     order_data = jsonb_set(order_data, '{lich_image_url}', '"${attachment_url}"', true)
