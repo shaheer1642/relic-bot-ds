@@ -2055,8 +2055,8 @@ async function trading_bot_orders_update(user_order_obj) {
         var sell_orders = []
         var buy_orders = []
         const item_id = user_order_obj.item_id
+        const item_type = user_order_obj.item_type
         const item_rank = res.rows[0]?.order_data.rank || 'unranked'
-        const item_type = res.rows[0]?.item_type
         const item_url = res.rows[0]?.item_url || res.rows[0]?.weapon_url
         const icon_url = res.rows[0]?.icon_url
         const item_name = item_url ? convertUpper(item_url):''
