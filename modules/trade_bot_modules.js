@@ -4526,16 +4526,10 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
         }
     }
     if (notification.channel == 'tradebot_users_orders_insert' || notification.channel == 'tradebot_users_orders_delete') {
-        if (payload.item_type == 'item')
-            trading_bot_orders_update(payload)
-        else if (payload.item_type == 'lich')
-            trading_lich_orders_update(payload)
+        trading_bot_orders_update(payload)
     }
     if (notification.channel == 'tradebot_users_orders_update') {
-        if (payload[0].item_type == 'item')
-            trading_bot_orders_update(payload[0])
-        else if (payload[0].item_type == 'lich')
-            trading_lich_orders_update(payload[0])
+        trading_bot_orders_update(payload[0])
     }
     if (notification.channel == 'tradebot_filled_users_orders_update_archived') {
         if (payload.thread_id) {
