@@ -2361,7 +2361,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             textC = draw(`${ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
             drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
           
-            var tempctx = ctx.getImageData(0,0,twc,thc)
+            const tempctx = ctx.getImageData(0,0,twc,thc)
             ctx.canvas.width = twc
             ctx.canvas.height = thc - 7
             ctx.putImageData(tempctx,0,0)
