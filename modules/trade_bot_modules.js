@@ -2120,27 +2120,23 @@ async function trading_bot_orders_update(user_order_obj) {
             }
             else if (item_type == 'lich') {
                 for(const [index,order] of sell_orders.entries()) {
-                    const attachment_url = await create_lich_image(order).catch(console.error)
-                    if (!attachment_url) return
                     embeds.push({
                         title: item_name,
                         description: tradingBotReactions.sell[index],
                         url: `https://warframe.market/auctions/search?type=${item_url.match('kuva_')? 'lich':'sister'}&weapon_url_name=${item_url}`,
                         fields: [],
-                        color: '#7cb45d',
-                        image: {url: attachment_url}
+                        color: tb_sellColor,
+                        image: {url: order.order_data.lich_image_url}
                     })
                 }
                 for(const [index,order] of buy_orders.entries()) {
-                    const attachment_url = await create_lich_image(order).catch(console.error)
-                    if (!attachment_url) return
                     embeds.push({
                         title: item_name,
-                        description: tradingBotReactions.sell[index],
+                        description: tradingBotReactions.buy[index],
                         url: `https://warframe.market/auctions/search?type=${item_url.match('kuva_')? 'lich':'sister'}&weapon_url_name=${item_url}`,
                         fields: [],
-                        color: '#7cb45d',
-                        image: {url: attachment_url}
+                        color: tb_buyColor,
+                        image: {url: order.order_data.lich_image_url}
                     })
                 }
             }
@@ -2236,8 +2232,7 @@ async function trading_lich_bot(interaction) {
                 ingame_name = res.rows[0].ingame_name
                 return 1
             }
-        })
-        .catch(err => {
+        }).catch(err => {
             console.log(err + 'Retrieving Database -> tradebot_users_list error')
             interaction.reply({content: "Some error occured retrieving database info.\nError code: 500", ephemeral: true}).catch(console.error)
             return 2
@@ -2249,71 +2244,76 @@ async function trading_lich_bot(interaction) {
                 console.log(err)
                 interaction.followUp({content: `🛑 <@${interaction.user.id}> Error occured sending DM. Make sure you have DMs turned on for the bot 🛑`, ephemeral: true}).catch(console.error)
             })
-            return Promise.resolve()
+            return resolve()
         }
         if (status == 2)
-            return Promise.resolve()
+            return resolve()
     
         //----retrieve lich info----
-        var lich_info = {}
         var status = await db.query(`SELECT * FROM lich_list WHERE weapon_url = '${interaction.options.getString('weapon')}'`)
         .then(res => {
-            if (res.rowCount != 1) {
-                interaction.reply({content: `☠️ Error retrieving lich info from DB.\nError code:\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-                return false
+            if (res.rowCount == 1) {
+                const lich_info = res.rows[0]
+                create_lich_image(interaction.user.id,ingame_name,lich_info.weapon_url,lich_info.icon_url,interaction.options.getString('name') || '',interaction.options.getInteger('price'),interaction.options.getNumber('damage'),interaction.options.getString('element'),interaction.options.getBoolean('ephemera'))
+                .then(attachment_url => {
+                    db.query(`
+                        INSERT INTO tradebot_users_orders 
+                        (order_id,discord_id,item_id,order_type,item_type,user_price,order_data,visibility,origin_channel_id,origin_guild_id,platform,update_timestamp,creation_timestamp) 
+                        VALUES (
+                            '${uuid.v1()}',
+                            ${interaction.user.id},
+                            '${lich_info.lich_id}',
+                            '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
+                            'lich',
+                            ${interaction.options.getInteger('price')},
+                            '${JSON.stringify({
+                                element: interaction.options.getString('element'),
+                                damage: interaction.options.getNumber('damage'),
+                                ephemera: interaction.options.getBoolean('ephemera'),
+                                lich_name: interaction.options.getString('name') || '',
+                                lich_image_url: attachment_url
+                            })}',
+                            true,
+                            ${interaction.channel.id},
+                            ${interaction.guild.id},
+                            'discord',
+                            ${new Date().getTime()},
+                            ${new Date().getTime()}
+                        )
+                        ON CONFLICT (discord_id,item_id) 
+                        DO UPDATE SET 
+                        order_type = EXCLUDED.order_type, 
+                        item_type = EXCLUDED.item_type, 
+                        user_price = EXCLUDED.user_price, 
+                        order_data = EXCLUDED.order_data, 
+                        visibility = EXCLUDED.visibility, 
+                        origin_channel_id = EXCLUDED.origin_channel_id, 
+                        origin_guild_id = EXCLUDED.origin_guild_id, 
+                        platform = EXCLUDED.platform,
+                        update_timestamp = EXCLUDED.update_timestamp;
+                    `).then(res => {
+                        return resolve()
+                    }).catch(err => {
+                        console.log(err)
+                        interaction.reply({content: `☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                        return reject()
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    interaction.reply({content: `☠️ Error generating lich image.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                    return reject()
+                })
             }
-            lich_info = res.rows[0]
-            return true
-        })
-        .catch(err => {
-            console.log(err); return false
-        })
-        if (!status)
-            return Promise.reject()
-        db.query(`
-            INSERT INTO tradebot_users_orders 
-            (order_id,discord_id,item_id,order_type,item_type,user_price,order_data,visibility,origin_channel_id,origin_guild_id,platform,update_timestamp,creation_timestamp) 
-            VALUES (
-                '${uuid.v1()}',
-                ${interaction.user.id},
-                '${lich_info.lich_id}',
-                '${interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb')}',
-                'lich',
-                ${interaction.options.getInteger('price')},
-                '${JSON.stringify({element: interaction.options.getString('element'),damage: interaction.options.getNumber('damage'),ephemera: interaction.options.getBoolean('ephemera'),lich_name: interaction.options.getString('name') || '',})}',
-                true,
-                ${interaction.channel.id},
-                ${interaction.guild.id},
-                'discord',
-                ${new Date().getTime()},
-                ${new Date().getTime()}
-            )
-            ON CONFLICT (discord_id,item_id) 
-            DO UPDATE SET 
-            order_type = EXCLUDED.order_type, 
-            item_type = EXCLUDED.item_type, 
-            user_price = EXCLUDED.user_price, 
-            order_data = EXCLUDED.order_data, 
-            visibility = EXCLUDED.visibility, 
-            origin_channel_id = EXCLUDED.origin_channel_id, 
-            origin_guild_id = EXCLUDED.origin_guild_id, 
-            platform = EXCLUDED.platform,
-            update_timestamp = EXCLUDED.update_timestamp;
-        `).then(async res => {
-            return resolve()
         }).catch(err => {
-            console.log(err)
-            interaction.reply({content: `☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
-            return reject()
+            console.log(err); 
+            reject(err)
         })
     })
 }
 
-async function create_lich_image(user_order_obj) {
+async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_name,user_price,damage,element,ephemera) {
     return new Promise((resolve,reject) => {
-        if (user_order_obj.order_data.lich_image_url)
-            return resolve(user_order_obj.order_data.lich_image_url)
-        Canvas.loadImage('https://warframe.market/static/assets/' + user_order_obj.icon_url)
+        Canvas.loadImage('https://warframe.market/static/assets/' + icon_url)
         .then(async img1 => {
             
             // Create image on canvas
@@ -2322,9 +2322,9 @@ async function create_lich_image(user_order_obj) {
             ctx.font = '20px Arial';
     
             //lich and trader name modification
-            const trader_name = twoLiner(user_order_obj.ingame_name,15)
-            const lich_name = twoLiner(user_order_obj.order_data.lich_name,30)
-            const name_width = ctx.measureText(trader_name).width
+            //const trader_name = twoLiner(user_order_obj.ingame_name,15)
+            //const lich_name = twoLiner(lich_name,30)
+            const name_width = ctx.measureText(username).width
     
             // Coordinates
             var tlX = (name_width < 80) ? 80:name_width
@@ -2345,18 +2345,18 @@ async function create_lich_image(user_order_obj) {
             ctx.drawImage(img1, tlX, tlY);
             ctx.fillStyle = '#ffffff';
             
-            textC = draw(`${trader_name}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
+            textC = draw(`${username}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
             drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
-            textC = draw(`${user_order_obj.user_price}p`, tlX+70, tlY-50, 25);
+            textC = draw(`${user_price}p`, tlX+70, tlY-50, 25);
             drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
-            textC = draw(`${user_order_obj.order_data.damage}%`, trX+20, ((trY+brY)/2)-((trY+brY)/2)*0.3, 20);
-            const img2 = await Canvas.loadImage(`./icons/d_${user_order_obj.order_data.element}.png`)
+            textC = draw(`${damage}%`, trX+20, ((trY+brY)/2)-((trY+brY)/2)*0.3, 20);
+            const img2 = await Canvas.loadImage(`./icons/d_${element}.png`)
             ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
             twc += 32
             drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
             textC = draw(`${lich_name}`, blX+40, blY+30,16);
             drawLineCurve(textC.tlX-10,textC.tlY+8,blX+10,textC.tlY+8,blX+10, blY+10)
-            textC = draw(`${user_order_obj.order_data.ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
+            textC = draw(`${ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
             drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
           
             var tempctx = ctx.getImageData(0,0,twc,thc)
@@ -2364,7 +2364,7 @@ async function create_lich_image(user_order_obj) {
             ctx.canvas.height = thc - 7
             ctx.putImageData(tempctx,0,0)
           
-            function draw(text, x, y, size=10, color = user_order_obj.weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
+            function draw(text, x, y, size=10, color = weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
                 ctx.font = size + 'px Arial';
                 ctx.fillStyle = color;
                 ctx.fillText(text, x, y);
@@ -2417,7 +2417,7 @@ async function create_lich_image(user_order_obj) {
               ctx.moveTo(x1,y1);
               ctx.lineTo(x2,y2);
               ctx.lineTo(x3,y3);
-              ctx.strokeStyle = user_order_obj.weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+              ctx.strokeStyle = weapon_url.match('kuva')? '#fcc603': '#06a0d4';
               ctx.lineWidth = 2;
               ctx.stroke();
               ctx.fillRect(x1-2.5,y1-2.5,5,5);
@@ -2427,27 +2427,20 @@ async function create_lich_image(user_order_obj) {
               ctx.beginPath();
               ctx.moveTo(x1,y1);
               ctx.lineTo(x2,y2);
-              ctx.strokeStyle = user_order_obj.weapon_url.match('kuva')? '#fcc603': '#06a0d4';
+              ctx.strokeStyle = weapon_url.match('kuva')? '#fcc603': '#06a0d4';
               ctx.lineWidth = 2;
               ctx.stroke();
               ctx.fillRect(x1-2.5,y1-2.5,5,5);
             }
     
             client.channels.cache.get('912395290701602866').send({
-                content: `canvas_t${user_order_obj.discord_id}_p${user_order_obj.user_price}.png`,
+                content: `canvas_t${discord_id}_p${user_price}.png`,
                 files: [{
                     attachment: ctx.canvas.toBuffer(),
-                    name: `canvas_t${user_order_obj.discord_id}_p${user_order_obj.user_price}.png`
+                    name: `canvas_t${discord_id}_p${user_price}.png`
                 }]
             }).then(res => {
-                console.log(res.attachments)
-                const attachment_url = res.attachments.map(attachment => attachment)[0].url
-                db.query(`
-                    UPDATE tradebot_users_orders SET 
-                    order_data = jsonb_set(order_data, '{lich_image_url}', '"${attachment_url}"', true)
-                    WHERE order_id = '${user_order_obj.order_id}'
-                `).then(res => resolve(attachment_url))
-                .catch((err) => reject(err))
+                resolve(res.attachments.map(attachment => attachment)[0].url)
             }).catch((err) => reject(err))
         }).catch((err) => reject(err))
     })
