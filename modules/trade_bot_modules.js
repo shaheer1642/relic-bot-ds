@@ -25,7 +25,7 @@ const ordersFillLogChannel = "864199722676125757"
 const tb_sellColor = '#7cb45d'
 const tb_buyColor = '#E74C3C'
 const tb_invisColor = '#71368A'
-const u_order_close_time = 10800000
+const u_order_close_time = 3600000
 
 async function bot_initialize() {
     if (client.guilds.cache.get('865904902941048862')) {
@@ -49,7 +49,17 @@ async function bot_initialize() {
         }
 
         //----Set timeouts for orders if any----
-        td_set_orders_timeouts().catch(console.error)
+        db.query(`SELECT * FROM tradebot_users_orders WHERE visibility = true;`)
+        .then(res => {
+            if (res.rows.length > 0) {
+                const all_orders = res.rows
+                const currTime = new Date().getTime()
+                for (const order of all_orders) {
+                    const timeout = (currTime + (u_order_close_time - (currTime - order.update_timestamp))) - currTime
+                    set_order_timeout(order,timeout)
+                }
+            }
+        }).catch(console.error)
     }
 }
 
@@ -3659,70 +3669,26 @@ Message: Hi
     })
 }
 
-async function td_set_orders_timeouts() {
+function td_set_orders_timeouts() {
     db.query(`SELECT * FROM tradebot_users_orders WHERE visibility = true`)
     .then(res => {
         if (res.rows.length > 0) {
             const all_orders = res.rows
             const currTime = new Date().getTime()
             for (const order of all_orders) {
-                const after3h = currTime + (u_order_close_time - (currTime - order.update_timestamp))
-                console.log(after3h - currTime)
-                setTimeout(() => {
-                    console.log('closing order due to timeout', order.order_id)
-                    db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id='${order.order_id}' AND visibility = true;`).catch(console.error)
-                }, after3h - currTime);
+                const timeout = (currTime + (u_order_close_time - (currTime - order.update_timestamp))) - currTime
+                set_order_timeout(order,timeout)
             }
         }
     }).catch(console.error)
 }
 
-async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich_info = {}) {
-    setTimeout(async () => {
-        var item_id = all_orders.item_id
-        var item_rank = all_orders.order_data.rank
-        var order_type = all_orders.order_type
-        var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND visibility=true`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status)
-            return
-        var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-        .then(res => {
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status) {
-            console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-            return Promise.reject()
-        }
-        var item_detail = null
-        var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false 
-            item_detail =res.rows[0]
-            return true 
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status)
-            return
-        var item_url = item_detail.item_url
-        var item_name = item_detail.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-    }, after3h - currTime);
+function set_order_timeout(order,timeout) {
+    console.log('setting auto-close timeout for order',order.order_id)
+    setTimeout(() => {
+        console.log('closing order due to timeout', order.order_id)
+        db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id='${order.order_id}' AND visibility = true;`).catch(console.error)
+    }, timeout);
 }
 
 async function tb_updateDmCacheOrder(msg,discord_id) {
