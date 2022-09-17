@@ -2321,7 +2321,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             // Create image on canvas
             const canvas = new Canvas.createCanvas(1000,1000)
             const ctx = canvas.getContext('2d');
-            ctx.font = '20px Consolas';
+            ctx.font = '20px Arial';
     
             //lich and trader name modification
             //const trader_name = twoLiner(user_order_obj.ingame_name,15)
@@ -2371,7 +2371,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             ctx.putImageData(tempctx,0,0)
           
             function draw(text, x, y, size=10, color = weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
-                ctx.font = size + 'px Consolas';
+                ctx.font = size + 'px Arial';
                 ctx.fillStyle = color;
                 ctx.fillText(text, x, y);
                 var cords = ctx.measureText(text)
