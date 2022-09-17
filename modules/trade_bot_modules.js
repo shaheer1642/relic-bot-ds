@@ -2256,7 +2256,7 @@ async function trading_lich_bot(interaction) {
         .then(res => {
             if (res.rowCount == 1) {
                 const lich_info = res.rows[0]
-                create_lich_image(interaction.user.id,ingame_name,lich_info.weapon_url,lich_info.icon_url,interaction.options.getString('name') || '',interaction.options.getInteger('price'),interaction.options.getNumber('damage'),interaction.options.getString('element'),interaction.options.getBoolean('ephemera'))
+                create_lich_image(interaction.user.id,ingame_name,lich_info.weapon_url,lich_info.icon_url,interaction.options.getString('name') || '',interaction.options.getInteger('price'),interaction.options.getNumber('damage'),interaction.options.getString('element'),interaction.options.getBoolean('ephemera'),interaction.options.getSubcommand().replace('sell','wts').replace('buy','wtb'))
                 .then(attachment_url => {
                     db.query(`
                         INSERT INTO tradebot_users_orders 
@@ -2313,7 +2313,7 @@ async function trading_lich_bot(interaction) {
     })
 }
 
-async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_name,user_price,damage,element,ephemera) {
+async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_name,user_price,damage,element,ephemera,order_type) {
     return new Promise((resolve,reject) => {
         Canvas.loadImage('https://warframe.market/static/assets/' + icon_url)
         .then(async img1 => {
@@ -2349,7 +2349,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             ctx.drawImage(img1, tlX, tlY);
             ctx.fillStyle = '#ffffff';
             
-            textC = draw(`${username}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
+            textC = draw(`${username}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, order_type == 'wts' ? tb_sellColor:tb_buyColor);
             drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
             textC = draw(`${user_price}p`, tlX+70, tlY-50, 25);
             drawLineStr(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),tlY-10)
@@ -2358,8 +2358,10 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             ctx.drawImage(img2, textC.trX, textC.trY-5, 32, 32);
             twc += 32
             drawLineCurve(textC.blX+((textC.brX-textC.blX)/2),textC.blY+10,textC.blX+((textC.brX-textC.blX)/2),textC.blY+30,trX+10, textC.blY+30)
-            textC = draw(`${lich_name}`, blX+40, blY+30,16);
-            drawLineCurve(textC.tlX-10,textC.tlY+8,blX+10,textC.tlY+8,blX+10, blY+10)
+            if (lich_name != '') {
+                textC = draw(`${lich_name}`, blX+40, blY+30,16);
+                drawLineCurve(textC.tlX-10,textC.tlY+8,blX+10,textC.tlY+8,blX+10, blY+10)
+            }
             textC = draw(`${ephemera.toString().replace('false','w/o').replace('true','with')} Eph.`, blX-80, ((tlY+blY)/2)+((tlY+blY)/2)*0.3, 12);
             drawLineCurve(textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-10,textC.tlX+((textC.trX-textC.tlX)/2),textC.tlY-20,tlX-10, textC.tlY-20)
           
