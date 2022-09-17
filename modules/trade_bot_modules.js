@@ -2347,6 +2347,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             ctx.drawImage(img1, tlX, tlY);
             ctx.fillStyle = '#ffffff';
             
+            ctx.fillText('heyyyy', 20, 20);
             textC = draw(`${username}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
             drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
             textC = draw(`${user_price}p`, tlX+70, tlY-50, 25);
