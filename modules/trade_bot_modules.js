@@ -4287,13 +4287,13 @@ async function lich_tut(message,args) {
                         type: 2,
                         label: "Activate Orders",
                         style: 3,
-                        custom_id: "tb_actv_lich_orders"
+                        custom_id: "tb_actv_orders"
                     },
                     {
                         type: 2,
                         label: "Close Orders",
                         style: 4,
-                        custom_id: "tb_close_lich_orders"
+                        custom_id: "tb_close_orders"
                     }
                 ]
     
