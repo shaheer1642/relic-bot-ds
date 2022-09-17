@@ -4365,7 +4365,7 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
         }
         trading_bot_orders_update(payload[0])
     }
-    if (_notification.channel == 'tradebot_users_orders_delete') {
+    if (notification.channel == 'tradebot_users_orders_delete') {
         trading_bot_orders_update(payload)
 
     }
