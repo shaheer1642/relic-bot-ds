@@ -29,9 +29,6 @@ const u_order_close_time = 10800000
 
 async function bot_initialize() {
     if (client.guilds.cache.get('865904902941048862')) {
-        //----Set timeouts for orders if any----
-        td_set_orders_timeouts().catch(console.error)
-        
         await db.query(`SELECT * FROM tradebot_channels`).catch(console.error)
         .then(res => {
             res.rows.forEach(row => {
@@ -50,6 +47,9 @@ async function bot_initialize() {
             client.channels.fetch(channel_id).catch(console.error)
             .then(channel => channel.messages.fetch().catch(console.error))
         }
+
+        //----Set timeouts for orders if any----
+        td_set_orders_timeouts().catch(console.error)
     }
 }
 
@@ -3660,226 +3660,69 @@ Message: Hi
 }
 
 async function td_set_orders_timeouts() {
-    var all_orders = null
-    var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE visibility = true`)
+    db.query(`SELECT * FROM tradebot_users_orders WHERE visibility = true`)
     .then(res => {
-        if (res.rows.length == 0)
-            return false 
-        all_orders = res.rows
-        return true 
-    })
-    .catch(err => {
-        console.log(err)
-        return false
-    })
-    if (status) {
-        var currTime = new Date().getTime()
-        for (var i=0;i<all_orders.length;i++) {
-            var after3h = currTime + (u_order_close_time - (currTime - all_orders[i].update_timestamp))
-            console.log(after3h - currTime)
-            set_order_timeout(all_orders[i],after3h,currTime)
+        if (res.rows.length > 0) {
+            const all_orders = res.rows
+            const currTime = new Date().getTime()
+            for (const order of all_orders) {
+                const after3h = currTime + (u_order_close_time - (currTime - order.update_timestamp))
+                console.log(after3h - currTime)
+                setTimeout(() => {
+                    console.log('closing order due to timeout', order.order_id)
+                    db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id='${order.order_id}' AND visibility = true;`).catch(console.error)
+                }, after3h - currTime);
+            }
         }
-    }
-    var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE visibility = true`)
-    .then(res => {
-        if (res.rows.length == 0)
-            return false 
-        all_orders = res.rows
-        return true 
-    })
-    .catch(err => {
-        console.log(err)
-        return false
-    })
-    if (status) {
-        var currTime = new Date().getTime()
-        for (var i=0;i<all_orders.length;i++) {
-            var lich_info = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${all_orders[i].lich_id}'`)
-            var after3h = currTime + (u_order_close_time - (currTime - all_orders[i].update_timestamp))
-            console.log(after3h - currTime)
-            set_order_timeout(all_orders[i],after3h,currTime,true,lich_info.rows[0])
-        }
-    }
+    }).catch(console.error)
 }
 
 async function set_order_timeout(all_orders,after3h,currTime,isLich = false,lich_info = {}) {
-    if (isLich) {
-        setTimeout(async () => {
-            var status = await db.query(`UPDATE tradebot_users_lich_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND visibility=true`)
-            .then(res => {
-                if (res.rowCount != 1)
-                    return false
-                return true
-            })
-            .catch(err => {
-                console.log(err)
+    setTimeout(async () => {
+        var item_id = all_orders.item_id
+        var item_rank = all_orders.order_data.rank
+        var order_type = all_orders.order_type
+        var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND visibility=true`)
+        .then(res => {
+            if (res.rows.length == 0)
                 return false
-            })
-            if (!status) {
-                console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}'`)
-                return
-            }
-            await trading_lich_orders_update(null, lich_info, 2)
-            .then(async res2 => {
-                    var postdata = {}
-                    postdata.content = " "
-                    postdata.embeds = []
-                    postdata.embeds.push({
-                        description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')})**`,
-                        footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                        timestamp: new Date(),
-                        color: '#FFFFFF'
-                    })
-                    console.log(postdata)
-                    var status = await db.query(`SELECT * from tradebot_users_list WHERE discord_id = ${all_orders.discord_id}`)
-                    .then(async res => {
-                        if (res.rows.length == 0)
-                            return false
-                        if (res.rows.length > 1)
-                            return false
-                        const user_data = res.rows[0]
-                        if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
-                            await client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
-                            .then(async channel => {
-                                await channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
-                                .then(async msg => {
-                                    msg.content = " "
-                                    msg.embeds[0].description += `\n**${lich_info.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())} (${all_orders.order_type.replace('wts','Sell').replace('wtb','Buy')})**`
-                                    await msg.edit({content: msg.content, embeds: msg.embeds}).catch(console.error)
-                                })
-                                .catch(console.error)
-                            })
-                            .catch(console.error)
-                            return true
-                        }
-                        const user = client.users.cache.get(all_orders.discord_id)
-                        if (user_data.notify_order == true) {
-                            var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
-                            if (user_presc) {
-                                if (user_presc.status != 'dnd')
-                                    await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
-                            }
-                            else
-                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
-                            return true
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status) {
-                        console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND order_type = '${all_orders.order_type}'`)
-                        return
-                    }
-                    return 
-            })
-            .catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND lich_id = '${lich_info.lich_id}' AND order_type = '${all_orders.order_type}''`))
-        }, after3h - currTime);
-    }
-    else {
-        setTimeout(async () => {
-            var item_id = all_orders.item_id
-            var item_rank = all_orders.order_data.rank
-            var order_type = all_orders.order_type
-            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}' AND visibility=true`)
-            .then(res => {
-                if (res.rows.length == 0)
-                    return false
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return
-            var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-            .then(res => {
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status) {
-                console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
-                return Promise.reject()
-            }
-            var item_detail = null
-            var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-            .then(res => {
-                if (res.rows.length == 0)
-                    return false 
-                item_detail =res.rows[0]
-                return true 
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return
-            var item_url = item_detail.item_url
-            var item_name = item_detail.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-            /*
-            await trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank).then(async res => {
-                var postdata = {}
-                postdata.content = " "
-                postdata.embeds = []
-                postdata.embeds.push({
-                    description: `❕ Order Notification ❕\n\nThe following orders have been auto-closed for you after ${((u_order_close_time/60)/60)/1000} hours:\n\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} (${order_type.replace('wts','Sell').replace('wtb','Buy')})**`,
-                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                    timestamp: new Date(),
-                    color: '#FFFFFF'
-                })
-                console.log(postdata)
-                var status = await db.query(`SELECT * from tradebot_users_list WHERE discord_id = ${all_orders.discord_id}`)
-                .then(async res => {
-                    if (res.rows.length == 0)
-                        return false
-                    if (res.rows.length > 1)
-                        return false
-                    const user_data = res.rows[0]
-                    if (user_data.extras.dm_cache_order.timestamp > new Date().getTime()-900000) {
-                        await client.channels.fetch(user_data.extras.dm_cache_order.channel_id)
-                        .then(async channel => {
-                            await channel.messages.fetch(user_data.extras.dm_cache_order.msg_id)
-                            .then(async msg => {
-                                msg.content = " "
-                                msg.embeds[0].description += `\n**${item_name}${item_rank.replace('unranked','').replace('maxed',' (maxed)')} (${order_type.replace('wts','Sell').replace('wtb','Buy')})**`
-                                await msg.edit({content: msg.content, embeds: msg.embeds}).catch(console.error)
-                            })
-                            .catch(console.error)
-                        })
-                        .catch(console.error)
-                        return true
-                    }
-                    const user = client.users.cache.get(all_orders.discord_id)
-                    if (user_data.notify_order == true) {
-                        var user_presc = client.guilds.cache.get(all_orders.origin_guild_id).presences.cache.find(mem => mem.userId == all_orders.discord_id)
-                        if (user_presc) {
-                            if (user_presc.status != 'dnd')
-                                await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
-                        }
-                        else
-                            await user.send(postdata).then(async res => await tb_updateDmCacheOrder(res,all_orders.discord_id)).catch(console.error)
-                        return true
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    return false
-                })
-                if (!status) {
-                    console.log(`Unexpected error occured in DB call during auto-closure of order discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`)
-                    return
-                }
-                return 
-            }).catch(err => console.log(`Error occured updating order during auto-closure discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}`))
-            */
-        }, after3h - currTime);
-    }
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return
+        var status = await db.query(`UPDATE tradebot_users_orders SET visibility=false WHERE discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+        .then(res => {
+            return true
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status) {
+            console.log(`Error setting timeout for order discord_id = ${all_orders.discord_id} AND item_id = '${item_id}' AND order_type = '${order_type}'`)
+            return Promise.reject()
+        }
+        var item_detail = null
+        var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+        .then(res => {
+            if (res.rows.length == 0)
+                return false 
+            item_detail =res.rows[0]
+            return true 
+        })
+        .catch(err => {
+            console.log(err)
+            return false
+        })
+        if (!status)
+            return
+        var item_url = item_detail.item_url
+        var item_name = item_detail.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    }, after3h - currTime);
 }
 
 async function tb_updateDmCacheOrder(msg,discord_id) {
