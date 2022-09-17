@@ -3683,12 +3683,17 @@ function td_set_orders_timeouts() {
     }).catch(console.error)
 }
 
+const orders_timeouts = {}
 function set_order_timeout(order,timeout) {
-    console.log('setting auto-close timeout for order',order.order_id,'executes in',timeout,'ms')
-    setTimeout(() => {
+    if (orders_timeouts[order.order_id]) {
+        clearTimeout(orders_timeouts[order.order_id])
+        console.log('cleared auto-close timeout for order',order.order_id)
+    }
+    orders_timeouts[order.order_id] = setTimeout(() => {
         console.log('closing order due to timeout', order.order_id)
         db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id='${order.order_id}' AND visibility = true;`).catch(console.error)
     }, timeout);
+    console.log('set auto-close timeout for order',order.order_id,'executes in',timeout,'ms')
 }
 
 async function tb_updateDmCacheOrder(msg,discord_id) {
@@ -4344,11 +4349,25 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
             }
         }
     }
-    if (notification.channel == 'tradebot_users_orders_insert' || notification.channel == 'tradebot_users_orders_delete') {
+    if (notification.channel == 'tradebot_users_orders_insert') {
+        if (payload.visibility == true) {
+            const currTime = new Date().getTime()
+            const timeout = (currTime + (u_order_close_time - (currTime - payload.update_timestamp))) - currTime
+            set_order_timeout(order,timeout)
+        }
         trading_bot_orders_update(payload)
     }
     if (notification.channel == 'tradebot_users_orders_update') {
+        if (payload.visibility == true) {
+            const currTime = new Date().getTime()
+            const timeout = (currTime + (u_order_close_time - (currTime - payload.update_timestamp))) - currTime
+            set_order_timeout(order,timeout)
+        }
         trading_bot_orders_update(payload[0])
+    }
+    if (_notification.channel == 'tradebot_users_orders_delete') {
+        trading_bot_orders_update(payload)
+
     }
     if (notification.channel == 'tradebot_filled_users_orders_update_archived') {
         if (payload.thread_id) {
