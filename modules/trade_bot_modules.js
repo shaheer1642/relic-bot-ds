@@ -2141,6 +2141,13 @@ async function trading_bot_orders_update(user_order_obj) {
                         image: {url: order.order_data.lich_image_url}
                     })
                 }
+                embeds.forEach((element,index) => {
+                    if (index != 0) {
+                        embeds[index].url = null
+                        embeds[index].title = null
+                        embeds[index].thumbnail = null
+                    }
+                })
             }
         } else console.log(res.rowCount,'rows queried')
 
