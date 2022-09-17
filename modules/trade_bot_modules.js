@@ -2349,7 +2349,6 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             ctx.drawImage(img1, tlX, tlY);
             ctx.fillStyle = '#ffffff';
             
-            ctx.fillText('heyyyy', 20, 20);
             textC = draw(`${username}`, (tlX>80) ? 10:tlX-name_width, tlY-30, 20, '#7cb45d');
             drawLineCurve(textC.trX+10,textC.trY+10,textC.trX+30,textC.trY+10,textC.trX+30, tlY-10)
             textC = draw(`${user_price}p`, tlX+70, tlY-50, 25);
@@ -2449,18 +2448,15 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
                 resolve(res.attachments.map(attachment => attachment)[0].url)
             }).catch((err) => reject(err))*/
 
-            fs.writeFileSync('lich_output.png',ctx.canvas.toBuffer("image/png"))
-            fs.readFile('lich_output.png','base64',(lich_output) => {
-                new WebhookClient({url: 'https://discord.com/api/webhooks/1020434538184319076/2op1q6orOunUROoEdRjDiEGu4e0kZzkx9ShetUdIMq-MNwAKztyDwYuymf1ajMivXnIT'}).send({
-                  content: `canvas_t${discord_id}_p${user_price}.png`,
-                  files: [{
-                      attachment: ctx.canvas.toBuffer("image/png"),
-                      name: `canvas_t${discord_id}_p${user_price}.png`
-                  }]
-                }).then(res => {
-                    resolve(res.attachments.map(attachment => attachment)[0].url)
-                }).catch(console.err)
-            })
+            new WebhookClient({url: 'https://discord.com/api/webhooks/1020434538184319076/2op1q6orOunUROoEdRjDiEGu4e0kZzkx9ShetUdIMq-MNwAKztyDwYuymf1ajMivXnIT'}).send({
+                content: `canvas_t${discord_id}_p${user_price}.png`,
+                files: [{
+                    attachment: ctx.canvas.toBuffer("image/png"),
+                    name: `canvas_t${discord_id}_p${user_price}.png`
+                }]
+            }).then(res => {
+                resolve(res.attachments.map(attachment => attachment)[0].url)
+            }).catch(console.err)
         }).catch((err) => reject(err))
     })
 }
