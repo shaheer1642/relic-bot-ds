@@ -4353,7 +4353,7 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
         if (payload.visibility == true) {
             const currTime = new Date().getTime()
             const timeout = (currTime + (u_order_close_time - (currTime - payload.update_timestamp))) - currTime
-            set_order_timeout(order,timeout)
+            set_order_timeout(payload,timeout)
         }
         trading_bot_orders_update(payload)
     }
@@ -4361,7 +4361,7 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
         if (payload.visibility == true) {
             const currTime = new Date().getTime()
             const timeout = (currTime + (u_order_close_time - (currTime - payload.update_timestamp))) - currTime
-            set_order_timeout(order,timeout)
+            set_order_timeout(payload,timeout)
         }
         trading_bot_orders_update(payload[0])
     }
