@@ -7,7 +7,7 @@
     "anychart": "^8.11.0",
     "axios": "^0.21.3",
     "axios-retry": "^3.1.9",
-    "canvas": "^2.8.0",
+    "canvas": "^2.10.1",
     "chart.js": "^3.7.1",
     "chartjs": "^0.3.24",
     "chartjs-node-canvas": "^4.1.6",
@@ -35,7 +35,6 @@
   "version": "1.0.0",
   "description": "Gauss Prime bot for discord",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "start": "node -r dotenv/config index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
