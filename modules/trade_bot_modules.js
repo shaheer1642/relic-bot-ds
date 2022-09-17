@@ -2448,7 +2448,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
                 resolve(res.attachments.map(attachment => attachment)[0].url)
             }).catch((err) => reject(err))*/
 
-            new WebhookClient({url: 'https://discord.com/api/webhooks/1020434538184319076/2op1q6orOunUROoEdRjDiEGu4e0kZzkx9ShetUdIMq-MNwAKztyDwYuymf1ajMivXnIT'}).send({
+            new WebhookClient({url: process.env.LICH_IMAGE_WH}).send({
                 content: `canvas_t${discord_id}_p${user_price}.png`,
                 files: [{
                     attachment: ctx.canvas.toBuffer("image/png"),
