@@ -3684,7 +3684,7 @@ function td_set_orders_timeouts() {
 }
 
 function set_order_timeout(order,timeout) {
-    console.log('setting auto-close timeout for order',order.order_id)
+    console.log('setting auto-close timeout for order',order.order_id,'executes in',timeout,'ms')
     setTimeout(() => {
         console.log('closing order due to timeout', order.order_id)
         db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE order_id='${order.order_id}' AND visibility = true;`).catch(console.error)
