@@ -4358,10 +4358,10 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
         trading_bot_orders_update(payload)
     }
     if (notification.channel == 'tradebot_users_orders_update') {
-        if (payload.visibility == true) {
+        if (payload[0].visibility == true) {
             const currTime = new Date().getTime()
-            const timeout = (currTime + (u_order_close_time - (currTime - payload.update_timestamp))) - currTime
-            set_order_timeout(payload,timeout)
+            const timeout = (currTime + (u_order_close_time - (currTime - payload[0].update_timestamp))) - currTime
+            set_order_timeout(payload[0],timeout)
         }
         trading_bot_orders_update(payload[0])
     }
