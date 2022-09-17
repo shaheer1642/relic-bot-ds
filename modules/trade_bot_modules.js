@@ -3896,7 +3896,7 @@ async function tb_activate_orders(message, interaction) {
     if (message) user_id = message.author.id
     else if (interaction) user_id = interaction.user.id
     else return
-    db.query(`UPDATE tradebot_users_orders SET visibility = true WHERE discord_id = ${user_id}`).catch(console.error)
+    db.query(`UPDATE tradebot_users_orders SET visibility = true WHERE discord_id = ${user_id} AND visibility = false`).catch(console.error)
     if (message) message.delete().catch(console.error)
     return
 }
@@ -4015,7 +4015,7 @@ async function tb_close_orders(message, interaction) {
         user_id = interaction.user.id
     else 
         return
-    db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE discord_id = ${user_id}`).catch(console.error)
+    db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE discord_id = ${user_id} AND visibility = true`).catch(console.error)
     if (message)
         setTimeout(() => message.delete().catch(console.error), 500)
     return
