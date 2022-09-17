@@ -30,5 +30,33 @@
   "engines": {
     "node": "16.x",
     "npm": "8.x"
-  }
+  },
+  "name": "relic-bot-ds",
+  "version": "1.0.0",
+  "description": "Gauss Prime bot for discord",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "start": "node -r dotenv/config index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaheer1642/relic-bot-ds.git"
+  },
+  "keywords": [
+    "Discord",
+    "bot",
+    "discord",
+    "gauss",
+    "prime",
+    "warframe",
+    "warframehub"
+  ],
+  "author": "MrSofty",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shaheer1642/relic-bot-ds/issues"
+  },
+  "homepage": "https://github.com/shaheer1642/relic-bot-ds#readme"
 }

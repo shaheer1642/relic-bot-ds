@@ -6,6 +6,8 @@ const { WebhookClient } = require('discord.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
 const JSONbig = require('json-bigint');
 const uuid = require('uuid');
+const { fstat } = require('fs');
+const fs = require('fs');
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
@@ -2368,7 +2370,7 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
             ctx.putImageData(tempctx,0,0)
           
             function draw(text, x, y, size=10, color = weapon_url.match('kuva')? '#fcc603': '#06a0d4') {
-                ctx.font = size + 'px Arial';
+                ctx.font = size + 'px Consolas';
                 ctx.fillStyle = color;
                 ctx.fillText(text, x, y);
                 var cords = ctx.measureText(text)
@@ -2447,15 +2449,18 @@ async function create_lich_image(discord_id,username,weapon_url,icon_url,lich_na
                 resolve(res.attachments.map(attachment => attachment)[0].url)
             }).catch((err) => reject(err))*/
 
-            const webhookClient = new WebhookClient({url: 'https://discord.com/api/webhooks/1020434538184319076/2op1q6orOunUROoEdRjDiEGu4e0kZzkx9ShetUdIMq-MNwAKztyDwYuymf1ajMivXnIT'}).send({
-              content: `canvas_t${discord_id}_p${user_price}.png`,
-              files: [{
-                  attachment: ctx.canvas.toBuffer(),
-                  name: `canvas_t${discord_id}_p${user_price}.png`
-              }]
-            }).then(res => {
-                resolve(res.attachments.map(attachment => attachment)[0].url)
-            }).catch(console.err)
+            fs.writeFileSync('lich_output.png',ctx.canvas.toBuffer())
+            fs.readFile('lich_output.png','base64',(lich_output) => {
+                const webhookClient = new WebhookClient({url: 'https://discord.com/api/webhooks/1020434538184319076/2op1q6orOunUROoEdRjDiEGu4e0kZzkx9ShetUdIMq-MNwAKztyDwYuymf1ajMivXnIT'}).send({
+                  content: `canvas_t${discord_id}_p${user_price}.png`,
+                  files: [{
+                      attachment: 'lich_output.png',
+                      name: `canvas_t${discord_id}_p${user_price}.png`
+                  }]
+                }).then(res => {
+                    resolve(res.attachments.map(attachment => attachment)[0].url)
+                }).catch(console.err)
+            })
         }).catch((err) => reject(err))
     })
 }

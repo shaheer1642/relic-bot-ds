@@ -15,7 +15,7 @@ async function bot_initialize() {
 		console.log(all_guild_ids)
 
 		if (process.env.DEBUG_MODE == 1) {
-			if (true) {
+			if (false) {
 				// delete prev registered slash commands
 				all_guild_ids.forEach(guildId => {
 					rest.get(Routes.applicationGuildCommands(client.user.id, guildId))

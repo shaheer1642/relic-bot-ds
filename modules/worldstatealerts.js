@@ -1,6 +1,3 @@
-if (process.env.DEBUG_MODE == 1)
-    return
-
 const {client} = require('./discord_client.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
