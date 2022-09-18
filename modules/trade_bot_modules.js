@@ -3710,7 +3710,7 @@ async function tb_activate_orders(message, interaction) {
     if (message) user_id = message.author.id
     else if (interaction) user_id = interaction.user.id
     else return
-    db.query(`UPDATE tradebot_users_orders SET visibility = true WHERE discord_id = ${user_id} AND visibility = false`).catch(console.error)
+    db.query(`UPDATE tradebot_users_orders SET visibility = true, update_timestamp=${new Date().getTime()} WHERE discord_id = ${user_id} AND visibility = false`).catch(console.error)
     if (message) message.delete().catch(console.error)
     return
 }
@@ -3823,15 +3823,11 @@ async function tb_activate_lich_orders(message, interaction) {
 
 async function tb_close_orders(message, interaction) {
     var user_id = 0
-    if (message)
-        user_id = message.author.id
-    else if (interaction)
-        user_id = interaction.user.id
-    else 
-        return
-    db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE discord_id = ${user_id} AND visibility = true`).catch(console.error)
-    if (message)
-        setTimeout(() => message.delete().catch(console.error), 500)
+    if (message) user_id = message.author.id
+    else if (interaction) user_id = interaction.user.id
+    else return
+    db.query(`UPDATE tradebot_users_orders SET visibility = false, update_timestamp=${new Date().getTime()} WHERE discord_id = ${user_id} AND visibility = true`).catch(console.error)
+    if (message) setTimeout(() => message.delete().catch(console.error), 500)
     return
 }
 
