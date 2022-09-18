@@ -2738,7 +2738,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                           brX: x+cords.width,
                           brY: y
                         }
-                        //console.log(cordss.tlX + 'x' + cordss.tlY)
+                        //console.log(cordss.tlX + 'x' + cordss.tlY) 
                         //ctx.fillRect(cordss.tlX,cordss.tlY,3,3);
                         //ctx.fillRect(cordss.trX,cordss.trY,3,3);
                         //ctx.fillRect(cordss.blX,cordss.blY,3,3);
