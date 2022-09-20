@@ -413,12 +413,16 @@ async function interaction_handler(interaction) {
     }
     else if (interaction.customId == 'worldstatealerts_fissures_tracker_add') {
         const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type').replace('steel path','steelpath'))
-        const relic_type = LU(interaction.fields.getTextInputValue('relic_type'))
+        const relic_type = LU(interaction.fields.getTextInputValue('relic_type')).replace('reqieum','requiem').replace('requium','requiem').replace('requim','requiem')
         const mission_type = LU(interaction.fields.getTextInputValue('mission_type').replace('defence','defense').replace('exterminate','extermination'))
         const planet = LU(interaction.fields.getTextInputValue('planet'))
         const node = LU(interaction.fields.getTextInputValue('node'))
         if ((planet && !node) || (node && !planet)) {
             interaction.reply({content: `Please put the planet name as well as the node, not just one of them`, ephemeral: true}).catch(console.error)
+            return
+        }
+        if (relic_type != 'lith' && relic_type != 'meso' && relic_type != 'neo' && relic_type != 'axi' && relic_type != 'requiem') {
+            interaction.reply({content: `**${relic_type}** is an invalid relic type. Please type one of: lith, meso, neo, axi, or requiem`, ephemeral: true}).catch(console.error)
             return
         }
         const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? planet:''}`
