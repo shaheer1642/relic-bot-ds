@@ -379,6 +379,7 @@ async function message_handler(message, multiMessage) {
 }
 
 client.on('messageReactionAdd', async (reaction, user) => {
+    if (user.bot) return
     if (Object.keys(tradingBotChannels).includes(reaction.message.channel.id) || Object.keys(tradingBotLichChannels).includes(reaction.message.channel.id) || tradingBotSpamChannels.includes(reaction.message.channel.id)) {
         if (tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`) || tradingBotReactions.buy.includes(`<:${reaction.emoji.identifier}>`)) {
             setTimeout(() => reaction.users.remove(user.id).catch(console.error), 1000)
