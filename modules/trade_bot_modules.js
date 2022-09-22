@@ -3118,11 +3118,12 @@ db.on('notification', async (notification) => {
             db.query(payload.item_type == 'item' ? `SELECT * FROM items_list WHERE id='${payload.item_id}';`:`SELECT * FROM lich_list WHERE lich_id='${payload.item_id}';`)
             .then(res => {
                 const item_data = res.rows[0]
+                const item_url = item_data.item_url || item_data.weapon_url
                 db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${payload.order_owner} OR discord_id = ${payload.order_filler};`)
                 .then(res => {
                     const user_data = {}
                     res.rows.forEach(row => user_data[row.discord_id] = row)
-                    var threadName = `${convertUpper(item_data.item_url)} (${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
+                    var threadName = `${convertUpper(item_url)} (${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
                     if (threadName.length > 99) {
                         console.log(`${threadName} thread's name is longer than 99`)
                         threadName = `(${user_data[payload.order_owner].ingame_name})x(${user_data[payload.order_filler].ingame_name})`
@@ -3152,11 +3153,11 @@ db.on('notification', async (notification) => {
                             }
                         }
                         console.log('thread created')
-                        client.users.fetch(payload.order_owner.toString()).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_data.item_url) + payload.order_data.rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
+                        client.users.fetch(payload.order_owner.toString()).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_url) + payload.order_data.rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
                         const postdata = {
                             color: payload.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor),
                             timestamp: new Date(),
-                            title: convertUpper(payload.item_type == 'item'? item_data.item_url:item_data.weapon_url) + payload.order_data.rank.replace('unranked','').replace('maxed',' (maxed)'),
+                            title: convertUpper(item_url) + payload.order_data.rank.replace('unranked','').replace('maxed',' (maxed)'),
                             footer: {text: `This trade will be auto-closed in 15 minutes\n\u200b`},
                             thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
                             description: 
