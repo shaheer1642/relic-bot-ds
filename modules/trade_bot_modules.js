@@ -3153,11 +3153,11 @@ db.on('notification', async (notification) => {
                             }
                         }
                         console.log('thread created')
-                        client.users.fetch(payload.order_owner.toString()).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_url) + payload.order_data.rank.replace('unranked','').replace('maxed',' (maxed)')}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
+                        client.users.fetch(payload.order_owner.toString()).then(user => user.send(`You have received a **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}** for **${convertUpper(item_url) + payload.order_data.rank?.replace('unranked','').replace('maxed',' (maxed)') || ''}**\nPlease click on <#${owner_channel_thread.id}> to trade`).catch(console.error)).catch(console.error)
                         const postdata = {
                             color: payload.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor),
                             timestamp: new Date(),
-                            title: convertUpper(item_url) + payload.order_data.rank.replace('unranked','').replace('maxed',' (maxed)'),
+                            title: convertUpper(item_url) + payload.order_data.rank?.replace('unranked','').replace('maxed',' (maxed)') || '',
                             footer: {text: `This trade will be auto-closed in 15 minutes\n\u200b`},
                             thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
                             description: 
