@@ -422,7 +422,7 @@ async function interaction_handler(interaction) {
             return
         }
         if (relic_type != 'lith' && relic_type != 'meso' && relic_type != 'neo' && relic_type != 'axi' && relic_type != 'requiem') {
-            interaction.reply({content: `**${relic_type}** is an invalid relic type. Please type one of: lith, meso, neo, axi, or requiem`, ephemeral: true}).catch(console.error)
+            interaction.reply({content: `**${relic_type}** is an invalid relic type.\nPlease type one of: lith, meso, neo, axi, or requiem`, ephemeral: true}).catch(console.error)
             return
         }
         const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? planet:''}`
