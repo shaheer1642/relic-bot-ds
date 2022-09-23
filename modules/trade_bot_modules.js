@@ -3160,7 +3160,7 @@ db.on('notification', async (notification) => {
                             timestamp: new Date(),
                             title: convertUpper(item_url) + (payload.order_data.rank?.replace('unranked','').replace('maxed',' (maxed)') || ''),
                             footer: {text: `This trade will be auto-closed in 15 minutes\n\u200b`},
-                            thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
+                            thumbnail:  {url: payload.item_type == 'item' ? 'https://warframe.market/static/assets/' + item_data.icon_url : ''},
                             description: 
 `**${payload.order_type.replace('wts','Seller').replace('wtb','Buyer')}:** <@${payload.order_owner}>
 **${payload.order_type.replace('wts','Buyer').replace('wtb','Seller')}:** <@${payload.order_filler}>
