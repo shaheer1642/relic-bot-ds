@@ -411,7 +411,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                                                 '${order_data.order_type}',
                                                 '{"${order_data.discord_id}": 0, "${user.id}": 0}',
                                                 ${order_data.user_price},
-                                                '${JSON.stringify({rank: order_data.order_data.rank})}',
+                                                '${JSON.stringify(order_data.order_data)}',
                                                 '${order_data.item_type}',
                                                 ${new Date().getTime()}
                                             );
