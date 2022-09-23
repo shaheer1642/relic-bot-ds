@@ -3174,6 +3174,7 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
                                 url: payload.item_type == 'item' ? '' : payload.order_data.lich_image_url,
                             },
                         }
+                        console.log(JSON.stringify(postdata))
                         owner_channel_thread.send({content: `<@${payload.order_owner}> <@${payload.order_filler}>`,embeds: [postdata]})
                         .then(open_message => {
                             db.query(`
