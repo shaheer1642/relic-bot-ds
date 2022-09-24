@@ -437,11 +437,30 @@ client.on('messageReactionAdd', async (reaction, user) => {
         if (reaction.message.channel.isThread()) {
             if (reaction.message.channel.ownerId == client.user.id) {
                 if (!reaction.message.channel.archived) {
-                    if (!reaction.message.author)
-                        reaction.message = await reaction.message.channel.messages.fetch(reaction.message.id).catch(console.error)
                     if (reaction.message.author.id == client.user.id) {
                         if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
-                            return Promise.resolve()
+                            return
+                        db.query(`SELECT * FROM tradebot_filled_users_orders WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`)
+                        .then(res => {
+                            if (res.rowCount != 1) return
+                            const order_data = res.rows[0]
+                            if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
+                                reaction.users.remove(user.id).catch(console.error)
+                                return
+                            }
+                            db.query(
+                                `<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] ? 
+    
+                                `UPDATE tradebot_filled_users_orders SET order_status = 'successful', order_rating = '${JSON.stringify({[order_data.order_owner]: 5,[order_data.order_filler]: 5,})}', archived = true
+                                WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`:
+    
+                                reaction.emoji.name == '⚠️' ? 
+    
+                                `UPDATE tradebot_filled_users_orders SET reporter_id = ${user.id}, archived = true
+                                WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`:''
+                            ).catch(console.error)
+                        }).catch(console.error)
+                        /*
                         var order_data = null
                         var from_cross = false
                         var q_filledOrderTable = 'tradebot_filled_users_orders'
@@ -539,6 +558,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                             `).catch(console.error)
                         }
                         return Promise.resolve()
+                        */
                     }
                 }
             }
