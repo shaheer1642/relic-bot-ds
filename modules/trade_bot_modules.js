@@ -83,12 +83,8 @@ async function message_handler(message, multiMessage) {
             SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id,timestamp: new Date().getTime()})}]'::jsonb
             WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
             RETURNING *;
-            UPDATE tradebot_filled_users_lich_orders
-            SET messages_log = messages_log || '[${JSON.stringify({message: sentMessage.replace(/\'/g,`''`), discord_id: message.author.id, platform: 'discord', thread_id: message.channel.id, timestamp: new Date().getTime()})}]'::jsonb
-            WHERE (thread_id = ${message.channel.id} OR cross_thread_id = ${message.channel.id}) AND archived = false AND (order_owner = ${message.author.id} OR order_filler = ${message.author.id})
-            RETURNING *;
         `).then(res => {
-            if (res[0].rowCount == 0 && res[1].rowCount == 0) {
+            if (res.rowCount == 0) {
                 message.delete().catch(console.error)
                 client.users.cache.get(message.author.id).send(`You do not have permission to send message in this thread.`).catch(console.error)
                 return
@@ -434,132 +430,141 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }).catch(console.error)
             }).catch(console.error)
         }
-        if (reaction.message.channel.isThread()) {
-            if (reaction.message.channel.ownerId == client.user.id) {
-                if (!reaction.message.channel.archived) {
-                    if (reaction.message.author.id == client.user.id) {
-                        if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
+    }
+    if (reaction.message.channel.isThread()) {
+        console.log('test 1')
+        if (reaction.message.channel.ownerId == client.user.id) {
+            console.log('test 2')
+            if (!reaction.message.channel.archived) {
+                console.log('test 3')
+                if (!reaction.message.author)
+                    reaction.message  = await reaction.message.fetch().catch(console.error)
+                if (reaction.message.author.id == client.user.id) {
+                    console.log('test 4')
+                    if ((reaction.emoji.name != '⚠️') && (`<:${reaction.emoji.identifier}>` != tradingBotReactions.success[0]))
+                        return
+                    console.log('test 5')
+                    console.log(`SELECT * FROM tradebot_filled_users_orders WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`)
+                    db.query(`SELECT * FROM tradebot_filled_users_orders WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`)
+                    .then(res => {
+                        if (res.rowCount != 1) return
+                        console.log('test 6')
+                        const order_data = res.rows[0]
+                        if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
+                            reaction.users.remove(user.id).catch(console.error)
                             return
-                        db.query(`SELECT * FROM tradebot_filled_users_orders WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`)
-                        .then(res => {
-                            if (res.rowCount != 1) return
-                            const order_data = res.rows[0]
-                            if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
-                                reaction.users.remove(user.id).catch(console.error)
-                                return
-                            }
-                            db.query(
-                                `<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] ? 
-    
-                                `UPDATE tradebot_filled_users_orders SET order_status = 'successful', order_rating = '${JSON.stringify({[order_data.order_owner]: 5,[order_data.order_filler]: 5,})}', archived = true
-                                WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`:
-    
-                                reaction.emoji.name == '⚠️' ? 
-    
-                                `UPDATE tradebot_filled_users_orders SET reporter_id = ${user.id}, archived = true
-                                WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`:''
-                            ).catch(console.error)
-                        }).catch(console.error)
-                        /*
-                        var order_data = null
-                        var from_cross = false
-                        var q_filledOrderTable = 'tradebot_filled_users_orders'
-                        var q_return = 'order_owner,order_filler,item_id,order_rating,order_type,user_price,order_status,trade_timestamp'
-                        if (reaction.message.embeds[0]) {
-                            if (reaction.message.embeds[0].description.match(/\*\*Trade type:\*\* Lich/)) {
-                                var q_filledOrderTable = 'tradebot_filled_users_lich_orders'
-                                var q_return = 'order_owner,order_filler,lich_id,element,damage,ephemera,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp'
-                            }
                         }
-                        var status = await db.query(`
+                        db.query(
+                            `<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] ? 
+
+                            `UPDATE tradebot_filled_users_orders SET order_status = 'successful', order_rating = '${JSON.stringify({[order_data.order_owner]: 5,[order_data.order_filler]: 5,})}', archived = true
+                            WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`:
+
+                            reaction.emoji.name == '⚠️' ? 
+
+                            `UPDATE tradebot_filled_users_orders SET reporter_id = ${user.id}, archived = true
+                            WHERE thread_id = ${reaction.message.channel.id} OR cross_thread_id = ${reaction.message.channel.id};`:''
+                        ).catch(console.error)
+                    }).catch(console.error)
+                    /*
+                    var order_data = null
+                    var from_cross = false
+                    var q_filledOrderTable = 'tradebot_filled_users_orders'
+                    var q_return = 'order_owner,order_filler,item_id,order_rating,order_type,user_price,order_status,trade_timestamp'
+                    if (reaction.message.embeds[0]) {
+                        if (reaction.message.embeds[0].description.match(/\*\*Trade type:\*\* Lich/)) {
+                            var q_filledOrderTable = 'tradebot_filled_users_lich_orders'
+                            var q_return = 'order_owner,order_filler,lich_id,element,damage,ephemera,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp'
+                        }
+                    }
+                    var status = await db.query(`
+                        SELECT * FROM ${q_filledOrderTable}
+                        WHERE thread_id = ${reaction.message.channel.id} AND trade_open_message = ${reaction.message.id} AND archived = false
+                    `).then(res => {
+                        if (res.rows.length != 1)
+                            return false
+                        order_data = res.rows[0]
+                        return true
+                    }).catch(err => {
+                        console.log(err)
+                        return false
+                    })
+                    if (!status) {
+                        var status2 = await db.query(`
                             SELECT * FROM ${q_filledOrderTable}
-                            WHERE thread_id = ${reaction.message.channel.id} AND trade_open_message = ${reaction.message.id} AND archived = false
+                            WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_trade_open_message = ${reaction.message.id} AND archived = false
                         `).then(res => {
                             if (res.rows.length != 1)
                                 return false
+                            from_cross = true
                             order_data = res.rows[0]
                             return true
                         }).catch(err => {
                             console.log(err)
                             return false
                         })
-                        if (!status) {
-                            var status2 = await db.query(`
-                                SELECT * FROM ${q_filledOrderTable}
-                                WHERE cross_thread_id = ${reaction.message.channel.id} AND cross_trade_open_message = ${reaction.message.id} AND archived = false
-                            `).then(res => {
-                                if (res.rows.length != 1)
-                                    return false
-                                from_cross = true
-                                order_data = res.rows[0]
-                                return true
-                            }).catch(err => {
-                                console.log(err)
-                                return false
-                            })
-                            if (!status2)
-                                return Promise.resolve()
-                        }
-                        if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
-                            reaction.users.remove(user.id).catch(console.error)
+                        if (!status2)
                             return Promise.resolve()
-                        }
-                        var q_threadId = 'thread_id'
-                        if (from_cross)
-                            var q_threadId = 'cross_thread_id'
-                        var suspicious = false
-                        if (q_filledOrderTable == 'tradebot_filled_users_lich_orders' && order_data.user_price > 1000)
-                            suspicious = true
-                        if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] && !suspicious) {
-                            var status = await db.query(`
-                                UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true), archived = true
-                                WHERE ${q_threadId} = ${reaction.message.channel.id};
-                                UPDATE ${q_filledOrderTable} SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true), archived = true
-                                WHERE ${q_threadId} = ${reaction.message.channel.id}
-                                RETURNING ${q_return};
-                            `).then(async res => {
-                                if (res[1].rowCount == 1) {
-                                    await db.query(`
-                                        UPDATE tradebot_users_list
-                                        SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
-                                        WHERE discord_id = ${(order_data.order_owner)} OR discord_id = ${(order_data.order_filler)}
-                                    `).catch(console.error)
-                                }
-                                return true
-                            }).catch(err => {
-                                console.log(err)
-                                return false
-                            })
-                            if (!status)
-                                return Promise.resolve()
-                            //update plat balance for users
-                            var q_ownerPlat = 'plat_gained'
-                            var q_fillerPlat = 'plat_spent'
-                            if (order_data.order_type == 'wtb') {
-                                var q_ownerPlat = 'plat_spent'
-                                var q_fillerPlat = 'plat_gained'
-                            }
-                            db.query(`
-                                UPDATE tradebot_users_list SET ${q_ownerPlat} = ${q_ownerPlat} + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_owner)};
-                                UPDATE tradebot_users_list SET ${q_fillerPlat} = ${q_fillerPlat} + ${Number(order_data.user_price)}
-                                WHERE discord_id = ${(order_data.order_filler)};
-                            `).then(res => console.log(`updated plat balance for seller and buyer`)).catch(console.error)
-                            //remove order from owner profile
-                            var query = `DELETE FROM tradebot_users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
-                            if (q_filledOrderTable == 'tradebot_filled_users_lich_orders')
-                                query = `DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
-                            db.query(query).then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`)).catch(console.error)
-                            //-------
-                        } else if (reaction.emoji.name == '⚠️' || suspicious) {
-                            db.query(`
-                                UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious ? null:user.id}, suspicious = ${suspicious}, archived = true
-                                WHERE ${q_threadId} = ${reaction.message.channel.id}
-                            `).catch(console.error)
-                        }
-                        return Promise.resolve()
-                        */
                     }
+                    if ((user.id != order_data.order_owner) && (user.id != order_data.order_filler)) {
+                        reaction.users.remove(user.id).catch(console.error)
+                        return Promise.resolve()
+                    }
+                    var q_threadId = 'thread_id'
+                    if (from_cross)
+                        var q_threadId = 'cross_thread_id'
+                    var suspicious = false
+                    if (q_filledOrderTable == 'tradebot_filled_users_lich_orders' && order_data.user_price > 1000)
+                        suspicious = true
+                    if (`<:${reaction.emoji.identifier}>` == tradingBotReactions.success[0] && !suspicious) {
+                        var status = await db.query(`
+                            UPDATE ${q_filledOrderTable} SET order_status = 'successful', order_rating = jsonb_set(order_rating,'{${order_data.order_owner}}', '5', true), archived = true
+                            WHERE ${q_threadId} = ${reaction.message.channel.id};
+                            UPDATE ${q_filledOrderTable} SET order_rating = jsonb_set(order_rating,'{${order_data.order_filler}}', '5', true), archived = true
+                            WHERE ${q_threadId} = ${reaction.message.channel.id}
+                            RETURNING ${q_return};
+                        `).then(async res => {
+                            if (res[1].rowCount == 1) {
+                                await db.query(`
+                                    UPDATE tradebot_users_list
+                                    SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res[1].rows[0])}', true)
+                                    WHERE discord_id = ${(order_data.order_owner)} OR discord_id = ${(order_data.order_filler)}
+                                `).catch(console.error)
+                            }
+                            return true
+                        }).catch(err => {
+                            console.log(err)
+                            return false
+                        })
+                        if (!status)
+                            return Promise.resolve()
+                        //update plat balance for users
+                        var q_ownerPlat = 'plat_gained'
+                        var q_fillerPlat = 'plat_spent'
+                        if (order_data.order_type == 'wtb') {
+                            var q_ownerPlat = 'plat_spent'
+                            var q_fillerPlat = 'plat_gained'
+                        }
+                        db.query(`
+                            UPDATE tradebot_users_list SET ${q_ownerPlat} = ${q_ownerPlat} + ${Number(order_data.user_price)}
+                            WHERE discord_id = ${(order_data.order_owner)};
+                            UPDATE tradebot_users_list SET ${q_fillerPlat} = ${q_fillerPlat} + ${Number(order_data.user_price)}
+                            WHERE discord_id = ${(order_data.order_filler)};
+                        `).then(res => console.log(`updated plat balance for seller and buyer`)).catch(console.error)
+                        //remove order from owner profile
+                        var query = `DELETE FROM tradebot_users_orders WHERE discord_id = ${order_data.order_owner} AND item_id = '${order_data.item_id}'`
+                        if (q_filledOrderTable == 'tradebot_filled_users_lich_orders')
+                            query = `DELETE FROM tradebot_users_lich_orders WHERE discord_id = ${order_data.order_owner} AND lich_id = '${order_data.lich_id}'`
+                        db.query(query).then(res => console.log(`deleted order ${order_data.item_id} for ${order_data.order_owner}`)).catch(console.error)
+                        //-------
+                    } else if (reaction.emoji.name == '⚠️' || suspicious) {
+                        db.query(`
+                            UPDATE ${q_filledOrderTable} SET reporter_id = ${suspicious ? null:user.id}, suspicious = ${suspicious}, archived = true
+                            WHERE ${q_threadId} = ${reaction.message.channel.id}
+                        `).catch(console.error)
+                    }
+                    return Promise.resolve()
+                    */
                 }
             }
         }
@@ -1130,7 +1135,12 @@ async function trading_bot_orders_update(user_order_obj) {
                                     }).catch(console.error)
                                 }
                             }
-                        }).catch(console.error)
+                        }).catch(err => {
+                            if (err.code == '23505') {
+                                console.log('dublicate msg for item',item_url)
+                                webhookClient.deleteMessage(wh_msg.id).catch(console.error)
+                            } else console.log(err)
+                        })
                     }).catch(console.error)
                 } else {
                     db.query(`
@@ -3293,7 +3303,6 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
     }
     if (notification.channel == 'tradebot_users_orders_delete') {
         trading_bot_orders_update(payload)
-
     }
     if (notification.channel == 'tradebot_filled_users_orders_update_archived') {
         if (payload.thread_id) {
@@ -3306,83 +3315,67 @@ React with ⚠️ to report the trader (Please type the reason of report and inc
         }
         db.query(`
             SELECT * FROM tradebot_filled_users_orders
-            JOIN items_list ON tradebot_filled_users_orders.item_id = items_list.id
+            ${payload.item_type == 'item' ? `JOIN items_list ON tradebot_filled_users_orders.item_id = items_list.id` : `JOIN lich_list ON tradebot_filled_users_orders.item_id = lich_list.lich_id`}
             WHERE tradebot_filled_users_orders.receipt_id = '${payload.receipt_id}';
-            SELECT * FROM tradebot_filled_users_lich_orders
-            JOIN lich_list ON tradebot_filled_users_lich_orders.lich_id = lich_list.lich_id
-            WHERE tradebot_filled_users_lich_orders.receipt_id = '${payload.receipt_id}';
         `).then(async res => {
-            var order_data = null
-            var isLich = false
-            var query_table = 'tradebot_filled_users_orders'
-            if (res[0].rowCount == 1) {
-                order_data = res[0].rows[0]
-            } else if (res[1].rowCount == 1) {
-                isLich = true
-                query_table = 'tradebot_filled_users_lich_orders'
-                order_data = res[1].rows[0]
-            } else {
-                return
-            }
+            console.log(res.rows)
+            if (res.rowCount != 1) return
+            const order_data = res.rows[0]
+            const isLich = order_data.item_type == 'lich' ? true:false
             db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${order_data.order_owner} OR discord_id = ${order_data.order_filler};`)
             .then(async res => {
-                if (res.rowCount != 2)
-                    return
+                if (res.rowCount != 2) return
                 const userData = {}
                 res.rows.forEach(row => userData[row.discord_id] = row)
-                    var postdata = {}
-                    postdata.content = order_data.suspicious ? '🛑 Bot has detected a suspicious trade. Require verification 🛑':' '
-                    postdata.embeds = [{
-                        description: 
+                var postdata = {}
+                postdata.content = order_data.suspicious ? '🛑 Bot has detected a suspicious trade. Requires verification 🛑':' '
+                postdata.embeds = [{
+                    description: 
 `${isLich ? 'A lich':'An item'} order has been filled and thread archived
 **Created by:** <@${order_data.order_owner}> (${embedScore(userData[order_data.order_owner].ingame_name)}) <--- ${order_data.order_type.replace('wts','Seller').replace('wtb','Buyer')}
 **Filled by:** <@${order_data.order_filler}> (${embedScore(userData[order_data.order_filler].ingame_name)}) <--- ${order_data.order_type.replace('wts','Buyer').replace('wtb','Seller')}
-${isLich ? `**Lich traded:** ${order_data.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}`:`**Item traded:** ${order_data.item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + order_data.order_data.rank.replace('unranked','').replace('maxed',' (maxed)')}`}
+${isLich ? `**Lich traded:** ${convertUpper(order_data.weapon_url)}`:`**Item traded:** ${convertUpper(order_data.item_url) + order_data.order_data.rank.replace('unranked','').replace('maxed',' (maxed)')}`}
 **Price:** ${order_data.user_price}<:platinum:881692607791648778>
 **Order status:** ${order_data.order_status == 'unsuccessful' ? `unsuccessful ⚠️ (Select the troublemaker)`:`successful ${tradingBotReactions.success[0]}`} ${order_data.reporter_id ? `\n**Reported by:** <@${order_data.reporter_id}>`:''}
 **Users balance changed:** ${order_data.order_status.replace('unsuccessful','No').replace('successful','Yes')}
 **-----Chat Log-----**
 ${order_data.messages_log.length > 0? order_data.messages_log.map(obj => `**${embedScore(userData[obj.discord_id].ingame_name)}**: ${embedScore(obj.message)}`).join('\n'):'Empty'}`,
-                        image: {url: isLich ? order_data.lich_image_url:''},
-                        timestamp: new Date(), 
-                        color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
-                    }]
-                    if (order_data.order_status == 'unsuccessful') {
-                        postdata.components = [{
-                            type: 1,
-                            components: [{
-                                type: 3,
-                                placeholder: 'Select the troublemaker',
-                                custom_id: 'staff_trade_verification',
-                                min_values: 1,
-                                max_values: 1,
-                                options: [
-                                    {
-                                        label: '🛑 ' + userData[order_data.order_owner].ingame_name,
-                                        value: order_data.order_owner
-                                    },
-                                    {
-                                        label: '🛑 ' + userData[order_data.order_filler].ingame_name,
-                                        value: order_data.order_filler
-                                    },
-                                    {
-                                        label: "None. All clear (change plat balance)",
-                                        value: "NonePlat"
-                                    },
-                                    {
-                                        label: "None. All clear (No change)",
-                                        value: "NoneNoPlat"
-                                    }
-                                ]
-                            }]
+                    image: {url: isLich ? order_data.order_data.lich_image_url:''},
+                    timestamp: new Date(), 
+                    color: order_data.order_status.replace('unsuccessful',tb_invisColor).replace('successful', order_data.order_type.replace('wts',tb_sellColor).replace('wtb',tb_buyColor))
+                }]
+                if (order_data.order_status == 'unsuccessful') {
+                    postdata.components = [{
+                        type: 1,
+                        components: [{
+                            type: 3,
+                            placeholder: 'Select the troublemaker',
+                            custom_id: 'staff_trade_verification',
+                            min_values: 1,
+                            max_values: 1,
+                            options: [
+                                {
+                                    label: '🛑 ' + userData[order_data.order_owner].ingame_name,
+                                    value: order_data.order_owner
+                                },
+                                {
+                                    label: '🛑 ' + userData[order_data.order_filler].ingame_name,
+                                    value: order_data.order_filler
+                                },
+                                {
+                                    label: "None. All clear (change plat balance)",
+                                    value: "NonePlat"
+                                },
+                                {
+                                    label: "None. All clear (No change)",
+                                    value: "NoneNoPlat"
+                                }
+                            ]
                         }]
-                    }
-                    const channel = client.channels.cache.get(ordersFillLogChannel) || await client.channels.fetch(ordersFillLogChannel).catch(console.error)
-                    if (channel) {
-                        channel.send(postdata).then(log_message => {
-                            db.query(`UPDATE ${query_table} SET trade_log_message = ${log_message.id} WHERE receipt_id = '${payload.receipt_id}';`).catch(console.error)
-                        }).catch(console.error)
-                    }
+                    }]
+                }
+                const channel = client.channels.cache.get(ordersFillLogChannel) || await client.channels.fetch(ordersFillLogChannel).catch(console.error)
+                if (channel) channel.send(postdata).then(log_message => db.query(`UPDATE tradebot_filled_users_orders SET trade_log_message = ${log_message.id} WHERE receipt_id = '${payload.receipt_id}';`).catch(console.error)).catch(console.error)
             }).catch(console.error)
         }).catch(console.error)
     }

@@ -114,35 +114,6 @@ client.on('ready', () => {
     if (process.env.DEBUG_MODE==1)
         return
 
-    /*
-    //----Re-define wfm-api orders timers if any-----
-    db.query(`SELECT * FROM auto_update_items`)
-    .then(res => {
-        if (res.rowCount > 0) {
-            res.rows.forEach(async e => {
-                console.log('Setting order timer for message ' + e.message_id)
-                const message = await client.channels.cache.get(e.channel_id).messages.fetch(e.message_id).catch(err => console.log(err))
-                var counter = 0;
-                message.edit({content: 'Auto-update has been turned on!'}).catch(err => console.log(err))
-                message.reactions.removeAll().catch(err => console.log(err))
-                var intervalID = setInterval(function () {
-                
-                    wfm_api.orders_update(message)
-                
-                    if (++counter === 120) {
-                        clearInterval(intervalID);
-                        message.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`}).catch(err => console.log(err))
-                        message.react(defaultReactions.update.string).catch(err => console.log(err))
-                        message.react(defaultReactions.auto_update.string).catch(err => console.log(err))
-                        db.query(`DELETE FROM auto_update_items WHERE message_id = ${message.id} AND channel_id = ${message.channel.id}`)
-                        .catch(err => console.log(err))
-                    }
-                }, 30000);
-            })
-        }
-    }).catch(err => console.log(err))
-    */
-
     osiris_guild.bot_initialize()
     trade_bot_modules.bot_initialize()
     botv.bot_initialize()
@@ -154,6 +125,12 @@ client.on('ready', () => {
     botv_event_voting.bot_initialize()
     worldstatealerts.bot_initialize()
     ducat_updater.bot_initialize()
+
+    client.guilds.fetch().then(guilds => {
+        guilds.forEach(guild => {
+            client.guilds.cache.get(guild.id).me.setNickname(process.env.MAINTENANCE_MODE ? 'Gauss Prime [Maintenance Mode]':'Gauss Prime').catch(console.error)
+        })
+    }).catch(console.error)
 })
 
 client.on('messageCreate', async message => {
