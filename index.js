@@ -128,7 +128,7 @@ client.on('ready', () => {
 
     client.guilds.fetch().then(guilds => {
         guilds.forEach(guild => {
-            client.guilds.cache.get(guild.id).me.setNickname(process.env.MAINTENANCE_MODE ? 'Gauss Prime [Maintenance Mode]':'Gauss Prime').catch(console.error)
+            client.guilds.cache.get(guild.id).me.setNickname(process.env.MAINTENANCE_MODE == 1 ? 'Gauss Prime [Maintenance Mode]':'Gauss Prime').catch(console.error)
         })
     }).catch(console.error)
 })
