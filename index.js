@@ -422,7 +422,7 @@ client.on('messageCreate', async message => {
                     botv_recruit.edit_main_msg(message,args)
                     break
                 case 'restart':
-                    if (message.user.id == '253525146923433984') {
+                    if (message.author.id == '253525146923433984') {
                         console.log('restarting bot upon discord user request',message.author.id)
                         message.channel.send({content: 'restart command received, restarting bot'})
                         .then(() => process.exit()).catch(console.error)
