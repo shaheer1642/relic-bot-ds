@@ -422,7 +422,10 @@ client.on('messageCreate', async message => {
                     botv_recruit.edit_main_msg(message,args)
                     break
                 case 'restart':
-                    if (message.user.id == '253525146923433984') process.exit()
+                    if (message.user.id == '253525146923433984') {
+                        message.channel.send({content: 'restart command received, restarting bot'})
+                        .then(() => process.exit()).catch(console.error)
+                    } else message.channel.send({content: 'Sorry, you don\'t have permission to use this command'}).catch(console.error)
                     break
                 //-----------------------*/
             }
