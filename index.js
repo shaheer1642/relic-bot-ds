@@ -421,6 +421,9 @@ client.on('messageCreate', async message => {
                 case 'test':
                     botv_recruit.edit_main_msg(message,args)
                     break
+                case 'restart':
+                    if (message.user.id == '253525146923433984') process.exit()
+                    break
                 //-----------------------*/
             }
         }
