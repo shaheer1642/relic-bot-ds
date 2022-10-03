@@ -423,6 +423,7 @@ client.on('messageCreate', async message => {
                     break
                 case 'restart':
                     if (message.user.id == '253525146923433984') {
+                        console.log('restarting bot upon discord user request',message.author.id)
                         message.channel.send({content: 'restart command received, restarting bot'})
                         .then(() => process.exit()).catch(console.error)
                     } else message.channel.send({content: 'Sorry, you don\'t have permission to use this command'}).catch(console.error)
