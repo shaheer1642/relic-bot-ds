@@ -93,8 +93,7 @@ async function orders(message,args) {
     .then(res => {
         items_list = res.rows
         return true
-    })
-    .catch (err => {
+    }).catch (err => {
         console.log(err)
         console.log('Retrieving Database -> items_list error')
         message.channel.send({content: "Some error occured retrieving items for db.\nError code: 500"}).catch(err => console.log(err))
@@ -159,7 +158,7 @@ async function orders(message,args) {
             })
         }
         const item_data = arrItems[i]
-        axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
+        axios("https://api.warframe.market/v1/items/" + item_data.raw_item_url + "/orders?include=item")
         .then(async response => {
             var ordersArr = []
             response.data.payload.orders.forEach(element => {
@@ -320,7 +319,7 @@ async function orders_update(message, reaction, user) {
     for (var i=0; i<arrItems.length; i++)
     {
         const item_data = arrItems[i]
-        axios("https://api.warframe.market/v1/items/" + item_data.item_url + "/orders?include=item")
+        axios("https://api.warframe.market/v1/items/" + item_data.raw_item_url + "/orders?include=item")
         .then(async response => {
             var ordersArr = []
             response.data.payload.orders.forEach(element => {
@@ -1077,7 +1076,7 @@ async function list(message,args) {
         message.channel.send("More than 10 search results detected for the item " + d_item_url + ", cannot process this request. Please provide a valid item name").catch(err => console.log(err));
         return
     }
-    const item_url = arrItemsUrl[0].item_url
+    const item_url = arrItemsUrl[0].raw_item_url
     const item_id = arrItemsUrl[0].item_id
     let processMessage = [];
     const process = await message.channel.send("Processing").then(response => {
