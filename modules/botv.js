@@ -176,41 +176,50 @@ async function guildMemberUpdate(oldMember, newMember) {
     }
 }
 
-async function guildMemberAdd(member) {
-    if (member.user.bot)
+client.on('guildMemberAdd', async member => {
+    if (process.env.DEBUG_MODE==1)
         return
-    member = await member.fetch().catch(console.error)
-    const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
-    const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
-    const embed = new MessageEmbed()
-        .setFooter({text: member.displayName, iconURL: member.user.displayAvatarURL()})
-        .setColor('RANDOM')
-        .addFields({
-            name: 'Account information',
-            value: '**• ID:** ' + member.user.id + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
-            inline: true
-        },{
-            name: 'Member information',
-            value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined + `\n**• Profile:** <@${member.user.id}>`,
-            inline: true
+
+    if (member.guild.id == "776804537095684108") {      //For BotV
+        if (member.user.bot)
+            return
+        member = await member.fetch().catch(console.error)
+        member.setNickname((member.nickname || member.displayName) + ' [Non-verified IGN]').catch(console.error)
+        const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
+        const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
+        const embed = new MessageEmbed()
+            .setFooter({text: member.displayName, iconURL: member.user.displayAvatarURL()})
+            .setColor('RANDOM')
+            .addFields({
+                name: 'Account information',
+                value: '**• ID:** ' + member.user.id + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
+                inline: true
+            },{
+                name: 'Member information',
+                value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined + `\n**• Profile:** <@${member.user.id}>`,
+                inline: true
+            })
+            .setTimestamp()
+        member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]})
+        .catch(err => {
+            console.log(err + '\nError sending member welcome message.')
+            inform_dc('Error sending member welcome message.')
+        });
+        
+        const role1 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'members')
+        const role2 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'new members')
+        await member.roles.add(role1).catch(console.error)
+        await member.roles.add(role2)
+        .then (response => {
+            mod_log(`Assigned roles <@&${role1.id}>, <@&${role2.id}> to user <@${member.id}>`,'#FFFF00')
+        }).catch(function (error) {
+            console.log(`${error} Error adding role ${role2.name} for user ${member.user.username}`)
+            inform_dc(`Error adding role ${role2.name} for user ${member.displayName}`)
         })
-        .setTimestamp()
-    member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]})
-    .catch(err => {
-        console.log(err + '\nError sending member welcome message.')
-        inform_dc('Error sending member welcome message.')
-    });
-    
-    const role1 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'members')
-    const role2 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'new members')
-    await member.roles.add(role1).catch(console.error)
-    await member.roles.add(role2)
-    .then (response => {
-        mod_log(`Assigned roles <@&${role1.id}>, <@&${role2.id}> to user <@${member.id}>`,'#FFFF00')
-    }).catch(function (error) {
-        console.log(`${error} Error adding role ${role2.name} for user ${member.user.username}`)
-        inform_dc(`Error adding role ${role2.name} for user ${member.displayName}`)
-    })
+    }
+});
+
+async function guildMemberAdd(member) {
 }
 
 async function reaction_handler(reaction,user,action) {
@@ -453,6 +462,5 @@ module.exports = {
     guildMemberUpdate,
     bot_initialize,
     message_handler,
-    guildMemberAdd,
     reaction_handler
 }

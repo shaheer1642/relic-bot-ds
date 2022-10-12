@@ -1872,10 +1872,6 @@ client.on('messageReactionRemove', async (reaction, user) => {
 client.on('guildMemberAdd', async member => {
     if (process.env.DEBUG_MODE==1)
         return
-
-    if (member.guild.id == "776804537095684108") {      //For BotV
-        botv.guildMemberAdd(member)
-    }
 });
 
 client.on('threadUpdate', async (oldThread,newThread) => {
