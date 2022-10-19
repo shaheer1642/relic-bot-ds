@@ -11,7 +11,6 @@ const otherRolesMessageId = "957330415734095932"
 const hiatusRoleId = '838888922971897856'
 const hiatus_removal_interval = 5184000000 // 60 days in ms
 
-setTimeout(check_hiatus_expiry, 10000);
 setInterval(check_hiatus_expiry, 3600000);
 
 function bot_initialize() {
