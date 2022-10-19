@@ -417,6 +417,9 @@ client.on('messageCreate', async message => {
                 case 'getpoints': 
                     botv_event_voting.calculate_votes(message)
                     break
+                case 'viewhiatus': 
+                    botv.getHiatusMembers(message)
+                    break
                 ///*----------------------
                 case 'test':
                     botv_recruit.edit_main_msg(message,args)

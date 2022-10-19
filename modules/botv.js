@@ -22,6 +22,35 @@ function message_handler(message) {
         generate_report(message)
 }
 
+function getHiatusMembers(message) {
+    db.query(`SELECT * from botv_hiatus_members`)
+    .then(res => {
+        if (res.rowCount == 0) {
+            message.channel.send('could not find any hiatus members').catch(console.error)
+        }
+        else {
+            message.channel.send({
+                content: '',
+                embeds: [{
+                    description: 'Members currently on hiatus',
+                    fields: [{
+                        name: 'Member',
+                        value: res.rows.map(row => {return `<@${row.discord_id}>`}).join('\n'),
+                        inline: true
+                    },{
+                        name: 'Role expiry',
+                        value: res.rows.map(row => {return `<t:${Math.round((new Date().getTime() + ((row.role_added_timestamp + 5184000000) - new Date().getTime()))/1000)}:R>`}).join('\n'),
+                        inline: true
+                    }]
+                }]
+            }).catch(err => {
+                console.log(err)
+                message.channel.send(err).catch(console.error)
+            })
+        }
+    }).catch(console.error)
+}
+
 function generate_report(message) {
     message.channel.send('Your issue has been recorded. Thanks for your feedback!\nIn-case of any enquiry on the report, please contact any admin').catch(console.error).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000));
     setTimeout(() => {
@@ -231,7 +260,7 @@ client.on('guildMemberUpdate', (oldMember,newMember) => {
         if (oldMember.roles.cache.find(r => r.id == hiatusRoleId) && !newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
             console.log('hiatus role added to a member')
             db.query(`DELETE FROM botv_hiatus_members WHERE discord_id = ${newMember.id}`).catch(console.error)
-            mod_log(`<@&${hiatusRoleId}> role removed from user <@${newMember.id}>`,'#2ECC71')
+            mod_log(`<@&${hiatusRoleId}> role removed from user <@${newMember.id}>`,'#E74C3C')
         }
     }
 })
@@ -479,5 +508,6 @@ module.exports = {
     guildMemberUpdate,
     bot_initialize,
     message_handler,
-    reaction_handler
+    reaction_handler,
+    getHiatusMembers
 }
