@@ -1,4 +1,5 @@
 const {client} = require('./discord_client.js');
+const {db} = require('./db_connection.js');
 const { MessageAttachment, Message, MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
@@ -7,6 +8,7 @@ const admin_channelId = '870385402916249611'
 const report_channelId = '1000036014867353711'
 const masteryRolesMessageId = "892084165405716541"
 const otherRolesMessageId = "957330415734095932"
+const hiatusRoleId = '838888922971897856'
 
 function bot_initialize() {
     if (client.guilds.cache.get('776804537095684108')) {
@@ -218,6 +220,21 @@ client.on('guildMemberAdd', async member => {
         })
     }
 });
+
+client.on('guildMemberUpdate', (oldMember,newMember) => {
+    if (newMember.guild.id == '776804537095684108') {
+        if (!oldMember.roles.cache.find(r => r.id == hiatusRoleId) && newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
+            console.log('hiatus role added to a member')
+            db.query(`INSERT INTO botv_hiatus_members (discord_id,role_added_timestamp) VALUES (${newMember.id},${new Date().getTime()})`).catch(console.error)
+            mod_log(`User <@${newMember.id}> has been assigned role <@&${hiatusRoleId}>\nThis will be auto-removed <t:${Math.round((new Date().getTime() + 5184000000)/1000)}:R>`,'#2ECC71')
+        }
+        if (oldMember.roles.cache.find(r => r.id == hiatusRoleId) && !newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
+            console.log('hiatus role added to a member')
+            db.query(`DELETE FROM botv_hiatus_members WHERE discord_id = ${newMember.id}`).catch(console.error)
+            mod_log(`<@&${hiatusRoleId}> role removed from user <@${newMember.id}>`,'#2ECC71')
+        }
+    }
+})
 
 async function guildMemberAdd(member) {
 }
