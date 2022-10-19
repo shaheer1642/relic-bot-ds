@@ -277,39 +277,37 @@ async function check_hiatus_expiry() {
         .then(res => {
             res.rows.forEach(member => {
                 const inactivity_interval = new Date().getTime() - Number(member.role_added_timestamp)
-                if (member.discord_id == '212952630350184449') {
-                    if (inactivity_interval > hiatus_removal_interval) {
-                        client.guilds.cache.get('776804537095684108').members.fetch(member.discord_id)
-                        .then(guildMember => {
-                            guildMember.roles.remove(hiatusRole)
-                            .then(() => {
-                                client.users.fetch(member.discord_id).then(user => user.send({
-                                    content: ' ',
-                                    embeds: [{
-                                        description: `This is an auto-generated message from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role has been removed and may soon be kicked from the clan. If you'd like to join back, please contact an admin in <#776804538119618583> chat`,
-                                        footer: {
-                                            text: `If you feel you've received this warning in error, please let us know`
-                                        },
-                                        color: '#470b96'
-                                    }]
-                                })).catch(console.error)
-                            }).catch(console.error)
+                if (inactivity_interval > hiatus_removal_interval) {
+                    client.guilds.cache.get('776804537095684108').members.fetch(member.discord_id)
+                    .then(guildMember => {
+                        guildMember.roles.remove(hiatusRole)
+                        .then(() => {
+                            client.users.fetch(member.discord_id).then(user => user.send({
+                                content: ' ',
+                                embeds: [{
+                                    description: `This is an auto-generated message from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role has been removed and may soon be kicked from the clan. If you'd like to join back, please contact an admin in <#776804538119618583> chat`,
+                                    footer: {
+                                        text: `If you feel you've received this warning in error, please let us know`
+                                    },
+                                    color: '#470b96'
+                                }]
+                            })).catch(console.error)
                         }).catch(console.error)
-                    } else if ((inactivity_interval > 3888000000) && !member.removal_notified) {
-                        client.users.fetch(member.discord_id).then(user => user.send({
-                            content: ' ',
-                            embeds: [{
-                                description: `This is an auto-generated warning from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role will be auto removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)} and soon kicked from the clan. If you'd like to stay, please contact an admin in <#776804538119618583> chat`,
-                                footer: {
-                                    text: `If you feel you've received this warning in error, please let us know`
-                                },
-                                color: '#470b96'
-                            }]
-                        })).then(res => {
-                            db.query(`UPDATE botv_hiatus_members SET removal_notified=true WHERE discord_id = ${member.discord_id}`).catch(console.error)
-                            mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus\nTheir hiatus role will be removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)}`,'#470b96')
-                        }).catch(console.error)
-                    }
+                    }).catch(console.error)
+                } else if ((inactivity_interval > 3888000000) && !member.removal_notified) {
+                    client.users.fetch(member.discord_id).then(user => user.send({
+                        content: ' ',
+                        embeds: [{
+                            description: `This is an auto-generated warning from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role will be auto removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)} and soon kicked from the clan. If you'd like to stay, please contact an admin in <#776804538119618583> chat`,
+                            footer: {
+                                text: `If you feel you've received this warning in error, please let us know`
+                            },
+                            color: '#470b96'
+                        }]
+                    })).then(res => {
+                        db.query(`UPDATE botv_hiatus_members SET removal_notified=true WHERE discord_id = ${member.discord_id}`).catch(console.error)
+                        mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus\nTheir hiatus role will be removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)}`,'#470b96')
+                    }).catch(console.error)
                 }
             })
         }).catch(console.error)
