@@ -2,13 +2,16 @@ const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js');
 const { MessageAttachment, Message, MessageEmbed } = require('discord.js');
 const fs = require('fs');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log,ms_to_days_hours} = require('./extras.js');
 
 const admin_channelId = '870385402916249611'
 const report_channelId = '1000036014867353711'
 const masteryRolesMessageId = "892084165405716541"
 const otherRolesMessageId = "957330415734095932"
 const hiatusRoleId = '838888922971897856'
+const hiatus_removal_interval = 5184000000 // 60 days in ms
+
+setTimeout(check_hiatus_expiry, 5000);
 
 function bot_initialize() {
     if (client.guilds.cache.get('776804537095684108')) {
@@ -39,7 +42,7 @@ function getHiatusMembers(message) {
                         inline: true
                     },{
                         name: 'Role expiry',
-                        value: res.rows.map(row => {return `<t:${Math.round((new Date().getTime() + ((Number(row.role_added_timestamp) + 5184000000) - new Date().getTime()))/1000)}:R>`}).join('\n'),
+                        value: res.rows.map(row => {return `<t:${Math.round((new Date().getTime() + ((Number(row.role_added_timestamp) + hiatus_removal_interval) - new Date().getTime()))/1000)}:R>`}).join('\n'),
                         inline: true
                     }]
                 }]
@@ -255,7 +258,7 @@ client.on('guildMemberUpdate', (oldMember,newMember) => {
         if (!oldMember.roles.cache.find(r => r.id == hiatusRoleId) && newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
             console.log('hiatus role added to a member')
             db.query(`INSERT INTO botv_hiatus_members (discord_id,role_added_timestamp) VALUES (${newMember.id},${new Date().getTime()})`).catch(console.error)
-            mod_log(`User <@${newMember.id}> has been assigned role <@&${hiatusRoleId}>\nThis will be auto-removed <t:${Math.round((new Date().getTime() + 5184000000)/1000)}:R>`,'#2ECC71')
+            mod_log(`User <@${newMember.id}> has been assigned role <@&${hiatusRoleId}>\nThis will be auto-removed <t:${Math.round((new Date().getTime() + hiatus_removal_interval)/1000)}:R>`,'#2ECC71')
         }
         if (oldMember.roles.cache.find(r => r.id == hiatusRoleId) && !newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
             console.log('hiatus role added to a member')
@@ -265,7 +268,50 @@ client.on('guildMemberUpdate', (oldMember,newMember) => {
     }
 })
 
-async function guildMemberAdd(member) {
+async function check_hiatus_expiry() {
+    console.log('botv.js check_hiatus_expiry called')
+    client.guilds.fetch('776804537095684108')
+    .then(guild_botv => {
+        const hiatusRole = guild_botv.roles.cache.find(r => r.id == hiatusRoleId)
+        db.query(`SELECT * FROM botv_hiatus_members`)
+        .then(res => {
+            res.rows.forEach(member => {
+                if (member.discord_id == '212952630350184449') {
+                    if ((Number(member.role_added_timestamp) + hiatus_removal_interval) > new Date().getTime()) {
+                        client.guilds.cache.get('776804537095684108').members.fetch(member.discord_id)
+                        .then(guildMember => {
+                            guildMember.roles.remove(hiatusRole)
+                            .then(() => {
+                                client.users.fetch(member.discord_id).then(user => user.send({
+                                    content: ' ',
+                                    embeds: [{
+                                        description: `This is an auto-generated message from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role has been removed and may soon be kicked from the clan. If you'd like to join back, please contact an admin in <#776804538119618583> chat`,
+                                        footer: {
+                                            text: `If you feel you've received this warning in error, please let us know`
+                                        }
+                                    }]
+                                })).catch(console.error)
+                            })
+                            .catch(console.error)
+                        }).catch(console.error)
+                    } else if (((Number(member.role_added_timestamp) + 3888000000) > new Date().getTime()) && !member.removal_notified) {
+                        const inactivity_interval = new Date().getTime() - Number(member.role_added_timestamp)
+                        client.users.fetch(member.discord_id).then(user => user.send({
+                            content: ' ',
+                            embeds: [{
+                                description: `This is an auto-generated warning from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role will be auto removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)} and soon kicked from the clan. If you'd like to stay, please contact an admin in <#776804538119618583> chat`,
+                                footer: {
+                                    text: `If you feel you've received this warning in error, please let us know`
+                                }
+                            }]
+                        })).then(res => {
+                            mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period`)
+                        }).catch(console.error)
+                    }
+                }
+            })
+        }).catch(console.error)
+    }).catch(console.error)
 }
 
 async function reaction_handler(reaction,user,action) {

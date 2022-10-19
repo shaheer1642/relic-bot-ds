@@ -119,4 +119,15 @@ function convertUpper(str) {
     return str.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
 }
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper};
+function ms_to_days_hours(ms) {
+    const days = Math.floor(ms / (24*60*60*1000));
+    const daysms = ms % (24*60*60*1000);
+    const hours = Math.floor(daysms / (60*60*1000));
+    const hoursms = ms % (60*60*1000);
+    const minutes = Math.floor(hoursms / (60*1000));
+    const minutesms = ms % (60*1000);
+    const sec = Math.floor(minutesms / 1000);
+    return days + " days " + hours + " hours";
+  }
+
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper,ms_to_days_hours};
