@@ -11,7 +11,8 @@ const otherRolesMessageId = "957330415734095932"
 const hiatusRoleId = '838888922971897856'
 const hiatus_removal_interval = 5184000000 // 60 days in ms
 
-setTimeout(check_hiatus_expiry, 5000);
+setTimeout(check_hiatus_expiry, 10000);
+setInterval(check_hiatus_expiry, 3600000);
 
 function bot_initialize() {
     if (client.guilds.cache.get('776804537095684108')) {
@@ -278,7 +279,7 @@ async function check_hiatus_expiry() {
             res.rows.forEach(member => {
                 const inactivity_interval = new Date().getTime() - Number(member.role_added_timestamp)
                 if (member.discord_id == '212952630350184449') {
-                    if ((new Date().getTime() - Number(member.role_added_timestamp)) > hiatus_removal_interval) {
+                    if (inactivity_interval > hiatus_removal_interval) {
                         client.guilds.cache.get('776804537095684108').members.fetch(member.discord_id)
                         .then(guildMember => {
                             guildMember.roles.remove(hiatusRole)
@@ -290,13 +291,12 @@ async function check_hiatus_expiry() {
                                         footer: {
                                             text: `If you feel you've received this warning in error, please let us know`
                                         },
-                                        color: '#FFFF00'
+                                        color: '#470b96'
                                     }]
                                 })).catch(console.error)
-                            })
-                            .catch(console.error)
+                            }).catch(console.error)
                         }).catch(console.error)
-                    } else if (((new Date().getTime() - Number(member.role_added_timestamp)) > 3888000000) && !member.removal_notified) {
+                    } else if ((inactivity_interval > 3888000000) && !member.removal_notified) {
                         client.users.fetch(member.discord_id).then(user => user.send({
                             content: ' ',
                             embeds: [{
@@ -304,11 +304,11 @@ async function check_hiatus_expiry() {
                                 footer: {
                                     text: `If you feel you've received this warning in error, please let us know`
                                 },
-                                color: '#FFFF00'
+                                color: '#470b96'
                             }]
                         })).then(res => {
                             db.query(`UPDATE botv_hiatus_members SET removal_notified=true WHERE discord_id = ${member.discord_id}`).catch(console.error)
-                            mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus\nTheir hiatus role will be removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)}`,'#FFFF00')
+                            mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus\nTheir hiatus role will be removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)}`,'#470b96')
                         }).catch(console.error)
                     }
                 }
