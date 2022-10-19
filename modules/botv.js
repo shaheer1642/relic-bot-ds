@@ -276,8 +276,9 @@ async function check_hiatus_expiry() {
         db.query(`SELECT * FROM botv_hiatus_members`)
         .then(res => {
             res.rows.forEach(member => {
+                const inactivity_interval = new Date().getTime() - Number(member.role_added_timestamp)
                 if (member.discord_id == '212952630350184449') {
-                    if ((Number(member.role_added_timestamp) + hiatus_removal_interval) > new Date().getTime()) {
+                    if ((new Date().getTime() - Number(member.role_added_timestamp)) > hiatus_removal_interval) {
                         client.guilds.cache.get('776804537095684108').members.fetch(member.discord_id)
                         .then(guildMember => {
                             guildMember.roles.remove(hiatusRole)
@@ -294,8 +295,7 @@ async function check_hiatus_expiry() {
                             })
                             .catch(console.error)
                         }).catch(console.error)
-                    } else if (((Number(member.role_added_timestamp) + 3888000000) > new Date().getTime()) && !member.removal_notified) {
-                        const inactivity_interval = new Date().getTime() - Number(member.role_added_timestamp)
+                    } else if (((new Date().getTime() - Number(member.role_added_timestamp)) > 3888000000) && !member.removal_notified) {
                         client.users.fetch(member.discord_id).then(user => user.send({
                             content: ' ',
                             embeds: [{
@@ -305,6 +305,7 @@ async function check_hiatus_expiry() {
                                 }
                             }]
                         })).then(res => {
+                            db.query(`UPDATE botv_hiatus_members SET removal_notified=true WHERE discord_id = ${member.discord_id}`).catch(console.error)
                             mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period`)
                         }).catch(console.error)
                     }
