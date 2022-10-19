@@ -30,7 +30,7 @@ function getHiatusMembers(message) {
         }
         else {
             message.channel.send({
-                content: '',
+                content: ' ',
                 embeds: [{
                     description: 'Members currently on hiatus',
                     fields: [{
