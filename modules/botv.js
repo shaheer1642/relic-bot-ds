@@ -39,7 +39,7 @@ function getHiatusMembers(message) {
                         inline: true
                     },{
                         name: 'Role expiry',
-                        value: res.rows.map(row => {return `<t:${Math.round((new Date().getTime() + ((row.role_added_timestamp + 5184000000) - new Date().getTime()))/1000)}:R>`}).join('\n'),
+                        value: res.rows.map(row => {return `<t:${Math.round((new Date().getTime() + ((Number(row.role_added_timestamp) + 5184000000) - new Date().getTime()))/1000)}:R>`}).join('\n'),
                         inline: true
                     }]
                 }]
