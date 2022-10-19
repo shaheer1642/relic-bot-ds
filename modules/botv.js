@@ -289,7 +289,8 @@ async function check_hiatus_expiry() {
                                         description: `This is an auto-generated message from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role has been removed and may soon be kicked from the clan. If you'd like to join back, please contact an admin in <#776804538119618583> chat`,
                                         footer: {
                                             text: `If you feel you've received this warning in error, please let us know`
-                                        }
+                                        },
+                                        color: '#FFFF00'
                                     }]
                                 })).catch(console.error)
                             })
@@ -302,11 +303,12 @@ async function check_hiatus_expiry() {
                                 description: `This is an auto-generated warning from **Blossoms of the Void** about your ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus. Your role will be auto removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)} and soon kicked from the clan. If you'd like to stay, please contact an admin in <#776804538119618583> chat`,
                                 footer: {
                                     text: `If you feel you've received this warning in error, please let us know`
-                                }
+                                },
+                                color: '#FFFF00'
                             }]
                         })).then(res => {
                             db.query(`UPDATE botv_hiatus_members SET removal_notified=true WHERE discord_id = ${member.discord_id}`).catch(console.error)
-                            mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period`)
+                            mod_log(`Warned user <@${member.discord_id}> about their ${ms_to_days_hours(inactivity_interval)} inactivity period on hiatus\nTheir hiatus role will be removed in ${ms_to_days_hours(hiatus_removal_interval - inactivity_interval)}`,'#FFFF00')
                         }).catch(console.error)
                     }
                 }
