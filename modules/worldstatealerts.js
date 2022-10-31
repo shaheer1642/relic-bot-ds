@@ -2867,11 +2867,11 @@ async function fissures_check() {
                 user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
                 query.push(`
                     UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
+                    SET fissures_users = jsonb_set(fissures_users, '{${`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
                 `)
                 query.push(`
                     UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
+                    SET fissures_users = jsonb_set(fissures_users, '{${`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
                 `)
             })
             fissures_list.steelPath.forEach(fissure => {
@@ -2882,11 +2882,11 @@ async function fissures_check() {
                 user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
                 query.push(`
                     UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
+                    SET fissures_users = jsonb_set(fissures_users, '{${`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
                 `)
                 query.push(`
                     UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
+                    SET fissures_users = jsonb_set(fissures_users, '{${`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
                 `)
             })
             fissures_list.voidStorm.forEach(fissure => {
@@ -2897,11 +2897,11 @@ async function fissures_check() {
                 user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
                 query.push(`
                     UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
+                    SET fissures_users = jsonb_set(fissures_users, '{${`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
                 `)
                 query.push(`
                     UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
+                    SET fissures_users = jsonb_set(fissures_users, '{${`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
                 `)
             })
             // last_appeared query
