@@ -2809,7 +2809,7 @@ async function fissures_check() {
                 return text.trim().toLowerCase().replace(/ /g,'_')
             }
 
-            var ping_string = ''
+            var ping_string = []
 
             function user_trackers(tracker_id,fissure) {
                 res.rows.forEach(row => {
@@ -2825,7 +2825,9 @@ async function fissures_check() {
                                     SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},last_appeared}', '${new Date(fissure.activation).getTime()}', true)
                                     WHERE channel_id = ${row.channel_id};
                                 `).catch(console.error)
-                                ping_string += `${fissure.isHard ? '[SP] ':''}${fissure.tier} ${fissure.missionType} - ${fissure.node} `
+                                const str = `${fissure.isHard ? '[SP] ':''}${fissure.tier} ${fissure.missionType} - ${fissure.node}`
+                                if (!ping_string.includes(str))
+                                    ping_string.push(str)
                                 if (!ping_users[row.channel_id])
                                     ping_users[row.channel_id] = []
                                 if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
@@ -2906,7 +2908,7 @@ async function fissures_check() {
                         }).catch(console.error)
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`${ping_string.trim()} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 60000)).catch(console.error)
+                        client.channels.cache.get(row.channel_id).send(`${ping_string.join(' ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 60000)).catch(console.error)
                 }
             })
 

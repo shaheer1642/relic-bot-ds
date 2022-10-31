@@ -30,6 +30,11 @@ const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
 require('./modules/trackers.js');
 
+// restart after 24.5h
+setTimeout(() => {
+    process.exit()
+}, 88200000);
+
 const ducatRolesMessageId = "899402069159608320"
 
 const defaultReactions = {
