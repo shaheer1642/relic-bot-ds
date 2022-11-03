@@ -2827,12 +2827,6 @@ async function fissures_check() {
                             if (!users[row.channel_id].includes(`<@${user}>`))
                                 users[row.channel_id].push(`<@${user}>`)
                             if (row.fissures_users[tracker_id].last_appeared != new Date(fissure.activation).getTime()) {
-                                /*
-                                db.query(`
-                                    UPDATE worldstatealert
-                                    SET fissures_users = jsonb_set(fissures_users, '{${tracker_id},last_appeared}', '${new Date(fissure.activation).getTime()}', true)
-                                    WHERE channel_id = ${row.channel_id};
-                                `).catch(console.error)*/
                                 const str = `${fissure.isHard ? '[SP] ':''}${fissure.tier} ${fissure.missionType} - ${fissure.node}`
                                 if (!ping_string.includes(str))
                                     ping_string.push(str)

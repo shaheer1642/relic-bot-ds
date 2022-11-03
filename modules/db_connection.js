@@ -21,8 +21,7 @@ db.connect().then(async res => {
 })
 
 db.on('error', err => {
-    console.log('=============== DB Connection error. ==============')
-    console.log(err)
+    console.log('=============== DB Connection error. ==============', err)
     process.exit()
 })
 
