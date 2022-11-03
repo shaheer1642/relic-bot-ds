@@ -2811,9 +2811,16 @@ async function fissures_check() {
 
             var ping_string = []
 
+            var query = []
             function user_trackers(tracker_id,fissure) {
                 res.rows.forEach(row => {
                     if (row.fissures_users[tracker_id]) {
+                        if (new Date(fissure.activation).getTime() > row.fissures_users[tracker_id].last_appeared) {
+                            query.push(`
+                                UPDATE worldstatealert
+                                SET fissures_users = jsonb_set(fissures_users, '{${tracker_id.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
+                            `)
+                        }
                         row.fissures_users[tracker_id].users.forEach(user => {
                             if (!users[row.channel_id])
                                 users[row.channel_id] = []
@@ -2858,21 +2865,12 @@ async function fissures_check() {
                 })
             }
 
-            var query = []
             fissures_list.normal.forEach(fissure => {
                 embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
                 user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
                 user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
-                query.push(`
-                    UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
-                `)
-                query.push(`
-                    UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
-                `)
             })
             fissures_list.steelPath.forEach(fissure => {
                 embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
@@ -2880,14 +2878,6 @@ async function fissures_check() {
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
                 user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
                 user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
-                query.push(`
-                    UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
-                `)
-                query.push(`
-                    UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
-                `)
             })
             fissures_list.voidStorm.forEach(fissure => {
                 embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
@@ -2895,14 +2885,6 @@ async function fissures_check() {
                 embed3.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
                 user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
                 user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
-                query.push(`
-                    UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
-                `)
-                query.push(`
-                    UPDATE worldstatealert
-                    SET fissures_users = jsonb_set(fissures_users, '{${`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`.replace(`'`,`''`)},last_appeared}', '${new Date(fissure.activation).getTime()}', true);
-                `)
             })
             // last_appeared query
             console.log('[Fissure Tracker] query:',query.join(' '))
