@@ -3111,6 +3111,7 @@ async function alerts_check() {
                 if (active_reward.match('orokin_reactor')) active_reward = 'orokin_reactor'
                 else if (active_reward.match('orokin_catalyst')) active_reward = 'orokin_catalyst'
                 else if (active_reward.match('umbra_forma')) active_reward = 'umbra_forma'
+                else if (active_reward.match('forma_umbra')) active_reward = 'umbra_forma'
                 else if (active_reward.match('forma')) active_reward = 'forma'
                 alerts_rewards.push(active_reward)
 
