@@ -1110,7 +1110,7 @@ db.on('notification', async (notification) => {
 
     if (notification.channel == 'challenges_update') {
         for (const discord_id in payload[0].progress) {
-            if ((payload[0].progress[discord_id] == payload[0].completion_count) && ((!payload[1].progress[discord_id]) || (payload[1].progress[discord_id] < payload[0].progress[discord_id]))) {
+            if ((payload[0].progress[discord_id] >= payload[0].completion_count) && ((!payload[1].progress[discord_id]) || (payload[1].progress[discord_id] < payload[0].progress[discord_id]))) {
                 db.query(`
                     INSERT INTO challenges_completed
                     (discord_id,challenge_id,activation_id,timestamp)
