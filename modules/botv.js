@@ -76,40 +76,39 @@ client.on('ready', () => {
     edit_challenges_leaderboard_embed()
 })
 
-async function member_hiatus_check(member_obj) {
-    return new Promise((resolve,reject) => {
-        if (!member_obj.roles.cache.find(r => r.id == hiatusRoleId))
-            reject('[member_hiatus_check] member on hiatus')
-        else
+async function member_hiatus_check(user_id) {
+    return new Promise(async (resolve,reject) => {
+        const guild = client.guilds.cache.get(botv_guild_id) || await client.guilds.fetch(botv_guild_id).catch(console.error)
+        const member = guild.members.cache.get(user_id) || await guild.members.fetch(botv_guild_id).catch(console.error)
+        const role = member.roles.cache.find(r => r.id == hiatusRoleId)
+        if (role)
             resolve()
+        else
+            reject('[member_hiatus_check] member on hiatus')
     })
 }
 
 function verify_challenge_chatty(message) {
     if (message.guild?.id == botv_guild_id) {
         if (message.channel.id == channel_ids.general) {
-            message.member.fetch().then(member_obj => {
-                member_hiatus_check(member_obj).then(() => {
-                    db.query(`
-                        UPDATE challenges SET
-                        progress = progress || CONCAT('{"${message.member.id}":', COALESCE(progress->>'${message.member.id}','0')::int + 1, '}')::jsonb
-                        WHERE name = 'Chatty' AND is_active = true;
-                    `).catch(console.error)
-                }).catch(console.error)
+            member_hiatus_check(message.member.id).then(() => {
+                db.query(`
+                    UPDATE challenges SET
+                    progress = progress || CONCAT('{"${message.member.id}":', COALESCE(progress->>'${message.member.id}','0')::int + 1, '}')::jsonb
+                    WHERE name = 'Chatty' AND is_active = true;
+                `).catch(console.error)
             }).catch(console.error)
         }
     }
 }
 function verify_challenge_no_comment(reaction,user) {
     if (reaction.message.guild.id == botv_guild_id) {
-        reaction.member.fetch().then(member_obj => {
-            member_hiatus_check(member_obj).then(() => {
-                db.query(`
-                    UPDATE challenges SET
-                    progress = progress || CONCAT('{"${user.id}":', COALESCE(progress->>'${user.id}','0')::int + 1, '}')::jsonb
-                    WHERE name = 'No comment' AND is_active = true;
-                `).catch(console.error)
-            }).catch(console.error)
+        member_hiatus_check(user.id).then(() => {
+            db.query(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${user.id}":', COALESCE(progress->>'${user.id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'No comment' AND is_active = true;
+            `).catch(console.error)
         }).catch(console.error)
     }
 }
@@ -117,35 +116,27 @@ async function verify_challenge_giveaway(embeds) {
     const winners = embeds[0].description.split('Winners: ')[1].replace(/<@/g, '').replace(/>/g, '').split(',')
     console.log('[verify_challenge_giveaway] ', embeds, winners)
     var query = []
-    await client.guilds.fetch(botv_guild_id).then(guild => {
-        winners.forEach(async winner_id => {
-            await guild.members.fetch(winner_id).then(member_obj => {
-                member_hiatus_check(member_obj).then(() => {
-                    query.push(`
-                        UPDATE challenges SET
-                        progress = progress || CONCAT('{"${winner_id}":', COALESCE(progress->>'${winner_id}','0')::int + 1, '}')::jsonb
-                        WHERE name = 'Winner' AND is_active = true;
-                    `)
-                }).catch(console.error)
-            }).catch(console.error)
-        })
+    winners.forEach(async winner_id => {
+        await member_hiatus_check(winner_id).then(() => {
+            query.push(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${winner_id}":', COALESCE(progress->>'${winner_id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Winner' AND is_active = true;
+            `)
+        }).catch(console.error)
     })
     db.query(query.join(' ')).catch(console.error)
 }
 async function verify_challenge_serviceman(squad) {
     var query = []
-    await client.guilds.fetch(botv_guild_id).then(guild => {
-        squad.filled.forEach(async userId => {
-            await guild.members.fetch(winner_id).then(member_obj => {
-                member_hiatus_check(member_obj).then(() => {
-                    query.push(`
-                        UPDATE challenges SET
-                        progress = progress || CONCAT('{"${userId}":', COALESCE(progress->>'${userId}','0')::int + 1, '}')::jsonb
-                        WHERE name = 'Serviceman' AND is_active = true;
-                    `)
-                }).catch(console.error)
-            }).catch(console.error)
-        })
+    squad.filled.forEach(async userId => {
+        await member_hiatus_check(userId).then(() => {
+            query.push(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${userId}":', COALESCE(progress->>'${userId}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Serviceman' AND is_active = true;
+            `)
+        }).catch(console.error)
     })
     db.query(query.join(' ')).catch(console.error)
 }
