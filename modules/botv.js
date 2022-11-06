@@ -502,7 +502,7 @@ function edit_challenges_embed() {
         channel.messages.fetch(message_ids.challenges.challenges).then(message => {
             db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed;`)
             .then(res => {
-                const challenges = res[0].rows
+                const challenges = res[0].rows.sort(dynamicSortDesc('rp'))
                 const completed = res[1].rows
                 if (challenges.length > 0) {
                     const payload = {
