@@ -68,6 +68,7 @@ client.on('ready', () => {
             message.edit(message_formats.challenges.faq).catch(console.error)
         }).catch(console.error)
     }).catch(console.error)
+    console.log('[ms_till_monday_12am]',ms_till_monday_12am())
     setTimeout(weekly_challenges_reset, ms_till_monday_12am());
     setTimeout(weekly_challenges_reset, weekly_deals_reset());
     edit_challenges_embed()
@@ -219,7 +220,7 @@ client.on('interactionCreate', (interaction) => {
                 const discord_id = interaction.user.id
                 const challenges = res[0].rows
                 const completed = res[1].rows
-                const user_acc_bal = res[2]?.rows[0].balance || 0
+                const user_acc_bal = res[2].rows[0]?.balance || 0
                 const payload = {
                     content: ' ',
                     embeds: [{
