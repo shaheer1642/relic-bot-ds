@@ -457,28 +457,40 @@ function edit_challenges_leaderboard_embed() {
                     })
                     if (leaderboard.length == 5) break
                 }
-                leaderboard = leaderboard.sort(dynamicSortDesc("complete_count"))
-                const payload = {
-                    content: ' ',
-                    embeds: [{
-                        title: 'Leaderboard',
-                        fields: [{
-                            name: 'User',
-                            value: leaderboard.map(user => user.discord_id).join('\n'),
-                            inline: true
-                        },{
-                            name: 'Challenges Completed',
-                            value: leaderboard.map(user => user.complete_count).join('\n'),
-                            inline: true
-                        },{
-                            name: 'RP',
-                            value: leaderboard.map(user => user.rp).join('\n'),
-                            inline: true
-                        }],
-                        color: '#ff0000'
-                    }]
+                if (leaderboard.length == 0) {
+                    message.edit({
+                        content: ' ',
+                        embeds: [{
+                            title: 'Leaderboard',
+                            description: 'No data',
+                            color: '#ff0000'
+                        }]
+                    }).catch(console.error)
+                } else {
+                    leaderboard = leaderboard.sort(dynamicSortDesc("rp"))
+                    leaderboard = leaderboard.sort(dynamicSortDesc("complete_count"))
+                    const payload = {
+                        content: ' ',
+                        embeds: [{
+                            title: 'Leaderboard',
+                            fields: [{
+                                name: 'User',
+                                value: leaderboard.map(user => user.discord_id).join('\n'),
+                                inline: true
+                            },{
+                                name: 'Challenges Completed',
+                                value: leaderboard.map(user => user.complete_count).join('\n'),
+                                inline: true
+                            },{
+                                name: 'RP',
+                                value: leaderboard.map(user => user.rp).join('\n'),
+                                inline: true
+                            }],
+                            color: '#ff0000'
+                        }]
+                    }
+                    message.edit(payload).catch(console.error)
                 }
-                message.edit(payload).catch(console.error)
             }).catch(console.error)
         }).catch(console.error)
     }).catch(console.error)
