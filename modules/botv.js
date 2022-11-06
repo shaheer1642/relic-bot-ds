@@ -98,6 +98,7 @@ function verify_challenge_no_comment(reaction,user) {
 }
 function verify_challenge_giveaway(embeds) {
     const winners = embeds[0].description.split('Winners: ')[1].replace(/<@/g, '').replace(/>/g, '').split(',')
+    console.log('[verify_challenge_giveaway] ', embeds, winners)
     var query = []
     winners.forEach(winner_id => {
         query.push(`
@@ -428,7 +429,7 @@ client.on('guildMemberUpdate', (oldMember,newMember) => {
             mod_log(`User <@${newMember.id}> has been assigned role <@&${hiatusRoleId}>\nThis will be auto-removed <t:${Math.round((new Date().getTime() + hiatus_removal_interval)/1000)}:R>`,'#2ECC71')
         }
         if (oldMember.roles.cache.find(r => r.id == hiatusRoleId) && !newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
-            console.log('hiatus role added to a member')
+            console.log('hiatus role removed from a member')
             db.query(`DELETE FROM botv_hiatus_members WHERE discord_id = ${newMember.id}`).catch(console.error)
             mod_log(`<@&${hiatusRoleId}> role removed from user <@${newMember.id}>`,'#E74C3C')
         }
@@ -1109,7 +1110,7 @@ db.on('notification', async (notification) => {
 
     if (notification.channel == 'challenges_update') {
         for (const discord_id in payload[0].progress) {
-            if ((payload[0].progress[discord_id] == payload[0].completion_count) && (payload[0].progress[discord_id] > payload[1].progress[discord_id])) {
+            if ((payload[0].progress[discord_id] == payload[0].completion_count) && ((!payload[1].progress[discord_id]) || (payload[1].progress[discord_id] < payload[0].progress[discord_id]))) {
                 db.query(`
                     INSERT INTO challenges_completed
                     (discord_id,challenge_id,activation_id,timestamp)
