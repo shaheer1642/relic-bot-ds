@@ -345,7 +345,7 @@ client.on('interactionCreate', (interaction) => {
                 } else {
                     interaction.update({
                         content: ' ',
-                        embeds: [{description: 'You do not have enough RP to purchase this deal'}],
+                        embeds: [{description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user.balance}`}],
                         ephemeral: true
                     }).catch(console.error)
                 }
