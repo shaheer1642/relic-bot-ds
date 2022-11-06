@@ -53,6 +53,10 @@ const message_formats = {
                     name: 'May I recommend a new challenge/deal?',
                     value: 'Of course, please use <#879053804610404424>. However, the challenge should be such that its completion can be auto-checked by the bot',
                     inline: false
+                },{
+                    name: 'Can I complete challenges if I go on hiatus?',
+                    value: 'No, your progress will not count. You can continue after your hiatus role is removed',
+                    inline: false
                 }],
                 color: '#ffffff'
             }]
@@ -80,12 +84,11 @@ async function member_hiatus_check(user_id) {
     return new Promise(async (resolve,reject) => {
         const guild = client.guilds.cache.get(botv_guild_id) || await client.guilds.fetch(botv_guild_id).catch(console.error)
         const member = guild.members.cache.get(user_id) || await guild.members.fetch(botv_guild_id).catch(console.error)
-        const role = member.roles.cache.find(r => r.id == hiatusRoleId)
-        console.log('[member_hiatus_check] roles ', member.roles, role)
+        const role = member.roles.cache.get(hiatusRoleId)
         if (role)
-            resolve()
-        else
             reject('[member_hiatus_check] member on hiatus')
+        else
+            resolve()
     })
 }
 
@@ -117,7 +120,7 @@ async function verify_challenge_giveaway(embeds) {
     const winners = embeds[0].description.split('Winners: ')[1].replace(/<@/g, '').replace(/>/g, '').split(',')
     console.log('[verify_challenge_giveaway] ', embeds, winners)
     var query = []
-    winners.forEach(async winner_id => {
+    for (const winner_id of winners) {
         await member_hiatus_check(winner_id).then(() => {
             query.push(`
                 UPDATE challenges SET
@@ -125,20 +128,20 @@ async function verify_challenge_giveaway(embeds) {
                 WHERE name = 'Winner' AND is_active = true;
             `)
         }).catch(console.error)
-    })
+    }
     db.query(query.join(' ')).catch(console.error)
 }
 async function verify_challenge_serviceman(squad) {
     var query = []
-    squad.filled.forEach(async userId => {
-        await member_hiatus_check(userId).then(() => {
+    for (const user_id of squad.filled) {
+        await member_hiatus_check(user_id).then(() => {
             query.push(`
                 UPDATE challenges SET
-                progress = progress || CONCAT('{"${userId}":', COALESCE(progress->>'${userId}','0')::int + 1, '}')::jsonb
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
                 WHERE name = 'Serviceman' AND is_active = true;
             `)
         }).catch(console.error)
-    })
+    }
     db.query(query.join(' ')).catch(console.error)
 }
 
@@ -605,7 +608,7 @@ function edit_deals_embed() {
                             description: `Next reset <t:${Math.round(Number(deals[0].expiry) / 1000)}:R>`,
                             fields: [{
                                 name: deals[0].item_name,
-                                value: `RP: ${deals[0].rp}\n${transactions.filter(transaction => transaction.deal_activation_id == deals[0].activation_id).length} Purchased`
+                                value: `RP: ${deals[0].rp}\n${transactions.filter(transaction => transaction.activation_id == deals[0].activation_id).length} Purchased`
                             }],
                             color: '#2d7d46'
                         }],
