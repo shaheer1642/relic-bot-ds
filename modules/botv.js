@@ -1144,7 +1144,7 @@ db.on('notification', async (notification) => {
                 db.query(`
                     INSERT INTO challenges_accounts
                     (discord_id,balance)
-                    VALUES (${discord_id},${payload[0].rp});
+                    VALUES (${payload.discord_id},${payload[0].rp});
                 `).catch(console.error)
             }
         }).catch(console.error)
