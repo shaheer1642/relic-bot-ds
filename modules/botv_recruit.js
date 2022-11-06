@@ -5,6 +5,7 @@ const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
+const {verify_challenge_serviceman} = require('./botv')
 
 
 async function bot_initialize() {
@@ -335,6 +336,7 @@ function mention_users(joined_user_id,squad_id) {
 }
 
 function open_squad(squad) {
+    verify_challenge_serviceman(squad)
     console.log('botv squad opened', squad.filled.join(' '))
     client.channels.cache.get('950400363410915348').threads.create({
         name: squad.name,

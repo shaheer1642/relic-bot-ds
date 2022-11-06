@@ -128,6 +128,12 @@ function ms_to_days_hours(ms) {
     const minutesms = ms % (60*1000);
     const sec = Math.floor(minutesms / 1000);
     return days + " days " + hours + " hours";
-  }
+}
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper,ms_to_days_hours};
+function ms_till_monday_12am() {
+    const ms = ((((7 - (new Date().getDay() == 0 ? 7 : new Date().getDay())) * 86400) + (((23 - new Date().getHours()) * 60 * 60 )) + ((60 - new Date().getMinutes()) * 60)) * 1000)
+    if (ms < 0) return 86400000
+    return ms
+}
+
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper,ms_to_days_hours,ms_till_monday_12am};

@@ -2,7 +2,10 @@ const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js');
 const { MessageAttachment, Message, MessageEmbed } = require('discord.js');
 const fs = require('fs');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log,ms_to_days_hours} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log,ms_to_days_hours, ms_till_monday_12am} = require('./extras.js');
+const { randomUUID } = require('crypto');
+const uuid = require('uuid');
+const JSONbig = require('json-bigint');
 
 const admin_channelId = '870385402916249611'
 const report_channelId = '1000036014867353711'
@@ -10,8 +13,605 @@ const masteryRolesMessageId = "892084165405716541"
 const otherRolesMessageId = "957330415734095932"
 const hiatusRoleId = '838888922971897856'
 const hiatus_removal_interval = 5184000000 // 60 days in ms
+const botv_guild_id = '776804537095684108'
+
+const channel_ids = {
+    challenges: '1038436846444748890',
+    general: '776804538119618583'
+}
+const message_ids = {
+    challenges: {
+        faq: '1038462550968389672',
+        leaderboard: '1038462582912200734',
+        deal: '1038462604609339442',
+        challenges: '1038462613752922222',
+    }
+}
+
+const message_formats = {
+    challenges: {
+        faq: {
+            content: ' ',
+            embeds: [{
+                fields: [{
+                    name: 'What are challenges?',
+                    value: 'These automated weekly challenges reset once a week, fulfilling them will give the user Reward Points',
+                    inline: false
+                },{
+                    name: 'Do I need to contact anyone after fulfilling challenges?',
+                    value: 'No, almost all the challenges are automatically monitored by the server bot. After finishing one, you\'ll see the challenge as completed',
+                    inline: false
+                },{
+                    name: 'Do I keep progress of previous week challenges?',
+                    value: 'No, progress of a challenge is reset every week',
+                    inline: false
+                },{
+                    name: 'What is RP?',
+                    value: 'RP stands for Rewards Points, which are credited to your account upon fulfilling challenges. You can use RP to:\n- Purchase the weekly deals including slots/orokins/forma bundle/prime sets\n- Use RP to trade in <#837706067127173240> channel instead of plat [under development]\n- Gift RP to another clan member [under development]',
+                    inline: false
+                },{
+                    name: 'May I recommend a new challenge/deal?',
+                    value: 'Of course, please use <#879053804610404424>. However, the challenge should be such that its completion can be auto-checked by the bot',
+                    inline: false
+                }],
+                color: '#ffffff'
+            }]
+        }
+    }
+}
 
 setInterval(check_hiatus_expiry, 3600000);
+
+client.on('ready', () => {
+    client.channels.fetch(channel_ids.challenges).then(channel => {
+        channel.messages.fetch(message_ids.challenges.faq).then(message => {
+            message.edit(message_formats.challenges.faq).catch(console.error)
+        }).catch(console.error)
+    }).catch(console.error)
+    setTimeout(weekly_challenges_reset, ms_till_monday_12am());
+    setTimeout(weekly_challenges_reset, weekly_deals_reset());
+    edit_challenges_embed()
+    edit_deals_embed()
+    edit_challenges_leaderboard_embed()
+})
+
+function verify_challenge_chatty(message) {
+    if (message.guild?.id == botv_guild_id) {
+        if (message.channel.id == channel_ids.general) {
+            db.query(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${message.member.id}":', COALESCE(progress->>'${message.member.id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Chatty' AND is_active = true;
+            `).catch(console.error)
+        }
+    }
+}
+function verify_challenge_no_comment(reaction,user) {
+    if (reaction.message.guild.id == botv_guild_id) {
+        db.query(`
+            UPDATE challenges SET
+            progress = progress || CONCAT('{"${user.id}":', COALESCE(progress->>'${user.id}','0')::int + 1, '}')::jsonb
+            WHERE name = 'No comment' AND is_active = true;
+        `).catch(console.error)
+    }
+}
+function verify_challenge_giveaway(embeds) {
+    const winners = embeds[0].description.split('Winners: ')[1].replace(/<@/g, '').replace(/>/g, '').split(',')
+    var query = []
+    winners.forEach(winner_id => {
+        query.push(`
+            UPDATE challenges SET
+            progress = progress || CONCAT('{"${winner_id}":', COALESCE(progress->>'${winner_id}','0')::int + 1, '}')::jsonb
+            WHERE name = 'Winner' AND is_active = true;
+        `)
+    })
+    db.query(query.join(' ')).catch(console.error)
+}
+function verify_challenge_serviceman(squad) {
+    var query = []
+    squad.filled.forEach(userId => {
+        query.push(`
+            UPDATE challenges SET
+            progress = progress || CONCAT('{"${userId}":', COALESCE(progress->>'${userId}','0')::int + 1, '}')::jsonb
+            WHERE name = 'Serviceman' AND is_active = true;
+        `)
+    })
+    db.query(query.join(' ')).catch(console.error)
+}
+
+client.on('messageCreate', (message) => {
+    verify_challenge_chatty(message)
+})
+
+client.on('messageReactionAdd', (reaction,user) => {
+    verify_challenge_no_comment(reaction,user)
+})
+
+client.on('interactionCreate', (interaction) => {
+    if (interaction.isCommand()) {
+        if (interaction.commandName == 'challenges') {
+            if (interaction.options.getSubcommand() === 'add') {
+                db.query(`INSERT INTO challenges
+                    (challenge_id,name,description,completion_count,rp)
+                    VALUES ('${uuid.v4()}','${interaction.options.getString('name').replace(/'/g,`''`)}','${interaction.options.getString('description').replace(/'/g,`''`)}',${interaction.options.getNumber('count')},${interaction.options.getNumber('rp')})
+                `).then(res => {
+                    if (res.rowCount == 1) {
+                        interaction.reply('The challenge has been added').catch(console.error)
+                    } else {
+                        interaction.reply('Unexpected error adding challenge').catch(console.error)
+                    }
+                }).catch(err => {
+                    console.log(err)
+                    interaction.reply(`Error adding challenge\n${err}`).catch(console.error)
+                })
+            }
+            if (interaction.options.getSubcommand() === 'view') {
+                db.query(`SELECT * FROM challenges;`)
+                .then(res => {
+                    const payload = {
+                        content: ' ',
+                        embeds: [{
+                            description: 'List of challenges',
+                            fields: [{
+                                name: 'Name',
+                                value: res.rows.map(challenge => challenge.name).join('\n'),
+                                inline: true
+                            },{
+                                name: 'Description',
+                                value: res.rows.map(challenge => challenge.description).join('\n'),
+                                inline: true
+                            },{
+                                name: 'RP value',
+                                value: res.rows.map(challenge => challenge.rp).join('\n'),
+                                inline: true
+                            },]
+                        }],
+                        ephemeral: true
+                    }
+                    interaction.reply(payload).catch(console.error)
+                }).catch(console.error)
+            }
+        }
+        if (interaction.commandName == 'deals') {
+            if (interaction.options.getSubcommand() === 'add') {
+                db.query(`INSERT INTO challenges_deals
+                    (deal_id,item_name,rp)
+                    VALUES ('${uuid.v4()}','${interaction.options.getString('item').replace(/'/g,`''`)}',${interaction.options.getNumber('cost')});
+                `).then(res => {
+                    if (res.rowCount == 1) {
+                        interaction.reply('The deal has been added').catch(console.error)
+                    } else {
+                        interaction.reply('Unexpected error adding deal').catch(console.error)
+                    }
+                }).catch(err => {
+                    console.log(err)
+                    interaction.reply(`Error adding deal\n${err}`).catch(console.error)
+                })
+            }
+            if (interaction.options.getSubcommand() === 'view') {
+                db.query(`SELECT * FROM challenges_deals;`)
+                .then(res => {
+                    const payload = {
+                        content: ' ',
+                        embeds: [{
+                            description: 'List of deals',
+                            fields: [{
+                                name: 'Item',
+                                value: res.rows.map(challenge => challenge.item_name).join('\n'),
+                                inline: true
+                            },{
+                                name: 'RP Cost',
+                                value: res.rows.map(challenge => challenge.rp).join('\n'),
+                                inline: true
+                            }]
+                        }],
+                        ephemeral: true
+                    }
+                    interaction.reply(payload).catch(console.error)
+                }).catch(console.error)
+            }
+        }
+    }
+    if (interaction.isButton()) {
+        if (interaction.customId == 'view_weekly_challenges_summary') {
+            db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed; SELECT * FROM challenges_accounts WHERE discord_id = ${interaction.user.id}`)
+            .then(res => {
+                const discord_id = interaction.user.id
+                const challenges = res[0].rows
+                const completed = res[1].rows
+                const user_acc_bal = res[2]?.rows[0].balance || 0
+                const payload = {
+                    content: ' ',
+                    embeds: [{
+                        author: {
+                            name: interaction.member.displayName,
+                            icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.jpeg`,
+                        },
+                        description: `RP: ${user_acc_bal}`,
+                        fields: [],
+                        color: '#76b5c5'
+                    }],
+                    ephemeral: true
+                }
+                challenges.forEach(challenge => {
+                    if (challenge.progress[discord_id]) {
+                        const is_completed = challenge.progress[discord_id] >= challenge.completion_count ? true:false
+                        payload.embeds[0].fields.push({
+                            name: challenge.name + ` (${Math.round(challenge.progress[discord_id]/challenge.completion_count * 100)}%)`,
+                            value: `${is_completed? '**':''}${challenge.progress[discord_id]}/${challenge.completion_count}${is_completed? '**':''}`,
+                            inline: true
+                        })
+                    }
+                })
+                interaction.reply(payload).catch(console.error)
+            }).catch(console.error)
+        }
+        if (interaction.customId == 'purchase_weekly_deal') {
+            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
+            .then(res => {
+                const deal = res[0].rows[0]
+                const user = res[1]?.rows[0]
+                if (user && deal.rp <= user.balance) {
+                    interaction.reply({
+                        content: ' ',
+                        embeds: [{
+                            description: `Are you sure you want to purchase **${deal.item_name}** for **${deal.rp} RP**?`
+                        }],
+                        components: [{
+                            type: 1,
+                            components: [{
+                                type: 2,
+                                label: "YES",
+                                style: 3,
+                                custom_id: "purchase_weekly_deal_yes",
+                            },{
+                                type: 2,
+                                label: "NO",
+                                style: 4,
+                                custom_id: "purchase_weekly_deal_no",
+                            }]
+                        }],
+                        ephemeral: true
+                    }).catch(console.error)
+                } else {
+                    interaction.reply({
+                        content: ' ',
+                        embeds: [{
+                            description: 'You do not have enough RP to purchase this deal'
+                        }],
+                        ephemeral: true
+                    }).catch(console.error)
+                }
+            }).catch(console.error)
+        }
+        if (interaction.customId == 'purchase_weekly_deal_yes') {
+            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
+            .then(res => {
+                const deal = res[0].rows[0]
+                const user = res[1]?.rows[0]
+                if (user && deal.rp <= user.balance) {
+                    db.query(`
+                        INSERT INTO challenges_transactions
+                        (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp)
+                        VALUES ('${uuid.v4()}',${interaction.user.id},'weekly_deal_purchase','${deal.activation_id}',${deal.rp},'debit',${new Date().getTime()})
+                    `).then(res => {
+                        if (res.rowCount == 1) {
+                            interaction.update({
+                                content: ' ',
+                                embeds: [{description: 'Processing transaction, a thread channel will be created soon'}],
+                                components: [{
+                                    type: 1,
+                                    components: [{
+                                        type: 2,
+                                        label: "YES",
+                                        style: 3,
+                                        custom_id: "purchase_weekly_deal_yes",
+                                        disabled: true
+                                    },{
+                                        type: 2,
+                                        label: "NO",
+                                        style: 4,
+                                        custom_id: "purchase_weekly_deal_no",
+                                        disabled: true
+                                    }]
+                                }],
+                                ephemeral: true
+                            }).catch(console.error)
+                        } else {
+                            interaction.update({
+                                content: ' ',
+                                embeds: [{description: 'Unexpected error processing transaction'}],
+                                components: [{
+                                    type: 1,
+                                    components: [{
+                                        type: 2,
+                                        label: "YES",
+                                        style: 3,
+                                        custom_id: "purchase_weekly_deal_yes",
+                                        disabled: true
+                                    },{
+                                        type: 2,
+                                        label: "NO",
+                                        style: 4,
+                                        custom_id: "purchase_weekly_deal_no",
+                                        disabled: true
+                                    }]
+                                }],
+                                ephemeral: true
+                            }).catch(console.error)
+                        }
+                    }).catch(console.error)
+                } else {
+                    interaction.update({
+                        content: ' ',
+                        embeds: [{description: 'You do not have enough RP to purchase this deal'}],
+                        ephemeral: true
+                    }).catch(console.error)
+                }
+            }).catch(console.error)
+        }
+        if (interaction.customId == 'purchase_weekly_deal_no') {
+            interaction.update({
+                content: ' ',
+                embeds: [{description: 'Transaction cancelled'}],
+                components: [{
+                    type: 1,
+                    components: [{
+                        type: 2,
+                        label: "YES",
+                        style: 3,
+                        custom_id: "purchase_weekly_deal_yes",
+                        disabled: true
+                    },{
+                        type: 2,
+                        label: "NO",
+                        style: 4,
+                        custom_id: "purchase_weekly_deal_no",
+                        disabled: true
+                    }]
+                }],
+                ephemeral: true
+            }).catch(console.error)
+        }
+    }
+})
+
+client.on('guildMemberAdd', async member => {
+    if (process.env.DEBUG_MODE==1)
+        return
+
+    if (member.guild.id == "776804537095684108") {      //For BotV
+        if (member.user.bot)
+            return
+        member = await member.fetch().catch(console.error)
+        member.setNickname((member.nickname || member.displayName) + ' [Non-verified IGN]').catch(console.error)
+        const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
+        const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
+        const embed = new MessageEmbed()
+            .setFooter({text: member.displayName, iconURL: member.user.displayAvatarURL()})
+            .setColor('RANDOM')
+            .addFields({
+                name: 'Account information',
+                value: '**• ID:** ' + member.user.id + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
+                inline: true
+            },{
+                name: 'Member information',
+                value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined + `\n**• Profile:** <@${member.user.id}>`,
+                inline: true
+            })
+            .setTimestamp()
+        member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]})
+        .catch(err => {
+            console.log(err + '\nError sending member welcome message.')
+            inform_dc('Error sending member welcome message.')
+        });
+        
+        const role1 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'members')
+        const role2 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'new members')
+        await member.roles.add(role1).catch(console.error)
+        await member.roles.add(role2)
+        .then (response => {
+            mod_log(`Assigned roles <@&${role1.id}>, <@&${role2.id}> to user <@${member.id}>`,'#FFFF00')
+        }).catch(function (error) {
+            console.log(`${error} Error adding role ${role2.name} for user ${member.user.username}`)
+            inform_dc(`Error adding role ${role2.name} for user ${member.displayName}`)
+        })
+    }
+});
+
+client.on('guildMemberUpdate', (oldMember,newMember) => {
+    if (newMember.guild.id == '776804537095684108') {
+        if (!oldMember.roles.cache.find(r => r.id == hiatusRoleId) && newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
+            console.log('hiatus role added to a member')
+            db.query(`INSERT INTO botv_hiatus_members (discord_id,role_added_timestamp) VALUES (${newMember.id},${new Date().getTime()})`).catch(console.error)
+            mod_log(`User <@${newMember.id}> has been assigned role <@&${hiatusRoleId}>\nThis will be auto-removed <t:${Math.round((new Date().getTime() + hiatus_removal_interval)/1000)}:R>`,'#2ECC71')
+        }
+        if (oldMember.roles.cache.find(r => r.id == hiatusRoleId) && !newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
+            console.log('hiatus role added to a member')
+            db.query(`DELETE FROM botv_hiatus_members WHERE discord_id = ${newMember.id}`).catch(console.error)
+            mod_log(`<@&${hiatusRoleId}> role removed from user <@${newMember.id}>`,'#E74C3C')
+        }
+    }
+})
+
+function edit_challenges_leaderboard_embed() {
+    client.channels.fetch(channel_ids.challenges).then(channel => {
+        channel.messages.fetch(message_ids.challenges.leaderboard).then(message => {
+            db.query(`SELECT * FROM challenges_completed; SELECT * FROM challenges_accounts`)
+            .then(res => {
+                const challanges = res[0].rows
+                const accounts = res[1].rows
+                var leaderboard = []
+                const user_challenges = {}
+                challanges.forEach(challenge => {
+                    if (!user_challenges[challenge.discord_id])
+                        user_challenges[challenge.discord_id] = {count: 0, rp: accounts.filter(account => account.discord_id == challenge.discord_id)[0].balance}
+                    user_challenges[challenge.discord_id].count++;
+                })
+                for (const user_id in user_challenges) {
+                    const user = user_challenges[user_id]
+                    leaderboard.push({
+                        discord_id: `<@${user_id}>`,
+                        complete_count: user.count,
+                        rp: user.rp
+                    })
+                    if (leaderboard.length == 5) break
+                }
+                leaderboard = leaderboard.sort(dynamicSortDesc("complete_count"))
+                const payload = {
+                    content: ' ',
+                    embeds: [{
+                        title: 'Leaderboard',
+                        fields: [{
+                            name: 'User',
+                            value: leaderboard.map(user => user.discord_id).join('\n'),
+                            inline: true
+                        },{
+                            name: 'Challenges Completed',
+                            value: leaderboard.map(user => user.complete_count).join('\n'),
+                            inline: true
+                        },{
+                            name: 'RP',
+                            value: leaderboard.map(user => user.rp).join('\n'),
+                            inline: true
+                        }],
+                        color: '#ff0000'
+                    }]
+                }
+                message.edit(payload).catch(console.error)
+            }).catch(console.error)
+        }).catch(console.error)
+    }).catch(console.error)
+}
+
+function edit_challenges_embed() {
+    client.channels.fetch(channel_ids.challenges).then(channel => {
+        channel.messages.fetch(message_ids.challenges.challenges).then(message => {
+            db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed;`)
+            .then(res => {
+                const challenges = res[0].rows
+                const completed = res[1].rows
+                if (challenges.length > 0) {
+                    const payload = {
+                        content: ' ',
+                        embeds: [{
+                            title: 'Weekly Challenges',
+                            description: `Next reset <t:${Math.round(Number(challenges[0].expiry) / 1000)}:R>`,
+                            fields: [],
+                            color: '#bd2848'
+                        }],
+                        components: [{
+                            type: 1,
+                            components: [{
+                                type: 2,
+                                label: "View Summary",
+                                style: 2,
+                                custom_id: "view_weekly_challenges_summary",
+                            }]
+                        }]
+                    }
+                    challenges.forEach(challenge => {
+                        var complete_count = 0
+                        completed.forEach(user_challenge => {
+                            if (user_challenge.activation_id == challenge.activation_id) complete_count++
+                        })
+                        payload.embeds[0].fields.push({
+                            name: challenge.name + ` (${challenge.rp} RP)`,
+                            value: challenge.description + '\n' + complete_count + ' completed',
+                            inline: true
+                        })
+                    })
+                    message.edit(payload).catch(console.error)
+                }
+            }).catch(console.error)
+        }).catch(console.error)
+    }).catch(console.error)
+}
+
+function weekly_challenges_reset() {
+    db.query(`UPDATE challenges SET is_active = false, activation_id = null, progress = '{}' RETURNING *`)
+    .then(res => {
+        res.rows = res.rows.sort(() => Math.random() - 0.5)
+        var query = []
+        for (const [index,row] of res.rows.entries()) {
+            if (index > 4) break;
+            query.push(`
+                UPDATE challenges SET 
+                is_active = true,
+                activation = ${new Date().getTime()},
+                expiry = ${new Date().getTime() + 604800000},
+                activation_id = '${uuid.v4()}'
+                WHERE challenge_id = '${row.challenge_id}';
+            `)
+        }
+        db.query(query.join(' ')).then(res => {
+            client.channels.fetch(channel_ids.challenges).then(channel => {
+                channel.send('Challenges have been reset').then(msg => {
+                    setTimeout(() => msg.delete().catch(console.error), 60000)
+                    edit_challenges_embed()
+                }).catch(console.error)
+            }).catch(console.error)
+        }).catch(console.error)
+    }).catch(console.error)
+}
+
+function edit_deals_embed() {
+    client.channels.fetch(channel_ids.challenges).then(channel => {
+        channel.messages.fetch(message_ids.challenges.deal).then(message => {
+            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_transactions;`)
+            .then(res => {
+                const deals = res[0].rows
+                const transactions = res[1].rows
+                if (deals.length > 0) {
+                    const payload = {
+                        content: ' ',
+                        embeds: [{
+                            title: 'Weekly Deal',
+                            description: `Next reset <t:${Math.round(Number(deals[0].expiry) / 1000)}:R>`,
+                            fields: [{
+                                name: deals[0].item_name,
+                                value: `RP: ${deals[0].rp}\n${transactions.filter(transaction => transaction.deal_activation_id == deals[0].activation_id).length} Purchased`
+                            }],
+                            color: '#2d7d46'
+                        }],
+                        components: [{
+                            type: 1,
+                            components: [{
+                                type: 2,
+                                label: "Purchase",
+                                style: 3,
+                                custom_id: "purchase_weekly_deal",
+                            }]
+                        }]
+                    }
+                    message.edit(payload).catch(console.error)
+                }
+            }).catch(console.error)
+        }).catch(console.error)
+    }).catch(console.error)
+}
+
+function weekly_deals_reset() {
+    db.query(`UPDATE challenges_deals SET is_active = false, activation_id = null RETURNING *`)
+    .then(res => {
+        const deals = res.rows.sort(() => Math.random() - 0.5)
+        db.query(`
+            UPDATE challenges_deals SET 
+            is_active = true,
+            activation = ${new Date().getTime()},
+            expiry = ${new Date().getTime() + 604800000},
+            activation_id = '${uuid.v4()}'
+            WHERE deal_id = '${deals[0].deal_id}';
+        `).then(res => {
+            client.channels.fetch(channel_ids.challenges).then(channel => {
+                channel.send('Weekly deal has been reset').then(msg => {
+                    setTimeout(() => msg.delete().catch(console.error), 60000)
+                    edit_deals_embed()
+                }).catch(console.error)
+            }).catch(console.error)
+        }).catch(console.error)
+    }).catch(console.error)
+}
 
 function bot_initialize() {
     if (client.guilds.cache.get('776804537095684108')) {
@@ -195,6 +795,7 @@ async function messageUpdate(oldMessage, newMessage) {
                     content: ' ',
                     embeds: newMessage.embeds
                 }).catch(console.error)
+                verify_challenge_giveaway(newMessage.embeds)
             }
         }
     }
@@ -209,64 +810,6 @@ async function guildMemberUpdate(oldMember, newMember) {
         console.log(e)
     }
 }
-
-client.on('guildMemberAdd', async member => {
-    if (process.env.DEBUG_MODE==1)
-        return
-
-    if (member.guild.id == "776804537095684108") {      //For BotV
-        if (member.user.bot)
-            return
-        member = await member.fetch().catch(console.error)
-        member.setNickname((member.nickname || member.displayName) + ' [Non-verified IGN]').catch(console.error)
-        const joined = Intl.DateTimeFormat('en-US').format(member.joinedAt);
-        const created = Intl.DateTimeFormat('en-US').format(member.user.createdAt);
-        const embed = new MessageEmbed()
-            .setFooter({text: member.displayName, iconURL: member.user.displayAvatarURL()})
-            .setColor('RANDOM')
-            .addFields({
-                name: 'Account information',
-                value: '**• ID:** ' + member.user.id + '\n**• Tag:** ' + member.user.tag + '\n**• Created at:** ' + created,
-                inline: true
-            },{
-                name: 'Member information',
-                value: '**• Display name:** ' + member.displayName + '\n**• Joined at:** ' + joined + `\n**• Profile:** <@${member.user.id}>`,
-                inline: true
-            })
-            .setTimestamp()
-        member.guild.channels.cache.find(channel => channel.name === "welcome").send({content: " ", embeds: [embed]})
-        .catch(err => {
-            console.log(err + '\nError sending member welcome message.')
-            inform_dc('Error sending member welcome message.')
-        });
-        
-        const role1 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'members')
-        const role2 = member.guild.roles.cache.find(role => role.name.toLowerCase() === 'new members')
-        await member.roles.add(role1).catch(console.error)
-        await member.roles.add(role2)
-        .then (response => {
-            mod_log(`Assigned roles <@&${role1.id}>, <@&${role2.id}> to user <@${member.id}>`,'#FFFF00')
-        }).catch(function (error) {
-            console.log(`${error} Error adding role ${role2.name} for user ${member.user.username}`)
-            inform_dc(`Error adding role ${role2.name} for user ${member.displayName}`)
-        })
-    }
-});
-
-client.on('guildMemberUpdate', (oldMember,newMember) => {
-    if (newMember.guild.id == '776804537095684108') {
-        if (!oldMember.roles.cache.find(r => r.id == hiatusRoleId) && newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
-            console.log('hiatus role added to a member')
-            db.query(`INSERT INTO botv_hiatus_members (discord_id,role_added_timestamp) VALUES (${newMember.id},${new Date().getTime()})`).catch(console.error)
-            mod_log(`User <@${newMember.id}> has been assigned role <@&${hiatusRoleId}>\nThis will be auto-removed <t:${Math.round((new Date().getTime() + hiatus_removal_interval)/1000)}:R>`,'#2ECC71')
-        }
-        if (oldMember.roles.cache.find(r => r.id == hiatusRoleId) && !newMember.roles.cache.find(r => r.id == hiatusRoleId)) {
-            console.log('hiatus role added to a member')
-            db.query(`DELETE FROM botv_hiatus_members WHERE discord_id = ${newMember.id}`).catch(console.error)
-            mod_log(`<@&${hiatusRoleId}> role removed from user <@${newMember.id}>`,'#E74C3C')
-        }
-    }
-})
 
 async function check_hiatus_expiry() {
     console.log('botv.js check_hiatus_expiry called')
@@ -502,7 +1045,7 @@ async function reaction_handler(reaction,user,action) {
             else if (reaction.emoji.id == "892062165115224074") {
                 const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 25+')
                 reaction.message.guild.members.cache.get(user.id).roles.remove(role)
-                .then (response => {
+                .then(response => {
                     console.log(JSON.stringify(response))
                     user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
                     .catch(console.error)
@@ -548,6 +1091,73 @@ async function reaction_handler(reaction,user,action) {
     }
 }
 
+db.on('notification', async (notification) => {
+    const payload = JSONbig.parse(notification.payload);
+
+    if (notification.channel == 'challenges_update') {
+        for (const discord_id in payload[0].progress) {
+            if ((payload[0].progress[discord_id] == payload[0].completion_count) && (payload[0].progress[discord_id] > payload[1].progress[discord_id])) {
+                db.query(`
+                    INSERT INTO challenges_completed
+                    (discord_id,challenge_id,activation_id,timestamp)
+                    VALUES (${discord_id},'${payload[0].challenge_id}','${payload[0].activation_id}',${new Date().getTime()});
+                `).catch(console.error)
+            }
+        }
+    }
+
+    if (notification.channel == 'challenges_completed_insert') {
+        edit_challenges_embed()
+        db.query(`SELECT * FROM challenges WHERE activation_id = '${payload.activation_id}'`)
+        .then(res => {
+            const challenge = res.rows[0]
+            db.query(`
+                INSERT INTO challenges_transactions
+                (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp)
+                VALUES ('${uuid.v4()}',${payload.discord_id},'challenge_completion','${challenge.activation_id}',${challenge.rp},'credit',${new Date().getTime()})
+            `).catch(console.error)
+        }).catch(console.error)
+    }
+
+    if (notification.channel == 'challenges_transactions_insert') {
+        db.query(`
+            UPDATE challenges_accounts SET
+            balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
+            WHERE discord_id = ${payload.discord_id};
+        `).then(res => {
+            if (res.rowCount == 0) {
+                db.query(`
+                    INSERT INTO challenges_accounts
+                    (discord_id,balance)
+                    VALUES (${discord_id},${payload[0].rp});
+                `).catch(console.error)
+            }
+        }).catch(console.error)
+        if (payload.type == 'weekly_deal_purchase') {
+            db.query(`SELECT * FROM challenges_deals WHERE activation_id = '${payload.activation_id}'`)
+            .then(res => {
+                const deal = res.rows[0]
+                client.channels.fetch(channel_ids.challenges).then(channel => {
+                    channel.threads.create({
+                        name: `Purchase ${deal.item_name} ${payload.discord_id}`,
+                        reason: 'Deal purchase'
+                    }).then(thread => {
+                        setTimeout(() => {
+                            channel.messages.fetch(thread.id).then(msg => msg.delete().catch(console.error)).catch(console.error)
+                        }, 10000);
+                        thread.send({
+                            content: `<@793061832196882452> <@${payload.discord_id}>`,
+                            embeds: [{
+                                description: `<@${payload.discord_id}> has purchased **${deal.item_name}** for **${deal.rp} RP**`
+                            }]
+                        }).catch(console.log)
+                    }).catch(console.error)
+                }).catch(console.error)
+            }).catch(console.error)
+        }
+    }
+})
+
 module.exports = {
     updateMasteryDistr,
     messageUpdate,
@@ -555,5 +1165,6 @@ module.exports = {
     bot_initialize,
     message_handler,
     reaction_handler,
-    getHiatusMembers
+    getHiatusMembers,
+    verify_challenge_serviceman
 }
