@@ -81,6 +81,7 @@ async function member_hiatus_check(user_id) {
         const guild = client.guilds.cache.get(botv_guild_id) || await client.guilds.fetch(botv_guild_id).catch(console.error)
         const member = guild.members.cache.get(user_id) || await guild.members.fetch(botv_guild_id).catch(console.error)
         const role = member.roles.cache.find(r => r.id == hiatusRoleId)
+        console.log('[member_hiatus_check] roles ', member.roles, role)
         if (role)
             resolve()
         else
