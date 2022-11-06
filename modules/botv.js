@@ -252,7 +252,7 @@ client.on('interactionCreate', (interaction) => {
             .then(res => {
                 const deal = res[0].rows[0]
                 const user_bal = res[1].rows[0]?.balance || 0
-                if (user && deal.rp <= user_bal) {
+                if (deal.rp <= user_bal) {
                     interaction.reply({
                         content: ' ',
                         embeds: [{
@@ -290,7 +290,7 @@ client.on('interactionCreate', (interaction) => {
             .then(res => {
                 const deal = res[0].rows[0]
                 const user_bal = res[1].rows[0]?.balance || 0
-                if (user && deal.rp <= user_bal) {
+                if (deal.rp <= user_bal) {
                     db.query(`
                         INSERT INTO challenges_transactions
                         (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp)
