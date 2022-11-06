@@ -251,12 +251,12 @@ client.on('interactionCreate', (interaction) => {
             db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
             .then(res => {
                 const deal = res[0].rows[0]
-                const user = res[1]?.rows[0]
-                if (user && deal.rp <= user.balance) {
+                const user_bal = res[1].rows[0]?.balance || 0
+                if (user && deal.rp <= user_bal) {
                     interaction.reply({
                         content: ' ',
                         embeds: [{
-                            description: `Are you sure you want to purchase **${deal.item_name}** for **${deal.rp} RP**?\nCurrent RP: ${user.balance}`
+                            description: `Are you sure you want to purchase **${deal.item_name}** for **${deal.rp} RP**?\nCurrent RP: ${user_bal}`
                         }],
                         components: [{
                             type: 1,
@@ -278,7 +278,7 @@ client.on('interactionCreate', (interaction) => {
                     interaction.reply({
                         content: ' ',
                         embeds: [{
-                            description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user.balance}`
+                            description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user_bal}`
                         }],
                         ephemeral: true
                     }).catch(console.error)
@@ -289,8 +289,8 @@ client.on('interactionCreate', (interaction) => {
             db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
             .then(res => {
                 const deal = res[0].rows[0]
-                const user = res[1]?.rows[0]
-                if (user && deal.rp <= user.balance) {
+                const user_bal = res[1].rows[0]?.balance || 0
+                if (user && deal.rp <= user_bal) {
                     db.query(`
                         INSERT INTO challenges_transactions
                         (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp)
@@ -345,7 +345,7 @@ client.on('interactionCreate', (interaction) => {
                 } else {
                     interaction.update({
                         content: ' ',
-                        embeds: [{description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user.balance}`}],
+                        embeds: [{description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user_bal}`}],
                         ephemeral: true
                     }).catch(console.error)
                 }
