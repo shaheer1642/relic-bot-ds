@@ -1122,7 +1122,6 @@ db.on('notification', async (notification) => {
 
     if (notification.channel == 'challenges_completed_insert') {
         edit_challenges_embed()
-        edit_challenges_leaderboard_embed()
         db.query(`SELECT * FROM challenges WHERE activation_id = '${payload.activation_id}'`)
         .then(res => {
             const challenge = res.rows[0]
@@ -1139,14 +1138,15 @@ db.on('notification', async (notification) => {
             UPDATE challenges_accounts SET
             balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
             WHERE discord_id = ${payload.discord_id};
-        `).then(res => {
+        `).then(async res => {
             if (res.rowCount == 0) {
-                db.query(`
+                await db.query(`
                     INSERT INTO challenges_accounts
                     (discord_id,balance)
                     VALUES (${payload.discord_id},${payload.rp});
                 `).catch(console.error)
             }
+            edit_challenges_leaderboard_embed()
         }).catch(console.error)
         if (payload.type == 'weekly_deal_purchase') {
             db.query(`SELECT * FROM challenges_deals WHERE activation_id = '${payload.activation_id}'`)
