@@ -68,9 +68,9 @@ client.on('ready', () => {
             message.edit(message_formats.challenges.faq).catch(console.error)
         }).catch(console.error)
     }).catch(console.error)
-    console.log('[ms_till_monday_12am]',ms_till_monday_12am())
+    console.log('[ms_till_monday_12am]', ms_till_monday_12am())
     setTimeout(weekly_challenges_reset, ms_till_monday_12am());
-    setTimeout(weekly_challenges_reset, weekly_deals_reset());
+    setTimeout(weekly_deals_reset, ms_till_monday_12am());
     edit_challenges_embed()
     edit_deals_embed()
     edit_challenges_leaderboard_embed()
@@ -256,7 +256,7 @@ client.on('interactionCreate', (interaction) => {
                     interaction.reply({
                         content: ' ',
                         embeds: [{
-                            description: `Are you sure you want to purchase **${deal.item_name}** for **${deal.rp} RP**?`
+                            description: `Are you sure you want to purchase **${deal.item_name}** for **${deal.rp} RP**?\nCurrent RP: ${user.balance}`
                         }],
                         components: [{
                             type: 1,
@@ -278,7 +278,7 @@ client.on('interactionCreate', (interaction) => {
                     interaction.reply({
                         content: ' ',
                         embeds: [{
-                            description: 'You do not have enough RP to purchase this deal'
+                            description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user.balance}`
                         }],
                         ephemeral: true
                     }).catch(console.error)
