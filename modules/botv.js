@@ -1121,6 +1121,7 @@ db.on('notification', async (notification) => {
 
     if (notification.channel == 'challenges_completed_insert') {
         edit_challenges_embed()
+        edit_challenges_leaderboard_embed()
         db.query(`SELECT * FROM challenges WHERE activation_id = '${payload.activation_id}'`)
         .then(res => {
             const challenge = res.rows[0]
