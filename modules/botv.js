@@ -1158,6 +1158,7 @@ db.on('notification', async (notification) => {
     }
 
     if (notification.channel == 'challenges_transactions_insert') {
+        edit_deals_embed()
         db.query(`
             UPDATE challenges_accounts SET
             balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
