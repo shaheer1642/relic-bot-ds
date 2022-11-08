@@ -429,9 +429,9 @@ async function updateDatabaseItem(db_items_list,item,index) {
     .then(async itemOrders => {
         //-----sell avg-----
         var sellAvgPrice = null
-        var sellAvgPrice_90 = 0
+        var sellAvgPrice_90 = {price: 0, timestamp: 0}
         var maxedSellAvgPrice = null
-        var maxedSellAvgPrice_90 = 0
+        var maxedSellAvgPrice_90 = {price: 0, timestamp: 0}
         var rank = null
         itemOrders.data.payload.statistics_closed["90days"].forEach(e => {
             if (item.tags.includes('relic') && e.subtype) {
@@ -444,26 +444,26 @@ async function updateDatabaseItem(db_items_list,item,index) {
             }
             else
                 sellAvgPrice = e.median
-            if (sellAvgPrice > sellAvgPrice_90)
-                sellAvgPrice_90 = sellAvgPrice
-            if (maxedSellAvgPrice > maxedSellAvgPrice_90)
-                maxedSellAvgPrice_90 = maxedSellAvgPrice
+            if (sellAvgPrice > sellAvgPrice_90.price)
+                sellAvgPrice_90 = {price: sellAvgPrice, timestamp: new Date(e.datetime).getTime()}
+            if (maxedSellAvgPrice > maxedSellAvgPrice_90.price)
+                maxedSellAvgPrice_90 = {price: maxedSellAvgPrice, timestamp: new Date(e.datetime).getTime()}
         })
         //-----buy avg-----
         var buyAvgPrice = null
-        var buyAvgPrice_90 = 0
+        var buyAvgPrice_90 = {price: 0, timestamp: 0}
         var maxedBuyAvgPrice = null
-        var maxedBuyAvgPrice_90 = 0
+        var maxedBuyAvgPrice_90 = {price: 0, timestamp: 0}
         itemOrders.data.payload.statistics_live["90days"].forEach(e => {
             if (e.order_type == "buy") {
                 if (e.mod_rank > 0)
                     maxedBuyAvgPrice = e.median
                 else
                     buyAvgPrice = e.median
-                if (buyAvgPrice > buyAvgPrice_90)
-                    buyAvgPrice_90 = buyAvgPrice
-                if (maxedBuyAvgPrice > maxedBuyAvgPrice_90)
-                    maxedBuyAvgPrice_90 = maxedBuyAvgPrice
+                if (buyAvgPrice > buyAvgPrice_90.price)
+                    buyAvgPrice_90 = {price: buyAvgPrice, timestamp: new Date(e.datetime).getTime()}
+                if (maxedBuyAvgPrice > maxedBuyAvgPrice_90.price)
+                    maxedBuyAvgPrice_90 = {price: maxedBuyAvgPrice, timestamp: new Date(e.datetime).getTime()}
             }
         })
         if (buyAvgPrice > sellAvgPrice)
