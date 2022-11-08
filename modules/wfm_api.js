@@ -257,10 +257,9 @@ async function orders(message,args) {
                     {name: 'Sellers (Max ranked)', value: sellers, inline: true},
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true},
-                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:R>`, inline: false}
+                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:R>\nVolume sold last 30 days: ${item_data.volume_sold} (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
                 )
             }
-            embeds[index-1].footer.text += 'Volume sold last 30 days: ' + item_data.volume_sold + '\n\u200b'
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 console.log(embeds)
@@ -420,11 +419,11 @@ async function orders_update(message, reaction, user) {
                     {name: 'Sellers (Max ranked)', value: sellers, inline: true},
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true},
-                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:R>`, inline: false}
+                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:R> (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
                 )
                 //embeds[index-1].footer.text += 'Max ranked avg: ' + item_data.maxed_sell_price + 'p\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205FMax last 90 days: ' + item_data.maxed_sell_last_90 + 'p\n\u200b'
             }
-            embeds[index-1].footer.text += 'Volume sold last 30 days: ' + item_data.volume_sold + '\n\u200b'
+            //embeds[index-1].footer.text += 'Volume sold last 30 days: ' + item_data.volume_sold + '\n\u200b'
             console.log(embeds.length + " " + arrItems.length)
             if (embeds.length==arrItems.length) {
                 embeds = embeds.sort(dynamicSort("title"))
