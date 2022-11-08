@@ -671,13 +671,13 @@ async function updateDatabaseItem(db_items_list,item,index) {
         var status = await db.query(`
             UPDATE items_list SET 
                 sell_price = ${sellAvgPrice},
-                sell_last_90 = ${sellAvgPrice_90},
+                sell_last_90 = '${JSON.stringify(sellAvgPrice_90)}',
                 buy_price = ${buyAvgPrice},
-                buy_last_90 = ${buyAvgPrice_90},
+                buy_last_90 = '${JSON.stringify(buyAvgPrice_90)}',
                 maxed_sell_price = ${maxedSellAvgPrice},
-                maxed_sell_last_90 = ${maxedSellAvgPrice_90},
+                maxed_sell_last_90 = '${JSON.stringify(maxedSellAvgPrice_90)}',
                 maxed_buy_price = ${maxedBuyAvgPrice},
-                maxed_buy_last_90 = ${maxedBuyAvgPrice_90},
+                maxed_buy_last_90 = '${JSON.stringify(maxedBuyAvgPrice_90)}',
                 volume_sold = ${volume_sold},
                 rank = ${rank},
                 ducat = ${ducat_value},
