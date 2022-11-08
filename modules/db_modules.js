@@ -1074,25 +1074,22 @@ async function dc_update_msgs() {
                 }
                 else {
                     for (var j=0;j<res.rows.length;j++) {
-                        var element = res.rows[j]
-                        var channel = client.channels.cache.get(element.channel_id)
-                        if (!channel.messages.cache.get(element.message_id))
-                            await channel.messages.fetch()
-                        await channel.messages.cache.get(element.message_id).edit(postdata[i].content).catch(err => console.log(err))
+                        const element = res.rows[j]
+                        const channel = client.channels.cache.get(element.channel_id) || await client.channels.fetch(element.channel_id).catch(console.error)
+                        const message = channel.messages.cache.get(element.message_id) || await channel.messages.fetch(element.message_id).catch(console.error)
+                        message.edit(postdata[i].content).catch(err => console.log(err))
                     }
                 }
-            })
-            .catch(err => console.log(err))
+            }).catch(err => console.log(err))
             msg_id_counter++
         }
         //----edit remaining ids----
         await db.query(`SELECT * FROM bot_updates_msg_ids WHERE id >= ${msg_id_counter} AND type = 'wfm_update_msgs'`)
         .then(res => {
             res.rows.forEach(async element => {
-                var channel = client.channels.cache.get(element.channel_id)
-                if (!channel.messages.cache.get(element.message_id))
-                    await channel.messages.fetch()
-                channel.messages.cache.get(element.message_id).edit({content: "--",embeds: []}).catch(err => console.log(err))
+                const channel = client.channels.cache.get(element.channel_id) || await client.channels.fetch(element.channel_id).catch(console.error)
+                const message = channel.messages.cache.get(element.message_id) || await channel.messages.fetch(element.message_id).catch(console.error)
+                message.edit({content: "--",embeds: []}).catch(err => console.log(err))
             })
         })
         .catch(err => console.log(err))

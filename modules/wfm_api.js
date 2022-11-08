@@ -223,7 +223,7 @@ async function orders(message,args) {
                     {name: 'Sellers', value: sellers, inline: true},
                     {name: 'Quantity\u205F\u205F\u205F\u205F\u205F', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true},
-                    {name: '\u200b', value: `Yesterday Avg: ${item_data.sell_price}\nHighest: ${item_data.sell_last_90.price}p on <t:${Math.round(item_data.sell_last_90.timestamp / 1000)}:R>`, inline: false}
+                    {name: '\u200b', value: `Yesterday Avg: ${item_data.sell_price}\nHighest: ${item_data.sell_last_90.price}p on <t:${Math.round(item_data.sell_last_90.timestamp / 1000)}:d>\nVolume sold last 30 days: ${item_data.volume_sold} (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
                 ],
                 thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
                 timestamp: new Date()
@@ -257,7 +257,7 @@ async function orders(message,args) {
                     {name: 'Sellers (Max ranked)', value: sellers, inline: true},
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true},
-                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:R>\nVolume sold last 30 days: ${item_data.volume_sold} (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
+                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:d>\nVolume sold last 30 days: ${item_data.volume_sold} (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
                 )
             }
             console.log(embeds.length + " " + arrItems.length)
@@ -383,7 +383,7 @@ async function orders_update(message, reaction, user) {
                     {name: 'Sellers', value: sellers, inline: true},
                     {name: 'Quantity\u205F\u205F\u205F\u205F\u205F', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true},
-                    {name: '\u200b', value: `Yesterday Avg: ${item_data.sell_price}\nHighest: ${item_data.sell_last_90.price}p on <t:${Math.round(item_data.sell_last_90.timestamp / 1000)}:R>`, inline: false}
+                    {name: '\u200b', value: `Yesterday Avg: ${item_data.sell_price}\nHighest: ${item_data.sell_last_90.price}p on <t:${Math.round(item_data.sell_last_90.timestamp / 1000)}:d>\nVolume sold last 30 days: ${item_data.volume_sold} (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
                 ],
                 thumbnail:  {url: 'https://warframe.market/static/assets/' + item_data.icon_url},
                 timestamp: new Date()
@@ -419,7 +419,7 @@ async function orders_update(message, reaction, user) {
                     {name: 'Sellers (Max ranked)', value: sellers, inline: true},
                     {name: 'Quantity', value: quantities, inline: true},
                     {name: 'Price', value: prices, inline: true},
-                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:R> (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
+                    {name: '\u200b', value: `Max Ranked Avg: ${item_data.maxed_sell_price}\nHighest: ${item_data.maxed_sell_last_90.price}p on <t:${Math.round(item_data.maxed_sell_last_90.timestamp / 1000)}:d> (${Math.round(item_data.volume_sold/30)}/day)`, inline: false}
                 )
                 //embeds[index-1].footer.text += 'Max ranked avg: ' + item_data.maxed_sell_price + 'p\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205F\u205FMax last 90 days: ' + item_data.maxed_sell_last_90 + 'p\n\u200b'
             }
