@@ -444,9 +444,9 @@ async function updateDatabaseItem(db_items_list,item,index) {
             }
             else
                 sellAvgPrice = e.median
-            if (sellAvgPrice > sellAvgPrice_90.price)
+            if (sellAvgPrice >= sellAvgPrice_90.price)
                 sellAvgPrice_90 = {price: sellAvgPrice, timestamp: new Date(e.datetime).getTime()}
-            if (maxedSellAvgPrice > maxedSellAvgPrice_90.price)
+            if (maxedSellAvgPrice >= maxedSellAvgPrice_90.price)
                 maxedSellAvgPrice_90 = {price: maxedSellAvgPrice, timestamp: new Date(e.datetime).getTime()}
         })
         //-----buy avg-----
@@ -460,9 +460,9 @@ async function updateDatabaseItem(db_items_list,item,index) {
                     maxedBuyAvgPrice = e.median
                 else
                     buyAvgPrice = e.median
-                if (buyAvgPrice > buyAvgPrice_90.price)
+                if (buyAvgPrice >= buyAvgPrice_90.price)
                     buyAvgPrice_90 = {price: buyAvgPrice, timestamp: new Date(e.datetime).getTime()}
-                if (maxedBuyAvgPrice > maxedBuyAvgPrice_90.price)
+                if (maxedBuyAvgPrice >= maxedBuyAvgPrice_90.price)
                     maxedBuyAvgPrice_90 = {price: maxedBuyAvgPrice, timestamp: new Date(e.datetime).getTime()}
             }
         })
