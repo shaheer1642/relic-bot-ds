@@ -56,7 +56,7 @@ function uptime(message,args) {
         currTime.getFullYear(),
         currTime.getMonth(),
         currTime.getDate() + 1, // the next day, ...
-        0, 15, 0 // ...at 00:15:00 hours
+        0, 15, 0 // ...at 00:15:00 hours 
     );
     if ((currDay.getTime() - currTime.getTime())>0)
         var msTill1AM = currDay.getTime() - currTime.getTime()
