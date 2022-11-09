@@ -847,9 +847,9 @@ async function auctions(message,args) {
         let postdata = {content: " ", embeds: []}
         //----Sort by buyout_price low->high----
         auctionsArr = auctionsArr.sort(dynamicSort("buyout_price"))
-        var d_ownerNames = ""
-        var d_weaponDetails = ""
-        var d_prices = ""
+        var d_ownerNames = "\u200b"
+        var d_weaponDetails = "\u200b"
+        var d_prices = "\u200b"
         var i=0
         for (var j=0; j<auctionsArr.length; j++)
         {
@@ -885,9 +885,9 @@ async function auctions(message,args) {
         )
         //----Sort by weapon damage incl. buyout price high->low----
         auctionsArr = auctionsArr.sort(dynamicSortDesc("damage"))
-        var d_ownerNames = ""
-        var d_weaponDetails = ""
-        var d_prices = ""
+        var d_ownerNames = "\u200b"
+        var d_weaponDetails = "\u200b"
+        var d_prices = "\u200b"
         var i=0
         for (var j=0; j<auctionsArr.length; j++)
         {
@@ -921,9 +921,9 @@ async function auctions(message,args) {
         )
         //----Sort by weapon damage high->low----
         auctionsArr = auctionsArr.sort(dynamicSortDesc("damage"))
-        var d_ownerNames = ""
-        var d_weaponDetails = ""
-        var d_prices = ""
+        var d_ownerNames = "\u200b"
+        var d_weaponDetails = "\u200b"
+        var d_prices = "\u200b"
         var i=0
         for (var j=0; j<auctionsArr.length; j++)
         {
@@ -956,8 +956,7 @@ async function auctions(message,args) {
         processMessage.edit(postdata).catch(err => console.log(err))
         message.react(defaultReactions.check.string).catch(err => console.log(err))
         return
-    })
-    .catch(function (error) {
+    }).catch(function (error) {
         processMessage.edit("Error occured retrieving auctions.\nError code 501").catch(err => console.log(err))
         if (error.response)
             console.log(JSON.stringify(error.response.data))
