@@ -873,7 +873,7 @@ async function auctions(message,args) {
         var d_partName = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
         postdata.embeds.push(
             {
-                title: d_partName, 
+                title: d_partName + (modifier ? ` (${modifier})`:''), 
                 description: "```fix\n(Sorted by buyout price)```", 
                 timestamp: new Date(),
                 fields: [
