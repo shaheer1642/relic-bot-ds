@@ -844,12 +844,16 @@ async function auctions(message,args) {
                 )
             }
         })
+        if (auctionsArr.length == 0) {
+            processMessage.edit({content: 'No sellers found for given weapon'}).catch(console.error)
+            return
+        }
         let postdata = {content: " ", embeds: []}
         //----Sort by buyout_price low->high----
         auctionsArr = auctionsArr.sort(dynamicSort("buyout_price"))
-        var d_ownerNames = "\u200b"
-        var d_weaponDetails = "\u200b"
-        var d_prices = "\u200b"
+        var d_ownerNames = ""
+        var d_weaponDetails = ""
+        var d_prices = ""
         var i=0
         for (var j=0; j<auctionsArr.length; j++)
         {
@@ -885,9 +889,9 @@ async function auctions(message,args) {
         )
         //----Sort by weapon damage incl. buyout price high->low----
         auctionsArr = auctionsArr.sort(dynamicSortDesc("damage"))
-        var d_ownerNames = "\u200b"
-        var d_weaponDetails = "\u200b"
-        var d_prices = "\u200b"
+        var d_ownerNames = ""
+        var d_weaponDetails = ""
+        var d_prices = ""
         var i=0
         for (var j=0; j<auctionsArr.length; j++)
         {
@@ -921,9 +925,9 @@ async function auctions(message,args) {
         )
         //----Sort by weapon damage high->low----
         auctionsArr = auctionsArr.sort(dynamicSortDesc("damage"))
-        var d_ownerNames = "\u200b"
-        var d_weaponDetails = "\u200b"
-        var d_prices = "\u200b"
+        var d_ownerNames = ""
+        var d_weaponDetails = ""
+        var d_prices = ""
         var i=0
         for (var j=0; j<auctionsArr.length; j++)
         {
