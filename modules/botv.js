@@ -504,11 +504,11 @@ function edit_challenges_leaderboard_embed() {
                                 inline: true
                             },{
                                 name: 'Challenges Completed',
-                                value: leaderboard.map(user => index < 5 ? user.complete_count:'').join('\n'),
+                                value: leaderboard.map((user,index) => index < 5 ? user.complete_count:'').join('\n'),
                                 inline: true
                             },{
                                 name: 'RP',
-                                value: leaderboard.map(user => index < 5 ? user.rp:'').join('\n'),
+                                value: leaderboard.map((user,index) => index < 5 ? user.rp:'').join('\n'),
                                 inline: true
                             }],
                             color: '#ff0000'
