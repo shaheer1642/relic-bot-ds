@@ -158,7 +158,7 @@ client.on('messageCreate', async message => {
         const member = guild.members.cache.get(message.author.id) || await guild.members.fetch(message.author.id).catch(console.error)
         const adminRole = member.roles.cache.get('891717782348136488')
         const staffRole = member.roles.cache.get('891718083520122880')
-        const timeout = /*adminRole || staffRole ? 3600000 :*/ 3000
+        const timeout = /*adminRole || staffRole ? 3600000 : */ 3000
         setTimeout(() => message.delete().catch(console.error), timeout);
     }
 
