@@ -156,8 +156,8 @@ client.on('messageCreate', async message => {
     if (message.type == 'DEFAULT' && !message.author?.bot && (['1039266854545403935','901799370071101460','901799369941073940','901799369974616094','901799369647484979'].includes(message.channel.id))) {
         const guild = client.guilds.cache.get(message.guild.id) || await client.guilds.fetch(message.guild.id).catch(console.error)
         const member = guild.members.cache.get(message.author.id) || await guild.members.fetch(message.author.id).catch(console.error)
-        const adminRole = member.roles.cache.get('891717782348136488') || await member.roles.fetch('891717782348136488').catch(console.error)
-        const staffRole = member.roles.cache.get('891718083520122880') || await member.roles.fetch('891718083520122880').catch(console.error)
+        const adminRole = member.roles.cache.get('891717782348136488')
+        const staffRole = member.roles.cache.get('891718083520122880')
         //const timeout = adminRole || staffRole ? 3600000 : 3000
         setTimeout(() => message.delete().catch(console.error), timeout);
     }
