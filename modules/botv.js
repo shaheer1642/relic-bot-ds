@@ -83,7 +83,7 @@ client.on('ready', () => {
 async function member_hiatus_check(user_id) {
     return new Promise(async (resolve,reject) => {
         const guild = client.guilds.cache.get(botv_guild_id) || await client.guilds.fetch(botv_guild_id).catch(console.error)
-        const member = guild.members.cache.get(user_id) || await guild.members.fetch(botv_guild_id).catch(console.error)
+        const member = guild.members.cache.get(user_id) || await guild.members.fetch(user_id).catch(console.error)
         const role = member.roles.cache.get(hiatusRoleId)
         if (role)
             reject('[member_hiatus_check] member on hiatus')
@@ -481,7 +481,6 @@ function edit_challenges_leaderboard_embed() {
                         complete_count: user.count,
                         rp: user.rp
                     })
-                    if (leaderboard.length == 5) break
                 }
                 if (leaderboard.length == 0) {
                     message.edit({
@@ -501,15 +500,15 @@ function edit_challenges_leaderboard_embed() {
                             title: 'Leaderboard',
                             fields: [{
                                 name: 'User',
-                                value: leaderboard.map(user => user.discord_id).join('\n'),
+                                value: leaderboard.map((user,index) => index < 5 ? user.discord_id:'').join('\n'),
                                 inline: true
                             },{
                                 name: 'Challenges Completed',
-                                value: leaderboard.map(user => user.complete_count).join('\n'),
+                                value: leaderboard.map(user => index < 5 ? user.complete_count:'').join('\n'),
                                 inline: true
                             },{
                                 name: 'RP',
-                                value: leaderboard.map(user => user.rp).join('\n'),
+                                value: leaderboard.map(user => index < 5 ? user.rp:'').join('\n'),
                                 inline: true
                             }],
                             color: '#ff0000'
