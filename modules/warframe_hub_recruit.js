@@ -116,7 +116,7 @@ client.on('interactionCreate', (interaction) => {
                 interaction.reply({content: 'Total spots must be greater than 1. Please try again', ephemeral: true}).catch(err => console.log(err))
                 return
             }
-            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,spots,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${interaction.fields.getTextInputValue('squad_name').trim().toLowerCase().replace(/ /g,'_')}',true,${total_spots},${new Date().getTime()})`)
+            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${interaction.fields.getTextInputValue('squad_name').trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                 edit_main_msg()
@@ -171,11 +171,11 @@ async function edit_main_msg() {
         for (const [index,squad] of res.rows.entries()) {
             if (squad.custom) {
                 if (!squads[squad.squad_type]) {
-                    const name = convertUpper(squad.squad_type.replace('sq_custom_','').replace(/_/g,' '))
+                    const name = convertUpper(squad.squad_type.replace(/_[1-4]$/,'').replace(/^sq_custom_/,'').replace(/_/g,' '))
                     squads[squad.squad_type] = {
                         name: name,
                         id: squad.squad_type,
-                        spots: squad.spots,
+                        spots: squad.squad_type.split('_')[squad.squad_type.split('_').length - 1],
                         filled: []
                     }
                 }
