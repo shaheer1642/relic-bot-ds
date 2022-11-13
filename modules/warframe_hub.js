@@ -15,8 +15,7 @@ client.on('interactionCreate', (interaction) => {
         interaction.reply({
             content: 'Please visit the following link in the browser to complete this transaction\n' + `https://gauss-prime-api.up.railway.app/warframehub/purchase/vip?discord_id=${interaction.user.id}`,
             ephemeral: true
-        })
-        .catch(console.error)
+        }).catch(console.error)
     }
 })
 
@@ -30,7 +29,7 @@ async function edit_vip_message() {
         embeds: [{
             title: 'VIP Subscription',
             description: 
-`Subscribe to the monthly VIP access for only **$4.99** to gain premium perks including:
+`Subscribe to the monthly VIP access for only **$3.99** to gain premium perks including:
 
 ◉ Removing ads from our [HubApp](https://www.hubapp.site/)
 ◉ Claiming the <@&1041308552905629746> role
