@@ -127,13 +127,9 @@ client.on('interactionCreate', (interaction) => {
                 mention_users(interaction.user.id,interaction.customId)
             }).catch(err => {
                 if (err.code == 23505) { // duplicate key
-                    db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.fields.getTextInputValue('squad_name')}'`)
-                    .then(res => {
-                        if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                        edit_main_msg()
-                        console.log(`wfhub_recruit: user ${interaction.user.id} left ${interaction.fields.getTextInputValue('squad_name')}`)
-                    })
-                    .catch(err => console.log(err))
+                    interaction.reply({
+                        content: 'That squad already exists'
+                    }).catch(err => console.log(err))
                 } else {
                     console.log(err)
                 }
