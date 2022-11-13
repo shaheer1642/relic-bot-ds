@@ -4,6 +4,7 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, c
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
+const guild_id = '865904902941048862'
 const recruit_channel_id = '1041319859469955073'
 const recruit_message_id = '1041322311313272872'
 
@@ -344,7 +345,7 @@ function open_squad(squad) {
         try {
             thread.send({content: msg.trim(), embeds: [{
                 title: squad.name,
-                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get('776804537095684108').members.cache.get(userId).displayName || client.guilds.cache.get('776804537095684108').members.cache.get(userId).nickname}\n`).toString().replace(/,/g,'').replace(/_/g, '\_')}`,
+                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get(guild_id).members.cache.get(userId).displayName || client.guilds.cache.get(guild_id).members.cache.get(userId).nickname}\n`).toString().replace(/,/g,'').replace(/_/g, '\_')}`,
                 color: '#ffffff'
             }]}).catch(err => console.log(err))
         } catch (e) {
