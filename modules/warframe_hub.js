@@ -24,7 +24,8 @@ async function edit_vip_message() {
 ◉ Removing ads from our [HubApp](https://www.hubapp.site/)
 ◉ Claiming the <@&1041308552905629746> role
 ◉ relicbot_premium_features
-◉ tradebot_premium_features`
+◉ tradebot_premium_features`,
+            color: '#7d2ec4'
         }],
         components: [
             {
