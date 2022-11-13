@@ -6,7 +6,7 @@ var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to p
 
 const guild_id = '865904902941048862'
 const recruit_channel_id = '1041319859469955073'
-const recruit_message_id = '1041322311313272872'
+const recruit_message_ids = ['1041370462099357736','1041370465547071568','1041370467631632474','1041370470349545543','1041370472866136105']
 
 client.on('ready', () => {
     setInterval(() => {     // check every 5m for squads timeouts
@@ -115,6 +115,9 @@ client.on('interactionCreate', (interaction) => {
             } else if (total_spots == 1) {
                 interaction.reply({content: 'Total spots must be greater than 1. Please try again', ephemeral: true}).catch(err => console.log(err))
                 return
+            } else if (total_spots > 4) {
+                interaction.reply({content: 'Total spots must be less than 4. Please try again', ephemeral: true}).catch(err => console.log(err))
+                return
             }
             db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${interaction.fields.getTextInputValue('squad_name').trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
             .then(res => {
@@ -201,6 +204,7 @@ async function edit_main_msg() {
     timeout_edit_components = setTimeout(edit_components, 1500);
 
     var notification_options = []
+    var i = 0
     for (const key in squads) {
         if (key == 'sq_leave_all')
             continue
@@ -210,6 +214,8 @@ async function edit_main_msg() {
             label: squads[key].name,
             value: squads[key].id
         })
+        i++;
+        if (i == 24) break
     }
     notification_options.push({
         label: 'Remove all',
@@ -217,20 +223,24 @@ async function edit_main_msg() {
     })
 
     async function edit_components() {
-        const message = channel.messages.cache.get(recruit_message_id) || await channel.messages.fetch(recruit_message_id).catch(console.error)
-        if (!message) return
-        message.edit({
-            content: ' ',
-            embeds: [{
-                title: 'Recruitment',
-                description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
-                footer: {
-                    text: 'Note: The squads may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
-                },
-                color: '#ffffff'
-            }],
-            components: getButtonComponents()
-        }).catch(err => console.log(err))
+        const components = getButtonComponents()
+
+        for (const [index,message_id] of recruit_message_ids.entries()) {
+            const message = channel.messages.cache.get(message_id) || await channel.messages.fetch(message_id).catch(console.error)
+            if (!message) continue
+            message.edit({
+                content: '_ _',
+                embeds: index == 0 ? [{
+                    title: 'Recruitment',
+                    description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
+                    footer: {
+                        text: 'Note: The squads may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
+                    },
+                    color: '#ffffff'
+                }] : [],
+                components: components[index] ? components[index] : []
+            }).catch(err => console.log(err))
+        }
     }
 
 
@@ -248,47 +258,75 @@ async function edit_main_msg() {
         console.log('[getButtonComponents] squadArr: ',squadArr)
 
         var k = 0;
+        components[k] = [{
+            type: 1,
+            components: []
+        }]
+        var l = 0;
         for (const [index,squad] of squadArr.entries()) {
-            if (index % 5 == 0) {
-                k = components.push({
-                        type: 1,
-                        components: []
-                }) - 1;
+            if (index % 5 == 0 && index != 0 && index % 25 != 0) {
+                components[k].push({
+                    type: 1,
+                    components: []
+                });
+                l++
             }
+            console.log(`k: ${k} l:${l}`)
             if (squad.id == 'sq_leave_all') {
-                components[k].components.push({
+                components[k][l].components.push({
                     type: 2,
                     label: squad.name,
                     style: 4,
                     custom_id: squad.id
                 })
             } else if (squad.id == 'sq_custom') {
-                components[k].components.push({
+                components[k][l].components.push({
                     type: 2,
                     label: squad.name,
                     style: 3,
                     custom_id: squad.id
                 })
             } else {
-                components[k].components.push({
+                components[k][l].components.push({
                     type: 2,
                     label: `${squad.filled.length}/${squad.spots} ${squad.name}`,
                     style: squad.filled.length == 4 ? 2:squad.filled.length == 3 ? 4:squad.filled.length == 2 ? 3:squad.filled.length == 1 ? 1:2,
                     custom_id: squad.id
                 })
             }
+            if (components[k].length == 5 && components[k][l].components.length == 5 && index != (squadArr.length - 1)) {
+                k++
+                l = 0
+                components[k] = [{
+                    type: 1,
+                    components: []
+                }]
+            }
         }
-        components.push({
-            type: 1,
-            components: [{
-                type: 3,
-                placeholder: 'Notification Settings',
-                custom_id: 'wfhub_recruit_notify',
-                min_values: 1,
-                max_values: notification_options.length,
-                options: notification_options
+        l++;
+        if (l > 4) {
+            k++;
+            l = 0
+            components[k] = [{
+                type: 1,
+                components: []
             }]
+        } else {
+            components[k].push({
+                type: 1,
+                components: []
+            });
+        }
+        components[k][l].components.push({
+            type: 3,
+            placeholder: 'Notification Settings',
+            custom_id: 'wfhub_recruit_notify',
+            min_values: 1,
+            max_values: notification_options.length,
+            options: notification_options
         })
+        
+        console.log(JSON.stringify(components))
         return components;
     }
 }
