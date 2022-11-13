@@ -1,5 +1,5 @@
 const {client} = require('./discord_client.js');
-const {db} = require('./modules/db_connection.js');
+const {db} = require('./db_connection.js');
 
 const guild_id = '865904902941048862'
 const vip_channel_id = '1041306010331119667'
