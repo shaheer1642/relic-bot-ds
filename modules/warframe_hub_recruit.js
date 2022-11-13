@@ -215,7 +215,6 @@ async function edit_main_msg() {
         label: 'Remove all',
         value: 'remove_all'
     })
-    console.log(JSON.stringify(notification_options))
 
     async function edit_components() {
         const message = channel.messages.cache.get(recruit_message_id) || await channel.messages.fetch(recruit_message_id).catch(console.error)
@@ -245,6 +244,8 @@ async function edit_main_msg() {
         })
         squadArr.push(squads.sq_custom);
         squadArr.push(squads.sq_leave_all);
+
+        console.log('[getButtonComponents] squadArr: ',squadArr)
 
         var k = 0;
         for (const [index,squad] of squadArr.entries()) {
