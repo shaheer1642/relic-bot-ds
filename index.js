@@ -18,6 +18,7 @@ const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
 const botv_recruit = require('./modules/botv_recruit.js');
+const warframe_hub_recruit = require('./modules/warframe_hub_recruit.js');
 const crud_server = require('./modules/crud_server.js');
 const botv_event_voting = require('./modules/botv_event_voting.js');
 const deploy_commands = require('./deploy-commands.js');

@@ -3,38 +3,32 @@ const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
-const {verify_challenge_serviceman} = require('./botv')
 
-async function bot_initialize() {
-    if (client.guilds.cache.get('776804537095684108')) {
-        await client.channels.fetch('950400363410915348').then(async (channel) => await channel.messages.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-        await client.guilds.fetch('776804537095684108').then(async (guild) => await guild.members.fetch().catch(err => console.log(err))).catch(err => console.log(err))
-        setInterval(() => {     // check every 5m for squads timeouts
-            db.query(`SELECT * FROM botv_recruit_members`)
-            .then(async res => {
-                for (var i=0; i<res.rowCount; i++) {
-                    squad = res.rows[i]
-                    if ((new Date().getTime() - squad.join_timestamp) > squad_timeout) {
-                        console.log(`botv_recruit: timing out squad ${squad.user_id} ${squad.squad_type}`)
-                        await db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${squad.user_id} AND squad_type = '${squad.squad_type}'`)
-                    }
+const recruit_channel_id = '1041319859469955073'
+const recruit_message_id = '1041322311313272872'
+
+client.on('ready', () => {
+    setInterval(() => {     // check every 5m for squads timeouts
+        db.query(`SELECT * FROM wfhub_recruit_members`)
+        .then(async res => {
+            for (var i=0; i<res.rowCount; i++) {
+                squad = res.rows[i]
+                if ((new Date().getTime() - squad.join_timestamp) > squad_timeout) {
+                    console.log(`wfhub_recruit: timing out squad ${squad.user_id} ${squad.squad_type}`)
+                    await db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${squad.user_id} AND squad_type = '${squad.squad_type}'`)
                 }
-                edit_main_msg()
-            }).catch(err => console.log(err))
-        }, 300000);
-        edit_main_msg()
-    }
-}
+            }
+            edit_main_msg()
+        }).catch(err => console.log(err))
+    }, 300000);
+    edit_main_msg()
+})
 
-function send_msg(msg, args) {
-    client.channels.cache.get('950400363410915348').send({content: 'empty'}).catch(err => console.log(err))
-}
-
-function interactionHandler(interaction) {
-    if (interaction.customId == 'botv_recruit_notify') {
+client.on('interactionCreate', () => {
+    if (interaction.customId == 'wfhub_recruit_notify') {
         edit_main_msg()
         console.log(interaction.values)
-        db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
+        db.query(`SELECT * FROM wfhub_squads_data WHERE id=1`).catch(err => console.log(err))
         .then(res => {
             var trackers = res.rows[0].trackers
             for (const value of interaction.values) {
@@ -48,13 +42,13 @@ function interactionHandler(interaction) {
                     trackers[value] = []
                 if (trackers[value].includes(interaction.user.id)) {
                     trackers[value] = trackers[value].filter(function(f) { return f !== interaction.user.id })
-                    console.log('botv_recruit: user',interaction.user.id,'is untracking',value)
+                    console.log('wfhub_recruit: user',interaction.user.id,'is untracking',value)
                 } else {
                     trackers[value].push(interaction.user.id)
-                    console.log('botv_recruit: user',interaction.user.id,'is now tracking',value)
+                    console.log('wfhub_recruit: user',interaction.user.id,'is now tracking',value)
                 }
             }
-            db.query(`UPDATE botv_squads_data SET trackers='${JSON.stringify(trackers)}' WHERE id=1`).catch(err => console.log(err))
+            db.query(`UPDATE wfhub_squads_data SET trackers='${JSON.stringify(trackers)}' WHERE id=1`).catch(err => console.log(err))
             var squads_list = getSquadsList()
             var tracked_squads = []
             for (const key in trackers) {
@@ -72,8 +66,8 @@ function interactionHandler(interaction) {
         return
     }
     if (interaction.customId == 'sq_leave_all') {
-        db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate().catch(err => console.log(err));edit_main_msg()}).catch(err => console.log(err))
-        console.log(`botv_recruit: user ${interaction.user.id} left all squads`)
+        db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate().catch(err => console.log(err));edit_main_msg()}).catch(err => console.log(err))
+        console.log(`wfhub_recruit: user ${interaction.user.id} left all squads`)
         return
     } else {
         if (interaction.customId == 'sq_custom') {
@@ -119,19 +113,19 @@ function interactionHandler(interaction) {
                 interaction.reply({content: 'Total spots must be greater than 1. Please try again', ephemeral: true}).catch(err => console.log(err))
                 return
             }
-            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,custom,spots,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${interaction.fields.getTextInputValue('squad_name').trim().toLowerCase().replace(/ /g,'_')}',true,${total_spots},${new Date().getTime()})`)
+            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,spots,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${interaction.fields.getTextInputValue('squad_name').trim().toLowerCase().replace(/ /g,'_')}',true,${total_spots},${new Date().getTime()})`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                 edit_main_msg()
-                console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
+                console.log(`wfhub_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
                 mention_users(interaction.user.id,interaction.customId)
             }).catch(err => {
                 if (err.code == 23505) { // duplicate key
-                    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.fields.getTextInputValue('squad_name')}'`)
+                    db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.fields.getTextInputValue('squad_name')}'`)
                     .then(res => {
                         if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                         edit_main_msg()
-                        console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.fields.getTextInputValue('squad_name')}`)
+                        console.log(`wfhub_recruit: user ${interaction.user.id} left ${interaction.fields.getTextInputValue('squad_name')}`)
                     })
                     .catch(err => console.log(err))
                 } else {
@@ -140,19 +134,19 @@ function interactionHandler(interaction) {
             })
         }
         else {
-            db.query(`INSERT INTO botv_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                 edit_main_msg()
-                console.log(`botv_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
+                console.log(`wfhub_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
                 mention_users(interaction.user.id,interaction.customId)
             }).catch(err => {
                 if (err.code == 23505) { // duplicate key
-                    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
+                    db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
                     .then(res => {
                         if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                         edit_main_msg()
-                        console.log(`botv_recruit: user ${interaction.user.id} left ${interaction.customId}`)
+                        console.log(`wfhub_recruit: user ${interaction.user.id} left ${interaction.customId}`)
                     })
                     .catch(err => console.log(err))
                 } else {
@@ -161,17 +155,14 @@ function interactionHandler(interaction) {
             })
         }
     }
-}
+})
 
 var timeout_edit_components = null;
 async function edit_main_msg() {
     console.log('editing main msg')
     var squads = getSquadsList()
 
-
-    var componentIndex = 0
-
-    await db.query(`SELECT * FROM botv_recruit_members`)
+    await db.query(`SELECT * FROM wfhub_recruit_members`)
     .then(async res => {
         //push custom squads to squads list
         for (const [index,squad] of res.rows.entries()) {
@@ -200,7 +191,8 @@ async function edit_main_msg() {
         }
     }).catch(err => console.log(err))
 
-    const channel = client.channels.cache.get('950400363410915348')
+    const channel = client.channels.cache.get(recruit_channel_id) || await client.channels.fetch(recruit_channel_id).catch(console.error)
+    if (!channel) return
 
     clearTimeout(timeout_edit_components)
     timeout_edit_components = setTimeout(edit_components, 1500);
@@ -222,8 +214,10 @@ async function edit_main_msg() {
     })
     console.log(JSON.stringify(notification_options))
 
-    function edit_components() {
-        channel.messages.cache.get('1004739559269085225').edit({
+    async function edit_components() {
+        const message = channel.messages.cache.get(recruit_message_id) || await channel.messages.fetch(recruit_message_id).catch(console.error)
+        if (!message) return
+        message.edit({
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
@@ -285,7 +279,7 @@ async function edit_main_msg() {
             components: [{
                 type: 3,
                 placeholder: 'Notification Settings',
-                custom_id: 'botv_recruit_notify',
+                custom_id: 'wfhub_recruit_notify',
                 min_values: 1,
                 max_values: notification_options.length,
                 options: notification_options
@@ -296,12 +290,12 @@ async function edit_main_msg() {
 }
 
 function mention_users(joined_user_id,squad_id) {
-    db.query(`SELECT * FROM botv_squads_data WHERE id=1`).catch(err => console.log(err))
-    .then(botv_squads_data => {
-        db.query(`SELECT * FROM botv_recruit_members`).catch(err => console.log(err))
-        .then(botv_recruit_members => {
-            var trackers = botv_squads_data.rows[0].trackers
-            var joined_members = botv_recruit_members.rows
+    db.query(`SELECT * FROM wfhub_squads_data WHERE id=1`).catch(err => console.log(err))
+    .then(wfhub_squads_data => {
+        db.query(`SELECT * FROM wfhub_recruit_members`).catch(err => console.log(err))
+        .then(wfhub_recruit_members => {
+            var trackers = wfhub_squads_data.rows[0].trackers
+            var joined_members = wfhub_recruit_members.rows
             var mention_list = []
             if (trackers[squad_id]) {
                 trackers[squad_id].forEach(userId => {
@@ -325,7 +319,7 @@ function mention_users(joined_user_id,squad_id) {
             }
             if (mention_list.length > 0) {
                 var squads_list = getSquadsList()
-                client.channels.cache.get('950400363410915348').send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`}).catch(err => console.log(err))
+                client.channels.cache.get(recruit_channel_id).send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`}).catch(err => console.log(err))
                 .then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
             }
         })
@@ -333,9 +327,8 @@ function mention_users(joined_user_id,squad_id) {
 }
 
 function open_squad(squad) {
-    verify_challenge_serviceman(squad)
     console.log('botv squad opened', squad.filled.join(' '))
-    client.channels.cache.get('950400363410915348').threads.create({
+    client.channels.cache.get(recruit_channel_id).threads.create({
         name: squad.name,
         autoArchiveDuration: 60,
         reason: 'Squad filled',
@@ -364,8 +357,8 @@ function open_squad(squad) {
         }
 
     }).catch(err => console.log(err))
-    db.query(`DELETE FROM botv_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}])`).catch(err => console.log(err)).then(res => edit_main_msg())
-    db.query(`UPDATE botv_squads_data SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
+    db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}])`).catch(err => console.log(err)).then(res => edit_main_msg())
+    db.query(`UPDATE wfhub_squads_data SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
 }
 
 function getSquadsList() {
@@ -479,7 +472,6 @@ function getSquadsList() {
 
 module.exports = {
     bot_initialize,
-    send_msg,
     edit_main_msg,
     interactionHandler
 }
