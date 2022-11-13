@@ -25,7 +25,7 @@ client.on('ready', () => {
     edit_main_msg()
 })
 
-client.on('interactionCreate', () => {
+client.on('interactionCreate', (interaction) => {
     if (interaction.customId == 'wfhub_recruit_notify') {
         edit_main_msg()
         console.log(interaction.values)
