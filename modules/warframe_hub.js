@@ -21,7 +21,7 @@ async function edit_vip_message() {
             description: 
 `Subscribe to the monthly VIP access for only **$4.99** to gain premium perks including:
 
-◉ Removing ads from our (HubApp)[https://www.hubapp.site/]
+◉ Removing ads from our [HubApp](https://www.hubapp.site/)
 ◉ Claiming the <@&1041308552905629746> role
 ◉ relicbot_premium_features
 ◉ tradebot_premium_features`
