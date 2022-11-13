@@ -27,7 +27,7 @@ client.on('ready', () => {
 
 client.on('interactionCreate', (interaction) => {
     if (interaction.channel.id != recruit_channel_id) return
-    
+
     if (interaction.customId == 'wfhub_recruit_notify') {
         edit_main_msg()
         console.log(interaction.values)
@@ -137,7 +137,7 @@ client.on('interactionCreate', (interaction) => {
             })
         }
         else {
-            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${new Date().getTime()})`)
+            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${interaction.customId.match(/^sq_custom/) ? true:false},${new Date().getTime()})`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
                 edit_main_msg()
@@ -171,7 +171,7 @@ async function edit_main_msg() {
         for (const [index,squad] of res.rows.entries()) {
             if (squad.custom) {
                 if (!squads[squad.squad_type]) {
-                    var name = convertUpper(squad.squad_type.replace('sq_custom_','').replace(/_/g,' '))
+                    const name = convertUpper(squad.squad_type.replace('sq_custom_','').replace(/_/g,' '))
                     squads[squad.squad_type] = {
                         name: name,
                         id: squad.squad_type,
