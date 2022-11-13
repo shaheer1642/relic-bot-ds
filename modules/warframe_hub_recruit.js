@@ -128,10 +128,15 @@ client.on('interactionCreate', (interaction) => {
             }).catch(err => {
                 if (err.code == 23505) { // duplicate key
                     interaction.reply({
-                        content: 'That squad already exists'
+                        content: 'That squad already exists',
+                        ephemeral: true
                     }).catch(err => console.log(err))
                 } else {
                     console.log(err)
+                    interaction.reply({
+                        content: 'Unexpected error occured',
+                        ephemeral: false
+                    }).catch(err => console.log(err))
                 }
             })
         }
@@ -267,7 +272,6 @@ async function edit_main_msg() {
                 });
                 l++
             }
-            console.log(`k: ${k} l:${l}`)
             if (squad.id == 'sq_leave_all') {
                 components[k][l].components.push({
                     type: 2,
@@ -322,7 +326,7 @@ async function edit_main_msg() {
             options: notification_options
         })
         
-        console.log(JSON.stringify(components))
+        //console.log(JSON.stringify(components))
         return components;
     }
 }
