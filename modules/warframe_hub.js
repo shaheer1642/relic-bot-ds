@@ -1,4 +1,4 @@
-const {client} = require('./modules/discord_client.js');
+const {client} = require('./discord_client.js');
 const {db} = require('./modules/db_connection.js');
 
 const guild_id = '865904902941048862'
