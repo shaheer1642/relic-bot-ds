@@ -54,6 +54,7 @@ async function edit_vip_message() {
 
 db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
+    console.log('[warframe_hub] db notification: ',payload)
 
     if (notification.channel == 'wfhub_payment_receipts_insert') {
         const user = client.users.cache.get(payload.discord_id) || await client.users.fetch(payload.discord_id).catch(console.error)
