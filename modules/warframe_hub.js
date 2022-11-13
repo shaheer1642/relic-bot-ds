@@ -19,7 +19,7 @@ async function edit_vip_message() {
         embeds: [{
             title: 'VIP Subscription',
             description: 
-`Subscribe to monthly VIP access for only **$4.99** to gain premium perks including:
+`Subscribe to the monthly VIP access for only **$4.99** to gain premium perks including:
 
 ◉ Removing ads from our (HubApp)[https://www.hubapp.site/]
 ◉ Claiming the <@&1041308552905629746> role

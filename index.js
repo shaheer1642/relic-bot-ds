@@ -24,6 +24,7 @@ const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
 const wfrim = require('./modules/wfrim.js');
+const warframe_hub = require('./modules/warframe_hub');
 const osiris_guild_id = '905559118096531456'
 const botv_guild_id = '776804537095684108'
 const {client} = require('./modules/discord_client.js');
