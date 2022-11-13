@@ -44,7 +44,7 @@ async function edit_vip_message() {
                 components: [{
                     type: 2,
                     label: 'Purchase VIP (test mode - no charges)',
-                    style: 2,
+                    style: 3,
                     custom_id: 'warframe_hub_purchase_vip'
                 }]
             },
