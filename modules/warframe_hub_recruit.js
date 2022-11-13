@@ -26,6 +26,8 @@ client.on('ready', () => {
 })
 
 client.on('interactionCreate', (interaction) => {
+    if (interaction.channel.id != recruit_channel_id) return
+    
     if (interaction.customId == 'wfhub_recruit_notify') {
         edit_main_msg()
         console.log(interaction.values)
@@ -319,9 +321,10 @@ function mention_users(joined_user_id,squad_id) {
                 })
             }
             if (mention_list.length > 0) {
-                var squads_list = getSquadsList()
-                client.channels.cache.get(recruit_channel_id).send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`}).catch(err => console.log(err))
+                const squads_list = getSquadsList()
+                client.channels.cache.get(recruit_channel_id).send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`})
                 .then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
+                .catch(console.error)
             }
         })
     })
