@@ -470,9 +470,3 @@ function getSquadsList() {
         },
     }
 }
-
-module.exports = {
-    bot_initialize,
-    edit_main_msg,
-    interactionHandler
-}
