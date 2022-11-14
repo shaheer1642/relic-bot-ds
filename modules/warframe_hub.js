@@ -47,6 +47,15 @@ async function edit_vip_message() {
                     custom_id: 'warframe_hub_purchase_vip'
                 }]
             },
+            {
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: 'Purchase VIP (Real payment)',
+                    style: 3,
+                    custom_id: 'warframe_hub_purchase_vip'
+                }]
+            },
         ]
     }).catch(console.error)
 }
