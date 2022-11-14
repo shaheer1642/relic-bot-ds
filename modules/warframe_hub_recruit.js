@@ -164,7 +164,7 @@ client.on('interactionCreate', (interaction) => {
     }
 })
 
-var timeout_edit_components = null;
+//var timeout_edit_components = null;
 async function edit_main_msg() {
     console.log('editing main msg')
     var squads = getSquadsList()
@@ -201,8 +201,8 @@ async function edit_main_msg() {
     const channel = client.channels.cache.get(recruit_channel_id) || await client.channels.fetch(recruit_channel_id).catch(console.error)
     if (!channel) return
 
-    clearTimeout(timeout_edit_components)
-    timeout_edit_components = setTimeout(edit_components, 1500);
+    //clearTimeout(timeout_edit_components)
+    //timeout_edit_components = setTimeout(edit_components, 1500);
 
     var notification_options = []
     var i = 0
@@ -223,12 +223,17 @@ async function edit_main_msg() {
         value: 'remove_all'
     })
 
+    edit_components()
+
     async function edit_components() {
+        console.log('[edit_components] called')
         const components = getButtonComponents()
 
         for (const [index,message_id] of recruit_message_ids.entries()) {
             const message = channel.messages.cache.get(message_id) || await channel.messages.fetch(message_id).catch(console.error)
+            console.log('[edit_components] got msg object',message.id)
             if (!message) continue
+            if (index > 0 ) if (message.components.length == 0 && !components[index]) continue
             message.edit({
                 content: '_ _',
                 embeds: index == 0 ? [{
@@ -240,6 +245,8 @@ async function edit_main_msg() {
                     color: '#ffffff'
                 }] : [],
                 components: components[index] ? components[index] : []
+            }).then(res => {
+                console.log('[edit_components] edited msg',message_id)
             }).catch(err => console.log(err))
         }
     }
@@ -256,7 +263,7 @@ async function edit_main_msg() {
         squadArr.push(squads.sq_custom);
         squadArr.push(squads.sq_leave_all);
 
-        console.log('[getButtonComponents] squadArr: ',squadArr)
+        //console.log('[getButtonComponents] squadArr: ',squadArr)
 
         var k = 0;
         components[k] = [{
