@@ -13,6 +13,12 @@ client.on('ready', () => {
 client.on('interactionCreate', (interaction) => {
     if (interaction.customId == 'warframe_hub_purchase_vip_sandbox') {
         interaction.reply({
+            content: 'Please visit the following link in the browser to complete this transaction\n' + `https://gauss-prime-api.up.railway.app/warframehub/purchase/vip/sandbox?discord_id=${interaction.user.id}`,
+            ephemeral: true
+        }).catch(console.error)
+    }
+    if (interaction.customId == 'warframe_hub_purchase_vip') {
+        interaction.reply({
             content: 'Please visit the following link in the browser to complete this transaction\n' + `https://gauss-prime-api.up.railway.app/warframehub/purchase/vip?discord_id=${interaction.user.id}`,
             ephemeral: true
         }).catch(console.error)
@@ -51,7 +57,7 @@ async function edit_vip_message() {
                 type: 1,
                 components: [{
                     type: 2,
-                    label: 'Purchase VIP (Real payment)',
+                    label: 'Purchase VIP (Real payment - $1.00)',
                     style: 4,
                     custom_id: 'warframe_hub_purchase_vip',
                     disabled: true
