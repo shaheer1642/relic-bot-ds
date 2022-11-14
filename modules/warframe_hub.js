@@ -11,7 +11,7 @@ client.on('ready', () => {
 })
 
 client.on('interactionCreate', (interaction) => {
-    if (interaction.customId == 'warframe_hub_purchase_vip') {
+    if (interaction.customId == 'warframe_hub_purchase_vip_sandbox') {
         interaction.reply({
             content: 'Please visit the following link in the browser to complete this transaction\n' + `https://gauss-prime-api.up.railway.app/warframehub/purchase/vip?discord_id=${interaction.user.id}`,
             ephemeral: true
