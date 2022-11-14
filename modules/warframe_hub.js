@@ -44,7 +44,7 @@ async function edit_vip_message() {
                     type: 2,
                     label: 'Purchase VIP (test mode - no charges)',
                     style: 3,
-                    custom_id: 'warframe_hub_purchase_vip'
+                    custom_id: 'warframe_hub_purchase_vip_sandbox'
                 }]
             },
             {
@@ -52,8 +52,9 @@ async function edit_vip_message() {
                 components: [{
                     type: 2,
                     label: 'Purchase VIP (Real payment)',
-                    style: 3,
-                    custom_id: 'warframe_hub_purchase_vip'
+                    style: 4,
+                    custom_id: 'warframe_hub_purchase_vip',
+                    disabled: true
                 }]
             },
         ]
