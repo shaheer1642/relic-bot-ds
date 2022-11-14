@@ -240,7 +240,7 @@ async function edit_main_msg() {
                     title: 'Recruitment',
                     description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
                     footer: {
-                        text: 'Note: The squads may take a few seconds to update. The issue lies on the client-side, not Bot-side. So don\'t spam if it is not updating, your request should be recorded in database immediately after you press a button'
+                        text: 'Note: The squads may take a few seconds to update due to API rate limiting'
                     },
                     color: '#ffffff'
                 }] : [],
