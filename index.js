@@ -398,7 +398,7 @@ client.on('messageCreate', async message => {
                     gpt3.answer(message,args)
                     break
                 case 'gpt3reset':
-                    gpt3.reset(message,args)
+                    gpt3.reset(message,args) 
                     break
                 */
                 case 'graphic':
