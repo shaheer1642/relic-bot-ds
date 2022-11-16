@@ -2826,7 +2826,7 @@ async function fissures_check() {
                                 users[row.channel_id] = []
                             if (!users[row.channel_id].includes(`<@${user}>`))
                                 users[row.channel_id].push(`<@${user}>`)
-                            if (row.fissures_users[tracker_id].last_appeared != new Date(fissure.activation).getTime()) {
+                            if (new Date(fissure.activation).getTime() > row.fissures_users[tracker_id].last_appeared) {
                                 const str = `${fissure.isHard ? '[SP] ':''}${fissure.tier} ${fissure.missionType} - ${fissure.node}`
                                 if (!ping_string.includes(str))
                                     ping_string.push(str)
