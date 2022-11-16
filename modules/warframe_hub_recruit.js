@@ -236,7 +236,7 @@ async function edit_main_msg() {
             const message = await webhook_client.fetchMessage(message_id).catch(console.error)
             console.log('[edit_components] got msg object',message.id)
             if (!message) continue
-            if (index > 0 ) if (message.components.length == 0 && !components[index]) continue
+            if (index > 0 ) if (message.components.length == 0 && !components[index]) break
             webhook_client.editMessage(message_id,{
                 content: '_ _',
                 embeds: index == 0 ? [{
