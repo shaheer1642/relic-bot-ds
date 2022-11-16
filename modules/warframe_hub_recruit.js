@@ -7,8 +7,11 @@ var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to p
 const guild_id = '865904902941048862'
 const recruit_channel_id = '1041319859469955073'
 const recruit_message_ids = ['1041370462099357736','1041370465547071568','1041370467631632474','1041370470349545543','1041370472866136105']
+const webhook_messages = ['1042452564316266516','1042452566463754280','1042452570372845599','1042452572885241948','1042452574827196578']
+var webhook_client;
 
-client.on('ready', () => {
+client.on('ready', async () => {
+    webhook_client = await client.fetchWebhook('1042451987721093202').catch(console.error)
     setInterval(() => {     // check every 5m for squads timeouts
         db.query(`SELECT * FROM wfhub_recruit_members`)
         .then(async res => {
@@ -229,12 +232,12 @@ async function edit_main_msg() {
         console.log('[edit_components] called')
         const components = getButtonComponents()
 
-        for (const [index,message_id] of recruit_message_ids.entries()) {
-            const message = channel.messages.cache.get(message_id) || await channel.messages.fetch(message_id).catch(console.error)
-            console.log('[edit_components] got msg object',message.id)
-            if (!message) continue
-            if (index > 0 ) if (message.components.length == 0 && !components[index]) continue
-            message.edit({
+        for (const [index,message_id] of webhook_messages.entries()) {
+            //console.log('[edit_components] got msg object',message.id)
+            //if (!message) continue
+            //if (index > 0 ) if (message.components.length == 0 && !components[index]) continue
+            console.log('[edit_components] editing msg',message_id)
+            webhook_client.editMessage(message_id,{
                 content: '_ _',
                 embeds: index == 0 ? [{
                     title: 'Recruitment',
