@@ -79,7 +79,7 @@ db.on('notification', async (notification) => {
             content: ' ',
             embeds: [{
                 title: 'Payment Successful',
-                description: `Thank you for ${payload.type}\n\n${JSON.stringify(payload.receipt)}`,
+                description: `Thank you for ${payload.type}\n\n${JSON.stringify(payload.details)}`,
                 footer: {
                     text: 'Receipt ID: ' + payload.receipt_id
                 },
