@@ -75,7 +75,7 @@ db.on('notification', async (notification) => {
                 content: ' ',
                 embeds: [{
                     title: 'Payment Successful',
-                    description: `Thank you for purchasing WarframeHub VIP Subscription!\nEnjoy your premium features\nYour subscription will expire <t:${Math.round(Number(payload.patreon_expiry_timestamp)/1000)}:R> unless you renew`,
+                    description: `Thank you for purchasing WarframeHub VIP Subscription!\nEnjoy your premium features\nYour subscription will expire <t:${Math.round(Number(payload[0].patreon_expiry_timestamp)/1000)}:R> unless you renew`,
                     color: '#7d2ec4',
                     timestamp: new Date().getTime()
                 }]
