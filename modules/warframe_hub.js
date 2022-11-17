@@ -13,13 +13,13 @@ client.on('ready', () => {
 client.on('interactionCreate', (interaction) => {
     if (interaction.customId == 'warframe_hub_purchase_vip_sandbox') {
         interaction.reply({
-            content: 'Please visit the following link in the browser to complete this transaction\n\nTest card number: 2223000048400011\ncsc:111\n\n' + `https://gauss-prime-api.up.railway.app/warframehub/purchase/vip/sandbox?discord_id=${interaction.user.id}`,
+            content: `Please visit the following link in the browser to complete this transaction\n\nhttps://www.patreon.com/oauth2/authorize?response_type=code&client_id=TKIWwI-3NzhfxQqIcVBvj5WHcFLoc8ylgFkz0310VSi2XEc0jyLU6bFpw6ZV75gN&redirect_uri=https://gauss-prime-api.up.railway.app/patreon/oauth&state=${interaction.user.id}`,
             ephemeral: true
         }).catch(console.error)
     }
     if (interaction.customId == 'warframe_hub_purchase_vip') {
         interaction.reply({
-            content: 'Please visit the following link in the browser to complete this transaction\n' + `https://gauss-prime-api.up.railway.app/warframehub/purchase/vip?discord_id=${interaction.user.id}`,
+            content: `Please visit the following link in the browser to complete this transaction\n\nhttps://www.patreon.com/oauth2/authorize?response_type=code&client_id=TKIWwI-3NzhfxQqIcVBvj5WHcFLoc8ylgFkz0310VSi2XEc0jyLU6bFpw6ZV75gN&redirect_uri=https://gauss-prime-api.up.railway.app/patreon/oauth&state=${interaction.user.id}`,
             ephemeral: true
         }).catch(console.error)
     }
