@@ -68,7 +68,7 @@ db.on('notification', async (notification) => {
 
     if (notification.channel == 'tradebot_users_list_update') {
         if ((payload[0].is_patron && !payload[1].is_patron) || (payload[0].is_patron && payload[0].patreon_expiry_timestamp != !payload[1].patreon_expiry_timestamp)) {
-            const user = client.users.cache.get(payload.discord_id.toString()) || await client.users.fetch(payload.discord_id.toString()).catch(console.error)
+            const user = client.users.cache.get(payload[0].discord_id.toString()) || await client.users.fetch(payload[0].discord_id.toString()).catch(console.error)
             if (!user) return
     
             user.send({
