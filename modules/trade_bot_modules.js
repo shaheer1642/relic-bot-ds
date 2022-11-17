@@ -2842,10 +2842,10 @@ async function tb_user_exist(discord_id) {
                 trading_bot_registeration(discord_id)
                 .then(res => reject(res))
                 .catch(err => reject(res))
+            } else if (res.rowCount == 1) {
+                resolve('user exists')
             }
-            resolve('user exists')
-        })
-        .catch(err => {
+        }).catch(err => {
             reject({content: `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`, embeds: [], ephemeral: true})
         })
     })
