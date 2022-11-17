@@ -52,7 +52,7 @@ async function edit_vip_message() {
                     type: 2,
                     label: 'Purchase VIP',
                     style: 3,
-                    custom_id: 'warframe_hub_purchase'
+                    custom_id: 'warframe_hub_purchase_vip'
                 }]
             },
         ]
