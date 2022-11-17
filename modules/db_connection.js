@@ -24,6 +24,8 @@ db.connect().then(async res => {
     db.query('LISTEN challenges_completed_insert').catch(console.error)
     
     db.query('LISTEN wfhub_payment_receipts_insert').catch(console.error)
+
+    db.query('LISTEN tradebot_users_list_update').catch(console.error)
 })
 
 db.on('error', err => {
