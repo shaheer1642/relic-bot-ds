@@ -3467,7 +3467,10 @@ async function invasions_check() {
             var timer = 300000
             invasions_timer = setTimeout(invasions_check, timer)
             console.log('invasions_check invokes in ' + msToTime(timer))
-        }).catch(console.error)
+        }).catch((err) => {
+            console.log(err)
+            invasions_timer = setTimeout(invasions_check,5000)
+        })
     })
     .catch(err => {
         console.log(err)
