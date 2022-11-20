@@ -16,7 +16,8 @@ module.exports = {
 	status: 'active',
 	guildIds: [
 		"832677897411493949",
-		"865904902941048862"
+		"865904902941048862",
+		"730808307010240572"
 	],
 	command_name: '/relic_bot'
 };
