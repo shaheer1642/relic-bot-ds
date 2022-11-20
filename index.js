@@ -21,6 +21,7 @@ const botv_recruit = require('./modules/botv_recruit.js');
 const warframe_hub_recruit = require('./modules/warframe_hub_recruit.js');
 const crud_server = require('./modules/crud_server.js');
 const botv_event_voting = require('./modules/botv_event_voting.js');
+const relicbot = require('./modules/relicbot.js');
 const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');

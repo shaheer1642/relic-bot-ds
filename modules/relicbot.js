@@ -124,7 +124,7 @@ function embed(with_names, tier) {
     msg.components[4].components.push({
         type: 2,
         label: "Squad Info",
-        style: 4,
+        style: 1,
         custom_id: "squad_info"
     })
     return msg
