@@ -26,7 +26,7 @@ module.exports = {
         )
         .addSubcommand(subcommand =>
             subcommand.setName('add_server')
-            .setDescription('Affiliate with this server ')
+            .setDescription('Affiliate with this server')
         )
         .addSubcommand(subcommand =>
             subcommand.setName('remove_server')
