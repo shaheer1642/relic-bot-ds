@@ -1185,9 +1185,9 @@ db.on('notification', async (notification) => {
                             channel.messages.fetch(thread.id).then(msg => msg.delete().catch(console.error)).catch(console.error)
                         }, 10000);
                         thread.send({
-                            content: `<@793061832196882452> <@${payload.discord_id}>`,
+                            content: `<@&793061832196882452> <@${payload.discord_id}>`,
                             embeds: [{
-                                description: `<@&${payload.discord_id}> has purchased **${deal.item_name}** for **${deal.rp} RP**`
+                                description: `<@${payload.discord_id}> has purchased **${deal.item_name}** for **${deal.rp} RP**`
                             }]
                         }).catch(console.log)
                     }).catch(console.error)
