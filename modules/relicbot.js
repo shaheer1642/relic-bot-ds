@@ -8,7 +8,7 @@ const {socket} = require('./socket')
 const server_commands_perms = [
     '253525146923433984', //softy
     '253980061969940481', //leo
-    '353154275745988610', //john
+    '353154275745988610', //john 
     '385459793508302851' //ady
 ]
 
