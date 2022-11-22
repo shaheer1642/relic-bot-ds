@@ -3,6 +3,7 @@ const {db} = require('./db_connection')
 const uuid = require('uuid')
 const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
+const {socket} = require('./socket')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -21,12 +22,18 @@ client.on('ready', async () => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
     if (!channels_list.includes(message.channel.id)) return
-    open_new_squad(message)
-    .then(res => {
-        setTimeout(() => message.delete().catch(console.error), 1000);
-    }).catch((err) => {
-        message.channel.send({content: err}).catch(console.error)
-        //.then(msg => setTimeout(() => {message.delete().catch(console.error);msg.delete().catch(console.error)}, 5000)) 
+    console.log('[relicbot messageCreate] content:',message.content)
+    socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id},responses => {
+        var flag = true
+        responses.forEach(res => {
+            if (res.code != 200) {
+                flag = false
+                console.log(res)
+                message.channel.send({content: res.message || 'error'}).catch(console.error)
+            }
+        })
+        if (flag)
+            setTimeout(() => message.delete().catch(console.error), 1000);
     })
 })
 
@@ -78,60 +85,14 @@ class Squad {
         this.tier = tier
         this.relic = relic
         this.host = host
-        //this.created_timestamp = new Date().getTime()
-        //this.expiry_timestamp = new Date().getTime() + 60 minutes
-    }
-
-    async insert_db() {
-        return new Promise((resolve,reject) => {
-            db.query(`INSERT INTO rb_squads (squad_id,tier,relic,host) VALUES ('${this.squad_id}','${this.tier}','${this.relic}','${this.host}')`)
-            .then(res => {
-                if (res.rowCount == 1) {
-                    squads_list.push(this)
-                    resolve()
-                } else reject()
-            }).catch(err => reject(err))
-        })
-    }
-
-    async delete_db() {
-        return new Promise((resolve,reject) => {
-            db.query(`DELETE FROM rb_squads where squad_id='${this.squad_id}'`)
-            .then(res => {
-                if (res.rowCount == 1) {
-                    squads_list = squads_list.filter(squad => squad.squad_id != this.squad_id)
-                    resolve()
-                } else reject()
-            }).catch(err => reject(err))
-        })
     }
 }
 
-function open_new_squad(message) {
-    return new Promise((resolve,reject) => {
-        const lines = message.content.toLowerCase().split('\n')
-        lines.forEach(line => {
-            const words = line.split(' ')
-            var tier = "", relic = words[1], host = message.author.id;
-            if (['lith','meso','neo','axi'].includes(words[0])) tier = words[0]
-            if (tier == "") return reject('invalid tier')
-            new Squad(tier,relic,host).insert_db().then(res => {
-                return resolve()
-            }).catch(err => reject(err))
-        })
+function edit_webhook_messages(squads,tier) {
+    const msg_payload = embed(squads,tier,false)
+    webhook_messages[tier + '_squads'].forEach(msg => {
+        new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
     })
-}
-
-function edit_webhook_messages(tier) {
-    db.query(`SELECT * FROM rb_squads WHERE tier='${tier}'`)
-    .then(res => {
-        if (res.rowCount > 0) {
-            const msg_payload = embed(res.rows,tier,false)
-            webhook_messages[tier + '_squads'].forEach(msg => {
-                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
-            })
-        }
-    }).catch(console.error)
 }
 
 function assign_global_variables() {
@@ -261,12 +222,13 @@ function embed(squads, tier, with_names) {
     return msg
 }
 
-db.on('notification', async (notification) => {
-    const payload = JSONbig.parse(notification.payload);
-
-    if (notification.channel == 'rb_squads_insert') {
-        edit_webhook_messages(payload.tier)
-    }
+socket.on('squadCreate', (squad) => {
+    console.log('[squadCreate]',squad)
+    socket.emit('relicbot/squads/fetch',{tier: squad.tier},(res) => {
+        if (res.code == 200) {
+            edit_webhook_messages(res.data, squad.tier)
+        }
+    })
 })
 
 module.exports = {
