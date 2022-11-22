@@ -67,15 +67,7 @@ client.on('interactionCreate', async (interaction) => {
             }
         }
     }
-    
-    if (interaction.customId == 'squad_info') {
-        console.log(interaction.user.id,'clicked squad_info')
-        interaction.deferUpdate().catch(console.error)
-        edit_relic_squads(true)
-        setTimeout(() => {
-            edit_relic_squads(false)
-        }, 5000);
-    }
+
 })
 
 var squads_list = []
