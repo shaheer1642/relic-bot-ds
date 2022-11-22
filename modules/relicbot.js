@@ -21,8 +21,15 @@ client.on('ready', async () => {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
     if (!channels_list.includes(message.channel.id)) return
-    setTimeout(() => message.delete().catch(console.error), 3000);
-    open_new_squad(message).catch((err) => message.channel.send({content: err}).catch(console.error))
+    open_new_squad(message)
+    .then(res => {
+        setTimeout(() => message.delete().catch(console.error), 1000);
+    }).catch((err) => {
+        message.channel.send({content: err})
+        .then(msg => {
+            setTimeout(() => msg.delete().catch(console.error), 5000);
+        }).catch(console.error)
+    })
 })
 
 client.on('interactionCreate', async (interaction) => {
