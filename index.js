@@ -142,11 +142,13 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', async message => {
+
+    if (relicbot.channels_list.includes(message.channel.id)) return
+
     if (message.author.id == client.user.id && message.type === 'CHANNEL_PINNED_MESSAGE') {
         pins_handler(message)
         return
     }
-
 
     if (message.author.id == hubapp.bot_id && Object.keys(hubapp.channel_ids).includes(message.channel.id))
         hubapp.message_create(message)

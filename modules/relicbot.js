@@ -2,6 +2,7 @@ const {client} = require('./discord_client');
 const {db} = require('./db_connection')
 const uuid = require('uuid')
 const { WebhookClient } = require('discord.js');
+const JSONbig = require('json-bigint');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -19,10 +20,9 @@ client.on('ready', async () => {
 
 client.on('messageCreate', async (message) => {
     if (!channels_list.includes(message.channel.id)) return
-    open_new_squad(message)
+    setTimeout(() => message.delete().catch(console.error), 3000);
+    open_new_squad(message).catch((err) => message.channel.send({content: err}).catch(console.error))
 })
-
-
 
 client.on('interactionCreate', async (interaction) => {
     
@@ -85,23 +85,27 @@ class Squad {
     }
 
     async insert_db() {
-        db.query(`INSERT INTO rb_squads (squad_id,tier,relic,host) VALUES ('${this.squad_id}','${this.tier}','${this.relic}','${this.host}')`)
-        .then(res => {
-            if (res.rowCount == 1) {
-                squads_list.push(this)
-                resolve()
-            } else reject()
-        }).catch(err => reject(err))
+        return new Promise((resolve,reject) => {
+            db.query(`INSERT INTO rb_squads (squad_id,tier,relic,host) VALUES ('${this.squad_id}','${this.tier}','${this.relic}','${this.host}')`)
+            .then(res => {
+                if (res.rowCount == 1) {
+                    squads_list.push(this)
+                    resolve()
+                } else reject()
+            }).catch(err => reject(err))
+        })
     }
 
     async delete_db() {
-        db.query(`DELETE FROM rb_squads where squad_id='${this.squad_id}'`)
-        .then(res => {
-            if (res.rowCount == 1) {
-                squads_list = squads_list.filter(squad => squad.squad_id != this.squad_id)
-                resolve()
-            } else reject()
-        }).catch(err => reject(err))
+        return new Promise((resolve,reject) => {
+            db.query(`DELETE FROM rb_squads where squad_id='${this.squad_id}'`)
+            .then(res => {
+                if (res.rowCount == 1) {
+                    squads_list = squads_list.filter(squad => squad.squad_id != this.squad_id)
+                    resolve()
+                } else reject()
+            }).catch(err => reject(err))
+        })
     }
 }
 
@@ -125,7 +129,7 @@ function edit_webhook_messages(tier) {
     .then(res => {
         if (res.rowCount > 0) {
             const msg_payload = embed(res.rows,tier,false)
-            webhook_messages[tier].forEach(msg => {
+            webhook_messages[tier + '_squads'].forEach(msg => {
                 new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
             })
         }
@@ -259,15 +263,6 @@ function embed(squads, tier, with_names) {
     return msg
 }
 
-client.on('ready', async () => {
-    edit_relic_squads(false)
-})
-
-async function edit_relic_squads(with_names) {
-    (await client.fetchWebhook('1043648178941087746')).editMessage('1043648496319864962', embed(with_names, 'Lith'));
-    (await client.fetchWebhook('1043648178941087746')).editMessage('1043649645705965599', embed(with_names, 'Meso'));
-}
-
 db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
 
@@ -275,3 +270,7 @@ db.on('notification', async (notification) => {
         edit_webhook_messages(payload.tier)
     }
 })
+
+module.exports = {
+    channels_list
+}
