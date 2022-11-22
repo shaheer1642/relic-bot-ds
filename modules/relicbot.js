@@ -26,7 +26,7 @@ client.on('messageCreate', async (message) => {
         setTimeout(() => message.delete().catch(console.error), 1000);
     }).catch((err) => {
         message.channel.send({content: err}).catch(console.error)
-        //.then(msg => setTimeout(() => {message.delete().catch(console.error);msg.delete().catch(console.error)}, 5000))
+        //.then(msg => setTimeout(() => {message.delete().catch(console.error);msg.delete().catch(console.error)}, 5000)) 
     })
 })
 
