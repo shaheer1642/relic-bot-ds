@@ -19,6 +19,7 @@ client.on('ready', async () => {
 })
 
 client.on('messageCreate', async (message) => {
+    if (message.author.bot) return
     if (!channels_list.includes(message.channel.id)) return
     setTimeout(() => message.delete().catch(console.error), 3000);
     open_new_squad(message).catch((err) => message.channel.send({content: err}).catch(console.error))
@@ -118,7 +119,7 @@ function open_new_squad(message) {
             if (['lith','meso','neo','axi'].includes(words[0])) tier = words[0]
             if (tier == "") return reject('invalid tier')
             new Squad(tier,relic,host).insert_db().then(res => {
-                resolve()
+                return resolve()
             }).catch(err => reject(err))
         })
     })
