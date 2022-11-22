@@ -1,5 +1,7 @@
 const {client} = require('./discord_client');
 const {db} = require('./db_connection')
+const uuid = require('uuid')
+const { WebhookClient } = require('discord.js');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -7,6 +9,20 @@ const server_commands_perms = [
     '353154275745988610', //john
     '385459793508302851' //ady
 ]
+
+const webhook_messages = {}
+const channels_list = []
+
+client.on('ready', async () => {
+    assign_global_variables()
+})
+
+client.on('messageCreate', async (message) => {
+    if (!channels_list.includes(message.channel.id)) return
+    open_new_squad(message)
+})
+
+
 
 client.on('interactionCreate', async (interaction) => {
     
@@ -56,6 +72,82 @@ client.on('interactionCreate', async (interaction) => {
     }
 })
 
+var squads_list = []
+
+class Squad {
+    constructor(tier, relic, host) {
+        this.squad_id = uuid.v4()
+        this.tier = tier
+        this.relic = relic
+        this.host = host
+        //this.created_timestamp = new Date().getTime()
+        //this.expiry_timestamp = new Date().getTime() + 60 minutes
+    }
+
+    async insert_db() {
+        db.query(`INSERT INTO rb_squads (squad_id,tier,relic,host) VALUES ('${this.squad_id}','${this.tier}','${this.relic}','${this.host}')`)
+        .then(res => {
+            if (res.rowCount == 1) {
+                squads_list.push(this)
+                resolve()
+            } else reject()
+        }).catch(err => reject(err))
+    }
+
+    async delete_db() {
+        db.query(`DELETE FROM rb_squads where squad_id='${this.squad_id}'`)
+        .then(res => {
+            if (res.rowCount == 1) {
+                squads_list = squads_list.filter(squad => squad.squad_id != this.squad_id)
+                resolve()
+            } else reject()
+        }).catch(err => reject(err))
+    }
+}
+
+function open_new_squad(message) {
+    return new Promise((resolve,reject) => {
+        const lines = message.content.toLowerCase().split('\n')
+        lines.forEach(line => {
+            const words = line.split(' ')
+            var tier = "", relic = words[1], host = message.author.id;
+            if (['lith','meso','neo','axi'].includes(words[0])) tier = words[0]
+            if (tier == "") return reject('invalid tier')
+            new Squad(tier,relic,host).insert_db().then(res => {
+                resolve()
+            }).catch(err => reject(err))
+        })
+    })
+}
+
+function edit_webhook_messages(tier) {
+    db.query(`SELECT * FROM rb_squads WHERE tier='${tier}'`)
+    .then(res => {
+        if (res.rowCount > 0) {
+            const msg_payload = embed(res.rows,tier,false)
+            webhook_messages[tier].forEach(msg => {
+                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
+            })
+        }
+    }).catch(console.error)
+}
+
+function assign_global_variables() {
+    db.query(`SELECT * FROM rb_messages`)
+    .then(res => {
+        res.rows.forEach((row) => {
+            if (!webhook_messages[row.type]) webhook_messages[row.type] = []
+            if (!channels_list.includes(row.channel_id)) channels_list.push(row.channel_id)
+            if (!webhook_messages[row.type].find(obj => obj.m_id == row.message_id)) {
+                webhook_messages[row.type].push({
+                    m_id: row.message_id,
+                    c_id: row.channel_id,
+                    url: row.webhook_url
+                })
+            }
+        })
+    }).catch(console.error)
+}
 
 function rb_add_server(guild_id) {
     return new Promise((resolve,reject) => {
@@ -128,121 +220,42 @@ function rb_remove_server(guild_id) {
     })
 }
 
-const pnames = [
-    'player 1\nplayer2\nplayer3',
-    'player 1\nplayer2',
-    'player 1'
-]
-
-function dynamicSort(property) {
-    var sortOrder = 1;
-    if(property[0] === "-") {
-        sortOrder = -1;
-        property = property.substr(1);
-    }
-    return function (a,b) {
-        /* next line works with strings and numbers, 
-         * and you may want to customize it to your needs
-         */
-        var result = (a[property] < b[property]) ? -1 : (a[property] > b[property]) ? 1 : 0;
-        return result * sortOrder;
-    }
-}
-
-function field(with_names, relic) {
-    const alph = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"].sort(() => Math.random() - 0.5)
-    const cycle = ["", "", "", "", "", "(4+ cycles)"].sort(() => Math.random() - 0.5)
-    const num = ["1", "2", "3", "4", "5", "6"].sort(() => Math.random() - 0.5)
-    const rot = ["1b1", "2b2", "3b3", "4b4"].sort(() => Math.random() - 0.5)
-    const refine = ["int", "exc", "flaw", "rad"].sort(() => Math.random() - 0.5)
-    const text = ['player 1\nplayer2\nplayer3','player 1\nplayer2','player 1'].sort(() => Math.random() - 0.5)
-    return {
-        name: `${alph[0]}${num[0]} ${rot[0]} ${refine[0]} ${cycle[0]}`,
-        value: with_names ? text[0] : text[0] == 'player 1\nplayer2\nplayer3' ? '🔥' : '\u200b',
-        inline: true
-    }
-}
-
-function embed(with_names, tier) {
-    const relics = Array.from(Array(24).keys()).map(() => field(with_names)).sort(dynamicSort("name"))
+function embed(squads, tier, with_names) {
+    var fields = []
+    var components = []
+    squads.map((squad,index) => {
+        fields.push({
+            name: `${squad.tier} ${squad.relic}`,
+            value: '\u200b',
+            inline: true
+        })
+        const k = Math.ceil((index + 1)/5) - 1
+        if (!components[k]) components[k] = {type: 1, components: []}
+        components[k].components.push({
+            type: 2,
+            label: squad.relic,
+            style: 2,
+            custom_id: squad.relic + Math.random() * 100
+        })
+    })
     const msg = {
         content: ' ',
         embeds: [{
             title: tier,
             description: ('━').repeat(34),
-            fields: relics,
-            color: tier == 'Lith'? 'RED' : 'BLUE'
+            fields: fields,
+            color: tier == 'lith'? 'RED' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'ORANGE' : tier == 'axi' ? 'YELLOW' : ''
         }],
-        components: [
-            {
-                type: 1,
-                components: relics.map((relic,index) => {
-                    if (index >= 5) return {}
-                    return {
-                        type: 2,
-                        label: relic.name.split(' ')[0],
-                        style: relic.value == 'player 1\nplayer2\nplayer3' || relic.value == '🔥' ? 3:2,
-                        custom_id: relic.name.split(' ')[0] + Math.random() * 100
-                    }
-                }).filter(value => Object.keys(value).length !== 0)
-            },
-            {
-                type: 1,
-                components: relics.map((relic,index) => {
-                    if (index >= 10 || index <= 4) return {}
-                    return {
-                        type: 2,
-                        label: relic.name.split(' ')[0],
-                        style: relic.value == 'player 1\nplayer2\nplayer3' || relic.value == '🔥' ? 3:2,
-                        custom_id: relic.name.split(' ')[0] + Math.random() * 100
-                    }
-                }).filter(value => Object.keys(value).length !== 0)
-            },
-            {
-                type: 1,
-                components: relics.map((relic,index) => {
-                    if (index >= 15 || index <= 9) return {}
-                    return {
-                        type: 2,
-                        label: relic.name.split(' ')[0],
-                        style: relic.value == 'player 1\nplayer2\nplayer3' || relic.value == '🔥' ? 3:2,
-                        custom_id: relic.name.split(' ')[0] + Math.random() * 100
-                    }
-                }).filter(value => Object.keys(value).length !== 0)
-            },
-            {
-                type: 1,
-                components: relics.map((relic,index) => {
-                    if (index >= 20 || index <= 14) return {}
-                    return {
-                        type: 2,
-                        label: relic.name.split(' ')[0],
-                        style: relic.value == 'player 1\nplayer2\nplayer3' || relic.value == '🔥' ? 3:2,
-                        custom_id: relic.name.split(' ')[0] + Math.random() * 100
-                    }
-                }).filter(value => Object.keys(value).length !== 0)
-            },
-            {
-                type: 1,
-                components: relics.map((relic,index) => {
-                    if (index >= 25 || index <= 19) return {}
-                    return {
-                        type: 2,
-                        label: relic.name.split(' ')[0],
-                        style: relic.value == 'player 1\nplayer2\nplayer3' || relic.value == '🔥' ? 3:2,
-                        custom_id: relic.name.split(' ')[0] + Math.random() * 100
-                    }
-                    
-                }).filter(value => Object.keys(value).length !== 0)
-            },
-        ]
+        components: components
     }
+    /*
     msg.components[4].components.push({
         type: 2,
         label: "Squad Info",
         style: 1,
         custom_id: "squad_info"
     })
+    */
     return msg
 }
 
@@ -254,3 +267,11 @@ async function edit_relic_squads(with_names) {
     (await client.fetchWebhook('1043648178941087746')).editMessage('1043648496319864962', embed(with_names, 'Lith'));
     (await client.fetchWebhook('1043648178941087746')).editMessage('1043649645705965599', embed(with_names, 'Meso'));
 }
+
+db.on('notification', async (notification) => {
+    const payload = JSONbig.parse(notification.payload);
+
+    if (notification.channel == 'rb_squads_insert') {
+        edit_webhook_messages(payload.tier)
+    }
+})

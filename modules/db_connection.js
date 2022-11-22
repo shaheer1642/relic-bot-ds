@@ -26,6 +26,10 @@ db.connect().then(async res => {
     db.query('LISTEN wfhub_payment_receipts_insert').catch(console.error)
 
     db.query('LISTEN tradebot_users_list_update').catch(console.error)
+
+    db.query('LISTEN rb_squads_insert').catch(console.error)
+    db.query('LISTEN rb_squads_update').catch(console.error)
+    db.query('LISTEN rb_squads_delete').catch(console.error)
 })
 
 db.on('error', err => {
