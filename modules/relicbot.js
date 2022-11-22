@@ -38,7 +38,6 @@ client.on('messageCreate', async (message) => {
 })
 
 client.on('interactionCreate', async (interaction) => {
-    
     if (interaction.isCommand()) {
         if (interaction.commandName == 'relic_bot') {
             if (!server_commands_perms.includes(interaction.user.id))
@@ -74,7 +73,17 @@ client.on('interactionCreate', async (interaction) => {
             }
         }
     }
-
+    if (interaction.isButton()) {
+        if (!channels_list.includes(interaction.channel.id)) return
+        if (interaction.customId.match('rb_sq_')) {
+            const squad_id = interaction.customId.split('rb_sq_')[1]
+            const discord_id = interaction.user.id
+            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id},(res) => {
+                if (res.code == 200) interaction.deferUpdate().catch(console.error)
+                else interaction.reply({content: res.message || 'error'}).catch(console.error)
+            })
+        }
+    }
 })
 
 var squads_list = []
@@ -189,7 +198,7 @@ function embed(squads, tier, with_names) {
     squads.map((squad,index) => {
         fields.push({
             name: `${squad.tier} ${squad.relic}`,
-            value: '\u200b',
+            value: squad.members.map(m => `<@${m}>`).join('\n'),
             inline: true
         })
         const k = Math.ceil((index + 1)/5) - 1
@@ -198,7 +207,7 @@ function embed(squads, tier, with_names) {
             type: 2,
             label: squad.relic,
             style: 2,
-            custom_id: squad.relic + Math.random() * 100
+            custom_id: `rb_sq_${squad.squad_id}`
         })
     })
     const msg = {
@@ -224,9 +233,20 @@ function embed(squads, tier, with_names) {
 
 socket.on('squadCreate', (squad) => {
     console.log('[squadCreate]',squad)
-    socket.emit('relicbot/squads/fetch',{tier: squad.tier},(res) => {
+    const tier = squad.tier
+    socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
         if (res.code == 200) {
-            edit_webhook_messages(res.data, squad.tier)
+            edit_webhook_messages(res.data, tier)
+        }
+    })
+})
+
+socket.on('squadUpdate', (squad) => {
+    console.log('[squadUpdate]',squad)
+    const tier = squad[0].tier
+    socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
+        if (res.code == 200) {
+            edit_webhook_messages(res.data, tier)
         }
     })
 })
