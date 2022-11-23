@@ -23,7 +23,7 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return
     if (!channels_list.includes(message.channel.id)) return
     console.log('[relicbot messageCreate] content:',message.content)
-    socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id},responses => {
+    socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
         var flag = true
         responses.forEach(res => {
             if (res.code != 200) {
@@ -249,6 +249,26 @@ socket.on('squadUpdate', (squad) => {
             edit_webhook_messages(res.data, tier)
         }
     })
+})
+
+socket.on('squadUpdate/open', async (payload) => {
+    console.log('[squadUpdate/open]',payload)
+    const squad = payload[0]
+    const channel = client.channels.cache.get(squad.channel_id) || await client.channels.fetch(squad.channel_id).catch(console.error)
+    if (!channel) return
+    channel.threads.create({
+        name: `${squad.tier} ${squad.relic}`,
+        autoArchiveDuration: 60,
+        reason: 'Relic squad filled'
+    }).then(async thread => {
+        thread.send({
+            content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
+            embeds: [{
+                description: `${squad.tier} ${squad.relic} has been filled\n/invite ${squad.members.map(m => `<@${m}>`).join('\n/invite ')}`
+            }]
+        }).catch(console.error)
+        setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
+    }).catch(console.error)
 })
 
 module.exports = {
