@@ -4,6 +4,7 @@ const uuid = require('uuid')
 const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -217,9 +218,10 @@ function rb_remove_server(guild_id) {
 function embed(squads, tier, with_all_names, name_for_squad_id) {
     var fields = []
     var components = []
+    squads = squads.sort(dynamicSort("main_relics"))
     squads.map((squad,index) => {
         fields.push({
-            name: `${squad.tier} ${squad.relic}`,
+            name: `${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
             value: (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) ? squad.members.map(m => `<@${m}>`).join('\n'):squad.members.length > 2 ? '🔥':'\u200b',
             inline: true
         })
@@ -227,7 +229,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         if (!components[k]) components[k] = {type: 1, components: []}
         components[k].components.push({
             type: 2,
-            label: squad.relic,
+            label: squad.main_relics.join(' '),
             style: 2,
             custom_id: `rb_sq_${squad.squad_id}`
         })
@@ -245,7 +247,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     const msg = {
         content: ' ',
         embeds: [{
-            title: tier,
+            title: convertUpper(tier),
             description: ('━').repeat(34),
             fields: fields,
             color: tier == 'lith'? 'RED' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'ORANGE' : tier == 'axi' ? 'YELLOW' : ''
@@ -281,14 +283,14 @@ socket.on('squadUpdate/open', async (payload) => {
     const channel = client.channels.cache.get(squad.channel_id) || await client.channels.fetch(squad.channel_id).catch(console.error)
     if (!channel) return
     channel.threads.create({
-        name: `${squad.tier} ${squad.relic}`,
+        name: `${squad.tier} ${squad.main_relics.join(' ')}`,
         autoArchiveDuration: 60,
         reason: 'Relic squad filled'
     }).then(async thread => {
         thread.send({
             content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
             embeds: [{
-                description: `${squad.tier} ${squad.relic} has been filled\n/invite ${squad.members.map(m => `<@${m}>`).join('\n/invite ')}`
+                description: `${squad.tier} ${squad.main_relics.join(' ')} has been filled\n/invite ${squad.members.map(m => `<@${m}>`).join('\n/invite ')}`
             }]
         }).catch(console.error)
         setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
