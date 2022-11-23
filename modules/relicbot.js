@@ -79,7 +79,7 @@ client.on('interactionCreate', async (interaction) => {
             socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
-                    edit_webhook_messages(res.data, tier, true)
+                    edit_webhook_messages(res.data, tier, true, null, interaction.channel.id)
                 }
             })
         } else if (interaction.customId.match('rb_sq_')) {
@@ -110,16 +110,18 @@ var timeout_edit_webhook_messages = {
     neo: null,
     axi: null,
 }
-function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id) {
+function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, single_channel_id) {
     const msg_payload = embed(squads,tier,with_all_names,name_for_squad_id)
     webhook_messages[tier + '_squads'].forEach(msg => {
-        new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
+        if (!single_channel_id || single_channel_id == msg.c_id)
+            new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
     })
     clearTimeout(timeout_edit_webhook_messages[tier])
     timeout_edit_webhook_messages[tier] = setTimeout(() => {
         const msg_payload = embed(squads,tier)
         webhook_messages[tier + '_squads'].forEach(msg => {
-            new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
+            //if (!single_channel_id || single_channel_id == msg.c_id)
+                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
         })
     }, 3000);
 }
