@@ -16,8 +16,16 @@ const server_commands_perms = [
 const webhook_messages = {}
 const channels_list = []
 
+const emote_ids = {
+    steel_essence: '<:steel_essence:962508988442869800>',
+    railjack: '<rj_icon>',
+    hot: '🔥',
+}
+
 client.on('ready', async () => {
-    assign_global_variables()
+    assign_global_variables().then(() => edit_recruitment_intro()).catch(console.error)
+    update_users_list()
+    
 })
 
 client.on('messageCreate', async (message) => {
@@ -25,14 +33,9 @@ client.on('messageCreate', async (message) => {
     if (!channels_list.includes(message.channel.id)) return
     console.log('[relicbot messageCreate] content:',message.content)
     socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
+        //console.log('[relicbot/squads/create] response',responses)
         var flag = true
-        if (typeof(responses) == 'object') {
-            if (responses.code != 200) {
-                flag = false
-                console.log(responses)
-                message.channel.send(error_codes_embed(responses,message.author.id)).catch(console.error)
-            }
-        } else {
+        if (Array.isArray(responses)) {
             responses.forEach(res => {
                 if (res.code != 200) {
                     flag = false
@@ -40,6 +43,12 @@ client.on('messageCreate', async (message) => {
                     message.channel.send(error_codes_embed(res,message.author.id)).catch(console.error)
                 }
             })
+        } else {
+            if (responses.code != 200) {
+                flag = false
+                console.log(responses)
+                message.channel.send(error_codes_embed(responses,message.author.id)).catch(console.error)
+            }
         }
         if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
     })
@@ -83,7 +92,15 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isButton()) {
         if (!channels_list.includes(interaction.channel.id)) return
-        if (interaction.customId.match('rb_sq_info_')) {
+        if (interaction.customId == 'rb_sq_leave_all') {
+            socket.emit('relicbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
+                if (res.code == 200) interaction.deferUpdate().catch(console.error)
+                else {
+                    interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                }
+            })
+        }
+        else if (interaction.customId.match('rb_sq_info_')) {
             const tier = interaction.customId.split('rb_sq_info_')[1]
             socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
                 if (res.code == 200) {
@@ -138,20 +155,60 @@ function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, sin
 }
 
 function assign_global_variables() {
-    db.query(`SELECT * FROM rb_messages`)
-    .then(res => {
-        res.rows.forEach((row) => {
-            if (!webhook_messages[row.type]) webhook_messages[row.type] = []
-            if (!channels_list.includes(row.channel_id)) channels_list.push(row.channel_id)
-            if (!webhook_messages[row.type].find(obj => obj.m_id == row.message_id)) {
-                webhook_messages[row.type].push({
-                    m_id: row.message_id,
-                    c_id: row.channel_id,
-                    url: row.webhook_url
-                })
-            }
-        })
-    }).catch(console.error)
+    return new Promise((resolve,reject) => {
+        db.query(`SELECT * FROM rb_messages`)
+        .then(res => {
+            res.rows.forEach((row) => {
+                if (!webhook_messages[row.type]) webhook_messages[row.type] = []
+                if (!channels_list.includes(row.channel_id)) channels_list.push(row.channel_id)
+                if (!webhook_messages[row.type].find(obj => obj.m_id == row.message_id)) {
+                    webhook_messages[row.type].push({
+                        m_id: row.message_id,
+                        c_id: row.channel_id,
+                        url: row.webhook_url
+                    })
+                }
+            })
+            resolve()
+        }).catch(console.error)
+    })
+}
+
+var users_list = {}
+function update_users_list() {
+    socket.emit('relicbot/users/fetch',{},(res) => {
+        if (res.code == 200) {
+            res.data.forEach(row => {
+                users_list[row.discord_id] = row
+            })
+        }
+    })
+}
+
+function edit_recruitment_intro() {
+    webhook_messages.recruitment_intro?.forEach(msg => {
+        new WebhookClient({url: msg.url}).editMessage(msg.m_id, {
+            content: ' ',
+            embeds: [{
+                description: '< recruitment intro/tutorial >',
+                color: 'WHITE'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Verify",
+                    style: 1,
+                    custom_id: `tb_verify`
+                },{
+                    type: 2,
+                    label: "Leave all",
+                    style: 4,
+                    custom_id: `rb_sq_leave_all`
+                }]
+            }]
+        }).catch(console.error)
+    })
 }
 
 function rb_add_server(guild_id) {
@@ -230,9 +287,17 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     var components = []
     squads = squads.sort(dynamicSort("main_relics"))
     squads.map((squad,index) => {
+        var field_value = '\u200b'
+        if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
+            field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
+        else {
+            if (squad.members.length > 2) field_value += emote_ids.hot
+            if (squad.is_steelpath) field_value += emote_ids.steel_essence
+            if (squad.is_railjack) field_value += emote_ids.railjack
+        }
         fields.push({
             name: `${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
-            value: (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) ? squad.members.map(m => `<@${m}>`).join('\n'):squad.members.length > 2 ? '🔥':'\u200b',
+            value: field_value,
             inline: true
         })
         const k = Math.ceil((index + 1)/5) - 1
@@ -293,18 +358,22 @@ socket.on('squadUpdate/open', async (payload) => {
     const channel = client.channels.cache.get(squad.channel_id) || await client.channels.fetch(squad.channel_id).catch(console.error)
     if (!channel) return
     channel.threads.create({
-        name: `${squad.tier} ${squad.main_relics.join(' ')}`,
+        name: `${convertUpper(squad.tier)} ${squad.main_relics.join(' ')}`,
         autoArchiveDuration: 60,
         reason: 'Relic squad filled'
     }).then(async thread => {
         thread.send({
             content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
             embeds: [{
-                description: `${squad.tier} ${squad.main_relics.join(' ')} has been filled\n/invite ${squad.members.map(m => `<@${m}>`).join('\n/invite ')}`
+                description: `**${`${convertUpper(squad.tier)} ${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ')}`
             }]
         }).catch(console.error)
         setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
     }).catch(console.error)
+})
+
+socket.on('tradebotUsersUpdated', (payload) => {
+    update_users_list()
 })
 
 function error_codes_embed(response,discord_id) {
