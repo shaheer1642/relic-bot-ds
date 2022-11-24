@@ -26,13 +26,21 @@ client.on('messageCreate', async (message) => {
     console.log('[relicbot messageCreate] content:',message.content)
     socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
         var flag = true
-        responses.forEach(res => {
-            if (res.code != 200) {
+        if (typeof(responses) == 'object') {
+            if (responses.code != 200) {
                 flag = false
-                console.log(res)
-                message.channel.send({content: res.message || 'error'}).catch(console.error)
+                console.log(responses)
+                message.channel.send(error_codes_embed(responses,message.author.id)).catch(console.error)
             }
-        })
+        } else {
+            responses.forEach(res => {
+                if (res.code != 200) {
+                    flag = false
+                    console.log(res)
+                    message.channel.send(error_codes_embed(res,message.author.id)).catch(console.error)
+                }
+            })
+        }
         if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
     })
 })
@@ -81,6 +89,8 @@ client.on('interactionCreate', async (interaction) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
                     edit_webhook_messages(res.data, tier, true, null, interaction.channel.id)
+                } else {
+                    interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
                 }
             })
         } else if (interaction.customId.match('rb_sq_')) {
@@ -88,7 +98,7 @@ client.on('interactionCreate', async (interaction) => {
             const discord_id = interaction.user.id
             socket.emit('relicbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
-                else interaction.reply({content: res.message || 'error'}).catch(console.error)
+                else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
         }
     }
@@ -296,6 +306,35 @@ socket.on('squadUpdate/open', async (payload) => {
         setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
     }).catch(console.error)
 })
+
+function error_codes_embed(response,discord_id) {
+    if (response.code == 499) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> Please verify your Warframe account to access this feature\nClick Verify to proceed`,
+                color: 'RED'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Verify",
+                    style: 1,
+                    custom_id: `tb_verify`
+                }]
+            }]
+        }
+    } else {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message || 'error'}`,
+                color: 'RED'
+            }]
+        }
+    }
+}
 
 module.exports = {
     channels_list
