@@ -18,14 +18,14 @@ const channels_list = []
 
 const emote_ids = {
     steel_essence: '<:steel_essence:962508988442869800>',
-    railjack: '<rj_icon>',
+    railjack: '<:railjack:1045456185429594214>',
     hot: '🔥',
+    cold: '❄️'
 }
 
 client.on('ready', async () => {
     assign_global_variables().then(() => edit_recruitment_intro()).catch(console.error)
     update_users_list()
-    
 })
 
 client.on('messageCreate', async (message) => {
@@ -291,9 +291,10 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
             field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
         else {
-            if (squad.members.length > 2) field_value += emote_ids.hot
-            if (squad.is_steelpath) field_value += emote_ids.steel_essence
-            if (squad.is_railjack) field_value += emote_ids.railjack
+            if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
+            if (squad.is_steelpath) field_value += ' ' + emote_ids.steel_essence
+            if (squad.is_railjack) field_value += ' ' + emote_ids.railjack
+            if ((new Date().getTime() - squad.creation_timestamp) > 900000) field_value += ' ' + emote_ids.cold
         }
         fields.push({
             name: `${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
