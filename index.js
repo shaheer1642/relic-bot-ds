@@ -1171,7 +1171,7 @@ client.on('interactionCreate', async interaction => {
                         fields: [
                             {name: 'Set', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
                             {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
-                            {name: 'Ducat', value: res.rows.map(e => {return e.ducat}).toString().replace(/,/g, '\n'), inline: true}
+                            {name: 'Volume Sold (30 days)', value: res.rows.map(e => {return e.volume_sold}).toString().replace(/,/g, '\n'), inline: true}
                         ],
                         timestamp: new Date()
                     })
@@ -1199,7 +1199,7 @@ client.on('interactionCreate', async interaction => {
                         fields: [
                             {name: 'Part', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
                             {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
-                            {name: 'Ducat', value: res.rows.map(e => {return e.ducat}).toString().replace(/,/g, '\n'), inline: true}
+                            {name: 'Volume Sold (30 days)', value: res.rows.map(e => {return e.volume_sold}).toString().replace(/,/g, '\n'), inline: true}
                         ],
                         timestamp: new Date()
                     })
