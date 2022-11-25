@@ -321,8 +321,8 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         }
     })
     const msg = {
-        content: ' ',
-        embeds: [{
+        content: '\u200b',
+        embeds: fields.length == 0 ? []:[{
             title: convertUpper(tier),
             description: ('━').repeat(34),
             fields: fields,
