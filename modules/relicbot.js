@@ -294,7 +294,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
             if (squad.is_steelpath) field_value += ' ' + emote_ids.steel_essence
             if (squad.is_railjack) field_value += ' ' + emote_ids.railjack
-            if ((new Date().getTime() - squad.creation_timestamp) > 900000) field_value += ' ' + emote_ids.cold
+            if (squad.is_old) field_value += ' ' + emote_ids.cold
         }
         fields.push({
             name: `${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
