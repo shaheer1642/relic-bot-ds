@@ -397,7 +397,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         if (!components[k]) components[k] = {type: 1, components: []}
         components[k].components.push({
             type: 2,
-            label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old > 2 ? emote_ids.cold:''} ${squad.main_relics.join(' ')}`.replace(/\s+/g, ' ').trim(),
+            label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old? emote_ids.cold:''} ${squad.main_relics.join(' ')}`.replace(/\s+/g, ' ').trim(),
             style: 2,
             custom_id: `rb_sq_${squad.squad_id}`
         })
