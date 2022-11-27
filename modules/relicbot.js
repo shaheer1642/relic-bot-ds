@@ -54,12 +54,14 @@ client.on('messageCreate', async (message) => {
         })
     }
     if (message.channel.isThread() && channels_list.includes(message.channel.parent.id)) {
-        socket.emit('relicbot/squads/messageCreate', {
-            message_id: message.id,
-            discord_id: message.author.id,
-            message: message.content,
-            thread_id: message.channel.id
-        })
+        if (message.channel.ownerId == client.user.id) {
+            socket.emit('relicbot/squads/messageCreate', {
+                message_id: message.id,
+                discord_id: message.author.id,
+                message: message.content,
+                thread_id: message.channel.id
+            })
+        }
     }
 })
 
@@ -129,17 +131,6 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
 })
-
-var squads_list = []
-
-class Squad {
-    constructor(tier, relic, host) {
-        this.squad_id = uuid.v4()
-        this.tier = tier
-        this.relic = relic
-        this.host = host
-    }
-}
 
 var timeout_edit_webhook_messages = {
     lith: null,
