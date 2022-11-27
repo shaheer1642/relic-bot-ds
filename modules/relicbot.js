@@ -15,12 +15,17 @@ const server_commands_perms = [
 
 const webhook_messages = {}
 const channels_list = []
+const webhooks_list = {}
 
 const emote_ids = {
     steel_essence: '<:steel_essence:962508988442869800>',
     railjack: '<:railjack:1045456185429594214>',
     hot: '🔥',
-    cold: '❄️'
+    cold: '❄️',
+    lith: '<:Lith:962457564493271051>',
+    meso: '<:Meso:962457563092361257>',
+    neo: '<:Neo:962457562844909588>',
+    axi: '<:Axi:962457563423735868>',
 }
 
 client.on('ready', async () => {
@@ -35,21 +40,14 @@ client.on('messageCreate', async (message) => {
         socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
             //console.log('[relicbot/squads/create] response',responses)
             var flag = true
-            if (Array.isArray(responses)) {
-                responses.forEach(res => {
-                    if (res.code != 200) {
-                        flag = false
-                        console.log(res)
-                        message.channel.send(error_codes_embed(res,message.author.id)).catch(console.error)
-                    }
-                })
-            } else {
-                if (responses.code != 200) {
+            if (!Array.isArray(responses)) responses = [responses]
+            responses.forEach(res => {
+                if (res.code != 200) {
                     flag = false
-                    console.log(responses)
-                    message.channel.send(error_codes_embed(responses,message.author.id)).catch(console.error)
+                    console.log(res)
+                    message.channel.send(error_codes_embed(res,message.author.id)).catch(console.error)
                 }
-            }
+            })
             if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
         })
     }
@@ -110,8 +108,45 @@ client.on('interactionCreate', async (interaction) => {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
                 }
             })
-        }
-        else if (interaction.customId.match('rb_sq_info_')) {
+        } else if (interaction.customId == 'rb_sq_trackers_add_modal') {
+            interaction.showModal({
+                title: "Track Squads",
+                custom_id: "rb_sq_trackers_add",
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "squad_name",
+                            label: "Squad Name(s) seperated by new line",
+                            style: 2,
+                            min_length: 1,
+                            max_length: 4000,
+                            placeholder: "neo v8\nmeso v2 2b2 int\naxi v8 2b2 rad with axi v1 flaw",
+                            required: true
+                        }]
+                    }
+                ]
+            }).catch(console.error)
+        } else if (interaction.customId == 'rb_sq_trackers_show') {
+            socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                if (res.code == 200) {
+                    interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                } else {
+                    interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                }
+            })
+        } else if (interaction.customId == 'rb_sq_trackers_remove_all') {
+            socket.emit('relicbot/trackers/delete',{discord_id: interaction.user.id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
+        } else if (interaction.customId.match('rb_sq_info_')) {
             const tier = interaction.customId.split('rb_sq_info_')[1]
             socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
                 if (res.code == 200) {
@@ -129,6 +164,49 @@ client.on('interactionCreate', async (interaction) => {
                 else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
         }
+    }
+    if (interaction.isModalSubmit()) {
+        if (!channels_list.includes(interaction.channel.id)) return
+        if (interaction.customId == 'rb_sq_trackers_add') {
+            console.log('[rb_sq_trackers_add]')
+            socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
+                console.log(responses)
+                if (!Array.isArray(responses)) responses = [responses]
+                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        if (interaction.message) {
+                            if (interaction.message.embeds[0]) {
+                                if (interaction.message.embeds[0].title == 'Tracked Squads') {
+                                    interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                } else {
+                                    interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                }
+                            } else {
+                                interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                            }
+                        } else {
+                            interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                        }
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
+        }
+    }
+    if (interaction.isSelectMenu()) {
+        if (!channels_list.includes(interaction.channel.id)) return
+        if (interaction.customId == 'rb_sq_trackers_remove') {
+            socket.emit('relicbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
+                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
+        } 
     }
 })
 
@@ -168,6 +246,7 @@ function assign_global_variables() {
                         url: row.webhook_url
                     })
                 }
+                webhooks_list[row.channel_id] = row.webhook_url
             })
             resolve()
         }).catch(console.error)
@@ -205,6 +284,19 @@ function edit_recruitment_intro() {
                     label: "Leave all",
                     style: 4,
                     custom_id: `rb_sq_leave_all`
+                }]
+            },{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Track Squads",
+                    style: 2,
+                    custom_id: `rb_sq_trackers_add_modal`
+                },{
+                    type: 2,
+                    label: "Show Trackers",
+                    style: 2,
+                    custom_id: `rb_sq_trackers_show`
                 }]
             }]
         }).catch(console.error)
@@ -305,7 +397,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         if (!components[k]) components[k] = {type: 1, components: []}
         components[k].components.push({
             type: 2,
-            label: squad.main_relics.join(' '),
+            label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old > 2 ? emote_ids.cold:''} ${squad.main_relics.join(' ')}`.replace(/\s+/g, ' ').trim(),
             style: 2,
             custom_id: `rb_sq_${squad.squad_id}`
         })
@@ -339,6 +431,21 @@ socket.on('squadCreate', (squad) => {
     socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
         if (res.code == 200) {
             edit_webhook_messages(res.data, tier, false,squad.squad_id)
+        }
+    })
+    socket.emit('relicbot/trackers/fetchSubscribers',{squad: squad},(res) => {
+        if (res.code == 200) {
+            const channel_ids = res.data
+            for (const channel_id in channel_ids) {
+                const discord_ids = channel_ids[channel_id]
+                new WebhookClient({url: webhooks_list[channel_id]}).send({
+                    content: `${relicBotSquadToString(squad)} ${discord_ids.map(id => `<@${id}>`).join(', ')}`
+                }).then(res => {
+                    setTimeout(() => {
+                        new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
+                    }, 10000);
+                }).catch(console.error)
+            }
         }
     })
 })
@@ -376,7 +483,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
             thread.send({
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
-                    description: `**${`${convertUpper(squad.tier)} ${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ')}`
+                    description: `**${relicBotSquadToString(squad)}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ')}`
                 }]
             }).catch(console.error)
             if (Object.keys(channel_ids).length > 1) thread.send({content: 'This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
@@ -445,6 +552,89 @@ function error_codes_embed(response,discord_id) {
             }]
         }
     }
+}
+
+function relicBotSquadToString(squad) {
+    return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()
+}
+
+function constructTrackersEmbed(trackers, ephemeral) {
+
+    const component_options = trackers.reduce((arr,tracker,index) => {
+        if (index < 25) {
+            arr.push({
+                label: `${relicBotSquadToString(tracker)} ${tracker.is_steelpath ? 'Steelpath':tracker.is_railjack ? 'Railjack':''}`,
+                value: tracker.tracker_id,
+                emoji: {
+                    name: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[0],
+                    id: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[1],
+                }
+            })
+        }
+        return arr
+    },[])
+
+    var payload = {
+        content: ' ',
+        embeds: [{
+            title: 'Tracked Squads',
+            color: 'WHITE',
+            fields: [{
+                name: 'Tier',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Squad Name',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Fissure Type',
+                value: '\u200b',
+                inline: true
+            }]
+        }],
+        components: component_options.length > 0 ? [{
+            type: 1,
+            components: [{
+                    type: 3,
+                    custom_id: "rb_sq_trackers_remove",
+                    options: component_options,
+                    placeholder: "Choose a tracker to remove",
+                    min_values: 1,
+                    max_values: component_options.length
+            }]
+        },{
+            type: 1,
+            components: [{
+                    type: 2,
+                    label: "Add Tracker",
+                    style: 3,
+                    custom_id: "rb_sq_trackers_add_modal"
+                },{
+                    type: 2,
+                    label: "Remove All",
+                    style: 4,
+                    custom_id: "rb_sq_trackers_remove_all"
+            }]
+        }] : [{
+            type: 1,
+            components: [
+                {
+                    type: 2,
+                    label: "Add Tracker",
+                    style: 3,
+                    custom_id: "rb_sq_trackers_add_modal"
+                }
+            ]
+        }],
+        ephemeral: ephemeral
+    }
+    trackers.forEach(tracker => {
+        payload.embeds[0].fields[0].value += `${emote_ids[tracker.tier]} ${convertUpper(tracker.tier)}` + '\n'
+        payload.embeds[0].fields[1].value += relicBotSquadToString(tracker) + '\n'
+        payload.embeds[0].fields[2].value += tracker.is_steelpath ? `${emote_ids.steel_essence} Steelpath` : tracker.is_railjack ? `${emote_ids.railjack} Railjack` : 'Normal' + '\n'
+    })
+    return payload
 }
 
 module.exports = {
