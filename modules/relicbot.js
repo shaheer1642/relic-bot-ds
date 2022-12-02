@@ -146,6 +146,26 @@ client.on('interactionCreate', async (interaction) => {
                     }
                 })
             })
+        } else if (interaction.customId == 'rb_sq_create_modal') {
+            interaction.showModal({
+                title: "Host Squad",
+                custom_id: "rb_sq_create",
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "squad_name",
+                            label: "Squad Name(s) seperated by new line",
+                            style: 2,
+                            min_length: 1,
+                            max_length: 4000,
+                            placeholder: "neo v8\nmeso v2 2b2 int\naxi v8 2b2 rad with axi v1 flaw",
+                            required: true
+                        }]
+                    }
+                ]
+            }).catch(console.error)
         } else if (interaction.customId.match('rb_sq_info_')) {
             const tier = interaction.customId.split('rb_sq_info_')[1]
             socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
@@ -191,6 +211,23 @@ client.on('interactionCreate', async (interaction) => {
                         interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
                     }
                 })
+            })
+        }
+        if (interaction.customId == 'rb_sq_create') {
+            console.log('[relicbot rb_sq_create] content:',message.content)
+            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+                //console.log('[relicbot/squads/create] response',responses)
+                interaction.deferUpdate().catch(console.error)
+                var flag = true
+                if (!Array.isArray(responses)) responses = [responses]
+                responses.forEach(res => {
+                    if (res.code != 200) {
+                        flag = false
+                        console.log(res)
+                        message.channel.send(error_codes_embed(res,message.author.id)).catch(console.error)
+                    }
+                })
+                if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
             })
         }
     }
@@ -288,6 +325,11 @@ function edit_recruitment_intro() {
                     label: "Verify",
                     style: 1,
                     custom_id: `tb_verify`
+                },{
+                    type: 2,
+                    label: "Host Squad",
+                    style: 3,
+                    custom_id: `rb_sq_create_modal`
                 },{
                     type: 2,
                     label: "Leave all",
