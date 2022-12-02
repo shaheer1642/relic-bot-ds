@@ -40,14 +40,17 @@ client.on('messageCreate', async (message) => {
         socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
             //console.log('[relicbot/squads/create] response',responses)
             var flag = true
+            const payload = {content: ' ', embeds: [], ephemeral: false}
             if (!Array.isArray(responses)) responses = [responses]
             responses.forEach(res => {
                 if (res.code != 200) {
                     flag = false
                     console.log(res)
-                    message.channel.send(error_codes_embed(res,message.author.id)).catch(console.error)
+                    if (payload.embeds.length < 11)
+                        payload.embeds.push(error_codes_embed(res,message.author.id).embeds[0])
                 }
             })
+            message.channel.send(payload).catch(console.error)
             if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
         })
     }
@@ -218,16 +221,16 @@ client.on('interactionCreate', async (interaction) => {
             socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 interaction.deferUpdate().catch(console.error)
-                var flag = true
                 if (!Array.isArray(responses)) responses = [responses]
+                const payload = {content: ' ', embeds: [], ephemeral: false}
                 responses.forEach(res => {
                     if (res.code != 200) {
-                        flag = false
                         console.log(res)
-                        message.channel.send(error_codes_embed(res,message.author.id)).catch(console.error)
+                        if (payload.embeds.length < 11)
+                            payload.embeds.push(error_codes_embed(res,message.author.id).embeds[0])
                     }
                 })
-                if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
+                interaction.reply(payload).catch(console.error)
             })
         }
     }
