@@ -214,7 +214,7 @@ client.on('interactionCreate', async (interaction) => {
             })
         }
         if (interaction.customId == 'rb_sq_create') {
-            console.log('[relicbot rb_sq_create] content:',message.content)
+            //console.log('[relicbot rb_sq_create] content:',message.content)
             socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 interaction.deferUpdate().catch(console.error)
