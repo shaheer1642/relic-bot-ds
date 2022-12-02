@@ -217,33 +217,42 @@ var timeout_edit_webhook_messages = {
     axi: null,
 }
 function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, single_channel_id) {
-    const msg_payload = embed(squads,tier,with_all_names,name_for_squad_id)
+    const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
+    const msg_payload_non_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,false)
     webhook_messages[tier + '_squads'].forEach(msg => {
         if (!single_channel_id || single_channel_id == msg.c_id)
-            new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
+            new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
     })
     clearTimeout(timeout_edit_webhook_messages[tier])
     timeout_edit_webhook_messages[tier] = setTimeout(() => {
-        const msg_payload = embed(squads,tier)
+        const msg_payload_vaulted = embed(squads,tier,null,null,true)
+        const msg_payload_non_vaulted = embed(squads,tier,null,null,false)
+        console.log('msg_payload_vaulted',JSON.stringify(msg_payload_vaulted))
+        console.log('msg_payload_non_vaulted',JSON.stringify(msg_payload_non_vaulted))
         webhook_messages[tier + '_squads'].forEach(msg => {
             //if (!single_channel_id || single_channel_id == msg.c_id)
-                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg_payload).catch(console.error)
+                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
         })
     }, 3000);
 }
 
 function assign_global_variables() {
     return new Promise((resolve,reject) => {
-        db.query(`SELECT * FROM rb_messages`)
+        db.query(`SELECT * FROM rb_messages; SELECT * FROM rb_channels;`)
         .then(res => {
-            res.rows.forEach((row) => {
+            const channels = {}
+            res[1].rows.forEach((row) => { 
+                channels[row.channel_id] = row
+            })
+            res[0].rows.forEach((row) => {
                 if (!webhook_messages[row.type]) webhook_messages[row.type] = []
                 if (!channels_list.includes(row.channel_id)) channels_list.push(row.channel_id)
                 if (!webhook_messages[row.type].find(obj => obj.m_id == row.message_id)) {
                     webhook_messages[row.type].push({
                         m_id: row.message_id,
                         c_id: row.channel_id,
-                        url: row.webhook_url
+                        c_type: channels[row.channel_id].type,
+                        url: row.webhook_url,
                     })
                 }
                 webhooks_list[row.channel_id] = row.webhook_url
@@ -374,11 +383,12 @@ function rb_remove_server(guild_id) {
     })
 }
 
-function embed(squads, tier, with_all_names, name_for_squad_id) {
+function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
     var fields = []
     var components = []
-    squads = squads.sort(dynamicSort("main_relics"))
+    squads = squads.sort(dynamicSort("main_relics")).filter(squad => vaulted ? squad.is_vaulted == true: squad.is_vaulted == false)
     squads.map((squad,index) => {
+        if ((vaulted && !squad.is_vaulted) || (!vaulted && squad.is_vaulted)) return
         var field_value = '\u200b'
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
             field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
