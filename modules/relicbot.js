@@ -600,7 +600,7 @@ function error_codes_embed(response,discord_id) {
         return {
             content: ' ',
             embeds: [{
-                description: `<@${discord_id}> ${response.message || 'error'}`,
+                description: `<@${discord_id}> ${response.message || response.err || response.error || 'error'}`,
                 color: 'RED'
             }]
         }
