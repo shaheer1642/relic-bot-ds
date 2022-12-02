@@ -220,7 +220,7 @@ client.on('interactionCreate', async (interaction) => {
             //console.log('[relicbot rb_sq_create] content:',message.content)
             socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
-                interaction.deferUpdate().catch(console.error)
+                //interaction.deferUpdate().catch(console.error)
                 if (!Array.isArray(responses)) responses = [responses]
                 const payload = {content: ' ', embeds: [], ephemeral: false}
                 responses.forEach(res => {
