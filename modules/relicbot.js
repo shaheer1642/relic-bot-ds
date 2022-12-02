@@ -43,7 +43,6 @@ client.on('messageCreate', async (message) => {
             if (!Array.isArray(responses)) responses = [responses]
             responses.forEach(res => {
                 if (res.code != 200) {
-                    flag = false
                     console.log(res)
                     if (payload.embeds.length < 11)
                         payload.embeds.push(error_codes_embed(res,message.author.id).embeds[0])
