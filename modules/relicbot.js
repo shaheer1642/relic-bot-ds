@@ -39,7 +39,6 @@ client.on('messageCreate', async (message) => {
         console.log('[relicbot messageCreate] content:',message.content)
         socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
             //console.log('[relicbot/squads/create] response',responses)
-            var flag = true
             const payload = {content: ' ', embeds: [], ephemeral: false}
             if (!Array.isArray(responses)) responses = [responses]
             responses.forEach(res => {
@@ -50,8 +49,11 @@ client.on('messageCreate', async (message) => {
                         payload.embeds.push(error_codes_embed(res,message.author.id).embeds[0])
                 }
             })
-            message.channel.send(payload).catch(console.error)
-            if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
+            if (payload.embeds.length > 0) {
+                const webhook_client = new WebhookClient({url: webhooks_list[message.channel.id]})
+                webhook_client.send(payload).then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), 5000)).catch(console.error)
+            }
+            setTimeout(() => message.delete().catch(console.error), 1000);
         })
     }
     if (message.channel.isThread() && Object.keys(channels_list).includes(message.channel.parent.id)) {
@@ -220,7 +222,7 @@ client.on('interactionCreate', async (interaction) => {
             //console.log('[relicbot rb_sq_create] content:',message.content)
             socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
-                //interaction.deferUpdate().catch(console.error)
+                interaction.deferUpdate().catch(console.error)
                 if (!Array.isArray(responses)) responses = [responses]
                 const payload = {content: ' ', embeds: [], ephemeral: false}
                 responses.forEach(res => {
@@ -230,7 +232,10 @@ client.on('interactionCreate', async (interaction) => {
                             payload.embeds.push(error_codes_embed(res,message.author.id).embeds[0])
                     }
                 })
-                interaction.reply(payload).catch(console.error)
+                if (payload.embeds.length > 0) {
+                    const webhook_client = new WebhookClient({url: webhooks_list[interaction.channel.id]})
+                    webhook_client.send(payload).then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), 5000)).catch(console.error)
+                }
             })
         }
     }
@@ -256,15 +261,24 @@ var timeout_edit_webhook_messages = {
     neo: null,
     axi: null,
 }
+var timeout_edit_webhook_messages_reset = {
+    lith: null,
+    meso: null,
+    neo: null,
+    axi: null,
+}
 function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, single_channel_id) {
-    const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
-    const msg_payload_non_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,false)
-    webhook_messages[tier + '_squads'].forEach(msg => {
-        if (!single_channel_id || single_channel_id == msg.c_id)
-            new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
-    })
     clearTimeout(timeout_edit_webhook_messages[tier])
     timeout_edit_webhook_messages[tier] = setTimeout(() => {
+        const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
+        const msg_payload_non_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,false)
+        webhook_messages[tier + '_squads'].forEach(msg => {
+            if (!single_channel_id || single_channel_id == msg.c_id)
+                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+        })
+    }, 500)
+    clearTimeout(timeout_edit_webhook_messages_reset[tier])
+    timeout_edit_webhook_messages_reset[tier] = setTimeout(() => {
         const msg_payload_vaulted = embed(squads,tier,null,null,true)
         const msg_payload_non_vaulted = embed(squads,tier,null,null,false)
         console.log('msg_payload_vaulted',JSON.stringify(msg_payload_vaulted))
