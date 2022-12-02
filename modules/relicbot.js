@@ -14,7 +14,7 @@ const server_commands_perms = [
 ]
 
 const webhook_messages = {}
-const channels_list = []
+const channels_list = {}
 const webhooks_list = {}
 
 const emote_ids = {
@@ -35,9 +35,9 @@ client.on('ready', async () => {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
-    if (channels_list.includes(message.channel.id)) {
+    if (Object.keys(channels_list).includes(message.channel.id)) {
         console.log('[relicbot messageCreate] content:',message.content)
-        socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
+        socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
             //console.log('[relicbot/squads/create] response',responses)
             var flag = true
             const payload = {content: ' ', embeds: [], ephemeral: false}
@@ -54,7 +54,7 @@ client.on('messageCreate', async (message) => {
             if (flag) setTimeout(() => message.delete().catch(console.error), 1000);
         })
     }
-    if (message.channel.isThread() && channels_list.includes(message.channel.parent.id)) {
+    if (message.channel.isThread() && Object.keys(channels_list).includes(message.channel.parent.id)) {
         if (message.channel.ownerId == client.user.id) {
             socket.emit('relicbot/squads/messageCreate', {
                 message_id: message.id,
@@ -103,7 +103,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isButton()) {
-        if (!channels_list.includes(interaction.channel.id)) return
+        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
         if (interaction.customId == 'rb_sq_leave_all') {
             socket.emit('relicbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
@@ -189,7 +189,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isModalSubmit()) {
-        if (!channels_list.includes(interaction.channel.id)) return
+        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
         if (interaction.customId == 'rb_sq_trackers_add') {
             console.log('[rb_sq_trackers_add]')
             socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
@@ -218,7 +218,7 @@ client.on('interactionCreate', async (interaction) => {
         }
         if (interaction.customId == 'rb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
-            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 //interaction.deferUpdate().catch(console.error)
                 if (!Array.isArray(responses)) responses = [responses]
@@ -235,7 +235,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isSelectMenu()) {
-        if (!channels_list.includes(interaction.channel.id)) return
+        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
         if (interaction.customId == 'rb_sq_trackers_remove') {
             socket.emit('relicbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
                 socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
@@ -280,22 +280,20 @@ function assign_global_variables() {
     return new Promise((resolve,reject) => {
         db.query(`SELECT * FROM rb_messages; SELECT * FROM rb_channels;`)
         .then(res => {
-            const channels = {}
             res[1].rows.forEach((row) => { 
-                channels[row.channel_id] = row
+                channels_list[row.channel_id] = row
+                webhooks_list[row.channel_id] = row.webhook_url
             })
             res[0].rows.forEach((row) => {
                 if (!webhook_messages[row.type]) webhook_messages[row.type] = []
-                if (!channels_list.includes(row.channel_id)) channels_list.push(row.channel_id)
                 if (!webhook_messages[row.type].find(obj => obj.m_id == row.message_id)) {
                     webhook_messages[row.type].push({
                         m_id: row.message_id,
                         c_id: row.channel_id,
-                        c_type: channels[row.channel_id].type,
+                        c_type: channels_list[row.channel_id].type,
                         url: row.webhook_url,
                     })
                 }
-                webhooks_list[row.channel_id] = row.webhook_url
             })
             resolve()
         }).catch(console.error)

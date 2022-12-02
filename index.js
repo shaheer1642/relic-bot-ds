@@ -143,7 +143,7 @@ client.on('ready', () => {
 
 client.on('messageCreate', async message => {
 
-    if (relicbot.channels_list.includes(message.channel.id)) return
+    if (Object.keys(relicbot.channels_list).includes(message.channel.id)) return
 
     if (message.author.id == client.user.id && message.type === 'CHANNEL_PINNED_MESSAGE') {
         pins_handler(message)
