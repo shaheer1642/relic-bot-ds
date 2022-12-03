@@ -29,9 +29,43 @@ const emote_ids = {
 }
 
 client.on('ready', async () => {
-    assign_global_variables().then(() => edit_recruitment_intro()).catch(console.error)
+    assign_global_variables().then(() => {
+        edit_recruitment_intro()
+        edit_leaderboard()
+        setInterval(edit_leaderboard, 900000);
+    }).catch(console.error)
     update_users_list()
 })
+
+function edit_leaderboard() {
+    socket.emit('relicbot/stats/fetch', {}, (res) => {
+        const payload = {
+            content: ' ',
+            embeds: [{
+                title: 'All-time Leaderboard',
+                description: ('━').repeat(34),
+                fields: [{
+                    name: 'Rank',
+                    value: res.data.map((user,index) => `${index+1}`).join('\n'),
+                    inline: true
+                },{
+                    name: 'Player',
+                    value: res.data.map(user => `${user.ingame_name}`).join('\n'),
+                    inline: true
+                },{
+                    name: 'Squads',
+                    value: res.data.map(user => `${user.squads_completed}`).join('\n'),
+                    inline: true
+                },],
+                color: 'WHITE'
+            }]
+        }
+        console.log(JSON.stringify(payload))
+        if (res.code == 200) {
+            new WebhookClient({url: webhooks_list['892006071030403072']}).editMessage('1048634340579475466', payload).catch(console.error)
+        }
+    })
+}
 
 function handleSquadCreateResponses(channel_id,discord_id,responses) {
     if (!Array.isArray(responses)) responses = [responses]
@@ -66,7 +100,7 @@ function handleSquadCreateResponses(channel_id,discord_id,responses) {
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
-    if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id)) {
+    if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id) && ['relics_vaulted','relics_non_vaulted'].includes(channels_list[message.channel.id].type)) {
         if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().split(' ')[0] == 'persist') return
         console.log('[relicbot messageCreate] content:',message.content)
         socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {

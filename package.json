@@ -38,7 +38,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node -r dotenv/config index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "nodemon -r dotenv/config test.js",
     "dev": "nodemon -r dotenv/config index.js"
   },
   "repository": {
