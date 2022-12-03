@@ -33,25 +33,45 @@ client.on('ready', async () => {
     update_users_list()
 })
 
+function handleSquadCreateResponses(channel_id,discord_id,responses) {
+    if (!Array.isArray(responses)) responses = [responses]
+    const payloads = [{content: ' ', embeds: [], ephemeral: false}]
+    var k = 0
+    var timeout = 5000
+    responses.forEach(res => {
+        const msg = error_codes_embed(res,discord_id)
+        if (res.code != 200) {
+            console.log(res)
+            if (!msg.components) {
+                if (payloads[k].embeds.length == 10) {
+                    payloads.push({content: ' ', embeds: [], ephemeral: false})
+                    k++;
+                }
+                payloads[k].embeds.push(...msg.embeds)
+            } else {
+                timeout = 10000
+                payloads.push(msg)
+                payloads.push({content: ' ', embeds: [], ephemeral: false})
+                k += 2;
+            }
+        }
+    })
+    payloads.forEach(payload => {
+        if (payload.embeds.length > 0) {
+            const webhook_client = new WebhookClient({url: webhooks_list[channel_id]})
+            webhook_client.send(payload).then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), timeout)).catch(console.error)
+        }
+    })
+}
+
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
-    if (Object.keys(channels_list).includes(message.channel.id)) {
+    if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id)) {
+        if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().split(' ')[0] == 'persist') return
         console.log('[relicbot messageCreate] content:',message.content)
         socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
             //console.log('[relicbot/squads/create] response',responses)
-            const payload = {content: ' ', embeds: [], ephemeral: false}
-            if (!Array.isArray(responses)) responses = [responses]
-            responses.forEach(res => {
-                if (res.code != 200) {
-                    console.log(res)
-                    if (payload.embeds.length < 10)
-                        payload.embeds.push(error_codes_embed(res,message.author.id).embeds[0])
-                }
-            })
-            if (payload.embeds.length > 0) {
-                const webhook_client = new WebhookClient({url: webhooks_list[message.channel.id]})
-                webhook_client.send(payload).then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), 5000)).catch(console.error)
-            }
+            handleSquadCreateResponses(message.channel.id,message.author.id,responses)
             setTimeout(() => message.delete().catch(console.error), 1000);
         })
     }
@@ -105,6 +125,7 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isButton()) {
         if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+
         if (interaction.customId == 'rb_sq_leave_all') {
             socket.emit('relicbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
@@ -180,6 +201,11 @@ client.on('interactionCreate', async (interaction) => {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
                 }
             })
+        } else if (interaction.customId.match('rb_sq_merge_false')) { 
+            socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[interaction.channel.id].type == 'relics_vaulted' ? true:false, merge_squad: false}, responses => {
+                interaction.deferUpdate().catch(console.error)
+                handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
+            })
         } else if (interaction.customId.match('rb_sq_')) {
             const squad_id = interaction.customId.split('rb_sq_')[1]
             const discord_id = interaction.user.id
@@ -222,19 +248,7 @@ client.on('interactionCreate', async (interaction) => {
             socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 interaction.deferUpdate().catch(console.error)
-                if (!Array.isArray(responses)) responses = [responses]
-                const payload = {content: ' ', embeds: [], ephemeral: false}
-                responses.forEach(res => {
-                    if (res.code != 200) {
-                        console.log(res)
-                        if (payload.embeds.length < 11)
-                            payload.embeds.push(error_codes_embed(res,message.author.id).embeds[0])
-                    }
-                })
-                if (payload.embeds.length > 0) {
-                    const webhook_client = new WebhookClient({url: webhooks_list[interaction.channel.id]})
-                    webhook_client.send(payload).then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), 5000)).catch(console.error)
-                }
+                handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
             })
         }
     }
@@ -597,7 +611,7 @@ function error_codes_embed(response,discord_id) {
             content: ' ',
             embeds: [{
                 description: `<@${discord_id}> Please verify your Warframe account to access this feature\nClick Verify to proceed`,
-                color: 'RED'
+                color: 'YELLOW'
             }],
             components: [{
                 type: 1,
@@ -606,6 +620,28 @@ function error_codes_embed(response,discord_id) {
                     label: "Verify",
                     style: 1,
                     custom_id: `tb_verify`
+                }]
+            }]
+        }
+    } else if (response.code == 399) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message}`,
+                color: 'GREEN'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Join Existing",
+                    style: 3,
+                    custom_id: `rb_sq_${response.squad_id}`
+                },{
+                    type: 2,
+                    label: "Host New",
+                    style: 3,
+                    custom_id: `rb_sq_merge_false$${response.squad_code}`
                 }]
             }]
         }
