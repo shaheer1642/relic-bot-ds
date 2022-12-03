@@ -55,7 +55,7 @@ client.on('messageCreate', async (message) => {
             setTimeout(() => message.delete().catch(console.error), 1000);
         })
     }
-    if (message.channel.isThread() && Object.keys(channels_list).includes(message.channel.parent.id)) {
+    if (message.channel.isThread() && Object.keys(channels_list).includes(message.channel.parent?.id)) {
         if (message.channel.ownerId == client.user.id) {
             socket.emit('relicbot/squads/messageCreate', {
                 message_id: message.id,
