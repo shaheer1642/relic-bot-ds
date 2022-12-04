@@ -503,7 +503,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
             if (squad.is_old) field_value += ' ' + emote_ids.cold
         }
         fields.push({
-            name: `${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
+            name: `${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
             value: field_value,
             inline: true
         })
@@ -511,7 +511,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
         if (!components[k]) components[k] = {type: 1, components: []}
         components[k].components.push({
             type: 2,
-            label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old? emote_ids.cold:''} ${squad.main_relics.join(' ')}`.replace(/\s+/g, ' ').trim(),
+            label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old? emote_ids.cold:''} ${squad.main_relics.join(' ').toUpperCase()}`.replace(/\s+/g, ' ').trim(),
             style: 2,
             custom_id: `rb_sq_${squad.squad_id}`
         })
@@ -691,7 +691,7 @@ function error_codes_embed(response,discord_id) {
 }
 
 function relicBotSquadToString(squad) {
-    return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ')} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ')} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()
+    return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()
 }
 
 function constructTrackersEmbed(trackers, ephemeral) {
