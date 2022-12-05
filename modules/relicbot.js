@@ -279,7 +279,7 @@ client.on('interactionCreate', async (interaction) => {
         }
         if (interaction.customId == 'rb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
-            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[interaction.message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
