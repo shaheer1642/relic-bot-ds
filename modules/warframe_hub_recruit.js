@@ -78,7 +78,7 @@ client.on('interactionCreate', (interaction) => {
     } else {
         if (interaction.customId == 'sq_custom') {
             interaction.showModal({
-                title: "Create custom squad",
+                title: "Host New Squad",
                 custom_id: "sq_custom_modal",
                 components: [
                     {
@@ -164,6 +164,49 @@ client.on('interactionCreate', (interaction) => {
                 }
             })
         }
+    }
+})
+
+client.on('messageCreate', (message) => {
+    if (message.author.bot) return
+    if (message.channel.id == '1041319859469955073') {
+        const total_spots = message.content.match('/4') ? 4 : message.content.match('/3') ? 3 : message.content.match('/2') ? 2 : 4
+        message.content = message.content.replace(/ [1-9]\/4/g,'').replace(/ [1-9]\/3/g,'').replace(/ [1-9]\/2/g,'').replace(/ [1-9]\/1/g,'')
+        if (message.content.length > 79) {
+            setTimeout(() => {
+                message.delete().catch(console.error)
+            }, 1000);
+            return message.channel.send({
+                content: 'squad name should be less than 80 characters',
+                ephemeral: true
+            }).catch(err => console.log(err)).then(msg => setTimeout(() => {
+                msg.delete().catch(console.error)
+            }, 5000))
+        }
+        db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${message.author.id},'sq_custom_${message.content.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
+        .then(res => {
+            setTimeout(() => {
+                message.delete().catch(console.error)
+            }, 1000);
+            edit_main_msg()
+            //mention_users(interaction.user.id,interaction.customId)
+        }).catch(err => {
+            if (err.code == 23505) { // duplicate key
+                message.channel.send({
+                    content: 'That squad already exists'
+                }).catch(err => console.log(err)).then(msg => setTimeout(() => {
+                    msg.delete().catch(console.error)
+                }, 5000))
+            } else {
+                console.log(err)
+                message.channel.send({
+                    content: 'Unexpected error: ' + err.stack,
+                    ephemeral: true
+                }).catch(err => console.log(err)).then(msg => setTimeout(() => {
+                    msg.delete().catch(console.error)
+                }, 5000))
+            }
+        })
     }
 })
 
@@ -513,7 +556,7 @@ function getSquadsList() {
             filled: []
         },
         sq_custom: {
-            name: 'Create Custom Squad',
+            name: 'Host New Squad',
             id: 'sq_custom'
         },
         sq_leave_all: {
