@@ -334,14 +334,18 @@ async function edit_main_msg() {
                     type: 2,
                     label: squad.name,
                     style: 4,
-                    custom_id: squad.id
+                    custom_id: squad.id,
                 })
             } else if (squad.id == 'sq_custom') {
                 components[k][l].components.push({
                     type: 2,
-                    label: squad.name,
+                    label: '💳' + squad.name,
                     style: 3,
-                    custom_id: squad.id
+                    custom_id: squad.id,
+                    // emoji: {
+                    //     id: '💳',
+                    //     name: 'card'
+                    // }
                 })
             } else {
                 components[k][l].components.push({
