@@ -122,7 +122,7 @@ client.on('interactionCreate', (interaction) => {
                 return
             }
             interaction.deferUpdate().catch(err => console.log(err))
-            interaction.fields.getTextInputValue('squad_name').split('\n').forEach(line => {
+            interaction.fields.getTextInputValue('squad_name').trim().split('\n').forEach(line => {
                 db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
                 .then(res => {
                     //if (res.rowCount == 1) 
@@ -172,7 +172,7 @@ client.on('interactionCreate', (interaction) => {
 client.on('messageCreate', (message) => {
     if (message.author.bot) return
     if (message.channel.id == '1041319859469955073') {
-        message.content.split('\n').forEach(line => {
+        message.content.trim().split('\n').forEach(line => {
             const total_spots = line.match('/4') ? 4 : line.match('/3') ? 3 : line.match('/2') ? 2 : 4
             line = line.replace(/ [1-9]\/4/g,'').replace(/ [1-9]\/3/g,'').replace(/ [1-9]\/2/g,'').replace(/ [1-9]\/1/g,'')
             if (line.length > 79) {
