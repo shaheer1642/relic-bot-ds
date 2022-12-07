@@ -334,7 +334,7 @@ async function edit_main_msg() {
                     type: 2,
                     label: squad.name,
                     style: 4,
-                    custom_id: squad.id,
+                    custom_id: squad.id
                 })
             } else if (squad.id == 'sq_custom') {
                 components[k][l].components.push({
@@ -350,9 +350,10 @@ async function edit_main_msg() {
             } else {
                 components[k][l].components.push({
                     type: 2,
-                    label: `${squad.filled.length}/${squad.spots} ${squad.name}`,
+                    label: `${squad.emote || ''} ${squad.filled.length}/${squad.spots} ${squad.name}`.trim(),
                     style: squad.filled.length == 4 ? 2:squad.filled.length == 3 ? 4:squad.filled.length == 2 ? 3:squad.filled.length == 1 ? 1:2,
-                    custom_id: squad.id
+                    custom_id: squad.id,
+                    emoji: squad.emoji
                 })
             }
             if (components[k].length == 5 && components[k][l].components.length == 3 && index != (squadArr.length - 1)) {
@@ -471,97 +472,146 @@ function getSquadsList() {
             name: 'Fissures',
             id: 'sq_fissures',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050151399066968074',
+                name: 'relic_pack'
+            }
         },
         sq_sortie: {
             name: 'Sortie',
             id: 'sq_sortie',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050156747135909918',
+                name: 'Sortie_b'
+            }
         },
         sq_incursions: {
             name: 'Incursions',
             id: 'sq_incursions',
             spots: 3,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '962508988442869800',
+                name: 'steel_essence'
+            }
         },
         sq_alerts: {
             name: 'Alerts',
             id: 'sq_alerts',
             spots: 3,
-            filled: []
+            filled: [],
+            emote: '❗'
         },
         sq_eidolons: {
             name: 'Eidolons',
             id: 'sq_eidolons',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050150973718417558',
+                name: 'ArcaneEnergize'
+            }
         },
         sq_taxi_help: {
             name: 'Taxi | Help',
             id: 'sq_taxi_help',
             spots: 2,
-            filled: []
+            filled: [],
+            emote: '🙋'
         },
         sq_mining_fishing: {
             name: 'Mining | Fishing',
             id: 'sq_mining_fishing',
             spots: 2,
-            filled: []
+            filled: [],
+            emote: '⛏️'
         },
         sq_index: {
             name: 'Index',
             id: 'sq_index',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '961605300601913424',
+                name: 'credits'
+            }
         },
         sq_profit_taker: {
             name: 'Profit Taker',
             id: 'sq_profit_taker',
             spots: 2,
-            filled: []
+            filled: [],
+            emote: '🕷️'
         },
         sq_bounties: {
             name: 'Bounties',
             id: 'sq_bounties',
             spots: 4,
-            filled: []
+            filled: [],
+            emote: '☠️'
         },
         sq_leveling: {
             name: 'Leveling',
             id: 'sq_leveling',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050156033743523860',
+                name: 'AffinityOrb'
+            }
         },
         sq_arbitration: {
             name: 'Arbitration',
             id: 'sq_arbitration',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050155343776321617',
+                name: 'VitusEssence'
+            }
         },
         sq_nightwave: {
             name: 'Nightwave',
             id: 'sq_nightwave',
             spots: 2,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050154112274141234',
+                name: 'NorasMixVol2Cred'
+            }
         },
         sq_lich_murmur: {
             name: 'Lich (murmur)',
             id: 'sq_lich_murmur',
             spots: 3,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050153404011397150',
+                name: 'lohkglyph'
+            }
         },
         sq_endo_arena: {
             name: 'Endo Arena',
             id: 'sq_endo_arena',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '962507075475370005',
+                name: 'endo'
+            }
         },
         sq_archon_hunt: {
             name: 'Archon Hunt',
             id: 'sq_archon_hunt',
             spots: 4,
-            filled: []
+            filled: [],
+            emoji: {
+                id: '1050150452852949073',
+                name: 'tau_crimson_shard'
+            }
         },
         sq_custom: {
             name: 'Host New Squad',
