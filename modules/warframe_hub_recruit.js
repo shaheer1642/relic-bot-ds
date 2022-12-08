@@ -1,5 +1,6 @@
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
+const {socket} = require('./socket')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
@@ -9,7 +10,53 @@ const recruit_channel_id = '1041319859469955073'
 const webhook_messages = ['1049812497726718013','1049812499391840357','1049812500968902706','1049812503095423087','1049812505167417384']
 var webhook_client;
 
+const server_commands_perms = [
+    '253525146923433984', //softy
+    '253980061969940481', //leo
+    '353154275745988610', //john 
+    '385459793508302851' //ady 
+]
+
+socket.on('tradebotUsersUpdated', (payload) => {
+    console.log('[warframe_hub_recruit] tradebotUsersUpdated')
+    update_users_list()
+})
+socket.on('squadKeywordsUpdate', (payload) => {
+    console.log('[warframe_hub_recruit] squadKeywordsUpdate')
+    update_words_list()
+})
+
+var users_list = {}
+function update_users_list() {
+    socket.emit('relicbot/users/fetch',{},(res) => {
+        if (res.code == 200) {
+            users_list = {}
+            res.data.forEach(row => {
+                users_list[row.discord_id] = row
+            })
+        }
+    })
+}
+
+var keywords_list = []
+var explicitwords_list = []
+function update_words_list() {
+    db.query(`SELECT * FROM wfhub_keywords`)
+    .then(res => {
+        keywords_list = []
+        explicitwords_list = []
+        res.rows.forEach(row => {
+            if (row.include)
+                keywords_list.push(row.name)
+            else
+                explicitwords_list.push(row.name)
+        })
+    }).catch(console.error)
+}
+
 client.on('ready', async () => {
+    update_users_list()
+    update_words_list()
     webhook_client = await client.fetchWebhook('1042451987721093202').catch(console.error)
     setInterval(() => {     // check every 5m for squads timeouts
         db.query(`SELECT * FROM wfhub_recruit_members`)
@@ -27,10 +74,37 @@ client.on('ready', async () => {
     edit_main_msg()
 })
 
+function isVerified(discord_id, channel) {
+    if (!users_list[discord_id]) {
+        channel.send({
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> Please verify your Warframe account to access this feature\nClick Verify to proceed`,
+                color: 'YELLOW'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Verify",
+                    style: 1,
+                    custom_id: `tb_verify`
+                }]
+            }]
+        }).then(msg => {
+            setTimeout(() => msg.delete().catch(console.error), 10000);
+        }).catch(console.error)
+        return false
+    } else {
+        return true
+    }
+}
+
 client.on('interactionCreate', (interaction) => {
     if (interaction.channel.id != recruit_channel_id) return
 
     if (interaction.customId == 'wfhub_recruit_notify') {
+        if (!isVerified(interaction.user.id, interaction.channel)) return
         edit_main_msg()
         console.log(interaction.values)
         db.query(`SELECT * FROM wfhub_squads_data WHERE id=1`).catch(err => console.log(err))
@@ -71,11 +145,13 @@ client.on('interactionCreate', (interaction) => {
         return
     }
     if (interaction.customId == 'sq_leave_all') {
+        if (!isVerified(interaction.user.id, interaction.channel)) return
         db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate().catch(err => console.log(err));edit_main_msg()}).catch(err => console.log(err))
         console.log(`wfhub_recruit: user ${interaction.user.id} left all squads`)
         return
     } else {
         if (interaction.customId == 'sq_custom') {
+            if (!isVerified(interaction.user.id, interaction.channel)) return
             interaction.showModal({
                 title: "Host New Squad",
                 custom_id: "sq_custom_modal",
@@ -110,6 +186,7 @@ client.on('interactionCreate', (interaction) => {
             }).catch(err => console.log(err))
             return
         } else if (interaction.customId == 'sq_custom_modal') {
+            if (!isVerified(interaction.user.id, interaction.channel)) return
             const total_spots = Math.abs(Number(interaction.fields.getTextInputValue('squad_spots')))
             if (!total_spots) {
                 interaction.reply({content: 'Total spots must be a valid number. Please try again', ephemeral: true}).catch(err => console.log(err))
@@ -123,6 +200,22 @@ client.on('interactionCreate', (interaction) => {
             }
             interaction.deferUpdate().catch(err => console.log(err))
             interaction.fields.getTextInputValue('squad_name').trim().split('\n').forEach(line => {
+                var hasKeyword = false
+                for (const word of keywords_list) {
+                    if (line.match(word)) {
+                        hasKeyword = true
+                        break
+                    }
+                }
+                if (!hasKeyword) return interaction.reply({content: 'Squad must contain a valid keyword', ephemeral: true}).catch(err => console.log(err))
+                var hasExplicitWord = false
+                for (const word of explicitwords_list) {
+                    if (line.match(word)) {
+                        hasExplicitWord = true
+                        break
+                    }
+                }
+                if (hasExplicitWord) return interaction.reply({content: 'Squad should not contain explicit words', ephemeral: true}).catch(err => console.log(err))
                 db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
                 .then(res => {
                     //if (res.rowCount == 1) 
@@ -145,7 +238,8 @@ client.on('interactionCreate', (interaction) => {
                 })
             })
         }
-        else {
+        else if (interaction.customId.match(/^sq_/)) {
+            if (!isVerified(interaction.user.id, interaction.channel)) return
             db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${interaction.customId.match(/^sq_custom/) ? true:false},${new Date().getTime()})`)
             .then(res => {
                 if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
@@ -171,47 +265,76 @@ client.on('interactionCreate', (interaction) => {
 
 client.on('messageCreate', (message) => {
     if (message.author.bot) return
-    if (message.channel.id == '1041319859469955073') {
-        message.content.trim().split('\n').forEach(line => {
-            const total_spots = line.match('/4') ? 4 : line.match('/3') ? 3 : line.match('/2') ? 2 : 4
-            line = line.replace(/ [1-9]\/4/g,'').replace(/ [1-9]\/3/g,'').replace(/ [1-9]\/2/g,'').replace(/ [1-9]\/1/g,'')
-            if (line.length > 79) {
-                setTimeout(() => {
-                    message.delete().catch(console.error)
-                }, 1000);
-                return message.channel.send({
-                    content: 'squad name should be less than 80 characters',
+
+    if (message.channel.id != recruit_channel_id) return
+    
+    if (!isVerified(message.author.id, message.channel)) return
+
+    if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
+
+    message.content.trim().split('\n').forEach(line => {
+        console.log(keywords_list,explicitwords_list)
+        var hasKeyword = false
+        for (const word of keywords_list) {
+            if (line.match(word)) {
+                hasKeyword = true
+                break
+            }
+        }
+        if (!hasKeyword) {
+            setTimeout(() => message.delete().catch(console.error), 1000);
+            return message.channel.send({content: `<@${message.author.id}> Squad must contain a valid keyword`}).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000) ).catch(err => console.log(err))
+        }
+        var hasExplicitWord = false
+        for (const word of explicitwords_list) {
+            if (line.match(word)) {
+                hasExplicitWord = true
+                break
+            }
+        }
+        if (hasExplicitWord) {
+            setTimeout(() => message.delete().catch(console.error), 1000);
+            return message.channel.send({content: `<@${message.author.id}> Squad must not contain explicit words`}).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000) ).catch(err => console.log(err))
+        }
+
+        const total_spots = line.match('/4') ? 4 : line.match('/3') ? 3 : line.match('/2') ? 2 : 4
+        line = line.replace(/ [1-9]\/4/g,'').replace(/ [1-9]\/3/g,'').replace(/ [1-9]\/2/g,'').replace(/ [1-9]\/1/g,'')
+        if (line.length > 79) {
+            setTimeout(() => {
+                message.delete().catch(console.error)
+            }, 1000);
+            return message.channel.send({
+                content: 'squad name should be less than 80 characters',
+                ephemeral: true
+            }).catch(err => console.log(err)).then(msg => setTimeout(() => {
+                msg.delete().catch(console.error)
+            }, 5000))
+        }
+        db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${message.author.id},'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
+        .then(res => {
+            setTimeout(() => {
+                message.delete().catch(console.error)
+            }, 1000);
+            edit_main_msg()
+            //mention_users(interaction.user.id,interaction.customId)
+        }).catch(err => {
+            if (err.code == 23505) { // duplicate key
+                message.channel.send({
+                    content: 'That squad already exists'
+                }).catch(err => console.log(err)).then(msg => setTimeout(() => {
+                    msg.delete().catch(console.error)
+                }, 5000))
+            } else {
+                console.log(err)
+                message.channel.send({
+                    content: 'Unexpected error: ' + err.stack,
                     ephemeral: true
                 }).catch(err => console.log(err)).then(msg => setTimeout(() => {
                     msg.delete().catch(console.error)
                 }, 5000))
             }
-            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${message.author.id},'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
-            .then(res => {
-                setTimeout(() => {
-                    message.delete().catch(console.error)
-                }, 1000);
-                edit_main_msg()
-                //mention_users(interaction.user.id,interaction.customId)
-            }).catch(err => {
-                if (err.code == 23505) { // duplicate key
-                    message.channel.send({
-                        content: 'That squad already exists'
-                    }).catch(err => console.log(err)).then(msg => setTimeout(() => {
-                        msg.delete().catch(console.error)
-                    }, 5000))
-                } else {
-                    console.log(err)
-                    message.channel.send({
-                        content: 'Unexpected error: ' + err.stack,
-                        ephemeral: true
-                    }).catch(err => console.log(err)).then(msg => setTimeout(() => {
-                        msg.delete().catch(console.error)
-                    }, 5000))
-                }
-            })
         })
-    }
+    })
 })
 
 //var timeout_edit_components = null;
@@ -449,7 +572,7 @@ function open_squad(squad) {
         try {
             thread.send({content: msg.trim(), embeds: [{
                 title: squad.name,
-                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${client.guilds.cache.get(guild_id).members.cache.get(userId).displayName || client.guilds.cache.get(guild_id).members.cache.get(userId).nickname}\n`).toString().replace(/,/g,'').replace(/_/g, '\_')}`,
+                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${users_list[userId].ingame_name}`).join('\n').replace(/_/g, '\_')}`,
                 color: '#ffffff'
             }]}).catch(err => console.log(err))
         } catch (e) {

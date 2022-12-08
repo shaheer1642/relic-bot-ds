@@ -101,7 +101,7 @@ function handleSquadCreateResponses(channel_id,discord_id,responses) {
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
     if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id) && ['relics_vaulted','relics_non_vaulted'].includes(channels_list[message.channel.id].type)) {
-        if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().split(' ')[0] == 'persist') return
+        if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
         console.log('[relicbot messageCreate] content:',message.content)
         socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
             //console.log('[relicbot/squads/create] response',responses)
@@ -365,6 +365,7 @@ var users_list = {}
 function update_users_list() {
     socket.emit('relicbot/users/fetch',{},(res) => {
         if (res.code == 200) {
+            users_list = {}
             res.data.forEach(row => {
                 users_list[row.discord_id] = row
             })
@@ -597,7 +598,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
             thread.send({
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
-                    description: `**${relicBotSquadToString(squad)}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ')}`
+                    description: `**${relicBotSquadToString(squad)}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`
                 }]
             }).catch(console.error)
             if (Object.keys(channel_ids).length > 1) thread.send({content: 'This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
@@ -626,6 +627,7 @@ socket.on('relicbot/squads/disbanded', async (payload) => {
 })
 
 socket.on('tradebotUsersUpdated', (payload) => {
+    console.log('[relicbot] tradebotUsersUpdated')
     update_users_list()
 })
 

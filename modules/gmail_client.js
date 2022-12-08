@@ -165,40 +165,42 @@ async function gmail_api_call(auth) {
                             if (user)
                                 user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 500')
                             return false
+                        } else {
+                            const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
+                            const member = guild.members.cache.get(xx_discord) || await guild.members.fetch(xx_discord).catch(console.error)
+                            const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+                            member.roles.add(role).catch(console.error)
+                            if (res.rowCount == 1) {
+                                var status = await db.query(`UPDATE tradebot_users_list SET ingame_name='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
+                                    if (user)
+                                        user.send('Your ign has been updated to **' + temp[4] + '**!').catch(console.error)
+                                    return true
+                                })
+                                .catch (err => {
+                                    console.log(err)
+                                    if (user)
+                                        user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 501').catch(console.error)
+                                    return false
+                                })
+                            }
+                            if (res.rowCount == 0) {
+                                var status = await db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${temp[4]}',${new Date().getTime()})`).then(res => {
+                                    if (user)
+                                        user.send('Welcome **' + temp[4] + '**! Your account has been verified.').catch(console.error)
+                                    return true
+                                })
+                                .catch (err => {
+                                    console.log(err)
+                                    if (user)
+                                        user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 502').catch(console.error)
+                                    return false
+                                })
+                            }
                         }
-                        if (res.rowCount == 1) {
-                            var status = await db.query(`UPDATE tradebot_users_list SET ingame_name='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
-                                if (user)
-                                    user.send('Your ign has been updated to **' + temp[4] + '**!').catch(console.error)
-                                return true
-                            })
-                            .catch (err => {
-                                console.log(err)
-                                if (user)
-                                    user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 501').catch(console.error)
-                                return false
-                            })
-                        }
-                        if (res.rowCount == 0) {
-                            var status = await db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${temp[4]}',${new Date().getTime()})`).then(res => {
-                                if (user)
-                                    user.send('Welcome **' + temp[4] + '**! Your account has been verified.').catch(console.error)
-                                return true
-                            })
-                            .catch (err => {
-                                console.log(err)
-                                if (user)
-                                    user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 502').catch(console.error)
-                                return false
-                            })
-                        }
-                        return true
-                    })
-                    .catch (err => {
+                    }).catch (err => {
                         console.log(err)
                         if (user)
                             user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 503').catch(console.error)
-                        return false
                     })
                     //----------------------
                     console.log('User ' + temp[4] + ' has verified their ign')
