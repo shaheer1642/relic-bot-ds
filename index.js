@@ -25,6 +25,7 @@ const relicbot = require('./modules/relicbot.js');
 const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
+const wfhub_daywave = require('./modules/wfhub_daywave.js');
 const wfrim = require('./modules/wfrim.js');
 const warframe_hub = require('./modules/warframe_hub');
 const osiris_guild_id = '905559118096531456'

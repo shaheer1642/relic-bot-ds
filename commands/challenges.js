@@ -30,7 +30,8 @@ module.exports = {
 	status: 'active',
 	guildIds: [
 		"776804537095684108",
-		"832677897411493949"
+		"832677897411493949",
+		"865904902941048862"
 	],
 	command_name: '/challenges'
 };

@@ -2,12 +2,14 @@ const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {socket} = require('./socket')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
+const {verify_challenge_serviceman} = require('./wfhub_daywave')
+
 const squad_timeout = 3600000
 var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
 
 const guild_id = '865904902941048862'
 const recruit_channel_id = '1041319859469955073'
-const webhook_messages = ['1049812497726718013','1049812499391840357','1049812500968902706','1049812503095423087','1049812505167417384']
+const webhook_messages = ['1050528676011315281','1050528677672255601','1050528679605841941','1050528681258397777','1050528682906746910']
 var webhook_client;
 
 const server_commands_perms = [
@@ -57,7 +59,7 @@ function update_words_list() {
 client.on('ready', async () => {
     update_users_list()
     update_words_list()
-    webhook_client = await client.fetchWebhook('1042451987721093202').catch(console.error)
+    webhook_client = await client.fetchWebhook('1050526671234670634').catch(console.error)
     setInterval(() => {     // check every 5m for squads timeouts
         db.query(`SELECT * FROM wfhub_recruit_members`)
         .then(async res => {
@@ -198,7 +200,7 @@ client.on('interactionCreate', (interaction) => {
                 interaction.reply({content: 'Total spots must be less than 4. Please try again', ephemeral: true}).catch(err => console.log(err))
                 return
             }
-            interaction.deferUpdate().catch(err => console.log(err))
+            //interaction.deferUpdate().catch(err => console.log(err))
             interaction.fields.getTextInputValue('squad_name').trim().split('\n').forEach(line => {
                 var hasKeyword = false
                 for (const word of keywords_list) {
@@ -218,6 +220,7 @@ client.on('interactionCreate', (interaction) => {
                 if (hasExplicitWord) return interaction.reply({content: 'Squad should not contain explicit words', ephemeral: true}).catch(err => console.log(err))
                 db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
                 .then(res => {
+                    interaction.deferUpdate().catch(err => console.log(err))
                     //if (res.rowCount == 1) 
                     edit_main_msg()
                     console.log(`wfhub_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
@@ -411,7 +414,7 @@ async function edit_main_msg() {
                 content: '_ _',
                 embeds: index == 0 ? [{
                     title: 'Recruitment',
-                    description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#879053804610404424> or PM <@253525146923433984>',
+                    description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#1003269491163148318>',
                     footer: {
                         text: 'Note: The squads may take a few seconds to update due to API rate limiting. Your request should be recorded immediately so do not spam'
                     },
@@ -555,6 +558,7 @@ function mention_users(joined_user_id,squad_id) {
 }
 
 function open_squad(squad) {
+    verify_challenge_serviceman(squad)
     console.log('botv squad opened', squad.filled.join(' '))
     client.channels.cache.get(recruit_channel_id).threads.create({
         name: squad.name,
@@ -665,7 +669,7 @@ function getSquadsList() {
         sq_profit_taker: {
             name: 'Profit Taker',
             id: 'sq_profit_taker',
-            spots: 2,
+            spots: 4,
             filled: [],
             emote: '🕷️'
         },

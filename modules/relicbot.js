@@ -378,17 +378,43 @@ function edit_recruitment_intro() {
         new WebhookClient({url: msg.url}).editMessage(msg.m_id, {
             content: ' ',
             embeds: [{
-                description: '< recruitment intro/tutorial >',
-                color: 'WHITE'
+                "title": "Relic Recruitment",
+                "color": 5814783,
+                "fields": [
+                  {
+                    "name": "Hosting Squad",
+                    "value": "Type message\n```diff\nlith b1\nmeso v2 4b4 int\n```",
+                    "inline": true
+                  },
+                  {
+                    "name": "Joining Squad",
+                    "value": "Click button to join squad\nClick again to leave",
+                    "inline": true
+                  },
+                  {
+                    "name": "Squad fill",
+                    "value": "A new channel will be created including all squad members and you will be notified",
+                    "inline": true
+                  },
+                  {
+                    "name": "2b2 Squads and offcycles",
+                    "value": "Only 2 squad members equip hosted relic at a time, other 2 equip a random relic or offcycle if given. The role is reversed every mission\n```diff\nmeso v2 2b2 int\naxi e1 2b2 rad with axi v8 offcycle\n```"
+                  },
+                  {
+                    "name": "Icons",
+                    "value": "❄️ Squad hosted 15m ago\n🔥 Squad is 3/4",
+                    "inline": true
+                  },
+                  {
+                    "name": "Track Squads",
+                    "value": "Add relics to be notified whenever someone hosts them",
+                    "inline": true
+                  }
+                ]
             }],
             components: [{
                 type: 1,
                 components: [{
-                    type: 2,
-                    label: "Verify",
-                    style: 1,
-                    custom_id: `tb_verify`
-                },{
                     type: 2,
                     label: "Host Squad",
                     style: 3,
@@ -398,13 +424,10 @@ function edit_recruitment_intro() {
                     label: "Leave all",
                     style: 4,
                     custom_id: `rb_sq_leave_all`
-                }]
-            },{
-                type: 1,
-                components: [{
+                },{
                     type: 2,
                     label: "Track Squads",
-                    style: 2,
+                    style: 1,
                     custom_id: `rb_sq_trackers_add_modal`
                 },{
                     type: 2,
@@ -513,7 +536,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
         components[k].components.push({
             type: 2,
             label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old? emote_ids.cold:''} ${squad.main_relics.join(' ').toUpperCase()}`.replace(/\s+/g, ' ').trim(),
-            style: 2,
+            style: squad.members.length > 1 ? 3 : 2,
             custom_id: `rb_sq_${squad.squad_id}`
         })
         if (index == squads.length - 1) {
@@ -586,6 +609,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
         channel_ids[channel_id].push(discord_id)
     }
     console.log('channel_ids:',channel_ids)
+    //send dms
     for (const channel_id in channel_ids) {
         const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
         if (!channel) continue
@@ -594,6 +618,11 @@ socket.on('relicbot/squads/opened', async (payload) => {
             autoArchiveDuration: 60,
             reason: 'Relic squad filled'
         }).then(async thread => {
+            channel_ids[channel_id].map(async discord_id => {
+                const user = client.users.cache.get(discord_id) || client.users.fetch(discord_id).catch(console.error)
+                if (user)
+                    user.send(`Your **${relicBotSquadToString(squad)}** squad has been filled. Click <#${thread.id}> to view squad`).catch(console.error)
+            })
             thread_ids.push(thread.id)
             thread.send({
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
@@ -676,9 +705,17 @@ function error_codes_embed(response,discord_id) {
                 },{
                     type: 2,
                     label: "Host New",
-                    style: 3,
+                    style: 1,
                     custom_id: `rb_sq_merge_false$${response.squad_code}`
                 }]
+            }]
+        }
+    } else if (response.code == 299) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message}`,
+                color: 'GREEN'
             }]
         }
     } else {
