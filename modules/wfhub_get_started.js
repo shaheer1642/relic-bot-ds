@@ -90,13 +90,13 @@ function squadbotembed() {
     }
 }
 
-client.on('interactionCreate', interaction => {
+client.on('interactionCreate', async interaction => {
     if (interaction.isButton()) {
         if (interaction.customId == 'getting_started_sandbox_sq_info') {
             interaction.deferUpdate().catch(console.error)
             editSquadMsgRelicBot(true)
         } else if (interaction.customId == 'getting_started_sandbox_complete_relicbot') {
-            interaction.reply({
+            await interaction.reply({
                 content: 'Great! Now try opening an Eidolon squad in <#890197385651838977>'
             }).catch(console.error)
             verifyTestComplete(interaction.user.id,'relic_bot')
