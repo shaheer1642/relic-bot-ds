@@ -8,8 +8,8 @@ var default_squads = [{
     name: 'V8 4b4 rad',
     members: ['804072666192412702','739833841686020216','212952630350184449']
 },{
-    id: 'e1_4b4_rad',
-    name: 'E1 4b4 rad',
+    id: 'e1_2b2_rad',
+    name: 'E1 2b2 rad',
     members: ['804072666192412702','739833841686020216']
 }]
 var squads = JSON.parse(JSON.stringify(default_squads))
