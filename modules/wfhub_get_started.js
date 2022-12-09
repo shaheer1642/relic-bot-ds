@@ -37,12 +37,12 @@ const get_started_cnl_id = '890197385651838977'
 
 const test_complete = {}
 
-client.on('ready', () => {
+client.on('ready', async () => {
     update_users_list()
     editSquadMsgRelicBot(false)
     editSquadMsgSquadBot()
-    rb_webhook = client.fetchWebhook(rb_wh_id).catch(console.error)
-    sb_webhook = client.fetchWebhook(sb_wh_id).catch(console.error)
+    rb_webhook = await client.fetchWebhook(rb_wh_id).catch(console.error)
+    sb_webhook = await client.fetchWebhook(sb_wh_id).catch(console.error)
 })
 
 function relicbotembed(show_members, show_members_for_squad) {
