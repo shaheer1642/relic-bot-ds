@@ -66,7 +66,7 @@ function edit_leaderboard() {
         }
         console.log(JSON.stringify(payload))
         if (res.code == 200) {
-            client.fetchWebhook('1048633229571276841').then(wh => wh.editMessage('1048634340579475466', payload).catch(console.error)).catch(console.error)
+            client.fetchWebhook('1050757563366522921').then(wh => wh.editMessage('1050762968037609482', payload).catch(console.error)).catch(console.error)
         }
     })
 }
