@@ -163,7 +163,7 @@ async function gmail_api_call(auth) {
                     var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id=${xx_discord}`).then(async res => {
                         if (res.rowCount > 1) {
                             if (user)
-                                user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 500')
+                                user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500')
                             return false
                         } else {
                             const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
@@ -179,7 +179,7 @@ async function gmail_api_call(auth) {
                                 .catch (err => {
                                     console.log(err)
                                     if (user)
-                                        user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 501').catch(console.error)
+                                        user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 501').catch(console.error)
                                     return false
                                 })
                             }
@@ -192,7 +192,7 @@ async function gmail_api_call(auth) {
                                 .catch (err => {
                                     console.log(err)
                                     if (user)
-                                        user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 502').catch(console.error)
+                                        user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 502').catch(console.error)
                                     return false
                                 })
                             }
@@ -200,7 +200,7 @@ async function gmail_api_call(auth) {
                     }).catch (err => {
                         console.log(err)
                         if (user)
-                            user.send('Something went wrong verifying your account. Please contact MrSofty#7926. Error code: 503').catch(console.error)
+                            user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 503').catch(console.error)
                     })
                     //----------------------
                     console.log('User ' + temp[4] + ' has verified their ign')
