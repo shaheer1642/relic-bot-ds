@@ -414,10 +414,7 @@ async function edit_main_msg() {
                 content: '_ _',
                 embeds: index == 0 ? [{
                     title: 'Recruitment',
-                    description: '- Click on the button to join a squad.\n\n- Your join request will automatically be timed-out after 1 hour in-case it does not fill.\n\n- Press button again to leave the squad, or you can press \'Leave all\'\n\n- You will be notified in DMs when squad fills.\n\n- For any queries or bugs, use <#1003269491163148318>',
-                    footer: {
-                        text: 'Note: The squads may take a few seconds to update due to API rate limiting. Your request should be recorded immediately so do not spam'
-                    },
+                    description: '- Click on the button to join a squad. Click again to leave; or click Leave All\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads have a 1 hour time-out\n\n- Ask anything in <#914990518558134292>. For any queries or bugs, use <#1003269491163148318>\n\n- Donate to Softy directly: https://www.allsquads.com/supportsofty',
                     color: '#ffffff'
                 }] : [],
                 components: components[index] ? components[index] : []
