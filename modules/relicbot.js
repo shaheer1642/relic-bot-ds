@@ -486,7 +486,8 @@ function rb_add_server(guild_id) {
                                             db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads_nv.id}', '${msg_type}', '${relic_squads_nv_wh.url}')`)
                                         }).catch(console.error)
                                     })
-                                    setTimeout(edit_recruitment_intro, 10000);
+                                    setTimeout(assign_global_variables, 10000);
+                                    setTimeout(edit_recruitment_intro, 15000);
                                     resolve({id: relic_squads.id})
                                 }).catch(err => reject(err))
                             }).catch(err => reject(err))
