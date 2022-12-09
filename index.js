@@ -33,6 +33,7 @@ const botv_guild_id = '776804537095684108'
 const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
 require('./modules/trackers.js');
+ require('./modules/wfhub_get_started.js');
 
 // restart after 24.5h
 setTimeout(() => {
