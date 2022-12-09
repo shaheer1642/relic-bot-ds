@@ -3,13 +3,11 @@ const { WebhookClient } = require('discord.js');
 
 client.on('ready', () => {
     console.log('client online')
-    //fetchWebhooks('892006071030403072')
-    //fetchWebhooks('1041319859469955073')
-    sendMsgWebhook('1050526671234670634', '_ _')
-    sendMsgWebhook('1050526671234670634', '_ _')
-    sendMsgWebhook('1050526671234670634', '_ _')
-    sendMsgWebhook('1050526671234670634', '_ _')
-    sendMsgWebhook('1050526671234670634', '_ _')
+    //fetchWebhooks('1050484747735924736')
+    sendMsgWebhook('1050488022132596807','_ _')
+    sendMsgWebhook('1050488022132596807','_ _')
+    sendMsgWebhook('1050488022132596807','_ _')
+    sendMsgWebhook('1050488022132596807','_ _')
 })
 
 function sendMsgWebhook(webhook_id, msg) {

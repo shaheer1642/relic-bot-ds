@@ -17,10 +17,10 @@ const channel_ids = {
 
 const message_ids = {
     challenges: {
-        faq: '1050488383459307531',
-        leaderboard: '1050488385724219432',
-        deal: '1050488387204821057',
-        challenges: '1050488389251633223',
+        faq: '1050766242497175562',
+        leaderboard: '1050766244451733504',
+        deal: '1050766246301409330',
+        challenges: '1050766248612479056',
     }
 }
 
