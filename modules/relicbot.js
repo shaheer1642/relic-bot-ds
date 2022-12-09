@@ -33,7 +33,6 @@ const emote_ids = {
 
 client.on('ready', async () => {
     assign_global_variables().then(() => {
-        console.log('assign_global_variables', webhook_messages, webhooks_list,channels_list)
         edit_recruitment_intro()
         edit_leaderboard()
         setInterval(edit_leaderboard, 900000);
@@ -319,7 +318,10 @@ var timeout_edit_webhook_messages_reset = {
     neo: null,
     axi: null,
 }
+
+var edit_webhook_messages_time_since_last_call = 0
 function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, single_channel_id) {
+    edit_webhook_messages_time_since_last_call = new Date().getTime()
     clearTimeout(timeout_edit_webhook_messages[tier])
     timeout_edit_webhook_messages[tier] = setTimeout(() => {
         const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
@@ -328,7 +330,7 @@ function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, sin
             if (!single_channel_id || single_channel_id == msg.c_id)
                 new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
         })
-    }, 500)
+    }, new Date().getTime() - edit_webhook_messages_time_since_last_call > 1000 ? 0 : 500)
     clearTimeout(timeout_edit_webhook_messages_reset[tier])
     timeout_edit_webhook_messages_reset[tier] = setTimeout(() => {
         const msg_payload_vaulted = embed(squads,tier,null,null,true)
@@ -826,7 +828,7 @@ async function fissures_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
         console.log('[relicbot] received fissures')
-        const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures;
+        const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
         
         if (!fissures) {
             console.log('Fissures check: no data available')
@@ -836,76 +838,74 @@ async function fissures_check() {
             return
         }
 
-        var fissures_list = {normal: [], steelPath: []}
-        var min_expiry = new Date().getTime() + 3600000
+        var fissures_list = []
+        var min_expiry = Infinity
+        var expiries = {}
         fissures.forEach(fissure => {
+            if (fissure.tier == 'Requiem') return
+            if (fissure.isStorm) return
             var expiry = new Date(fissure.expiry).getTime()
             if ((expiry - new Date().getTime()) > 0) {
-                if (expiry < min_expiry)
-                    min_expiry = expiry
-                if (fissure.isHard) 
-                    fissures_list.steelPath.push(fissure)
-                else if (!fissure.isHard && !fissure.isStorm) 
-                    fissures_list.normal.push(fissure)
+                if (expiry < min_expiry) min_expiry = expiry
+                const key = `${fissure.tier}${fissure.isHard ? '_SP':''}`
+                if (!expiries[key]) expiries[key] = 0
+                if (expiry > expiries[key]) expiries[key] = expiry
+                if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
+                    fissures_list.push(fissure)
+                }
             }
         })
-        fissures_list.normal.sort(dynamicSort("tierNum"))
-        fissures_list.steelPath.sort(dynamicSort("tierNum"))
+        console.log('expiries',expiries)
 
-        var embed1 = {
-            title: "Fissures",
-            fields: [{
-                name: "Tier",
-                value: "",
-                inline: true
-            },{
-                name: "Mission",
-                value: "",
-                inline: true
-            },{
-                name: "Expires",
-                value: "",
-                inline: true
-            }],
-            color: 'WHITE'
-        }
-        var embed2 = {
-            title: "Steel Path Fissures",
-            fields: [{
-                name: "Tier",
-                value: "",
-                inline: true
-            },{
-                name: "Mission",
-                value: "",
-                inline: true
-            },{
-                name: "Expires",
-                value: "",
-                inline: true
-            }],
-            color: 'WHITE'
+        const payload = {
+            content: ' ',
+            embeds: [{
+                title: "Fissures",
+                description: fissures_list.length == 0 ? 'No good fissures at the time <:kekmask:935214374933659741>' : '',
+                fields: fissures_list.length == 0 ? [] : [{
+                    name: "Tier",
+                    value: "\u200b",
+                    inline: true
+                },{
+                    name: "Mission",
+                    value: "\u200b",
+                    inline: true
+                },{
+                    name: "Expires",
+                    value: "\u200b",
+                    inline: true
+                },{
+                    name: "Next Reset",
+                    value: Object.keys(expiries).filter(e => !e.match('_SP')).map(key => `\`${key}\`: <t:${Math.round((expiries[key] - 180000)/1000)}:R>`).join('\n'),
+                    inline: true
+                },{
+                    name: "\u200b",
+                    value: Object.keys(expiries).filter(e => e.match('_SP')).map(key => `${emote_ids.steel_essence} \`${key.replace('_SP','')}\`: <t:${Math.round((expiries[key] - 180000)/1000)}:R>`).join('\n'),
+                    inline: true
+                }],
+                color: 'WHITE'
+            }]
         }
 
-        fissures_list.normal.forEach(fissure => {
-            embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
-            embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
-            embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+        fissures_list.forEach(fissure => {
+            if (fissure.isHard) return
+            payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
+            payload.embeds[0].fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+            payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
         })
-        fissures_list.steelPath.forEach(fissure => {
-            embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
-            embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
-            embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+        payload.embeds[0].fields[0].value += `\n`
+        payload.embeds[0].fields[1].value += `\n`
+        payload.embeds[0].fields[2].value += `\n`
+        fissures_list.forEach(fissure => {
+            if (!fissure.isHard) return
+            payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
+            payload.embeds[0].fields[1].value += `${emote_ids.steel_essence} ${fissure.missionType} - ${fissure.node}\n`
+            payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
         })
-
-        console.log(webhook_messages)
 
         webhook_messages.fissures?.forEach(msg => {
             console.log(msg)
-            new WebhookClient({url: msg.url}).editMessage(msg.m_id, {
-                content: ' ',
-                embeds: [embed1, embed2]
-            }).catch(console.error)
+            new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
         })
 
         var timer = min_expiry - new Date().getTime()
