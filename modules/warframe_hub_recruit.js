@@ -9,7 +9,7 @@ var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to p
 
 const guild_id = '865904902941048862'
 const recruit_channel_id = '1041319859469955073'
-const webhook_messages = ['1050528676011315281','1050528677672255601','1050528679605841941','1050528681258397777','1050528682906746910']
+const webhook_messages = ['1050763642729152603','1050763644356526131','1050763646139121704','1050763648127209552','1050763649972703252']
 var webhook_client;
 
 const server_commands_perms = [
