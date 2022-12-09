@@ -1,6 +1,6 @@
-const {client} = require('./modules/discord_client.js');
+const {client} = require('./discord_client.js');
 const { WebhookClient } = require('discord.js');
-const { db } = require('./modules/db_connection.js');
+const { db } = require('./db_connection.js');
 const {socket} = require('./socket')
 
 var default_squads = [{
