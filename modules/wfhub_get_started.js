@@ -54,7 +54,7 @@ function relicbotembed(show_members, show_members_for_squad) {
             title: 'Axi',
             fields: squads.map(squad => ({
                 name: squad.name,
-                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `${users_list[id].ingame_name}`).join('\n'):squad.members.length > 2 ? '🔥':'\u200b',
+                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `${users_list[id]?.ingame_name || 'tenno'}`).join('\n'):squad.members.length > 2 ? '🔥':'\u200b',
                 inline: true
             }))
         }],
@@ -187,7 +187,7 @@ function openSquadRelicBot(squad) {
         thread.send({
             content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
             embeds: [{
-                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`
+                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name || 'tenno').join('\n/invite ').replace(/_/g, '\_')}`
             }]
         }).then(() => {
             thread.send({
@@ -215,7 +215,7 @@ function openSquadSquadBot(squad) {
         thread.send({
             content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
             embeds: [{
-                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`
+                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name || 'tenno').join('\n/invite ').replace(/_/g, '\_')}`
             }]
         }).then(() => {
             thread.send({
