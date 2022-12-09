@@ -34,9 +34,4 @@ const get_started_cnl_id = '890197385651838977'
 
 client.on('ready', async () => {
     console.log('client online')
-    rb_webhook = await client.fetchWebhook(rb_wh_id).catch(console.error)
-    sb_webhook = await client.fetchWebhook(sb_wh_id).catch(console.error)
-    setTimeout(() => {
-        rb_webhook?.editMessage(rb_msg_id, 'test')
-    }, 3000);
 })
