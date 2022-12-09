@@ -1,3 +1,4 @@
 {
-    "ext": "js,html,css"
+    "ext": "js,html,css",
+    "ignore": ["./test.js"] 
 }

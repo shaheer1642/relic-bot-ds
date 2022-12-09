@@ -5,6 +5,9 @@ const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
+const WorldState = require('warframe-worldstate-parser');
+const axios = require('axios');
+const axiosRetry = require('axios-retry');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -30,9 +33,11 @@ const emote_ids = {
 
 client.on('ready', async () => {
     assign_global_variables().then(() => {
+        console.log('assign_global_variables', webhook_messages, webhooks_list,channels_list)
         edit_recruitment_intro()
         edit_leaderboard()
         setInterval(edit_leaderboard, 900000);
+        fissures_check()
     }).catch(console.error)
     update_users_list()
 })
@@ -62,7 +67,7 @@ function edit_leaderboard() {
         }
         console.log(JSON.stringify(payload))
         if (res.code == 200) {
-            new WebhookClient({url: webhooks_list['892006071030403072']}).editMessage('1048634340579475466', payload).catch(console.error)
+            client.fetchWebhook('1048633229571276841').then(wh => wh.editMessage('1048634340579475466', payload).catch(console.error)).catch(console.error)
         }
     })
 }
@@ -464,20 +469,22 @@ function rb_add_server(guild_id) {
                                     INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads.id}','${relic_squads_wh.url}','${guild_id}','relics_vaulted',${new Date().getTime()});
                                     INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads_nv.id}','${relic_squads_nv_wh.url}','${guild_id}','relics_non_vaulted',${new Date().getTime()});
                                 `).then(() => {
-                                    ['1','2','3','4','5'].forEach((val,index) => {
+                                    ['1','2','3','4','5','6'].forEach((val,index) => {
                                         var msg_type;
                                         if (index == 0) msg_type = 'recruitment_intro'
-                                        if (index == 1) msg_type = 'lith_squads'
-                                        if (index == 2) msg_type = 'meso_squads'
-                                        if (index == 3) msg_type = 'neo_squads'
-                                        if (index == 4) msg_type = 'axi_squads'
-                                        relic_squads_wh.send('--').then(res => {
+                                        if (index == 1) msg_type = 'fissures'
+                                        if (index == 2) msg_type = 'lith_squads'
+                                        if (index == 3) msg_type = 'meso_squads'
+                                        if (index == 4) msg_type = 'neo_squads'
+                                        if (index == 5) msg_type = 'axi_squads'
+                                        relic_squads_wh.send('_ _').then(res => {
                                             db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads.id}', '${msg_type}', '${relic_squads_wh.url}')`)
                                         }).catch(console.error)
-                                        relic_squads_nv_wh.send('--').then(res => {
+                                        relic_squads_nv_wh.send('_ _').then(res => {
                                             db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads_nv.id}', '${msg_type}', '${relic_squads_nv_wh.url}')`)
                                         }).catch(console.error)
                                     })
+                                    setTimeout(edit_recruitment_intro(), 10000);
                                     resolve({id: relic_squads.id})
                                 }).catch(err => reject(err))
                             }).catch(err => reject(err))
@@ -810,6 +817,106 @@ function constructTrackersEmbed(trackers, ephemeral) {
         payload.embeds[0].fields[2].value += tracker.is_steelpath ? `${emote_ids.steel_essence} Steelpath` : tracker.is_railjack ? `${emote_ids.railjack} Railjack` : 'Normal' + '\n'
     })
     return payload
+}
+
+var fissuresTimer;
+async function fissures_check() {
+    console.log('[relicbot] fissures_check called')
+
+    axios('http://content.warframe.com/dynamic/worldState.php')
+    .then( worldstateData => {
+        console.log('[relicbot] received fissures')
+        const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures;
+        
+        if (!fissures) {
+            console.log('Fissures check: no data available')
+            var timer = 300000
+            fissuresTimer = setTimeout(fissures_check, timer)
+            console.log(`fissures_check reset in ${msToTime(timer)}`)
+            return
+        }
+
+        var fissures_list = {normal: [], steelPath: []}
+        var min_expiry = new Date().getTime() + 3600000
+        fissures.forEach(fissure => {
+            var expiry = new Date(fissure.expiry).getTime()
+            if ((expiry - new Date().getTime()) > 0) {
+                if (expiry < min_expiry)
+                    min_expiry = expiry
+                if (fissure.isHard) 
+                    fissures_list.steelPath.push(fissure)
+                else if (!fissure.isHard && !fissure.isStorm) 
+                    fissures_list.normal.push(fissure)
+            }
+        })
+        fissures_list.normal.sort(dynamicSort("tierNum"))
+        fissures_list.steelPath.sort(dynamicSort("tierNum"))
+
+        var embed1 = {
+            title: "Fissures",
+            fields: [{
+                name: "Tier",
+                value: "",
+                inline: true
+            },{
+                name: "Mission",
+                value: "",
+                inline: true
+            },{
+                name: "Expires",
+                value: "",
+                inline: true
+            }],
+            color: 'WHITE'
+        }
+        var embed2 = {
+            title: "Steel Path Fissures",
+            fields: [{
+                name: "Tier",
+                value: "",
+                inline: true
+            },{
+                name: "Mission",
+                value: "",
+                inline: true
+            },{
+                name: "Expires",
+                value: "",
+                inline: true
+            }],
+            color: 'WHITE'
+        }
+
+        fissures_list.normal.forEach(fissure => {
+            embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+            embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+            embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+        })
+        fissures_list.steelPath.forEach(fissure => {
+            embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+            embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+            embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+        })
+
+        console.log(webhook_messages)
+
+        webhook_messages.fissures?.forEach(msg => {
+            console.log(msg)
+            new WebhookClient({url: msg.url}).editMessage(msg.m_id, {
+                content: ' ',
+                embeds: [embed1, embed2]
+            }).catch(console.error)
+        })
+
+        var timer = min_expiry - new Date().getTime()
+        if (timer > 180000) timer -= 180000  // check 3 min before for reset
+        fissuresTimer = setTimeout(fissures_check, timer)
+        console.log('fissures_check invokes in ' + msToTime(timer))
+        return
+    }).catch(err => {
+        console.log(err)
+        fissuresTimer = setTimeout(fissures_check,5000)
+    })
 }
 
 module.exports = {
