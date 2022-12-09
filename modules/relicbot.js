@@ -321,7 +321,6 @@ var timeout_edit_webhook_messages_reset = {
 
 var edit_webhook_messages_time_since_last_call = 0
 function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, single_channel_id) {
-    edit_webhook_messages_time_since_last_call = new Date().getTime()
     clearTimeout(timeout_edit_webhook_messages[tier])
     timeout_edit_webhook_messages[tier] = setTimeout(() => {
         const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
@@ -342,6 +341,7 @@ function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, sin
                 new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
         })
     }, 3000);
+    edit_webhook_messages_time_since_last_call = new Date().getTime()
 }
 
 function assign_global_variables() {
@@ -696,7 +696,8 @@ function error_codes_embed(response,discord_id) {
                     style: 1,
                     custom_id: `tb_verify`
                 }]
-            }]
+            }],
+            ephemeral: true
         }
     } else if (response.code == 399) {
         return {
@@ -718,7 +719,8 @@ function error_codes_embed(response,discord_id) {
                     style: 1,
                     custom_id: `rb_sq_merge_false$${response.squad_code}`
                 }]
-            }]
+            }],
+            ephemeral: true
         }
     } else if (response.code == 299) {
         return {
@@ -726,7 +728,8 @@ function error_codes_embed(response,discord_id) {
             embeds: [{
                 description: `<@${discord_id}> ${response.message}`,
                 color: 'GREEN'
-            }]
+            }],
+            ephemeral: true
         }
     } else {
         return {
@@ -734,7 +737,8 @@ function error_codes_embed(response,discord_id) {
             embeds: [{
                 description: `<@${discord_id}> ${response.message || response.err || response.error || 'error'}`,
                 color: 'RED'
-            }]
+            }],
+            ephemeral: true
         }
     }
 }

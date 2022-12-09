@@ -1,6 +1,7 @@
 const {client} = require('./modules/discord_client.js');
 const { WebhookClient } = require('discord.js');
 const { db } = require('./modules/db_connection.js');
+const {socket} = require('./socket')
 
 var default_squads = [{
     id: 'v8_4b4_rad',
@@ -26,6 +27,8 @@ var default_sb_squads = [{
 }]
 var sb_squads = JSON.parse(JSON.stringify(default_sb_squads))
 
+var rb_webhook;
+var sb_webhook;
 const rb_wh_id = '1050767806595088455'
 const sb_wh_id = '1050767812609712219'
 const rb_msg_id = '1050768010576679032'
@@ -35,15 +38,11 @@ const get_started_cnl_id = '890197385651838977'
 const test_complete = {}
 
 client.on('ready', () => {
-    console.log('client online')
     update_users_list()
-    //fetchWebhooks('1050484747735924736')
-    if (true) {
-        editSquadMsgRelicBot(false)
-    }
-    if (true) {
-        editSquadMsgSquadBot()
-    }
+    editSquadMsgRelicBot(false)
+    editSquadMsgSquadBot()
+    rb_webhook = client.fetchWebhook(rb_wh_id).catch(console.error)
+    sb_webhook = client.fetchWebhook(sb_wh_id).catch(console.error)
 })
 
 function relicbotembed(show_members, show_members_for_squad) {
@@ -124,11 +123,11 @@ function editSquadMsgRelicBot(show_members, show_members_for_squad) {
     timeSinceLastCall = new Date().getTime()
     clearTimeout(editSquadMsgRelicBotTimeout1)
     editSquadMsgRelicBotTimeout1 = setTimeout(() => {
-        editMsgWebhook(rb_wh_id, rb_msg_id, relicbotembed(show_members, show_members_for_squad))
+        rb_webhook?.editMessage(rb_msg_id, relicbotembed(show_members, show_members_for_squad))
     }, timeout);
     clearTimeout(editSquadMsgRelicBotTimeout2)
     editSquadMsgRelicBotTimeout2 = setTimeout(() => {
-        editMsgWebhook(rb_wh_id, rb_msg_id, relicbotembed(false))
+        rb_webhook?.editMessage(rb_msg_id, relicbotembed(false))
     }, 3000);
 }
 
@@ -139,7 +138,7 @@ function editSquadMsgSquadBot(show_members, show_members_for_squad) {
     timeSinceLastCallSquad = new Date().getTime()
     clearTimeout(editSquadMsgSquadBotTimeout1)
     editSquadMsgSquadBotTimeout1 = setTimeout(() => {
-        editMsgWebhook(sb_wh_id, sb_msg_id, squadbotembed())
+        sb_webhook?.editMessage(sb_msg_id, squadbotembed())
     }, timeout);
 }
 
@@ -256,30 +255,6 @@ async function verifyTestComplete(discord_id, verify_for) {
     }
 }
 
-function sendMsgWebhook(webhook_id, msg) {
-    client.fetchWebhook(webhook_id).then(wh => {
-        wh.send(msg).catch(console.error)
-    }).catch(console.error)
-}
-
-function editMsgWebhook(webhook_id, msg_id, msg) {
-    client.fetchWebhook(webhook_id).then(wh => {
-        wh.editMessage(msg_id, msg).catch(console.error)
-    }).catch(console.error)
-}
-
-function fetchWebhooks(channel_id) {
-    client.channels.cache.get(channel_id).fetchWebhooks().then(whs => {
-        console.log(whs)
-    }).catch(console.error)
-}
-
-function createWebhook(channel_id, name, avatar) {
-    client.channels.cache.get(channel_id).createWebhook(name, {avatar: avatar}).then(wh => {
-        console.log(wh)
-    }).catch(console.error)
-}
-
 var users_list = {}
 function update_users_list() {
     db.query(`SELECT * FROM tradebot_users_list`)
@@ -290,9 +265,7 @@ function update_users_list() {
     }).catch(console.error)
 }
 
-/*
 socket.on('tradebotUsersUpdated', (payload) => {
     console.log('[relicbot] tradebotUsersUpdated')
     update_users_list()
 })
-*/
