@@ -574,7 +574,7 @@ function open_squad(squad) {
         try {
             thread.send({content: msg.trim(), embeds: [{
                 title: squad.name,
-                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${users_list[userId].ingame_name}`).join('\n').replace(/_/g, '\_')}`,
+                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${users_list[userId]?.ingame_name}`).join('\n').replace(/_/g, '\_')}`,
                 color: '#ffffff'
             }]}).catch(err => console.log(err))
         } catch (e) {
