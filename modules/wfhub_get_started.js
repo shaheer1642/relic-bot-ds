@@ -6,11 +6,11 @@ const {socket} = require('./socket')
 var default_squads = [{
     id: 'v8_4b4_rad',
     name: 'V8 4b4 rad',
-    members: ['804072666192412702','739833841686020216','212952630350184449']
+    members: ['804072666192412702','892087497998348349','212952630350184449']
 },{
     id: 'e1_2b2_rad',
     name: 'E1 2b2 rad',
-    members: ['804072666192412702','739833841686020216']
+    members: ['804072666192412702','892087497998348349']
 }]
 var squads = JSON.parse(JSON.stringify(default_squads))
 
@@ -18,7 +18,7 @@ var default_sb_squads = [{
     id: 'eidolon',
     name: 'Eidolon Hunt',
     spots: 4,
-    members: ['804072666192412702','739833841686020216','212952630350184449']
+    members: ['804072666192412702','892087497998348349','212952630350184449']
 },{
     id: 'sanctuary_onslaught',
     name: 'Sanctuary Onslaught',
@@ -34,8 +34,6 @@ const sb_wh_id = '1050767812609712219'
 const rb_msg_id = '1051184251275575408'
 const sb_msg_id = '1051184255541198979'
 const get_started_cnl_id = '890197385651838977'
-
-const test_complete = {}
 
 client.on('ready', async () => {
     rb_webhook = await client.fetchWebhook(rb_wh_id).catch(console.error)
@@ -95,14 +93,12 @@ client.on('interactionCreate', async interaction => {
             interaction.deferUpdate().catch(console.error)
             editSquadMsgRelicBot(true)
         } else if (interaction.customId == 'getting_started_sandbox_complete_relicbot') {
-            await interaction.reply({
-                content: 'Great! Now try opening an Eidolon squad in <#890197385651838977>'
-            }).catch(console.error)
-            verifyTestComplete(interaction.user.id,'relic_bot')
+            interaction.deferUpdate().catch(console.error)
+            testComplete(interaction.user.id)
             if (interaction.channel.isThread()) interaction.channel.setArchived(true).catch(console.error)
         } else if (interaction.customId == 'getting_started_sandbox_complete_squadbot') {
             interaction.deferUpdate().catch(console.error)
-            verifyTestComplete(interaction.user.id,'squad_bot')
+            testComplete(interaction.user.id)
             if (interaction.channel.isThread()) interaction.channel.setArchived(true).catch(console.error)
         } else if (interaction.customId.match('sb_getting_started_sandbox_sq_')) {
             joinSquadSquadBot(interaction.customId, interaction.user.id)
@@ -233,23 +229,18 @@ function openSquadSquadBot(squad) {
     }).catch(console.error)
 }
 
-async function verifyTestComplete(discord_id, verify_for) {
-    if (!test_complete[discord_id]) test_complete[discord_id] = {relic_bot: false, squad_bot: false}
-    test_complete[discord_id][verify_for] = true
-    if (test_complete[discord_id].relic_bot && test_complete[discord_id].squad_bot) {
-        delete test_complete[discord_id]
-        const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
-        if (!guild) return
-        const member = guild.members.cache.get(discord_id) || await guild.members.fetch(discord_id).catch(console.error)
-        if (!member) return
-        const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-        if (!role) return
-        member.roles.add(role).catch(console.error)
-        client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard!\nUse channels <#1041319859469955073> <#1050717343040409630> to start recruiting`)
-        .then(msg => {
-            setTimeout(() => {
-                msg.delete().catch(console.error)
-            }, 30000);
-        }).catch(console.error)
-    }
+async function testComplete(discord_id) {
+    const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
+    if (!guild) return
+    const member = guild.members.cache.get(discord_id) || await guild.members.fetch(discord_id).catch(console.error)
+    if (!member) return
+    const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+    if (!role) return
+    member.roles.add(role).catch(console.error)
+    client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard!\nUse channels <#1041319859469955073> <#1050717343040409630> to start recruiting`)
+    .then(msg => {
+        setTimeout(() => {
+            msg.delete().catch(console.error)
+        }, 30000);
+    }).catch(console.error)
 }
