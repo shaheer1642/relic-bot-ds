@@ -8,6 +8,7 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, c
 const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
+const {event_emitter} = require('./event_emitter')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -609,6 +610,7 @@ socket.on('squadUpdate', (payload) => {
 })
 
 socket.on('relicbot/squads/opened', async (payload) => {
+    event_emitter.emit('relicbot_squad_filled',payload)
     console.log('[relicbot/squads/opened]',payload)
     const squad = payload
     const thread_ids = []

@@ -1,15 +1,12 @@
 const config = require('./config.json')
-const {MessageEmbed, WebhookClient} = require('discord.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const wfm_api = require('./modules/wfm_api.js');
 const test_modules = require('./modules/test_modules.js');
 const trade_bot_modules = require('./modules/trade_bot_modules.js');
-const ducat_updater = require('./modules/ducat_updater.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
-//const gpt3 = require('./modules/gpt3.js');
 const {pins_handler} = require('./modules/pins_handler.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
@@ -17,30 +14,23 @@ const hubapp = require('./modules/hubapp.js');
 const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
-const botv_recruit = require('./modules/botv_recruit.js');
-const warframe_hub_recruit = require('./modules/warframe_hub_recruit.js');
-const crud_server = require('./modules/crud_server.js');
-const botv_event_voting = require('./modules/botv_event_voting.js');
-const relicbot = require('./modules/relicbot.js');
+const relicbot = require('./modules/as_relicbot.js');
 const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
-const wfhub_daywave = require('./modules/wfhub_daywave.js');
-const wfrim = require('./modules/wfrim.js');
-const warframe_hub = require('./modules/warframe_hub');
 const osiris_guild_id = '905559118096531456'
-const botv_guild_id = '776804537095684108'
 const {client} = require('./modules/discord_client.js');
 require('./modules/gmail_client.js');
 require('./modules/trackers.js');
 require('./modules/wfhub_get_started.js');
+require('./modules/as_daywave.js');
+require('./modules/as_squadbot.js');
+require('./modules/allsquads.js');
 
 // restart after 24.5h
 setTimeout(() => {
     process.exit()
 }, 88200000);
-
-const ducatRolesMessageId = "899402069159608320"
 
 const defaultReactions = {
     check: {
@@ -116,29 +106,20 @@ client.on('ready', () => {
     inform_dc(`Bot has started.`)
 
     client.user.setActivity('.help', { type: 2 })
-
-    console.log('DEBUG_MODE: ' + process.env.DEBUG_MODE)
     
     deploy_commands.bot_initialize()
-
-    if (process.env.DEBUG_MODE==1)
-        return
 
     osiris_guild.bot_initialize()
     trade_bot_modules.bot_initialize()
     botv.bot_initialize()
-    botv_recruit.bot_initialize()
     osiris_tts.bot_initialize()
     osiris_guild.bot_initialize()
-    wfrim.bot_initialize()
     twitch_affiliate.bot_initialize()
-    botv_event_voting.bot_initialize()
     worldstatealerts.bot_initialize()
-    ducat_updater.bot_initialize()
 
     client.guilds.fetch().then(guilds => {
         guilds.forEach(guild => {
-            client.guilds.cache.get(guild.id).me.setNickname(process.env.MAINTENANCE_MODE == 1 ? 'Gauss Prime [Maintenance Mode]':'Gauss Prime').catch(console.error)
+            client.guilds.cache.get(guild.id).me.setNickname(`${client.guilds.cache.get(guild.id).me.displayName.replace(/\[Maintenance Mode\]/g,'').trim()}${process.env.MAINTENANCE_MODE == 1 ? ' [Maintenance Mode]':''}`).catch(console.error)
         })
     }).catch(console.error)
 })
@@ -173,20 +154,11 @@ client.on('messageCreate', async message => {
             osiris_guild.messageHandler(message).catch(err => console.log(err))
         }
 
-        if (message.guild.id == '967721532262580294') {
-            crud_server.message_create(message)
-        }
-        if (message.guild.id == '832677897411493949') {
-            crud_server.message_create(message)
-        }
-
-        if (message.channelId == '817828725701476403') botv_event_voting.message_handler(message)
-
         message.attachments.map(attachment => {
             attachment.url
         })
 
-        if (message.guild.id == botv_guild_id) {
+        if (message.guild.id == '776804537095684108') {
             botv.message_handler(message)
         }
         if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
@@ -368,67 +340,11 @@ client.on('messageCreate', async message => {
                 case 'updatedb':
                     db_modules.updateDB(message,args)
                     break
-                case 'getdb':
-                    db_modules.getDB(message,args)
-                    break
-                case 'bought':
-                    ducat_updater.bought(message,args)
-                    break
-                case 'update':
-                    ducat_updater.updateDucatForced(message,args)
-                    break
-                case 'baro':
-                    test_modules.baroArrival(message,args)
-                    break
-                case 'ducat_template':
-                    test_modules.ducat_template(message)
-                    break
-                case 'getmessage':
-                    test_modules.getMessage(message,args)
-                    break
                 case 'say':
                     test_modules.saySomething(message,args)
                     break
                 case 'launchnuke':
                     test_modules.launchNuke(message,args)
-                    break
-                case 'query':
-                    wfm_api.user_query(message,args)
-                    break
-                /*
-                case 'gpt3':
-                    gpt3.completion(message,args)
-                    break
-                case 'gpt3ans':
-                    gpt3.answer(message,args)
-                    break
-                case 'gpt3reset':
-                    gpt3.reset(message,args) 
-                    break
-                */
-                case 'graphic':
-                    test_modules.canvasTest(message,args)
-                    break
-                case 'sendmsg':
-                    test_modules.sendMessage(message,args)
-                    break
-                case 'senduet':
-                    test_modules.sendUet(message,args)
-                    break
-                case 'qnafaq':
-                    test_modules.qnaFaq(message,args)
-                    break
-                case 'tbcommands':
-                    test_modules.tbcommandslist(message,args)
-                    break
-                case 'tbfulltut':
-                    test_modules.tbFullTutorial(message,args)
-                    break
-                case 'react':
-                    test_modules.react(message,args)
-                    break
-                case 'edit':
-                    test_modules.edit(message,args)
                     break
                 case 'wssetup':
                     worldstatealerts.wssetup(message,args)
@@ -436,16 +352,10 @@ client.on('messageCreate', async message => {
                 case 'getserverstats':
                     discord_server_modules.computeServerStats(message,args)
                     break
-                case 'getpoints': 
-                    botv_event_voting.calculate_votes(message)
-                    break
                 case 'viewhiatus': 
                     botv.getHiatusMembers(message)
                     break
                 ///*----------------------
-                case 'test':
-                    botv_recruit.edit_main_msg(message,args)
-                    break
                 case 'restart':
                     if (message.author.id == '253525146923433984') {
                         console.log('restarting bot upon discord user request',message.author.id)
@@ -470,9 +380,6 @@ client.on('messageCreate', async message => {
 })
 
 client.on("messageUpdate", async function(oldMessage, newMessage) {
-    if (process.env.DEBUG_MODE==1)
-        return
-
     if (newMessage.guildId == "776804537095684108") 
         botv.messageUpdate(oldMessage, newMessage)
 
@@ -480,160 +387,9 @@ client.on("messageUpdate", async function(oldMessage, newMessage) {
         hubapp.message_update(newMessage)
 });
 
-client.on('presenceUpdate', async (oldMember,newMember) => {
-    if (process.env.DEBUG_MODE==1)
-        return
-
-    if (newMember.member)
-        if (newMember.member.guild)
-            if (trade_bot_modules.tradingBotGuilds.includes(newMember.member.guild.id)) {
-                if (!newMember.member.presence.status || newMember.member.presence.status == 'offline') {
-                    await offline_orders_update(newMember).catch(err => console.log(err))
-                }
-                return
-
-                async function offline_orders_update(newMember) {
-                    var user_data = null
-                    var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${newMember.user.id}`)
-                    .then(res => {
-                        if (res.rows.length == 0) {     //user does not exist in the db
-                            console.log('User does not exist in db')
-                            return false
-                        }
-                        if (res.rows.length > 1) {     //unexpected response
-                            console.log('Unexpected db response')
-                            return false
-                        }
-                        user_data = res.rows[0]
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                    if (!status)
-                        return Promise.resolve()
-                    db.query(`SELECT * FROM tradebot_users_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                    .then(res => {
-                        if (res.rows.length == 0) {     //no visible orders at the time
-                            console.log('No visible items orders at the time')
-                            return
-                        }
-                        else if (res.rows.length > 0) {     //visible orders found
-                            var orders_list = res.rows
-                            db.query(`UPDATE tradebot_users_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                            .then(async res => {
-                                if (res.rowCount == 0)
-                                    return
-                                var all_orders_names = []
-                                for (var i=0;i<orders_list.length;i++) {
-                                    var item_id = orders_list[i].item_id
-                                    var item_rank = orders_list[i].user_rank
-                                    console.log(JSON.stringify(orders_list))
-                                    await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-                                    .then(async res => {
-                                        if (res.rows.length==0) { //unexpected response 
-                                            console.log('Unexpected db response fetching item info')
-                                            return
-                                        }
-                                        if (res.rows.length>1) { //unexpected response
-                                            console.log('Unexpected db response fetching item info')
-                                            return
-                                        }
-                                        var item_url = res.rows[0].item_url
-                                        var item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + item_rank.replace('unranked','').replace('maxed',' (maxed)')
-                                        await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2,item_rank)
-                                        .then(() => {
-                                            all_orders_names.push(item_name + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
-                                        })
-                                        .catch(err => console.log(err))
-                                    })
-                                    .catch(err => console.log(err))
-                                }
-                                var postdata = {}
-                                postdata.content = " "
-                                postdata.embeds = []
-                                postdata.embeds.push({
-                                    description: `
-                                    ❕ Offline Notification ❕\n
-                                    You have been detected offline. Following orders have been set invisible for you:\n
-                                    ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                                    timestamp: new Date(),
-                                    color: '#FFFFFF'
-                                })
-                                if (user_data.notify_offline)
-                                    newMember.user.send(postdata).catch(err => console.log(err))
-                            })
-                            .catch(err => console.log(err))
-                        }
-                    })
-                    .catch(err => console.log(err))
-                    db.query(`SELECT * FROM tradebot_users_lich_orders WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                    .then(res => {
-                        if (res.rows.length == 0) {     //no visible orders at the time
-                            console.log('No visible lich orders at the time')
-                            return
-                        }
-                        else if (res.rows.length > 0) {     //visible orders found
-                            var orders_list = res.rows
-                            db.query(`UPDATE tradebot_users_lich_orders SET visibility = false WHERE discord_id = ${newMember.user.id} AND visibility = true`)
-                            .then(async res => {
-                                if (res.rowCount == 0)
-                                    return
-                                var all_orders_names = []
-                                for (var i=0;i<orders_list.length;i++) {
-                                    await db.query(`SELECT * FROM lich_list WHERE lich_id = '${orders_list[i].lich_id}'`)
-                                    .then(async res => {
-                                        if (res.rows.length==0) { //unexpected response 
-                                            console.log('Unexpected db response fetching lich info')
-                                            return
-                                        }
-                                        if (res.rows.length>1) { //unexpected response
-                                            console.log('Unexpected db response fetching lich info')
-                                            return
-                                        }
-                                        lich_info = res.rows[0]
-                                        await trade_bot_modules.trading_lich_orders_update(null,lich_info,2)
-                                        .then(() => {
-                                            all_orders_names.push(res.rows[0].weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()) + ' (' + orders_list[i].order_type.replace('wts','Sell').replace('wtb','Buy') + ' order)')
-                                        })
-                                        .catch(err => console.log(err))
-                                    })
-                                    .catch(err => console.log(err))
-                                }
-                                var postdata = {}
-                                postdata.content = " "
-                                postdata.embeds = []
-                                postdata.embeds.push({
-                                    description: `
-                                    ❕ Offline Notification ❕\n
-                                    You have been detected offline. Following orders have been set invisible for you:\n
-                                    ${'**' + all_orders_names.toString().replace(/,/g,'**\n**') + '**'}`,
-                                    footer: {text: `Type 'notifications' to disable these notifications in the future.\nType 'my orders' in trade channel to reactivate all your orders\n\u200b`},
-                                    timestamp: new Date(),
-                                    color: '#FFFFFF'
-                                })
-                                if (user_data.notify_offline)
-                                    newMember.user.send(postdata).catch(err => console.log(err))
-                            })
-                            .catch(err => console.log(err))
-                        }
-                    })
-                    .catch(err => console.log(err))
-                }
-            }
-    return
-})
-
 client.on('interactionCreate', async interaction => {
 
     worldstatealerts.interaction_handler(interaction)
-    
-    if (interaction.channelId == '950400363410915348') {
-        botv_recruit.interactionHandler(interaction);
-        return
-    }
 
     if (interaction.channelId == '996418373137219595') {
         osiris_tts.interactionHandler(interaction);
@@ -1405,10 +1161,6 @@ client.on('shardError', error => {
 });
 
 client.on('messageDelete', async message => {
-    
-    if (process.env.DEBUG_MODE==1)
-        return
-
     if (Object.keys(hubapp.channel_ids).includes(message.channel.id))
         hubapp.message_delete(message)
 
@@ -1546,9 +1298,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-    if (reaction.message.channel.id == '817828725701476403') 
-        botv_event_voting.reaction_handler(reaction, user, 'add')
-
     if (reaction.message.guildId == osiris_guild_id)
         osiris_guild.reactionAddHandler(reaction,user).catch(err => console.log(err))
 
@@ -1660,76 +1409,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }, 30000);
         return
     }
-
-    if (reaction.emoji.name == "⭐") {
-        if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id != ducatRolesMessageId)
-            return
-        const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-1')
-        reaction.message.guild.members.cache.get(user.id).roles.add(role)
-        .then (response => {
-            console.log(JSON.stringify(response))
-            user.send('Role ' + role.name + ' Added.').catch(err => console.log(err));
-        })
-        .catch(function (error) {
-            user.send('Error occured assigning role. Please try again.\nError Code: 500').catch(err => console.log(err));
-        })
-    }
-    
-    if (reaction.emoji.name == "💎") {
-        if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id != ducatRolesMessageId)
-            return
-        const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-2')
-        reaction.message.guild.members.cache.get(user.id).roles.add(role)
-        .then (response => {
-            console.log(JSON.stringify(response))
-            user.send('Role ' + role.name + ' Added.').catch(err => console.log(err));
-        })
-        .catch(function (error) {
-            user.send('Error occured assigning role. Please try again.\nError Code: 500').catch(err => console.log(err));
-        })
-    }
-
-    if (reaction.emoji.name == "🔴") {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id == ducatRolesMessageId) {
-            await db.query(`UPDATE ducat_users_details SET dnd = true WHERE discord_id = ${user.id}`)
-            .then(async res => {
-                if (res.rowCount == 0) {
-                    await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},true)`).catch(err => console.log(err))
-                }
-            })
-            .catch(err => console.log(err))
-            return
-        }
-    }
-
-    if (reaction.emoji.name == "🟣") {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id == ducatRolesMessageId) {
-            await db.query(`UPDATE ducat_users_details SET invis = true WHERE discord_id = ${user.id}`)
-            .then(async res => {
-                if (res.rowCount == 0) {
-                    await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},true)`).catch(err => console.log(err))
-                }
-            })
-            .catch(err => console.log(err))
-            return
-        }
-    }
     
     if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
         worldstatealerts.setupReaction(reaction, user, "add")
@@ -1815,94 +1494,12 @@ client.on('messageReactionRemove', async (reaction, user) => {
     if (reaction.message.guildId == '776804537095684108')
         botv.reaction_handler(reaction,user,'remove')
 
-    if (reaction.emoji.name == "⭐") {
-        if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id != ducatRolesMessageId)
-            return
-        const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-1')
-        reaction.message.guild.members.cache.get(user.id).roles.remove(role)
-        .then (response => {
-            console.log(JSON.stringify(response))
-            user.send('Role ' + role.name + ' Removed.')
-            .catch(err => console.log(err));
-        })
-        .catch(function (error) {
-            user.send('Error occured removing role. Please try again.\nError Code: 500')
-            .catch(err => console.log(err));
-        })
-    }
-    
-    if (reaction.emoji.name == "💎") {
-        if (!reaction.message.author)
-            var fetch = await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id != ducatRolesMessageId)
-            return
-        const role = reaction.message.guild.roles.cache.find(role => role.name === 'Ducats-2')
-        reaction.message.guild.members.cache.get(user.id).roles.remove(role)
-        .then (response => {
-            console.log(JSON.stringify(response))
-            user.send('Role ' + role.name + ' Removed.')
-            .catch(err => console.log(err));
-        })
-        .catch(function (error) {
-            user.send('Error occured removing role. Please try again.\nError Code: 500')
-            .catch(err => console.log(err));
-        })
-    }
-
-    if (reaction.emoji.name == "🔴") {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id == ducatRolesMessageId) {
-            await db.query(`UPDATE ducat_users_details SET dnd = false WHERE discord_id = ${user.id}`)
-            .then(async res => {
-                if (res.rowCount == 0) {
-                    await db.query(`INSERT INTO ducat_users_details (discord_id,dnd) VALUES (${user.id},false)`).catch(err => console.log(err))
-                }
-            })
-            .catch(err => console.log(err))
-            return
-        }
-    }
-
-    if (reaction.emoji.name == "🟣") {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id != client.user.id)
-            return
-        if (reaction.message.id == ducatRolesMessageId) {
-            await db.query(`UPDATE ducat_users_details SET invis = false WHERE discord_id = ${user.id}`)
-            .then(async res => {
-                if (res.rowCount == 0) {
-                    await db.query(`INSERT INTO ducat_users_details (discord_id,invis) VALUES (${user.id},false)`).catch(err => console.log(err))
-                }
-            })
-            .catch(err => console.log(err))
-            return
-        }
-    }
-
     if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
         worldstatealerts.setupReaction(reaction, user, "remove")
     }
 });
 
-client.on('guildMemberAdd', async member => {
-    if (process.env.DEBUG_MODE==1)
-        return
-});
-
 client.on('threadUpdate', async (oldThread,newThread) => {
-    if (process.env.DEBUG_MODE==1)
-        return
-
     if (newThread.archived) {
         if (newThread.ownerId != client.user.id)
             return
@@ -1918,53 +1515,6 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
         botv.guildMemberUpdate(oldMember, newMember)
 })
 
-//process shutdown handles
-
-/*
-process
-  .on('SIGTERM', procshutdown('SIGTERM'))
-  .on('SIGINT', procshutdown('SIGINT'))
-  .on('uncaughtException', procshutdown('uncaughtException'));
-*/
-function procshutdown(signal) {
-    /*
-    const downtimeInform = [
-        '891756819045826621',
-        '899290597259640853',
-        '892160436881993758',
-        '892003772698611723',
-        '893133821313187881',
-        '892108718358007820',
-        '906555131254956042',
-        '892843163851563009'
-    ]
-    */
-    const downtimeInform = ['891756819045826621','892160436881993758']
-    return (err) => {
-        console.log(`${ signal }...`);
-        if (err) {
-            console.error(err)
-            if (err.code == '57P01') {
-                console.log('----DATABASE DISCONNECTION----')
-                process.exit(err ? 1 : 0);
-            }
-        };
-        if (process.env.DEBUG_MODE != 1) {
-            downtimeInform.forEach(channel => {
-                client.channels.cache.get(channel).send(`Bot process was terminated on signal ${signal}, please expect a brief downtime`)
-                .then(res => {
-                    db.query(`INSERT INTO process_terminate_flush (channel_id,msg_id) VALUES (${res.channelId},${res.id})`).catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            })
-        }
-        else 
-            process.exit(err ? 1 : 0);
-        setTimeout(() => {
-          console.log('...waited 15s, exiting.');
-          process.exit(err ? 1 : 0);
-        }, 15000).unref();
-    };
-}
 
 axiosRetry(axios, {
     retries: 50, // number of retries

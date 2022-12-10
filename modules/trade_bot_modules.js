@@ -2566,11 +2566,9 @@ async function trading_bot_registeration(discord_id) {
             if (res.rows.length != 0)
                 postdata.content += 'Note: Your ign has already been verified. It will be updated upon re-verification\n'
             const uni_id = generateId()
-            db.query(`DELETE FROM tradebot_users_unverified where discord_id = ${discord_id}`)
-            .then(() => {
-                db.query(`INSERT INTO tradebot_users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
-                .then(res => {
-                    postdata.content += 
+            db.query(`INSERT INTO tradebot_users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
+            .then(res => {
+                postdata.content += 
 `**Please follow these steps to verify your account:**
 1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
 2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
@@ -2579,19 +2577,13 @@ Subject: **${uni_id}**
 Message: Hi
 4) Click 'Send' button
 5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`
-                    postdata.embeds.push({
-                        description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
-                    })
-                    resolve(postdata)
-                }).catch(err => {
-                    console.log(err)
-                    postdata.content = "Some error occured inserting record into db.\nError code: 502\nPlease contact MrSofty#7926"
-                    reject(postdata)
+                postdata.embeds.push({
+                    description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
                 })
-            })
-            .catch(err => {
+                resolve(postdata)
+            }).catch(err => {
                 console.log(err)
-                postdata.content = "Some error occured deleting record from db.\nError code: 501\nPlease contact MrSofty#7926"
+                postdata.content = "Some error occured inserting record into db.\nError code: 502\nPlease contact MrSofty#7926"
                 reject(postdata)
             })
         })

@@ -31,18 +31,17 @@ var rb_webhook;
 var sb_webhook;
 const rb_wh_id = '1050767806595088455'
 const sb_wh_id = '1050767812609712219'
-const rb_msg_id = '1050768010576679032'
-const sb_msg_id = '1050768011344232528'
+const rb_msg_id = '1051184251275575408'
+const sb_msg_id = '1051184255541198979'
 const get_started_cnl_id = '890197385651838977'
 
 const test_complete = {}
 
 client.on('ready', async () => {
-    update_users_list()
-    editSquadMsgRelicBot(false)
-    editSquadMsgSquadBot()
     rb_webhook = await client.fetchWebhook(rb_wh_id).catch(console.error)
     sb_webhook = await client.fetchWebhook(sb_wh_id).catch(console.error)
+    editSquadMsgRelicBot(false)
+    editSquadMsgSquadBot()
 })
 
 function relicbotembed(show_members, show_members_for_squad) {
@@ -54,7 +53,7 @@ function relicbotembed(show_members, show_members_for_squad) {
             title: 'Axi',
             fields: squads.map(squad => ({
                 name: squad.name,
-                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `${users_list[id]?.ingame_name || 'tenno'}`).join('\n'):squad.members.length > 2 ? '🔥':'\u200b',
+                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `<@${id}>`).join('\n'):squad.members.length > 2 ? '🔥':'\u200b',
                 inline: true
             }))
         }],
@@ -187,7 +186,7 @@ function openSquadRelicBot(squad) {
         thread.send({
             content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
             embeds: [{
-                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name || 'tenno').join('\n/invite ').replace(/_/g, '\_')}`
+                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => `<@${id}>`).join('\n/invite ').replace(/_/g, '\_')}`
             }]
         }).then(() => {
             thread.send({
@@ -215,7 +214,7 @@ function openSquadSquadBot(squad) {
         thread.send({
             content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
             embeds: [{
-                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name || 'tenno').join('\n/invite ').replace(/_/g, '\_')}`
+                description: `**${squad.name}**\n\n/invite ${squad.members.map(id => `<@${id}>`).join('\n/invite ').replace(/_/g, '\_')}`
             }]
         }).then(() => {
             thread.send({
@@ -254,18 +253,3 @@ async function verifyTestComplete(discord_id, verify_for) {
         }).catch(console.error)
     }
 }
-
-var users_list = {}
-function update_users_list() {
-    db.query(`SELECT * FROM tradebot_users_list`)
-    .then(res => {
-        res.rows.forEach(row => {
-            users_list[row.discord_id] = row
-        })
-    }).catch(console.error)
-}
-
-socket.on('tradebotUsersUpdated', (payload) => {
-    console.log('[relicbot] tradebotUsersUpdated')
-    update_users_list()
-})

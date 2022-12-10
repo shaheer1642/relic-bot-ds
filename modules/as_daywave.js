@@ -5,6 +5,7 @@ const fs = require('fs');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mod_log,ms_to_days_hours, ms_till_monday_12am} = require('./extras.js');
 const uuid = require('uuid');
 const JSONbig = require('json-bigint');
+const {event_emitter} = require('./event_emitter')
 
 var webhook_client;
 
@@ -23,6 +24,20 @@ const message_ids = {
         challenges: '1050766248612479056',
     }
 }
+
+event_emitter.on('relicbot_squad_filled',(squad) => {
+    verify_challenge_reliqiary(squad)
+    verify_challenge_relic_maniac(squad)
+})
+event_emitter.on('squadbot_squad_filled',(squad) => {
+    verify_challenge_squaddie(squad)
+    verify_challenge_allsquaddie(squad)
+    verify_challenge_archon_is_easy(squad)
+    verify_challenge_hydrolist_pro(squad)
+    verify_challenge_sortie_for_anasa(squad)
+    verify_challenge_helper(squad)
+    verify_challenge_credit_is_due(squad)
+})
 
 const message_formats = {
     challenges: {
@@ -43,7 +58,7 @@ const message_formats = {
                     inline: false
                 },{
                     name: 'What is RP?',
-                    value: 'RP stands for Rewards Points, which are credited to your account upon fulfilling challenges. You can use RP to:\n- Purchase the weekly deals including slots/orokins/forma bundle/prime sets\n- Gift RP to another server member [under development]',
+                    value: 'RP stands for Rewards Points, which are credited to your account upon fulfilling challenges. You can use RP to:\n- Purchase the weekly deals including orokins/slots\nYour points get saved for a coming giveaway system, where you can join with Daywave points to win all kinds of stuff!',
                     inline: false
                 },{
                     name: 'May I recommend a new challenge/deal?',
@@ -67,59 +82,117 @@ client.on('ready', async () => {
     edit_challenges_leaderboard_embed()
 })
 
-function verify_challenge_chatty(message) {
-    if (message.guild?.id == guild_id) {
-        if (message.channel.id == channel_ids.general) {
-            db.query(`
-                UPDATE challenges SET
-                progress = progress || CONCAT('{"${message.member.id}":', COALESCE(progress->>'${message.member.id}','0')::int + 1, '}')::jsonb
-                WHERE name = 'Chatty' AND is_active = true;
-            `).catch(console.error)
-        }
-    }
-}
-function verify_challenge_no_comment(reaction,user) {
-    if (reaction.message.guild.id == guild_id) {
-        db.query(`
-            UPDATE challenges SET
-            progress = progress || CONCAT('{"${user.id}":', COALESCE(progress->>'${user.id}','0')::int + 1, '}')::jsonb
-            WHERE name = 'No comment' AND is_active = true;
-        `).catch(console.error)
-        .catch(console.error)
-    }
-}
-async function verify_challenge_giveaway(embeds) {
-    const winners = embeds[0].description.split('Winners: ')[1].replace(/<@/g, '').replace(/>/g, '').split(',')
-    console.log('[verify_challenge_giveaway] ', embeds, winners)
-    var query = []
-    for (const winner_id of winners) {
-        query.push(`
-            UPDATE challenges SET
-            progress = progress || CONCAT('{"${winner_id}":', COALESCE(progress->>'${winner_id}','0')::int + 1, '}')::jsonb
-            WHERE name = 'Winner' AND is_active = true;
-        `)
-    }
-    db.query(query.join(' ')).catch(console.error)
-}
-async function verify_challenge_serviceman(squad) {
+/*----------verify challenges-----------*/
+
+function verify_challenge_squaddie(squad) {
     var query = []
     for (const user_id of squad.filled) {
         query.push(`
             UPDATE challenges SET
             progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
-            WHERE name = 'Serviceman' AND is_active = true;
+            WHERE name = 'Squaddie' AND is_active = true;
         `)
     }
     db.query(query.join(' ')).catch(console.error)
 }
-
-client.on('messageCreate', (message) => {
-    verify_challenge_chatty(message)
-})
-
-client.on('messageReactionAdd', (reaction,user) => {
-    verify_challenge_no_comment(reaction,user)
-})
+function verify_challenge_allsquaddie(squad) {
+    var query = []
+    for (const user_id of squad.filled) {
+        query.push(`
+            UPDATE challenges SET
+            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+            WHERE name = 'AllSquaddie' AND is_active = true;
+        `)
+    }
+    db.query(query.join(' ')).catch(console.error)
+}
+function verify_challenge_reliqiary(squad) {
+    var query = []
+    for (const user_id of squad.members) {
+        query.push(`
+            UPDATE challenges SET
+            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+            WHERE name = 'Reliqiary' AND is_active = true;
+        `)
+    }
+    db.query(query.join(' ')).catch(console.error)
+}
+function verify_challenge_relic_maniac(squad) {
+    var query = []
+    for (const user_id of squad.members) {
+        query.push(`
+            UPDATE challenges SET
+            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+            WHERE name = 'Relic Maniac' AND is_active = true;
+        `)
+    }
+    db.query(query.join(' ')).catch(console.error)
+}
+function verify_challenge_archon_is_easy(squad) {
+    if (squad.id == 'sq_archon_hunt') {
+        var query = []
+        for (const user_id of squad.filled) {
+            query.push(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Archon is Easy' AND is_active = true;
+            `)
+        }
+        db.query(query.join(' ')).catch(console.error)
+    }
+}
+function verify_challenge_hydrolist_pro(squad) {
+    if (squad.id == 'sq_eidolons') {
+        var query = []
+        for (const user_id of squad.filled) {
+            query.push(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Hydrolist Pro' AND is_active = true;
+            `)
+        }
+        db.query(query.join(' ')).catch(console.error)
+    }
+}
+function verify_challenge_sortie_for_anasa(squad) {
+    if (squad.id == 'sq_sortie') {
+        var query = []
+        for (const user_id of squad.filled) {
+            query.push(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Sortie for Anasa' AND is_active = true;
+            `)
+        }
+        db.query(query.join(' ')).catch(console.error)
+    }
+}
+function verify_challenge_helper(squad) {
+    if (squad.id == 'sq_taxi_help') {
+        var query = []
+        for (const user_id of squad.filled) {
+            query.push(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Helper' AND is_active = true;
+            `)
+        }
+        db.query(query.join(' ')).catch(console.error)
+    }
+}
+function verify_challenge_credit_is_due(squad) {
+    if (squad.id == 'sq_profit_taker' || squad.id == 'sq_index') {
+        var query = []
+        for (const user_id of squad.filled) {
+            query.push(`
+                UPDATE challenges SET
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                WHERE name = 'Credit is Due' AND is_active = true;
+            `)
+        }
+        db.query(query.join(' ')).catch(console.error)
+    }
+}
 
 client.on('interactionCreate', (interaction) => {
     if (interaction.guild.id == guild_id) {
@@ -454,7 +527,6 @@ function edit_challenges_embed() {
                 }]
             }
             challenges.forEach(challenge => {
-                if (!challenge.guild_ids.includes(guild_id)) return
                 var complete_count = 0
                 completed.forEach(user_challenge => {
                     if (user_challenge.activation_id == challenge.activation_id) complete_count++
@@ -554,13 +626,48 @@ function weekly_deals_reset() {
 db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
 
+    if (notification.channel == 'challenges_update') {
+        for (const discord_id in payload[0].progress) {
+            if ((payload[0].progress[discord_id] >= payload[0].completion_count) && ((!payload[1].progress[discord_id]) || (payload[1].progress[discord_id] < payload[0].progress[discord_id]))) {
+                db.query(`
+                    INSERT INTO challenges_completed
+                    (discord_id,challenge_id,activation_id,timestamp)
+                    VALUES (${discord_id},'${payload[0].challenge_id}','${payload[0].activation_id}',${new Date().getTime()});
+                `).catch(console.error)
+            }
+        }
+    }
+
     if (notification.channel == 'challenges_completed_insert') {
         edit_challenges_embed()
+        db.query(`SELECT * FROM challenges WHERE activation_id = '${payload.activation_id}'`)
+        .then(res => {
+            const challenge = res.rows[0]
+            db.query(`
+                INSERT INTO challenges_transactions
+                (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp)
+                VALUES ('${uuid.v4()}',${payload.discord_id},'challenge_completion','${challenge.activation_id}',${challenge.rp},'credit',${new Date().getTime()})
+            `).catch(console.error)
+        }).catch(console.error)
     }
 
     if (notification.channel == 'challenges_transactions_insert') {
         edit_deals_embed()
-        if (payload.type == 'weekly_deal_purchase' && payload.guild_id == guild_id) {
+        db.query(`
+            UPDATE challenges_accounts SET
+            balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
+            WHERE discord_id = ${payload.discord_id};
+        `).then(async res => {
+            if (res.rowCount == 0) {
+                await db.query(`
+                    INSERT INTO challenges_accounts
+                    (discord_id,balance)
+                    VALUES (${payload.discord_id},${payload.rp});
+                `).catch(console.error)
+            }
+            edit_challenges_leaderboard_embed()
+        }).catch(console.error)
+        if (payload.type == 'weekly_deal_purchase' && payload.guild_id == botv_guild_id) {
             db.query(`SELECT * FROM challenges_deals WHERE activation_id = '${payload.activation_id}'`)
             .then(res => {
                 const deal = res.rows[0]
@@ -573,7 +680,7 @@ db.on('notification', async (notification) => {
                             channel.messages.fetch(thread.id).then(msg => msg.delete().catch(console.error)).catch(console.error)
                         }, 10000);
                         thread.send({
-                            content: `<@&891717782348136488> <@&891718083520122880> <@${payload.discord_id}>`,
+                            content: `<@&793061832196882452> <@${payload.discord_id}>`,
                             embeds: [{
                                 description: `<@${payload.discord_id}> has purchased **${deal.item_name}** for **${deal.rp} RP**`
                             }]
@@ -584,7 +691,3 @@ db.on('notification', async (notification) => {
         }
     }
 })
-
-module.exports = {
-    verify_challenge_serviceman
-}

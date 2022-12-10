@@ -156,7 +156,7 @@ async function gmail_api_call(auth) {
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
                     const user = await client.users.fetch(xx_discord).catch(console.error)
-                    await db.query(`DELETE FROM tradebot_users_unverified WHERE id = '${xx_id}'`).catch(err => console.log(err))
+                    await db.query(`DELETE FROM tradebot_users_unverified WHERE discord_id = '${xx_discord}'`).catch(err => console.log(err))
                     const temp = res.data.snippet.split(' ')
                     await db.query(`UPDATE hubapp_users SET forums_username='${temp[4]}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
                     //---Check if user already exists
