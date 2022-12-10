@@ -322,6 +322,7 @@ client.on('messageCreate', (message) => {
             //mention_users(interaction.user.id,interaction.customId)
         }).catch(err => {
             if (err.code == 23505) { // duplicate key
+                setTimeout(() => message.delete().catch(console.error), 1000);
                 message.channel.send({
                     content: 'That squad already exists'
                 }).catch(err => console.log(err)).then(msg => setTimeout(() => {
