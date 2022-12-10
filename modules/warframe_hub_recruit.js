@@ -415,7 +415,7 @@ async function edit_main_msg() {
                 content: '_ _',
                 embeds: index == 0 ? [{
                     title: 'Recruitment',
-                    description: '- Click on the button to join a squad. Click again to leave; or click Leave All\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads have a 1 hour time-out\n\n- Ask anything in <#914990518558134292>. For any queries or bugs, use <#1003269491163148318>\n\n- Donate to Softy directly: https://www.allsquads.com/supportsofty',
+                    description: '- Click on the button to join a squad. Click again to leave; or click Leave All\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads have a 1 hour time-out\n\n- Ask anything in <#914990518558134292>. For any queries or bugs, use <#1003269491163148318>',
                     color: '#ffffff'
                 }] : [],
                 components: components[index] ? components[index] : []
@@ -463,7 +463,7 @@ async function edit_main_msg() {
             } else if (squad.id == 'sq_custom') {
                 components[k][l].components.push({
                     type: 2,
-                    label: '💳' + squad.name,
+                    label: squad.name,
                     style: 3,
                     custom_id: squad.id,
                     // emoji: {
