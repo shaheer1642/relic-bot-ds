@@ -214,7 +214,7 @@ function openSquadSquadBot(squad) {
             }]
         }).then(() => {
             thread.send({
-                content: 'Oh look! You have successfully filled your first squad\nHere you can chat with all the squad members that want to run this relic.\n\nIf you have an open squad, always be ready to play under 2-5 minutes\nIf you join another squad within next 15 minutes, previous one will be disbanded\n\nSometimes, squad can be 2b2 instead of 4b4 radshare\nIn that case, only 2 people according to chat order will equip relic during the mission, while other 2 will equip random relic. This rotation switches every mission\n\nReact with ✅ to proceed',
+                content: 'Oh look! You have successfully filled your first squad\nHere you can chat with all the squad members that want to run this relic.\n\nIf you have an open squad, always be ready to play under 2-5 minutes\nIf you join another squad within next 15 minutes, previous one will be disbanded\n\nSometimes, squad can be 2b2 instead of 4b4 radshare\nIn that case, only 2 people according to chat order will equip relic during the mission, while other 2 will equip random relic. This rotation switches every mission\n\n**The server just opened, so give it some time to get fully active! :)**\n\nReact with ✅ to proceed',
                 components: [{
                     type: 1,
                     components: [{
