@@ -157,8 +157,8 @@ async function gmail_api_call(auth) {
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
                     const user = await client.users.fetch(xx_discord).catch(console.error)
                     await db.query(`DELETE FROM tradebot_users_unverified WHERE discord_id = '${xx_discord}'`).catch(err => console.log(err))
-                    const temp = res.data.snippet.split(' ')
-                    await db.query(`UPDATE hubapp_users SET forums_username='${temp[4]}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
+                    const ingame_name = res.data.snippet.split(' ')[4].replace('(PSN)','')
+                    await db.query(`UPDATE hubapp_users SET forums_username='${ingame_name}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
                     //---Check if user already exists
                     var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id=${xx_discord}`).then(async res => {
                         if (res.rowCount > 1) {
@@ -171,15 +171,14 @@ async function gmail_api_call(auth) {
                             const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
                             try {
                                 member.roles.add(role).catch(console.error)
-                                member.setNickname(temp[4]).catch(console.error)
+                                member.setNickname(ingame_name).catch(console.error)
                             } catch {}
                             if (res.rowCount == 1) {
-                                var status = await db.query(`UPDATE tradebot_users_list SET ingame_name='${temp[4]}' WHERE discord_id = ${xx_discord}`).then(res => {
+                                var status = await db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}' WHERE discord_id = ${xx_discord}`).then(res => {
                                     if (user)
-                                        user.send('Your ign has been updated to **' + temp[4] + '**!').catch(console.error)
+                                        user.send('Your ign has been updated to **' + ingame_name + '**!').catch(console.error)
                                     return true
-                                })
-                                .catch (err => {
+                                }).catch (err => {
                                     console.log(err)
                                     if (user)
                                         user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 501').catch(console.error)
@@ -187,12 +186,11 @@ async function gmail_api_call(auth) {
                                 })
                             }
                             if (res.rowCount == 0) {
-                                var status = await db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${temp[4]}',${new Date().getTime()})`).then(res => {
+                                var status = await db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${ingame_name}',${new Date().getTime()})`).then(res => {
                                     if (user)
-                                        user.send('Welcome to AllSquads **' + temp[4] + '**! Your account has been verified.\nCheck the <#890197385651838977> tutorial to gain access to recruitment').catch(console.error)
+                                        user.send('Welcome to AllSquads **' + ingame_name + '**! Your account has been verified.\nCheck the <#890197385651838977> tutorial to gain access to recruitment').catch(console.error)
                                     return true
-                                })
-                                .catch (err => {
+                                }).catch (err => {
                                     console.log(err)
                                     if (user)
                                         user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 502').catch(console.error)
@@ -206,7 +204,7 @@ async function gmail_api_call(auth) {
                             user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 503').catch(console.error)
                     })
                     //----------------------
-                    console.log('User ' + temp[4] + ' has verified their ign')
+                    console.log('User ' + ingame_name + ' has verified their ign')
                     break
                 }
             }
