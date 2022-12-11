@@ -168,9 +168,11 @@ async function gmail_api_call(auth) {
                         } else {
                             const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
                             const member = guild.members.cache.get(xx_discord) || await guild.members.fetch(xx_discord).catch(console.error)
-                            const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+                            const role1 = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+                            const role2 = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
                             try {
-                                member.roles.add(role).catch(console.error)
+                                member.roles.add(role1).catch(console.error)
+                                member.roles.add(role2).catch(console.error)
                                 member.setNickname(ingame_name).catch(console.error)
                             } catch {}
                             if (res.rowCount == 1) {
