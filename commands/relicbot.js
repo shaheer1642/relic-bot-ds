@@ -12,12 +12,7 @@ module.exports = {
 			subcommand.setName('remove_server')
 			.setDescription('Unaffiliate this server')
 		),
-	scope: 'private',
+	scope: 'global',
 	status: 'active',
-	guildIds: [
-		"832677897411493949",
-		"865904902941048862",
-		"730808307010240572"
-	],
 	command_name: '/relic_bot'
 };
