@@ -4,7 +4,14 @@ const { Routes } = require('discord-api-types/v9');
 const {client} = require('./modules/discord_client.js');
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
-async function bot_initialize() {
+client.on("guildCreate", guild => {
+    console.log("Joined a new guild: " + guild.name);
+	console.log('redeploying app commands')
+	deployCommands()
+    //Your other stuff like adding to guildArray
+})
+
+function deployCommands() {
 	try {
 		console.log('Registering application commands...')
 		
@@ -78,6 +85,9 @@ async function bot_initialize() {
 	} catch(e) {
 		console.log(e)
 	}
+}
+
+async function bot_initialize() {
 }
 
 module.exports = {
