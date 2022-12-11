@@ -11,7 +11,7 @@ client.on("guildCreate", guild => {
     //Your other stuff like adding to guildArray
 })
 
-function deployCommands() {
+async function deployCommands() {
 	try {
 		console.log('Registering application commands...')
 		
