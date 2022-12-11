@@ -9,7 +9,12 @@ const { WebhookClient } = require('discord.js');
 const authProvider = new ClientCredentialsAuthProvider(process.env.twitch_clientId, process.env.twitch_clientSecret);
 const twitchApiClient = new ApiClient({ authProvider });
 
-const authorized_userIds = ['253525146923433984','253980061969940481']
+const server_commands_perms = [
+    '253525146923433984', //softy
+    '253980061969940481', //leo
+    '353154275745988610', //john 
+    '385459793508302851' //ady 
+]
 
 const countries = [ 
     {name: 'Afghanistan', code: 'AF'}, 
@@ -278,7 +283,7 @@ async function interaction_handler(interaction) {
     try {
         if (interaction.isCommand()) {
             if (interaction.commandName == 'twitch_affiliate') {
-                if (authorized_userIds.includes(interaction.user.id)) {
+                if (server_commands_perms.includes(interaction.user.id)) {
                     if (interaction.options.getSubcommand() == 'add_streamer') {
                         addStreamer(usernameValidate(interaction.options.getString('username')),interaction.options.getString('country')).catch(err => {interaction.reply({content: `Sorry, some error occured.\n${JSON.stringify(err)}`});console.log(err)})
                         .then((res) => {
@@ -317,7 +322,7 @@ async function interaction_handler(interaction) {
         if (interaction.isAutocomplete()) {
             if (interaction.commandName == 'twitch_affiliate') {
                 // check if authorized user
-                if (authorized_userIds.includes(interaction.user.id)) {
+                if (server_commands_perms.includes(interaction.user.id)) {
                     if (interaction.options.getSubcommand() == 'add_streamer') {
                         console.log(`autocomplete (twitch_affiliate add_streamer) query: ${interaction.options.getString('country')}`)
                         const country_text = interaction.options.getString('country')
