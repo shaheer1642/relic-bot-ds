@@ -661,8 +661,12 @@ function open_squad(squad) {
         }
 
     }).catch(err => console.log(err))
-    db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}])`).catch(err => console.log(err)).then(res => edit_main_msg())
-    db.query(`UPDATE wfhub_squads_data SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true)`).catch(err => console.log(err))
+    db.query(`
+        DELETE FROM wfhub_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}]);
+        UPDATE rb_squads SET members=members${squad.filled.map(discord_id => `-'${discord_id}'`).join('')} WHERE status='active';
+        UPDATE wfhub_squads_data SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true);
+    `).then(res => edit_main_msg())
+    .catch(err => console.log(err))
 }
 
 function getSquadsList() {
