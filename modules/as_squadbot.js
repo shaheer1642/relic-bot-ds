@@ -208,6 +208,7 @@ client.on('interactionCreate', (interaction) => {
         }
         //interaction.deferUpdate().catch(err => console.log(err))
         interaction.fields.getTextInputValue('squad_name').trim().split('\n').forEach(line => {
+            line = line.toLowerCase()
             var hasKeyword = false
             for (const word of keywords_list) {
                 if (line.match(word)) {
@@ -306,7 +307,7 @@ client.on('messageCreate', (message) => {
 
     if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
 
-    message.content.trim().split('\n').forEach(line => {
+    message.content.trim().toLowerCase().split('\n').forEach(line => {
         console.log(keywords_list,explicitwords_list)
         var hasKeyword = false
         for (const word of keywords_list) {
