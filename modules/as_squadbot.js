@@ -207,8 +207,7 @@ client.on('interactionCreate', (interaction) => {
             return
         }
         //interaction.deferUpdate().catch(err => console.log(err))
-        interaction.fields.getTextInputValue('squad_name').trim().split('\n').forEach(line => {
-            line = line.toLowerCase()
+        interaction.fields.getTextInputValue('squad_name').toLowerCase().trim().split('\n').forEach(line => {
             var hasKeyword = false
             for (const word of keywords_list) {
                 if (line.match(word)) {
