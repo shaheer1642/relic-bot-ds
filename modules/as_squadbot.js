@@ -607,7 +607,7 @@ function mention_users(joined_user_id,squad_id) {
         .then(wfhub_recruit_members => {
             var trackers = wfhub_squads_data.rows[0].trackers
             var joined_members = wfhub_recruit_members.rows
-            if (joined_members.filter(o => o.squad_id == squad_id).length > 1) return
+            if (joined_members.filter(o => o.squad_type == squad_id).length > 1) return
             var mention_list = []
             if (trackers[squad_id]) {
                 trackers[squad_id].forEach(userId => {
