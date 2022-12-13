@@ -100,7 +100,7 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand() && interaction.guild.id == guild_id && interaction.commandName == 'giveaways') {
         if (interaction.options.getSubcommand() == 'create') {
             const discord_id = interaction.user.id
-            const item = interaction.options.getString('item')
+            const item = interaction.options.getString('item').replace(/'/g,`''`)
             const rp_cost = interaction.options.getNumber('rp_cost')
             const winner_count = interaction.options.getNumber('winner_count')
             const expiry = interaction.options.getString('expiry')
