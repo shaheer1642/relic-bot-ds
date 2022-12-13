@@ -909,7 +909,6 @@ async function fissures_check() {
         })
 
         webhook_messages.fissures?.forEach(msg => {
-            console.log(msg)
             new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
         })
 

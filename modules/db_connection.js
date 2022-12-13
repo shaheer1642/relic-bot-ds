@@ -30,6 +30,10 @@ db.connect().then(async res => {
     db.query('LISTEN rb_squads_insert').catch(console.error)
     db.query('LISTEN rb_squads_update').catch(console.error)
     db.query('LISTEN rb_squads_delete').catch(console.error)
+
+    db.query('LISTEN as_gabot_giveaways_insert').catch(console.error)
+    db.query('LISTEN as_gabot_giveaways_update').catch(console.error)
+    db.query('LISTEN as_gabot_giveaways_delete').catch(console.error)
 })
 
 db.on('error', err => {

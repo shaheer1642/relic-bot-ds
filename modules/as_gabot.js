@@ -11,7 +11,7 @@ const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
 
 const guild_id = '865904902941048862'
-const channel_id = '1052213356460769432'
+const channel_id = '890198895508992020'
 
 function replyAndDelete(channel, message) {
     channel.send({
@@ -22,13 +22,34 @@ function replyAndDelete(channel, message) {
         }, 10000);
     }).catch(console.error)
 }
+const getShuffledArr = arr => {
+    const newArr = arr.slice()
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const rand = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
+    }
+    return newArr
+};
 
-function closeGiveaway(giveaway_id, expiry_timestamp) {
+function closeGiveaway(giveawayObj) {
     setTimeout(() => {
         db.query(`
-            UPDATE as_gabot_giveaways SET status = 'closed' WHERE giveaway_id='${giveaway_id}' AND status = 'opened'
-        `).catch(console.error)
-    }, expiry_timestamp - new Date().getTime());
+            SELECT * FROM as_gabot_giveaways WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
+        `).then(res => {
+            const giveaway = res.rows[0]
+            if (!giveaway) return
+            var winners_list = []
+            giveaway.join_list = getShuffledArr(giveaway.join_list);
+            while(giveaway.winner_count != 0) {
+                winners_list.push(giveaway.join_list.pop())
+                giveaway.winner_count--
+            }
+            winners_list = winners_list.filter(o => o != undefined)
+            db.query(`
+                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}', status = '${winners_list.length == 0 ? 'discarded':'closed'}' WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
+            `).catch(console.error)
+        }).catch(console.error)
+    }, giveawayObj.expiry_timestamp - new Date().getTime());
 }
 
 client.on('messageReactionAdd', async (reaction,user) => {
@@ -49,6 +70,7 @@ client.on('messageReactionAdd', async (reaction,user) => {
             const giveaway = res[0].rows[0]
             const user_account = res[1].rows[0]
             if (!giveaway) return reaction.users.remove(user.id).catch(console.error)
+            if (giveaway.status != 'active') return reaction.users.remove(user.id).catch(console.error) 
             if (!user_account) {
                 reaction.users.remove(user.id).catch(console.error)
                 return replyAndDelete(reaction.message.channel, `<@${user.id}> You do not have enough RP to join this giveaway. Current RP: 0`)
@@ -106,7 +128,7 @@ client.on('interactionCreate', async (interaction) => {
                 content: ' ',
                 embeds: [{
                     title: convertUpper(item),
-                    description: 'React with 🎉 to join',
+                    description: `React with 🎉 to join\n${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries`,
                     fields: [{
                         name: 'Hosted By',
                         value: `<@${discord_id}>`,
@@ -120,9 +142,6 @@ client.on('interactionCreate', async (interaction) => {
                         value: `<t:${Math.round(Number(new Date().getTime() + expiration) / 1000)}:R>`,
                         inline: true
                     },],
-                    footer: {
-                        text: `${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries\n\u200b`
-                    },
                     color: 'RANDOM',
                     timestamp: new Date().getTime()
                 }]
@@ -183,6 +202,11 @@ client.on('interactionCreate', async (interaction) => {
 
 client.on('ready', async () => {
     update_users_list()
+    db.query(`
+        SELECT * FROM as_gabot_giveaways WHERE status = 'active';
+    `).then(res => {
+        res.rows.forEach(giveaway => closeGiveaway(giveaway))
+    }).catch(console.error)
 })
 
 var users_list = {}
@@ -207,40 +231,40 @@ db.on('notification', async (notification) => {
     
     if (notification.channel == 'as_gabot_giveaways_insert') {
         const giveaway = payload
-        closeGiveaway(giveaway.giveaway_id, giveaway.expiry_timestamp)
+        closeGiveaway(giveaway)
     }
 
     if (notification.channel == 'as_gabot_giveaways_update') {
         const giveaway = payload[0]
-        const old_giveaway = payload
-        if (giveaway.status == 'closed' && old_giveaway.status == 'opened') {
-            db.query(`
-                SELECT * FROM as_gabot_messages WHERE giveaway_id = '${giveaway.giveaway_id}'
-            `).then(async res => {
-                if (!res.rows[0]) return
-                const channel = client.channels.cache.get(res.rows[0].channel_id) || await client.channels.fetch(res.rows[0].channel_id).catch(console.error)
-                if (!channel) return
-                const message = channel.messages.cache.get(res.rows[0].message_id) || await channel.messages.fetch(res.rows[0].message_id).catch(console.error)
-                if (!message) return
-                message.edit({
-                    content: ' ',
-                    embeds: message.embeds.map(embed => {
-                        embed.title = `~~${embed.title}~~ (Ended)`
-                        embed.fields.push({
-                            name: `Winner${giveaway.winners_list.length > 1 ? 's':''}`,
-                            value: giveaway.winners_list.map(id => `<@${id}>`).join('\n'),
-                            inline: true
-                        })
-                        return embed
+        const old_giveaway = payload[1]
+        const channel = client.channels.cache.get(giveaway.channel_id) || await client.channels.fetch(giveaway.channel_id).catch(console.error)
+        if (!channel) return
+        const message = channel.messages.cache.get(giveaway.message_id) || await channel.messages.fetch(giveaway.message_id).catch(console.error)
+        if (!message) return
+        if (old_giveaway.status == 'active' && giveaway.status != 'active') {
+            message.edit({
+                content: ' ',
+                embeds: message.embeds.map(embed => {
+                    embed.title = `~~${embed.title}~~ (Ended)`
+                    embed.fields.push({
+                        name: `Winner${giveaway.winners_list.length > 1 ? 's':''}`,
+                        value: giveaway.winners_list.length == 0 ? 'Not enough entries' : giveaway.winners_list.map(id => `<@${id}>`).join('\n'),
+                        inline: false
                     })
-                }).catch(console.error)
-                channel.send({
-                    content: ' ',
-                    embeds: [{
-                        title: 'Giveaway Ended',
-                        description: `${giveaway.winners_list.map(id => `<@${id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}**`
-                    }]
-                }).catch(console.error)
+                    embed.fields = embed.fields.filter(o => o.name != 'Expires')
+                    return embed
+                })
+            }).catch(console.error)
+            channel.send({
+                content: giveaway.winners_list.length == 0 ? `**Giveaway Ended: ${convertUpper(giveaway.item)}**\n*Not enough entries*` : `**Giveaway Ended**\n${giveaway.winners_list.map(id => `<@${id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}**`,
+            }).catch(console.error)
+        } else {
+            message.edit({
+                content: ' ',
+                embeds: message.embeds.map(embed => {
+                    embed.description = `React with 🎉 to join\n${giveaway.winner_count || 1} Winner${giveaway.winner_count > 1 ? 's':''} | ${giveaway.join_list.length} Entr${giveaway.join_list.length > 1 ? 'ies':'y'}`
+                    return embed
+                })
             }).catch(console.error)
         }
     }
