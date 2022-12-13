@@ -26,6 +26,7 @@ require('./modules/wfhub_get_started.js');
 require('./modules/as_daywave.js');
 require('./modules/as_squadbot.js');
 require('./modules/allsquads.js');
+require('./modules/as_gabot.js');
 
 // restart after 24.5h
 setTimeout(() => {

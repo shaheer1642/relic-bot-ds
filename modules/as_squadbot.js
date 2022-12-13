@@ -225,6 +225,15 @@ client.on('interactionCreate', (interaction) => {
             }
             if (hasExplicitWord) return interaction.reply({content: 'Squad should not contain explicit words', ephemeral: true}).catch(err => console.log(err))
 
+            if (line.length > 70) {
+                return interaction.channel.send({
+                    content: `<@${interaction.user.id}> Squad name should be less than 70 characters`,
+                    ephemeral: true
+                }).catch(err => console.log(err)).then(msg => setTimeout(() => {
+                    msg.delete().catch(console.error)
+                }, 5000))
+            }
+
             db.query(`SELECT * FROM wfhub_recruit_members WHERE squad_type = 'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}'`)
             .then(res => {
                 if (res.rowCount != 0) {
@@ -333,12 +342,12 @@ client.on('messageCreate', (message) => {
 
         const total_spots = line.match('/4') ? 4 : line.match('/3') ? 3 : line.match('/2') ? 2 : 4
         line = line.replace(/ [1-9]\/4/g,'').replace(/ [1-9]\/3/g,'').replace(/ [1-9]\/2/g,'').replace(/ [1-9]\/1/g,'')
-        if (line.length > 79) {
+        if (line.length > 70) {
             setTimeout(() => {
                 message.delete().catch(console.error)
             }, 1000);
             return message.channel.send({
-                content: 'squad name should be less than 80 characters',
+                content: `<@${message.author.id}> Squad name should be less than 70 characters`,
                 ephemeral: true
             }).catch(err => console.log(err)).then(msg => setTimeout(() => {
                 msg.delete().catch(console.error)

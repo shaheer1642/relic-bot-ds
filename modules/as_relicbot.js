@@ -834,7 +834,6 @@ async function fissures_check() {
 
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
-        console.log('[relicbot] received fissures')
         const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
         
         if (!fissures) {
@@ -862,7 +861,6 @@ async function fissures_check() {
                 }
             }
         })
-        console.log('expiries',expiries)
 
         const payload = {
             content: ' ',

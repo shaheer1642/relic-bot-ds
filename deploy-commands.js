@@ -88,6 +88,7 @@ async function deployCommands() {
 }
 
 async function bot_initialize() {
+	deployCommands()
 }
 
 module.exports = {
