@@ -195,252 +195,250 @@ function verify_challenge_credit_is_due(squad) {
 }
 
 client.on('interactionCreate', (interaction) => {
-    if (interaction.guild.id == guild_id) {
-        if (interaction.isCommand()) {
-            if (interaction.commandName == 'challenges') {
-                if (interaction.options.getSubcommand() === 'add') {
-                    db.query(`INSERT INTO challenges
-                        (challenge_id,name,description,completion_count,rp)
-                        VALUES ('${uuid.v4()}','${interaction.options.getString('name').replace(/'/g,`''`)}','${interaction.options.getString('description').replace(/'/g,`''`)}',${interaction.options.getNumber('count')},${interaction.options.getNumber('rp')})
-                    `).then(res => {
-                        if (res.rowCount == 1) {
-                            interaction.reply('The challenge has been added').catch(console.error)
-                        } else {
-                            interaction.reply('Unexpected error adding challenge').catch(console.error)
-                        }
-                    }).catch(err => {
-                        console.log(err)
-                        interaction.reply(`Error adding challenge\n${err}`).catch(console.error)
-                    })
-                }
-                if (interaction.options.getSubcommand() === 'view') {
-                    db.query(`SELECT * FROM challenges;`)
-                    .then(res => {
-                        const payload = {
-                            content: ' ',
-                            embeds: [{
-                                description: 'List of challenges',
-                                fields: [{
-                                    name: 'Name',
-                                    value: res.rows.map(challenge => challenge.name).join('\n'),
-                                    inline: true
-                                },{
-                                    name: 'Description',
-                                    value: res.rows.map(challenge => challenge.description).join('\n'),
-                                    inline: true
-                                },{
-                                    name: 'RP value',
-                                    value: res.rows.map(challenge => challenge.rp).join('\n'),
-                                    inline: true
-                                },]
-                            }],
-                            ephemeral: true
-                        }
-                        interaction.reply(payload).catch(console.error)
-                    }).catch(console.error)
-                }
+    if (interaction.isCommand()) {
+        if (interaction.commandName == 'challenges') {
+            if (interaction.options.getSubcommand() === 'add') {
+                db.query(`INSERT INTO challenges
+                    (challenge_id,name,description,completion_count,rp)
+                    VALUES ('${uuid.v4()}','${interaction.options.getString('name').replace(/'/g,`''`)}','${interaction.options.getString('description').replace(/'/g,`''`)}',${interaction.options.getNumber('count')},${interaction.options.getNumber('rp')})
+                `).then(res => {
+                    if (res.rowCount == 1) {
+                        interaction.reply('The challenge has been added').catch(console.error)
+                    } else {
+                        interaction.reply('Unexpected error adding challenge').catch(console.error)
+                    }
+                }).catch(err => {
+                    console.log(err)
+                    interaction.reply(`Error adding challenge\n${err}`).catch(console.error)
+                })
             }
-            if (interaction.commandName == 'deals') {
-                if (interaction.options.getSubcommand() === 'add') {
-                    db.query(`INSERT INTO challenges_deals
-                        (deal_id,item_name,rp)
-                        VALUES ('${uuid.v4()}','${interaction.options.getString('item').replace(/'/g,`''`)}',${interaction.options.getNumber('cost')});
-                    `).then(res => {
-                        if (res.rowCount == 1) {
-                            interaction.reply('The deal has been added').catch(console.error)
-                        } else {
-                            interaction.reply('Unexpected error adding deal').catch(console.error)
-                        }
-                    }).catch(err => {
-                        console.log(err)
-                        interaction.reply(`Error adding deal\n${err}`).catch(console.error)
-                    })
-                }
-                if (interaction.options.getSubcommand() === 'view') {
-                    db.query(`SELECT * FROM challenges_deals;`)
-                    .then(res => {
-                        const payload = {
-                            content: ' ',
-                            embeds: [{
-                                description: 'List of deals',
-                                fields: [{
-                                    name: 'Item',
-                                    value: res.rows.map(challenge => challenge.item_name).join('\n'),
-                                    inline: true
-                                },{
-                                    name: 'RP Cost',
-                                    value: res.rows.map(challenge => challenge.rp).join('\n'),
-                                    inline: true
-                                }]
-                            }],
-                            ephemeral: true
-                        }
-                        interaction.reply(payload).catch(console.error)
-                    }).catch(console.error)
-                }
-            }
-        }
-        if (interaction.isButton()) {
-            if (interaction.customId == 'view_weekly_challenges_summary') {
-                db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed; SELECT * FROM challenges_accounts WHERE discord_id = ${interaction.user.id}`)
+            if (interaction.options.getSubcommand() === 'view') {
+                db.query(`SELECT * FROM challenges;`)
                 .then(res => {
-                    const discord_id = interaction.user.id
-                    const challenges = res[0].rows
-                    const completed = res[1].rows
-                    const user_acc_bal = res[2].rows[0]?.balance || 0
                     const payload = {
                         content: ' ',
                         embeds: [{
-                            author: {
-                                name: interaction.member.displayName,
-                                icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.jpeg`,
-                            },
-                            description: `RP: ${user_acc_bal}`,
-                            fields: [],
-                            color: '#76b5c5'
+                            description: 'List of challenges',
+                            fields: [{
+                                name: 'Name',
+                                value: res.rows.map(challenge => challenge.name).join('\n'),
+                                inline: true
+                            },{
+                                name: 'Description',
+                                value: res.rows.map(challenge => challenge.description).join('\n'),
+                                inline: true
+                            },{
+                                name: 'RP value',
+                                value: res.rows.map(challenge => challenge.rp).join('\n'),
+                                inline: true
+                            },]
                         }],
                         ephemeral: true
                     }
-                    challenges.forEach(challenge => {
-                        if (challenge.progress[discord_id]) {
-                            const is_completed = challenge.progress[discord_id] >= challenge.completion_count ? true:false
-                            payload.embeds[0].fields.push({
-                                name: challenge.name + ` (${Math.round(challenge.progress[discord_id]/challenge.completion_count * 100)}%)`,
-                                value: `${is_completed? '**':''}${challenge.progress[discord_id]}/${challenge.completion_count}${is_completed? '**':''}`,
-                                inline: true
-                            })
-                        }
-                    })
                     interaction.reply(payload).catch(console.error)
                 }).catch(console.error)
             }
-            if (interaction.customId == 'purchase_weekly_deal') {
-                db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
-                .then(res => {
-                    const deal = res[0].rows[0]
-                    const user_bal = res[1].rows[0]?.balance || 0
-                    if (deal.rp <= user_bal) {
-                        interaction.reply({
-                            content: ' ',
-                            embeds: [{
-                                description: `Are you sure you want to purchase **${deal.item_name}** for **${deal.rp} RP**?\nCurrent RP: ${user_bal}`
-                            }],
-                            components: [{
-                                type: 1,
-                                components: [{
-                                    type: 2,
-                                    label: "YES",
-                                    style: 3,
-                                    custom_id: "purchase_weekly_deal_yes",
-                                },{
-                                    type: 2,
-                                    label: "NO",
-                                    style: 4,
-                                    custom_id: "purchase_weekly_deal_no",
-                                }]
-                            }],
-                            ephemeral: true
-                        }).catch(console.error)
+        }
+        if (interaction.commandName == 'deals') {
+            if (interaction.options.getSubcommand() === 'add') {
+                db.query(`INSERT INTO challenges_deals
+                    (deal_id,item_name,rp)
+                    VALUES ('${uuid.v4()}','${interaction.options.getString('item').replace(/'/g,`''`)}',${interaction.options.getNumber('cost')});
+                `).then(res => {
+                    if (res.rowCount == 1) {
+                        interaction.reply('The deal has been added').catch(console.error)
                     } else {
-                        interaction.reply({
-                            content: ' ',
-                            embeds: [{
-                                description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user_bal}`
-                            }],
-                            ephemeral: true
-                        }).catch(console.error)
+                        interaction.reply('Unexpected error adding deal').catch(console.error)
                     }
+                }).catch(err => {
+                    console.log(err)
+                    interaction.reply(`Error adding deal\n${err}`).catch(console.error)
+                })
+            }
+            if (interaction.options.getSubcommand() === 'view') {
+                db.query(`SELECT * FROM challenges_deals;`)
+                .then(res => {
+                    const payload = {
+                        content: ' ',
+                        embeds: [{
+                            description: 'List of deals',
+                            fields: [{
+                                name: 'Item',
+                                value: res.rows.map(challenge => challenge.item_name).join('\n'),
+                                inline: true
+                            },{
+                                name: 'RP Cost',
+                                value: res.rows.map(challenge => challenge.rp).join('\n'),
+                                inline: true
+                            }]
+                        }],
+                        ephemeral: true
+                    }
+                    interaction.reply(payload).catch(console.error)
                 }).catch(console.error)
             }
-            if (interaction.customId == 'purchase_weekly_deal_yes') {
-                db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
-                .then(res => {
-                    const deal = res[0].rows[0]
-                    const user_bal = res[1].rows[0]?.balance || 0
-                    if (deal.rp <= user_bal) {
-                        db.query(`
-                            INSERT INTO challenges_transactions
-                            (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp, guild_id)
-                            VALUES ('${uuid.v4()}',${interaction.user.id},'weekly_deal_purchase','${deal.activation_id}',${deal.rp},'debit',${new Date().getTime()},'${interaction.guild.id}')
-                        `).then(res => {
-                            if (res.rowCount == 1) {
-                                interaction.update({
-                                    content: ' ',
-                                    embeds: [{description: 'Processing transaction, a thread channel will be created soon'}],
-                                    components: [{
-                                        type: 1,
-                                        components: [{
-                                            type: 2,
-                                            label: "YES",
-                                            style: 3,
-                                            custom_id: "purchase_weekly_deal_yes",
-                                            disabled: true
-                                        },{
-                                            type: 2,
-                                            label: "NO",
-                                            style: 4,
-                                            custom_id: "purchase_weekly_deal_no",
-                                            disabled: true
-                                        }]
-                                    }],
-                                    ephemeral: true
-                                }).catch(console.error)
-                            } else {
-                                interaction.update({
-                                    content: ' ',
-                                    embeds: [{description: 'Unexpected error processing transaction'}],
-                                    components: [{
-                                        type: 1,
-                                        components: [{
-                                            type: 2,
-                                            label: "YES",
-                                            style: 3,
-                                            custom_id: "purchase_weekly_deal_yes",
-                                            disabled: true
-                                        },{
-                                            type: 2,
-                                            label: "NO",
-                                            style: 4,
-                                            custom_id: "purchase_weekly_deal_no",
-                                            disabled: true
-                                        }]
-                                    }],
-                                    ephemeral: true
-                                }).catch(console.error)
-                            }
-                        }).catch(console.error)
-                    } else {
-                        interaction.update({
-                            content: ' ',
-                            embeds: [{description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user_bal}`}],
-                            ephemeral: true
-                        }).catch(console.error)
-                    }
-                }).catch(console.error)
-            }
-            if (interaction.customId == 'purchase_weekly_deal_no') {
-                interaction.update({
+        }
+    }
+    if (interaction.isButton()) {
+        if (interaction.customId == 'view_weekly_challenges_summary') {
+            db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed; SELECT * FROM challenges_accounts WHERE discord_id = ${interaction.user.id}`)
+            .then(res => {
+                const discord_id = interaction.user.id
+                const challenges = res[0].rows
+                const completed = res[1].rows
+                const user_acc_bal = res[2].rows[0]?.balance || 0
+                const payload = {
                     content: ' ',
-                    embeds: [{description: 'Transaction cancelled'}],
-                    components: [{
-                        type: 1,
-                        components: [{
-                            type: 2,
-                            label: "YES",
-                            style: 3,
-                            custom_id: "purchase_weekly_deal_yes",
-                            disabled: true
-                        },{
-                            type: 2,
-                            label: "NO",
-                            style: 4,
-                            custom_id: "purchase_weekly_deal_no",
-                            disabled: true
-                        }]
+                    embeds: [{
+                        author: {
+                            name: interaction.member.displayName,
+                            icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.jpeg`,
+                        },
+                        description: `RP: ${user_acc_bal}`,
+                        fields: [],
+                        color: '#76b5c5'
                     }],
                     ephemeral: true
-                }).catch(console.error)
-            }
+                }
+                challenges.forEach(challenge => {
+                    if (challenge.progress[discord_id]) {
+                        const is_completed = challenge.progress[discord_id] >= challenge.completion_count ? true:false
+                        payload.embeds[0].fields.push({
+                            name: challenge.name + ` (${Math.round(challenge.progress[discord_id]/challenge.completion_count * 100)}%)`,
+                            value: `${is_completed? '**':''}${challenge.progress[discord_id]}/${challenge.completion_count}${is_completed? '**':''}`,
+                            inline: true
+                        })
+                    }
+                })
+                interaction.reply(payload).catch(console.error)
+            }).catch(console.error)
+        }
+        if (interaction.customId == 'purchase_weekly_deal') {
+            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
+            .then(res => {
+                const deal = res[0].rows[0]
+                const user_bal = res[1].rows[0]?.balance || 0
+                if (deal.rp <= user_bal) {
+                    interaction.reply({
+                        content: ' ',
+                        embeds: [{
+                            description: `Are you sure you want to purchase **${deal.item_name}** for **${deal.rp} RP**?\nCurrent RP: ${user_bal}`
+                        }],
+                        components: [{
+                            type: 1,
+                            components: [{
+                                type: 2,
+                                label: "YES",
+                                style: 3,
+                                custom_id: "purchase_weekly_deal_yes",
+                            },{
+                                type: 2,
+                                label: "NO",
+                                style: 4,
+                                custom_id: "purchase_weekly_deal_no",
+                            }]
+                        }],
+                        ephemeral: true
+                    }).catch(console.error)
+                } else {
+                    interaction.reply({
+                        content: ' ',
+                        embeds: [{
+                            description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user_bal}`
+                        }],
+                        ephemeral: true
+                    }).catch(console.error)
+                }
+            }).catch(console.error)
+        }
+        if (interaction.customId == 'purchase_weekly_deal_yes') {
+            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
+            .then(res => {
+                const deal = res[0].rows[0]
+                const user_bal = res[1].rows[0]?.balance || 0
+                if (deal.rp <= user_bal) {
+                    db.query(`
+                        INSERT INTO challenges_transactions
+                        (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp, guild_id)
+                        VALUES ('${uuid.v4()}',${interaction.user.id},'weekly_deal_purchase','${deal.activation_id}',${deal.rp},'debit',${new Date().getTime()},'${interaction.guild.id}')
+                    `).then(res => {
+                        if (res.rowCount == 1) {
+                            interaction.update({
+                                content: ' ',
+                                embeds: [{description: 'Processing transaction, a thread channel will be created soon'}],
+                                components: [{
+                                    type: 1,
+                                    components: [{
+                                        type: 2,
+                                        label: "YES",
+                                        style: 3,
+                                        custom_id: "purchase_weekly_deal_yes",
+                                        disabled: true
+                                    },{
+                                        type: 2,
+                                        label: "NO",
+                                        style: 4,
+                                        custom_id: "purchase_weekly_deal_no",
+                                        disabled: true
+                                    }]
+                                }],
+                                ephemeral: true
+                            }).catch(console.error)
+                        } else {
+                            interaction.update({
+                                content: ' ',
+                                embeds: [{description: 'Unexpected error processing transaction'}],
+                                components: [{
+                                    type: 1,
+                                    components: [{
+                                        type: 2,
+                                        label: "YES",
+                                        style: 3,
+                                        custom_id: "purchase_weekly_deal_yes",
+                                        disabled: true
+                                    },{
+                                        type: 2,
+                                        label: "NO",
+                                        style: 4,
+                                        custom_id: "purchase_weekly_deal_no",
+                                        disabled: true
+                                    }]
+                                }],
+                                ephemeral: true
+                            }).catch(console.error)
+                        }
+                    }).catch(console.error)
+                } else {
+                    interaction.update({
+                        content: ' ',
+                        embeds: [{description: `You do not have enough RP to purchase this deal\nCurrent RP: ${user_bal}`}],
+                        ephemeral: true
+                    }).catch(console.error)
+                }
+            }).catch(console.error)
+        }
+        if (interaction.customId == 'purchase_weekly_deal_no') {
+            interaction.update({
+                content: ' ',
+                embeds: [{description: 'Transaction cancelled'}],
+                components: [{
+                    type: 1,
+                    components: [{
+                        type: 2,
+                        label: "YES",
+                        style: 3,
+                        custom_id: "purchase_weekly_deal_yes",
+                        disabled: true
+                    },{
+                        type: 2,
+                        label: "NO",
+                        style: 4,
+                        custom_id: "purchase_weekly_deal_no",
+                        disabled: true
+                    }]
+                }],
+                ephemeral: true
+            }).catch(console.error)
         }
     }
 })

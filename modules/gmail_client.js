@@ -191,7 +191,7 @@ async function gmail_api_call(auth) {
                             if (res.rowCount == 0) {
                                 var status = await db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${ingame_name}',${new Date().getTime()})`).then(res => {
                                     if (user)
-                                        user.send('Welcome to AllSquads **' + ingame_name + '**! Your account has been verified.\nCheck the <#890197385651838977> tutorial to gain access to recruitment').catch(console.error)
+                                        user.send('Welcome to AllSquads **' + ingame_name + '**! Your account has been verified.\nCheck the <#890197385651838977> tutorial on how to join squads').catch(console.error)
                                     event_emitter.emit('allSquadsNewUserVerified', {discord_id: xx_discord})
                                     return true
                                 }).catch (err => {

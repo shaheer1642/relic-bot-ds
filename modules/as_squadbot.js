@@ -48,12 +48,13 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
         content: ' ',
         embeds: [{
             description: 'Select the squads you are interested in, to be notified whenever someone hosts them. You may change notification settings in <#1041319859469955073> channel in the future',
+            color: 'WHITE'
         }],
         components: [{
             type: 1,
             components: [{
                 type: 3,
-                placeholder: 'Select',
+                placeholder: 'Track Squads',
                 custom_id: 'wfhub_recruit_notify',
                 min_values: 1,
                 max_values: notification_options.length,
@@ -147,7 +148,7 @@ function isVerified(discord_id, channel) {
 }
 
 client.on('interactionCreate', (interaction) => {
-    if (interaction.channel.id != recruit_channel_id) return
+    //if (interaction.channel.id != recruit_channel_id) return
 
     if (interaction.customId == 'wfhub_recruit_notify') {
         if (!isVerified(interaction.user.id, interaction.channel)) return
