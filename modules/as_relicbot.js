@@ -243,7 +243,18 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.match('rb_sq_merge_false')) { 
             socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[interaction.channel.id].type == 'relics_vaulted' ? true:false, merge_squad: false}, responses => {
                 interaction.deferUpdate().catch(console.error)
+                interaction.message.delete().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
+            })
+        } else if (interaction.customId.match('rb_sq_merge_true_')) {
+            const squad_id = interaction.customId.split('rb_sq_merge_true_')[1]
+            const discord_id = interaction.user.id
+            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id,channel_id: interaction.channel.id},(res) => {
+                if (res.code == 200) {
+                    interaction.deferUpdate().catch(console.error)
+                    interaction.message.delete().catch(console.error)
+                }
+                else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
         } else if (interaction.customId.match('rb_sq_')) {
             const squad_id = interaction.customId.split('rb_sq_')[1]
@@ -714,7 +725,7 @@ function error_codes_embed(response,discord_id) {
                     type: 2,
                     label: "Join Existing",
                     style: 3,
-                    custom_id: `rb_sq_${response.squad_id}`
+                    custom_id: `rb_sq_merge_true_${response.squad_id}`
                 },{
                     type: 2,
                     label: "Host New",
