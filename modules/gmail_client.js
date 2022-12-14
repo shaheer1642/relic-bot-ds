@@ -3,6 +3,7 @@ const readline = require('readline');
 const {google} = require('googleapis');
 const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js');
+const {event_emitter} = require('./event_emitter')
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
@@ -191,6 +192,7 @@ async function gmail_api_call(auth) {
                                 var status = await db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${ingame_name}',${new Date().getTime()})`).then(res => {
                                     if (user)
                                         user.send('Welcome to AllSquads **' + ingame_name + '**! Your account has been verified.\nCheck the <#890197385651838977> tutorial to gain access to recruitment').catch(console.error)
+                                    event_emitter.emit('allSquadsNewUserVerified', {discord_id: xx_discord})
                                     return true
                                 }).catch (err => {
                                     console.log(err)

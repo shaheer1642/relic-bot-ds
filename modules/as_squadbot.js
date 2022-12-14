@@ -18,7 +18,50 @@ const server_commands_perms = [
     '385459793508302851' //ady 
 ]
 
+event_emitter.on('allSquadsNewUserVerified', async data => {
+    const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
+    if (!user) return
+    
+    var squads = getSquadsList()
+    var notification_options = []
+    var i = 0
+    for (const key in squads) {
+        if (key == 'sq_leave_all')
+            continue
+        if (key == 'sq_custom')
+            continue
+        if (key == 'sq_info')
+            continue
+        notification_options.push({
+            label: squads[key].name,
+            value: squads[key].id
+        })
+        i++;
+        if (i == 24) break
+    }
+    notification_options.push({
+        label: 'Remove all',
+        value: 'remove_all'
+    })
 
+    user.send({
+        content: ' ',
+        embeds: [{
+            description: 'Select the squads you are interested in, to be notified whenever someone hosts them. You may change notification settings in <#1041319859469955073> channel in the future',
+        }],
+        components: [{
+            type: 1,
+            components: [{
+                type: 3,
+                placeholder: 'Select',
+                custom_id: 'wfhub_recruit_notify',
+                min_values: 1,
+                max_values: notification_options.length,
+                options: notification_options
+            }]
+        }]
+    }).catch(console.error)
+})
 
 socket.on('tradebotUsersUpdated', (payload) => {
     console.log('[warframe_hub_recruit] tradebotUsersUpdated')
