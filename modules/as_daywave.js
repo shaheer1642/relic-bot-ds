@@ -578,7 +578,7 @@ function weekly_challenges_reset() {
         res.rows = res.rows.sort(() => Math.random() - 0.5)
         var query = []
         for (const [index,row] of res.rows.entries()) {
-            if (index > 4) break;
+            //if (index > 4) break;
             query.push(`
                 UPDATE challenges SET 
                 is_active = true,
