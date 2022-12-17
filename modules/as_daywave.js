@@ -19,8 +19,6 @@ const channel_ids = {
 const message_ids = {
     challenges: {
         faq: '1050766242497175562',
-        leaderboard: '1050766244451733504',
-        deal: '1050766246301409330',
         challenges: '1050766248612479056',
     }
 }
@@ -49,20 +47,16 @@ const message_formats = {
                     value: 'Daywave comes with automated weekly challenges which reset every week, fulfilling them will give the user Reward Points',
                     inline: false
                 },{
+                    name: 'What is RP?',
+                    value: 'RP stands for Rewards Points, which are credited to your account upon fulfilling challenges. You can use RP to join <#890198895508992020>',
+                    inline: false
+                },{
                     name: 'Do I need to contact anyone after fulfilling challenges?',
                     value: 'No, almost all the challenges are automatically monitored by the server bot. After finishing one, you\'ll see the challenge as completed',
                     inline: false
                 },{
                     name: 'Do I keep progress of previous week challenges?',
                     value: 'No, progress of a challenge is reset every week',
-                    inline: false
-                },{
-                    name: 'What is RP?',
-                    value: 'RP stands for Rewards Points, which are credited to your account upon fulfilling challenges. You can use RP to:\n- Purchase the weekly deals including orokins/slots\nYour points get saved for a coming giveaway system, where you can join with Daywave points to win all kinds of stuff!',
-                    inline: false
-                },{
-                    name: 'May I recommend a new challenge/deal?',
-                    value: 'Of course, please use <#1003269491163148318>. However, the challenge should be such that its completion can be auto-checked by the bot',
                     inline: false
                 }],
                 color: '#ffffff'
@@ -78,8 +72,8 @@ client.on('ready', async () => {
     setTimeout(weekly_challenges_reset, ms_till_monday_12am());
     setTimeout(weekly_deals_reset, ms_till_monday_12am());
     edit_challenges_embed()
-    edit_deals_embed()
-    edit_challenges_leaderboard_embed()
+    //edit_deals_embed()
+    //edit_challenges_leaderboard_embed()
 })
 
 /*----------verify challenges-----------*/
@@ -614,7 +608,7 @@ function weekly_deals_reset() {
             client.channels.fetch(channel_ids.challenges).then(channel => {
                 channel.send('Weekly deal has been reset').then(msg => {
                     setTimeout(() => msg.delete().catch(console.error), 60000)
-                    edit_deals_embed()
+                    //edit_deals_embed()
                 }).catch(console.error)
             }).catch(console.error)
         }).catch(console.error)
@@ -650,7 +644,7 @@ db.on('notification', async (notification) => {
     }
 
     if (notification.channel == 'challenges_transactions_insert') {
-        edit_deals_embed()
+        //edit_deals_embed()
         db.query(`
             UPDATE challenges_accounts SET
             balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
@@ -663,7 +657,7 @@ db.on('notification', async (notification) => {
                     VALUES (${payload.discord_id},${payload.rp});
                 `).catch(console.error)
             }
-            edit_challenges_leaderboard_embed()
+            //edit_challenges_leaderboard_embed()
         }).catch(console.error)
         if (payload.type == 'weekly_deal_purchase' && payload.guild_id == botv_guild_id) {
             db.query(`SELECT * FROM challenges_deals WHERE activation_id = '${payload.activation_id}'`)
