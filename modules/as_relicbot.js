@@ -585,6 +585,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
     return msg
 }
 
+var subscribersTimeout = {}
 socket.on('squadCreate', (squad) => {
     console.log('[squadCreate]',squad)
     const tier = squad.tier
@@ -597,14 +598,22 @@ socket.on('squadCreate', (squad) => {
         if (res.code == 200) {
             const channel_ids = res.data
             for (const channel_id in channel_ids) {
-                const discord_ids = channel_ids[channel_id]
-                new WebhookClient({url: webhooks_list[channel_id]}).send({
-                    content: `${relicBotSquadToString(squad)} ${discord_ids.map(id => `<@${id}>`).join(', ')}`
-                }).then(res => {
+                const discord_ids = channel_ids[channel_id].filter(sub => !subscribersTimeout[sub])
+                discord_ids.map(sub => {
+                    subscribersTimeout[sub] = true
                     setTimeout(() => {
-                        new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
-                    }, 10000);
-                }).catch(console.error)
+                        delete subscribersTimeout[sub]
+                    }, 120000);
+                })
+                if (discord_ids.length > 0) {
+                    new WebhookClient({url: webhooks_list[channel_id]}).send({
+                        content: `${relicBotSquadToString(squad)} ${discord_ids.map(id => `<@${id}>`).join(', ')}`
+                    }).then(res => {
+                        setTimeout(() => {
+                            new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
+                        }, 10000);
+                    }).catch(console.error)
+                }
             }
         }
     })
