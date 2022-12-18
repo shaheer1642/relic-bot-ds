@@ -417,10 +417,10 @@ async function interaction_handler(interaction) {
         const mission_type = LU(interaction.fields.getTextInputValue('mission_type').replace('defence','defense').replace('exterminate','extermination'))
         const planet = LU(interaction.fields.getTextInputValue('planet'))
         const node = LU(interaction.fields.getTextInputValue('node'))
-        if ((planet && !node) || (node && !planet)) {
-            interaction.reply({content: `Please put the planet name as well as the node, not just one of them`, ephemeral: true}).catch(console.error)
-            return
-        }
+        // if ((planet && !node) || (node && !planet)) {
+        //     interaction.reply({content: `Please put the planet name as well as the node, not just one of them`, ephemeral: true}).catch(console.error)
+        //     return
+        // }
         if (relic_type != 'lith' && relic_type != 'meso' && relic_type != 'neo' && relic_type != 'axi' && relic_type != 'requiem') {
             interaction.reply({content: `**${relic_type}** is an invalid relic type.\nPlease type one of: lith, meso, neo, axi, or requiem`, ephemeral: true}).catch(console.error)
             return
