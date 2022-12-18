@@ -3217,7 +3217,7 @@ async function global_upgrades_check() {
                                 embeds: [{
                                     title: 'Event Booster',
                                     description: `React to be notified when a booster is active\n\nNo booster active right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
-                                    footer: {text: 'Note: This alert is unstable at the moment'},
+                                    //footer: {text: 'Note: This alert is unstable at the moment'},
                                     color: colors.global_upgrades
                                 }]
                             }).catch(console.error)
@@ -3438,7 +3438,7 @@ async function invasions_check() {
                     value: '',
                     inline: true
                 }],
-                footer: {text: 'Note: This alert is unstable at the moment'},
+                //footer: {text: 'Note: This alert is unstable at the moment'},
                 color: colors.invasions
             }
             invasions_list = invasions_list.sort(dynamicSort("expiry"))
