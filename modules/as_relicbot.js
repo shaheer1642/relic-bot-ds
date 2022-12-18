@@ -525,7 +525,7 @@ function rb_remove_server(guild_id) {
                 res[0].rows.forEach(async row => {
                     const channel = client.channels.cache.get(row.channel_id) || await client.channels.fetch(row.channel_id).catch(console.error)
                     if (!channel) return
-                    channel.send('This server has been unaffiliated from WarframeHub. Farewell!').catch(console.error)
+                    channel.send('This server has been unaffiliated from AllSquads. Farewell!').catch(console.error)
                 })
                 resolve()
             } else return reject('Server is not affiliated')

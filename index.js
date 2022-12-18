@@ -15,6 +15,7 @@ const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
 const relicbot = require('./modules/as_relicbot.js');
+const squadbot = require('./modules/as_squadbot.js');
 const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
@@ -24,7 +25,7 @@ require('./modules/gmail_client.js');
 require('./modules/trackers.js');
 require('./modules/wfhub_get_started.js');
 require('./modules/as_daywave.js');
-require('./modules/as_squadbot.js');
+require('./modules/as_hubrecruit.js');
 require('./modules/allsquads.js');
 require('./modules/as_gabot.js');
 
@@ -128,6 +129,7 @@ client.on('ready', () => {
 client.on('messageCreate', async message => {
 
     if (Object.keys(relicbot.channels_list).includes(message.channel.id)) return
+    if (Object.keys(squadbot.channels_list).includes(message.channel.id)) return
 
     if (message.author.id == client.user.id && message.type === 'CHANNEL_PINNED_MESSAGE') {
         pins_handler(message)

@@ -1,15 +1,14 @@
-const {db} = require('./db_connection.js');
-const {client} = require('./discord_client.js');
+const {client} = require('./discord_client');
+const {db} = require('./db_connection')
+const uuid = require('uuid')
+const { WebhookClient } = require('discord.js');
+const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
+const WorldState = require('warframe-worldstate-parser');
+const axios = require('axios');
+const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
-
-const squad_timeout = 3600000
-var mention_users_timeout = [] //array of user ids, flushed every 2 minutes to prevent spam
-
-const recruit_channel_id = '1041319859469955073'
-const webhook_messages = ['1050763642729152603','1050763644356526131','1050763646139121704','1050763648127209552','1050763649972703252']
-var webhook_client;
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -18,60 +17,168 @@ const server_commands_perms = [
     '385459793508302851' //ady 
 ]
 
-event_emitter.on('allSquadsNewUserVerified', async data => {
-    const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
-    if (!user) return
-    
-    var squads = getSquadsList()
-    var notification_options = []
-    var i = 0
-    for (const key in squads) {
-        if (key == 'sq_leave_all')
-            continue
-        if (key == 'sq_custom')
-            continue
-        if (key == 'sq_info')
-            continue
-        notification_options.push({
-            label: squads[key].name,
-            value: squads[key].id
-        })
-        i++;
-        if (i == 24) break
-    }
-    notification_options.push({
-        label: 'Remove all',
-        value: 'remove_all'
-    })
+const webhook_messages = {}
+const channels_list = {}
+const webhooks_list = {}
 
-    user.send({
-        content: ' ',
-        embeds: [{
-            description: 'Select the squads you are interested in, to be notified whenever someone hosts them. You may change notification settings in <#1041319859469955073> channel in the future',
-            color: 'WHITE'
-        }],
-        components: [{
-            type: 1,
-            components: [{
-                type: 3,
-                placeholder: 'Track Squads',
-                custom_id: 'wfhub_recruit_notify',
-                min_values: 1,
-                max_values: notification_options.length,
-                options: notification_options
-            }]
-        }]
+const emote_ids = {
+    steel_essence: '<:steel_essence:962508988442869800>',
+    railjack: '<:railjack:1045456185429594214>',
+    hot: '🔥',
+    cold: '❄️',
+    lith: '<:Lith:962457564493271051>',
+    meso: '<:Meso:962457563092361257>',
+    neo: '<:Neo:962457562844909588>',
+    axi: '<:Axi:962457563423735868>',
+}
+
+client.on('ready', async () => {
+    assign_global_variables().then(() => {
+        //edit_recruitment_intro()
     }).catch(console.error)
-})
-
-socket.on('tradebotUsersUpdated', (payload) => {
-    console.log('[warframe_hub_recruit] tradebotUsersUpdated')
     update_users_list()
 })
-socket.on('squadKeywordsUpdate', (payload) => {
-    console.log('[warframe_hub_recruit] squadKeywordsUpdate')
-    update_words_list()
+
+function handleSquadCreateResponses(channel_id,discord_id,responses) {
+    if (!Array.isArray(responses)) responses = [responses]
+    const payloads = [{content: ' ', embeds: [], ephemeral: false}]
+    var k = 0
+    var timeout = 5000
+    responses.forEach(res => {
+        const msg = error_codes_embed(res,discord_id)
+        if (res.code != 200) {
+            console.log(res)
+            if (!msg.components) {
+                if (payloads[k].embeds.length == 10) {
+                    payloads.push({content: ' ', embeds: [], ephemeral: false})
+                    k++;
+                }
+                payloads[k].embeds.push(...msg.embeds)
+            } else {
+                timeout = 10000
+                payloads.push(msg)
+                payloads.push({content: ' ', embeds: [], ephemeral: false})
+                k += 2;
+            }
+        }
+    })
+    payloads.forEach(payload => {
+        if (payload.embeds.length > 0) {
+            const webhook_client = new WebhookClient({url: webhooks_list[channel_id]})
+            webhook_client.send(payload).then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), timeout)).catch(console.error)
+        }
+    })
+}
+
+client.on('messageCreate', async (message) => {
+    if (message.author.bot) return
 })
+
+client.on('interactionCreate', async (interaction) => {
+    if (interaction.isCommand()) {
+        if (interaction.commandName == 'squad_bot') {
+            if (!server_commands_perms.includes(interaction.user.id))
+                return interaction.reply('You do not have permission to use this command').catch(console.error)
+            await interaction.deferReply().catch(console.error)
+            if (interaction.options.getSubcommand() == 'add_server') {
+                add_server(interaction.guild.id).then(res => {
+                    interaction.editReply({
+                        content: ' ',
+                        embeds: [{description: `Successfully affiliated with this server\nChannels can be found at <#${res.id}>`, color: 'WHITE'}]
+                    }).catch(console.error)
+                }).catch(err => {
+                    console.log(err)
+                    interaction.editReply({
+                        content: ' ',
+                        embeds: [{description: 'Error occured\n' + err, color: 'WHITE'}]
+                    }).catch(console.error)
+                })
+            }
+            if (interaction.options.getSubcommand() == 'remove_server') {
+                remove_server(interaction.guild.id).then(res => {
+                    interaction.editReply({
+                        content: ' ',
+                        embeds: [{description: 'Successfully unaffiliated from this server', color: 'WHITE'}]
+                    }).catch(console.error)
+                }).catch(err => {
+                    console.log(err)
+                    interaction.editReply({
+                        content: ' ',
+                        embeds: [{description: 'Error occured\n' + err, color: 'WHITE'}]
+                    }).catch(console.error)
+                })
+            }
+        }
+    }
+    if (interaction.isButton()) {
+    }
+    if (interaction.isModalSubmit()) {
+    }
+    if (interaction.isSelectMenu()) {
+    }
+})
+
+var timeout_edit_webhook_messages = {
+    lith: null,
+    meso: null,
+    neo: null,
+    axi: null,
+}
+var timeout_edit_webhook_messages_reset = {
+    lith: null,
+    meso: null,
+    neo: null,
+    axi: null,
+}
+
+var edit_webhook_messages_time_since_last_call = 0
+function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, single_channel_id) {
+    clearTimeout(timeout_edit_webhook_messages[tier])
+    timeout_edit_webhook_messages[tier] = setTimeout(() => {
+        const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
+        const msg_payload_non_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,false)
+        webhook_messages[tier + '_squads'].forEach(msg => {
+            if (!single_channel_id || single_channel_id == msg.c_id)
+                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+        })
+    }, new Date().getTime() - edit_webhook_messages_time_since_last_call > 1000 ? 0 : 500)
+    clearTimeout(timeout_edit_webhook_messages_reset[tier])
+    timeout_edit_webhook_messages_reset[tier] = setTimeout(() => {
+        const msg_payload_vaulted = embed(squads,tier,null,null,true)
+        const msg_payload_non_vaulted = embed(squads,tier,null,null,false)
+        console.log('msg_payload_vaulted',JSON.stringify(msg_payload_vaulted))
+        console.log('msg_payload_non_vaulted',JSON.stringify(msg_payload_non_vaulted))
+        webhook_messages[tier + '_squads'].forEach(msg => {
+            //if (!single_channel_id || single_channel_id == msg.c_id)
+                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+        })
+    }, 3000);
+    edit_webhook_messages_time_since_last_call = new Date().getTime()
+}
+
+function assign_global_variables() {
+    return new Promise((resolve,reject) => {
+        db.query(`SELECT * FROM as_sb_messages; SELECT * FROM as_sb_channels;`)
+        .then(res => {
+            res[1].rows.forEach((row) => { 
+                channels_list[row.channel_id] = row
+                webhooks_list[row.channel_id] = row.webhook_url
+            })
+            res[0].rows.forEach((row) => {
+                if (!webhook_messages[row.type]) webhook_messages[row.type] = []
+                if (!webhook_messages[row.type].find(obj => obj.m_id == row.message_id)) {
+                    webhook_messages[row.type].push({
+                        m_id: row.message_id,
+                        c_id: row.channel_id,
+                        c_type: channels_list[row.channel_id].type,
+                        url: row.webhook_url,
+                    })
+                }
+            })
+            resolve()
+        }).catch(console.error)
+    })
+}
 
 var users_list = {}
 function update_users_list() {
@@ -85,45 +192,186 @@ function update_users_list() {
     })
 }
 
-var keywords_list = []
-var explicitwords_list = []
-function update_words_list() {
-    db.query(`SELECT * FROM wfhub_keywords`)
-    .then(res => {
-        keywords_list = []
-        explicitwords_list = []
-        res.rows.forEach(row => {
-            if (row.include)
-                keywords_list.push(row.name)
-            else
-                explicitwords_list.push(row.name)
-        })
-    }).catch(console.error)
+function edit_recruitment_intro() {
+    webhook_messages.recruitment_intro?.forEach(msg => {
+        new WebhookClient({url: msg.url}).editMessage(msg.m_id, {
+            content: ' ',
+            embeds: [{
+                "title": "Relic Recruitment",
+                "color": 5814783,
+                "fields": [
+                  {
+                    "name": "Hosting Squad",
+                    "value": "Type message\n```diff\nlith b1\nmeso v2 4b4 int\n```",
+                    "inline": true
+                  },
+                  {
+                    "name": "Joining Squad",
+                    "value": "Click button to join squad\nClick again to leave",
+                    "inline": true
+                  },
+                  {
+                    "name": "Squad fill",
+                    "value": "A new channel will be created including all squad members and you will be notified",
+                    "inline": true
+                  },
+                  {
+                    "name": "2b2 Squads and offcycles",
+                    "value": "Only 2 squad members equip hosted relic at a time, other 2 equip a random relic or offcycle if given. The role is reversed every mission\n```diff\nmeso v2 2b2 int\naxi e1 2b2 rad with axi v8 offcycle\n```"
+                  },
+                  {
+                    "name": "Icons",
+                    "value": "❄️ Squad hosted 15m ago\n🔥 Squad is 3/4",
+                    "inline": true
+                  },
+                  {
+                    "name": "Track Squads",
+                    "value": "Add relics to be notified whenever someone hosts them",
+                    "inline": true
+                  }
+                ]
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Host Squad",
+                    style: 3,
+                    custom_id: `rb_sq_create_modal`
+                },{
+                    type: 2,
+                    label: "Leave all",
+                    style: 4,
+                    custom_id: `rb_sq_leave_all`
+                },{
+                    type: 2,
+                    label: "Track Squads",
+                    style: 1,
+                    custom_id: `rb_sq_trackers_add_modal`
+                },{
+                    type: 2,
+                    label: "Show Trackers",
+                    style: 2,
+                    custom_id: `rb_sq_trackers_show`
+                }]
+            }]
+        }).catch(console.error)
+    })
 }
 
-client.on('ready', async () => {
-    update_users_list()
-    update_words_list()
-    webhook_client = await client.fetchWebhook('1050526671234670634').catch(console.error)
-    setInterval(() => {     // check every 5m for squads timeouts
-        db.query(`SELECT * FROM wfhub_recruit_members`)
-        .then(async res => {
-            for (var i=0; i<res.rowCount; i++) {
-                squad = res.rows[i]
-                if ((new Date().getTime() - squad.join_timestamp) > squad_timeout) {
-                    console.log(`wfhub_recruit: timing out squad ${squad.user_id} ${squad.squad_type}`)
-                    await db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${squad.user_id} AND squad_type = '${squad.squad_type}'`)
-                }
-            }
-            edit_main_msg()
-        }).catch(err => console.log(err))
-    }, 300000);
-    edit_main_msg()
-})
+function add_server(guild_id) {
+    return new Promise((resolve,reject) => {
+        db.query(`INSERT INTO as_sb_guilds (guild_id) VALUES ('${guild_id}')`)
+        .then(res => {
+            if (res.rowCount == 1) {
+                client.guilds.fetch(guild_id)
+                .then(guild => {
+                    guild.channels.create('🚀᲼find-squad',{
+                        type: 'GUILD_TEXT',
+                    }).then(async find_squads => {
+                        const find_squads_wh = await find_squads.createWebhook('Squad',{avatar: 'https://media.discordapp.net/attachments/864199722676125757/1050526257630171227/pngwing.com.png?width=528&height=521'}).catch(console.error)
+                        db.query(`
+                            INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type) VALUES ('${find_squads.id}','${find_squads_wh.url}','${guild_id}','find_squads');
+                        `).then(async () => {
+                            for (const val of ['1','2','3','4','5']) {
+                                var msg_type;
+                                if (index == 0) msg_type = 'find_squads_1'
+                                if (index == 1) msg_type = 'find_squads_2'
+                                if (index == 2) msg_type = 'find_squads_3'
+                                if (index == 3) msg_type = 'find_squads_4'
+                                if (index == 4) msg_type = 'find_squads_5'
+                                await find_squads_wh.send('_ _').then(res => {
+                                    db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${find_squads.id}', '${msg_type}', '${find_squads.url}')`)
+                                }).catch(console.error)
+                            }
+                            setTimeout(assign_global_variables, 10000);
+                            //setTimeout(edit_recruitment_intro, 15000);
+                            resolve({id: find_squads.id})
+                        }).catch(err => reject(err))
+                    }).catch(err => reject(err))
+                }).catch(err => reject(err))
+            } else reject('Unexpected result querying db, please contact developer')
+        }).catch(err => {
+            console.log(err)
+            if (err.code == '23505') return reject('Server is already affiliated')
+            reject(err)
+        })
+    })
+}
 
-function isVerified(discord_id, channel) {
-    if (!users_list[discord_id]) {
-        channel.send({
+function remove_server(guild_id) {
+    return new Promise((resolve,reject) => {
+        db.query(`
+            SELECT * FROM as_sb_channels where guild_id='${guild_id}';
+            DELETE FROM as_sb_guilds where guild_id='${guild_id}';
+        `).then(res => {
+            if (res[1].rowCount == 1) {
+                res[0].rows.forEach(async row => {
+                    const channel = client.channels.cache.get(row.channel_id) || await client.channels.fetch(row.channel_id).catch(console.error)
+                    if (!channel) return
+                    channel.send('This server has been unaffiliated from AllSquads. Farewell!').catch(console.error)
+                })
+                resolve()
+            } else return reject('Server is not affiliated')
+        }).catch(err => reject(err))
+    })
+}
+
+function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
+    var fields = []
+    var components = []
+    squads = squads.sort(dynamicSort("main_relics")).filter(squad => vaulted ? squad.is_vaulted == true: squad.is_vaulted == false)
+    squads.map((squad,index) => {
+        if ((vaulted && !squad.is_vaulted) || (!vaulted && squad.is_vaulted)) return
+        var field_value = '\u200b'
+        if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
+            field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
+        else {
+            if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
+            if (squad.is_steelpath) field_value += ' ' + emote_ids.steel_essence
+            if (squad.is_railjack) field_value += ' ' + emote_ids.railjack
+            if (squad.is_old) field_value += ' ' + emote_ids.cold
+        }
+        fields.push({
+            name: `${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
+            value: field_value,
+            inline: true
+        })
+        const k = Math.ceil((index + 1)/5) - 1
+        if (!components[k]) components[k] = {type: 1, components: []}
+        components[k].components.push({
+            type: 2,
+            label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old? emote_ids.cold:''} ${squad.main_relics.join(' ').toUpperCase()}`.replace(/\s+/g, ' ').trim(),
+            style: squad.members.length > 1 ? 3 : 2,
+            custom_id: `rb_sq_${squad.squad_id}`
+        })
+        if (index == squads.length - 1) {
+            const k = Math.ceil((index + 2)/5) - 1
+            if (!components[k]) components[k] = {type: 1, components: []}
+            components[k].components.push({
+                type: 2,
+                label: "Squad Info",
+                style: 1,
+                custom_id: `rb_sq_info_${tier}`
+            })
+        }
+    })
+    const msg = {
+        content: '\u200b',
+        embeds: fields.length == 0 ? []:[{
+            title: convertUpper(tier),
+            description: ('━').repeat(34),
+            fields: fields,
+            color: tier == 'lith'? 'RED' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'ORANGE' : tier == 'axi' ? 'YELLOW' : ''
+        }],
+        components: components
+    }
+    return msg
+}
+
+function error_codes_embed(response,discord_id) {
+    if (response.code == 499) {
+        return {
             content: ' ',
             embeds: [{
                 description: `<@${discord_id}> Please verify your Warframe account to access this feature\nClick Verify to proceed`,
@@ -137,751 +385,136 @@ function isVerified(discord_id, channel) {
                     style: 1,
                     custom_id: `tb_verify`
                 }]
-            }]
-        }).then(msg => {
-            setTimeout(() => msg.delete().catch(console.error), 10000);
-        }).catch(console.error)
-        return false
-    } else {
-        return true
-    }
-}
-
-client.on('interactionCreate', (interaction) => {
-    //if (interaction.channel.id != recruit_channel_id) return
-    if (interaction.customId) {
-        if (interaction.customId == 'wfhub_recruit_notify') {
-            if (!isVerified(interaction.user.id, interaction.channel)) return
-            edit_main_msg()
-            console.log(interaction.values)
-            db.query(`SELECT * FROM wfhub_squads_data WHERE id=1`).catch(err => console.log(err))
-            .then(res => {
-                var trackers = res.rows[0].trackers
-                for (const value of interaction.values) {
-                    if (value == 'remove_all') {
-                        for (const key in trackers) {
-                            trackers[key] = trackers[key].filter(function(f) { return f !== interaction.user.id })
-                        }
-                        break
-                    }
-                    if (!trackers[value])
-                        trackers[value] = []
-                    if (trackers[value].includes(interaction.user.id)) {
-                        trackers[value] = trackers[value].filter(function(f) { return f !== interaction.user.id })
-                        console.log('wfhub_recruit: user',interaction.user.id,'is untracking',value)
-                    } else {
-                        trackers[value].push(interaction.user.id)
-                        console.log('wfhub_recruit: user',interaction.user.id,'is now tracking',value)
-                    }
-                }
-                db.query(`UPDATE wfhub_squads_data SET trackers='${JSON.stringify(trackers)}' WHERE id=1`).catch(err => console.log(err))
-                var squads_list = getSquadsList()
-                var tracked_squads = []
-                for (const key in trackers) {
-                    if (trackers[key].includes(interaction.user.id)) {
-                        if (squads_list[key])
-                            tracked_squads.push(squads_list[key].name)
-                        else {
-                            tracked_squads.push(convertUpper(key.replace('sq_custom_','').replace(/_/g,'_')))
-                        }
-                    }
-                }
-                var reply_msg = tracked_squads.length > 0 ? `You are now tracking the following squads:\n${tracked_squads.join('\n')}`:'You are not tracking any squads'
-                interaction.reply({content: reply_msg, ephemeral: true}).catch(err => console.log(err))
-            })
-            return
-        } else if (interaction.customId == 'sq_leave_all') {
-            if (!isVerified(interaction.user.id, interaction.channel)) return
-            db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${interaction.user.id}`).then(res => {interaction.deferUpdate().catch(err => console.log(err));edit_main_msg()}).catch(err => console.log(err))
-            console.log(`wfhub_recruit: user ${interaction.user.id} left all squads`)
-            return
-        } else if (interaction.customId == 'sq_info') {
-            if (!isVerified(interaction.user.id, interaction.channel)) return
-            interaction.deferUpdate().catch(console.error)
-            edit_main_msg(true)
-            setTimeout(() => {
-                edit_main_msg()
-            }, 3000);
-        } else if (interaction.customId == 'sq_custom') {
-            if (!isVerified(interaction.user.id, interaction.channel)) return
-            interaction.showModal({
-                title: "Host New Squad",
-                custom_id: "sq_custom_modal",
-                components: [
-                    {
-                        type: 1,
-                        components: [{
-                            type: 4,
-                            custom_id: "squad_name",
-                            label: "Squad Name",
-                            style: 2,
-                            min_length: 1,
-                            max_length: 4000,
-                            placeholder: "polymer bundle farm\neidolon 4x3 lf volt, harrow, trin",
-                            required: true
-                        }]
-                    },{
-                        type: 1,
-                        components: [{
-                            type: 4,
-                            custom_id: "squad_spots",
-                            label: "Total Spots",
-                            style: 1,
-                            min_length: 1,
-                            max_length: 1,
-                            value: 4,
-                            placeholder: "i.e. 4",
-                            required: true
-                        }]
-                    }
-                ]
-            }).catch(err => console.log(err))
-            return
-        } else if (interaction.customId == 'sq_custom_modal') {
-            if (!isVerified(interaction.user.id, interaction.channel)) return
-            const total_spots = Math.abs(Number(interaction.fields.getTextInputValue('squad_spots')))
-            if (!total_spots) {
-                interaction.reply({content: 'Total spots must be a valid number. Please try again', ephemeral: true}).catch(err => console.log(err))
-                return
-            } else if (total_spots == 1) {
-                interaction.reply({content: 'Total spots must be greater than 1. Please try again', ephemeral: true}).catch(err => console.log(err))
-                return
-            } else if (total_spots > 4) {
-                interaction.reply({content: 'Total spots must be less than 4. Please try again', ephemeral: true}).catch(err => console.log(err))
-                return
-            }
-            //interaction.deferUpdate().catch(err => console.log(err))
-            interaction.fields.getTextInputValue('squad_name').toLowerCase().trim().split('\n').forEach(line => {
-                var hasKeyword = false
-                for (const word of keywords_list) {
-                    if (line.match(word)) {
-                        hasKeyword = true
-                        break
-                    }
-                }
-                if (!hasKeyword) return interaction.reply({content: 'Squad must contain a valid keyword', ephemeral: true}).catch(err => console.log(err))
-                var hasExplicitWord = false
-                for (const word of explicitwords_list) {
-                    if (line.match(word)) {
-                        hasExplicitWord = true
-                        break
-                    }
-                }
-                if (hasExplicitWord) return interaction.reply({content: 'Squad should not contain explicit words', ephemeral: true}).catch(err => console.log(err))
-    
-                if (line.length > 70) {
-                    return interaction.channel.send({
-                        content: `<@${interaction.user.id}> Squad name should be less than 70 characters`,
-                        ephemeral: true
-                    }).catch(err => console.log(err)).then(msg => setTimeout(() => {
-                        msg.delete().catch(console.error)
-                    }, 5000))
-                }
-    
-                db.query(`SELECT * FROM wfhub_recruit_members WHERE squad_type = 'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}'`)
-                .then(res => {
-                    if (res.rowCount != 0) {
-                        interaction.reply({
-                            content: 'Squad already exists',
-                            ephemeral: true
-                        }).catch(err => console.log(err))
-                    } else {
-                        db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
-                        .then(res => {
-                            interaction.deferUpdate().catch(err => console.log(err))
-                            edit_main_msg()
-                            console.log(`wfhub_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
-                        }).catch(err => {
-                            if (err.code == 23505) { // duplicate key
-                                interaction.reply({
-                                    content: 'Squad already exists',
-                                    ephemeral: true
-                                }).catch(err => console.log(err))
-                            } else {
-                                console.log(err)
-                                interaction.reply({
-                                    content: 'Unexpected error occured',
-                                    ephemeral: false
-                                }).catch(err => console.log(err))
-                            }
-                        })
-                    }
-                }).catch(err => {
-                    if (err.code == 23505) { // duplicate key
-                        interaction.reply({
-                            content: 'Squad already exists',
-                            ephemeral: true
-                        }).catch(err => console.log(err))
-                    } else {
-                        console.log(err)
-                        interaction.reply({
-                            content: 'Unexpected error occured: ' + err.stack,
-                            ephemeral: false
-                        }).catch(err => console.log(err))
-                    }
-                })
-            })
-        } else if (interaction.customId.match(/^sq_/)) {
-            if (!isVerified(interaction.user.id, interaction.channel)) return
-            db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${interaction.user.id},'${interaction.customId}',${interaction.customId.match(/^sq_custom/) ? true:false},${new Date().getTime()})`)
-            .then(res => {
-                if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                edit_main_msg()
-                console.log(`wfhub_recruit: user ${interaction.user.id} joined ${interaction.customId}`)
-                mention_users(interaction.user.id,interaction.customId)
-            }).catch(err => {
-                if (err.code == 23505) { // duplicate key
-                    db.query(`DELETE FROM wfhub_recruit_members WHERE user_id = ${interaction.user.id} AND squad_type = '${interaction.customId}'`)
-                    .then(res => {
-                        if (res.rowCount == 1) interaction.deferUpdate().catch(err => console.log(err))
-                        edit_main_msg()
-                        console.log(`wfhub_recruit: user ${interaction.user.id} left ${interaction.customId}`)
-                    })
-                    .catch(err => console.log(err))
-                } else {
-                    console.log(err)
-                }
-            })
+            }],
+            ephemeral: true
         }
-    }
-})
-
-client.on('messageCreate', (message) => {
-    if (message.author.bot) return
-
-    if (message.channel.id != recruit_channel_id) return
-    
-    if (!isVerified(message.author.id, message.channel)) {
-        setTimeout(() => {
-            message.delete().catch(console.error)
-        }, 1000);
-        return
-    }
-
-    if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
-
-    message.content.trim().toLowerCase().split('\n').forEach(line => {
-        console.log(keywords_list,explicitwords_list)
-        var hasKeyword = false
-        for (const word of keywords_list) {
-            if (line.match(word)) {
-                hasKeyword = true
-                break
-            }
-        }
-        if (!hasKeyword) {
-            setTimeout(() => message.delete().catch(console.error), 1000);
-            return message.channel.send({content: `<@${message.author.id}> Squad must contain a valid keyword`}).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000) ).catch(err => console.log(err))
-        }
-        var hasExplicitWord = false
-        for (const word of explicitwords_list) {
-            if (line.match(word)) {
-                hasExplicitWord = true
-                break
-            }
-        }
-        if (hasExplicitWord) {
-            setTimeout(() => message.delete().catch(console.error), 1000);
-            return message.channel.send({content: `<@${message.author.id}> Squad must not contain explicit words`}).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000) ).catch(err => console.log(err))
-        }
-
-        const total_spots = line.match('/4') ? 4 : line.match('/3') ? 3 : line.match('/2') ? 2 : 4
-        line = line.replace(/ [1-9]\/4/g,'').replace(/ [1-9]\/3/g,'').replace(/ [1-9]\/2/g,'').replace(/ [1-9]\/1/g,'')
-        if (line.length > 70) {
-            setTimeout(() => {
-                message.delete().catch(console.error)
-            }, 1000);
-            return message.channel.send({
-                content: `<@${message.author.id}> Squad name should be less than 70 characters`,
-                ephemeral: true
-            }).catch(err => console.log(err)).then(msg => setTimeout(() => {
-                msg.delete().catch(console.error)
-            }, 5000))
-        }
-        
-        db.query(`SELECT * FROM wfhub_recruit_members WHERE squad_type = 'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}'`)
-        .then(res => {
-            if (res.rowCount != 0) {
-                setTimeout(() => {
-                    message.delete().catch(console.error)
-                }, 1000);
-                message.channel.send({content: 'Squad already exists'}).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(err => console.log(err))
-            } else {
-                db.query(`INSERT INTO wfhub_recruit_members (user_id,squad_type,custom,join_timestamp) VALUES (${message.author.id},'sq_custom_${line.trim().toLowerCase().replace(/ /g,'_')}_${total_spots}',true,${new Date().getTime()})`)
-                .then(res => {
-                    setTimeout(() => {
-                        message.delete().catch(console.error)
-                    }, 1000);
-                    edit_main_msg()
-                }).catch(err => {
-                    if (err.code == 23505) {
-                        setTimeout(() => {
-                            message.delete().catch(console.error)
-                        }, 1000);
-                        message.channel.send({content: 'Squad already exists'}).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(err => console.log(err))
-                    } else {
-                        console.log(err)
-                        message.channel.send({
-                            content: 'Unexpected error: ' + err.stack,
-                            ephemeral: true
-                        }).catch(err => console.log(err)).then(msg => setTimeout(() => {
-                            msg.delete().catch(console.error)
-                        }, 5000))
-                    }
-                })
-            }
-        }).catch(err => {
-            if (err.code == 23505) {
-                setTimeout(() => {
-                    message.delete().catch(console.error)
-                }, 1000);
-                message.channel.send({content: 'Squad already exists'}).then(msg => setTimeout(() => msg.delete().catch(console.error), 5000)).catch(err => console.log(err))
-            } else {
-                console.log(err)
-                message.channel.send({
-                    content: 'Unexpected error: ' + err.stack,
-                    ephemeral: true
-                }).catch(err => console.log(err)).then(msg => setTimeout(() => {
-                    msg.delete().catch(console.error)
-                }, 5000))
-            }
-        })
-    })
-})
-
-//var timeout_edit_components = null;
-async function edit_main_msg(show_members) {
-    console.log('editing main msg')
-    var squads = getSquadsList()
-
-    await db.query(`SELECT * FROM wfhub_recruit_members`)
-    .then(async res => {
-        //push custom squads to squads list
-        for (const [index,squad] of res.rows.entries()) {
-            if (squad.custom) {
-                if (!squads[squad.squad_type]) {
-                    const name = convertUpper(squad.squad_type.replace(/_[1-4]$/,'').replace(/^sq_custom_/,'').replace(/_/g,' '))
-                    squads[squad.squad_type] = {
-                        name: name,
-                        id: squad.squad_type,
-                        spots: squad.squad_type.split('_')[squad.squad_type.split('_').length - 1],
-                        filled: []
-                    }
-                }
-            }
-        }
-
-        for (var i=0; i<res.rowCount; i++) {
-            const join = res.rows[i];
-            if (squads[join.squad_type]) {
-                squads[join.squad_type].filled.push(join.user_id);
-                if (squads[join.squad_type].filled.length == squads[join.squad_type].spots) {
-                    open_squad(JSON.parse(JSON.stringify(squads[join.squad_type])))
-                    squads[join.squad_type].filled = []
-                }
-            }
-        }
-    }).catch(err => console.log(err))
-
-    const channel = client.channels.cache.get(recruit_channel_id) || await client.channels.fetch(recruit_channel_id).catch(console.error)
-    if (!channel) return
-
-    //clearTimeout(timeout_edit_components)
-    //timeout_edit_components = setTimeout(edit_components, 1500);
-
-    var notification_options = []
-    var i = 0
-    for (const key in squads) {
-        if (key == 'sq_leave_all')
-            continue
-        if (key == 'sq_custom')
-            continue
-        if (key == 'sq_info')
-            continue
-        notification_options.push({
-            label: squads[key].name,
-            value: squads[key].id
-        })
-        i++;
-        if (i == 24) break
-    }
-    notification_options.push({
-        label: 'Remove all',
-        value: 'remove_all'
-    })
-
-    const embeds = []
-    embeds.push({
-        title: 'Recruitment',
-        description: '- Click on the button to join a squad. Click again to leave; or click Leave All\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads **expire** in 1 hour\n\n- Ask anything in <#914990518558134292>. For any queries or bugs, use <#1003269491163148318>\n\n- The server just opened, give it some time to reach full activity! 🙂',
-        color: '#ffffff',
-    })
-    if (show_members) {
-        embeds.push({
-            title: 'Squad Members',
-            color: 'GREEN', 
-            fields: Object.keys(squads).map(id => squads[id].filled?.length > 0 ? {
-                name: squads[id].name,
-                value: squads[id].filled.map(m_id => users_list[m_id]?.ingame_name).join('\n'),
-                inline: true
-            }:null).filter(o => o != null)
-        })
-    }
-
-    edit_components()
-
-    async function edit_components() {
-        console.log('[edit_components] called')
-        const components = getButtonComponents()
-
-        for (const [index,message_id] of webhook_messages.entries()) {
-            const message = await webhook_client.fetchMessage(message_id).catch(console.error)
-            if (!message) continue
-            console.log('[edit_components] got msg object',message.id)
-            if (index > 0 ) if (message.components.length == 0 && !components[index]) break
-            webhook_client.editMessage(message_id,{
-                content: '_ _',
-                embeds: index == 0 ? embeds : [],
-                components: components[index] ? components[index] : []
-            }).then(res => {
-                console.log('[edit_components] edited msg',message_id)
-            }).catch(err => console.log(err))
-        }
-    }
-
-
-    function getButtonComponents() {
-        var components = [];
-
-        var squadArr = []
-        Object.keys(squads).forEach(squad => {
-            if (squads[squad].id == 'sq_leave_all' || squads[squad].id == 'sq_custom' || squads[squad].id == 'sq_info') return       // return for now, push later at the end of arr
-            squadArr.push(squads[squad]);
-        })
-        squadArr.push(squads.sq_custom);
-        squadArr.push(squads.sq_leave_all);
-        squadArr.push(squads.sq_info);
-
-        //console.log('[getButtonComponents] squadArr: ',squadArr)
-
-        var k = 0;
-        components[k] = [{
-            type: 1,
-            components: []
-        }]
-        var l = 0;
-        for (const [index,squad] of squadArr.entries()) {
-            if (index % 3 == 0 && index != 0 && index % 15 != 0) {
-                components[k].push({
-                    type: 1,
-                    components: []
-                });
-                l++
-            }
-            if (squad.id == 'sq_leave_all') {
-                components[k][l].components.push({
+    } else if (response.code == 399) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message}`,
+                color: 'GREEN'
+            }],
+            components: [{
+                type: 1,
+                components: [{
                     type: 2,
-                    label: squad.name,
-                    style: 4,
-                    custom_id: squad.id
-                })
-            } else if (squad.id == 'sq_custom') {
-                components[k][l].components.push({
-                    type: 2,
-                    label: squad.name,
+                    label: "Join Existing",
                     style: 3,
-                    custom_id: squad.id,
-                })
-            } else if (squad.id == 'sq_info') {
-                components[k][l].components.push({
+                    custom_id: `rb_sq_merge_true_${response.squad_id}`
+                },{
                     type: 2,
-                    label: squad.name,
+                    label: "Host New",
                     style: 1,
-                    custom_id: squad.id,
-                })
-            } else {
-                components[k][l].components.push({
-                    type: 2,
-                    label: `${squad.emote || ''} ${squad.filled.length}/${squad.spots} ${squad.name}`.trim(),
-                    style: squad.filled.length == 4 ? 2:squad.filled.length == 3 ? 4:squad.filled.length == 2 ? 3:squad.filled.length == 1 ? 1:2,
-                    custom_id: squad.id,
-                    emoji: squad.emoji
-                })
-            }
-            if (components[k].length == 5 && components[k][l].components.length == 3 && index != (squadArr.length - 1)) {
-                k++
-                l = 0
-                components[k] = [{
-                    type: 1,
-                    components: []
+                    custom_id: `rb_sq_merge_false$${response.squad_code}`
                 }]
-            }
+            }],
+            ephemeral: true
         }
-        l++;
-        if (l > 4) {
-            k++;
-            l = 0
-            components[k] = [{
-                type: 1,
-                components: []
+    } else if (response.code == 299) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message}`,
+                color: 'GREEN'
+            }],
+            ephemeral: true
+        }
+    } else {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message || response.err || response.error || 'error'}`,
+                color: 'RED'
+            }],
+            ephemeral: true
+        }
+    }
+}
+
+function relicBotSquadToString(squad) {
+    return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()
+}
+
+function constructTrackersEmbed(trackers, ephemeral) {
+
+    const component_options = trackers.reduce((arr,tracker,index) => {
+        if (index < 25) {
+            arr.push({
+                label: `${relicBotSquadToString(tracker)} ${tracker.is_steelpath ? 'Steelpath':tracker.is_railjack ? 'Railjack':''}`,
+                value: tracker.tracker_id,
+                emoji: {
+                    name: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[0],
+                    id: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[1],
+                }
+            })
+        }
+        return arr
+    },[])
+
+    var payload = {
+        content: ' ',
+        embeds: [{
+            title: 'Tracked Squads',
+            color: 'WHITE',
+            fields: [{
+                name: 'Tier',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Squad Name',
+                value: '\u200b',
+                inline: true
+            },{
+                name: 'Fissure Type',
+                value: '\u200b',
+                inline: true
             }]
-        } else {
-            components[k].push({
-                type: 1,
-                components: []
-            });
-        }
-        components[k][l].components.push({
-            type: 3,
-            placeholder: 'Notification Settings',
-            custom_id: 'wfhub_recruit_notify',
-            min_values: 1,
-            max_values: notification_options.length,
-            options: notification_options
-        })
-        
-        //console.log(JSON.stringify(components))
-        return components;
+        }],
+        components: component_options.length > 0 ? [{
+            type: 1,
+            components: [{
+                    type: 3,
+                    custom_id: "rb_sq_trackers_remove",
+                    options: component_options,
+                    placeholder: "Choose a tracker to remove",
+                    min_values: 1,
+                    max_values: component_options.length
+            }]
+        },{
+            type: 1,
+            components: [{
+                    type: 2,
+                    label: "Add Tracker",
+                    style: 3,
+                    custom_id: "rb_sq_trackers_add_modal"
+                },{
+                    type: 2,
+                    label: "Remove All",
+                    style: 4,
+                    custom_id: "rb_sq_trackers_remove_all"
+            }]
+        }] : [{
+            type: 1,
+            components: [
+                {
+                    type: 2,
+                    label: "Add Tracker",
+                    style: 3,
+                    custom_id: "rb_sq_trackers_add_modal"
+                }
+            ]
+        }],
+        ephemeral: ephemeral
     }
-}
-
-function mention_users(joined_user_id,squad_id) {
-    db.query(`SELECT * FROM wfhub_squads_data WHERE id=1`).catch(err => console.log(err))
-    .then(wfhub_squads_data => {
-        db.query(`SELECT * FROM wfhub_recruit_members`).catch(err => console.log(err))
-        .then(wfhub_recruit_members => {
-            var trackers = wfhub_squads_data.rows[0].trackers
-            var joined_members = wfhub_recruit_members.rows
-            if (joined_members.filter(o => o.squad_type == squad_id).length > 1) return
-            var mention_list = []
-            if (trackers[squad_id]) {
-                trackers[squad_id].forEach(userId => {
-                    var member_in_squad = false
-                    for (var member of joined_members) {
-                        if ((member.user_id == userId) && (member.squad_type == squad_id)) {
-                            member_in_squad = true
-                            break
-                        }
-                    }
-                    if ((userId != joined_user_id) && !member_in_squad) {
-                        if (!mention_users_timeout.includes(userId)) {
-                            mention_list.push(`<@${userId}>`)
-                            mention_users_timeout.push(userId)
-                            setTimeout(() => {
-                                mention_users_timeout = mention_users_timeout.filter(function(f) { return f !== userId })
-                            }, 120000);
-                        }
-                    }
-                })
-            }
-            if (mention_list.length > 0) {
-                const squads_list = getSquadsList()
-                client.channels.cache.get(recruit_channel_id).send({content:`Someone is looking for ${squads_list[squad_id].name} squad ${mention_list.join(', ')}`})
-                .then(msg => setTimeout(() => msg.delete().catch(err => console.log(err)), 10000))
-                .catch(console.error)
-            }
-        })
+    trackers.forEach(tracker => {
+        payload.embeds[0].fields[0].value += `${emote_ids[tracker.tier]} ${convertUpper(tracker.tier)}` + '\n'
+        payload.embeds[0].fields[1].value += relicBotSquadToString(tracker) + '\n'
+        payload.embeds[0].fields[2].value += tracker.is_steelpath ? `${emote_ids.steel_essence} Steelpath` : tracker.is_railjack ? `${emote_ids.railjack} Railjack` : 'Normal' + '\n'
     })
+    return payload
 }
 
-function open_squad(squad) {
-    event_emitter.emit('squadbot_squad_filled', squad)
-    console.log('botv squad opened', squad.filled.join(' '))
-    client.channels.cache.get(recruit_channel_id).threads.create({
-        name: squad.name,
-        autoArchiveDuration: 60,
-        reason: 'Squad filled',
-    }).then(thread => {
-        console.log(JSON.stringify(squad))
-        setTimeout(() => thread.parent.messages.cache.get(thread.id).delete().catch(err => console.log(err)), 5000)
-        var msg = ""
-        squad.filled.forEach(userId => {
-            msg += `<@${userId}> `
-            client.users.fetch(userId).then(user => user.send({content: `Your ${squad.name} squad has opened. Click on <#${thread.id}> to view squad`}).catch(err => console.log(err))).catch(err => console.log(err))
-        })
-
-        try {
-            thread.send({content: msg.trim(), embeds: [{
-                title: squad.name,
-                description: `Please decide a host and invite each other in the game.\n\n${squad.filled.map(userId => `/invite ${users_list[userId]?.ingame_name}`).join('\n').replace(/_/g, '\_')}`,
-                color: '#ffffff'
-            }]}).catch(err => console.log(err))
-        } catch (e) {
-            console.log(e)
-            thread.send({content: msg.trim(), embeds: [{
-                title: squad.name,
-                description: `Please decide a host and invite each other in the game.`,
-                color: '#ffffff'
-            }]}).catch(err => console.log(err))
-        }
-
-    }).catch(err => console.log(err))
-    db.query(`
-        DELETE FROM wfhub_recruit_members WHERE user_id = ANY(ARRAY[${squad.filled.join(', ')}]);
-        UPDATE rb_squads SET members=members${squad.filled.map(discord_id => `-'${discord_id}'`).join('')} WHERE status='active';
-        UPDATE wfhub_squads_data SET history = jsonb_set(history, '{payload,999999}', '${JSON.stringify({squad: squad.id,members: squad.filled, timestamp: new Date().getTime()})}', true);
-    `).then(res => edit_main_msg())
-    .catch(err => console.log(err))
-}
-
-function getSquadsList() {
-    return {
-        sq_fissures: {
-            name: 'Fissures',
-            id: 'sq_fissures',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '1050151399066968074',
-                name: 'relic_pack'
-            }
-        },
-        sq_sortie: {
-            name: 'Sortie',
-            id: 'sq_sortie',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '1050156747135909918',
-                name: 'Sortie_b'
-            }
-        },
-        sq_incursions: {
-            name: 'Incursions',
-            id: 'sq_incursions',
-            spots: 3,
-            filled: [],
-            emoji: {
-                id: '962508988442869800',
-                name: 'steel_essence'
-            }
-        },
-        sq_alerts: {
-            name: 'Alerts',
-            id: 'sq_alerts',
-            spots: 3,
-            filled: [],
-            emote: '❗'
-        },
-        sq_eidolons: {
-            name: 'Eidolons',
-            id: 'sq_eidolons',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '1050150973718417558',
-                name: 'ArcaneEnergize'
-            }
-        },
-        sq_taxi_help: {
-            name: 'Taxi | Help',
-            id: 'sq_taxi_help',
-            spots: 2,
-            filled: [],
-            emote: '🙋'
-        },
-        sq_mining_fishing: {
-            name: 'Mining | Fishing',
-            id: 'sq_mining_fishing',
-            spots: 2,
-            filled: [],
-            emote: '⛏️'
-        },
-        sq_index: {
-            name: 'Index',
-            id: 'sq_index',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '961605300601913424',
-                name: 'credits'
-            }
-        },
-        sq_profit_taker: {
-            name: 'Profit Taker',
-            id: 'sq_profit_taker',
-            spots: 4,
-            filled: [],
-            emote: '🕷️'
-        },
-        sq_bounties: {
-            name: 'Bounties',
-            id: 'sq_bounties',
-            spots: 4,
-            filled: [],
-            emote: '☠️'
-        },
-        sq_leveling: {
-            name: 'Leveling',
-            id: 'sq_leveling',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '1050156033743523860',
-                name: 'AffinityOrb'
-            }
-        },
-        sq_arbitration: {
-            name: 'Arbitration',
-            id: 'sq_arbitration',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '1050155343776321617',
-                name: 'VitusEssence'
-            }
-        },
-        sq_nightwave: {
-            name: 'Nightwave',
-            id: 'sq_nightwave',
-            spots: 2,
-            filled: [],
-            emoji: {
-                id: '1050154112274141234',
-                name: 'NorasMixVol2Cred'
-            }
-        },
-        sq_lich_murmur: {
-            name: 'Lich (murmur)',
-            id: 'sq_lich_murmur',
-            spots: 3,
-            filled: [],
-            emoji: {
-                id: '1050153404011397150',
-                name: 'lohkglyph'
-            }
-        },
-        sq_endo_arena: {
-            name: 'Endo Arena',
-            id: 'sq_endo_arena',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '962507075475370005',
-                name: 'endo'
-            }
-        },
-        sq_archon_hunt: {
-            name: 'Archon Hunt',
-            id: 'sq_archon_hunt',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '1050150452852949073',
-                name: 'tau_crimson_shard'
-            }
-        },
-        sq_custom: {
-            name: 'Host New Squad',
-            id: 'sq_custom'
-        },
-        sq_leave_all: {
-            name: 'Leave All',
-            id: 'sq_leave_all',
-        },
-        sq_info: {
-            name: 'Squad Info',
-            id: 'sq_info',
-        },
-    }
+module.exports = {
+    channels_list
 }

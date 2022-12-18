@@ -371,7 +371,7 @@ async function addStreamer(username,country_code) {
             }
             db.query(`SELECT * FROM twitch_affiliate_streamers where streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
             .then(res => {
-                if (res.rowCount == 1) resolve(`The streamer **${username}** has already been affiliated with WarframeHub`)
+                if (res.rowCount == 1) resolve(`The streamer **${username}** has already been affiliated with AllSquads`)
                 else if (res.rowCount == 0) {
                     db.query(`INSERT INTO twitch_affiliate_streamers (username,streamer_id,country_code,time_added) VALUES ('${username}','${twitchUser.id}',NULLIF('${country_code}', ''),${new Date().getTime()})`).catch(err => reject(err))
                     .then(res => {
@@ -388,7 +388,7 @@ async function addStreamer(username,country_code) {
                                     await db.query(`INSERT INTO twitch_affiliate_messages (streamer_id,message_id,channel_id,guild_id,message_type,time_added) VALUES ('${twitchUser.id}',${res.id},${row.channel_id},${row.guild_id},'affiliate_message',${new Date().getTime()})`).catch(err => reject(err))
                                 })
                             }
-                            resolve(`**${username}** has now been affiliated with WarframeHub`)
+                            resolve(`**${username}** has now been affiliated with AllSquads`)
                         })
                     })
                 } else {
@@ -408,7 +408,7 @@ async function removeStreamer(username) {
             }
             db.query(`SELECT * FROM twitch_affiliate_streamers WHERE streamer_id = '${twitchUser.id}'`).catch(err => reject(err))
             .then(res => {
-                if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with WarframeHub`)
+                if (res.rowCount == 0) resolve(`The streamer **${username}** was never affiliated with AllSquads`)
                 else if (res.rowCount == 1) {
                     db.query(`SELECT * FROM twitch_affiliate_messages 
                     JOIN twitch_affiliate_channels ON twitch_affiliate_messages.channel_id = twitch_affiliate_channels.channel_id
@@ -423,7 +423,7 @@ async function removeStreamer(username) {
                                 webhookClient.deleteMessage(message.message_id).catch(err => console.log(err))
                                 //client.channels.cache.get(message.channel_id).messages.fetch(message.message_id).then(msg => msg.delete().catch(err => console.log(err))).catch(err => console.log(err))
                             })
-                            resolve(`**${username}** has been unaffiliated from WarframeHub`)
+                            resolve(`**${username}** has been unaffiliated from AllSquads`)
                         })
                     })
                 } else {
@@ -624,9 +624,9 @@ async function removeServerAffiliation(guildId) {
                         await channel.delete().catch(err => console.log(err))
                     })
                 }
-                resolve('The server is has been unaffiliated from WarframeHub')
+                resolve('The server is has been unaffiliated from AllSquads')
             } else if (res.rowCount == 0) {
-                resolve('The server is currently not in affiliation with WarframeHub')
+                resolve('The server is currently not in affiliation with AllSquads')
             } else {
                 reject('Unexpected result querying db, contact developer with error code 504')
             }
@@ -638,7 +638,7 @@ async function addServerAffiliation(guildId) {
     return new Promise((resolve,reject) => {
         db.query(`SELECT * FROM twitch_affiliate_channels WHERE guild_id=${guildId}`).catch(err => reject(err))
         .then(res => {
-            if (res.rowCount == 2) resolve('This server has already been affiliated with WarframeHub')
+            if (res.rowCount == 2) resolve('This server has already been affiliated with AllSquads')
             else if (res.rowCount == 0) {
                 client.guilds.fetch(guildId).catch(err => reject(err))
                 .then(guild => {
@@ -653,9 +653,9 @@ async function addServerAffiliation(guildId) {
                             }).catch(err => reject(err)).then(streameraff => {
                                 streamerlive.setParent(category).catch(err => reject(err))
                                 streameraff.setParent(category).catch(err => reject(err))
-                                streamerlive.createWebhook('Twitch Affiliates (WarframeHub)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
+                                streamerlive.createWebhook('Twitch Affiliates (AllSquads)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
                                 .then(streamerliveWebhook => {
-                                    streameraff.createWebhook('Twitch Affiliates (WarframeHub)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
+                                    streameraff.createWebhook('Twitch Affiliates (AllSquads)',{avatar: 'https://cdn.discordapp.com/attachments/864199722676125757/1001563100438331453/purple-twitch-logo-png-18.png'}).catch(err => reject(err))
                                     .then(streameraffWebhook => {
                                         db.query(`
                                             INSERT INTO twitch_affiliate_channels (channel_id,webhook_url,guild_id,channel_type,time_added) VALUES (${streamerlive.id},'${streamerliveWebhook.url}',${guildId},'live_channel',${new Date().getTime()});
@@ -677,7 +677,7 @@ async function addServerAffiliation(guildId) {
                                                 await streamerliveWebhook.send({
                                                     content: `Streamers currently live are shown here`
                                                 }).catch(err => reject(err))
-                                                resolve(`This server has now been affiliated with WarframeHub. View affiliates in <#${streameraff.id}>`)
+                                                resolve(`This server has now been affiliated with AllSquads. View affiliates in <#${streameraff.id}>`)
                                             })
                                         })
                                     })
