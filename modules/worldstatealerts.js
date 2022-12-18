@@ -425,7 +425,7 @@ async function interaction_handler(interaction) {
             interaction.reply({content: `**${relic_type}** is an invalid relic type.\nPlease type one of: lith, meso, neo, axi, or requiem`, ephemeral: true}).catch(console.error)
             return
         }
-        const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? `_${planet}_`:''}`.replace(/_$/,'')
+        const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? `_${planet}_`:''}`.replace(/_$/,'').replace(/__/g,'_')
         console.log(tracker_id)
         db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id};`)
         .then(res => {
