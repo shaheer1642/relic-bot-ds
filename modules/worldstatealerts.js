@@ -412,7 +412,7 @@ async function interaction_handler(interaction) {
         }).catch(console.error)
     }
     else if (interaction.customId == 'worldstatealerts_fissures_tracker_add') {
-        const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type').replace('steel path','steelpath'))
+        const fissure_type = LU(interaction.fields.getTextInputValue('fissure_type').replace('steel path','steelpath').replace('rail jack','railjack'))
         const relic_type = LU(interaction.fields.getTextInputValue('relic_type')).replace('reqieum','requiem').replace('requium','requiem').replace('requim','requiem')
         const mission_type = LU(interaction.fields.getTextInputValue('mission_type').replace('defence','defense').replace('exterminate','extermination'))
         const planet = LU(interaction.fields.getTextInputValue('planet'))
@@ -425,7 +425,7 @@ async function interaction_handler(interaction) {
             interaction.reply({content: `**${relic_type}** is an invalid relic type.\nPlease type one of: lith, meso, neo, axi, or requiem`, ephemeral: true}).catch(console.error)
             return
         }
-        const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? planet:''}`
+        const tracker_id = `${fissure_type}_${relic_type}_${mission_type}${node ? `_${node}_`:''}${planet ? `_${planet}_`:''}`.replace(/_$/,'')
         console.log(tracker_id)
         db.query(`SELECT fissures_users FROM worldstatealert WHERE channel_id = ${interaction.channel.id};`)
         .then(res => {
@@ -2863,21 +2863,33 @@ async function fissures_check() {
                 embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                // check only mission type
                 user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                // check only mission type + planet
+                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split(' ').filter(w => w.match('(') && w.match(')'))[0])}`, fissure)
+                // check only mission type + planet + node
                 user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
             fissures_list.steelPath.forEach(fissure => {
                 embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                // check only mission type
                 user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                // check only mission type + planet
+                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split(' ').filter(w => w.match('(') && w.match(')'))[0])}`, fissure)
+                // check only mission type + planet + node
                 user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
             fissures_list.voidStorm.forEach(fissure => {
                 embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
                 embed3.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                 embed3.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                // check only mission type
                 user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                // check only mission type + planet
+                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split(' ').filter(w => w.match('(') && w.match(')'))[0])}`, fissure)
+                // check only mission type + planet + node
                 user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
             // last_appeared query

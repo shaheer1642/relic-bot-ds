@@ -851,6 +851,16 @@ function getSquadsList() {
                 name: 'lohkglyph'
             }
         },
+        sq_lich_murmur: {
+            name: 'Sister (murmur)',
+            id: 'sq_sister_murmur',
+            spots: 3,
+            filled: [],
+            emoji: {
+                id: '1050153404011397150',
+                name: 'lohkglyph'
+            }
+        },
         sq_endo_arena: {
             name: 'Endo Arena',
             id: 'sq_endo_arena',
