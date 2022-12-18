@@ -281,7 +281,7 @@ function add_server(guild_id) {
                                 if (index == 3) msg_type = 'find_squads_4'
                                 if (index == 4) msg_type = 'find_squads_5'
                                 await find_squads_wh.send('_ _').then(res => {
-                                    db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${find_squads.id}', '${msg_type}', '${find_squads.url}')`)
+                                    db.query(`INSERT INTO as_sb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${find_squads.id}', '${msg_type}', '${find_squads.url}')`)
                                 }).catch(console.error)
                             }
                             setTimeout(assign_global_variables, 10000);
