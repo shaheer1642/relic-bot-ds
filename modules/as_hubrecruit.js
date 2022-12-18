@@ -857,8 +857,8 @@ function getSquadsList() {
             spots: 3,
             filled: [],
             emoji: {
-                id: '1050153404011397150',
-                name: 'lohkglyph'
+                id: '1054126094715981944',
+                name: 'lohkglyph2'
             }
         },
         sq_endo_arena: {
