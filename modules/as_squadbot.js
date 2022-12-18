@@ -271,7 +271,7 @@ function add_server(guild_id) {
                     }).then(async find_squads => {
                         const find_squads_wh = await find_squads.createWebhook('Squad',{avatar: 'https://media.discordapp.net/attachments/864199722676125757/1050526257630171227/pngwing.com.png?width=528&height=521'}).catch(console.error)
                         db.query(`
-                            INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type) VALUES ('${find_squads.id}','${find_squads_wh.url}','${guild_id}','find_squads');
+                            INSERT INTO as_sb_channels (channel_id,webhook_url,guild_id,type) VALUES ('${find_squads.id}','${find_squads_wh.url}','${guild_id}','find_squads');
                         `).then(async () => {
                             for (const val of ['1','2','3','4','5']) {
                                 var msg_type;
