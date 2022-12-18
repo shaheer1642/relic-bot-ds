@@ -273,7 +273,7 @@ function add_server(guild_id) {
                         db.query(`
                             INSERT INTO as_sb_channels (channel_id,webhook_url,guild_id,type) VALUES ('${find_squads.id}','${find_squads_wh.url}','${guild_id}','find_squads');
                         `).then(async () => {
-                            for (const val of ['1','2','3','4','5']) {
+                            for (const [index,val] of ['1','2','3','4','5'].entries()) {
                                 var msg_type;
                                 if (index == 0) msg_type = 'find_squads_1'
                                 if (index == 1) msg_type = 'find_squads_2'
