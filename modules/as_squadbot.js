@@ -171,7 +171,7 @@ function assign_global_variables() {
                         m_id: row.message_id,
                         c_id: row.channel_id,
                         c_type: channels_list[row.channel_id].type,
-                        url: row.webhook_url,
+                        url: webhooks_list[row.channel_id],
                     })
                 }
             })
