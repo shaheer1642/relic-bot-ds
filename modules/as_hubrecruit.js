@@ -851,7 +851,7 @@ function getSquadsList() {
                 name: 'lohkglyph'
             }
         },
-        sq_lich_murmur: {
+        sq_sister_murmur: {
             name: 'Sister (murmur)',
             id: 'sq_sister_murmur',
             spots: 3,
