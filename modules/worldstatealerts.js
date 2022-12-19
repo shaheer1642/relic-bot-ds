@@ -2866,7 +2866,7 @@ async function fissures_check() {
                 // check only mission type
                 user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
                 // check only mission type + planet
-                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split(' ').filter(w => w.match('(') && w.match(')'))[0])}`, fissure)
+                user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split('(')[1].replace(')',''))}`, fissure)
                 // check only mission type + planet + node
                 user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
@@ -2877,7 +2877,7 @@ async function fissures_check() {
                 // check only mission type
                 user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
                 // check only mission type + planet
-                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split(' ').filter(w => w.match('(') && w.match(')'))[0])}`, fissure)
+                user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split('(')[1].replace(')',''))}`, fissure)
                 // check only mission type + planet + node
                 user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
@@ -2888,7 +2888,7 @@ async function fissures_check() {
                 // check only mission type
                 user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
                 // check only mission type + planet
-                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split(' ').filter(w => w.match('(') && w.match(')'))[0])}`, fissure)
+                user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split('(')[1].replace(')',''))}`, fissure)
                 // check only mission type + planet + node
                 user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(','').replace(')',''))}`, fissure)
             })
