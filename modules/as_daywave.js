@@ -123,7 +123,7 @@ function verify_challenge_relic_maniac(squad) {
     db.query(query.join(' ')).catch(console.error)
 }
 function verify_challenge_archon_is_easy(squad) {
-    if (squad.id == 'sq_archon_hunt') {
+    if (squad.id.match('archon')) {
         var query = []
         for (const user_id of squad.filled) {
             query.push(`
@@ -136,7 +136,7 @@ function verify_challenge_archon_is_easy(squad) {
     }
 }
 function verify_challenge_hydrolist_pro(squad) {
-    if (squad.id == 'sq_eidolons') {
+    if (squad.id.match('eidolon')) {
         var query = []
         for (const user_id of squad.filled) {
             query.push(`
@@ -149,7 +149,7 @@ function verify_challenge_hydrolist_pro(squad) {
     }
 }
 function verify_challenge_sortie_for_anasa(squad) {
-    if (squad.id == 'sq_sortie') {
+    if (squad.id.match('sortie')) {
         var query = []
         for (const user_id of squad.filled) {
             query.push(`
@@ -162,7 +162,7 @@ function verify_challenge_sortie_for_anasa(squad) {
     }
 }
 function verify_challenge_helper(squad) {
-    if (squad.id == 'sq_taxi_help') {
+    if (squad.id.match('help')) {
         var query = []
         for (const user_id of squad.filled) {
             query.push(`
@@ -175,7 +175,7 @@ function verify_challenge_helper(squad) {
     }
 }
 function verify_challenge_credit_is_due(squad) {
-    if (squad.id == 'sq_profit_taker' || squad.id == 'sq_index') {
+    if (squad.id.match('profit_taker') || squad.id.match('index')) {
         var query = []
         for (const user_id of squad.filled) {
             query.push(`
