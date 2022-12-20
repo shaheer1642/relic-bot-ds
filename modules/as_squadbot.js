@@ -274,21 +274,31 @@ function update_users_list() {
 var timeout_edit_webhook_messages = null
 var timeout_edit_webhook_messages_reset = null
 var edit_webhook_messages_time_since_last_call = 0
-function edit_webhook_messages(squads,with_all_names,name_for_squad_id, single_channel_id) {
+function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_id) {
     clearTimeout(timeout_edit_webhook_messages)
     timeout_edit_webhook_messages = setTimeout(() => {
-        const payload = embed(squads,with_all_names,name_for_squad_id)
-        webhook_messages['find_squads_1'].forEach(msg => {
-            if (!single_channel_id || single_channel_id == msg.c_id)
-                new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
+        socket.emit('squadbot/squads/fetch',{},(res) => {
+            if (res.code == 200) {
+                squads = res.data
+                const payload = embed(squads,with_all_names,name_for_squad_id)
+                webhook_messages['find_squads_1'].forEach(msg => {
+                    if (!single_channel_id || single_channel_id == msg.c_id)
+                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
+                })
+            }
         })
     }, new Date().getTime() - edit_webhook_messages_time_since_last_call > 1000 ? 0 : 500)
     clearTimeout(timeout_edit_webhook_messages_reset)
     timeout_edit_webhook_messages_reset = setTimeout(() => {
-        const payload = embed(squads)
-        webhook_messages['find_squads_1'].forEach(msg => {
-            //if (!single_channel_id || single_channel_id == msg.c_id)
-                new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
+        socket.emit('squadbot/squads/fetch',{},(res) => {
+            if (res.code == 200) {
+                squads = res.data
+                const payload = embed(squads)
+                webhook_messages['find_squads_1'].forEach(msg => {
+                    //if (!single_channel_id || single_channel_id == msg.c_id)
+                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
+                })
+            }
         })
     }, 3000);
     edit_webhook_messages_time_since_last_call = new Date().getTime()
@@ -545,7 +555,7 @@ socket.on('squadbot/squadCreate', (squad) => {
     const tier = squad.tier
     socket.emit('squadbot/squads/fetch',{},(res) => {
         if (res.code == 200) {
-            edit_webhook_messages(res.data, false, squad.squad_id)
+            edit_webhook_messages(false, squad.squad_id)
         }
     })
     // socket.emit('squadbot/trackers/fetchSubscribers',{squad: squad},(res) => {
@@ -576,11 +586,7 @@ socket.on('squadbot/squadCreate', (squad) => {
 socket.on('squadbot/squadUpdate', (payload) => {
     console.log('[squadUpdate]',payload)
     const squad = payload[0]
-    socket.emit('squadbot/squads/fetch',{tier: squad.tier},(res) => {
-        if (res.code == 200) {
-            edit_webhook_messages(res.data, squad.tier, false,squad.squad_id)
-        }
-    })
+    edit_webhook_messages(false, squad.squad_id)
 })
 
 socket.on('squadbot/squads/opened', async (payload) => {
