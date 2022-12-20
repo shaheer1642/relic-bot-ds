@@ -726,16 +726,16 @@ function open_squad(squad) {
 
 function getSquadsList() {
     return {
-        sq_fissures: {
-            name: 'Fissures',
-            id: 'sq_fissures',
-            spots: 4,
-            filled: [],
-            emoji: {
-                id: '1050151399066968074',
-                name: 'relic_pack'
-            }
-        },
+        // sq_fissures: {
+        //     name: 'Fissures',
+        //     id: 'sq_fissures',
+        //     spots: 4,
+        //     filled: [],
+        //     emoji: {
+        //         id: '1050151399066968074',
+        //         name: 'relic_pack'
+        //     }
+        // },
         sq_sortie: {
             name: 'Sortie',
             id: 'sq_sortie',
@@ -780,13 +780,13 @@ function getSquadsList() {
             filled: [],
             emote: '🙋'
         },
-        sq_mining_fishing: {
-            name: 'Mining | Fishing',
-            id: 'sq_mining_fishing',
-            spots: 2,
-            filled: [],
-            emote: '⛏️'
-        },
+        // sq_mining_fishing: {
+        //     name: 'Mining | Fishing',
+        //     id: 'sq_mining_fishing',
+        //     spots: 2,
+        //     filled: [],
+        //     emote: '⛏️'
+        // },
         sq_index: {
             name: 'Index',
             id: 'sq_index',
@@ -834,7 +834,7 @@ function getSquadsList() {
         sq_nightwave: {
             name: 'Nightwave',
             id: 'sq_nightwave',
-            spots: 2,
+            spots: 3,
             filled: [],
             emoji: {
                 id: '1050154112274141234',
