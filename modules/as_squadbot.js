@@ -86,7 +86,7 @@ client.on('messageCreate', async (message) => {
                 discord_id: message.author.id,
                 message: message.content,
                 thread_id: message.channel.id
-            })
+            }, res => console.log(res))
         }
     }
 })
@@ -128,6 +128,74 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isButton()) {
+        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+
+        if (interaction.customId == 'as_sb_sq_leave_all') {
+            socket.emit('squadbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
+                if (res.code == 200) interaction.deferUpdate().catch(console.error)
+                else {
+                    interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                }
+            })
+        } else if (interaction.customId == 'as_sb_sq_create_modal') {
+            interaction.showModal({
+                title: "Host Squad",
+                custom_id: "as_sb_sq_create",
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "squad_name",
+                            label: "Squad Name(s) seperated by new line",
+                            style: 2,
+                            min_length: 1,
+                            max_length: 4000,
+                            placeholder: "hydron\nprofit taker\neidolon 5x3",
+                            required: true
+                        }]
+                    }
+                ]
+            }).catch(console.error)
+        } else if (interaction.customId.match('as_sb_sq_info_')) {
+            // const tier = interaction.customId.split('rb_sq_info_')[1]
+            // socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
+            //     if (res.code == 200) {
+            //         interaction.deferUpdate().catch(console.error)
+            //         edit_webhook_messages(res.data, tier, true, null, interaction.channel.id)
+            //     } else {
+            //         interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            //     }
+            // })
+        } else if (interaction.customId.match('as_sb_sq_merge_false')) {
+            socket.emit('squadbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
+                interaction.deferUpdate().catch(console.error)
+                interaction.message.delete().catch(console.error)
+                handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
+            })
+        } else if (interaction.customId.match('as_sb_sq_merge_true_')) {
+            const squad_id = interaction.customId.split('as_sb_sq_merge_true_')[1]
+            const discord_id = interaction.user.id
+            socket.emit('squadbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id,channel_id: interaction.channel.id},(res) => {
+                if (res.code == 200) {
+                    interaction.deferUpdate().catch(console.error)
+                    interaction.message.delete().catch(console.error)
+                }
+                else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            })
+        } else if (interaction.customId.match('as_sb_sq_default_')) {
+            socket.emit('squadbot/squads/create',{message: interaction.customId.split('as_sb_sq_default_')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id}, responses => {
+                interaction.deferUpdate().catch(console.error)
+                handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
+            })
+        } else if (interaction.customId.match('as_sb_sq_')) {
+            const squad_id = interaction.customId.split('as_sb_sq_')[1]
+            const discord_id = interaction.user.id
+            socket.emit('squadbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id,channel_id: interaction.channel.id},(res) => {
+                if (res.code == 200) interaction.deferUpdate().catch(console.error)
+                else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            })
+        }
     }
     if (interaction.isModalSubmit()) {
     }
@@ -286,12 +354,16 @@ function remove_server(guild_id) {
 }
 
 function embed(squads, with_all_names, name_for_squad_id) {
+    console.log('embed called',new Date().getTime())
     //var fields = []
     var components = []
 
     const new_squads_obj = {}
-    default_squads.concat(squads).map(squad => {
-        new_squads_obj[squad.squad_string] = squad
+    default_squads.concat(squads).map((squad,index) => {
+        if (new_squads_obj[squad.squad_string] && !new_squads_obj[squad.squad_string].is_default)
+            new_squads_obj[squad.squad_string + index] = squad
+        else
+            new_squads_obj[squad.squad_string] = squad
     })
 
     const new_squads = []
@@ -299,7 +371,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
         new_squads.push(new_squads_obj[squad])
     })
 
-    console.log(JSON.stringify(new_squads))
+    console.log(JSON.stringify(new_squads),new Date().getTime())
 
     new_squads.map((squad,index) => {
         // var field_value = '\u200b'
@@ -322,7 +394,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
             type: 2,
             label: `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}`,
             style: squad.members.length == 4 ? 2:squad.members.length == 3 ? 4:squad.members.length == 2 ? 3:squad.members.length == 1 ? 1:2,
-            custom_id: squad.is_default ?  `as_sb_sq_default_${squad.squad_string}`: `as_sb_sq_${squad.squad_id}`
+            custom_id: squad.is_default ?  `as_sb_sq_default_${squad.squad_string}_1/${squad.spots}`: `as_sb_sq_${squad.squad_id}`
         })
     })
     const msg = {
@@ -348,17 +420,17 @@ function edit_recruitment_intro() {
                     type: 2,
                     label: "Host Squad",
                     style: 3,
-                    custom_id: `sb_sq_create_modal`
+                    custom_id: `as_sb_sq_create_modal`
                 },{
                     type: 2,
                     label: "Leave all",
                     style: 4,
-                    custom_id: `sb_sq_leave_all`
+                    custom_id: `as_sb_sq_leave_all`
                 },{
                     type: 2,
                     label: "Squad Info",
                     style: 1,
-                    custom_id: `sb_sq_squad_info`
+                    custom_id: `as_sb_sq_squad_info`
                 }]
             }, {
                 type: 1,
@@ -440,7 +512,7 @@ function error_codes_embed(response,discord_id) {
                     type: 2,
                     label: "Host New",
                     style: 1,
-                    custom_id: `as_sb_merge_false$${response.squad_code}`
+                    custom_id: `as_sb_sq_merge_false$${response.squad_string}`
                 }]
             }],
             ephemeral: true
@@ -512,8 +584,8 @@ socket.on('squadbot/squadUpdate', (payload) => {
 })
 
 socket.on('squadbot/squads/opened', async (payload) => {
-    event_emitter.emit('relicbot_squad_filled',payload)
-    console.log('[relicbot/squads/opened]',payload)
+    //event_emitter.emit('squadbot_squad_filled',payload)
+    console.log('[squadbot/squads/opened]',payload)
     const squad = payload
     const thread_ids = []
     const channel_ids = {}
@@ -528,35 +600,41 @@ socket.on('squadbot/squads/opened', async (payload) => {
         const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
         if (!channel) continue
         await channel.threads.create({
-            name: `${convertUpper(squad.tier)} ${squad.main_relics.join(' ')}`,
+            name: `${convertUpper(squad.squad_string)}`,
             autoArchiveDuration: 60,
-            reason: 'Relic squad filled'
+            reason: 'Squad filled'
         }).then(async thread => {
             channel_ids[channel_id].map(async discord_id => {
                 const user = client.users.cache.get(discord_id) || client.users.fetch(discord_id).catch(console.error)
                 if (user)
-                    user.send(`Your **${relicBotSquadToString(squad)}** squad has been filled. Click <#${thread.id}> to view squad`).catch(console.error)
+                    user.send(`Your **${convertUpper(squad.squad_string)}** squad has been filled. Click <#${thread.id}> to view squad`).catch(console.error)
             })
             thread_ids.push(thread.id)
             thread.send({
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
-                    description: `**${relicBotSquadToString(squad)}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`
+                    title: convertUpper(squad.squad_string),
+                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`,
+                    footer: {
+                        text: `This squad will auto-close in 30m`
+                    }
                 }]
             }).catch(console.error)
             if (Object.keys(channel_ids).length > 1) thread.send({content: 'This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
             setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
         }).catch(console.error)
     }
-    socket.emit('relicbot/squads/update',{params: `thread_ids='${JSON.stringify(thread_ids)}' WHERE squad_id='${squad.squad_id}' AND status='opened'`})
+    socket.emit('squadbot/squads/update',{params: `thread_ids='${JSON.stringify(thread_ids)}' WHERE squad_id='${squad.squad_id}' AND status='opened'`})
 })
 
 socket.on('squadbot/squads/closed', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
-        channel.send({content: `**--- Squad closed ---**`}).catch(console.error)
-        channel.setArchived().catch(console.error)
+        channel.send({content: `**--- Squad closed ---**`})
+        .then(res => {
+            channel.setArchived().catch(console.error)
+        }).catch(console.error)
     })
 })
 
@@ -564,8 +642,10 @@ socket.on('squadbot/squads/disbanded', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
-        channel.send({content: `**--- Squad disbanded. A member joined another squad ---**`}).catch(console.error)
-        channel.setArchived().catch(console.error)
+        channel.send({content: `**--- Squad disbanded. A member joined another squad ---**`})
+        .then(res => {
+            channel.setArchived().catch(console.error)
+        }).catch(console.error)
     })
 })
 
@@ -574,7 +654,7 @@ socket.on('tradebotUsersUpdated', (payload) => {
     update_users_list()
 })
 
-socket.on('squadMessageCreate',payload => {
+socket.on('squadbot/squadMessageCreate',payload => {
     payload.squad_thread_ids.forEach(async thread_id => {
         if (thread_id != payload.thread_id) {
             const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)

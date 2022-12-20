@@ -70,14 +70,16 @@ client.on('messageReactionAdd', async (reaction,user) => {
             const giveaway = res[0].rows[0]
             const user_account = res[1].rows[0]
             if (!giveaway) return reaction.users.remove(user.id).catch(console.error)
-            if (giveaway.status != 'active') return reaction.users.remove(user.id).catch(console.error) 
-            if (!user_account) {
-                reaction.users.remove(user.id).catch(console.error)
-                return replyAndDelete(reaction.message.channel, `<@${user.id}> You do not have enough RP to join this giveaway\nCurrent RP: 0\nCheck <#1050484747735924736> on how to earn RP`)
-            }
-            if (user_account.balance < giveaway.rp_cost) {
-                reaction.users.remove(user.id).catch(console.error)
-                return replyAndDelete(reaction.message.channel, `<@${user.id}> You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`)
+            if (giveaway.status != 'active') return reaction.users.remove(user.id).catch(console.error)
+            if (giveaway.rp_cost > 0) {
+                if (!user_account) {
+                    reaction.users.remove(user.id).catch(console.error)
+                    return replyAndDelete(reaction.message.channel, `<@${user.id}> You do not have enough RP to join this giveaway\nCurrent RP: 0\nCheck <#1050484747735924736> on how to earn RP`)
+                }
+                if (user_account.balance < giveaway.rp_cost) {
+                    reaction.users.remove(user.id).catch(console.error)
+                    return replyAndDelete(reaction.message.channel, `<@${user.id}> You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`)
+                }
             }
             if (giveaway.discord_id == user.id) {
                 reaction.users.remove(user.id).catch(console.error)
