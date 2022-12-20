@@ -501,17 +501,17 @@ socket.on('squadbot/squadCreate', (squad) => {
     // })
 })
 
-socket.on('squadUpdate', (payload) => {
+socket.on('squadbot/squadUpdate', (payload) => {
     console.log('[squadUpdate]',payload)
     const squad = payload[0]
-    socket.emit('relicbot/squads/fetch',{tier: squad.tier},(res) => {
+    socket.emit('squadbot/squads/fetch',{tier: squad.tier},(res) => {
         if (res.code == 200) {
             edit_webhook_messages(res.data, squad.tier, false,squad.squad_id)
         }
     })
 })
 
-socket.on('relicbot/squads/opened', async (payload) => {
+socket.on('squadbot/squads/opened', async (payload) => {
     event_emitter.emit('relicbot_squad_filled',payload)
     console.log('[relicbot/squads/opened]',payload)
     const squad = payload
@@ -551,7 +551,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
     socket.emit('relicbot/squads/update',{params: `thread_ids='${JSON.stringify(thread_ids)}' WHERE squad_id='${squad.squad_id}' AND status='opened'`})
 })
 
-socket.on('relicbot/squads/closed', async (payload) => {
+socket.on('squadbot/squads/closed', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
@@ -560,7 +560,7 @@ socket.on('relicbot/squads/closed', async (payload) => {
     })
 })
 
-socket.on('relicbot/squads/disbanded', async (payload) => {
+socket.on('squadbot/squads/disbanded', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
