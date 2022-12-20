@@ -603,7 +603,7 @@ async function edit_main_msg(show_members) {
                 components[k][l].components.push({
                     type: 2,
                     label: `${squad.emote || ''} ${squad.filled.length}/${squad.spots} ${squad.name}`.trim(),
-                    style: squad.filled.length == 4 ? 2:squad.filled.length == 3 ? 4:squad.filled.length == 2 ? 3:squad.filled.length == 1 ? 1:2,
+                    style: (squad.spots - squad.filled.length) == 1 ? 4 : (squad.spots - squad.filled.length) == 2 ? 3 : (squad.spots - squad.filled.length) == 3 ? 1 : 2, //== 4 ? 2:squad.filled.length == 3 ? 4:squad.filled.length == 2 ? 3:squad.filled.length == 1 ? 1:2,
                     custom_id: squad.id,
                     emoji: squad.emoji
                 })
