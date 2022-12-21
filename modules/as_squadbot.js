@@ -137,6 +137,44 @@ client.on('interactionCreate', async (interaction) => {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
                 }
             })
+        } else if (interaction.customId == 'as_sb_sq_trackers_add_modal') {
+            interaction.showModal({
+                title: "Track Squads",
+                custom_id: "as_sb_sq_trackers_add",
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "squad_name",
+                            label: "Squad Name(s) seperated by new line",
+                            style: 2,
+                            min_length: 1,
+                            max_length: 4000,
+                            placeholder: "hydron\nprofit taker\neidolon 5x3",
+                            required: true
+                        }]
+                    }
+                ]
+            }).catch(console.error)
+        } else if (interaction.customId == 'as_sb_sq_trackers_show') {
+            socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                if (res.code == 200) {
+                    interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                } else {
+                    interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                }
+            })
+        } else if (interaction.customId == 'as_sb_sq_trackers_remove_all') {
+            socket.emit('squadbot/trackers/delete',{discord_id: interaction.user.id},(res) => {
+                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
         } else if (interaction.customId == 'as_sb_sq_create_modal') {
             interaction.showModal({
                 title: "Host Squad",
@@ -199,33 +237,32 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isModalSubmit()) {
         if (!Object.keys(channels_list).includes(interaction.channel.id)) return
-        // if (interaction.customId == 'rb_sq_trackers_add') {
-        //     console.log('[rb_sq_trackers_add]')
-        //     socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
-        //         console.log(responses)
-        //         if (!Array.isArray(responses)) responses = [responses]
-        //         socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
-        //             if (res.code == 200) {
-        //                 if (interaction.message) {
-        //                     if (interaction.message.embeds[0]) {
-        //                         if (interaction.message.embeds[0].title == 'Tracked Squads') {
-        //                             interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
-        //                         } else {
-        //                             interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
-        //                         }
-        //                     } else {
-        //                         interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
-        //                     }
-        //                 } else {
-        //                     interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
-        //                 }
-        //             } else {
-        //                 interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
-        //             }
-        //         })
-        //     })
-        // }
-        if (interaction.customId == 'as_sb_sq_create') {
+        if (interaction.customId == 'as_sb_sq_trackers_add') {
+            console.log('[as_sb_sq_trackers_add]')
+            socket.emit('squadbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
+                console.log(responses)
+                if (!Array.isArray(responses)) responses = [responses]
+                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        if (interaction.message) {
+                            if (interaction.message.embeds[0]) {
+                                if (interaction.message.embeds[0].title == 'Tracked Squads') {
+                                    interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                } else {
+                                    interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                }
+                            } else {
+                                interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                            }
+                        } else {
+                            interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                        }
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
+        } else if (interaction.customId == 'as_sb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
             
             socket.emit('squadbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
@@ -235,8 +272,113 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isSelectMenu()) {
+        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+        if (interaction.customId == 'as_sb_sq_trackers_add_menu') {
+            console.log('[as_sb_sq_trackers_add_menu]')
+            socket.emit('squadbot/trackers/create',{message: interaction.values,discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
+                //console.log(responses)
+                if (!Array.isArray(responses)) responses = [responses]
+                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        edit_recruitment_intro()
+                        if (interaction.message) {
+                            if (interaction.message.embeds[0]) {
+                                if (interaction.message.embeds[0].title == 'Tracked Squads') {
+                                    interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                } else {
+                                    interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                }
+                            } else {
+                                interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                            }
+                        } else {
+                            interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                        }
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
+        } else if (interaction.customId == 'as_sb_sq_trackers_remove') {
+            socket.emit('squadbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
+                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
+        } 
     }
 })
+
+function constructTrackersEmbed(trackers, ephemeral) {
+
+    const component_options = trackers.reduce((arr,tracker,index) => {
+        if (index < 25) {
+            arr.push({
+                label: `${convertUpper(tracker.squad_string)}`,
+                value: tracker.tracker_id,
+                // emoji: {
+                //     name: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[0],
+                //     id: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[1],
+                // }
+            })
+        }
+        return arr
+    },[])
+
+    var payload = {
+        content: ' ',
+        embeds: [{
+            title: 'Tracked Squads',
+            description: trackers.length == 0 ? 'You are not tracking any squads':'',
+            color: 'WHITE',
+            fields: trackers.length == 0 ? []:[{
+                name: 'Squad Name',
+                value: trackers.map(tracker => `${convertUpper(tracker.squad_string)}`).join('\n'),
+                inline: true
+            }]
+        }],
+        components: component_options.length > 0 ? [{
+            type: 1,
+            components: [{
+                    type: 3,
+                    custom_id: "as_sb_sq_trackers_remove",
+                    options: component_options,
+                    placeholder: "Choose a tracker to remove",
+                    min_values: 1,
+                    max_values: component_options.length
+            }]
+        },{
+            type: 1,
+            components: [{
+                    type: 2,
+                    label: "Add Tracker",
+                    style: 3,
+                    custom_id: "as_sb_sq_trackers_add_modal"
+                },{
+                    type: 2,
+                    label: "Remove All",
+                    style: 4,
+                    custom_id: "as_sb_sq_trackers_remove_all"
+            }]
+        }] : [{
+            type: 1,
+            components: [
+                {
+                    type: 2,
+                    label: "Add Tracker",
+                    style: 3,
+                    custom_id: "as_sb_sq_trackers_add_modal"
+                }
+            ]
+        }],
+        ephemeral: ephemeral
+    }
+    return payload
+}
 
 function handleSquadCreateResponses(channel_id,discord_id,responses) {
     if (!Array.isArray(responses)) responses = [responses]
@@ -315,10 +457,23 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
         socket.emit('squadbot/squads/fetch',{},(res) => {
             if (res.code == 200) {
                 squads = res.data
-                const payload = embed(squads,with_all_names,name_for_squad_id)
-                webhook_messages['find_squads_1'].forEach(msg => {
-                    if (!single_channel_id || single_channel_id == msg.c_id)
-                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
+                const payloads = embed(squads,with_all_names,name_for_squad_id)
+                Array(5).fill(0).forEach((value,index) => {
+                    webhook_messages[`find_squads_${index+1}`].forEach(async msg => {
+                        if (!single_channel_id || single_channel_id == msg.c_id) {
+                            if (payloads[index]) {
+                                new WebhookClient({url: msg.url}).editMessage(msg.m_id, payloads[index]).catch(console.error)
+                            } else if (!payloads[index]) {
+                                const channel = client.channels.cache.get(msg.c_id) || await client.channels.fetch(msg.c_id).catch(console.error)
+                                if (!channel) return
+                                const message = channel.messages.cache.get(msg.m_id) || await channel.messages.fetch(msg.m_id).catch(console.error)
+                                if (!message) return
+                                if (message.components.length != 0) {
+                                    new WebhookClient({url: msg.url}).editMessage(msg.m_id, {content: '_ _', embeds: [], components: []}).catch(console.error)
+                                }
+                            }
+                        }
+                    })
                 })
             }
         })
@@ -328,10 +483,23 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
         socket.emit('squadbot/squads/fetch',{},(res) => {
             if (res.code == 200) {
                 squads = res.data
-                const payload = embed(squads)
-                webhook_messages['find_squads_1'].forEach(msg => {
-                    //if (!single_channel_id || single_channel_id == msg.c_id)
-                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
+                const payloads = embed(squads)
+                Array(5).fill(0).forEach((value,index) => {
+                    webhook_messages[`find_squads_${index+1}`].forEach(async msg => {
+                        if (!single_channel_id || single_channel_id == msg.c_id) {
+                            if (payloads[index]) {
+                                new WebhookClient({url: msg.url}).editMessage(msg.m_id, payloads[index]).catch(console.error)
+                            } else if (!payloads[index]) {
+                                const channel = client.channels.cache.get(msg.c_id) || await client.channels.fetch(msg.c_id).catch(console.error)
+                                if (!channel) return
+                                const message = channel.messages.cache.get(msg.m_id) || await channel.messages.fetch(msg.m_id).catch(console.error)
+                                if (!message) return
+                                if (message.components.length != 0) {
+                                    new WebhookClient({url: msg.url}).editMessage(msg.m_id, {content: '_ _', embeds: [], components: []}).catch(console.error)
+                                }
+                            }
+                        }
+                    })
                 })
             }
         })
@@ -418,7 +586,11 @@ function embed(squads, with_all_names, name_for_squad_id) {
 
     console.log(JSON.stringify(new_squads),new Date().getTime())
 
+    const payloads = []
     new_squads.map((squad,index) => {
+        const payload_index = Math.ceil((index + 1)/15) - 1
+        const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
+        if (!payloads[payload_index]) payloads[payload_index] = {content: ' ', embeds: [], components: []}
         // var field_value = '\u200b'
         // if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
         //     field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
@@ -433,21 +605,16 @@ function embed(squads, with_all_names, name_for_squad_id) {
         //     value: field_value,
         //     inline: true
         // })
-        const k = Math.ceil((index + 1)/3) - 1
-        if (!components[k]) components[k] = {type: 1, components: []}
-        components[k].components.push({
+        if (!payloads[payload_index].components[component_index]) payloads[payload_index].components[component_index] = {type: 1, components: []}
+        payloads[payload_index].components[component_index].components.push({
             type: 2,
             label: `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}`,
             style: squad.members.length == 4 ? 2:squad.members.length == 3 ? 4:squad.members.length == 2 ? 3:squad.members.length == 1 ? 1:2,
             custom_id: squad.is_default ?  `as_sb_sq_default_${squad.squad_string}_1/${squad.spots}`: `as_sb_sq_${squad.squad_id}`
         })
     })
-    const msg = {
-        content: '\u200b',
-        embeds: [],
-        components: components
-    }
-    return msg
+    console.log(JSON.stringify(payloads))
+    return payloads
 }
 
 function edit_recruitment_intro() {
@@ -476,41 +643,25 @@ function edit_recruitment_intro() {
                     label: "Squad Info",
                     style: 1,
                     custom_id: `as_sb_sq_squad_info`
+                },{
+                    type: 2,
+                    label: "Show Trackers",
+                    style: 2,
+                    custom_id: `as_sb_sq_trackers_show`
                 }]
             }, {
                 type: 1,
                 components: [{
                     type: 3,
-                    custom_id: "sb_sq_tracker",
-                    options:[
-                        {
-                            "label": "Rogue",
-                            "value": "rogue",
-                            "description": "Sneak n stab",
-                            "emoji": {
-                                "name": "rogue",
-                                "id": "625891304148303894"
-                            }
-                        },
-                        {
-                            "label": "Mage",
-                            "value": "mage",
-                            "description": "Turn 'em into a sheep",
-                            "emoji": {
-                                "name": "mage",
-                                "id": "625891304081063986"
-                            }
-                        },
-                        {
-                            "label": "Priest",
-                            "value": "priest",
-                            "description": "You get heals when I'm done doing damage",
-                            "emoji": {
-                                "name": "priest",
-                                "id": "625891303795982337"
-                            }
-                        }
-                    ],
+                    custom_id: "as_sb_sq_trackers_add_menu",
+                    options: default_squads.map((squad) => ({
+                        label: convertUpper(squad.squad_string),
+                        value: squad.squad_string,
+                        // emoji: {
+                        //     "name": "rogue",
+                        //     "id": "625891304148303894"
+                        // }
+                    })),
                     placeholder: "Notification Settings",
                     min_values: 1,
                     max_values: 3
@@ -587,35 +738,34 @@ function error_codes_embed(response,discord_id) {
 var subscribersTimeout = {}
 socket.on('squadbot/squadCreate', (squad) => {
     console.log('[squadbot/squadCreate]',squad)
-    const tier = squad.tier
     socket.emit('squadbot/squads/fetch',{},(res) => {
         if (res.code == 200) {
             edit_webhook_messages(false, squad.squad_id)
         }
     })
-    // socket.emit('squadbot/trackers/fetchSubscribers',{squad: squad},(res) => {
-    //     if (res.code == 200) {
-    //         const channel_ids = res.data
-    //         for (const channel_id in channel_ids) {
-    //             const discord_ids = channel_ids[channel_id].filter(sub => !subscribersTimeout[sub])
-    //             discord_ids.map(sub => {
-    //                 subscribersTimeout[sub] = true
-    //                 setTimeout(() => {
-    //                     delete subscribersTimeout[sub]
-    //                 }, 120000);
-    //             })
-    //             if (discord_ids.length > 0) {
-    //                 new WebhookClient({url: webhooks_list[channel_id]}).send({
-    //                     content: `${relicBotSquadToString(squad)} ${discord_ids.map(id => `<@${id}>`).join(', ')}`
-    //                 }).then(res => {
-    //                     setTimeout(() => {
-    //                         new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
-    //                     }, 10000);
-    //                 }).catch(console.error)
-    //             }
-    //         }
-    //     }
-    // })
+    socket.emit('squadbot/trackers/fetchSubscribers',{squad: squad},(res) => {
+        if (res.code == 200) {
+            const channel_ids = res.data
+            for (const channel_id in channel_ids) {
+                const discord_ids = channel_ids[channel_id].filter(sub => !subscribersTimeout[sub])
+                discord_ids.map(sub => {
+                    subscribersTimeout[sub] = true
+                    setTimeout(() => {
+                        delete subscribersTimeout[sub]
+                    }, 120000);
+                })
+                if (discord_ids.length > 0) {
+                    new WebhookClient({url: webhooks_list[channel_id]}).send({
+                        content: `Someone is looking for ${convertUpper(squad.squad_string)} squad ${discord_ids.map(id => `<@${id}>`).join(', ')}`
+                    }).then(res => {
+                        setTimeout(() => {
+                            new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
+                        }, 10000);
+                    }).catch(console.error)
+                }
+            }
+        }
+    })
 })
 
 socket.on('squadbot/squadUpdate', (payload) => {
