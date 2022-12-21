@@ -198,6 +198,41 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isModalSubmit()) {
+        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+        // if (interaction.customId == 'rb_sq_trackers_add') {
+        //     console.log('[rb_sq_trackers_add]')
+        //     socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
+        //         console.log(responses)
+        //         if (!Array.isArray(responses)) responses = [responses]
+        //         socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+        //             if (res.code == 200) {
+        //                 if (interaction.message) {
+        //                     if (interaction.message.embeds[0]) {
+        //                         if (interaction.message.embeds[0].title == 'Tracked Squads') {
+        //                             interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+        //                         } else {
+        //                             interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+        //                         }
+        //                     } else {
+        //                         interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+        //                     }
+        //                 } else {
+        //                     interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+        //                 }
+        //             } else {
+        //                 interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+        //             }
+        //         })
+        //     })
+        // }
+        if (interaction.customId == 'as_sb_sq_create') {
+            //console.log('[relicbot rb_sq_create] content:',message.content)
+            
+            socket.emit('squadbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+                interaction.deferUpdate().catch(console.error)
+                handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
+            })
+        }
     }
     if (interaction.isSelectMenu()) {
     }
