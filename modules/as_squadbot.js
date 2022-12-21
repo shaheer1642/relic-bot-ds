@@ -24,40 +24,118 @@ const webhooks_list = {}
 const emote_ids = {
     steel_essence: '<:steel_essence:962508988442869800>',
     railjack: '<:railjack:1045456185429594214>',
-    hot: '🔥',
-    cold: '❄️',
     lith: '<:Lith:962457564493271051>',
     meso: '<:Meso:962457563092361257>',
     neo: '<:Neo:962457562844909588>',
     axi: '<:Axi:962457563423735868>',
+    sortie: '<:Sortie_b:1050156747135909918>',
+    incursion: '<:steel_essence:962508988442869800>',
+    alert: '<:❗:>',
+    eidolon: '<:ArcaneEnergize:1050150973718417558>',
+    help: '<:🙋:>',
+    index: '<:credits:961605300601913424>',
+    profit_taker: '<:🕷️:>',
+    bounty: '<:☠️:>',
+    bounties: '<:☠️:>',
+    leveling: '<:AffinityOrb:1050156033743523860>',
+    arbitration: '<:VitusEssence:1050155343776321617>',
+    nightwave: '<:NorasMixVol2Cred:1050154112274141234>',
+    lich: '<:lohkglyph:1050153404011397150>',
+    sister: '<:lohkglyph2:1054126094715981944>',
+    endo: '<:endo:962507075475370005>',
+    archon: '<:tau_crimson_shard:1050150452852949073>',
+}
+
+function emoteObjFromSquadString(squad_string) {
+    var name = ''
+    var id = ''
+    Object.keys(emote_ids).forEach(key => {
+        if (squad_string.match(key)) {
+            const identifier = emote_ids[key].replace('<:','').replace('>','')
+            name = identifier.split(':')[0]
+            id = identifier.split(':')[1]
+        }
+    })
+    return {
+        name: name,
+        id: id
+    }
 }
 
 const default_squads = [{
     squad_string: 'sortie',
     spots: 4,
     members: [],
-    emoji: {
-        id: '1050156747135909918',
-        name: 'Sortie_b'
-    },
     is_default: true
 },{
-    squad_string: 'nightwave',
+    squad_string: 'incursions',
+    spots: 3,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'alerts',
+    spots: 3,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'eidolons',
+    spots: 4,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'need_help',
     spots: 2,
     members: [],
-    emoji: {
-        id: '1050156747135909918',
-        name: 'Sortie_b'
-    },
     is_default: true
 },{
     squad_string: 'index',
     spots: 4,
     members: [],
-    emoji: {
-        id: '1050156747135909918',
-        name: 'Sortie_b'
-    },
+    is_default: true
+},{
+    squad_string: 'profit_taker',
+    spots: 4,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'bounties',
+    spots: 4,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'leveling',
+    spots: 4,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'arbitration',
+    spots: 4,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'nightwave',
+    spots: 3,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'lich_(murmur)',
+    spots: 3,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'sister_(murmur)',
+    spots: 3,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'endo_arena',
+    spots: 4,
+    members: [],
+    is_default: true
+},{
+    squad_string: 'archon_hunt',
+    spots: 4,
+    members: [],
     is_default: true
 },]
 
@@ -195,16 +273,9 @@ client.on('interactionCreate', async (interaction) => {
                     }
                 ]
             }).catch(console.error)
-        } else if (interaction.customId.match('as_sb_sq_info_')) {
-            // const tier = interaction.customId.split('rb_sq_info_')[1]
-            // socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
-            //     if (res.code == 200) {
-            //         interaction.deferUpdate().catch(console.error)
-            //         edit_webhook_messages(res.data, tier, true, null, interaction.channel.id)
-            //     } else {
-            //         interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
-            //     }
-            // })
+        } else if (interaction.customId == 'as_sb_sq_squad_info') {
+            edit_webhook_messages(true, null, interaction.channel.id)
+            interaction.deferUpdate().catch(console.error)
         } else if (interaction.customId.match('as_sb_sq_merge_false')) {
             socket.emit('squadbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
                 interaction.deferUpdate().catch(console.error)
@@ -320,10 +391,7 @@ function constructTrackersEmbed(trackers, ephemeral) {
             arr.push({
                 label: `${convertUpper(tracker.squad_string)}`,
                 value: tracker.tracker_id,
-                // emoji: {
-                //     name: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[0],
-                //     id: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[1],
-                // }
+                emoji: emoteObjFromSquadString(tracker.squad_string).id != '' ? emoteObjFromSquadString(tracker.squad_string) : emoteObjFromSquadString(tracker.squad_string).name
             })
         }
         return arr
@@ -590,7 +658,16 @@ function embed(squads, with_all_names, name_for_squad_id) {
     new_squads.map((squad,index) => {
         const payload_index = Math.ceil((index + 1)/15) - 1
         const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
-        if (!payloads[payload_index]) payloads[payload_index] = {content: ' ', embeds: [], components: []}
+        if (!payloads[payload_index]) payloads[payload_index] = {content: ' ', embeds: [{description: '⸻'.repeat(10), fields: []}], components: []}
+        if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) {
+            if (squad.members.length > 0) {
+                payloads[payload_index].embeds[0].fields.push({
+                    name: convertUpper(squad.squad_string),
+                    value: squad.members.map(id => users_list[id]?.ingame_name).join('\n'),
+                    inline: true
+                })
+            }
+        }
         // var field_value = '\u200b'
         // if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
         //     field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
@@ -609,8 +686,9 @@ function embed(squads, with_all_names, name_for_squad_id) {
         payloads[payload_index].components[component_index].components.push({
             type: 2,
             label: `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}`,
-            style: squad.members.length == 4 ? 2:squad.members.length == 3 ? 4:squad.members.length == 2 ? 3:squad.members.length == 1 ? 1:2,
-            custom_id: squad.is_default ?  `as_sb_sq_default_${squad.squad_string}_1/${squad.spots}`: `as_sb_sq_${squad.squad_id}`
+            style: squad.members.length == 0 ? 2 : (squad.spots - squad.members.length) == 1 ? 4 : (squad.spots - squad.members.length) == 2 ? 3 : (squad.spots - squad.members.length) == 3 ? 1 : 2,
+            custom_id: squad.is_default ?  `as_sb_sq_default_${squad.squad_string}_1/${squad.spots}`: `as_sb_sq_${squad.squad_id}`,
+            emoji: emoteObjFromSquadString(squad.squad_string).id != '' ? emoteObjFromSquadString(squad.squad_string) : emoteObjFromSquadString(squad.squad_string).name
         })
     })
     console.log(JSON.stringify(payloads))
@@ -657,10 +735,7 @@ function edit_recruitment_intro() {
                     options: default_squads.map((squad) => ({
                         label: convertUpper(squad.squad_string),
                         value: squad.squad_string,
-                        // emoji: {
-                        //     "name": "rogue",
-                        //     "id": "625891304148303894"
-                        // }
+                        emoji: emoteObjFromSquadString(squad.squad_string).id != '' ? emoteObjFromSquadString(squad.squad_string) : emoteObjFromSquadString(squad.squad_string).name
                     })),
                     placeholder: "Notification Settings",
                     min_values: 1,
