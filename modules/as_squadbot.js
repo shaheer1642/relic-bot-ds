@@ -474,7 +474,7 @@ function handleSquadCreateResponses(channel_id,discord_id,responses) {
     payloads.forEach(payload => {
         if (payload.embeds.length > 0) {
             const webhook_client = new WebhookClient({url: webhooks_list[channel_id]})
-            webhook_client.send(payload).catch(console.error) //.then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), timeout)).catch(console.error)
+            webhook_client.send(payload).catch(console.error).then(res => setTimeout(() => webhook_client.deleteMessage(res.id).catch(console.error), timeout)).catch(console.error)
         }
     })
 }
