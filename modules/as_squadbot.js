@@ -911,7 +911,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
                     title: convertUpper(squad.squad_string),
                     description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`,
                     footer: {
-                        text: `This squad will auto-close in 30m`
+                        text: `This squad will auto-close in ${Math.round(squad.squad_closure / 60 / 1000)}`
                     }
                 }]
             }).catch(console.error)
