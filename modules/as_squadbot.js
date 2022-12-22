@@ -234,7 +234,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isButton()) {
-        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+        if (!Object.keys(channels_list).includes(interaction.channel.id) && interaction.guild) return
 
         if (interaction.customId == 'as_sb_sq_leave_all') {
             socket.emit('squadbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
@@ -335,10 +335,10 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isModalSubmit()) {
-        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+        if (!Object.keys(channels_list).includes(interaction.channel.id) && interaction.guild) return
         if (interaction.customId == 'as_sb_sq_trackers_add') {
             console.log('[as_sb_sq_trackers_add]')
-            socket.emit('squadbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
+            socket.emit('squadbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1054843353302323281'},(responses) => {
                 console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
