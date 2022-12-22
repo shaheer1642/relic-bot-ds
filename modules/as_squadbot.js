@@ -812,6 +812,7 @@ function error_codes_embed(response,discord_id) {
 
 var subscribersTimeout = {}
 socket.on('squadbot/squadCreate', (squad) => {
+    if (squad.status != 'active') return
     console.log('[squadbot/squadCreate]',squad)
     socket.emit('squadbot/squads/fetch',{},(res) => {
         if (res.code == 200) {
