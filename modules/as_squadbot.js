@@ -879,7 +879,7 @@ socket.on('squadbot/squadUpdate', (payload) => {
 })
 
 socket.on('squadbot/squads/opened', async (payload) => {
-    //event_emitter.emit('squadbot_squad_filled',payload)
+    event_emitter.emit('squadbot_squad_filled',payload)
     console.log('[squadbot/squads/opened]',payload)
     const squad = payload
     const thread_ids = []
