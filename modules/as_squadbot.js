@@ -62,6 +62,34 @@ function emoteObjFromSquadString(squad_string) {
     }
 }
 
+event_emitter.on('allSquadsNewUserVerified', async data => {
+    const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
+    if (!user) return
+
+    user.send({
+        content: ' ',
+        embeds: [{
+            description: 'Select the squads you are interested in, to be notified whenever someone hosts them. You may change notification settings in <#1054843353302323281> channel in the future',
+            color: 'WHITE'
+        }],
+        components: [{
+            type: 1,
+            components: [{
+                type: 3,
+                custom_id: "as_sb_sq_trackers_add_menu",
+                options: default_squads.map((squad) => ({
+                    label: convertUpper(squad.squad_string),
+                    value: squad.squad_string,
+                    emoji: emoteObjFromSquadString(squad.squad_string).id != '' ? emoteObjFromSquadString(squad.squad_string) : emoteObjFromSquadString(squad.squad_string).name
+                })),
+                placeholder: "Notification Settings",
+                min_values: 1,
+                max_values: default_squads.length
+            }]
+        }]
+    }).catch(console.error)
+})
+
 const default_squads = [{
     squad_string: 'sortie',
     spots: 4,
@@ -343,10 +371,10 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isSelectMenu()) {
-        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+        if (!Object.keys(channels_list).includes(interaction.channel.id) && interaction.guild) return
         if (interaction.customId == 'as_sb_sq_trackers_add_menu') {
             console.log('[as_sb_sq_trackers_add_menu]')
-            socket.emit('squadbot/trackers/create',{message: interaction.values,discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
+            socket.emit('squadbot/trackers/create',{message: interaction.values,discord_id: interaction.user.id, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1054843353302323281'},(responses) => {
                 //console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
@@ -727,7 +755,7 @@ function edit_recruitment_intro() {
                     style: 2,
                     custom_id: `as_sb_sq_trackers_show`
                 }]
-            }, {
+            },{
                 type: 1,
                 components: [{
                     type: 3,
@@ -739,7 +767,7 @@ function edit_recruitment_intro() {
                     })),
                     placeholder: "Notification Settings",
                     min_values: 1,
-                    max_values: 3
+                    max_values: default_squads.length
                 }]
             }]
         }).catch(console.error)

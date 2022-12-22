@@ -25,7 +25,7 @@ require('./modules/gmail_client.js');
 require('./modules/trackers.js');
 require('./modules/wfhub_get_started.js');
 require('./modules/as_daywave.js');
-require('./modules/as_hubrecruit.js');
+//require('./modules/as_hubrecruit.js');
 require('./modules/allsquads.js');
 require('./modules/as_gabot.js');
 
