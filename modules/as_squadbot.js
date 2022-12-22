@@ -97,7 +97,7 @@ const default_squads = [{
     is_default: true
 },{
     squad_string: 'incursions',
-    spots: 3,
+    spots: 4,
     members: [],
     is_default: true
 },{
