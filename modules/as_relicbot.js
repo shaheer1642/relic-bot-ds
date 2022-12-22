@@ -43,7 +43,7 @@ client.on('ready', async () => {
 })
 
 function edit_leaderboard() {
-    socket.emit('relicbot/stats/fetch', {}, (res) => {
+    socket.emit('relicbot/stats/fetch', {limit: 10}, (res) => {
         const payload = {
             content: ' ',
             embeds: [{

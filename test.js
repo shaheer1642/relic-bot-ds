@@ -6,6 +6,7 @@ const uuid = require('uuid')
 client.on('ready', async () => {
     console.log('client is online')
     migrateSquadsData()
+    migrateTrackersData()
 })
 
 function migrateSquadsData() {
