@@ -421,7 +421,7 @@ function edit_recruitment_intro() {
                   },
                   {
                     "name": "Icons",
-                    "value": "❄️ Squad hosted 15m ago\n🔥 Squad is 3/4",
+                    "value": "🔥 Squad is 3/4",
                     "inline": true
                   },
                   {
