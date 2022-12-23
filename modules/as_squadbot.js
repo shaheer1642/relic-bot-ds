@@ -96,7 +96,7 @@ const default_squads = [{
     members: [],
     is_default: true
 },{
-    squad_string: 'incursions',
+    squad_string: 'steelpath_incursions',
     spots: 4,
     members: [],
     is_default: true
