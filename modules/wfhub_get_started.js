@@ -235,7 +235,7 @@ async function testComplete(discord_id) {
     const member = guild.members.cache.get(discord_id) || await guild.members.fetch(discord_id).catch(console.error)
     if (!member) return
     const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-    if (!role) return
+    if (!role) return 
     member.roles.add(role).catch(console.error)
     client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard!\nUse channels <#1054843353302323281> <#1050717343040409630> to start recruiting`)
     .then(msg => {
