@@ -286,7 +286,7 @@ db.on('notification', async (notification) => {
                 content: giveaway.winners_list.length == 0 ? `**Giveaway Ended: ${convertUpper(giveaway.item)}**\n*Not enough entries*` : `**Giveaway Ended**\n${giveaway.winners_list.map(id => `<@${id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}**`,
             }).catch(console.error)
         } else if (giveaway.status == 'active') {
-            message.edit(embedGenerator()).catch(console.error)
+            message.edit(embedGenerator(giveaway)).catch(console.error)
         }
     }
 })
