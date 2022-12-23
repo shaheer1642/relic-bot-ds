@@ -98,6 +98,17 @@ client.on('messageReactionAdd', async (reaction,user) => {
     }
 })
 
+client.on('messageDelete', async (message) => {
+    if (message.channel.id == channel_id) {
+        if (!message.author)
+            message = await client.channels.cache.get(message.channel.id).messages.fetch(message.id).catch(console.error)
+        if (!message.author.bot) return
+        db.query(`
+            DELETE FROM as_gabot_giveaways WHERE message_id='${message.id}';
+        `).catch(console.error)
+    }
+})
+
 client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand() && interaction.guild.id == guild_id && interaction.commandName == 'giveaways') {
         if (interaction.options.getSubcommand() == 'create') {
