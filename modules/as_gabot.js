@@ -227,6 +227,31 @@ socket.on('tradebotUsersUpdated', (payload) => {
     update_users_list()
 })
 
+function embedGenerator(giveaway) {
+    return {
+        content: ' ',
+        embeds: [{
+            title: convertUpper(giveaway.item),
+            description: `React with 🎉 to join\n${giveaway.winner_count || 1} Winner${giveaway.winner_count > 1 ? 's':''} | ${giveaway.join_list.length} Entr${giveaway.join_list.length > 1 ? 'ies':'y'}`,
+            fields: [{
+                name: 'Hosted By',
+                value: `<@${giveaway.discord_id}>`,
+                inline: true
+            },{
+                name: 'RP Required to Join',
+                value: giveaway.rp_cost.toString(),
+                inline: true
+            },{
+                name: 'Expires',
+                value: `<t:${Math.round(giveaway.expiry_timestamp / 1000)}:R>`,
+                inline: true
+            },],
+            color: 'RANDOM',
+            timestamp: new Date().getTime()
+        }]
+    }
+}
+
 
 db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
@@ -260,14 +285,8 @@ db.on('notification', async (notification) => {
             channel.send({
                 content: giveaway.winners_list.length == 0 ? `**Giveaway Ended: ${convertUpper(giveaway.item)}**\n*Not enough entries*` : `**Giveaway Ended**\n${giveaway.winners_list.map(id => `<@${id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}**`,
             }).catch(console.error)
-        } else {
-            message.edit({
-                content: ' ',
-                embeds: message.embeds.map(embed => {
-                    embed.description = `React with 🎉 to join\n${giveaway.winner_count || 1} Winner${giveaway.winner_count > 1 ? 's':''} | ${giveaway.join_list.length} Entr${giveaway.join_list.length > 1 ? 'ies':'y'}`
-                    return embed
-                })
-            }).catch(console.error)
+        } else if (giveaway.status == 'active') {
+            message.edit(embedGenerator()).catch(console.error)
         }
     }
 })
