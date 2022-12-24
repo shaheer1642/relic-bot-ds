@@ -280,19 +280,20 @@ db.on('notification', async (notification) => {
         const message = channel.messages.cache.get(giveaway.message_id) || await channel.messages.fetch(giveaway.message_id).catch(console.error)
         if (!message) return
         if (old_giveaway.status == 'active' && giveaway.status != 'active') {
-            message.edit({
-                content: ' ',
-                embeds: message.embeds.map(embed => {
-                    embed.title = `~~${embed.title}~~ (Ended)`
-                    embed.fields.push({
-                        name: `Winner${giveaway.winners_list.length > 1 ? 's':''}`,
-                        value: giveaway.winners_list.length == 0 ? 'Not enough entries' : giveaway.winners_list.map(id => `<@${id}>`).join('\n'),
-                        inline: false
-                    })
-                    embed.fields = embed.fields.filter(o => o.name != 'Expires')
-                    return embed
-                })
-            }).catch(console.error)
+            message.delete().catch(console.error)
+            // message.edit({
+            //     content: ' ',
+            //     embeds: message.embeds.map(embed => {
+            //         embed.title = `~~${embed.title}~~ (Ended)`
+            //         embed.fields.push({
+            //             name: `Winner${giveaway.winners_list.length > 1 ? 's':''}`,
+            //             value: giveaway.winners_list.length == 0 ? 'Not enough entries' : giveaway.winners_list.map(id => `<@${id}>`).join('\n'),
+            //             inline: false
+            //         })
+            //         embed.fields = embed.fields.filter(o => o.name != 'Expires')
+            //         return embed
+            //     })
+            // }).catch(console.error)
             channel.send({
                 content: giveaway.winners_list.length == 0 ? `**Giveaway Ended: ${convertUpper(giveaway.item)}**\n*Not enough entries*` : `**Giveaway Ended**\n${giveaway.winners_list.map(id => `<@${id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}**`,
             }).catch(console.error)
