@@ -96,17 +96,17 @@ const default_squads = [{
     members: [],
     is_default: true
 },{
-    squad_string: 'steelpath_incursions',
+    squad_string: 'steelpath_incursion',
     spots: 4,
     members: [],
     is_default: true
 },{
-    squad_string: 'alerts',
+    squad_string: 'alert',
     spots: 3,
     members: [],
     is_default: true
 },{
-    squad_string: 'eidolons',
+    squad_string: 'eidolon',
     spots: 4,
     members: [],
     is_default: true
