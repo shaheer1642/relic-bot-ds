@@ -101,7 +101,7 @@ client.on('messageReactionAdd', async (reaction,user) => {
 client.on('messageDelete', async (message) => {
     if (message.channel.id == channel_id) {
         if (!message.author)
-            message = await client.channels.cache.get(message.channel.id).messages.fetch(message.id).catch(console.error)
+            message = await message.fetch().catch(console.error)
         if (!message.author.bot) return
         db.query(`
             UPDATE as_gabot_giveaways SET status = 'cancelled' WHERE message_id='${message.id}' AND status = 'active';
