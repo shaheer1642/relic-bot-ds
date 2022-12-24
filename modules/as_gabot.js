@@ -104,7 +104,7 @@ client.on('messageDelete', async (message) => {
             message = await client.channels.cache.get(message.channel.id).messages.fetch(message.id).catch(console.error)
         if (!message.author.bot) return
         db.query(`
-            DELETE FROM as_gabot_giveaways WHERE message_id='${message.id}';
+            UPDATE as_gabot_giveaways SET status = 'cancelled' WHERE message_id='${message.id}' AND status = 'active';
         `).catch(console.error)
     }
 })
@@ -279,7 +279,7 @@ db.on('notification', async (notification) => {
         if (!channel) return
         const message = channel.messages.cache.get(giveaway.message_id) || await channel.messages.fetch(giveaway.message_id).catch(console.error)
         if (!message) return
-        if (old_giveaway.status == 'active' && giveaway.status != 'active') {
+        if (old_giveaway.status == 'active' && (giveaway.status == 'closed' || giveaway.status == 'discarded')) {
             message.delete().catch(console.error)
             // message.edit({
             //     content: ' ',
