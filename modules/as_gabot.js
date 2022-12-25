@@ -230,23 +230,27 @@ client.on('interactionCreate', async (interaction) => {
                 if (giveaway.rp_cost > 0) {
                     if (!user_account) {
                         return interaction.reply({
-                            content: `You do not have enough RP to join this giveaway\nCurrent RP: 0\nCheck <#1050484747735924736> on how to earn RP`
+                            content: `You do not have enough RP to join this giveaway\nCurrent RP: 0\nCheck <#1050484747735924736> on how to earn RP`, 
+                            ephemeral: true
                         }).catch(console.error)
                     }
                     if (user_account.balance < giveaway.rp_cost) {
                         return interaction.reply({
-                            content: `You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`
+                            content: `You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`, 
+                            ephemeral: true
                         }).catch(console.error)
                     }
                 }
                 if (giveaway.discord_id == interaction.user.id) {
                     return interaction.reply({
-                        content: `Cannot join your own giveaway`
+                        content: `Cannot join your own giveaway`, 
+                        ephemeral: true
                     }).catch(console.error)
                 }
                 if (giveaway.join_list.includes(interaction.user.id)) {
                     return interaction.reply({
-                        content: `You have already joined this giveaway`
+                        content: `You have already joined this giveaway`, 
+                        ephemeral: true
                     }).catch(console.error)
                 }
                 db.query(`
@@ -255,6 +259,7 @@ client.on('interactionCreate', async (interaction) => {
                     VALUES ('${uuid.v4()}',${interaction.user.id},'giveaway_join',${giveaway.rp_cost},'debit',${new Date().getTime()},'${interaction.message.guild.id}');
                     UPDATE as_gabot_giveaways SET join_list = join_list || '"${interaction.user.id}"' WHERE giveaway_id = '${giveaway.giveaway_id}';
                 `).catch(console.error)
+                interaction.deferUpdate().catch(console.error)
             }).catch(console.error)
         }
     }
