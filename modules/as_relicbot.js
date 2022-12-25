@@ -635,8 +635,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
     const squad = payload
     const thread_ids = []
     const channel_ids = {}
-    for (const discord_id in squad.joined_from_channel_ids) {
-        if (!squad.members.includes(discord_id)) continue
+    for (const discord_id of squad.members) {
         const channel_id = squad.joined_from_channel_ids[discord_id]
         if (!channel_ids[channel_id]) channel_ids[channel_id] = []
         channel_ids[channel_id].push(discord_id)
