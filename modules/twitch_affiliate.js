@@ -462,7 +462,7 @@ async function updateAffiliations() {
                     id: streamer.streamer_id,
                     username: twitchUser.name,
                     displayName: twitchUser.displayName,
-                    description: twitchUser.description,
+                    description: twitchUser.name == 'freso' ? '\u200b' : twitchUser.description,
                     avatarUrl: twitchUser.profilePictureUrl,
                     country_code: streamer.country_code,
                     stream: {},
