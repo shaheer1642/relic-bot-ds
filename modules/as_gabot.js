@@ -46,7 +46,7 @@ function closeGiveaway(giveawayObj) {
             }
             winners_list = winners_list.filter(o => o != undefined)
             db.query(`
-                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}', status = '${winners_list.length == 0 ? 'discarded':'closed'}' WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
+                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}', status = 'ended' WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
             `).catch(console.error)
         }).catch(console.error)
     }, giveawayObj.expiry_timestamp - new Date().getTime());
@@ -276,7 +276,7 @@ db.on('notification', async (notification) => {
         if (!channel) return
         const message = channel.messages.cache.get(giveaway.message_id) || await channel.messages.fetch(giveaway.message_id).catch(console.error)
         if (!message) return
-        if (old_giveaway.status == 'active' && (giveaway.status == 'closed' || giveaway.status == 'discarded')) {
+        if (old_giveaway.status == 'active' && giveaway.status == 'ended') {
             message.delete().catch(console.error)
             // message.edit({
             //     content: ' ',
