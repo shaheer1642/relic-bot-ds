@@ -154,7 +154,17 @@ client.on('interactionCreate', async (interaction) => {
                     },],
                     color: 'RANDOM',
                     timestamp: new Date().getTime()
-                }]
+                }],
+                components: [{
+                    type: 1,
+                    components: [{
+                        type: 2,
+                        label: '0',
+                        emoji: '🎉',
+                        style: 3,
+                        custom_id: 'as_ga_join'
+                    }]
+                }],
             }).then(msg => {
                 db.query(`
                     INSERT INTO as_gabot_giveaways (
@@ -179,11 +189,10 @@ client.on('interactionCreate', async (interaction) => {
                         interaction.reply({
                             content: ' ',
                             embeds: [{
-                                description: `Your giveaway **${convertUpper(item)}** has been hosted in channel <#${channel_id}>`
+                                description: `Your giveaway **${convertUpper(item)}** has been hosted in <#${channel_id}> channel`
                             }],
                             ephemeral: true
                         }).catch(console.error)
-                        msg.react('🎉').catch(console.error)
                     } else {
                         interaction.reply({
                             content: ' ',
@@ -205,6 +214,47 @@ client.on('interactionCreate', async (interaction) => {
                     }).catch(console.error)
                     msg.delete().catch(console.error)
                 })
+            }).catch(console.error)
+        }
+    }
+    if (interaction.isButton()) {
+        if (interaction.customId == 'as_ga_join') {
+            db.query(`
+                SELECT * FROM as_gabot_giveaways WHERE message_id = '${interaction.message.id}';
+                SELECT * FROM challenges_accounts WHERE discord_id = ${interaction.user.id};
+            `).then(res => {
+                const giveaway = res[0].rows[0]
+                const user_account = res[1].rows[0]
+                if (!giveaway) return interaction.reply({content: 'Some error occured. Please contact an admin or MrSofty#7012', ephemeral: true}).catch(console.error)
+                if (giveaway.status != 'active') return interaction.reply({content: 'Giveaway is not active', ephemeral: true}).catch(console.error)
+                if (giveaway.rp_cost > 0) {
+                    if (!user_account) {
+                        return interaction.reply({
+                            content: `You do not have enough RP to join this giveaway\nCurrent RP: 0\nCheck <#1050484747735924736> on how to earn RP`
+                        }).catch(console.error)
+                    }
+                    if (user_account.balance < giveaway.rp_cost) {
+                        return interaction.reply({
+                            content: `You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`
+                        }).catch(console.error)
+                    }
+                }
+                if (giveaway.discord_id == interaction.user.id) {
+                    return interaction.reply({
+                        content: `Cannot join your own giveaway`
+                    }).catch(console.error)
+                }
+                if (giveaway.join_list.includes(interaction.user.id)) {
+                    return interaction.reply({
+                        content: `You have already joined this giveaway`
+                    }).catch(console.error)
+                }
+                db.query(`
+                    INSERT INTO challenges_transactions
+                    (transaction_id,discord_id,type,rp,balance_type,timestamp, guild_id)
+                    VALUES ('${uuid.v4()}',${interaction.user.id},'giveaway_join',${giveaway.rp_cost},'debit',${new Date().getTime()},'${interaction.message.guild.id}');
+                    UPDATE as_gabot_giveaways SET join_list = join_list || '"${interaction.user.id}"' WHERE giveaway_id = '${giveaway.giveaway_id}';
+                `).catch(console.error)
             }).catch(console.error)
         }
     }
@@ -256,7 +306,17 @@ function embedGenerator(giveaway) {
             },],
             color: 'RANDOM',
             timestamp: new Date().getTime()
-        }]
+        }],
+        components: [{
+            type: 1,
+            components: [{
+                type: 2,
+                label: giveaway.join_list.length,
+                emoji: '🎉',
+                style: 3,
+                custom_id: 'as_ga_join'
+            }]
+        }],
     }
 }
 
