@@ -574,32 +574,32 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
             }
         })
     }, new Date().getTime() - edit_webhook_messages_time_since_last_call > 1000 ? 0 : 500)
-    clearTimeout(timeout_edit_webhook_messages_reset)
-    timeout_edit_webhook_messages_reset = setTimeout(() => {
-        socket.emit('squadbot/squads/fetch',{},(res) => {
-            if (res.code == 200) {
-                squads = res.data
-                const payloads = embed(squads)
-                Array(5).fill(0).forEach((value,index) => {
-                    webhook_messages[`find_squads_${index+1}`].forEach(async msg => {
-                        if (!single_channel_id || single_channel_id == msg.c_id) {
-                            if (payloads[index]) {
-                                new WebhookClient({url: msg.url}).editMessage(msg.m_id, payloads[index]).catch(console.error)
-                            } else if (!payloads[index]) {
-                                const channel = client.channels.cache.get(msg.c_id) || await client.channels.fetch(msg.c_id).catch(console.error)
-                                if (!channel) return
-                                const message = channel.messages.cache.get(msg.m_id) || await channel.messages.fetch(msg.m_id).catch(console.error)
-                                if (!message) return
-                                if (message.components.length != 0) {
-                                    new WebhookClient({url: msg.url}).editMessage(msg.m_id, {content: '_ _', embeds: [], components: []}).catch(console.error)
-                                }
-                            }
-                        }
-                    })
-                })
-            }
-        })
-    }, 3000);
+    setTimeout(edit_webhook_messages, 3000);
+    // timeout_edit_webhook_messages_reset = setTimeout(() => {
+    //     socket.emit('squadbot/squads/fetch',{},(res) => {
+    //         if (res.code == 200) {
+    //             squads = res.data
+    //             const payloads = embed(squads)
+    //             Array(5).fill(0).forEach((value,index) => {
+    //                 webhook_messages[`find_squads_${index+1}`].forEach(async msg => {
+    //                     if (!single_channel_id || single_channel_id == msg.c_id) {
+    //                         if (payloads[index]) {
+    //                             new WebhookClient({url: msg.url}).editMessage(msg.m_id, payloads[index]).catch(console.error)
+    //                         } else if (!payloads[index]) {
+    //                             const channel = client.channels.cache.get(msg.c_id) || await client.channels.fetch(msg.c_id).catch(console.error)
+    //                             if (!channel) return
+    //                             const message = channel.messages.cache.get(msg.m_id) || await channel.messages.fetch(msg.m_id).catch(console.error)
+    //                             if (!message) return
+    //                             if (message.components.length != 0) {
+    //                                 new WebhookClient({url: msg.url}).editMessage(msg.m_id, {content: '_ _', embeds: [], components: []}).catch(console.error)
+    //                             }
+    //                         }
+    //                     }
+    //                 })
+    //             })
+    //         }
+    //     })
+    // }, 3000);
     edit_webhook_messages_time_since_last_call = new Date().getTime()
 }
 
@@ -631,6 +631,7 @@ function add_server(guild_id) {
                             }
                             setTimeout(assign_global_variables, 10000);
                             setTimeout(edit_recruitment_intro, 15000);
+                            setTimeout(edit_webhook_messages, 15000);
                             resolve({id: find_squads.id})
                         }).catch(err => reject(err))
                     }).catch(err => reject(err))
