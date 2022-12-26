@@ -3,6 +3,8 @@ const io = require('socket.io-client')
 
 const socket = io(process.env.SOCKET_URL, {
     transports : ['websocket'],
+    pingInterval: 1000 * 60 * 5,
+    pingTimeout: 1000 * 60 * 3,
     query: {
         bot_token: process.env.DISCORD_BOT_TOKEN
     }
