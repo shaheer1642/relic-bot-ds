@@ -62,6 +62,10 @@ function emoteObjFromSquadString(squad_string) {
     }
 }
 
+client.on('channelDelete', channel => {
+    db.query(`DELETE FROM as_sb_trackers WHERE channel_id = '${channel.id}'; DELETE FROM rb_trackers WHERE channel_id = '${channel.id}';`)
+})
+
 event_emitter.on('allSquadsNewUserVerified', async data => {
     const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
     if (!user) return
