@@ -167,8 +167,8 @@ async function gmail_api_call(auth) {
                                 user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500')
                             return false
                         } else {
-                            const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
-                            const member = guild.members.cache.get(xx_discord) || await guild.members.fetch(xx_discord).catch(console.error)
+                            const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
+                            const member = await guild.members.fetch(xx_discord).catch(console.error)
                             const role1 = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
                             const role2 = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
                             member.roles.add(role1).catch(console.error)
