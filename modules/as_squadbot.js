@@ -712,7 +712,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
             emoji: emoteObjFromSquadString(squad.squad_string).id != '' ? emoteObjFromSquadString(squad.squad_string) : emoteObjFromSquadString(squad.squad_string).name
         })
     })
-    console.log(JSON.stringify(payloads))
+    //console.log(JSON.stringify(payloads))
     return payloads
 }
 
