@@ -39,7 +39,8 @@
   "scripts": {
     "start": "node -r dotenv/config index.js",
     "test": "nodemon -r dotenv/config test.js",
-    "dev": "nodemon -r dotenv/config index.js"
+    "dev": "nodemon -r dotenv/config index.js",
+    "refresh_as_members": "node -r dotenv/config scripts/refresh_as_members.js"
   },
   "repository": {
     "type": "git",
