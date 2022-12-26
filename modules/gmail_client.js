@@ -171,9 +171,9 @@ async function gmail_api_call(auth) {
                                 const member = await guild.members.fetch(xx_discord).catch(console.error)
                                 const role1 = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
                                 const role2 = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-                                member.roles.add(role1).catch(console.error)
-                                member.roles.add(role2).catch(console.error)
-                                member.setNickname(ingame_name).catch(console.error)
+                                await member.roles.add(role1).catch(console.error)
+                                await member.roles.add(role2).catch(console.error)
+                                await member.setNickname(ingame_name).catch(console.error)
                             } catch (e) {
                                 console.log(e)
                             }
