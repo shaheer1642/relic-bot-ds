@@ -164,7 +164,7 @@ async function gmail_api_call(auth) {
                     //---Check if user already exists
                     db.query(`SELECT * FROM tradebot_users_list WHERE discord_id=${xx_discord}`).then(async res => {
                         if (res.rowCount > 1) {
-                            if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500')
+                            if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500').catch(console.error)
                         } else {
                             try {
                                 const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
