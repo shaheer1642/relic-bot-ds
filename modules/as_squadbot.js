@@ -70,6 +70,11 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
     const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
     if (!user) return
 
+    const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
+    const member = await guild.members.fetch(data.discord_id).catch(console.error)
+
+    if (!member) return
+
     user.send({
         content: ' ',
         embeds: [{
