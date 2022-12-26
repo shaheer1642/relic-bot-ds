@@ -169,11 +169,13 @@ async function gmail_api_call(auth) {
                         } else {
                             const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
                             const member = await guild.members.fetch(xx_discord).catch(console.error)
-                            const role1 = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
-                            const role2 = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-                            member.roles.add(role1).catch(console.error)
-                            member.roles.add(role2).catch(console.error)
-                            member.setNickname(ingame_name).catch(console.error)
+                            if (member) {
+                                const role1 = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+                                const role2 = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+                                member.roles.add(role1).catch(console.error)
+                                member.roles.add(role2).catch(console.error)
+                                member.setNickname(ingame_name).catch(console.error)
+                            }
                             if (res.rowCount == 1) {
                                 var status = await db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}' WHERE discord_id = ${xx_discord}`).then(res => {
                                     if (user)
