@@ -175,7 +175,9 @@ async function gmail_api_call(auth) {
                                 member.roles.add(role1).catch(console.error)
                                 member.roles.add(role2).catch(console.error)
                                 member.setNickname(ingame_name).catch(console.error)
-                            } catch {}
+                            } catch (e) {
+                                console.log(e)
+                            }
                             if (res.rowCount == 1) {
                                 var status = await db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}' WHERE discord_id = ${xx_discord}`).then(res => {
                                     if (user)
