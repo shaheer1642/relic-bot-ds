@@ -9,6 +9,10 @@ const vip_message_id = '1041306046280499200'
 
 client.on('ready', () => {
     edit_vip_message()
+    assign_allsquads_roles()
+    edit_leaderboard()
+    setInterval(assign_allsquads_roles, 3600000);
+    setInterval(edit_leaderboard, 900000);
 })
 
 client.on('interactionCreate', (interaction) => {
@@ -57,6 +61,70 @@ async function edit_vip_message() {
             },
         ]
     }).catch(console.error)
+}
+
+async function assign_allsquads_roles() {
+    const guild = await client.guilds.fetch(guild_id).catch(console.error)
+    if (!guild) return
+    const roles = [{
+        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'star child'),
+        requirement: 3
+    },{
+        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'lotus lover'),
+        requirement: 20
+    },{
+        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'sentient'),
+        requirement: 50
+    },{
+        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'true master'),
+        requirement: 100
+    },{
+        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'legendary'),
+        requirement: 300
+    }]
+    socket.emit('relicbot/stats/fetch', {}, (res) => {
+        if (res.code == 200) {
+            const users = res.data
+            users.map(user => {
+                roles.forEach(async role => {
+                    if (user.squads_completed >= role.requirement) {
+                        const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
+                        if (!member) return
+                        if (!member.roles.cache.get(role.object.id)) member.roles.add(role.object).catch(console.error)
+                    }
+                })
+            })
+        }
+    })
+}
+
+function edit_leaderboard() {
+    socket.emit('relicbot/stats/fetch', {limit: 10}, (res) => {
+        if (res.code == 200) {
+            const payload = {
+                content: ' ',
+                embeds: [{
+                    title: 'All-time Leaderboard',
+                    description: ('━').repeat(34),
+                    fields: [{
+                        name: 'Rank',
+                        value: res.data.map((user,index) => `${index+1}`).join('\n'),
+                        inline: true
+                    },{
+                        name: 'Player',
+                        value: res.data.map(user => `${user.ingame_name}`).join('\n'),
+                        inline: true
+                    },{
+                        name: 'Squads',
+                        value: res.data.map(user => `${user.squads_completed}`).join('\n'),
+                        inline: true
+                    },],
+                    color: 'WHITE'
+                }]
+            }
+            client.fetchWebhook('1050757563366522921').then(wh => wh.editMessage('1050762968037609482', payload).catch(console.error)).catch(console.error)
+        }
+    })
 }
 
 db.on('notification', async (notification) => {

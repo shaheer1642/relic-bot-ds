@@ -35,42 +35,10 @@ const emote_ids = {
 client.on('ready', async () => {
     assign_global_variables().then(() => {
         edit_recruitment_intro()
-        edit_leaderboard()
-        setInterval(edit_leaderboard, 900000);
         fissures_check()
     }).catch(console.error)
     update_users_list()
 })
-
-function edit_leaderboard() {
-    socket.emit('relicbot/stats/fetch', {limit: 10}, (res) => {
-        const payload = {
-            content: ' ',
-            embeds: [{
-                title: 'All-time Leaderboard',
-                description: ('━').repeat(34),
-                fields: [{
-                    name: 'Rank',
-                    value: res.data.map((user,index) => `${index+1}`).join('\n'),
-                    inline: true
-                },{
-                    name: 'Player',
-                    value: res.data.map(user => `${user.ingame_name}`).join('\n'),
-                    inline: true
-                },{
-                    name: 'Squads',
-                    value: res.data.map(user => `${user.squads_completed}`).join('\n'),
-                    inline: true
-                },],
-                color: 'WHITE'
-            }]
-        }
-        console.log(JSON.stringify(payload))
-        if (res.code == 200) {
-            client.fetchWebhook('1050757563366522921').then(wh => wh.editMessage('1050762968037609482', payload).catch(console.error)).catch(console.error)
-        }
-    })
-}
 
 function handleSquadCreateResponses(channel_id,discord_id,responses) {
     if (!Array.isArray(responses)) responses = [responses]
