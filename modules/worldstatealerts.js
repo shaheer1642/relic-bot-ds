@@ -2438,6 +2438,7 @@ async function cycles_check() {
             })
             // ping 10m before cetus cycle change
             if (new Date(cetusCycle.expiry).getTime() - new Date().getTime() > 600000) {
+                console.log('launching cetus cycle change 10m timeout in',new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 600000,'ms')
                 clearTimeout(ping_10m_before_cetus_cycle_change_timeout)
                 ping_10m_before_cetus_cycle_change_timeout = setTimeout(() => {
                     var user_ids = {}
