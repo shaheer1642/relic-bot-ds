@@ -2437,7 +2437,7 @@ async function cycles_check() {
                 })
             })
             // ping 10m before cetus cycle change
-            if (new Date(cetusCycle.expiry).getTime() - new Date().getTime() > 600000) {
+            if ((new Date(cetusCycle.expiry).getTime() - new Date().getTime()) > 600000) {
                 console.log('launching cetus cycle change 10m timeout in',new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 600000,'ms')
                 clearTimeout(ping_10m_before_cetus_cycle_change_timeout)
                 ping_10m_before_cetus_cycle_change_timeout = setTimeout(() => {
@@ -2473,7 +2473,7 @@ async function cycles_check() {
                                 client.channels.cache.get(row.channel_id).send(`Cetus: ${cetusCycle.state == 'day' ? 'night' : 'day'} starts in 10 minutes`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                         }
                     })
-                }, new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 600000);
+                }, (new Date(cetusCycle.expiry).getTime() - new Date().getTime()) - 600000);
             }
             // ----- vallis check
             await db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(console.error)
