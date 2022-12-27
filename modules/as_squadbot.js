@@ -878,7 +878,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
     const thread_ids = []
     const channel_ids = {}
     for (const discord_id of squad.members) {
-        const channel_id = squad.joined_from_channel_ids[discord_id]
+        const channel_id = squad.joined_from_channel_ids[discord_id] || '1054843353302323281'
         if (!channel_ids[channel_id]) channel_ids[channel_id] = []
         channel_ids[channel_id].push(discord_id)
     }
