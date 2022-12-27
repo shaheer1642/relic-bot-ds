@@ -2,6 +2,7 @@ const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js');
 const JSONbig = require('json-bigint');
 const {tb_user_exist} = require('./trade_bot_modules')
+const {socket} = require('./socket')
 
 const guild_id = '865904902941048862'
 const vip_channel_id = '1041306010331119667'
@@ -90,7 +91,11 @@ async function assign_allsquads_roles() {
                     if (user.squads_completed >= role.requirement) {
                         const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
                         if (!member) return
-                        if (!member.roles.cache.get(role.object.id)) member.roles.add(role.object).catch(console.error)
+                        if (!member.roles.cache.get(role.object.id)) {
+                            member.roles.add(role.object).then(res => {
+                                client.channels.cache.get('908056220911431760').send(`**${user.ingame_name}** has achieved the rank <@&${role.object.id}, Congratulations! 🎉`).catch(console.error)
+                            }).catch(console.error)
+                        }
                     }
                 })
             })
