@@ -65,6 +65,7 @@ async function edit_vip_message() {
 }
 
 async function assign_allsquads_roles() {
+    console.log('[allsquads.assign_allsquads_roles] called')
     const guild = await client.guilds.fetch(guild_id).catch(console.error)
     if (!guild) return
     const roles = [{
@@ -104,6 +105,7 @@ async function assign_allsquads_roles() {
 }
 
 function edit_leaderboard() {
+    console.log('[allsquads.edit_leaderboard] called')
     socket.emit('relicbot/stats/fetch', {limit: 10}, (res) => {
         if (res.code == 200) {
             const payload = {
