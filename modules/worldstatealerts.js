@@ -2442,19 +2442,24 @@ async function cycles_check() {
                 clearTimeout(ping_10m_before_cetus_cycle_change_timeout)
                 ping_10m_before_cetus_cycle_change_timeout = setTimeout(() => {
                     var user_ids = {}
-                    row.cycles_users[cetusCycle.state == 'day' ? 'night' : 'day'].forEach(user => {
-                        if (!user_ids[row.channel_id])
-                            user_ids[row.channel_id] = []
-                        if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
-                            // get user discord status
-                            const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
-                            if (!user_presc || user_presc.status == 'offline') {
-                                if (!row.ping_filter.offline.includes(user)) {
-                                    if (!user_ids[row.channel_id].includes(`<@${user}>`))
-                                        user_ids[row.channel_id].push(`<@${user}>`)
-                                }
-                            } else if (user_presc.status == 'dnd') {
-                                if (!row.ping_filter.dnd.includes(user)) {
+                    res.rows.forEach(row => {
+                        row.cycles_users[cetusCycle.state == 'day' ? 'night' : 'day'].forEach(user => {
+                            if (!user_ids[row.channel_id])
+                                user_ids[row.channel_id] = []
+                            if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                                // get user discord status
+                                const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                if (!user_presc || user_presc.status == 'offline') {
+                                    if (!row.ping_filter.offline.includes(user)) {
+                                        if (!user_ids[row.channel_id].includes(`<@${user}>`))
+                                            user_ids[row.channel_id].push(`<@${user}>`)
+                                    }
+                                } else if (user_presc.status == 'dnd') {
+                                    if (!row.ping_filter.dnd.includes(user)) {
+                                        if (!user_ids[row.channel_id].includes(`<@${user}>`))
+                                            user_ids[row.channel_id].push(`<@${user}>`)
+                                    }
+                                } else {
                                     if (!user_ids[row.channel_id].includes(`<@${user}>`))
                                         user_ids[row.channel_id].push(`<@${user}>`)
                                 }
@@ -2462,10 +2467,7 @@ async function cycles_check() {
                                 if (!user_ids[row.channel_id].includes(`<@${user}>`))
                                     user_ids[row.channel_id].push(`<@${user}>`)
                             }
-                        } else {
-                            if (!user_ids[row.channel_id].includes(`<@${user}>`))
-                                user_ids[row.channel_id].push(`<@${user}>`)
-                        }
+                        })
                     })
                     res.rows.forEach(row => {
                         if (row.cycles_alert) {
