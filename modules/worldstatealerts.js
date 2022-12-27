@@ -2369,6 +2369,7 @@ async function baro_check() {
     })
 }
 
+var ping_10m_before_cetus_cycle_change_timeout = null
 async function cycles_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
     .then( worldstateData => {
@@ -2435,6 +2436,44 @@ async function cycles_check() {
                     }
                 })
             })
+            // ping 10m before cetus cycle change
+            if (new Date(cetusCycle.expiry).getTime() - new Date().getTime() > 600000) {
+                clearTimeout(ping_10m_before_cetus_cycle_change_timeout)
+                ping_10m_before_cetus_cycle_change_timeout = setTimeout(() => {
+                    var user_ids = {}
+                    row.cycles_users[cetusCycle.state == 'day' ? 'night' : 'day'].forEach(user => {
+                        if (!user_ids[row.channel_id])
+                            user_ids[row.channel_id] = []
+                        if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                            // get user discord status
+                            const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                            if (!user_presc || user_presc.status == 'offline') {
+                                if (!row.ping_filter.offline.includes(user)) {
+                                    if (!user_ids[row.channel_id].includes(`<@${user}>`))
+                                        user_ids[row.channel_id].push(`<@${user}>`)
+                                }
+                            } else if (user_presc.status == 'dnd') {
+                                if (!row.ping_filter.dnd.includes(user)) {
+                                    if (!user_ids[row.channel_id].includes(`<@${user}>`))
+                                        user_ids[row.channel_id].push(`<@${user}>`)
+                                }
+                            } else {
+                                if (!user_ids[row.channel_id].includes(`<@${user}>`))
+                                    user_ids[row.channel_id].push(`<@${user}>`)
+                            }
+                        } else {
+                            if (!user_ids[row.channel_id].includes(`<@${user}>`))
+                                user_ids[row.channel_id].push(`<@${user}>`)
+                        }
+                    })
+                    res.rows.forEach(row => {
+                        if (row.cycles_alert) {
+                            if (user_ids[row.channel_id] && user_ids[row.channel_id].length > 0)
+                                client.channels.cache.get(row.channel_id).send(`Cetus: ${cetusCycle.state == 'day' ? 'night' : 'day'} starts in 10 minutes`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                        }
+                    })
+                }, new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 600000);
+            }
             // ----- vallis check
             await db.query(`UPDATE worldstatealert SET vallis_status = '${vallisCycle.state}'`).catch(console.error)
             res.rows.forEach(row => {
