@@ -2474,7 +2474,7 @@ async function cycles_check() {
                     res.rows.forEach(row => {
                         if (row.cycles_alert) {
                             if (user_ids[row.channel_id] && user_ids[row.channel_id].length > 0)
-                                client.channels.cache.get(row.channel_id).send(`Cetus: ${cetusCycle.state == 'day' ? 'night' : 'day'} starts in 10 minutes`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id).send(`Cetus: ${cetusCycle.state == 'day' ? 'night' : 'day'} starts in 10 minutes ${user_ids[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                         }
                     })
                 }, (new Date(cetusCycle.expiry).getTime() - new Date().getTime()) - 600000);
