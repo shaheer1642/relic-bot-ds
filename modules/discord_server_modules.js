@@ -73,10 +73,12 @@ async function computeServerStats(message, args) {
         }
         channel_data.forEach(obj => {
             if (obj.messages == 0) return
+            if (embed.description.length > 4000) return
             embed.description += `<#${obj.channel}>: ${obj.messages} msgs\n`
         })
         embed.description += '\n-----\n\n'
         user_msgs_sorted.forEach(obj => {
+            if (embed.description.length > 4000) return
             embed.description += `<@${obj.user}>: ${obj.messages} msgs\n`
         })
         if (embed.description.length > 4096)
