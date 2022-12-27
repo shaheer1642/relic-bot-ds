@@ -2441,6 +2441,7 @@ async function cycles_check() {
                 console.log('launching cetus cycle change 10m timeout in',new Date(cetusCycle.expiry).getTime() - new Date().getTime() - 600000,'ms')
                 clearTimeout(ping_10m_before_cetus_cycle_change_timeout)
                 ping_10m_before_cetus_cycle_change_timeout = setTimeout(() => {
+                    console.log('cetus cycle change 10m timeout launched')
                     var user_ids = {}
                     res.rows.forEach(row => {
                         row.cycles_users[cetusCycle.state == 'day' ? 'night' : 'day'].forEach(user => {
@@ -2469,6 +2470,7 @@ async function cycles_check() {
                             }
                         })
                     })
+                    console.log('user_ids',user_ids)
                     res.rows.forEach(row => {
                         if (row.cycles_alert) {
                             if (user_ids[row.channel_id] && user_ids[row.channel_id].length > 0)
