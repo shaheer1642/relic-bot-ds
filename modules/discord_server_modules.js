@@ -11,14 +11,15 @@ async function computeServerStats(message, args) {
     
         //var channel_msgs = {}
     
-        const guild = await client.guilds.fetch(message.guildId)
-        const channels = await guild.channels.fetch()
+        const guild = await client.guilds.fetch(message.guild.id).catch(console.error)
+        const channels = await guild.channels.fetch().catch(console.error)
     
         console.log(channels.size)
         
         var user_msgs = {}
 
         var channel_data = await Promise.all(channels.map(async (channel,channelId) => {
+            if (!channel.type) return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_CATEGORY') return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_VOICE') return {channel: channelId, messages: 0}
             var last_msg = await channel.messages.fetch({limit: 1})
@@ -30,7 +31,7 @@ async function computeServerStats(message, args) {
             all_msgs_ids.push(last_id)
             var stopFlag = 0
             while(!stopFlag) {
-                const messages = await channel.messages.fetch({limit: 100, before: last_id})
+                const messages = await channel.messages.fetch({limit: 100, before: last_id}).catch(console.error)
                 for (var [messageId,message] of messages) {
                     last_id = messageId
                     if (message.createdTimestamp < timestamp) {
