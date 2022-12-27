@@ -93,7 +93,7 @@ async function assign_allsquads_roles() {
                         if (!member) return
                         if (!member.roles.cache.get(role.object.id)) {
                             member.roles.add(role.object).then(res => {
-                                client.channels.cache.get('908056220911431760').send(`**${user.ingame_name}** has achieved the rank <@&${role.object.id}, Congratulations! 🎉`).catch(console.error)
+                                client.channels.cache.get('908056220911431760').send(`**${user.ingame_name}** has achieved the rank <@&${role.object.id}>, Congratulations! 🎉`).catch(console.error)
                             }).catch(console.error)
                         }
                     }
