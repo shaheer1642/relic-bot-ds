@@ -594,7 +594,7 @@ socket.on('squadCreate', (squad) => {
 
 socket.on('squadUpdate', (payload) => {
     console.log('[squadUpdate]',payload)
-    edit_webhook_messages(payload[0].tier, false,squad.squad_id)
+    edit_webhook_messages(payload[0].tier, false,payload[0].squad_id)
 })
 
 socket.on('relicbot/squads/opened', async (payload) => {
