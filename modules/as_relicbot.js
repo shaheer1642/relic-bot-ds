@@ -203,7 +203,7 @@ client.on('interactionCreate', async (interaction) => {
             socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
-                    edit_webhook_messages(res.data, tier, true, null, interaction.channel.id)
+                    edit_webhook_messages(tier, true, null, interaction.channel.id)
                 } else {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
                 }
@@ -300,25 +300,35 @@ var timeout_edit_webhook_messages_reset = {
 }
 
 var edit_webhook_messages_time_since_last_call = 0
-function edit_webhook_messages(squads,tier,with_all_names,name_for_squad_id, single_channel_id) {
+function edit_webhook_messages(tier,with_all_names,name_for_squad_id, single_channel_id) {
     clearTimeout(timeout_edit_webhook_messages[tier])
     timeout_edit_webhook_messages[tier] = setTimeout(() => {
-        const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
-        const msg_payload_non_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,false)
-        webhook_messages[tier + '_squads'].forEach(msg => {
-            if (!single_channel_id || single_channel_id == msg.c_id)
-                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+        socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
+            if (res.code == 200) {
+                const squads = res.data
+                const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
+                const msg_payload_non_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,false)
+                webhook_messages[tier + '_squads'].forEach(msg => {
+                    if (!single_channel_id || single_channel_id == msg.c_id)
+                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+                })
+            }
         })
     }, new Date().getTime() - edit_webhook_messages_time_since_last_call > 1000 ? 0 : 500)
     clearTimeout(timeout_edit_webhook_messages_reset[tier])
     timeout_edit_webhook_messages_reset[tier] = setTimeout(() => {
-        const msg_payload_vaulted = embed(squads,tier,null,null,true)
-        const msg_payload_non_vaulted = embed(squads,tier,null,null,false)
-        console.log('msg_payload_vaulted',JSON.stringify(msg_payload_vaulted))
-        console.log('msg_payload_non_vaulted',JSON.stringify(msg_payload_non_vaulted))
-        webhook_messages[tier + '_squads'].forEach(msg => {
-            //if (!single_channel_id || single_channel_id == msg.c_id)
-                new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+        socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
+            if (res.code == 200) {
+                const squads = res.data
+                const msg_payload_vaulted = embed(squads,tier,null,null,true)
+                const msg_payload_non_vaulted = embed(squads,tier,null,null,false)
+                console.log('msg_payload_vaulted',JSON.stringify(msg_payload_vaulted))
+                console.log('msg_payload_non_vaulted',JSON.stringify(msg_payload_non_vaulted))
+                webhook_messages[tier + '_squads'].forEach(msg => {
+                    //if (!single_channel_id || single_channel_id == msg.c_id)
+                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+                })
+            }
         })
     }, 3000);
     edit_webhook_messages_time_since_last_call = new Date().getTime()
@@ -556,12 +566,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
 var subscribersTimeout = {}
 socket.on('squadCreate', (squad) => {
     console.log('[squadCreate]',squad)
-    const tier = squad.tier
-    socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
-        if (res.code == 200) {
-            edit_webhook_messages(res.data, tier, false,squad.squad_id)
-        }
-    })
+    edit_webhook_messages(squad.tier, false,squad.squad_id)
     socket.emit('relicbot/trackers/fetchSubscribers',{squad: squad},(res) => {
         if (res.code == 200) {
             const channel_ids = res.data
@@ -589,12 +594,7 @@ socket.on('squadCreate', (squad) => {
 
 socket.on('squadUpdate', (payload) => {
     console.log('[squadUpdate]',payload)
-    const squad = payload[0]
-    socket.emit('relicbot/squads/fetch',{tier: squad.tier},(res) => {
-        if (res.code == 200) {
-            edit_webhook_messages(res.data, squad.tier, false,squad.squad_id)
-        }
-    })
+    edit_webhook_messages(payload[0].tier, false,squad.squad_id)
 })
 
 socket.on('relicbot/squads/opened', async (payload) => {

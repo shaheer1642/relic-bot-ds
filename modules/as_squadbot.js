@@ -620,7 +620,7 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
     timeout_edit_webhook_messages = setTimeout(() => {
         socket.emit('squadbot/squads/fetch',{},(res) => {
             if (res.code == 200) {
-                squads = res.data
+                const squads = res.data
                 const payloads = embed(squads,with_all_names,name_for_squad_id)
                 Array(5).fill(0).forEach((value,index) => {
                     webhook_messages[`find_squads_${index+1}`].forEach(async msg => {
@@ -646,7 +646,7 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
     timeout_edit_webhook_messages_reset = setTimeout(() => {
         socket.emit('squadbot/squads/fetch',{},(res) => {
             if (res.code == 200) {
-                squads = res.data
+                const squads = res.data
                 const payloads = embed(squads)
                 Array(5).fill(0).forEach((value,index) => {
                     webhook_messages[`find_squads_${index+1}`].forEach(async msg => {
