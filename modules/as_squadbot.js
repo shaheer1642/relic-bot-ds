@@ -78,7 +78,7 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
     user.send({
         content: ' ',
         embeds: [{
-            description: 'Select the squads you are interested in, to be notified whenever someone hosts them. You may change notification settings in <#1054843353302323281> channel in the future',
+            description: 'Check <#890197385651838977> tutorial on how to find squads via Discord\nSelect the squads you are interested in, to be notified whenever someone hosts them. You may change notification settings via <#1054843353302323281> channel in the future',
             color: 'WHITE'
         }],
         components: [{
