@@ -342,7 +342,7 @@ db.on('notification', async (notification) => {
         const message = channel.messages.cache.get(giveaway.message_id) || await channel.messages.fetch(giveaway.message_id).catch(console.error)
         //if (!message) return
         if (old_giveaway.status == 'active' && giveaway.status == 'ended') {
-            message.delete().catch(console.error)
+            if (message) message.delete().catch(console.error)
             // message.edit({
             //     content: ' ',
             //     embeds: message.embeds.map(embed => {
