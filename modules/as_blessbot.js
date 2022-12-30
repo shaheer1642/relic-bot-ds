@@ -1,7 +1,5 @@
-const {client} = require('./modules/discord_client.js');
-const {db} = require('./modules/db_connection')
-const {WebhookClient} = require('discord.js')
-const uuid = require('uuid')
+const {client} = require('./discord_client.js');
+const {db} = require('./db_connection')
 const JSONbig = require('json-bigint');
 
 const webhook_id = '1058463788560552028'
@@ -13,18 +11,18 @@ client.on('ready', async () => {
     
     webhook_client = await client.fetchWebhook(webhook_id).catch(console.error)
 
-    webhook_client.editMessage('1058464437138366514', {
-        content: '_ _',
-        components: [{
-            type: 1,
-            components: [{
-                type: 2,
-                label: 'Bless',
-                style: 3,
-                custom_id: 'as_bb_host'
-            }]
-        }],
-    })
+    // webhook_client.editMessage('1058464437138366514', {
+    //     content: '_ _',
+    //     components: [{
+    //         type: 1,
+    //         components: [{
+    //             type: 2,
+    //             label: 'Bless',
+    //             style: 3,
+    //             custom_id: 'as_bb_host'
+    //         }]
+    //     }],
+    // })
 })
 
 client.on('interactionCreate', interaction => {
@@ -45,7 +43,7 @@ client.on('interactionCreate', interaction => {
                                 components.push(...components_list[key])
                             }
                         })
-                        console.log(JSON.stringify(components))
+                        //console.log(JSON.stringify(components))
                         interaction.update(components.length == 0 ? {
                             embeds: [{
                                 description: `Your blessing has been hosted in <#${channel_id}>`
@@ -61,8 +59,7 @@ client.on('interactionCreate', interaction => {
                         }).catch(console.error)
                     }
                 }).catch(console.error)
-            }
-            else if (interaction.customId == 'as_bb_host') {
+            } else if (interaction.customId == 'as_bb_host') {
                 interaction.reply({
                     content: ' ',
                     embeds: [{
@@ -75,6 +72,33 @@ client.on('interactionCreate', interaction => {
                 }).then(msg => {
                     console.log(msg)
                     db.query(`INSERT INTO as_bb_blesses (setup_message_id,discord_id) VALUES ('${msg.id}','${interaction.user.id}')`).catch(console.error)
+                }).catch(console.error)
+            }
+        }
+    }
+})
+
+db.on('notification', async (notification) => {
+    const payload = JSONbig.parse(notification.payload);
+    
+    if (notification.channel == 'as_bb_blesses_update') {
+        const blessing = payload[0]
+        const old_blessing = payload[1]
+        if (blessing.status == 'setup') {
+            if (blessing.bless_type && blessing.bless_time && blessing.region && blessing.relay && blessing.instance) {
+                const submit_timestamp = new Date().getTime()
+                const bless_time = Math.round((submit_timestamp + Number(blessing.bless_time.replace('m',''))*60*1000) / 1000)
+                db.query(`UPDATE as_bb_blesses SET submit_timestamp = ${submit_timestamp}, status = 'active' WHERE bless_id = '${blessing.bless_id}'`)
+                webhook_client.send({
+                    content: ' ',
+                    embeds: [{
+                        title: blessing.bless_type + ' Blessing',
+                        description: '⸻'.repeat(10),
+                        fields: [...Object.keys(components_list).map(key => ({name: key, value: key == 'bless_time' ? `<t:${bless_time}:R> (<t:${bless_time}:t>)`:blessing[key], inline: true})), {
+                            name: 'Blessed By',
+                            value: `<@${blessing.discord_id}>`
+                        }]
+                    }],
                 }).catch(console.error)
             }
         }
@@ -221,33 +245,3 @@ const components_list = {
         }]
     }],
 }
-
-
-db.on('notification', async (notification) => {
-    const payload = JSONbig.parse(notification.payload);
-    
-    if (notification.channel == 'as_bb_blesses_update') {
-        const blessing = payload[0]
-        const old_blessing = payload[1]
-        if (blessing.status == 'setup') {
-            if (blessing.bless_type && blessing.bless_time && blessing.region && blessing.relay && blessing.instance) {
-                const submit_timestamp = new Date().getTime()
-                const bless_time = Math.round((submit_timestamp + Number(blessing.bless_time.replace('m',''))*60*1000) / 1000)
-                db.query(`UPDATE as_bb_blesses SET submit_timestamp = ${submit_timestamp}, status = 'active' WHERE bless_id = '${blessing.bless_id}'`)
-                const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
-                if (!channel) return
-                channel.send({
-                    content: ' ',
-                    embeds: [{
-                        title: blessing.bless_type + ' Blessing',
-                        description: '⸻'.repeat(10),
-                        fields: [...Object.keys(components_list).map(key => ({name: key, value: key == 'bless_time' ? `<t:${bless_time}:R> (<t:${bless_time}:t>)`:blessing[key], inline: true})), {
-                            name: 'Blessed By',
-                            value: `<@${blessing.discord_id}>`
-                        }]
-                    }],
-                }).catch(console.error)
-            }
-        }
-    }
-})
