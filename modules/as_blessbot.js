@@ -1,12 +1,11 @@
 const {client} = require('./discord_client.js');
 const {db} = require('./db_connection')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
-const {WebhookClient} = require('discord.js')
-const uuid = require('uuid')
 const JSONbig = require('json-bigint');
 
 const webhook_id = '1058463788560552028'
 const channel_id = '1058462882968371331'
+const intro_message_id = '1058804842551845055'
 var webhook_client = null
 
 const emotes = {
@@ -41,7 +40,7 @@ client.on('ready', async () => {
         })
     }).catch(console.error)
 
-    edit_recruitment_intro()
+    edit_intro()
 })
 
 client.on('interactionCreate', interaction => {
@@ -113,6 +112,7 @@ client.on('interactionCreate', interaction => {
 })
 
 client.on('messageReactionAdd', (reaction,user) => {
+    if (user.bot) return
     if (reaction.message.channel.id == channel_id) {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionAdd',reaction.emoji.identifier,user.id)
@@ -133,6 +133,7 @@ client.on('messageReactionAdd', (reaction,user) => {
 })
 
 client.on('messageReactionRemove', (reaction,user) => {
+    if (user.bot) return
     if (reaction.message.channel.id == channel_id) {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionRemove',reaction.emoji.identifier,user.id)
@@ -406,8 +407,8 @@ function embedGenerator(blessing) {
     }
 }
 
-function edit_recruitment_intro() {
-    webhook_client.editMessage('1058464437138366514', {
+function edit_intro() {
+    webhook_client.editMessage(intro_message_id, {
         content: ' ',
         embeds: [{
             title: 'Warframe Blessing',
