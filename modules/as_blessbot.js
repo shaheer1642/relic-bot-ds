@@ -312,7 +312,7 @@ db.on('notification', async (notification) => {
                 const submit_timestamp = new Date().getTime()
                 db.query(`
                     UPDATE as_bb_blesses SET submit_timestamp = ${submit_timestamp}, status = 'active' WHERE bless_id = '${blessing.bless_id}';
-                    DELETE FROM as_bb_blesses WHERE discord_id = '${blessing.discord_id}' AND status = 'active';
+                    DELETE FROM as_bb_blesses WHERE discord_id = '${blessing.discord_id}' AND status = 'setup' AND bless_id != '${blessing.bless_id}';
                 `).catch(console.error)
             }
         } else if (blessing.status == 'active' && old_blessing.status == 'setup') {
