@@ -412,7 +412,7 @@ function edit_intro() {
         content: ' ',
         embeds: [{
             title: 'Warframe Blessing',
-            description: 'Blessing boosts players\' grind for the next couple of hours. Help your fellow tennos in their journey!\n\nOnly Mastery Rank 30s or above can bless other players.\nWant to bless? Click the **Bless** button\n\nReact to be notified whenever someone blesses a booster of your liking!',
+            description: 'Blessing boosts players\' grind for the next couple of hours. Help your fellow tennos in their journey!\n\nOnly Mastery Rank 30s or above can bless other players.\nWant to bless? Click the **Bless** button\n\nReact to be notified whenever someone blesses a booster of your liking!\nMake sure you are in the same **region**, **relay** and the **instance** as shown. Client language should be **English**',
             color: '#2d7d46'
         }],
         components: [{
