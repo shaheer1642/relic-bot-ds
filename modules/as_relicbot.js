@@ -445,37 +445,27 @@ function rb_add_server(guild_id) {
                     }).then(category => { 
                         guild.channels.create('•🔮•relic-squads',{
                             type: 'GUILD_TEXT',
-                        }).then(relic_squads => {
-                            guild.channels.create('•🔮•relic-squads-non-vaulted',{
-                                type: 'GUILD_TEXT',
-                            }).then(async relic_squads_nv => {
-                                await relic_squads.setParent(category).catch(console.error)
-                                await relic_squads_nv.setParent(category).catch(console.error)
-                                const relic_squads_wh = await relic_squads.createWebhook('Relic',{avatar: 'https://cdn.discordapp.com/attachments/943131999189733387/1043978374089019462/relic_pack.png'}).catch(console.error)
-                                const relic_squads_nv_wh = await relic_squads_nv.createWebhook('Relic',{avatar: 'https://cdn.discordapp.com/attachments/943131999189733387/1043978374089019462/relic_pack.png'}).catch(console.error)
-                                db.query(`
-                                    INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads.id}','${relic_squads_wh.url}','${guild_id}','relics_vaulted',${new Date().getTime()});
-                                    INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads_nv.id}','${relic_squads_nv_wh.url}','${guild_id}','relics_non_vaulted',${new Date().getTime()});
-                                `).then(() => {
-                                    ['1','2','3','4','5','6'].forEach((val,index) => {
-                                        var msg_type;
-                                        if (index == 0) msg_type = 'recruitment_intro'
-                                        if (index == 1) msg_type = 'fissures'
-                                        if (index == 2) msg_type = 'lith_squads'
-                                        if (index == 3) msg_type = 'meso_squads'
-                                        if (index == 4) msg_type = 'neo_squads'
-                                        if (index == 5) msg_type = 'axi_squads'
-                                        relic_squads_wh.send('_ _').then(res => {
-                                            db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads.id}', '${msg_type}', '${relic_squads_wh.url}')`)
-                                        }).catch(console.error)
-                                        relic_squads_nv_wh.send('_ _').then(res => {
-                                            db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads_nv.id}', '${msg_type}', '${relic_squads_nv_wh.url}')`)
-                                        }).catch(console.error)
-                                    })
-                                    setTimeout(assign_global_variables, 10000);
-                                    setTimeout(edit_recruitment_intro, 15000);
-                                    resolve({id: relic_squads.id})
-                                }).catch(err => reject(err))
+                        }).then(async relic_squads => {
+                            await relic_squads.setParent(category).catch(console.error)
+                            const relic_squads_wh = await relic_squads.createWebhook('Relic',{avatar: 'https://cdn.discordapp.com/attachments/943131999189733387/1043978374089019462/relic_pack.png'}).catch(console.error)
+                            db.query(`
+                                INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads.id}','${relic_squads_wh.url}','${guild_id}','relics_vaulted',${new Date().getTime()});
+                            `).then(() => {
+                                ['1','2','3','4','5','6'].forEach((val,index) => {
+                                    var msg_type;
+                                    if (index == 0) msg_type = 'recruitment_intro'
+                                    if (index == 1) msg_type = 'fissures'
+                                    if (index == 2) msg_type = 'lith_squads'
+                                    if (index == 3) msg_type = 'meso_squads'
+                                    if (index == 4) msg_type = 'neo_squads'
+                                    if (index == 5) msg_type = 'axi_squads'
+                                    relic_squads_wh.send('_ _').then(res => {
+                                        db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads.id}', '${msg_type}', '${relic_squads_wh.url}')`)
+                                    }).catch(console.error)
+                                })
+                                setTimeout(assign_global_variables, 10000);
+                                setTimeout(edit_recruitment_intro, 15000);
+                                resolve({id: relic_squads.id})
                             }).catch(err => reject(err))
                         }).catch(err => reject(err))
                     }).catch(err => reject(err))
