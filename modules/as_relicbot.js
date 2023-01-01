@@ -614,7 +614,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
         const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
         if (!channel) continue
         await channel.threads.create({
-            name: `${convertUpper(squad.tier)} ${squad.main_relics.join(' ')}`,
+            name: convertUpper(`${squad.tier} ${squad.main_relics.join(' ')}`),
             autoArchiveDuration: 60,
             reason: 'Relic squad filled'
         }).then(async thread => {
