@@ -76,7 +76,7 @@ client.on('messageCreate', async (message) => {
     if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id) && ['relics_vaulted','relics_non_vaulted'].includes(channels_list[message.channel.id].type)) {
         if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
         console.log('[relicbot messageCreate] content:',message.content)
-        socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id, channel_vaulted: channels_list[message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
+        socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
             //console.log('[relicbot/squads/create] response',responses)
             handleSquadCreateResponses(message.channel.id,message.author.id,responses)
             setTimeout(() => message.delete().catch(console.error), 1000);
@@ -209,7 +209,7 @@ client.on('interactionCreate', async (interaction) => {
                 }
             })
         } else if (interaction.customId.match('rb_sq_merge_false')) { 
-            socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[interaction.channel.id].type == 'relics_vaulted' ? true:false, merge_squad: false}, responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
                 interaction.deferUpdate().catch(console.error)
                 interaction.message.delete().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
@@ -263,7 +263,7 @@ client.on('interactionCreate', async (interaction) => {
         }
         if (interaction.customId == 'rb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
-            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id, channel_vaulted: channels_list[interaction.message.channel.id].type == 'relics_vaulted' ? true:false},responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
