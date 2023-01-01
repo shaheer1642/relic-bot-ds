@@ -627,7 +627,11 @@ socket.on('relicbot/squads/opened', async (payload) => {
             thread.send({
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
-                    description: `**${relicBotSquadToString(squad)}**\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`
+                    title: relicBotSquadToString(squad),
+                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`,
+                    footer: {
+                        text: `This squad will auto-close in 15m`
+                    }
                 }]
             }).catch(console.error)
             if (Object.keys(channel_ids).length > 1) thread.send({content: 'This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
