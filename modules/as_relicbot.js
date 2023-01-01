@@ -641,8 +641,10 @@ socket.on('relicbot/squads/closed', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
-        channel.send({content: `**--- Squad closed ---**`}).catch(console.error)
-        channel.setArchived().catch(console.error)
+        channel.send({content: `**--- Squad closed ---**`})
+        .then(res => {
+            channel.setArchived().catch(console.error)
+        }).catch(console.error)
     })
 })
 
