@@ -306,11 +306,10 @@ function edit_webhook_messages(tier,with_all_names,name_for_squad_id, single_cha
         socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
             if (res.code == 200) {
                 const squads = res.data
-                const msg_payload_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,true)
-                const msg_payload_non_vaulted = embed(squads,tier,with_all_names,name_for_squad_id,false)
+                const payload = embed(squads,tier,with_all_names,name_for_squad_id)
                 webhook_messages[tier + '_squads'].forEach(msg => {
                     if (!single_channel_id || single_channel_id == msg.c_id)
-                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
                 })
             }
         })
@@ -320,13 +319,10 @@ function edit_webhook_messages(tier,with_all_names,name_for_squad_id, single_cha
         socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
             if (res.code == 200) {
                 const squads = res.data
-                const msg_payload_vaulted = embed(squads,tier,null,null,true)
-                const msg_payload_non_vaulted = embed(squads,tier,null,null,false)
-                console.log('msg_payload_vaulted',JSON.stringify(msg_payload_vaulted))
-                console.log('msg_payload_non_vaulted',JSON.stringify(msg_payload_non_vaulted))
+                const payload = embed(squads,tier)
                 webhook_messages[tier + '_squads'].forEach(msg => {
-                    //if (!single_channel_id || single_channel_id == msg.c_id)
-                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, msg.c_type == 'relics_vaulted' ? msg_payload_vaulted : msg_payload_non_vaulted).catch(console.error)
+                    if (!single_channel_id || single_channel_id == msg.c_id)
+                        new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
                 })
             }
         })
@@ -511,12 +507,11 @@ function rb_remove_server(guild_id) {
     })
 }
 
-function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
+function embed(squads, tier, with_all_names, name_for_squad_id) {
     var fields = []
     var components = []
-    squads = squads.sort(dynamicSort("main_relics")).filter(squad => vaulted ? squad.is_vaulted == true: squad.is_vaulted == false)
+    squads = squads.sort(dynamicSort("main_relics"))
     squads.map((squad,index) => {
-        if ((vaulted && !squad.is_vaulted) || (!vaulted && squad.is_vaulted)) return
         var field_value = '\u200b'
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
             field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
@@ -556,7 +551,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id, vaulted) {
             title: convertUpper(tier),
             description: ('━').repeat(34),
             fields: fields,
-            color: tier == 'lith'? 'RED' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'ORANGE' : tier == 'axi' ? 'YELLOW' : ''
+            color: tier == 'lith'? 'GREEN' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'RED' : tier == 'axi' ? 'YELLOW' : ''
         }],
         components: components
     }
