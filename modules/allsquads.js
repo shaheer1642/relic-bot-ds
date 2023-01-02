@@ -111,7 +111,7 @@ function edit_leaderboard() {
             const leaderboards = res.data
             const payload = {
                 content: ' ',
-                embeds: Object.keys(leaderboards).map(key 
+                embeds: Object.keys(leaderboards).map(key =>
                     ({
                         title: key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
                         description: leaderboards[key].length > 0 ? '⸻'.repeat(10) : 'No data available yet',
