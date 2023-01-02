@@ -326,7 +326,7 @@ function edit_webhook_messages(tier,with_all_names,name_for_squad_id, single_cha
                 })
             }
         })
-    }, 3000);
+    }, 6000);
     edit_webhook_messages_time_since_last_call = new Date().getTime()
 }
 
