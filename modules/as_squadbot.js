@@ -893,9 +893,12 @@ socket.on('squadbot/squads/opened', async (payload) => {
             reason: 'Squad filled'
         }).then(async thread => {
             channel_ids[channel_id].map(async discord_id => {
-                const user = client.users.cache.get(discord_id) || client.users.fetch(discord_id).catch(console.error)
-                if (user)
+                try {
+                    const user = client.users.cache.get(discord_id) || client.users.fetch(discord_id).catch(console.error)
                     user.send(`Your **${convertUpper(squad.squad_string)}** squad has been filled. Click <#${thread.id}> to view squad`).catch(console.error)
+                } catch(e) {
+                    console.log(e)
+                }
             })
             thread_ids.push(thread.id)
             thread.send({
