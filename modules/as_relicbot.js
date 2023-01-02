@@ -314,7 +314,7 @@ function edit_webhook_messages(tier,with_all_names,name_for_squad_id, single_cha
             }
         })
     }, new Date().getTime() - edit_webhook_messages_time_since_last_call > 1000 ? 0 : 500)
-    clearTimeout(timeout_edit_webhook_messages_reset[tier])
+    if (!single_channel_id) clearTimeout(timeout_edit_webhook_messages_reset[tier])
     timeout_edit_webhook_messages_reset[tier] = setTimeout(() => {
         socket.emit('relicbot/squads/fetch',{tier: tier},(res) => {
             if (res.code == 200) {

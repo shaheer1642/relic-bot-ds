@@ -642,7 +642,7 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
             }
         })
     }, new Date().getTime() - edit_webhook_messages_time_since_last_call > 1000 ? 0 : 500)
-    clearTimeout(timeout_edit_webhook_messages_reset)
+    if (!single_channel_id) clearTimeout(timeout_edit_webhook_messages_reset)
     timeout_edit_webhook_messages_reset = setTimeout(() => {
         socket.emit('squadbot/squads/fetch',{},(res) => {
             if (res.code == 200) {
