@@ -13,7 +13,7 @@ client.on('ready', () => {
     assign_allsquads_roles()
     edit_leaderboard()
     setInterval(assign_allsquads_roles, 3600000);
-    setInterval(edit_leaderboard, 900000);
+    setInterval(edit_leaderboard, 300000);
 })
 
 client.on('interactionCreate', (interaction) => {
@@ -106,28 +106,31 @@ async function assign_allsquads_roles() {
 
 function edit_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('relicbot/stats/fetch', {limit: 10}, (res) => {
+    socket.emit('allsquads/leaderboards/fetch', {limit: 10}, (res) => {
         if (res.code == 200) {
+            const leaderboards = res.data
             const payload = {
                 content: ' ',
-                embeds: [{
-                    title: 'All-time Leaderboard',
-                    description: ('━').repeat(34),
-                    fields: [{
-                        name: 'Rank',
-                        value: res.data.map((user,index) => `${index+1}`).join('\n'),
-                        inline: true
-                    },{
-                        name: 'Player',
-                        value: res.data.map(user => `${user.ingame_name}`).join('\n'),
-                        inline: true
-                    },{
-                        name: 'Squads',
-                        value: res.data.map(user => `${user.squads_completed}`).join('\n'),
-                        inline: true
-                    },],
-                    color: 'WHITE'
-                }]
+                embeds: Object.keys(leaderboards).map(key => {
+                    ({
+                        title: key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
+                        description: leaderboards[key].length > 0 ? '⸻'.repeat(10) : 'No data available yet',
+                        fields: leaderboards[key].length > 0 ? [{
+                            name: 'Rank',
+                            value: leaderboards[key].map((user,index) => `${index+1}`).join('\n'),
+                            inline: true
+                        },{
+                            name: 'Player',
+                            value: leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
+                            inline: true
+                        },{
+                            name: 'Squads',
+                            value: leaderboards[key].map(user => `${user.squads_completed}`).join('\n'),
+                            inline: true
+                        }] : [],
+                        color: 'WHITE'
+                    })
+                })
             }
             client.fetchWebhook('1050757563366522921').then(wh => wh.editMessage('1050762968037609482', payload).catch(console.error)).catch(console.error)
         }
