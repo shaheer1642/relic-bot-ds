@@ -916,7 +916,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
         }).catch(console.error)
     }
     socket.emit('squadbot/squads/update',{params: `thread_ids='${JSON.stringify(thread_ids)}' WHERE squad_id='${squad.squad_id}' AND status='opened'`})
-    logSquad(payload, false, 'Squad opened')
+    logSquad(payload, false, 'squad_opened')
 })
 
 socket.on('squadbot/squads/closed', async (payload) => {
@@ -928,7 +928,7 @@ socket.on('squadbot/squads/closed', async (payload) => {
             channel.setArchived().catch(console.error)
         }).catch(console.error)
     })
-    logSquad(payload, true, 'Squad closed')
+    logSquad(payload, true, 'squad_closed')
 })
 
 socket.on('squadbot/squads/disbanded', async (payload) => {
@@ -940,7 +940,7 @@ socket.on('squadbot/squads/disbanded', async (payload) => {
             channel.setArchived().catch(console.error)
         }).catch(console.error)
     })
-    logSquad(payload, true, 'Squad disbanded')
+    logSquad(payload, true, 'squad_disbanded')
 })
 
 async function logSquad(squad,include_chat,action) {
@@ -956,7 +956,7 @@ async function logSquad(squad,include_chat,action) {
                         description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `**${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\_'),
                         timestamp: new Date(),
                         footer: {
-                            text: `Squad Id: ${squad.squad_id}`
+                            text: `Squad Id: ${squad.squad_id}\n\u200b`
                         }
                     }]
                 }).catch(console.error)
@@ -970,7 +970,7 @@ async function logSquad(squad,include_chat,action) {
                 description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\_'),
                 timestamp: new Date(),
                 footer: {
-                    text: `Squad Id: ${squad.squad_id}`
+                    text: `Squad Id: ${squad.squad_id}\n\u200b`
                 }
             }]
         }).catch(console.error)
