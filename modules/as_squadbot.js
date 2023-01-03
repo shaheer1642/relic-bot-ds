@@ -957,7 +957,8 @@ async function logSquad(squad,include_chat,action) {
                         timestamp: new Date(),
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
-                        }
+                        },
+                        color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
                     }]
                 }).catch(console.error)
             }
@@ -971,7 +972,8 @@ async function logSquad(squad,include_chat,action) {
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
-                }
+                },
+                color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
             }]
         }).catch(console.error)
     }
