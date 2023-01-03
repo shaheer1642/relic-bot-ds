@@ -672,7 +672,7 @@ async function logSquad(squad,include_chat,action) {
         channel.send({
             content: convertUpper(action),
             embeds: [{
-                title: convertUpper(squad.squad_string),
+                title: relicBotSquadToString(squad),
                 description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\_'),
                 timestamp: new Date(),
                 footer: {
