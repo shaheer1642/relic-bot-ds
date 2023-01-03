@@ -199,7 +199,7 @@ client.on('messageCreate', async (message) => {
             socket.emit('squadbot/squads/messageCreate', {
                 message_id: message.id,
                 discord_id: message.author.id,
-                message: message.content,
+                message: `${message.content}\n${message.attachments.map(attachment => attachment.url).join('\n')}`.trim(),
                 thread_id: message.channel.id
             }, res => console.log(res))
         }
