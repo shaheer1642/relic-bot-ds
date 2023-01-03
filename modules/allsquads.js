@@ -97,7 +97,7 @@ async function assign_allsquads_roles() {
                                 client.channels.cache.get('908056220911431760').send({
                                     content: ' ',
                                     embeds: [{
-                                        description: `**${user.ingame_name}** has achieved the rank <@&${role.object.id}>, Congratulations! 🎉`,
+                                        description: `<@${user.discord_id}> has achieved the rank <@&${role.object.id}>, Congratulations! 🎉`,
                                         color: role.object.color
                                     }]
                                 }).catch(console.error)
