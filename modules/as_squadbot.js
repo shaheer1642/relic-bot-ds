@@ -916,6 +916,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
         }).catch(console.error)
     }
     socket.emit('squadbot/squads/update',{params: `thread_ids='${JSON.stringify(thread_ids)}' WHERE squad_id='${squad.squad_id}' AND status='opened'`})
+    logSquad(payload, false, 'Squad opened')
 })
 
 socket.on('squadbot/squads/closed', async (payload) => {
@@ -927,6 +928,7 @@ socket.on('squadbot/squads/closed', async (payload) => {
             channel.setArchived().catch(console.error)
         }).catch(console.error)
     })
+    logSquad(payload, true, 'Squad closed')
 })
 
 socket.on('squadbot/squads/disbanded', async (payload) => {
@@ -938,7 +940,42 @@ socket.on('squadbot/squads/disbanded', async (payload) => {
             channel.setArchived().catch(console.error)
         }).catch(console.error)
     })
+    logSquad(payload, true, 'Squad disbanded')
 })
+
+async function logSquad(squad,include_chat,action) {
+    const channel = client.channels.cache.get('1059876227504152666') || await client.channels.fetch('1059876227504152666').catch(console.error)
+    if (!channel) return
+    if (include_chat) {
+        socket.emit('squadbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
+            if (res.code == 200) {
+                channel.send({
+                    content: convertUpper(action),
+                    embeds: [{
+                        title: convertUpper(squad.squad_string),
+                        description: `**---- Squad Members ----**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**---- Squad Chat ----**\n${res.data.map(row => `**${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\_'),
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Squad Id: ${squad.squad_id}`
+                        }
+                    }]
+                }).catch(console.error)
+            }
+        })
+    } else {
+        channel.send({
+            content: convertUpper(action),
+            embeds: [{
+                title: convertUpper(squad.squad_string),
+                description: `**---- Squad Members ----**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\_'),
+                timestamp: new Date(),
+                footer: {
+                    text: `Squad Id: ${squad.squad_id}`
+                }
+            }]
+        }).catch(console.error)
+    }
+}
 
 socket.on('tradebotUsersUpdated', (payload) => {
     console.log('[relicbot] tradebotUsersUpdated')
