@@ -875,9 +875,15 @@ async function fissures_check() {
                 if (!expiries[key]) expiries[key] = 0
                 if (expiry > expiries[key]) expiries[key] = expiry
                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
-                    fissures_list.push(fissure)
+                    if (!['Stribog'].includes(fissure.node.split(' (')[0]))
+                        fissures_list.push(fissure)
                 }
             }
+        })
+
+        Object.keys(expiries).forEach(key => {
+            const reset_time = expiries[key] - 180000
+            if (reset_time < min_expiry) min_expiry = reset_time
         })
 
         const payload = {
