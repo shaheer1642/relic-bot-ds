@@ -618,6 +618,45 @@ socket.on('relicbot/squads/opened', async (payload) => {
                         text: `This squad will auto-close in 15m`
                     }
                 }]
+            }).then(msg => {
+                axios('http://content.warframe.com/dynamic/worldState.php')
+                .then( worldstateData => {
+                    const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
+                    if (!fissures) return
+
+                    var fissures_list = []
+                    fissures.forEach(fissure => {
+                        if (fissure.tier.toLowerCase() == squad.tier) {
+                            var expiry = new Date(fissure.expiry).getTime()
+                            if ((expiry - new Date().getTime()) > 0) {
+                                if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
+                                    if (!['Stribog'].includes(fissure.node.split(' (')[0]))
+                                        fissures_list.push(fissure)
+                                }
+                            }
+                        }
+                    })
+
+                    msg.edit({
+                        content: msg.content,
+                        embeds: [{
+                            ...msg.embeds[0],
+                            fields: [{
+                                name: "Tier",
+                                value: fissures_list.map(fissure => `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}`).join('\n'),
+                                inline: true
+                            },{
+                                name: "Mission",
+                                value: fissures_list.map(fissure => `${fissure.isHard ? emote_ids.steel_essence:fissure.isStorm ? emote_ids.railjack:''} ${fissure.missionType} - ${fissure.node}`.trim()).join('\n'),
+                                inline: true
+                            },{
+                                name: "Expires",
+                                value: fissures_list.map(fissure => `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>`).join('\n'),
+                                inline: true
+                            }]
+                        }]
+                    }).catch(console.error)
+                }).catch(console.error)
             }).catch(console.error)
             if (Object.keys(channel_ids).length > 1) thread.send({content: 'This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
             setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
