@@ -237,7 +237,7 @@ async function testComplete(discord_id) {
     const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
     if (!role) return 
     member.roles.add(role).catch(console.error)
-    client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard!\nUse channels <#1054843353302323281> <#1050717343040409630> to start recruiting`)
+    client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard!\nUse channels <#1054843353302323281> <#1050717341123616851> to start recruiting`)
     .then(msg => {
         setTimeout(() => {
             msg.delete().catch(console.error)
