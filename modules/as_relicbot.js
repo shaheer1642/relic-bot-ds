@@ -630,7 +630,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                             var expiry = new Date(fissure.expiry).getTime()
                             if ((expiry - new Date().getTime()) > 0) {
                                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
-                                    if (!['Stribog'].includes(fissure.node.split(' (')[0]))
+                                    if (!['Stribog','Cervantes'].includes(fissure.node.split(' (')[0]))
                                         fissures_list.push(fissure)
                                 }
                             }
@@ -914,7 +914,7 @@ async function fissures_check() {
                 if (!expiries[key]) expiries[key] = 0
                 if (expiry > expiries[key]) expiries[key] = expiry
                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
-                    if (!['Stribog'].includes(fissure.node.split(' (')[0]))
+                    if (!['Stribog','Cervantes'].includes(fissure.node.split(' (')[0]))
                         fissures_list.push(fissure)
                 }
             }
