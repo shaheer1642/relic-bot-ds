@@ -3113,8 +3113,8 @@ async function riven_tut(message,args) {
 
 function generateId() {
     let ID = "";
-    let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    for ( var i = 0; i < 5; i++ ) {
+    let characters = "ABCDEFGHJKMNOPQRSTUVWXYZ023456789";
+    for ( var i = 0; i < 6; i++ ) {
       ID += characters.charAt(Math.floor(Math.random() * 36));
     }
     return ID;
