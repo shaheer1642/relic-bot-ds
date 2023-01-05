@@ -613,7 +613,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: relicBotSquadToString(squad),
-                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`,
+                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).join('\n/invite ').replace(/_/g, '\_')}`,
                     footer: {
                         text: `This squad will auto-close in 15m`
                     }
@@ -665,6 +665,10 @@ socket.on('relicbot/squads/opened', async (payload) => {
     socket.emit('relicbot/squads/update',{params: `thread_ids='${JSON.stringify(thread_ids)}' WHERE squad_id='${squad.squad_id}' AND status='opened'`})
     logSquad(payload, false, 'squad_opened')
 })
+
+function enquote(username) {
+    return username.match(' ') ? `"${username}"`:username
+}
 
 socket.on('relicbot/squads/closed', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {

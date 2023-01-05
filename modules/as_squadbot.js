@@ -905,7 +905,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: convertUpper(squad.squad_string),
-                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => users_list[id]?.ingame_name).join('\n/invite ').replace(/_/g, '\_')}`,
+                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).join('\n/invite ').replace(/_/g, '\_')}`,
                     footer: {
                         text: `This squad will auto-close in ${Math.round(squad.squad_closure / 60 / 1000)}m`
                     }
@@ -918,6 +918,10 @@ socket.on('squadbot/squads/opened', async (payload) => {
     socket.emit('squadbot/squads/update',{params: `thread_ids='${JSON.stringify(thread_ids)}' WHERE squad_id='${squad.squad_id}' AND status='opened'`})
     logSquad(payload, false, 'squad_opened')
 })
+
+function enquote(username) {
+    return username.match(' ') ? `"${username}"`:username
+}
 
 socket.on('squadbot/squads/closed', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
