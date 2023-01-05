@@ -179,7 +179,7 @@ async function gmail_api_call(auth) {
                                 console.log(e)
                             }
                             if (res.rowCount == 1) {
-                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}' WHERE discord_id = ${xx_discord}`).then(res => {
+                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = ${xx_discord}`).then(res => {
                                     if (user) user.send('Your ign has been updated to **' + ingame_name + '**!').catch(console.error)
                                 }).catch (err => {
                                     console.log(err)
