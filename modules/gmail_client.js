@@ -156,7 +156,8 @@ async function gmail_api_call(auth) {
                 const xx_discord = ids_list[j].discord_id
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
-                    const ingame_name = res.data.snippet.split(' ')[4].replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')
+                    const ingame_name = `${res.data.snippet.split(' ')[4].replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')} ${res.data.snippet.split(' ')[5] == 'has'? '':res.data.snippet.split(' ')[5]}`.trim()
+                    const platform = res.data.snippet.split(' ')[4].match('(PSN)') ? 'PSN' : res.data.snippet.split(' ')[4].match('(NSW)') ? 'NSW' : res.data.snippet.split(' ')[4].match('(XBOX)') ? 'XBOX' : 'PC'
                     console.log('User ' + ingame_name + ' has verified their ign')
                     const user = await client.users.fetch(xx_discord).catch(console.error)
                     db.query(`DELETE FROM tradebot_users_unverified WHERE discord_id = '${xx_discord}'`).catch(err => console.log(err))
@@ -186,7 +187,7 @@ async function gmail_api_call(auth) {
                                 })
                             }
                             if (res.rowCount == 0) {
-                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,registered_timestamp) values (${xx_discord},'${ingame_name}',${new Date().getTime()})`).then(res => {
+                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values (${xx_discord},'${ingame_name}','${platform}',${new Date().getTime()})`).then(res => {
                                     if (user) user.send('Welcome to AllSquads **' + ingame_name + '**! Your account has been verified').catch(console.error)
                                     event_emitter.emit('allSquadsNewUserVerified', {discord_id: xx_discord})
                                 }).catch (err => {
