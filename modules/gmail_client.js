@@ -156,9 +156,19 @@ async function gmail_api_call(auth) {
                 const xx_discord = ids_list[j].discord_id
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
-                    const ingame_name = `${res.data.snippet.split(' ')[4].replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')} ${res.data.snippet.split(' ')[5] == 'has'? '':res.data.snippet.split(' ')[5]}`.trim()
-                    const platform = res.data.snippet.split(' ')[4].match('(PSN)') ? 'PSN' : res.data.snippet.split(' ')[4].match('(NSW)') ? 'NSW' : res.data.snippet.split(' ')[4].match('(XBOX)') ? 'XBOX' : 'PC'
-                    console.log('User ' + ingame_name + ' has verified their ign')
+                    var ingame_name = ''
+                    const words = res.data.snippet.split(' ')
+                    var i = 4
+                    while (true) {
+                        if (words[i] == 'has' && words[i+1] == 'sent') break;
+                        ingame_name += words[i]
+                        i++;
+                        if (i == 50) break; //infinite loop
+                    }
+                    const platform = ingame_name.match('(PSN)') ? 'PSN' : ingame_name.match('(NSW)') ? 'NSW' : ingame_name.match('(XBOX)') ? 'XBOX' : 'PC'
+                    ingame_name = ingame_name.replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')
+                    //const ingame_name = `${res.data.snippet.split(' ')[4].replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')} ${res.data.snippet.split(' ')[5] == 'has'? '':res.data.snippet.split(' ')[5]}`.trim()
+                    console.log('User', ingame_name, 'has verified their ign ; Platform:', platform)
                     const user = await client.users.fetch(xx_discord).catch(console.error)
                     db.query(`DELETE FROM tradebot_users_unverified WHERE discord_id = '${xx_discord}'`).catch(err => console.log(err))
                     db.query(`UPDATE hubapp_users SET forums_username='${ingame_name}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
