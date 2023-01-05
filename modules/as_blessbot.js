@@ -208,24 +208,24 @@ const components_list = {
             custom_id: 'as_bb_label.bless_time'
         },{
             type: 2,
-            label: '1m',
-            style: 1,
-            custom_id: 'as_bb_option.bless_time.1m'
-        },{
-            type: 2,
             label: '5m',
             style: 1,
             custom_id: 'as_bb_option.bless_time.5m'
         },{
             type: 2,
-            label: '10m',
-            style: 1,
-            custom_id: 'as_bb_option.bless_time.10m'
-        },{
-            type: 2,
             label: '15m',
             style: 1,
             custom_id: 'as_bb_option.bless_time.15m'
+        },{
+            type: 2,
+            label: '30m',
+            style: 1,
+            custom_id: 'as_bb_option.bless_time.30m'
+        },{
+            type: 2,
+            label: '60m',
+            style: 1,
+            custom_id: 'as_bb_option.bless_time.60m'
         }]
     }],
     region: [{
