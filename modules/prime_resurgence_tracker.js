@@ -1,7 +1,7 @@
 const axios = require('axios');
 const {client} = require('./discord_client.js');
 
-const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic']
+const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic','lith_b10_relic']
 
 setInterval(() => {
     console.log('pr tracker invoked')
@@ -10,7 +10,7 @@ setInterval(() => {
         .then(async response => {
             const orders = response.data.payload.orders
             orders.forEach(order => {
-                if (order.user.status != "offline" && order.order_type == "sell" && order.region == "en" && order.visible && order.platfrom == 'pc' && order.platinum <=5 && order.quantity >= 3) {
+                if (order.user.status != "offline" && order.order_type == "sell" && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <=5 && order.quantity >= 3) {
                     sendAlert(order, item_url)
                 }
             })
