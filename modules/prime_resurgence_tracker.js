@@ -4,6 +4,7 @@ const {client} = require('./discord_client.js');
 const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic']
 
 setInterval(() => {
+    console.log('pr tracker invoked')
     items_list.forEach(item_url => {
         axios(`https://api.warframe.market/v1/items/${item_url}/orders`)
         .then(async response => {
