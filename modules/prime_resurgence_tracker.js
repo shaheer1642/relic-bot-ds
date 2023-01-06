@@ -27,9 +27,8 @@ function sendAlert(order,item) {
     const key = `${order.user.ingame_name}${item}`
     if (timeouts.includes(key)) return
     client.channels.cache.get(log_channel).send({
-        content: ' ',
+        content: mention_users.map(id => `<@${id}>`).join(', '),
         embeds: [{
-            content: mention_users.map(id => `<@${id}>`).join(', '),
             description: `User **${order.user.ingame_name}** (status: ${order.user.status}) is selling x${order.quantity} **${item}** (${order.subtype}) for ${order.platinum}p each (react with 👍 if you already pmed)`
         }]
     }).then(msg => msg.react('👍').catch(console.error)).catch(console.error)
