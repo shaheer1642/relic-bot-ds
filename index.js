@@ -29,6 +29,7 @@ require('./modules/as_daywave.js');
 require('./modules/allsquads.js');
 require('./modules/as_gabot.js');
 require('./modules/as_blessbot.js');
+require('./modules/prime_resurgence_tracker.js');
 
 // restart after 24.5h
 setTimeout(() => {
