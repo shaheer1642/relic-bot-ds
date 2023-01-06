@@ -23,7 +23,7 @@ function sendAlert(order,item) {
     client.channels.cache.get('892003813786017822').send({
         content: ' ',
         embeds: [{
-            description: `User ${order.user.ingame_name} (status: ${order.user.status}) is selling x${order.quantity} ${item} (${order.subtype}) for ${order.platinum}p each (react with 👍 if you already pmed)`
+            description: `User **${order.user.ingame_name}** (status: ${order.user.status}) is selling x${order.quantity} **${item}** (${order.subtype}) for ${order.platinum}p each (react with 👍 if you already pmed)`
         }]
     }).catch(console.error)
 }
