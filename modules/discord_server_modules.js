@@ -19,7 +19,7 @@ async function computeServerStats(message, args) {
         var user_msgs = {}
 
         var channel_data = await Promise.all(channels.map(async (channel,channelId) => {
-            if (!channel || !channel.type) return {channel: channelId, messages: 0}
+            if (!channel || !channel.type || !channel.messages) return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_CATEGORY') return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_VOICE') return {channel: channelId, messages: 0}
             var last_msg = await channel.messages.fetch({limit: 1}).catch(console.error)
