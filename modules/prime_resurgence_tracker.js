@@ -8,7 +8,7 @@ setInterval(() => {
         axios(`https://api.warframe.market/v1/items/${item_url}/orders`)
         .then(async response => {
             response.data.payload.orders.forEach(order => {
-                if ((order.user.status == "ingame") && (order.order_type == "sell") && (order.region == "en") && (order.visible == 1) && order.platfrom == 'pc' && order.platinum <=5 && order.quantity >= 3) {
+                if ((order.user.status != "offline") && (order.order_type == "sell") && (order.region == "en") && order.visible && order.platfrom == 'pc' && order.platinum <=5 && order.quantity >= 3) {
                     sendAlert(order, item_url)
                 }
             })
@@ -20,7 +20,7 @@ function sendAlert(order,item) {
     client.channels.cache.get('892003813786017822').send({
         content: ' ',
         embeds: [{
-            description: `User ${order.user.ingame_name} is selling x${order.quantity} ${item} for ${order.platinum}p each (react with 👍 if you already pmed)`
+            description: `User ${order.user.ingame_name} (status: ${order.user.status}) is selling x${order.quantity} ${item} (${order.subtype}) for ${order.platinum}p each (react with 👍 if you already pmed)`
         }]
     }).catch(console.error)
 }
