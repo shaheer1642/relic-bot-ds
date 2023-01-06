@@ -1,7 +1,7 @@
 const axios = require('axios');
 const {client} = require('./discord_client.js');
 
-const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic','lith_b10_relic']
+const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic']
 
 setInterval(() => {
     console.log('pr tracker invoked')
