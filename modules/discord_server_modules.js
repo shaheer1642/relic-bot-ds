@@ -22,7 +22,8 @@ async function computeServerStats(message, args) {
             if (!channel || !channel.type) return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_CATEGORY') return {channel: channelId, messages: 0}
             if (channel.type == 'GUILD_VOICE') return {channel: channelId, messages: 0}
-            var last_msg = await channel.messages.fetch({limit: 1})
+            var last_msg = await channel.messages.fetch({limit: 1}).catch(console.error)
+            if (!last_msg) return {channel: channelId, messages: 0}
             last_msg.forEach(msg => last_msg = msg)
             if (last_msg.createdTimestamp < timestamp)
                 return {channel: channelId, messages: 0}
