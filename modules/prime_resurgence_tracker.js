@@ -122,6 +122,101 @@ const items_list = [{
     max_price: 5,
     min_quantity: 3,
     type: 'sell'
+},{
+    item_url: 'meso_b1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_b3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_b3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_m1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_m2_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_m1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_r1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_s4_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_d1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_v2_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_b1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_n9_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_f3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_s5_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_g1_relic',
+    max_price: 7,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_g2_relic',
+    max_price: 7,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_n7_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_e1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_l1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
 }]
 
 const mention_users = ['253525146923433984','407222185447391234']
