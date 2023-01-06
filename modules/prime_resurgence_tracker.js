@@ -2,6 +2,9 @@ const axios = require('axios');
 const {client} = require('./discord_client.js');
 
 const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic']
+const log_channel = '1060960447966232696'
+
+var timeouts = []
 
 setInterval(() => {
     //console.log('pr tracker invoked')
@@ -20,10 +23,16 @@ setInterval(() => {
 
 function sendAlert(order,item) {
     //console.log('sendAlert invoked')
-    client.channels.cache.get('892003813786017822').send({
+    const key = `${order.user.ingame_name}${item}`
+    if (timeouts.includes(key)) return
+    client.channels.cache.get(log_channel).send({
         content: ' ',
         embeds: [{
             description: `User **${order.user.ingame_name}** (status: ${order.user.status}) is selling x${order.quantity} **${item}** (${order.subtype}) for ${order.platinum}p each (react with 👍 if you already pmed)`
         }]
     }).catch(console.error)
+    timeouts.push(key)
+    setTimeout(() => {
+        timeouts = timeouts.filter(user => user !== key)
+    }, 120000);
 }
