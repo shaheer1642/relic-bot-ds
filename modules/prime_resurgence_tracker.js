@@ -59,7 +59,7 @@ const items_list = [{
     type: 'sell'
 },{
     item_url: 'neo_z1_relic',
-    max_price: 4,
+    max_price: 3,
     min_quantity: 3,
     type: 'sell'
 },{
@@ -158,5 +158,5 @@ function sendAlert(order,item) {
     timeouts.push(key)
     setTimeout(() => {
         timeouts = timeouts.filter(user => user !== key)
-    }, 120000);
+    }, 900000);
 }
