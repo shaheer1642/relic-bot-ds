@@ -2,7 +2,28 @@ const axios = require('axios');
 const {client} = require('./discord_client.js');
 const {convertUpper} = require('./extras.js');
 
-const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic']
+const items_list = [{
+    item_url: 'axi_l4_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_v8_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_o2_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_o3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},]
+
 const mention_users = ['253525146923433984','407222185447391234']
 const log_channel = '1060960447966232696'
 
@@ -10,12 +31,12 @@ var timeouts = []
 
 setInterval(() => {
     //console.log('pr tracker invoked')
-    items_list.forEach(item_url => {
-        axios(`https://api.warframe.market/v1/items/${item_url}/orders`)
+    items_list.forEach(tracker => {
+        axios(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`)
         .then(async response => {
             const orders = response.data.payload.orders
             orders.forEach(order => {
-                if (order.user.status != "offline" && order.order_type == "sell" && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <=5 && order.quantity >= 3) {
+                if (order.user.status != "offline" && order.order_type == tracker.type && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <= tracker.max_price && order.quantity >= tracker.min_quantity) {
                     sendAlert(order, item_url)
                 }
             })
@@ -27,7 +48,7 @@ function sendAlert(order,item) {
     //console.log('sendAlert invoked')
     const key = `${order.user.ingame_name}${item}`
     if (timeouts.includes(key)) return
-    const pasta = `/w ${order.user.ingame_name} Hi! Are you still selling [${convertUpper(item)}] for ${order.platinum}p each?`
+    const pasta = `/w ${order.user.ingame_name} Hi! Are you still ${order.order_type}ing [${convertUpper(item)}] for ${order.platinum}p each?`
     client.channels.cache.get(log_channel).send({
         content: mention_users.map(id => `<@${id}>`).join(', '),
         embeds: [{
