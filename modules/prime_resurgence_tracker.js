@@ -13,16 +13,116 @@ const items_list = [{
     min_quantity: 3,
     type: 'sell'
 },{
+    item_url: 'meso_o3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
     item_url: 'lith_o2_relic',
     max_price: 5,
     min_quantity: 3,
     type: 'sell'
 },{
-    item_url: 'meso_o3_relic',
+    item_url: 'axi_g1_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_n4_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_s6_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_n1_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_v4_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_k1_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_s3_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_z1_relic',
+    max_price: 4,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_n2_relic',
     max_price: 5,
     min_quantity: 3,
     type: 'sell'
-},]
+},{
+    item_url: 'meso_n5_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_n11_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_n3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'neo_n7_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_n3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_n3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'lith_t3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_n3_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'axi_n5_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_f1_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+},{
+    item_url: 'meso_o4_relic',
+    max_price: 5,
+    min_quantity: 3,
+    type: 'sell'
+}]
 
 const mention_users = ['253525146923433984','407222185447391234']
 const log_channel = '1060960447966232696'
