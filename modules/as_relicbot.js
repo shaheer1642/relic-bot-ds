@@ -538,7 +538,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     const msg = {
         content: '\u200b',
         embeds: fields.length == 0 ? []:[{
-            title: convertUpper(tier),
+            title: `${emote_ids[tier]} ${convertUpper(tier)}`,
             description: '⸻'.repeat(10),
             fields: fields,
             color: tier == 'lith'? 'GREEN' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'RED' : tier == 'axi' ? 'YELLOW' : ''
