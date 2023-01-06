@@ -2,6 +2,7 @@ const axios = require('axios');
 const {client} = require('./discord_client.js');
 
 const items_list = ['axi_l4_relic','neo_v8_relic','meso_o3_relic','lith_o2_relic']
+const mention_users = ['253525146923433984','407222185447391234']
 const log_channel = '1060960447966232696'
 
 var timeouts = []
@@ -28,9 +29,10 @@ function sendAlert(order,item) {
     client.channels.cache.get(log_channel).send({
         content: ' ',
         embeds: [{
+            content: mention_users.map(id => `<@${id}>`).join(', '),
             description: `User **${order.user.ingame_name}** (status: ${order.user.status}) is selling x${order.quantity} **${item}** (${order.subtype}) for ${order.platinum}p each (react with 👍 if you already pmed)`
         }]
-    }).catch(console.error)
+    }).then(msg => msg.react('👍').catch(console.error)).catch(console.error)
     timeouts.push(key)
     setTimeout(() => {
         timeouts = timeouts.filter(user => user !== key)
