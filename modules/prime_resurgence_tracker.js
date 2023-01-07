@@ -252,7 +252,7 @@ function sendAlert(order,item) {
     //console.log('sendAlert invoked')
     const key = `${order.user.ingame_name}${item}`
     if (timeouts.includes(key)) return
-    const pasta = `/w ${order.user.ingame_name} Hi! Are you still ${order.order_type}ing [${convertUpper(item)}] for ${order.platinum}p each?`
+    const pasta = `/w ${order.user.ingame_name} Hi! Are you still ${order.order_type}ing [${convertUpper(item)}] for ${order.platinum}p each? (warframe.market)`
     client.channels.cache.get(log_channel).send({
         content: mention_users.map(id => `<@${id}>`).join(', '),
         embeds: [{
