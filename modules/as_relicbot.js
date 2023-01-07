@@ -619,7 +619,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
             thread.send({
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
-                    title: relicBotSquadToString(squad) + squad.is_steelpath ? ' (Steelpath)' : squad.is_railjack ? ' (Railjack)' : '',
+                    title: `${relicBotSquadToString(squad)} ${squad.is_steelpath ? '(Steelpath)' : squad.is_railjack ? '(Railjack)' : ''}`.trim(),
                     description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).join('\n/invite ').replace(/_/g, '\_')}`,
                     footer: {
                         text: `This squad will auto-close in 15m`
