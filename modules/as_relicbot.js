@@ -516,6 +516,13 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             value: field_value,
             inline: true
         })
+        if (squads.length <= 12) {
+            fields.push({
+                name: '\u200b',
+                value: '\u200b',
+                inline: true
+            })
+        }
         const k = Math.ceil((index + 1)/5) - 1
         if (!components[k]) components[k] = {type: 1, components: []}
         components[k].components.push({
