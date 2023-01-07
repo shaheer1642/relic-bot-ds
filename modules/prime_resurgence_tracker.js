@@ -1,4 +1,4 @@
-const axios = require('axios');
+const request = require('request');
 const {client} = require('./discord_client.js');
 const {convertUpper} = require('./extras.js');
 
@@ -226,16 +226,25 @@ var timeouts = []
 
 setInterval(() => {
     //console.log('pr tracker invoked')
-    items_list.forEach(tracker => {
-        axios(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`)
-        .then(async response => {
-            const orders = response.data.payload.orders
+    getShuffledArr(items_list).forEach(tracker => {
+        request(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`, function (error, response, body) {
+            if (error || response.statusCode != 200) return
+            const orders = body.payload.orders
             orders.forEach(order => {
                 if (order.user.status != "offline" && order.order_type == tracker.type && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <= tracker.max_price && order.quantity >= tracker.min_quantity) {
                     sendAlert(order, tracker.item_url)
                 }
             })
-        }).catch(console.error);
+        });
+        // axios(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`)
+        // .then(async response => {
+        //     const orders = response.data.payload.orders
+        //     orders.forEach(order => {
+        //         if (order.user.status != "offline" && order.order_type == tracker.type && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <= tracker.max_price && order.quantity >= tracker.min_quantity) {
+        //             sendAlert(order, tracker.item_url)
+        //         }
+        //     })
+        // }).catch(console.error);
     })
 }, 60000);
 
@@ -255,3 +264,12 @@ function sendAlert(order,item) {
         timeouts = timeouts.filter(user => user !== key)
     }, 900000);
 }
+
+const getShuffledArr = arr => {
+    const newArr = arr.slice()
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const rand = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
+    }
+    return newArr
+};
