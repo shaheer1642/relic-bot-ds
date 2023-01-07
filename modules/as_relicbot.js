@@ -546,7 +546,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         content: '\u200b',
         embeds: fields.length == 0 ? []:[{
             title: `${emote_ids[tier]} ${convertUpper(tier)}`,
-            description: '⸻'.repeat(11),
+            description: '⸻'.repeat(12),
             fields: fields,
             color: tier == 'lith'? 'GREEN' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'RED' : tier == 'axi' ? 'YELLOW' : ''
         }],
