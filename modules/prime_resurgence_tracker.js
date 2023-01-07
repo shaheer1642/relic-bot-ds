@@ -228,7 +228,7 @@ setInterval(() => {
     //console.log('pr tracker invoked')
     getShuffledArr(items_list).forEach(tracker => {
         request(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`, function (error, response, body) {
-            if (error || response.statusCode != 200) return
+            if (!response) return
             const orders = body.payload.orders
             orders.forEach(order => {
                 if (order.user.status != "offline" && order.order_type == tracker.type && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <= tracker.max_price && order.quantity >= tracker.min_quantity) {
