@@ -237,7 +237,7 @@ setInterval(() => {
             })
         }).catch(console.error);
     })
-}, 10000);
+}, 60000);
 
 function sendAlert(order,item) {
     //console.log('sendAlert invoked')
