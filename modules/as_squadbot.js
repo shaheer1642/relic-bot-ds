@@ -693,7 +693,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
     new_squads.map((squad,index) => {
         const payload_index = Math.ceil((index + 1)/15) - 1
         const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
-        if (!payloads[payload_index]) payloads[payload_index] = {content: ' ', embeds: [{description: '⸻'.repeat(10), fields: []}], components: []}
+        if (!payloads[payload_index]) payloads[payload_index] = {content: ' ', embeds: [{description: '⸻'.repeat(11), fields: []}], components: []}
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) {
             if (squad.members.length > 0) {
                 payloads[payload_index].embeds[0].fields.push({
