@@ -1415,10 +1415,7 @@ async function relist(message,args) {
     })
     .catch(function (error) {
         processMessage.edit("Error occured retrieving profile orders. Please try again.\nError code 500").catch(err => console.log(err))
-        if (error.response)
-            console.log(JSON.stringify(error.response.data))
-        else
-            console.log(error)
+        console.log(JSON.stringify(error))
         return
     });
     return
