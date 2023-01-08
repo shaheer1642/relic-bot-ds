@@ -3,6 +3,9 @@ const {db} = require('./db_connection.js');
 const JSONbig = require('json-bigint');
 const {tb_user_exist} = require('./trade_bot_modules')
 const {socket} = require('./socket')
+const {event_emitter} = require('./event_emitter')
+const squadbot = require('./as_squadbot.js');
+const { convertUpper } = require('./extras.js');
 
 const guild_id = '865904902941048862'
 const vip_channel_id = '1041306010331119667'
@@ -16,19 +19,97 @@ client.on('ready', () => {
     setInterval(edit_leaderboard, 300000);
 })
 
-client.on('interactionCreate', (interaction) => {
-    if (interaction.customId == 'warframe_hub_purchase_vip') {
-        tb_user_exist(interaction.user.id).then(res => {
-            interaction.reply({
-                content: `Please visit the following link in the browser to complete this transaction\n\nhttps://www.patreon.com/oauth2/authorize?response_type=code&client_id=TKIWwI-3NzhfxQqIcVBvj5WHcFLoc8ylgFkz0310VSi2XEc0jyLU6bFpw6ZV75gN&redirect_uri=https://gauss-prime-api.up.railway.app/api/patreon/oauth&state=${interaction.user.id}\n\nUpon successful payment you will receive a DM from the bot. In-case payment went through but you didn't gain the VIP sub, please contact an administrator to manually review it`,
-                ephemeral: true
-            }).catch(console.error)
-        }).catch(err => {
-            interaction.reply({
-                ...err,
-                ephemeral: true
-            }).catch(console.error)
+event_emitter.on('allSquadsNewUserVerified', async data => {
+    const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
+    if (!user) return
+
+    const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
+    const member = await guild.members.fetch(data.discord_id).catch(console.error)
+
+    if (!member) return
+
+    payloadsGenerator().forEach(payload => {
+        user.send(payload).catch(console.error)
+    })
+
+    function payloadsGenerator() {
+        const squad_trackers = ['sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
+        'sister_(murmur)','endo_arena','archon_hunt']
+        const relic_trackers = ['lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
+        'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','meso f2 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
+        ,'axi s6 relic','lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','neo n9 relic','axi s4 relic','lith v7 relic'
+        ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
+        const squads_payloads = []
+        const relics_payloads = []
+        squad_trackers.map((squad,index) => {
+            const payload_index = Math.ceil((index + 1)/15) - 1
+            const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
+            if (!squads_payloads[payload_index]) squads_payloads[payload_index] = {content: ' ', embeds: [], components: []}
+            if (!squads_payloads[payload_index].components[component_index]) squads_payloads[payload_index].components[component_index] = {type: 1, components: []}
+            squads_payloads[payload_index].components[component_index].components.push({
+                type: 2,
+                style: 1,
+                label: convertUpper(squad),
+                custom_id: `as_new_member_sq_trackers_add.${squad}`,
+                emoji: squadbot.emoteObjFromSquadString(squad)
+            })
         })
+        relic_trackers.map((squad,index) => {
+            const payload_index = Math.ceil((index + 1)/20) - 1
+            const component_index = Math.ceil((index - payload_index * 20 + 1)/4) - 1
+            if (!relics_payloads[payload_index]) relics_payloads[payload_index] = {content: ' ', embeds: [], components: []}
+            if (!relics_payloads[payload_index].components[component_index]) relics_payloads[payload_index].components[component_index] = {type: 1, components: []}
+            relics_payloads[payload_index].components[component_index].components.push({
+                type: 2,
+                style: 1,
+                label: convertUpper(squad.replace(' relic','')),
+                custom_id: `as_new_member_sq_trackers_add.${squad}`,
+                emoji: squadbot.emoteObjFromSquadString(squad)
+            })
+        })
+        squads_payloads[0].embeds = [{
+            description: '**Click the squads** you are interested in, to be notified when someone hosts them.\nUse <#1054843353302323281> and <#1050717341123616851> channels to change this notification setting in the future\n\nFor further information about the server, check out <#890197385651838977>',
+            color: 'WHITE'
+        }]
+        relics_payloads[0].embeds = [{
+            description: 'Check out these vaulted relics in your relic console!\nSub to them if you have',
+            color: 'WHITE'
+        }]
+        
+        return squads_payloads.concat(relics_payloads)
+    }
+})
+
+client.on('interactionCreate', (interaction) => {
+    if (interaction.isButton()) {
+        if (interaction.customId == 'warframe_hub_purchase_vip') {
+            tb_user_exist(interaction.user.id).then(res => {
+                interaction.reply({
+                    content: `Please visit the following link in the browser to complete this transaction\n\nhttps://www.patreon.com/oauth2/authorize?response_type=code&client_id=TKIWwI-3NzhfxQqIcVBvj5WHcFLoc8ylgFkz0310VSi2XEc0jyLU6bFpw6ZV75gN&redirect_uri=https://gauss-prime-api.up.railway.app/api/patreon/oauth&state=${interaction.user.id}\n\nUpon successful payment you will receive a DM from the bot. In-case payment went through but you didn't gain the VIP sub, please contact an administrator to manually review it`,
+                    ephemeral: true
+                }).catch(console.error)
+            }).catch(err => {
+                interaction.reply({
+                    ...err,
+                    ephemeral: true
+                }).catch(console.error)
+            })
+        } else if (interaction.customId.split('.')[0] == 'as_new_member_sq_trackers_add') {
+            const value = interaction.customId.split('.')[1]
+            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,discord_id: interaction.user.id, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
+                console.log(responses)
+                if (!Array.isArray(responses)) responses = [responses]
+                if (responses[0].code == 200) {
+                    const components = interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
+                    if (components.length == 0) interaction.message.delete().catch(console.error)
+                    else {
+                        interaction.update({
+                            components: components
+                        }).catch(console.error)
+                    }
+                }
+            })
+        }
     }
 })
 

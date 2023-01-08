@@ -24,19 +24,19 @@ const webhooks_list = {}
 const emote_ids = {
     steel_essence: '<:steel_essence:962508988442869800>',
     railjack: '<:railjack:1045456185429594214>',
-    lith: '<:Lith:962457564493271051>',
-    meso: '<:Meso:962457563092361257>',
-    neo: '<:Neo:962457562844909588>',
-    axi: '<:Axi:962457563423735868>',
+    lith: '<:Lith:1060995797807804496>',
+    meso: '<:Meso:1060997039808336002>',
+    neo: '<:Neo:1060997042702401646>',
+    axi: '<:Axi:1060997035815358634>',
     sortie: '<:Sortie_b:1050156747135909918>',
     incursion: '<:steel_essence:962508988442869800>',
-    alert: '<:❗:>',
+    alert: '❗',
     eidolon: '<:ArcaneEnergize:1050150973718417558>',
-    help: '<:🙋:>',
+    help: '🙋',
     index: '<:credits:961605300601913424>',
-    profit_taker: '<:🕷️:>',
-    bounty: '<:☠️:>',
-    bounties: '<:☠️:>',
+    profit_taker: '🕷️',
+    bounty: '☠️',
+    bounties: '☠️',
     leveling: '<:AffinityOrb:1050156033743523860>',
     arbitration: '<:VitusEssence:1050155343776321617>',
     nightwave: '<:NorasMixVol2Cred:1050154112274141234>',
@@ -47,56 +47,17 @@ const emote_ids = {
 }
 
 function emoteObjFromSquadString(squad_string) {
-    var name = ''
-    var id = ''
+    var identifier = ''
     Object.keys(emote_ids).forEach(key => {
         if (squad_string.match(key)) {
-            const identifier = emote_ids[key].replace('<:','').replace('>','')
-            name = identifier.split(':')[0]
-            id = identifier.split(':')[1]
+            identifier = emote_ids[key]
         }
     })
-    return {
-        name: name,
-        id: id
-    }
+    return identifier
 }
 
 client.on('channelDelete', channel => {
     db.query(`DELETE FROM as_sb_trackers WHERE channel_id = '${channel.id}'; DELETE FROM rb_trackers WHERE channel_id = '${channel.id}';`).catch(console.error)
-})
-
-event_emitter.on('allSquadsNewUserVerified', async data => {
-    const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
-    if (!user) return
-
-    const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
-    const member = await guild.members.fetch(data.discord_id).catch(console.error)
-
-    if (!member) return
-
-    user.send({
-        content: ' ',
-        embeds: [{
-            description: 'Check <#890197385651838977> tutorial on how to find squads via Discord\nSelect the squads you are interested in, to be notified whenever someone hosts them. You may change notification settings via <#1054843353302323281> channel in the future',
-            color: 'WHITE'
-        }],
-        components: [{
-            type: 1,
-            components: [{
-                type: 3,
-                custom_id: "as_sb_sq_trackers_add_menu",
-                options: default_squads.map((squad) => ({
-                    label: convertUpper(squad.squad_string),
-                    value: squad.squad_string,
-                    emoji: emoteObjFromSquadString(squad.squad_string).id != '' ? emoteObjFromSquadString(squad.squad_string) : emoteObjFromSquadString(squad.squad_string).name
-                })),
-                placeholder: "Notification Settings",
-                min_values: 1,
-                max_values: default_squads.length
-            }]
-        }]
-    }).catch(console.error)
 })
 
 const default_squads = [{
@@ -428,7 +389,7 @@ function constructTrackersEmbed(trackers, ephemeral) {
             arr.push({
                 label: `${convertUpper(tracker.squad_string)}`,
                 value: tracker.tracker_id,
-                emoji: emoteObjFromSquadString(tracker.squad_string).id != '' ? emoteObjFromSquadString(tracker.squad_string) : emoteObjFromSquadString(tracker.squad_string).name
+                emoji: emoteObjFromSquadString(tracker.squad_string)
             })
         }
         return arr
@@ -709,7 +670,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
             label: `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}`,
             style: squad.members.length == 0 ? 2 : (squad.spots - squad.members.length) == 1 ? 4 : (squad.spots - squad.members.length) == 2 ? 3 : (squad.spots - squad.members.length) == 3 ? 1 : 2,
             custom_id: squad.is_default ?  `as_sb_sq_default_${squad.squad_string}_1/${squad.spots}`: `as_sb_sq_${squad.squad_id}`,
-            emoji: emoteObjFromSquadString(squad.squad_string).id != '' ? emoteObjFromSquadString(squad.squad_string) : emoteObjFromSquadString(squad.squad_string).name
+            emoji: emoteObjFromSquadString(squad.squad_string)
         })
     })
     //console.log(JSON.stringify(payloads))
@@ -756,7 +717,7 @@ function edit_recruitment_intro() {
                     options: default_squads.map((squad) => ({
                         label: convertUpper(squad.squad_string),
                         value: squad.squad_string,
-                        emoji: emoteObjFromSquadString(squad.squad_string).id != '' ? emoteObjFromSquadString(squad.squad_string) : emoteObjFromSquadString(squad.squad_string).name
+                        emoji: emoteObjFromSquadString(squad.squad_string)
                     })),
                     placeholder: "Notification Settings",
                     min_values: 1,
@@ -999,5 +960,7 @@ socket.on('squadbot/squadMessageCreate',payload => {
 })
 
 module.exports = {
-    channels_list
+    channels_list,
+    default_squads,
+    emoteObjFromSquadString
 }
