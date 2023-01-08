@@ -256,7 +256,7 @@ function sendAlert(order,item) {
     client.channels.cache.get(log_channel).send({
         content: mention_users.map(id => `<@${id}>`).join(', '),
         embeds: [{
-            description: `User **${order.user.ingame_name}** (status: ${order.user.status}) is selling x${order.quantity} **${convertUpper(item)}** (${order.subtype}) for ${order.platinum}p each\n${pasta}\n(react with 👍 before you are going to pm)`
+            description: `User **${order.user.ingame_name}** (status: ${order.user.status}) is selling x${order.quantity} (${convertUpper(item)})[https://warframe.market/items/${item}] (${order.subtype}) for ${order.platinum}p each\n${pasta}\n(react with 👍 before you are going to pm)`
         }]
     }).then(msg => msg.react('👍').catch(console.error)).catch(console.error)
     timeouts.push(key)
