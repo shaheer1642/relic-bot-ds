@@ -708,7 +708,7 @@ async function logSquad(squad,include_chat,action) {
                 channel.send({
                     content: convertUpper(action),
                     embeds: [{
-                        title: relicBotSquadToString(squad),
+                        title: `${relicBotSquadToString(squad)} ${squad.is_steelpath ? '(Steelpath)' : squad.is_railjack ? '(Railjack)' : ''}`.trim(),
                         description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `**${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\_'),
                         timestamp: new Date(),
                         footer: {
@@ -723,7 +723,7 @@ async function logSquad(squad,include_chat,action) {
         channel.send({
             content: convertUpper(action),
             embeds: [{
-                title: relicBotSquadToString(squad),
+                title: `${relicBotSquadToString(squad)} ${squad.is_steelpath ? '(Steelpath)' : squad.is_railjack ? '(Railjack)' : ''}`.trim(),
                 description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\_'),
                 timestamp: new Date(),
                 footer: {
