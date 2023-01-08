@@ -905,7 +905,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: convertUpper(squad.squad_string),
-                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).join('\n/invite ').replace(/_/g, '\_')}`,
+                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).sort().join('\n/invite ').replace(/_/g, '\_')}`,
                     footer: {
                         text: `This squad will auto-close in ${Math.round(squad.squad_closure / 60 / 1000)}m`
                     }
