@@ -889,7 +889,7 @@ function constructTrackersEmbed(trackers, ephemeral) {
         ephemeral: ephemeral
     }
     trackers.forEach(tracker => {
-        if (payload.embeds[0].fields[1].length < 1000) {
+        if (payload.embeds[0].fields[1].value.length < 1000) {
             payload.embeds[0].fields[0].value += `${emote_ids[tracker.tier]} ${convertUpper(tracker.tier)}` + '\n'
             payload.embeds[0].fields[1].value += relicBotSquadToString(tracker) + '\n'
             payload.embeds[0].fields[2].value += (tracker.is_steelpath ? `${emote_ids.steel_essence} Steelpath` : tracker.is_railjack ? `${emote_ids.railjack} Railjack` : 'Normal') + '\n'
