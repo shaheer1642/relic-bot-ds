@@ -161,10 +161,11 @@ async function gmail_api_call(auth) {
                     var i = 4
                     while (true) {
                         if (words[i] == 'has' && words[i+1] == 'sent') break;
-                        ingame_name += words[i]
+                        ingame_name += `${words[i]} `
                         i++;
                         if (i == 50) break; //infinite loop
                     }
+                    ingame_name = ingame_name.trim()
                     const platform = ingame_name.match('(PSN)') ? 'PSN' : ingame_name.match('(NSW)') ? 'NSW' : ingame_name.match('(XBOX)') ? 'XBOX' : 'PC'
                     ingame_name = ingame_name.replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')
                     //const ingame_name = `${res.data.snippet.split(' ')[4].replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')} ${res.data.snippet.split(' ')[5] == 'has'? '':res.data.snippet.split(' ')[5]}`.trim()
