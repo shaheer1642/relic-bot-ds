@@ -2566,7 +2566,7 @@ async function trading_bot_registeration(discord_id) {
         .then(res => {
             const uni_id = generateId()
             db.query(`INSERT INTO tradebot_users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
-            .then(res => {
+            .then(() => {
                 resolve(allsquads.verificationInstructions('en',uni_id,res.rows.length == 0 ? false:true))
             }).catch(err => {
                 console.log(err)

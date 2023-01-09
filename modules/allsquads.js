@@ -259,7 +259,7 @@ function verificationInstructions(language,code,already_verified) {
         }
     } else if (language == 'fr') {
         return {
-            content: `${already_verified ? 'Note: Votre pseudo en jeu a déjà été vérifié. Il sera mis à jour après re-vérification\n':''}**Veuillez suivre les étapes suivantes afin de vérifier votre compte:**\n1) Connectez-vous sur le forum de warframe en visitant ce lien: https://forums.warframe.com/\n2) Aller sur sur cette page et envoyer un nouveau message au bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Ecrivez le message sous la forme suivante:\Objet: **${code}**\nMessage: Salut\n4) CLiquez sur "Envoyer"\n5) Le bot va vérifier la boite mail dans quelques secondes et il va vous envoyer un message de confirmation. Merci!`,
+            content: `${already_verified ? 'Note: Votre pseudo en jeu a déjà été vérifié. Il sera mis à jour après re-vérification\n':''}**Veuillez suivre les étapes suivantes afin de vérifier votre compte:**\n1) Connectez-vous sur le forum de warframe en visitant ce lien: https://forums.warframe.com/\n2) Aller sur sur cette page et envoyer un nouveau message au bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Ecrivez le message sous la forme suivante:\nObjet: **${code}**\nMessage: Salut\n4) CLiquez sur "Envoyer"\n5) Le bot va vérifier la boite mail dans quelques secondes et il va vous envoyer un message de confirmation. Merci!`,
             embeds: [{
                 description: '[Visitez le forum](https://forums.warframe.com/)\n\n[Envoyer un message au bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
                 footer: {
