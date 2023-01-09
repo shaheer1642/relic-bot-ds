@@ -8,6 +8,7 @@ const JSONbig = require('json-bigint');
 const uuid = require('uuid');
 const { fstat } = require('fs');
 const fs = require('fs');
+const allsquads = require('./allsquads')
 
 const userOrderLimit = 50
 const filledOrdersLimit = 500
@@ -160,7 +161,7 @@ async function message_handler(message, multiMessage) {
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    message.channel.send(`☠️ Error fetching active orders info in db. Please contact MrSofty#7012\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
                     setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
@@ -172,7 +173,7 @@ async function message_handler(message, multiMessage) {
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    message.channel.send(`☠️ Error updating orders info in db. Please contact MrSofty#7012\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
                     setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
@@ -260,7 +261,7 @@ async function message_handler(message, multiMessage) {
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error fetching active lich orders info in db. Please contact MrSofty#7926\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    message.channel.send(`☠️ Error fetching active lich orders info in db. Please contact MrSofty#7012\nError code: 500`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
                     setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
@@ -272,7 +273,7 @@ async function message_handler(message, multiMessage) {
                 })
                 .catch(err => {
                     console.log(err)
-                    message.channel.send(`☠️ Error updating lich orders info in db. Please contact MrSofty#7926\nError code: 501`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
+                    message.channel.send(`☠️ Error updating lich orders info in db. Please contact MrSofty#7012\nError code: 501`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000))
                     setTimeout(() => message.delete().catch(console.error), 10000)
                     return false
                 })
@@ -597,7 +598,7 @@ async function check_user(message) {
             resolve(res.rows[0])
         })
         .catch(err => {
-            message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`).catch(console.error)
+            message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7012 ☠️`).catch(console.error)
             reject(err)
         })
     })
@@ -616,7 +617,7 @@ async function leaderboard(message) {
     })
     .catch(err => {
         console.log(err)
-        message.channel.send('☠️ Error fetching users info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️')
+        message.channel.send('☠️ Error fetching users info from DB.\nError code: 500\nPlease contact MrSofty#7012 ☠️')
         return false
     })
     if (!status)
@@ -666,7 +667,7 @@ async function leaderboard(message) {
     }
     message.channel.send(postdata).catch(err => {
         console.log(err)
-        message.channel.send('Some error sending embed. Please contact MrSofty#7926')
+        message.channel.send('Some error sending embed. Please contact MrSofty#7012')
     })
     return
 }
@@ -751,7 +752,7 @@ async function trading_bot(message,args,command) {
         .catch (err => {
             console.log(err)
             console.log('Retrieving Database -> items_list error')
-            message.channel.send({content: "☠️ Some error occured retrieving database info.\nError code: 501\nContact MrSofty#7926 ☠️"})
+            message.channel.send({content: "☠️ Some error occured retrieving database info.\nError code: 501\nContact MrSofty#7012 ☠️"})
             return false
         })
         if (!status)      
@@ -774,7 +775,7 @@ async function trading_bot(message,args,command) {
                     })
                     .catch(() => {
                         console.log("Error updating DB.")
-                        message.channel.send({content: "☠️ Some error occured updating item in db.\nError code:\nContact MrSofty#7926 ☠️"})
+                        message.channel.send({content: "☠️ Some error occured updating item in db.\nError code:\nContact MrSofty#7012 ☠️"})
                         return false
                     })
                     if (!status)      
@@ -887,7 +888,7 @@ async function trading_bot(message,args,command) {
                             VALUES ('${all_orders[0].order_id}','${uuid.v1()}',${message.channel.id},${all_orders[0].origin_channel_id},${trader.discord_id},${tradee.discord_id},'${item_id}','${JSON.stringify({rank: item_rank})}','${target_order_type}','item','{"${trader.discord_id}": 0, "${tradee.discord_id}": 0}',${price},${new Date().getTime()})
                         `).catch(err => {
                             console.log(err)
-                            message.channel.send(`☠️ <@${tradee.discord_id}> Error adding filled order in db.\nError code: 504\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+                            message.channel.send(`☠️ <@${tradee.discord_id}> Error adding filled order in db.\nError code: 504\nPlease contact MrSofty#7012 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
                         })
                         return Promise.resolve()
                     }
@@ -914,7 +915,7 @@ async function trading_bot(message,args,command) {
                 return false
             })
             if (!status) {
-                message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500\nContact MrSofty#7926 ☠️").catch(console.error); 
+                message.channel.send("☠️ Something went wrong retreiving item lowest price\nError code: 500\nContact MrSofty#7012 ☠️").catch(console.error); 
                 return Promise.reject()
             }
         }
@@ -940,11 +941,11 @@ async function trading_bot(message,args,command) {
             return false
         })
         if (!status) {
-            message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+            message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 500\nContact MrSofty#7012 ☠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
             return Promise.reject()
         }
         if (avg_price == null || avg_price == "null") {
-            message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7926 ☠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+            message.channel.send("☠️ Something went wrong retreiving item avg price\nError code: 501\nContact MrSofty#7012 ☠️").then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
             return Promise.reject()
         }
         if (!price) {
@@ -976,7 +977,7 @@ async function trading_bot(message,args,command) {
         `).then(async res => {
             return resolve()
         }).catch(err => {
-            originMessage.channel.send(`☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
+            originMessage.channel.send(`☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7012 ☠️`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error);
             console.log(err)
             return reject()
         })
@@ -1248,12 +1249,12 @@ async function trading_lich_bot(interaction) {
                         return resolve()
                     }).catch(err => {
                         console.log(err)
-                        interaction.reply({content: `☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                        interaction.reply({content: `☠️ Error updating DB order.\nError code: 501\nPlease contact MrSofty#7012 ☠️`, ephemeral: true}).catch(console.error)
                         return reject()
                     })
                 }).catch(err => {
                     console.log(err)
-                    interaction.reply({content: `☠️ Error generating lich image.\nError code: 501\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                    interaction.reply({content: `☠️ Error generating lich image.\nError code: 501\nPlease contact MrSofty#7012 ☠️`, ephemeral: true}).catch(console.error)
                     return reject()
                 })
             }
@@ -1578,7 +1579,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     .catch(err => {
         console.log(err)
         if (interaction)
-            interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+            interaction.reply({content: `☠️ Error retrieving item sell orders from DB.\nError code: 503\nPlease contact MrSofty#7012 ☠️`, ephemeral: true}).catch(console.error)
         return Promise.reject()
     })
     await db.query(`
@@ -1748,7 +1749,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
     .catch(err => {
         console.log(err)
         if (interaction)
-            interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+            interaction.reply({content: `☠️ Error retrieving item buy orders from DB.\nError code: 503\nPlease contact MrSofty#7012 ☠️`, ephemeral: true}).catch(console.error)
         return Promise.reject()
     })
     embeds.forEach((element,index) => {
@@ -1774,7 +1775,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             else if (res.rows.length > 1) {
                 console.log(`Detected more than one message for lich ${lich_info.weapon_url} in channel ${multiCid}`)
                 if (interaction)
-                    interaction.reply({content: `☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                    interaction.reply({content: `☠️ Detected more than one message in a channel for this item.\nError code: 503.5\nPlease contact MrSofty#7012 ☠️`, ephemeral: true}).catch(console.error)
                 return false
             }
             else {
@@ -1826,7 +1827,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
                 })
                 .catch(err => {
                     if (interaction)
-                        interaction.reply({content: `☠️ Error editing existing orders in channel <#${multiCid}>.\nError code: 505\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                        interaction.reply({content: `☠️ Error editing existing orders in channel <#${multiCid}>.\nError code: 505\nPlease contact MrSofty#7012 ☠️`, ephemeral: true}).catch(console.error)
                     console.log(err)
                     return
                 })
@@ -1897,7 +1898,7 @@ async function trading_lich_orders_update(interaction, lich_info, update_type) {
             .catch(err => {
                 console.log(err)
                 if (interaction) {
-                    interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7926 ☠️`, ephemeral: true}).catch(console.error)
+                    interaction.reply({content: `☠️ Error posting new orders in channel <#${multiCid}>.\nError code: 506\nPlease contact MrSofty#7012 ☠️`, ephemeral: true}).catch(console.error)
                 }
                 return Promise.reject()
             })
@@ -1932,7 +1933,7 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
                     }
                 }).catch (err => {
                     console.log(err)
-                    status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500.1 ☠️`
+                    status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7012\nError code: 500.1 ☠️`
                     return false
                 })
                 if (status)
@@ -1957,7 +1958,7 @@ async function trading_bot_user_orders(user_id,ingame_name,request_type) {
     })
     .catch (err => {
         console.log(err)
-        status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7926\nError code: 500 ☠️`
+        status_msg = `☠️ Error retrieving info from the DB. Please contact MrSofty#7012\nError code: 500 ☠️`
         return false
     })
     if (!status)
@@ -2175,7 +2176,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
         .catch(err => {
             console.log(err)
-            status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`
+            status_message = `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7012 ☠️`
             return false
         })
         if (!status) {
@@ -2220,7 +2221,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     .catch (err => {
         console.log(err)
         console.log('Retrieving Database -> items_list error')
-        message.channel.send({content: "☠️ Some error occured retrieving database info.\nError code: 501\nContact MrSofty#7926 ☠️"})
+        message.channel.send({content: "☠️ Some error occured retrieving database info.\nError code: 501\nContact MrSofty#7012 ☠️"})
         return false
     })
     if (!status)      
@@ -2262,7 +2263,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
         //------------------------------
         if (status == 1) {
-            message.channel.send({content: "☠️ Some error occured retrieving lich list from db.\nError code: 501.2\nContact MrSofty#7926 ☠️"})
+            message.channel.send({content: "☠️ Some error occured retrieving lich list from db.\nError code: 501.2\nContact MrSofty#7012 ☠️"})
             return Promise.reject()
         }
         if (status == 2) {
@@ -2295,7 +2296,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
         .catch(err => {
             console.log(err)
-            message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(console.error)
+            message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7012\nError code: 501 ☠️`).catch(console.error)
             return false
         })
         if (!status)
@@ -2384,7 +2385,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             })
         }
         if (postdata.embeds.length == 0) {
-            message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(console.error)
+            message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7012\nError code: 502 ☠️`).catch(console.error)
             return Promise.reject()
         }
         postdata.embeds[0].title = weapon_name
@@ -2400,7 +2401,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             })
             .catch(err => {
                 console.log(err)
-                message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(console.error)
+                message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7012\nError code: 503 ☠️`).catch(console.error)
             })
         }
         else if (request_type == 2) {
@@ -2413,7 +2414,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
             })
             .catch(err => {
                 console.log(err)
-                message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(console.error)
+                message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7012\nError code: 504 ☠️`).catch(console.error)
             })
         }
         return Promise.resolve()
@@ -2449,7 +2450,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
     })
     .catch(err => {
         console.log(err)
-        message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7926\nError code: 501 ☠️`).catch(console.error)
+        message.channel.send(`☠️ Error retrieving order info from db. Please contact MrSofty#7012\nError code: 501 ☠️`).catch(console.error)
         return false
     })
     if (!status)
@@ -2524,7 +2525,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
     }
     if (postdata.embeds.length == 0) {
-        message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7926\nError code: 502 ☠️`).catch(console.error)
+        message.channel.send(`☠️ Error occured making embed. Please contact MrSofty#7012\nError code: 502 ☠️`).catch(console.error)
         return Promise.reject()
     }
     postdata.embeds[0].title = item_name + item_rank.replace('unranked','').replace('maxed',' (maxed)')
@@ -2540,7 +2541,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
         .catch(err => {
             console.log(err)
-            message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7926\nError code: 503 ☠️`).catch(console.error)
+            message.channel.send(`☠️ Error occured sending message. Please contact MrSofty#7012\nError code: 503 ☠️`).catch(console.error)
         })
     }
     else if (request_type == 2) {
@@ -2553,7 +2554,7 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
         })
         .catch(err => {
             console.log(err)
-            message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7926\nError code: 504 ☠️`).catch(console.error)
+            message.channel.send(`☠️ Error occured editing embed. Please contact MrSofty#7012\nError code: 504 ☠️`).catch(console.error)
         })
     }
     return Promise.resolve()
@@ -2561,36 +2562,19 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
 
 async function trading_bot_registeration(discord_id) {
     return new Promise((resolve, reject) => {
-        var postdata = {content: ' ', embeds: [], ephemeral: true}
-        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`).then(res => {
-            if (res.rows.length != 0)
-                postdata.content += 'Note: Your ign has already been verified. It will be updated upon re-verification\n'
+        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
+        .then(res => {
             const uni_id = generateId()
             db.query(`INSERT INTO tradebot_users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
             .then(res => {
-                postdata.content += 
-`**Please follow these steps to verify your account:**
-1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/
-2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114
-3) Write the message body as given below:
-Subject: **${uni_id}**
-Message: Hi
-4) Click 'Send' button
-5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`
-                postdata.embeds.push({
-                    description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)'
-                })
-                resolve(postdata)
+                resolve(allsquads.verificationInstructions('en',uni_id,res.rows.length == 0 ? false:true))
             }).catch(err => {
                 console.log(err)
-                postdata.content = "Some error occured inserting record into db.\nError code: 502\nPlease contact MrSofty#7926"
-                reject(postdata)
+                reject({content: "Some error occured inserting record into db.\nError code: 502\nPlease contact MrSofty#7012"})
             })
-        })
-        .catch (err => {
+        }).catch(err => {
             console.log(err)
-            postdata.content = "Some error occured retrieving database info.\nError code: 500\nPlease contact MrSofty#7926"
-            reject(postdata)
+            reject({content: "Some error occured retrieving database info.\nError code: 500\nPlease contact MrSofty#7012"})
         })
     })
 }
@@ -2663,7 +2647,7 @@ async function tb_activate_lich_orders(message, interaction) {
     })
     .catch(err => {
         console.log(err)
-        status_msg = `☠️ Error fetching your lich orders from db. Please contact MrSofty#7926\nError code: 500 ☠️`
+        status_msg = `☠️ Error fetching your lich orders from db. Please contact MrSofty#7012\nError code: 500 ☠️`
         return false
     })
     if (!status) {
@@ -2686,11 +2670,11 @@ async function tb_activate_lich_orders(message, interaction) {
     })
     if (!status) {
         if (message) {
-            message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
+            message.channel.send(`☠️ Error updating your orders visibility in db. Please contact MrSofty#7012\nError code: 501 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
             setTimeout(() => message.delete().catch(console.error), 5000)
         }
         else
-            interaction.reply({content: `☠️ Error updating your orders visibility in db. Please contact MrSofty#7926\nError code: 501 ☠️`, embeds: [], ephemeral: true}).catch(console.error)
+            interaction.reply({content: `☠️ Error updating your orders visibility in db. Please contact MrSofty#7012\nError code: 501 ☠️`, embeds: [], ephemeral: true}).catch(console.error)
         return
     }
     for (var i=0;i<user_orders.length;i++) {
@@ -2712,11 +2696,11 @@ async function tb_activate_lich_orders(message, interaction) {
         })
         if (!status) {
             if (message) {
-                message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
+                message.channel.send(`☠️ Error fetching item info from db. Please contact MrSofty#7012\nError code: 502 ☠️`).then(msg => setTimeout(() => msg.delete(), 5000)).catch(console.error)
                 setTimeout(() => message.delete().catch(console.error), 5000)
             }
             else
-                interaction.reply({content: `☠️ Error fetching item info from db. Please contact MrSofty#7926\nError code: 502 ☠️`, embeds: [], ephemeral: true}).catch(console.error)
+                interaction.reply({content: `☠️ Error fetching item info from db. Please contact MrSofty#7012\nError code: 502 ☠️`, embeds: [], ephemeral: true}).catch(console.error)
             return
         }
         console.log(`updating lich order ${lich_info.weapon_url} for ${user_id}`)
@@ -2838,7 +2822,7 @@ async function tb_user_exist(discord_id) {
                 resolve('user exists')
             }
         }).catch(err => {
-            reject({content: `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926 ☠️`, embeds: [], ephemeral: true})
+            reject({content: `☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7012 ☠️`, embeds: [], ephemeral: true})
         })
     })
 }
