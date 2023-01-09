@@ -619,7 +619,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
             thread.send({
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
-                    title: `${relicBotSquadToString(squad)} ${squad.is_steelpath ? '(Steelpath)' : squad.is_railjack ? '(Railjack)' : ''}`.trim(),
+                    title: relicBotSquadToString(squad,true),
                     description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).sort().join('\n/invite ').replace(/_/g, '\_')}`,
                     footer: {
                         text: `This squad will auto-close in 15m`
@@ -708,7 +708,7 @@ async function logSquad(squad,include_chat,action) {
                 channel.send({
                     content: convertUpper(action),
                     embeds: [{
-                        title: `${relicBotSquadToString(squad)} ${squad.is_steelpath ? '(Steelpath)' : squad.is_railjack ? '(Railjack)' : ''}`.trim(),
+                        title: relicBotSquadToString(squad,true),
                         description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `**${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\_'),
                         timestamp: new Date(),
                         footer: {
@@ -723,7 +723,7 @@ async function logSquad(squad,include_chat,action) {
         channel.send({
             content: convertUpper(action),
             embeds: [{
-                title: `${relicBotSquadToString(squad)} ${squad.is_steelpath ? '(Steelpath)' : squad.is_railjack ? '(Railjack)' : ''}`.trim(),
+                title: relicBotSquadToString(squad,true),
                 description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\_'),
                 timestamp: new Date(),
                 footer: {
@@ -813,8 +813,8 @@ function error_codes_embed(response,discord_id) {
     }
 }
 
-function relicBotSquadToString(squad) {
-    return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()
+function relicBotSquadToString(squad,include_sp_rj) {
+    return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${include_sp_rj ? (squad.is_steelpath ? 'Steelpath':squad.is_railjack ? 'Railjack':''):''} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()
 }
 
 function constructTrackersEmbed(trackers, ephemeral) {
