@@ -3099,7 +3099,7 @@ function generateId() {
     let ID = "";
     let characters = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
     for ( var i = 0; i < 6; i++ ) {
-      ID += characters.charAt(Math.floor(Math.random() * 36));
+      ID += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return ID;
 }
