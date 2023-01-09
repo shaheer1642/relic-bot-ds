@@ -254,7 +254,8 @@ function verificationInstructions(language,code,already_verified) {
                     text: already_verified ? `${code}_alrver`:`${code}_!alrver`
                 }
             }],
-            components: components
+            components: components,
+            ephemeral: true
         }
     } else if (language == 'fr') {
         return {
@@ -265,7 +266,8 @@ function verificationInstructions(language,code,already_verified) {
                     text: already_verified ? `${code}_alrver`:`${code}_!alrver`
                 }
             }],
-            components: components
+            components: components,
+            ephemeral: true
         }
     }
 }
