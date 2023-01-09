@@ -138,7 +138,7 @@ client.on('interactionCreate', async (interaction) => {
                 content: ' ',
                 embeds: [{
                     title: convertUpper(item),
-                    description: `React with 🎉 to join\n${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries`,
+                    description: `Click 🎉 to join\n${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries`,
                     fields: [{
                         name: 'Hosted By',
                         value: `<@${discord_id}>`,
@@ -295,7 +295,7 @@ function embedGenerator(giveaway) {
         content: ' ',
         embeds: [{
             title: convertUpper(giveaway.item),
-            description: `React with 🎉 to join\n${giveaway.winner_count || 1} Winner${giveaway.winner_count > 1 ? 's':''} | ${giveaway.join_list.length} Entr${giveaway.join_list.length > 1 ? 'ies':'y'}`,
+            description: `Click 🎉 to join\n${giveaway.winner_count || 1} Winner${giveaway.winner_count > 1 ? 's':''} | ${giveaway.join_list.length} Entr${giveaway.join_list.length > 1 ? 'ies':'y'}`,
             fields: [{
                 name: 'Hosted By',
                 value: `<@${giveaway.discord_id}>`,
