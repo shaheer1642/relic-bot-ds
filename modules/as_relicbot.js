@@ -395,7 +395,7 @@ function edit_recruitment_intro() {
                   },
                   {
                     "name": "Icons",
-                    "value": "🔥 Squad is 3/4",
+                    "value": `🔥 Squad is 3/4\n${emote_ids.steel_essence} Steelpath Squad`,
                     "inline": true
                   },
                   {

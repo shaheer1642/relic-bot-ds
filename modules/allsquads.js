@@ -240,7 +240,7 @@ function verificationInstructions(language,code,already_verified) {
             custom_id: 'allsquads_verification_translate.en'
         },{
             type: 2,
-            label: 'French',
+            label: 'Français',
             style: 3,
             custom_id: 'allsquads_verification_translate.fr'
         }].filter(obj => obj.custom_id.split('.')[1] != language)
