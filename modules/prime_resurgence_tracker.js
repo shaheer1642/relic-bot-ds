@@ -44,7 +44,7 @@ const items_list = [{
     type: 'sell'
 },{
     item_url: 'lith_v4_relic',
-    max_price: 4,
+    max_price: 3,
     min_quantity: 3,
     type: 'sell'
 },{
@@ -262,7 +262,7 @@ function sendAlert(order,item) {
     timeouts.push(key)
     setTimeout(() => {
         timeouts = timeouts.filter(user => user !== key)
-    }, 900000);
+    }, 1800000);
 }
 
 const getShuffledArr = arr => {
