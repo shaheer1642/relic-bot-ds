@@ -155,7 +155,7 @@ async function gmail_api_call(auth) {
                 const xx_id = ids_list[j].id
                 const xx_discord = ids_list[j].discord_id
                 console.log(xx_id)
-                if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).match(xx_id)) {
+                if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).toLowerCase().match(`>${xx_id.toLowerCase()}<`)) {
                     var ingame_name = ''
                     const words = res.data.snippet.split(' ')
                     var i = 4
