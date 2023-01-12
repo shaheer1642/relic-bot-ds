@@ -1,0 +1,45 @@
+[{
+    "en": "Note: Your ign has already been verified. It will be updated upon re-verification",
+    "fr": "Note: Votre pseudo en jeu a déjà été vérifié. Il sera mis à jour après re-vérification",
+    "it": "Nota: Il tuo IGN è già stato verificato, verrà aggiornato appena verrà riverificato"
+},{
+    "en": "Please follow these steps to verify your account",
+    "fr": "Veuillez suivre les étapes suivantes afin de vérifier votre compte",
+    "it": "Perfavore segui questi passaggi per verificare il tuo account"
+},{
+    "en": "First make sure you are signed-in on Warframe forums by visiting this link",
+    "fr": "Connectez-vous sur le forum de warframe en visitant ce lien",
+    "it": "Per prima cosa assicurati di essere registrato sul forum di Warframe cliccando su questo link"
+},{
+    "en": "Visit this page to compose a new message to the bot",
+    "fr": "Aller sur sur cette page et envoyer un nouveau message au bot",
+    "it": "Visita questa pagina per comporre un nuovo messaggio al bot"
+},{
+    "en": "Write the message body as given below",
+    "fr": "Ecrivez le message sous la forme suivante",
+    "it": "Scrivi il testo del messaggio come è indicato sotto"
+},{
+    "en": "Subject:",
+    "fr": "Objet:",
+    "it": "Soggetto:"
+},{
+    "en": "Message:",
+    "fr": "Message:",
+    "it": "Message:"
+},{
+    "en": "Click 'Send' button",
+    "fr": "CLiquez sur 'Envoyer'",
+    "it": "Clicca sul tasto 'invio'"
+},{
+    "en": "Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!",
+    "fr": "Le bot va vérifier la boite mail dans quelques secondes et il va vous envoyer un message de confirmation. Merci!",
+    "it": "Il bot farà i controlli della inbox nei prossimi secondi e ti invierà un messaggio di conferma. Grazie!"
+},{
+    "en": "Visit the forums",
+    "fr": "Visitez le forum",
+    "it": "Visita il forum"
+},{
+    "en": "Message the bot",
+    "fr": "Envoyer un message au bot",
+    "it": "Messaggia il bot"
+}]

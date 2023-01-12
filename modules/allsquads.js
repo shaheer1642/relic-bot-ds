@@ -6,6 +6,8 @@ const {socket} = require('./socket')
 const {event_emitter} = require('./event_emitter')
 const squadbot = require('./as_squadbot.js');
 const { convertUpper } = require('./extras.js');
+const translations = require('./../translations.json');
+const supported_langs = ['en','fr','it']
 
 const guild_id = '865904902941048862'
 const vip_channel_id = '1041306010331119667'
@@ -229,7 +231,6 @@ function edit_leaderboard() {
     })
 }
 
-
 function verificationInstructions(language,code,already_verified) {
     const components = [{
         type: 1,
@@ -250,6 +251,18 @@ function verificationInstructions(language,code,already_verified) {
             custom_id: 'allsquads_verification_translate.it'
         }].filter(obj => obj.custom_id.split('.')[1] != language)
     }]
+    const payload = {
+        content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n':''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
+        embeds: [{
+            description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
+            footer: {
+                text: already_verified ? `${code}_alrver`:`${code}_!alrver`
+            }
+        }],
+        components: components,
+        ephemeral: true
+    }
+    return translatePayload(payload, language)
     if (language == 'en') {
         return {
             content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n':''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
@@ -289,6 +302,24 @@ function verificationInstructions(language,code,already_verified) {
     }
 }
 
+function translatePayload(payload, lang) {
+    if (!lang || lang == 'en' || !supported_langs.includes(lang)) return payload;
+    try {
+        payloadString = JSON.stringify(payload)
+        translations.forEach(sentence => {
+            if (!sentence[en] || sentence[en] == "" || !sentence[lang] || sentence[lang] == "")
+                return
+            while (payloadString.match(sentence)) {
+                payloadString = payloadString.replace(sentence.en,sentence[lang])
+            }
+        })
+        return JSON.parse(payloadString)
+    } catch(e) {
+        console.log(`Error while translating\npayload:${JSON.stringify(payload)}\nlang: ${lang}\nerror: ${e}`)
+        return payload
+    }
+}
+
 db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
     console.log('[warframe_hub] db notification: ',payload)
@@ -315,5 +346,6 @@ db.on('notification', async (notification) => {
 })
 
 module.exports = {
-    verificationInstructions
+    verificationInstructions,
+    translatePayload
 }

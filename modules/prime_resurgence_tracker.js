@@ -34,7 +34,7 @@ const items_list = [{
     type: 'sell'
 },{
     item_url: 'axi_s6_relic',
-    max_price: 4,
+    max_price: 3,
     min_quantity: 3,
     type: 'sell'
 },{
@@ -219,7 +219,7 @@ const items_list = [{
     type: 'sell'
 }]
 
-const mention_users = ['253525146923433984','407222185447391234']
+const mention_users = ['253525146923433984','407222185447391234', '689646747172995107']
 const log_channel = '1060960447966232696'
 
 var timeouts = []
