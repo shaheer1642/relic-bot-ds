@@ -9,7 +9,7 @@ const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
-const allsquads = require('./allsquads')
+const {translatePayload} = require('./allsquads')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -370,10 +370,11 @@ function update_users_list() {
 function edit_recruitment_intro() {
     webhook_messages.recruitment_intro?.forEach(msg => {
         msg.cnl_id
-        new WebhookClient({url: msg.url}).editMessage(msg.m_id, allsquads.translatePayload({
+        new WebhookClient({url: msg.url}).editMessage(msg.m_id, translatePayload({
             content: ' ',
             embeds: [{
                 "title": "Relic Recruitment",
+                description: msg.c_id == '1050717341123616851' ? '':'[This bot is created by Warframe Squads](https://discord.gg/346ZthxCe8)',
                 "color": 5814783,
                 "fields": [
                   {

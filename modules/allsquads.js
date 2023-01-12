@@ -1,10 +1,10 @@
 const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js');
 const JSONbig = require('json-bigint');
-const {tb_user_exist} = require('./trade_bot_modules')
+// const {tb_user_exist} = require('./trade_bot_modules')
 const {socket} = require('./socket')
+const {emoteObjFromSquadString} = require('./emotes')
 const {event_emitter} = require('./event_emitter')
-const squadbot = require('./as_squadbot.js');
 const { convertUpper } = require('./extras.js');
 const translations = require('./../translations.json');
 const supported_langs = ['en','fr','it']
@@ -53,7 +53,7 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
                 style: 1,
                 label: convertUpper(squad),
                 custom_id: `as_new_member_sq_trackers_add.${squad}`,
-                emoji: squadbot.emoteObjFromSquadString(squad)
+                emoji: emoteObjFromSquadString(squad)
             })
         })
         relic_trackers.map((squad,index) => {
@@ -66,7 +66,7 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
                 style: 1,
                 label: convertUpper(squad.replace(' relic','')),
                 custom_id: `as_new_member_sq_trackers_add.${squad}`,
-                emoji: squadbot.emoteObjFromSquadString(squad)
+                emoji: emoteObjFromSquadString(squad)
             })
         })
         squads_payloads[0].embeds = [{
@@ -85,17 +85,21 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
 client.on('interactionCreate', (interaction) => {
     if (interaction.isButton()) {
         if (interaction.customId == 'warframe_hub_purchase_vip') {
-            tb_user_exist(interaction.user.id).then(res => {
-                interaction.reply({
-                    content: `Please visit the following link in the browser to complete this transaction\n\nhttps://www.patreon.com/oauth2/authorize?response_type=code&client_id=TKIWwI-3NzhfxQqIcVBvj5WHcFLoc8ylgFkz0310VSi2XEc0jyLU6bFpw6ZV75gN&redirect_uri=https://gauss-prime-api.up.railway.app/api/patreon/oauth&state=${interaction.user.id}\n\nUpon successful payment you will receive a DM from the bot. In-case payment went through but you didn't gain the VIP sub, please contact an administrator to manually review it`,
-                    ephemeral: true
-                }).catch(console.error)
-            }).catch(err => {
-                interaction.reply({
-                    ...err,
-                    ephemeral: true
-                }).catch(console.error)
-            })
+            interaction.reply({
+                content: 'This functionality has been disabled for a bit',
+                ephemeral: true
+            }).catch(console.error)
+            // tb_user_exist(interaction.user.id).then(res => {
+            //     interaction.reply({
+            //         content: `Please visit the following link in the browser to complete this transaction\n\nhttps://www.patreon.com/oauth2/authorize?response_type=code&client_id=TKIWwI-3NzhfxQqIcVBvj5WHcFLoc8ylgFkz0310VSi2XEc0jyLU6bFpw6ZV75gN&redirect_uri=https://gauss-prime-api.up.railway.app/api/patreon/oauth&state=${interaction.user.id}\n\nUpon successful payment you will receive a DM from the bot. In-case payment went through but you didn't gain the VIP sub, please contact an administrator to manually review it`,
+            //         ephemeral: true
+            //     }).catch(console.error)
+            // }).catch(err => {
+            //     interaction.reply({
+            //         ...err,
+            //         ephemeral: true
+            //     }).catch(console.error)
+            // })
         } else if (interaction.customId.split('.')[0] == 'as_new_member_sq_trackers_add') {
             const value = interaction.customId.split('.')[1]
             socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,discord_id: interaction.user.id, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
@@ -311,7 +315,7 @@ function translatePayload(payload, lang) {
             var i = 0;
             while (payloadString.match(sentence.en)) {
                 payloadString = payloadString.replace(sentence.en,sentence[lang])
-                console.log('in loop',sentence.en,sentence[lang])
+                // console.log('in loop',sentence.en,sentence[lang])
                 i++;
                 if (i > 100) {
                     console.log('[allsquads.translatePayload] breaking loop after 100 iterations')

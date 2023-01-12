@@ -9,7 +9,9 @@ const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
-const allsquads = require('./allsquads')
+const {translatePayload} = require('./allsquads')
+const {emote_ids, emoteObjFromSquadString} = require('./emotes')
+
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -21,41 +23,6 @@ const server_commands_perms = [
 const webhook_messages = {}
 const channels_list = {}
 const webhooks_list = {}
-
-const emote_ids = {
-    steel_essence: '<:steel_essence:962508988442869800>',
-    railjack: '<:railjack:1045456185429594214>',
-    lith: '<:Lith:1060995797807804496>',
-    meso: '<:Meso:1060997039808336002>',
-    neo: '<:Neo:1060997042702401646>',
-    axi: '<:Axi:1060997035815358634>',
-    sortie: '<:Sortie_b:1050156747135909918>',
-    incursion: '<:steel_essence:962508988442869800>',
-    alert: '❗',
-    eidolon: '<:ArcaneEnergize:1050150973718417558>',
-    help: '🙋',
-    index: '<:credits:961605300601913424>',
-    profit_taker: '🕷️',
-    bounty: '☠️',
-    bounties: '☠️',
-    leveling: '<:AffinityOrb:1050156033743523860>',
-    arbitration: '<:VitusEssence:1050155343776321617>',
-    nightwave: '<:NorasMixVol2Cred:1050154112274141234>',
-    lich: '<:lohkglyph:1050153404011397150>',
-    sister: '<:lohkglyph2:1054126094715981944>',
-    endo: '<:endo:962507075475370005>',
-    archon: '<:tau_crimson_shard:1050150452852949073>',
-}
-
-function emoteObjFromSquadString(squad_string) {
-    var identifier = ''
-    Object.keys(emote_ids).forEach(key => {
-        if (squad_string.match(key)) {
-            identifier = emote_ids[key]
-        }
-    })
-    return identifier
-}
 
 client.on('channelDelete', channel => {
     db.query(`DELETE FROM as_sb_trackers WHERE channel_id = '${channel.id}'; DELETE FROM rb_trackers WHERE channel_id = '${channel.id}';`).catch(console.error)
@@ -680,11 +647,11 @@ function embed(squads, with_all_names, name_for_squad_id) {
 
 function edit_recruitment_intro() {
     webhook_messages.recruitment_intro?.forEach(msg => {
-        new WebhookClient({url: msg.url}).editMessage(msg.m_id, allsquads.translatePayload({
+        new WebhookClient({url: msg.url}).editMessage(msg.m_id, translatePayload({
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
-                description: '- Click on the button to join a squad. Click again to leave; or click Leave All\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads **expire** in 1 hour\n\n- Ask anything in <#914990518558134292>. For any queries or bugs, use <#1003269491163148318>\n\n- The server just opened, give it some time to reach full activity! 🙂',
+                description: `- Click on the button to join a squad. Click again to leave; or click 'Leave All'\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads expire in 1 hour${msg.c_id == '1054843353302323281' ? `\n\n- Ask anything in <#914990518558134292>. For any queries or bugs, use <#1003269491163148318>\n\n- The server just opened, give it some time to reach full activity! 🙂`:''}${msg.c_id == '1054843353302323281' ? '':'\n\n[This bot is created by Warframe Squads](https://discord.gg/346ZthxCe8)'}`,
                 color: '#ffffff',
             }],
             components: [{
