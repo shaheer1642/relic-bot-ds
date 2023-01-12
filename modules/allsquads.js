@@ -307,7 +307,7 @@ function translatePayload(payload, lang) {
     try {
         payloadString = JSON.stringify(payload)
         translations.forEach(sentence => {
-            if (!sentence[en] || sentence[en] == "" || !sentence[lang] || sentence[lang] == "")
+            if (!sentence.en || sentence.en == "" || !sentence[lang] || sentence[lang] == "")
                 return
             while (payloadString.match(sentence)) {
                 payloadString = payloadString.replace(sentence.en,sentence[lang])

@@ -238,7 +238,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.customId == 'rb_sq_trackers_add') {
             console.log('[rb_sq_trackers_add]')
             socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
-                console.log(responses)
+                //console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
                     if (res.code == 200) {
@@ -557,7 +557,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
 
 var subscribersTimeout = {}
 socket.on('squadCreate', (squad) => {
-    console.log('[squadCreate]',squad)
+    console.log('[relicbot/squadCreate]')
     edit_webhook_messages(squad.tier, false,squad.squad_id)
     socket.emit('relicbot/trackers/fetchSubscribers',{squad: squad},(res) => {
         if (res.code == 200) {
@@ -585,13 +585,13 @@ socket.on('squadCreate', (squad) => {
 })
 
 socket.on('squadUpdate', (payload) => {
-    console.log('[squadUpdate]',payload)
+    console.log('[relicbot/squadUpdate]')
     edit_webhook_messages(payload[0].tier, false,payload[0].squad_id)
 })
 
 socket.on('relicbot/squads/opened', async (payload) => {
     event_emitter.emit('relicbot_squad_filled',payload)
-    console.log('[relicbot/squads/opened]',payload)
+    console.log('[relicbot/squads/opened]')
     const squad = payload
     const thread_ids = []
     const channel_ids = {}
@@ -600,7 +600,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
         if (!channel_ids[channel_id]) channel_ids[channel_id] = []
         channel_ids[channel_id].push(discord_id)
     }
-    console.log('channel_ids:',channel_ids)
+    //console.log('channel_ids:',channel_ids)
     //send dms
     for (const channel_id in channel_ids) {
         const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
@@ -902,10 +902,10 @@ async function fissures_check() {
         const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
         
         if (!fissures) {
-            console.log('Fissures check: no data available')
+            console.log('[relicbot] Fissures check: no data available')
             var timer = 300000
             fissuresTimer = setTimeout(fissures_check, timer)
-            console.log(`fissures_check reset in ${msToTime(timer)}`)
+            console.log(`[relicbot] fissures_check reset in ${msToTime(timer)}`)
             return
         }
 
@@ -985,7 +985,7 @@ async function fissures_check() {
 
         var timer = min_expiry - new Date().getTime()
         fissuresTimer = setTimeout(fissures_check, timer)
-        console.log('fissures_check invokes in ' + msToTime(timer))
+        console.log('[relicbot] fissures_check invokes in ' + msToTime(timer))
         return
     }).catch(err => {
         console.log(err)

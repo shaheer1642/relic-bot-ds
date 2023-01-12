@@ -309,7 +309,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.customId == 'as_sb_sq_trackers_add') {
             console.log('[as_sb_sq_trackers_add]')
             socket.emit('squadbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1054843353302323281'},(responses) => {
-                console.log(responses)
+                // console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
                     if (res.code == 200) {
@@ -633,7 +633,7 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
 }
 
 function embed(squads, with_all_names, name_for_squad_id) {
-    console.log('embed called',new Date().getTime())
+    // console.log('embed called',new Date().getTime())
 
     const new_squads_obj = {}
     default_squads.concat(squads).map((squad,index) => {
@@ -795,7 +795,7 @@ function error_codes_embed(response,discord_id) {
 var subscribersTimeout = {}
 socket.on('squadbot/squadCreate', (squad) => {
     if (squad.status != 'active') return
-    console.log('[squadbot/squadCreate]',squad)
+    console.log('[squadbot/squadCreate]')
     socket.emit('squadbot/squads/fetch',{},(res) => {
         if (res.code == 200) {
             edit_webhook_messages(false, squad.squad_id)
@@ -827,14 +827,14 @@ socket.on('squadbot/squadCreate', (squad) => {
 })
 
 socket.on('squadbot/squadUpdate', (payload) => {
-    console.log('[squadUpdate]',payload)
+    console.log('[squadUpdate]')
     const squad = payload[0]
     edit_webhook_messages(false, squad.squad_id)
 })
 
 socket.on('squadbot/squads/opened', async (payload) => {
     event_emitter.emit('squadbot_squad_filled',payload)
-    console.log('[squadbot/squads/opened]',payload)
+    console.log('[squadbot/squads/opened]')
     const squad = payload
     const thread_ids = []
     const channel_ids = {}
@@ -843,7 +843,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
         if (!channel_ids[channel_id]) channel_ids[channel_id] = []
         channel_ids[channel_id].push(discord_id)
     }
-    console.log('channel_ids:',channel_ids)
+    //console.log('channel_ids:',channel_ids)
     //send dms
     for (const channel_id in channel_ids) {
         const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
