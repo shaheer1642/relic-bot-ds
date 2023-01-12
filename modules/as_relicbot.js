@@ -406,7 +406,8 @@ function edit_recruitment_intro() {
                     "inline": true
                   }
                 ]
-            }]
+            }],
+            components: []
         }, channels_list[msg.c_id].lang) ).catch(console.error)
     })
 }
