@@ -120,6 +120,44 @@ client.on('interactionCreate', (interaction) => {
             const already_verified = interaction.message.embeds[0].footer?.text.split('_')[1] == 'alrver' ? true : false
             const language = interaction.customId.split('.')[1]
             interaction.update(verificationInstructions(language,code,already_verified)).catch(console.error)
+        } else if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
+            interaction.showModal({
+                title: "Squad Invalidation",
+                custom_id: interaction.customId,
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "reason",
+                            label: "Reason",
+                            style: 2,
+                            min_length: 5,
+                            max_length: 200,
+                            placeholder: "Please provide a reason",
+                            required: true
+                        }]
+                    }
+                ]
+            }).catch(console.error)
+        }  else if (interaction.customId == 'rb_sq_create_modal') {
+        }
+    }
+    if (interaction.isModalSubmit()) {
+        if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
+            const bot_type = interaction.customId.split('.')[1]
+            const squad_id = interaction.customId.split('.')[2]
+            const discord_id = interaction.user.id
+            const reason = interaction.fields.getTextInputValue('reason')
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,discord_id: discord_id,reason: reason},(res) => {
+                if (res.code == 200) {
+                    interaction.update({
+                        content: `Squad invalidated by <@${discord_id}>\nReason: ${reason}`,
+                        embeds: interaction.message.embeds.map(embed => ({...embed, color: 'RED'})),
+                        components: []
+                    }).catch(console.error)
+                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            })
         }
     }
 })
@@ -327,6 +365,38 @@ function translatePayload(payload, lang) {
     } catch(e) {
         console.log(`[allsquads.translatePayload] Error while translating\npayload:${JSON.stringify(payload)}\nlang: ${lang}\nerror: ${e}`)
         return payload
+    }
+}
+
+
+function error_codes_embed(response,discord_id) {
+    if (response.code == 499) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> Please verify your Warframe account to access this feature\nClick Verify to proceed`,
+                color: 'YELLOW'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Verify",
+                    style: 1,
+                    custom_id: `tb_verify`
+                }]
+            }],
+            ephemeral: true
+        }
+    } else {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message || response.err || response.error || 'error'}`,
+                color: 'RED'
+            }],
+            ephemeral: true
+        }
     }
 }
 

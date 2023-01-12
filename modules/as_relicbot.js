@@ -261,8 +261,7 @@ client.on('interactionCreate', async (interaction) => {
                     }
                 })
             })
-        }
-        if (interaction.customId == 'rb_sq_create') {
+        } else if (interaction.customId == 'rb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
             socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
@@ -593,7 +592,7 @@ socket.on('squadUpdate', (payload) => {
 })
 
 socket.on('relicbot/squads/opened', async (payload) => {
-    event_emitter.emit('relicbot_squad_filled',payload)
+    // event_emitter.emit('relicbot_squad_filled',payload)
     console.log('[relicbot/squads/opened]')
     const squad = payload
     const thread_ids = []
@@ -718,7 +717,17 @@ async function logSquad(squad,include_chat,action) {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
                         },
                         color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
-                    }]
+                    }],
+                    components: action == 'squad_closed' ? [{
+                        type: 1,
+                        components: [{
+                            type: 2,
+                            label: "Invalidate",
+                            emoji: "🛑",
+                            style: 4,
+                            custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}`
+                        }]
+                    }]:[]
                 }).catch(console.error)
             }
         })
@@ -733,7 +742,17 @@ async function logSquad(squad,include_chat,action) {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
                 },
                 color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
-            }]
+            }],
+            components: action == 'squad_closed' ? [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Invalidate",
+                    emoji: "🛑",
+                    style: 4,
+                    custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}`
+                }]
+            }]:[]
         }).catch(console.error)
     }
 }

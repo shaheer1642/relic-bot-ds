@@ -801,7 +801,7 @@ socket.on('squadbot/squadUpdate', (payload) => {
 })
 
 socket.on('squadbot/squads/opened', async (payload) => {
-    event_emitter.emit('squadbot_squad_filled',payload)
+    // event_emitter.emit('squadbot_squad_filled',payload)
     console.log('[squadbot/squads/opened]')
     const squad = payload
     const thread_ids = []
@@ -891,8 +891,18 @@ async function logSquad(squad,include_chat,action) {
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
                         },
-                        color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
-                    }]
+                        color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'PURPLE' : 'WHITE'
+                    }],
+                    components: action == 'squad_closed' ? [{
+                        type: 1,
+                        components: [{
+                            type: 2,
+                            label: "Invalidate",
+                            emoji: "🛑",
+                            style: 4,
+                            custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}`
+                        }]
+                    }]:[]
                 }).catch(console.error)
             }
         })
@@ -906,8 +916,18 @@ async function logSquad(squad,include_chat,action) {
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
                 },
-                color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
-            }]
+                color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'PURPLE' : 'WHITE'
+            }],
+            components: action == 'squad_closed' ? [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Invalidate",
+                    emoji: "🛑",
+                    style: 4,
+                    custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}`
+                }]
+            }]:[]
         }).catch(console.error)
     }
 }

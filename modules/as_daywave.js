@@ -6,6 +6,7 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mo
 const uuid = require('uuid');
 const JSONbig = require('json-bigint');
 const {event_emitter} = require('./event_emitter')
+const {socket} = require('./socket')
 
 var webhook_client;
 
@@ -23,18 +24,31 @@ const message_ids = {
     }
 }
 
-event_emitter.on('relicbot_squad_filled',(squad) => {
-    verify_challenge_reliqiary(squad)
-    verify_challenge_relic_maniac(squad)
+socket.on('relicbot/squads/opened', async (payload) => {
+    verify_challenge_reliqiary(squad,'+')
+    verify_challenge_relic_maniac(squad,'+')
 })
-event_emitter.on('squadbot_squad_filled',(squad) => {
-    verify_challenge_squaddie(squad)
-    verify_challenge_allsquaddie(squad)
-    verify_challenge_archon_is_easy(squad)
-    verify_challenge_hydrolist_pro(squad)
-    verify_challenge_sortie_for_anasa(squad)
-    verify_challenge_helper(squad)
-    verify_challenge_credit_is_due(squad)
+socket.on('squadbot/squads/opened', async (payload) => {
+    verify_challenge_squaddie(squad,'+')
+    verify_challenge_allsquaddie(squad,'+')
+    verify_challenge_archon_is_easy(squad,'+')
+    verify_challenge_hydrolist_pro(squad,'+')
+    verify_challenge_sortie_for_anasa(squad,'+')
+    verify_challenge_helper(squad,'+')
+    verify_challenge_credit_is_due(squad,'+')
+})
+socket.on('relicbot/squads/invalidated', async (payload) => {
+    verify_challenge_reliqiary(squad,'-')
+    verify_challenge_relic_maniac(squad,'-')
+})
+socket.on('squadbot/squads/invalidated', async (payload) => {
+    verify_challenge_squaddie(squad,'-')
+    verify_challenge_allsquaddie(squad,'-')
+    verify_challenge_archon_is_easy(squad,'-')
+    verify_challenge_hydrolist_pro(squad,'-')
+    verify_challenge_sortie_for_anasa(squad,'-')
+    verify_challenge_helper(squad,'-')
+    verify_challenge_credit_is_due(squad,'-')
 })
 
 const message_formats = {
@@ -78,109 +92,109 @@ client.on('ready', async () => {
 
 /*----------verify challenges-----------*/
 
-function verify_challenge_squaddie(squad) {
+function verify_challenge_squaddie(squad,operator) {
     var query = []
     for (const user_id of squad.members) {
         query.push(`
             UPDATE challenges SET
-            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
             WHERE name = 'Squaddie' AND is_active = true;
         `)
     }
     db.query(query.join(' ')).catch(console.error)
 }
-function verify_challenge_allsquaddie(squad) {
+function verify_challenge_allsquaddie(squad,operator) {
     var query = []
     for (const user_id of squad.members) {
         query.push(`
             UPDATE challenges SET
-            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
             WHERE name = 'AllSquaddie' AND is_active = true;
         `)
     }
     db.query(query.join(' ')).catch(console.error)
 }
-function verify_challenge_reliqiary(squad) {
+function verify_challenge_reliqiary(squad,operator) {
     var query = []
     for (const user_id of squad.members) {
         query.push(`
             UPDATE challenges SET
-            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
             WHERE name = 'Reliqiary' AND is_active = true;
         `)
     }
     db.query(query.join(' ')).catch(console.error)
 }
-function verify_challenge_relic_maniac(squad) {
+function verify_challenge_relic_maniac(squad,operator) {
     var query = []
     for (const user_id of squad.members) {
         query.push(`
             UPDATE challenges SET
-            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+            progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
             WHERE name = 'Relic Maniac' AND is_active = true;
         `)
     }
     db.query(query.join(' ')).catch(console.error)
 }
-function verify_challenge_archon_is_easy(squad) {
+function verify_challenge_archon_is_easy(squad,operator) {
     if (squad.squad_string.match('archon')) {
         var query = []
         for (const user_id of squad.members) {
             query.push(`
                 UPDATE challenges SET
-                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
                 WHERE name = 'Archon is Easy' AND is_active = true;
             `)
         }
         db.query(query.join(' ')).catch(console.error)
     }
 }
-function verify_challenge_hydrolist_pro(squad) {
+function verify_challenge_hydrolist_pro(squad,operator) {
     if (squad.squad_string.match('eidolon')) {
         var query = []
         for (const user_id of squad.members) {
             query.push(`
                 UPDATE challenges SET
-                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
                 WHERE name = 'Hydrolist Pro' AND is_active = true;
             `)
         }
         db.query(query.join(' ')).catch(console.error)
     }
 }
-function verify_challenge_sortie_for_anasa(squad) {
+function verify_challenge_sortie_for_anasa(squad,operator) {
     if (squad.squad_string.match('sortie')) {
         var query = []
         for (const user_id of squad.members) {
             query.push(`
                 UPDATE challenges SET
-                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
                 WHERE name = 'Sortie for Anasa' AND is_active = true;
             `)
         }
         db.query(query.join(' ')).catch(console.error)
     }
 }
-function verify_challenge_helper(squad) {
+function verify_challenge_helper(squad,operator) {
     if (squad.squad_string.match('help')) {
         var query = []
         for (const user_id of squad.members) {
             query.push(`
                 UPDATE challenges SET
-                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
                 WHERE name = 'Helper' AND is_active = true;
             `)
         }
         db.query(query.join(' ')).catch(console.error)
     }
 }
-function verify_challenge_credit_is_due(squad) {
+function verify_challenge_credit_is_due(squad,operator) {
     if (squad.squad_string.match('profit_taker') || squad.squad_string.match('index')) {
         var query = []
         for (const user_id of squad.members) {
             query.push(`
                 UPDATE challenges SET
-                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int + 1, '}')::jsonb
+                progress = progress || CONCAT('{"${user_id}":', COALESCE(progress->>'${user_id}','0')::int ${operator} 1, '}')::jsonb
                 WHERE name = 'Credit is Due' AND is_active = true;
             `)
         }
