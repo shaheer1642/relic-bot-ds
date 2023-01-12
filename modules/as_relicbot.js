@@ -406,30 +406,6 @@ function edit_recruitment_intro() {
                     "inline": true
                   }
                 ]
-            }],
-            components: [{
-                type: 1,
-                components: [{
-                    type: 2,
-                    label: "Host Squad",
-                    style: 3,
-                    custom_id: `rb_sq_create_modal`
-                },{
-                    type: 2,
-                    label: "Leave all",
-                    style: 4,
-                    custom_id: `rb_sq_leave_all`
-                },{
-                    type: 2,
-                    label: "Track Squads",
-                    style: 1,
-                    custom_id: `rb_sq_trackers_add_modal`
-                },{
-                    type: 2,
-                    label: "Show Trackers",
-                    style: 2,
-                    custom_id: `rb_sq_trackers_show`
-                }]
             }]
         }, channels_list[msg.c_id].lang) ).catch(console.error)
     })
@@ -716,7 +692,7 @@ async function logSquad(squad,include_chat,action) {
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
                         },
-                        color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
+                        color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'PURPLE' : 'WHITE'
                     }],
                     components: action == 'squad_closed' ? [{
                         type: 1,
@@ -741,7 +717,7 @@ async function logSquad(squad,include_chat,action) {
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
                 },
-                color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'RED' : 'WHITE'
+                color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'PURPLE' : 'WHITE'
             }],
             components: action == 'squad_closed' ? [{
                 type: 1,
@@ -982,6 +958,30 @@ async function fissures_check() {
                     inline: true
                 }],
                 color: 'WHITE'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Host Squad",
+                    style: 3,
+                    custom_id: `rb_sq_create_modal`
+                },{
+                    type: 2,
+                    label: "Leave all",
+                    style: 4,
+                    custom_id: `rb_sq_leave_all`
+                },{
+                    type: 2,
+                    label: "Track Squads",
+                    style: 1,
+                    custom_id: `rb_sq_trackers_add_modal`
+                },{
+                    type: 2,
+                    label: "Show Trackers",
+                    style: 2,
+                    custom_id: `rb_sq_trackers_show`
+                }]
             }]
         }
 
@@ -1002,7 +1002,7 @@ async function fissures_check() {
         })
 
         webhook_messages.fissures?.forEach(msg => {
-            new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
+            new WebhookClient({url: msg.url}).editMessage(msg.m_id, translatePayload(payload, channels_list[msg.c_id].lang)).catch(console.error)
         })
 
         var timer = min_expiry - new Date().getTime()
