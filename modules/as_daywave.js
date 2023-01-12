@@ -24,11 +24,11 @@ const message_ids = {
     }
 }
 
-socket.on('relicbot/squads/opened', async (payload) => {
+socket.on('relicbot/squads/opened', async (squad) => {
     verify_challenge_reliqiary(squad,'+')
     verify_challenge_relic_maniac(squad,'+')
 })
-socket.on('squadbot/squads/opened', async (payload) => {
+socket.on('squadbot/squads/opened', async (squad) => {
     verify_challenge_squaddie(squad,'+')
     verify_challenge_allsquaddie(squad,'+')
     verify_challenge_archon_is_easy(squad,'+')
@@ -37,11 +37,11 @@ socket.on('squadbot/squads/opened', async (payload) => {
     verify_challenge_helper(squad,'+')
     verify_challenge_credit_is_due(squad,'+')
 })
-socket.on('relicbot/squads/invalidated', async (payload) => {
+socket.on('relicbot/squads/invalidated', async (squad) => {
     verify_challenge_reliqiary(squad,'-')
     verify_challenge_relic_maniac(squad,'-')
 })
-socket.on('squadbot/squads/invalidated', async (payload) => {
+socket.on('squadbot/squads/invalidated', async (squad) => {
     verify_challenge_squaddie(squad,'-')
     verify_challenge_allsquaddie(squad,'-')
     verify_challenge_archon_is_easy(squad,'-')
