@@ -27,9 +27,9 @@
     "fr": "Message:",
     "it": "Message:"
 },{
-    "en": "Click 'Send' button",
-    "fr": "CLiquez sur 'Envoyer'",
-    "it": "Clicca sul tasto 'invio'"
+    "en": "Click \"Send\" button",
+    "fr": "CLiquez sur \"Envoyer\"",
+    "it": "Clicca sul tasto \"invio\""
 },{
     "en": "Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!",
     "fr": "Le bot va vérifier la boite mail dans quelques secondes et il va vous envoyer un message de confirmation. Merci!",
@@ -42,4 +42,100 @@
     "en": "Message the bot",
     "fr": "Envoyer un message au bot",
     "it": "Messaggia il bot"
+},{
+    "en": "Recruitment",
+    "fr": "Recrutement",
+    "it": ""
+},{
+    "en": "Click on the button to join a squad. Click again to leave; or click \"Leave All\"",
+    "fr": "Cliquez sur le bouton pour rejoindre une escouade. Re-cliquez pour quitter; ou cliquez \"Quitter Tout\"",
+    "it": ""
+},{
+    "en": "If you have an open squad, **always be ready to play under 2-5 minutes!**",
+    "fr": "Si vous avez une escouade, **soyez toujours prêt pour jouer dans les 2-5 minutes!**",
+    "it": ""
+},{
+    "en": "You will be notified in DMs when squad fills. Unfilled squads expire in 1 hour",
+    "fr": "Vous serez notifié dans vos messages privés lorsque l'escouade sera remplie. Les escouades non remplies expire après 1h",
+    "it": ""
+},{
+    "en": "Relic Recruitment",
+    "fr": "Recrutement de Relique ",
+    "it": ""
+},{
+    "en": "Hosting Squad",
+    "fr": "Création d'escouade ",
+    "it": ""
+},{
+    "en": "Type message",
+    "fr": "Écrire un message ",
+    "it": ""
+},{
+    "en": "Joining Squad",
+    "fr": "Rejoindre une escouade",
+    "it": ""
+},{
+    "en": "Click button to join squad",
+    "fr": "Cliquez sur le bouton pour rejoindre l'escouade",
+    "it": ""
+},{
+    "en": "Click again to leave",
+    "fr": "Re-Cliquez pour quitter",
+    "it": ""
+},{
+    "en": "Squad fill",
+    "fr": "Escouade remplie",
+    "it": ""
+},{
+    "en": "A new channel will be created including all squad members and you will be notified",
+    "fr": "Un nouveau canal sera créé incluant tout les membre de l'escouade et vous serez notifié",
+    "it": ""
+},{
+    "en": "2b2 Squads and offcycles",
+    "fr": "Escouades 2b2 et hors- cycles",
+    "it": ""
+},{
+    "en": "Only 2 squad members equip hosted relic at a time, other 2 equip a random relic or offcycle if given. The role is reversed every mission",
+    "fr": "Seul deux membres de l'escouade utilisent la relique en cours, les deux autres membres de l'escouade utilisent une relique aléatoire. Les rôles seront inversés lors de la prochaine sélection de relique.",
+    "it": ""
+},{
+    "en": "Icons",
+    "fr": "Icône",
+    "it": ""
+},{
+    "en": "Squad is 3/4",
+    "fr": "Escouade est 3/4",
+    "it": ""
+},{
+    "en": "Steelpath Squad",
+    "fr": "Escouade Route d'acier (steelpath)",
+    "it": ""
+},{
+    "en": "Add relics to be notified whenever someone hosts them",
+    "fr": "Ajouter des reliques pour être notifié lorsque quelqu'un créé une escouade pour les ouvrir",
+    "it": ""
+},{
+    "en": "Host Squad",
+    "fr": "Créé une escouade",
+    "it": ""
+},{
+    "en": "Leave all",
+    "fr": "Quittez tout",
+    "it": ""
+},{
+    "en": "Track Squads",
+    "fr": "Traquer les escouades",
+    "it": ""
+},{
+    "en": "Show Trackers",
+    "fr": "Montrer les Traqueurs",
+    "it": ""
+},{
+    "en": "Squad Info",
+    "fr": "Info de l'escouade",
+    "it": ""
+},{
+    "en": "This bot is created by Warframe Squads",
+    "fr": "ce bot a été créé par Warframe Squads",
+    "it": ""
 }]

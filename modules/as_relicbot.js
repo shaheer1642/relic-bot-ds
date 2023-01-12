@@ -9,6 +9,7 @@ const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
+const allsquads = require('./allsquads')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -368,7 +369,8 @@ function update_users_list() {
 
 function edit_recruitment_intro() {
     webhook_messages.recruitment_intro?.forEach(msg => {
-        new WebhookClient({url: msg.url}).editMessage(msg.m_id, {
+        msg.cnl_id
+        new WebhookClient({url: msg.url}).editMessage(msg.m_id, allsquads.translatePayload({
             content: ' ',
             embeds: [{
                 "title": "Relic Recruitment",
@@ -429,7 +431,7 @@ function edit_recruitment_intro() {
                     custom_id: `rb_sq_trackers_show`
                 }]
             }]
-        }).catch(console.error)
+        }, channels_list[msg.c_id].lang) ).catch(console.error)
     })
 }
 

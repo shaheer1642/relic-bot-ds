@@ -254,7 +254,7 @@ function verificationInstructions(language,code,already_verified) {
     const payload = {
         content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n':''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
         embeds: [{
-            description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
+            description: '[Visit the forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
             footer: {
                 text: already_verified ? `${code}_alrver`:`${code}_!alrver`
             }
@@ -307,15 +307,21 @@ function translatePayload(payload, lang) {
     try {
         payloadString = JSON.stringify(payload)
         translations.forEach(sentence => {
-            if (!sentence.en || sentence.en == "" || !sentence[lang] || sentence[lang] == "")
-                return
-            while (payloadString.match(sentence)) {
+            if (!sentence.en || sentence.en == "" || !sentence[lang] || sentence[lang] == "" || sentence.en == sentence[lang]) return
+            var i = 0;
+            while (payloadString.match(sentence.en)) {
                 payloadString = payloadString.replace(sentence.en,sentence[lang])
+                console.log('in loop',sentence.en,sentence[lang])
+                i++;
+                if (i > 100) {
+                    console.log('[allsquads.translatePayload] breaking loop after 100 iterations')
+                    break
+                };
             }
         })
         return JSON.parse(payloadString)
     } catch(e) {
-        console.log(`Error while translating\npayload:${JSON.stringify(payload)}\nlang: ${lang}\nerror: ${e}`)
+        console.log(`[allsquads.translatePayload] Error while translating\npayload:${JSON.stringify(payload)}\nlang: ${lang}\nerror: ${e}`)
         return payload
     }
 }
