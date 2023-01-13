@@ -22,23 +22,30 @@ client.on('interactionCreate', interaction => {
 async function getFaqReply(faq_id) {
     return new Promise((resolve,reject) => {
         db.query(`SELECT * FROM as_faq WHERE faq_id = '${faq_id}';`).then(res => {
-            var title = ""
-            var description = ""
             if (res.rowCount != 1) {
-                title = "Error occured"
-                description = "Unexpected DB response"
+                return resolve({
+                    content: ' ',
+                    embeds: [{
+                        title: "Error occured",
+                        description: "Unexpected DB response"
+                    }],
+                    ephemeral: true
+                })
             } else {
-                title = res.rows[0].title
-                description = res.rows[0].body
+                const faq = res.rows[0]
+                return resolve({
+                    content: ' ',
+                    embeds: [{
+                        title: faq.title,
+                        description: faq.body,
+                        image: {
+                            url: faq.image_url
+                        }
+                    }],
+                    ephemeral: true
+                })
             }
-            return resolve({
-                content: ' ',
-                embeds: [{
-                    title: title,
-                    description: description
-                }],
-                ephemeral: true
-            })
+            return 
         }).catch(console.error)
     })
 }
