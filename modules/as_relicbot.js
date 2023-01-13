@@ -604,7 +604,7 @@ socket.on('squadUpdate', (payload) => {
     edit_webhook_messages(payload[0].tier, false,payload[0].squad_id)
 })
 
-const vip_hosts_list = ['825921976401002526','493552748613337098','253525146923433984']
+const vip_hosts_list = ['825921976401002526','493552748613337098']
 var vip_hosts_timeouts = []
 function vip_hosts(squad) {
     const user_id = squad.original_host
