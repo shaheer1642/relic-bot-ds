@@ -964,7 +964,7 @@ async function fissures_check() {
                 type: 1,
                 components: [{
                     type: 2,
-                    label: "Host Squad",
+                    label: "Host Relic",
                     style: 3,
                     custom_id: `rb_sq_create_modal`
                 },{
@@ -974,12 +974,12 @@ async function fissures_check() {
                     custom_id: `rb_sq_leave_all`
                 },{
                     type: 2,
-                    label: "Track Squads",
+                    label: "Track Relics",
                     style: 1,
                     custom_id: `rb_sq_trackers_add_modal`
                 },{
                     type: 2,
-                    label: "Show Trackers",
+                    label: "My Relics",
                     style: 2,
                     custom_id: `rb_sq_trackers_show`
                 }]

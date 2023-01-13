@@ -107,6 +107,10 @@
     "fr": "Créé une escouade",
     "it": "Crea una squadra"
 },{
+    "en": "Host Relic",
+    "fr": "Créé une escouade",
+    "it": "Crea una squadra"
+},{
     "en": "Leave all",
     "fr": "Quittez tout",
     "it": "Esci dalle squadre"
@@ -115,7 +119,15 @@
     "fr": "Traquer les escouades",
     "it": "Traccia le squadre"
 },{
+    "en": "Track Relics",
+    "fr": "Traquer les escouades",
+    "it": "Traccia le squadre"
+},{
     "en": "Show Trackers",
+    "fr": "Montrer les Traqueurs",
+    "it": "Mostra le squadre tracciate"
+},{
+    "en": "My Relics",
     "fr": "Montrer les Traqueurs",
     "it": "Mostra le squadre tracciate"
 },{
