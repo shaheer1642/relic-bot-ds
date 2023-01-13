@@ -134,7 +134,9 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.isButton()) {
         if (!Object.keys(channels_list).includes(interaction.channel.id)) return
 
-        if (interaction.customId == 'rb_sq_leave_all') {
+        if (interaction.customId == 'rb_recruitment_faq') {
+            interaction.reply(translatePayload(recruitment_faq, channels_list[interaction.channel.id].lang)).catch(console.error)
+        } else if (interaction.customId == 'rb_sq_leave_all') {
             socket.emit('relicbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else {
@@ -366,9 +368,47 @@ function update_users_list() {
     })
 }
 
+const recruitment_faq = {
+    content: ' ',
+    embeds: [{
+        "title": "Relic Recruitment",
+        "color": 5814783,
+        "fields": [
+          {
+            "name": "Hosting Squad",
+            "value": "Type message\n```diff\nlith b1\nmeso v2 4b4 int\n```",
+            "inline": true
+          },
+          {
+            "name": "Joining Squad",
+            "value": "Click button to join squad\nClick again to leave",
+            "inline": true
+          },
+          {
+            "name": "Squad fill",
+            "value": "A new channel will be created including all squad members and you will be notified",
+            "inline": true
+          },
+          {
+            "name": "2b2 Squads and offcycles",
+            "value": "Only 2 squad members equip hosted relic at a time, other 2 equip a random relic or offcycle if given. The role is reversed every mission\n```diff\nmeso v2 2b2 int\naxi e1 2b2 rad with axi v8 offcycle\n```"
+          },
+          {
+            "name": "Icons",
+            "value": `🔥 Squad is 3/4\n${emote_ids.steel_essence} Steelpath Squad`,
+            "inline": true
+          },
+          {
+            "name": "Track Squads",
+            "value": "Add relics to be notified whenever someone hosts them",
+            "inline": true
+          }
+        ]
+    }]
+}
+
 function edit_recruitment_intro() {
     webhook_messages.recruitment_intro?.forEach(msg => {
-        msg.cnl_id
         new WebhookClient({url: msg.url}).editMessage(msg.m_id, translatePayload({
             content: ' ',
             embeds: [{
@@ -376,25 +416,6 @@ function edit_recruitment_intro() {
                 description: msg.c_id == '1050717341123616851' ? '':'[This bot is created by Warframe Squads](https://discord.gg/346ZthxCe8)',
                 "color": 5814783,
                 "fields": [
-                  {
-                    "name": "Hosting Squad",
-                    "value": "Type message\n```diff\nlith b1\nmeso v2 4b4 int\n```",
-                    "inline": true
-                  },
-                  {
-                    "name": "Joining Squad",
-                    "value": "Click button to join squad\nClick again to leave",
-                    "inline": true
-                  },
-                  {
-                    "name": "Squad fill",
-                    "value": "A new channel will be created including all squad members and you will be notified",
-                    "inline": true
-                  },
-                  {
-                    "name": "2b2 Squads and offcycles",
-                    "value": "Only 2 squad members equip hosted relic at a time, other 2 equip a random relic or offcycle if given. The role is reversed every mission\n```diff\nmeso v2 2b2 int\naxi e1 2b2 rad with axi v8 offcycle\n```"
-                  },
                   {
                     "name": "Icons",
                     "value": `🔥 Squad is 3/4\n${emote_ids.steel_essence} Steelpath Squad`,
@@ -407,7 +428,15 @@ function edit_recruitment_intro() {
                   }
                 ]
             }],
-            components: []
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    custom_id: 'rb_recruitment_faq',
+                    label: "FAQ",
+                    style: 1
+                }]
+            }]
         }, channels_list[msg.c_id].lang) ).catch(console.error)
     })
 }

@@ -5,22 +5,22 @@ const {convertUpper} = require('./extras.js');
 const items_list = [{
     item_url: 'axi_l4_relic',
     max_price: 5,
-    min_quantity: 3,
+    min_quantity: 6,
     type: 'sell'
 },{
     item_url: 'neo_v8_relic',
     max_price: 5,
-    min_quantity: 3,
+    min_quantity: 6,
     type: 'sell'
 },{
     item_url: 'meso_o3_relic',
     max_price: 5,
-    min_quantity: 3,
+    min_quantity: 6,
     type: 'sell'
 },{
     item_url: 'lith_o2_relic',
     max_price: 5,
-    min_quantity: 3,
+    min_quantity: 6,
     type: 'sell'
 },{
     item_url: 'axi_g1_relic',
