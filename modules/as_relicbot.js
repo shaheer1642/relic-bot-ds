@@ -610,6 +610,7 @@ var vip_hosts_timeouts = []
 var vip_hosts_discarded_squad_ids = []
 function vip_hosts(squad) {
     if (vip_hosts_discarded_squad_ids.includes(squad.squad_id)) return;
+    vip_hosts_discarded_squad_ids.push(squad.squad_id)
 
     const user_ids = squad.members
     user_ids.forEach(user_id => {
@@ -618,7 +619,7 @@ function vip_hosts(squad) {
             setTimeout(() => {
                 vip_hosts_timeouts = vip_hosts_timeouts.filter(id => id != user_id)
             }, 30000);
-            sendMessage(`**${users_list[user_id].ingame_name}** ${squad.original_host == user_id ? 'has joined':'is hoting'} ${relicBotSquadToString(squad, true)}`)
+            sendMessage(`**${users_list[user_id].ingame_name}** ${squad.original_host == user_id ? 'is hosting':'has joined'} ${relicBotSquadToString(squad, true)}`)
         }
     })
 
