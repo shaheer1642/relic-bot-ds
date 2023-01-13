@@ -663,7 +663,16 @@ socket.on('relicbot/squads/opened', async (payload) => {
                     footer: {
                         text: `This squad will auto-close in 15m`
                     }
-                }]
+                }],
+                components: squad.squad_type == '2b2' ? [{
+                    type: 1,
+                    components: [{
+                        type: 2,
+                        label: 'What is 2b2?',
+                        style: 3,
+                        custom_id: `as_faq_click.e8153f62-9329-11ed-b38a-0242ac1100a8`,
+                    }]
+                }]:[]
             }).then(msg => {
                 axios('http://content.warframe.com/dynamic/worldState.php')
                 .then( worldstateData => {
