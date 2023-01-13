@@ -38,6 +38,12 @@ db.connect().then(async res => {
     db.query('LISTEN as_bb_blesses_insert').catch(console.error)
     db.query('LISTEN as_bb_blesses_update').catch(console.error)
     db.query('LISTEN as_bb_blesses_delete').catch(console.error)
+
+    db.query(`
+        LISTEN as_faq_insert;
+        LISTEN as_faq_update;
+        LISTEN as_faq_delete;
+    `).catch(console.error)
 })
 
 db.on('error', err => {
