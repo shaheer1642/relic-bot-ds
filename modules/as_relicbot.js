@@ -602,19 +602,25 @@ socket.on('squadCreate', (squad) => {
 socket.on('squadUpdate', (payload) => {
     console.log('[relicbot/squadUpdate]')
     edit_webhook_messages(payload[0].tier, false,payload[0].squad_id)
+    vip_hosts(squad)
 })
 
 const vip_hosts_list = ['825921976401002526','493552748613337098']
 var vip_hosts_timeouts = []
+var vip_hosts_discarded_squad_ids = []
 function vip_hosts(squad) {
-    const user_id = squad.original_host
-    if (vip_hosts_list.includes(user_id) && !vip_hosts_timeouts.includes(user_id))  {
-        vip_hosts_timeouts.push(user_id)
-        setTimeout(() => {
-            vip_hosts_timeouts = vip_hosts_timeouts.filter(id => id != user_id)
-        }, 30000);
-        sendMessage(`**${users_list[user_id].ingame_name}** is hosting ${relicBotSquadToString(squad, true)}`)
-    }
+    if (vip_hosts_discarded_squad_ids.includes(squad.squad_id)) return;
+
+    const user_ids = squad.members
+    user_ids.forEach(user_id => {
+        if (vip_hosts_list.includes(user_id) && !vip_hosts_timeouts.includes(user_id))  {
+            vip_hosts_timeouts.push(user_id)
+            setTimeout(() => {
+                vip_hosts_timeouts = vip_hosts_timeouts.filter(id => id != user_id)
+            }, 30000);
+            sendMessage(`**${users_list[user_id].ingame_name}** ${squad.original_host == user_id ? 'has joined':'is hoting'} ${relicBotSquadToString(squad, true)}`)
+        }
+    })
 
     function sendMessage(message) {
         client.channels.cache.get('1063574659028766832').send(message).catch(console.error)
