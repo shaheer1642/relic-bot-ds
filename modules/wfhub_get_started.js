@@ -8,8 +8,8 @@ var default_squads = [{
     name: 'V8 4b4 rad',
     members: ['804072666192412702','892087497998348349','212952630350184449']
 },{
-    id: 'e1_2b2_rad',
-    name: 'E1 2b2 rad',
+    id: 's3_4b4_int',
+    name: 'S3 4b4 int',
     members: ['804072666192412702','892087497998348349']
 }]
 var squads = JSON.parse(JSON.stringify(default_squads))
@@ -44,7 +44,7 @@ client.on('ready', async () => {
 
 function relicbotembed(show_members, show_members_for_squad) {
     return {
-        content: 'Welcome! **Press V8** to join a **test** relic squad',
+        content: 'Welcome! **Press V8** to join a **test** relic squad. 4b4 rad = radshare',
         embeds: [{
             color: 'YELLOW',
             description: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
