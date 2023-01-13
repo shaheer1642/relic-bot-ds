@@ -602,7 +602,7 @@ socket.on('squadCreate', (squad) => {
 socket.on('squadUpdate', (payload) => {
     console.log('[relicbot/squadUpdate]')
     edit_webhook_messages(payload[0].tier, false,payload[0].squad_id)
-    vip_hosts(squad)
+    vip_hosts(payload[0])
 })
 
 const vip_hosts_list = ['825921976401002526','493552748613337098']
