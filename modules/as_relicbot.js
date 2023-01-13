@@ -399,7 +399,7 @@ const recruitment_faq = {
             "inline": true
           },
           {
-            "name": "Track Squads",
+            "name": "Track Relics",
             "value": "Add relics to be notified whenever someone hosts them",
             "inline": true
           }
@@ -428,7 +428,7 @@ function edit_recruitment_intro() {
                     "inline": true
                   },
                   {
-                    "name": "Track Squads",
+                    "name": "Track Relics",
                     "value": "Add relics to be notified whenever someone hosts them",
                     "inline": true
                   }
