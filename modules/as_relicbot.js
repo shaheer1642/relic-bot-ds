@@ -423,6 +423,11 @@ function edit_recruitment_intro() {
                     "inline": true
                   },
                   {
+                    "name": "\u200b",
+                    "value": "\u200b",
+                    "inline": true
+                  },
+                  {
                     "name": "Track Squads",
                     "value": "Add relics to be notified whenever someone hosts them",
                     "inline": true
