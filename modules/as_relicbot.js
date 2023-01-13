@@ -404,7 +404,8 @@ const recruitment_faq = {
             "inline": true
           }
         ]
-    }]
+    }],
+    ephemeral: true
 }
 
 function edit_recruitment_intro() {
