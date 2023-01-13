@@ -1,16 +1,10 @@
 const {client} = require('./modules/discord_client.js');
 const {db} = require('./modules/db_connection')
-const {socket} = require('./modules/socket')
-const {WebhookClient} = require('discord.js')
-const uuid = require('uuid')
-const JSONbig = require('json-bigint');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./modules/extras.js');
 
 const channel_id = '1063435050802237540'
 const message_id = '1063435290494111764'
 
 client.on('ready', async () => {
-    console.log('client is online')
     editMainMessage()
 })
 
@@ -40,36 +34,44 @@ client.on('interactionCreate', interaction => {
     }
     if (interaction.isModalSubmit()) {
         if (interaction.customId.split('.')[0] == 'as_at_get_users_verified') {
-            const time_since = interaction.fields.getTextInputValue('time_since')
-            var ms = 0
-            time_since.split(' ').map(word => {
-                if (word.match('y')) ms += 31104000000 * Number(word.replace('y',''))
-                if (word.match('M')) ms += 2592000000 * Number(word.replace('M',''))
-                if (word.match('w')) ms += 604800000 * Number(word.replace('w',''))
-                if (word.match('d')) ms += 86400000 * Number(word.replace('d',''))
-                if (word.match('h')) ms += 3600000 * Number(word.replace('h',''))
-                if (word.match('m')) ms += 60000 * Number(word.replace('m',''))
-                if (word.match('s')) ms += 1000 * Number(word.replace('s',''))
-            })
-            if (!ms) return interaction.reply({content: 'Invalid input for time_since', ephemeral: true}).catch(console.error)
-            db.query(`
-                SELECT * FROM tradebot_users_list WHERE registered_timestamp > ${new Date().getTime() -  ms} ORDER BY registered_timestamp DESC;
-            `).then(res => {
-                const users = res.rows
-                if (users.length > 0) {
-                    interaction.reply({
-                        content: ' ',
-                        embeds: [{
-                            title: `${res.rows.length} users verified in last ${time_since}`,
-                            description: users.map(user => user.ingame_name).join(', ').substring(0, 1999)
-                        }],
-                        ephemeral: true
-                    }).catch(console.error)
-                } else interaction.reply({content: `0 users returned for last ${time_since}`, ephemeral: true}).catch(console.error)
-            }).catch(console.error)
+            getUsersVerified(interaction.fields.getTextInputValue('time_since').trim()).then(payload => interaction.reply(payload).catch(console.error)).catch(console.error)
         }
     }
 })
+
+async function getUsersVerified(time_since) {
+    var ms = timeStringToMs(time_since)
+    if (!ms) return {content: 'Invalid input for time_since', ephemeral: true}
+    db.query(`
+        SELECT * FROM tradebot_users_list WHERE registered_timestamp > ${new Date().getTime() -  ms} ORDER BY registered_timestamp DESC;
+    `).then(res => {
+        const users = res.rows
+        if (users.length > 0) {
+            return {
+                content: ' ',
+                embeds: [{
+                    title: `${res.rows.length} users verified in last ${time_since}`,
+                    description: users.map(user => user.ingame_name).join(', ').substring(0, 1999)
+                }],
+                ephemeral: true
+            }
+        } else return {content: `0 users returned for last ${time_since}`, ephemeral: true}
+    }).catch(console.error)
+}
+
+function timeStringToMs(time_string) {
+    var ms = 0
+    time_string.split(' ').map(word => {
+        if (word.match('y')) ms += 31104000000 * Number(word.replace('y',''))
+        if (word.match('M')) ms += 2592000000 * Number(word.replace('M',''))
+        if (word.match('w')) ms += 604800000 * Number(word.replace('w',''))
+        if (word.match('d')) ms += 86400000 * Number(word.replace('d',''))
+        if (word.match('h')) ms += 3600000 * Number(word.replace('h',''))
+        if (word.match('m')) ms += 60000 * Number(word.replace('m',''))
+        if (word.match('s')) ms += 1000 * Number(word.replace('s',''))
+    })
+    return ms
+}
 
 async function editMainMessage() {
     const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)

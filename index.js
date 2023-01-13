@@ -31,6 +31,7 @@ require('./modules/as_gabot.js');
 require('./modules/as_blessbot.js');
 require('./modules/prime_resurgence_tracker.js');
 require('./modules/as_faq.js');
+require('./modules/as_admin_tools.js');
 
 // restart after 24.5h
 setTimeout(() => {
