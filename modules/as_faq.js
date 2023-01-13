@@ -45,7 +45,6 @@ async function getFaqReply(faq_id) {
                     ephemeral: true
                 })
             }
-            return 
         }).catch(console.error)
     })
 }

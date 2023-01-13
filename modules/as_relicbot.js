@@ -596,12 +596,30 @@ socket.on('squadCreate', (squad) => {
             }
         }
     })
+    vip_hosts(squad)
 })
 
 socket.on('squadUpdate', (payload) => {
     console.log('[relicbot/squadUpdate]')
     edit_webhook_messages(payload[0].tier, false,payload[0].squad_id)
 })
+
+const vip_hosts_list = ['825921976401002526','493552748613337098','253525146923433984']
+var vip_hosts_timeouts = []
+function vip_hosts(squad) {
+    const user_id = squad.original_host
+    if (vip_hosts_list.includes(user_id) && !vip_hosts_timeouts.includes(user_id))  {
+        vip_hosts_timeouts.push(user_id)
+        setTimeout(() => {
+            vip_hosts_timeouts = vip_hosts_timeouts.filter(id => id != user_id)
+        }, 30000);
+        sendMessage(`**${users_list[user_id].ingame_name}** is hosting ${relicBotSquadToString(squad, true)}`)
+    }
+
+    function sendMessage(message) {
+        client.channels.cache.get('1063574659028766832').send(message).catch(console.error)
+    }
+}
 
 socket.on('relicbot/squads/opened', async (payload) => {
     // event_emitter.emit('relicbot_squad_filled',payload)
