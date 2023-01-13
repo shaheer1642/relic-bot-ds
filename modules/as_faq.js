@@ -51,7 +51,7 @@ function updateFaqWebhookMessage() {
     }).catch(console.error)
 
     function payloadGenerator(faqs) {
-        const payload = {content: ' ', embeds: [{description: 'Some text'}], components: []}
+        const payload = {content: ' ', embeds: [{description: 'Frequently Asked Questions are listed below. Click the button to view information'}], components: []}
         faqs.map((faq,index) => {
             const payload_index = Math.ceil((index + 1)/15) - 1
             const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
