@@ -1,5 +1,5 @@
-const {client} = require('./modules/discord_client.js');
-const {db} = require('./modules/db_connection')
+const {client} = require('./discord_client.js');
+const {db} = require('./db_connection.js')
 
 const channel_id = '1063435050802237540'
 const message_id = '1063435290494111764'
