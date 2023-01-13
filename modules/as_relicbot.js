@@ -701,7 +701,7 @@ async function logSquad(squad,include_chat,action) {
                             type: 2,
                             label: "Invalidate",
                             emoji: "🛑",
-                            style: 4,
+                            style: 2,
                             custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}`
                         }]
                     }]:[]
@@ -726,7 +726,7 @@ async function logSquad(squad,include_chat,action) {
                     type: 2,
                     label: "Invalidate",
                     emoji: "🛑",
-                    style: 4,
+                    style: 2,
                     custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}`
                 }]
             }]:[]
