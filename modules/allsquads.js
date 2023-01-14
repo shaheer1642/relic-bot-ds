@@ -14,6 +14,7 @@ const vip_channel_id = '1041306010331119667'
 const vip_message_id = '1041306046280499200'
 
 client.on('ready', () => {
+    update_users_list()
     edit_vip_message()
     assign_allsquads_roles()
     edit_leaderboard()
@@ -81,6 +82,22 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
         return squads_payloads.concat(relics_payloads)
     }
 })
+
+socket.on('tradebotUsersUpdated', (payload) => {
+    console.log('[allsquads] tradebotUsersUpdated')
+    update_users_list()
+})
+var users_list = {}
+function update_users_list() {
+    socket.emit('relicbot/users/fetch',{},(res) => {
+        if (res.code == 200) {
+            users_list = {}
+            res.data.forEach(row => {
+                users_list[row.discord_id] = row
+            })
+        }
+    })
+}
 
 client.on('interactionCreate', (interaction) => {
     if (interaction.isButton()) {
@@ -152,7 +169,12 @@ client.on('interactionCreate', (interaction) => {
                     }
                 ]
             }).catch(console.error)
-        }  else if (interaction.customId == 'rb_sq_create_modal') {
+        } else if (interaction.customId == 'as_sq_become_host') {
+            interaction.channel.send(`**${users_list[interaction.user.id].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
+            interaction.deferUpdate().catch(console.error)
+            // interaction.update({
+            //     components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
+            // }).catch(console.error)
         }
     }
     if (interaction.isModalSubmit()) {

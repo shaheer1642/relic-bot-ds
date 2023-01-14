@@ -696,6 +696,11 @@ socket.on('relicbot/squads/opened', async (payload) => {
                         label: `What is ${squad.squad_type}?`,
                         style: 3,
                         custom_id: `as_faq_click.${squad.squad_type == '4b4' ? 'e8153f62-9329-11ed-b38a-0242ac1100a8' : '5d2d1c7c-938c-11ed-b5db-0242ac1100a8'}`,
+                    },{
+                        type: 2,
+                        label: `Become Host`,
+                        style: 1,
+                        custom_id: 'as_sq_become_host',
                     }]
                 }]
             }).then(msg => {
