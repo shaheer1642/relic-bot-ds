@@ -630,7 +630,7 @@ socket.on('squadUpdate', (payload) => {
     vip_hosts(payload[0])
 })
 
-const vip_hosts_list = ['825921976401002526','493552748613337098']
+const vip_hosts_list = ['825921976401002526','493552748613337098','230016515418619904']
 var vip_hosts_timeouts = []
 var vip_hosts_discarded_squad_ids = []
 function vip_hosts(squad) {
