@@ -839,15 +839,15 @@ socket.on('squadbot/squads/opened', async (payload) => {
                         text: `This squad will auto-close in ${Math.round(squad.squad_closure / 60 / 1000)}m`
                     }
                 }],
-                // components: [{
-                //     type: 1,
-                //     components: [{
-                //         type: 2,
-                //         label: `Become Host`,
-                //         style: 1,
-                //         custom_id: `as_sq_become_host.squadbot.${squad.squad_id}`,
-                //     }]
-                // }]
+                components: [{
+                    type: 1,
+                    components: [{
+                        type: 2,
+                        label: `Become Host`,
+                        style: 1,
+                        custom_id: `as_sq_become_host.squadbot.${squad.squad_id}`,
+                    }]
+                }]
             }).catch(console.error)
             if (Object.keys(channel_ids).length > 1) thread.send({content: 'This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
             setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
