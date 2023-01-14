@@ -169,7 +169,7 @@ client.on('interactionCreate', (interaction) => {
                     }
                 ]
             }).catch(console.error)
-        } else if (interaction.customId == 'as_sq_become_host') {
+        } else if (interaction.customId.split('.')[0] == 'as_sq_become_host') {
             interaction.channel.send(`**${users_list[interaction.user.id].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
             // interaction.deferUpdate().catch(console.error)
             interaction.update({
