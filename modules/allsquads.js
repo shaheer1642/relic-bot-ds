@@ -172,9 +172,9 @@ client.on('interactionCreate', (interaction) => {
         } else if (interaction.customId == 'as_sq_become_host') {
             interaction.channel.send(`**${users_list[interaction.user.id].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
             interaction.deferUpdate().catch(console.error)
-            // interaction.update({
-            //     components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
-            // }).catch(console.error)
+            interaction.update({
+                components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
+            }).catch(console.error)
         }
     }
     if (interaction.isModalSubmit()) {
