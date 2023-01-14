@@ -74,7 +74,7 @@ function handleSquadCreateResponses(channel_id,discord_id,responses) {
 
 function replyAndDelete(payload,messageObj,timeout) {
     try {
-        messageObj.channel.send(typeof payload == Object ? payload : {
+        messageObj.channel.send(typeof payload == "object" ? payload : {
             content: ' ',
             embeds: [{
                 description: payload
