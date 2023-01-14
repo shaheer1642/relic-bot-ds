@@ -768,6 +768,12 @@ async function logSquad(squad,include_chat,action) {
                         type: 1,
                         components: [{
                             type: 2,
+                            label: "Validate",
+                            emoji: "✅",
+                            style: 2,
+                            custom_id: `as_sq_validate.relicbot.${squad.squad_id}`
+                        },{
+                            type: 2,
                             label: "Invalidate",
                             emoji: "🛑",
                             style: 2,
@@ -792,6 +798,12 @@ async function logSquad(squad,include_chat,action) {
             components: action == 'squad_closed' ? [{
                 type: 1,
                 components: [{
+                    type: 2,
+                    label: "Validate",
+                    emoji: "✅",
+                    style: 2,
+                    custom_id: `as_sq_validate.relicbot.${squad.squad_id}`
+                },{
                     type: 2,
                     label: "Invalidate",
                     emoji: "🛑",

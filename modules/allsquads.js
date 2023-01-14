@@ -120,6 +120,18 @@ client.on('interactionCreate', (interaction) => {
             const already_verified = interaction.message.embeds[0].footer?.text.split('_')[1] == 'alrver' ? true : false
             const language = interaction.customId.split('.')[1]
             interaction.update(verificationInstructions(language,code,already_verified)).catch(console.error)
+        } else if (interaction.customId.split('.')[0] == 'as_sq_validate') {
+            const bot_type = interaction.customId.split('.')[1]
+            const squad_id = interaction.customId.split('.')[2]
+            const discord_id = interaction.user.id
+            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,discord_id: discord_id},(res) => {
+                if (res.code == 200) {
+                    interaction.update({
+                        content: `Squad Closed\nValidated by <@${discord_id}>`,
+                        components: []
+                    }).catch(console.error)
+                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            })
         } else if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
             interaction.showModal({
                 title: "Squad Invalidation",
