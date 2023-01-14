@@ -72,16 +72,41 @@ function handleSquadCreateResponses(channel_id,discord_id,responses) {
     })
 }
 
+function replyAndDelete(payload,messageObj,timeout) {
+    try {
+        messageObj.channel.send(typeof payload == Object ? payload : {
+            content: ' ',
+            embeds: [{
+                description: payload
+            }]
+        }).then(res => {
+            setTimeout(() => {
+                res.delete().catch(console.error)
+            }, timeout || 5000);
+        }).catch(console.error)
+    } catch(e) {
+        console.error(e)
+    }
+}
+
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
     if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id) && ['relics_vaulted','relics_non_vaulted'].includes(channels_list[message.channel.id].type)) {
         if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
         console.log('[relicbot messageCreate] content:',message.content)
-        socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
-            //console.log('[relicbot/squads/create] response',responses)
-            handleSquadCreateResponses(message.channel.id,message.author.id,responses)
-            setTimeout(() => message.delete().catch(console.error), 1000);
-        })
+        message.content = message.content.toLowerCase().trim()
+        if (message.content.split(' ')[0] == 'leave') {
+            socket.emit('relicbot/squads/leave',{discord_id: message.author.id, tier: message.content.split(' ')[1] || 'all'},(res) => {
+                if (res.code != 200) replyAndDelete(error_codes_embed(res, message.author.id),message)
+                setTimeout(() => message.delete().catch(console.error), 1000);
+            })
+        } else {
+            socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
+                //console.log('[relicbot/squads/create] response',responses)
+                handleSquadCreateResponses(message.channel.id,message.author.id,responses)
+                setTimeout(() => message.delete().catch(console.error), 1000);
+            })
+        }
     }
     if (message.channel.isThread() && Object.keys(channels_list).includes(message.channel.parent?.id)) {
         if (message.channel.ownerId == client.user.id) {
@@ -137,7 +162,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.customId == 'rb_recruitment_faq') {
             interaction.reply(translatePayload(recruitment_faq, channels_list[interaction.channel.id].lang)).catch(console.error)
         } else if (interaction.customId == 'rb_sq_leave_all') {
-            socket.emit('relicbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
+            socket.emit('relicbot/squads/leave',{discord_id: interaction.user.id, tier: 'all'},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -853,7 +878,7 @@ function error_codes_embed(response,discord_id) {
         return {
             content: ' ',
             embeds: [{
-                description: `<@${discord_id}> ${response.message}`,
+                description: `<@${discord_id}> ${response.message || response.err || response.error}`,
                 color: 'GREEN'
             }],
             components: [{
@@ -876,7 +901,7 @@ function error_codes_embed(response,discord_id) {
         return {
             content: ' ',
             embeds: [{
-                description: `<@${discord_id}> ${response.message}`,
+                description: `<@${discord_id}> ${response.message || response.err || response.error}`,
                 color: 'GREEN'
             }],
             ephemeral: true
