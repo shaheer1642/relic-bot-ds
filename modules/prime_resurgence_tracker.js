@@ -231,7 +231,7 @@ setInterval(() => {
             if (error || !response || response.statusCode != 200 || !body) return
             const orders = JSON.parse(body).payload.orders
             orders.forEach(order => {
-                if (order.user.status != "offline" && order.order_type == tracker.type && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <= tracker.max_price && order.quantity >= tracker.min_quantity) {
+                if (order.user.status != "offline" && order.order_type == tracker.type && order.region == "en" && order.visible && order.platform == 'pc' && order.platinum <= tracker.max_price && order.platinum != 1 && order.quantity >= tracker.min_quantity) {
                     sendAlert(order, tracker.item_url)
                 }
             })

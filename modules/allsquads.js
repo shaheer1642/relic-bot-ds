@@ -170,11 +170,19 @@ client.on('interactionCreate', (interaction) => {
                 ]
             }).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_sq_become_host') {
-            interaction.channel.send(`**${users_list[interaction.user.id].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
-            // interaction.deferUpdate().catch(console.error)
-            interaction.update({
-                components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
-            }).catch(console.error)
+            const bot_type = interaction.customId.split('.')[1]
+            const squad_id = interaction.customId.split('.')[2]
+            const discord_id = interaction.user.id
+            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,discord_id: discord_id},(res) => {
+                if (res.code == 200) {
+                    interaction.deferUpdate().catch(console.error)
+                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            })
+            // interaction.channel.send(`**${users_list[interaction.user.id].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
+            // // interaction.deferUpdate().catch(console.error)
+            // interaction.update({
+            //     components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
+            // }).catch(console.error)
         }
     }
     if (interaction.isModalSubmit()) {
