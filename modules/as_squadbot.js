@@ -834,7 +834,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: convertUpper(squad.squad_string),
-                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).sort().join('\n/invite ').replace(/_/g, '\_')}`,
+                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).sort().join('\n/invite ').replace(/_/g, '\\_')}`,
                     footer: {
                         text: `This squad will auto-close in ${Math.round(squad.squad_closure / 60 / 1000)}m`
                     }
@@ -886,7 +886,7 @@ async function logSquad(squad,include_chat,action) {
                     content: convertUpper(action),
                     embeds: [{
                         title: convertUpper(squad.squad_string),
-                        description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `**${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\_'),
+                        description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `**${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\\_'),
                         timestamp: new Date(),
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
@@ -917,7 +917,7 @@ async function logSquad(squad,include_chat,action) {
             content: convertUpper(action),
             embeds: [{
                 title: convertUpper(squad.squad_string),
-                description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\_'),
+                description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\\_'),
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
