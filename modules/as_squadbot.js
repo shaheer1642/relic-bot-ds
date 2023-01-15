@@ -892,7 +892,7 @@ socket.on('squadbot/squads/selectedhost', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
-        channel.send(`**${users_list[payload.squad_host].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply`).catch(console.error)
+        channel.send(`**${users_list[payload.squad_host].ingame_name}** is hosting this squad\n- Please invite everyone, and make sure the squad is set to "invite-only"\n- Only the host should initiate the mission\n- If host migrates, same rules apply`).catch(console.error)
         const openMessage = squadOpenMessages[`${payload.squad_id}_${thread_id}`] 
         if (openMessage) {
             openMessage.edit({
