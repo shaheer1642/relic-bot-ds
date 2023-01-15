@@ -653,6 +653,7 @@ function vip_hosts(squad) {
     }
 }
 
+const squadOpenMessages = {}
 socket.on('relicbot/squads/opened', async (payload) => {
     // event_emitter.emit('relicbot_squad_filled',payload)
     console.log('[relicbot/squads/opened]')
@@ -704,6 +705,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                     }]
                 }]
             }).then(msg => {
+                squadOpenMessages[`${squad.squad_id}_${thread.id}`] = msg
                 axios('http://content.warframe.com/dynamic/worldState.php')
                 .then( worldstateData => {
                     const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
@@ -782,6 +784,12 @@ socket.on('relicbot/squads/selectedhost', async (payload) => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
         channel.send(`**${users_list[payload.squad_host].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
+        const openMessage = squadOpenMessages[`${payload.squad_id}_${thread_id}`] 
+        if (openMessage) {
+            openMessage.edit({
+                components: openMessage.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId.split('.')[0] == 'as_sq_become_host' ?  {...subcomponent, disabled: true, label: `Become Host (${users_list[payload.squad_host].ingame_name} is Hosting)`} : subcomponent)}))
+            }).catch(console.error)
+        }
     })
 })
 
