@@ -893,8 +893,9 @@ socket.on('squadbot/squads/selectedhost', async (payload) => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
         channel.send(`**${users_list[payload.squad_host].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
-        if (squadOpenMessages[`${squad.squad_id}_${thread.id}`]) {
-            squadOpenMessages[`${squad.squad_id}_${thread.id}`].edit({
+        const openMessage = squadOpenMessages[`${payload.squad_id}_${thread_id}`] 
+        if (openMessage) {
+            openMessage.edit({
                 components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => interaction.customId.split('.')[0] == 'as_sq_become_host' ?  {...subcomponent, disabled: true, label: `~~Become Host~~ (${users_list[payload.squad_host].ingame_name} is Hosting)`} : subcomponent)}))
             }).catch(console.error)
         }
