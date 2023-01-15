@@ -673,7 +673,7 @@ function edit_recruitment_intro() {
                     custom_id: `as_sb_sq_squad_info`
                 },{
                     type: 2,
-                    label: "Show Trackers",
+                    label: "Tracked Squads",
                     style: 2,
                     custom_id: `as_sb_sq_trackers_show`
                 }]

@@ -11,7 +11,9 @@ const message_id = '1063435290494111764'
 
 client.on('ready', async () => {
     console.log('client is online')
-    sentMsgInBotTest({content: ' ', embeds: [{description: '⸻'.repeat(13)}]})
+    client.channels.cache.get('1064189673632702494').fetchWebhooks().then(whs => {
+        console.log(whs)
+    }).catch(console.error)
 })
 
 function sentMsgInBotTest(payload) {
