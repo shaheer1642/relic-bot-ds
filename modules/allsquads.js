@@ -124,7 +124,7 @@ client.on('interactionCreate', (interaction) => {
                 console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 if (responses[0].code == 200) {
-                    const components = interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
+                    const components = interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? {...subcomponent, disabled: true} : subcomponent)}))
                     if (components.length == 0) interaction.message.delete().catch(console.error)
                     else {
                         interaction.update({
