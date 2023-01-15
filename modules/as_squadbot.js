@@ -820,7 +820,8 @@ socket.on('squadbot/squads/opened', async (payload) => {
         await channel.threads.create({
             name: `${convertUpper(squad.squad_string)}`,
             autoArchiveDuration: 60,
-            reason: 'Squad filled'
+            reason: 'Squad filled',
+            type: 'private'
         }).then(async thread => {
             channel_ids[channel_id].map(async discord_id => {
                 try {
@@ -864,28 +865,40 @@ function enquote(username) {
     return username.match(' ') ? `"${username}"`:username
 }
 
-socket.on('squadbot/squads/closed', async (payload) => {
-    payload.thread_ids.forEach(async thread_id => {
+socket.on('squadbot/squads/closed', async (squad) => {
+    squad.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
-        channel.send({content: `**--- Squad closed ---**`})
+        channel.send({
+            content: `**⸻ Squad closed ⸻**`,
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Rate Squad",
+                    emoji: "⭐",
+                    style: 2,
+                    custom_id: `as_users_rate.${squad.members.join('_')}`
+                }]
+            }]
+        })
         .then(res => {
-            channel.setArchived().catch(console.error)
+            // channel.setArchived().catch(console.error)
         }).catch(console.error)
     })
-    logSquad(payload, true, 'squad_closed')
+    logSquad(squad, true, 'squad_closed')
 })
 
-socket.on('squadbot/squads/disbanded', async (payload) => {
-    payload.thread_ids.forEach(async thread_id => {
+socket.on('squadbot/squads/disbanded', async (squad) => {
+    squad.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
-        channel.send({content: `**--- Squad disbanded. A member joined another squad ---**`})
+        channel.send({content: `**⸻ Squad disbanded. A member joined another squad ⸻**`})
         .then(res => {
             channel.setArchived().catch(console.error)
         }).catch(console.error)
     })
-    logSquad(payload, true, 'squad_disbanded')
+    logSquad(squad, true, 'squad_disbanded')
 })
 
 socket.on('squadbot/squads/selectedhost', async (payload) => {

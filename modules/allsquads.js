@@ -184,6 +184,32 @@ client.on('interactionCreate', (interaction) => {
             // interaction.update({
             //     components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
             // }).catch(console.error)
+        } else if (interaction.customId.split('.')[0] == 'as_users_rate') {
+            const discord_id = interaction.user.id
+            const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
+            const rated_user = interaction.customId.split('.')[2]
+            const rating = interaction.customId.split('.')[3]
+            if (rated_user && rating) {
+                socket.emit(`allsquads/user/ratings/create`,{discord_id: discord_id, rated_user: rated_user, rating: rating})
+            }
+            if (member_ids.length == 1 && !member_ids[0]) {
+                const payload = {
+                    content: ' ',
+                    embeds: [{
+                        description: '**Thank you for rating!**',
+                        color: 'ORANGE'
+                    }],
+                    components: [],
+                    ephemeral: true
+                }
+                if (interaction.message.type == 'REPLY') interaction.update(payload).catch(console.error)
+                else interaction.reply(payload).catch(console.error)
+            } else {
+                generateRateUserEmbed(discord_id,member_ids).then(payload => {
+                    if (interaction.message.type == 'REPLY') interaction.update(payload).catch(console.error)
+                    else interaction.reply(payload).catch(console.error)
+                }).catch(console.error)
+            }
         }
     }
     if (interaction.isModalSubmit()) {
@@ -204,6 +230,59 @@ client.on('interactionCreate', (interaction) => {
         }
     }
 })
+
+function generateRateUserEmbed(discord_id, member_ids) {
+    return new Promise((resolve,reject) => {
+        socket.emit(`allsquads/user/ratings/fetch`,{discord_id: discord_id},(res) => {
+            if (res.code == 200) {
+                const rated_users = res.data
+                const payload = {content: ' ', embeds: [], components: [], ephemeral: true}
+                member_ids.forEach(discord_id => {
+                    if (Object.keys(rated_users).includes(discord_id))
+                        member_ids = member_ids.filter(id => id != discord_id)
+                })
+                if (member_ids.length == 0) {
+                    payload.embeds.push({
+                        description: '**It appears you have already rated these members. Thank you!**',
+                        footer: {
+                            text: 'The option to change rating is under-development'
+                        },
+                        color: 'ORANGE'
+                    })
+                } else {
+                    const rate_user = member_ids[0]
+                    payload.embeds.push({
+                        description: `How was your experience with **${users_list[rate_user].ingame_name}**?`,
+                        color: 'BLUE'
+                    })
+                    payload.components.push({
+                        type: 1,
+                        components: Array.from([1,2,3,4,5]).map(rating => ({
+                            type: 2,
+                            label: rating == 1 ? 'Horrible' : rating == 2 ? 'Decent' : rating == 3 ? 'Good' : rating == 4 ? 'Very Good' : rating == 5 ? 'Excellent' : 'undefined',
+                            custom_id: `as_users_rate.${member_ids.filter(id => id != rate_user).join('_')}.${rate_user}.${rating}`,
+                            style: rating == 1 ? 2 : rating == 2 ? 1 : rating == 3 ? 1 : rating == 4 ? 3 : rating == 5 ? 3 : 2,
+                            emoji: rating == 5 ? '<:tobey:931278673154306109>' : null
+                        }))
+                    })
+                    payload.components.push({
+                        type: 1,
+                        components: [{
+                            type: 2,
+                            label: 'Skip',
+                            custom_id: `as_users_rate.${member_ids.filter(id => id != rate_user).join('_')}`,
+                            style: 4
+                        }]
+                    })
+                }
+                console.log(JSON.stringify(payload))
+                return resolve(payload)
+            } else {
+                reject(res)
+            }
+        })
+    })
+}
 
 async function edit_vip_message() {
     const channel = client.channels.cache.get(vip_channel_id) || await client.channels.fetch(vip_channel_id).catch(console.error)

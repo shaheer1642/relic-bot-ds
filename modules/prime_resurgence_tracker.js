@@ -219,12 +219,13 @@ const items_list = [{
     type: 'sell'
 }]
 
-const mention_users = ['253525146923433984','407222185447391234', '689646747172995107']
+const mention_users = ['253525146923433984','407222185447391234']
 const log_channel = '1060960447966232696'
 
 var timeouts = []
 
 setInterval(() => {
+    if (process.env.MAINTENANCE_MODE) return
     //console.log('pr tracker invoked')
     getShuffledArr(items_list).forEach(tracker => {
         request(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`, function (error, response, body) {
