@@ -55,7 +55,7 @@ const default_squads = [{
     is_default: true
 },{
     squad_string: 'index',
-    spots: 4,
+    spots: 3,
     members: [],
     is_default: true
 },{
