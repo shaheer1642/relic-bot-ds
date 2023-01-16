@@ -159,7 +159,7 @@ function makeParagraph() {
                 user_msgs[j] += `<@${id}> : ${users[id]} msgs\n`
                 if (user_msgs[j].length >= 4000) j++
             })
-            return resolve({paragraph: paragraphs, user_msgs: user_msgs})
+            return resolve({paragraphs: paragraphs, user_msgs: user_msgs})
         }).catch(console.error)
     })
 }
