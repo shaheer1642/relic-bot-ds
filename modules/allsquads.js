@@ -18,10 +18,8 @@ client.on('ready', () => {
     edit_vip_message()
     assign_allsquads_roles()
     edit_leaderboard()
-    edit_leaderboardv2()
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
-    setInterval(edit_leaderboardv2, 300000);
 })
 
 event_emitter.on('allSquadsNewUserVerified', async data => {
@@ -342,59 +340,6 @@ async function assign_allsquads_roles() {
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'legendary'),
         requirement: 300
     }]
-    socket.emit('relicbot/stats/fetch', {}, (res) => {
-        if (res.code == 200) {
-            const users = res.data
-            users.map(user => {
-                roles.forEach(async role => {
-                    if (!role.object) return
-                    if (user.squads_completed >= role.requirement) {
-                        const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
-                        if (!member) return
-                        // db.query(`INSERT INTO as_rank_roles (discord_id,rank_type) VALUES ('${user.discord_id}','${role.rank_type}')`).catch(console.error)
-                        if (!member.roles.cache.get(role.object.id)) {
-                            member.roles.add(role.object).then(res => {
-                                client.channels.cache.get('1060716155150536754').send({
-                                    content: ' ',
-                                    embeds: [{
-                                        description: `<@${user.discord_id}> has achieved the rank <@&${role.object.id}>, Congratulations! 🎉`,
-                                        color: role.object.color
-                                    }]
-                                }).catch(console.error)
-                                db.query(`INSERT INTO as_rank_roles (discord_id,rank_type) VALUES ('${user.discord_id}','${role.rank_type}')`).catch(console.error)
-                            }).catch(console.error)
-                        }
-                    }
-                })
-            })
-        }
-    })
-}
-async function assign_allsquads_rolesv2() {
-    console.log('[allsquads.assign_allsquads_rolesv2] called')
-    const guild = await client.guilds.fetch(guild_id).catch(console.error)
-    if (!guild) return
-    const roles = [{
-        rank_type: 'rank_1',
-        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'star child'),
-        requirement: 3
-    },{
-        rank_type: 'rank_2',
-        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'lotus lover'),
-        requirement: 20
-    },{
-        rank_type: 'rank_3',
-        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'sentient'),
-        requirement: 50
-    },{
-        rank_type: 'rank_4',
-        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'true master'),
-        requirement: 100
-    },{
-        rank_type: 'rank_5',
-        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'legendary'),
-        requirement: 300
-    }]
     socket.emit('allsquads/statistics/fetch', {}, (res) => {
         if (res.code == 200) {
             const alltime_users = res.data.all_time
@@ -425,39 +370,6 @@ async function assign_allsquads_rolesv2() {
 
 function edit_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/leaderboards/fetch', {limit: 10}, (res) => {
-        if (res.code == 200) {
-            const leaderboards = res.data
-            const payload = {
-                content: ' ',
-                embeds: Object.keys(leaderboards).map(key =>
-                    ({
-                        title: key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
-                        description: `${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
-                        fields: leaderboards[key].length > 0 ? [{
-                            name: 'Rank',
-                            value: leaderboards[key].map((user,index) => `${index+1}`).join('\n'),
-                            inline: true
-                        },{
-                            name: 'Player',
-                            value: leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
-                            inline: true
-                        },{
-                            name: 'Squads',
-                            value: leaderboards[key].map(user => `${user.reputation}`).join('\n'),
-                            inline: true
-                        }] : [],
-                        color: 'WHITE'
-                    })
-                )
-            }
-            client.fetchWebhook('1050757563366522921').then(wh => wh.editMessage('1050762968037609482', payload).catch(console.error)).catch(console.error)
-        }
-    })
-}
-
-function edit_leaderboardv2() {
-    console.log('[allsquads.edit_leaderboardv2] called')
     socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: ['253525146923433984','739833841686020216'], exclude_daily: true}, (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
