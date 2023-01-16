@@ -97,14 +97,18 @@ function message_handler(message) {
     if (message.channel.id == '1064243157992230953') {
         if (message.content.toLowerCase() == '.makeparagraph' || message.content.toLowerCase() == '.makesentence') {
             message.channel.send('fetching data...').then(processMsg => {
-                makeParagraph().then(payload => {
-                    message.channel.send(payload.paragraph).catch(err => {
-                        message.channel.send(JSON.stringify(err)).catch(console.error)
-                    })
-                    message.channel.send(payload.user_msgs).catch(err => {
-                        message.channel.send(JSON.stringify(err)).catch(console.error)
-                    })
+                makeParagraph().then(async payload => {
                     processMsg.delete().catch(console.error)
+                    for (const paragraph of payload.paragraphs) {
+                        await message.channel.send({content: ' ', embeds: [{description: paragraph}]}).catch(err => {
+                            message.channel.send(JSON.stringify(err)).catch(console.error)
+                        })
+                    }
+                    for (const user_msg of payload.user_msgs) {
+                        await message.channel.send({content: ' ', embeds: [{description: user_msg}]}).catch(err => {
+                            message.channel.send(JSON.stringify(err)).catch(console.error)
+                        })
+                    }
                 }).catch(err => {
                     message.channel.send(JSON.stringify(err)).catch(console.error)
                 })
@@ -140,13 +144,22 @@ function makeParagraph() {
             }
             console.log('[botv.makeParagraph] total msgs',all_msgs.length)
             all_msgs = all_msgs.sort(dynamicSort("createdTimestamp"))
-            var paragraph = ''
-            all_msgs.forEach(msg => paragraph += `${msg.content.split(' ')[0]} `)
-            paragraph = paragraph.trim()
-            var user_msgs = '__Messages sent by users__\n\n'
-            Object.keys(users).forEach(id => user_msgs += `<@${id}> : ${users[id]}\n`)
-            user_msgs = user_msgs.trim()
-            return resolve({paragraph: paragraph, user_msgs: user_msgs})
+            all_msgs = all_msgs.filter(msg => msg.id != '1063858377521893546')
+            var paragraphs = []
+            var i = 0;
+            all_msgs.forEach(msg => {
+                if (!paragraphs[i]) paragraphs[i] = ''
+                paragraphs[i] += `${(msg.content.split('\n')[0]).split(' ')[0]} `
+                if (paragraphs[i].length >= 4000) i++
+            })
+            var user_msgs = []
+            var j = 0;
+            Object.keys(users).forEach(id => {
+                if (!user_msgs[j]) user_msgs[j] = ''
+                user_msgs[j] += `<@${id}> : ${users[id]} msgs\n`
+                if (user_msgs[j].length >= 4000) j++
+            })
+            return resolve({paragraph: paragraphs, user_msgs: user_msgs})
         }).catch(console.error)
     })
 }
