@@ -21,6 +21,7 @@ client.on('ready', () => {
     edit_leaderboardv2()
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
+    setInterval(edit_leaderboardv2, 300000);
 })
 
 event_emitter.on('allSquadsNewUserVerified', async data => {
@@ -457,7 +458,7 @@ function edit_leaderboard() {
 
 function edit_leaderboardv2() {
     console.log('[allsquads.edit_leaderboardv2] called')
-    socket.emit('allsquads/statistics/fetch', {limit: 10}, (res) => {
+    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: ['253525146923433984','739833841686020216'], exclude_daily: true}, (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             const payload = {
@@ -520,43 +521,6 @@ function verificationInstructions(language,code,already_verified) {
         ephemeral: true
     }
     return translatePayload(payload, language)
-    if (language == 'en') {
-        return {
-            content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n':''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
-            embeds: [{
-                description: '[Visit forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
-                footer: {
-                    text: already_verified ? `${code}_alrver`:`${code}_!alrver`
-                }
-            }],
-            components: components,
-            ephemeral: true
-        }
-    } else if (language == 'fr') {
-        return {
-            content: `${already_verified ? 'Note: Votre pseudo en jeu a déjà été vérifié. Il sera mis à jour après re-vérification\n':''}**Veuillez suivre les étapes suivantes afin de vérifier votre compte:**\n1) Connectez-vous sur le forum de warframe en visitant ce lien: https://forums.warframe.com/\n2) Aller sur sur cette page et envoyer un nouveau message au bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Ecrivez le message sous la forme suivante:\nObjet: **${code}**\nMessage: Salut\n4) CLiquez sur "Envoyer"\n5) Le bot va vérifier la boite mail dans quelques secondes et il va vous envoyer un message de confirmation. Merci!`,
-            embeds: [{
-                description: '[Visitez le forum](https://forums.warframe.com/)\n\n[Envoyer un message au bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
-                footer: {
-                    text: already_verified ? `${code}_alrver`:`${code}_!alrver`
-                }
-            }],
-            components: components,
-            ephemeral: true
-        }
-    } else if (language == 'it') {
-        return {
-            content: `${already_verified ? 'Nota: Il tuo IGN è già stato verificato, verrà aggiornato appena verrà riverificato\n':''}**Perfavore segui questi passaggi per verificare il tuo account:**\n1) Per prima cosa assicurati di essere registrato sul forum di Warframe cliccando su questo link: https://forums.warframe.com/\n2) Visita questa pagina per comporre un nuovo messaggio al bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Scrivi il testo del messaggio come è indicato sotto:\nSoggetto: **${code}**\nMessage: Ciao\n4) Clicca sul tasto "invio"\n5) Il bot farà i controlli della inbox nei prossimi secondi e ti invierà un messaggio di conferma. Grazie!`,
-            embeds: [{
-                description: '[Visita il forum](https://forums.warframe.com/)\n\n[Messaggia il bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
-                footer: {
-                    text: already_verified ? `${code}_alrver`:`${code}_!alrver`
-                }
-            }],
-            components: components,
-            ephemeral: true
-        }
-    }
 }
 
 function translatePayload(payload, lang) {
