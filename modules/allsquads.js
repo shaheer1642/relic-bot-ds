@@ -472,7 +472,7 @@ function edit_leaderboardv2() {
                             inline: true
                         },{
                             name: key == 'top_squads' ? 'Squad' : 'Player',
-                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${squad.squad_string}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
+                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
                             inline: true
                         },{
                             name: key == 'top_squads' ? 'Hosts' : 'Reputation',
