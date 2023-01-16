@@ -616,7 +616,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
         new_squads.push(new_squads_obj[squad])
     })
 
-    //console.log(JSON.stringify(new_squads),new Date().getTime())
+    //console.log(JSON.stringify(new_squads),new Date().getTime()) 
 
     const payloads = []
     new_squads.map((squad,index) => {
