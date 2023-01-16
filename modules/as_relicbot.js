@@ -577,7 +577,8 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
                 type: 2,
                 label: "Squad Info",
                 style: 1,
-                custom_id: `rb_sq_info_${tier}`
+                custom_id: `rb_sq_info_${tier}`,
+                disabled: with_all_names ? true : false
             })
         }
     })
