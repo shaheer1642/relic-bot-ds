@@ -149,7 +149,9 @@ function makeParagraph() {
             var i = 0;
             all_msgs.forEach(msg => {
                 if (!paragraphs[i]) paragraphs[i] = ''
-                paragraphs[i] += `${(msg.content.split('\n')[0]).split(' ')[0]} `
+                word = (msg.content.split('\n')[0]).split(' ')[0]
+                if (word.match(/\./) || word.match(/\,/)) paragraphs[i] = paragraphs[i].trim()
+                paragraphs[i] += `${word}${word.match(/\./) ? '\n':''} `
                 if (paragraphs[i].length >= 4000) i++
             })
             var user_msgs = []
