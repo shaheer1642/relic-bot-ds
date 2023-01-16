@@ -464,22 +464,22 @@ function edit_leaderboardv2() {
                 content: ' ',
                 embeds: Object.keys(leaderboards).map(key =>
                     ({
-                        title: key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
+                        title: key == 'top_squads' ? 'Top Squads This Week' : key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
                         description: `${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
                         fields: leaderboards[key].length > 0 ? [{
                             name: 'Rank',
-                            value: leaderboards[key].map((user,index) => `${index+1}`).join('\n'),
+                            value: leaderboards[key].map((e,index) => `${index+1}`).join('\n'),
                             inline: true
                         },{
-                            name: 'Player',
-                            value: leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
+                            name: key == 'top_squads' ? 'Squad' : 'Player',
+                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${squad.squad_string}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
                             inline: true
                         },{
-                            name: 'Reputation',
-                            value: leaderboards[key].map(user => `${parseFloat(user.reputation.toFixed(2))}`).join('\n'),
+                            name: key == 'top_squads' ? 'Hosts' : 'Reputation',
+                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${squad.hosts}`).join('\n') : leaderboards[key].map(user => `${parseFloat(user.reputation.toFixed(2))}`).join('\n'),
                             inline: true
                         }] : [],
-                        color: 'WHITE'
+                        color: key == 'top_squads' ? 'BLUE' : 'WHITE'
                     })
                 )
             }
