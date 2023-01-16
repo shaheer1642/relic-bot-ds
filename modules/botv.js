@@ -94,6 +94,61 @@ function bot_initialize() {
 function message_handler(message) {
     if (message.channel.id == report_channelId)
         generate_report(message)
+    if (message.channel.id == '1064243157992230953') {
+        if (message.content.toLowerCase() == '.makeparagraph' || message.content.toLowerCase() == '.makesentence') {
+            message.channel.send('fetching data...').then(processMsg => {
+                makeParagraph().then(payload => {
+                    message.channel.send(payload.paragraph).catch(err => {
+                        message.channel.send(JSON.stringify(err)).catch(console.error)
+                    })
+                    message.channel.send(payload.user_msgs).catch(err => {
+                        message.channel.send(JSON.stringify(err)).catch(console.error)
+                    })
+                    processMsg.delete().catch(console.error)
+                }).catch(err => {
+                    message.channel.send(JSON.stringify(err)).catch(console.error)
+                })
+            }).catch(console.error)
+        }
+    }
+}
+
+function makeParagraph() {
+    console.log('[botv.makeParagraph] called')
+    const game_channel = '1063752691496517662'
+    return new Promise((resolve,reject) => {
+        client.channels.fetch(game_channel).then(async channel => {
+            var users = {}
+            var last_msg = await channel.messages.fetch({limit: 1}).catch(console.error)
+            if (!last_msg) return reject('channel is empty')
+            last_msg.forEach(msg => last_msg = msg)
+            var all_msgs = []
+            all_msgs.push(last_msg)
+            var last_id = last_msg.id
+            var stopFlag = 0
+            while(!stopFlag) {
+                const messages = await channel.messages.fetch({limit: 100, before: last_id}).catch(console.error)
+                for (var [messageId,message] of messages) {
+                    last_id = messageId
+                    //console.log(message.createdTimestamp)
+                    all_msgs.push(message)
+                    if (!users[message.author.id]) users[message.author.id] = 0
+                    users[message.author.id]++
+                }
+                if (messages.size < 100)
+                    break
+            }
+            console.log('[botv.makeParagraph] total msgs',all_msgs.length)
+            all_msgs = all_msgs.sort(dynamicSort("createdTimestamp"))
+            var paragraph = ''
+            all_msgs.forEach(msg => paragraph += `${msg.content.split(' ')[0]} `)
+            paragraph = paragraph.trim()
+            var user_msgs = '__Messages sent by users__\n\n'
+            Object.keys(users).forEach(id => user_msgs += `<@${id}> : ${users[id]}\n`)
+            user_msgs = user_msgs.trim()
+            return resolve({paragraph: paragraph, user_msgs: user_msgs})
+        }).catch(console.error)
+    })
 }
 
 function getHiatusMembers(message) {
