@@ -480,7 +480,7 @@ function edit_leaderboardv2() {
                             value: key == 'top_squads' ? leaderboards[key].map(squad => `${squad.hosts}`).join('\n') : leaderboards[key].map(user => `${parseFloat(user.reputation.toFixed(2))}`).join('\n'),
                             inline: true
                         }] : [],
-                        color: key == 'top_squads' ? 'BLUE' : 'WHITE'
+                        color: key == 'top_squads' ? 'BLUE' : 'ORANGE'
                     })
                 )
             }
