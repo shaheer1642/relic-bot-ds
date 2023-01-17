@@ -235,7 +235,7 @@ function openSquadSquadBot(squad) {
     }).catch(console.error)
 }
 
-async function testCompleteEmbed(discord_id) {
+function testCompleteEmbed(discord_id) {
     return {
         content: `<@${discord_id}> You have completed the tutorial, Welcome aboard! First make sure you\'ve verified your ign using <#908430387649343538> channel\nIf so, use channels <#1054843353302323281> <#1050717341123616851> to start recruiting!`
     }
