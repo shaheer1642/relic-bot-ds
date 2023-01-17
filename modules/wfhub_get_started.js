@@ -93,13 +93,15 @@ client.on('interactionCreate', async interaction => {
             interaction.deferUpdate().catch(console.error)
             editSquadMsgRelicBot(true)
         } else if (interaction.customId == 'getting_started_sandbox_complete_relicbot') {
-            interaction.deferUpdate().catch(console.error)
-            testComplete(interaction.user.id)
-            if (interaction.channel.isThread()) interaction.channel.setArchived(true).catch(console.error)
+            if (interaction.channel.isThread()) {
+                interaction.reply(testCompleteEmbed(interaction.user.id)).catch(console.error)
+                interaction.channel.setArchived(true).catch(console.error)
+            }
         } else if (interaction.customId == 'getting_started_sandbox_complete_squadbot') {
-            interaction.deferUpdate().catch(console.error)
-            testComplete(interaction.user.id)
-            if (interaction.channel.isThread()) interaction.channel.setArchived(true).catch(console.error)
+            if (interaction.channel.isThread()) {
+                interaction.reply(testCompleteEmbed(interaction.user.id)).catch(console.error)
+                interaction.channel.setArchived(true).catch(console.error)
+            }
         } else if (interaction.customId.match('sb_getting_started_sandbox_sq_')) {
             joinSquadSquadBot(interaction.customId, interaction.user.id)
             interaction.deferUpdate().catch(console.error)
@@ -229,18 +231,21 @@ function openSquadSquadBot(squad) {
     }).catch(console.error)
 }
 
-async function testComplete(discord_id) {
-    // const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
-    // if (!guild) return
-    // const member = guild.members.cache.get(discord_id) || await guild.members.fetch(discord_id).catch(console.error)
-    // if (!member) return
-    // const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-    // if (!role) return 
-    // member.roles.add(role).catch(console.error)
-    client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard! First make sure you\'ve verified your ign using <#908430387649343538> channel\nIf so, use channels <#1054843353302323281> <#1050717341123616851> to start recruiting!`)
-    .then(msg => {
-        setTimeout(() => {
-            msg.delete().catch(console.error)
-        }, 30000);
-    }).catch(console.error)
+async function testCompleteEmbed(discord_id) {
+    return {
+        content: `<@${discord_id}> You have completed the tutorial, Welcome aboard! First make sure you\'ve verified your ign using <#908430387649343538> channel\nIf so, use channels <#1054843353302323281> <#1050717341123616851> to start recruiting!`
+    }
+    // // const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
+    // // if (!guild) return
+    // // const member = guild.members.cache.get(discord_id) || await guild.members.fetch(discord_id).catch(console.error)
+    // // if (!member) return
+    // // const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+    // // if (!role) return 
+    // // member.roles.add(role).catch(console.error)
+    // client.channels.cache.get(get_started_cnl_id).send()
+    // .then(msg => {
+    //     setTimeout(() => {
+    //         msg.delete().catch(console.error)
+    //     }, 30000);
+    // }).catch(console.error)
 }
