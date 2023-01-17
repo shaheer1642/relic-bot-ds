@@ -230,14 +230,14 @@ function openSquadSquadBot(squad) {
 }
 
 async function testComplete(discord_id) {
-    const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
-    if (!guild) return
-    const member = guild.members.cache.get(discord_id) || await guild.members.fetch(discord_id).catch(console.error)
-    if (!member) return
-    const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-    if (!role) return 
-    member.roles.add(role).catch(console.error)
-    client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard!\nUse channels <#1054843353302323281> <#1050717341123616851> to start recruiting`)
+    // const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
+    // if (!guild) return
+    // const member = guild.members.cache.get(discord_id) || await guild.members.fetch(discord_id).catch(console.error)
+    // if (!member) return
+    // const role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+    // if (!role) return 
+    // member.roles.add(role).catch(console.error)
+    client.channels.cache.get(get_started_cnl_id).send(`<@${discord_id}> You have completed the tutorial, Welcome aboard! First make sure you\'ve verified your ign using <#908430387649343538> channel\nIf so, use channels <#1054843353302323281> <#1050717341123616851> to start recruiting!`)
     .then(msg => {
         setTimeout(() => {
             msg.delete().catch(console.error)
