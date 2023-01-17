@@ -94,13 +94,17 @@ client.on('interactionCreate', async interaction => {
             editSquadMsgRelicBot(true)
         } else if (interaction.customId == 'getting_started_sandbox_complete_relicbot') {
             if (interaction.channel.isThread()) {
-                interaction.reply(testCompleteEmbed(interaction.user.id)).catch(console.error)
-                interaction.channel.setArchived(true).catch(console.error)
+                interaction.reply(testCompleteEmbed(interaction.user.id))
+                .then(res => {
+                    interaction.channel.setArchived(true).catch(console.error)
+                }).catch(console.error)
             }
         } else if (interaction.customId == 'getting_started_sandbox_complete_squadbot') {
             if (interaction.channel.isThread()) {
-                interaction.reply(testCompleteEmbed(interaction.user.id)).catch(console.error)
-                interaction.channel.setArchived(true).catch(console.error)
+                interaction.reply(testCompleteEmbed(interaction.user.id))
+                .then(res => {
+                    interaction.channel.setArchived(true).catch(console.error)
+                }).catch(console.error)
             }
         } else if (interaction.customId.match('sb_getting_started_sandbox_sq_')) {
             joinSquadSquadBot(interaction.customId, interaction.user.id)
