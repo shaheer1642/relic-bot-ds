@@ -925,7 +925,7 @@ async function logSquad(squad,include_chat,action) {
                     content: convertUpper(action),
                     embeds: [{
                         title: convertUpper(squad.squad_string),
-                        description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `[<t:${Math.round(row.creation_timestamp / 1000)}:t>] **${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\\_'),
+                        description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n\n\n**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>`).replace(log.split(' ')[1],`**${users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `[<t:${Math.round(Number(row.creation_timestamp) / 1000)}:t>] **${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\\_'),
                         timestamp: new Date(),
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
