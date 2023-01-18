@@ -10,6 +10,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
 const {translatePayload} = require('./allsquads')
+const {as_users_ratings} = require('./allsquads/as_users_ratings')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -537,13 +538,14 @@ function rb_remove_server(guild_id) {
 }
 
 function embed(squads, tier, with_all_names, name_for_squad_id) {
+    console.log('[as_relicbot.embed] as_users_ratings',as_users_ratings)
     var fields = []
     var components = []
     squads = squads.sort(dynamicSort("main_relics"))
     squads.map((squad,index) => {
         var field_value = '\u200b'
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
-            field_value = squad.members.map(id => users_list[id]?.ingame_name).join('\n')
+            field_value = squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.rating >= 4 ? '⭐':''}`.trim()).join('\n')
         else {
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
             if (squad.is_steelpath) field_value += ' ' + emote_ids.steel_essence

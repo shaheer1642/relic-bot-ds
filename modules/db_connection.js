@@ -1,4 +1,5 @@
 const DB = require('pg');
+const {event_emitter} = require('./event_emitter')
 
 const db = new DB.Client({
     connectionString: process.env.DATABASE_URL,
@@ -10,39 +11,44 @@ const db = new DB.Client({
 
 db.connect().then(async res => {
     console.log('DB Connection established.')
-
-    db.query('LISTEN tradebot_filled_users_orders_insert').catch(console.error)
-    db.query('LISTEN tradebot_filled_users_orders_update_new_message').catch(console.error)
-    db.query('LISTEN tradebot_filled_users_orders_update_archived').catch(console.error)
-
-    db.query('LISTEN tradebot_users_orders_insert').catch(console.error)
-    db.query('LISTEN tradebot_users_orders_update').catch(console.error)
-    db.query('LISTEN tradebot_users_orders_delete').catch(console.error)
-    
-    db.query('LISTEN challenges_update').catch(console.error)
-    db.query('LISTEN challenges_transactions_insert').catch(console.error)
-    db.query('LISTEN challenges_completed_insert').catch(console.error)
-    
-    db.query('LISTEN wfhub_payment_receipts_insert').catch(console.error)
-
-    db.query('LISTEN tradebot_users_list_update').catch(console.error)
-
-    db.query('LISTEN rb_squads_insert').catch(console.error)
-    db.query('LISTEN rb_squads_update').catch(console.error)
-    db.query('LISTEN rb_squads_delete').catch(console.error)
-
-    db.query('LISTEN as_gabot_giveaways_insert').catch(console.error)
-    db.query('LISTEN as_gabot_giveaways_update').catch(console.error)
-    db.query('LISTEN as_gabot_giveaways_delete').catch(console.error)
-
-    db.query('LISTEN as_bb_blesses_insert').catch(console.error)
-    db.query('LISTEN as_bb_blesses_update').catch(console.error)
-    db.query('LISTEN as_bb_blesses_delete').catch(console.error)
+    event_emitter.emit('db_connected')
 
     db.query(`
+        LISTEN tradebot_filled_users_orders_insert;
+        LISTEN tradebot_filled_users_orders_update_new_message;
+        LISTEN tradebot_filled_users_orders_update_archived;
+
+        LISTEN tradebot_users_list_update;
+
+        LISTEN tradebot_users_orders_insert;
+        LISTEN tradebot_users_orders_update;
+        LISTEN tradebot_users_orders_delete;
+
+        LISTEN wfhub_payment_receipts_insert;
+
+        LISTEN challenges_update;
+        LISTEN challenges_transactions_insert;
+        LISTEN challenges_completed_insert;
+
+        LISTEN rb_squads_insert;
+        LISTEN rb_squads_update;
+        LISTEN rb_squads_delete;
+
+        LISTEN as_gabot_giveaways_insert;
+        LISTEN as_gabot_giveaways_update;
+        LISTEN as_gabot_giveaways_delete;
+
+        LISTEN as_bb_blesses_insert;
+        LISTEN as_bb_blesses_update;
+        LISTEN as_bb_blesses_delete;
+
         LISTEN as_faq_insert;
         LISTEN as_faq_update;
         LISTEN as_faq_delete;
+        
+        LISTEN as_users_ratings_insert;
+        LISTEN as_users_ratings_update;
+        LISTEN as_users_ratings_delete;
     `).catch(console.error)
 })
 

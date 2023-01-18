@@ -11,7 +11,7 @@ const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
 const {translatePayload} = require('./allsquads')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes')
-
+const {as_users_ratings} = require('./allsquads/as_users_ratings')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -627,7 +627,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
             if (squad.members.length > 0) {
                 payloads[payload_index].embeds[0].fields.push({
                     name: convertUpper(squad.squad_string),
-                    value: squad.members.map(id => users_list[id]?.ingame_name).join('\n'),
+                    value: squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.rating >= 4 ? '⭐':''}`.trim()).join('\n'),
                     inline: true
                 })
             }
