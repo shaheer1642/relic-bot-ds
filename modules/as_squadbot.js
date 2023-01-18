@@ -627,7 +627,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
             if (squad.members.length > 0) {
                 payloads[payload_index].embeds[0].fields.push({
                     name: convertUpper(squad.squad_string),
-                    value: squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.rating >= 4 ? '⭐':''}`.trim()).join('\n'),
+                    value: squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '⭐':''}`.trim()).join('\n'),
                     inline: true
                 })
             }

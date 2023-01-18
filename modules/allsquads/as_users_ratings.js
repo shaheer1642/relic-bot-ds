@@ -21,13 +21,15 @@ function updateUserRatings() {
         })
         // console.log('after deletion',as_users_ratings)
         db_user_ratings.forEach(user_rating => {
-            if (!as_users_ratings[user_rating.rated_user]) as_users_ratings[user_rating.rated_user] = { users_rated: [], ratings: [], rating: null }
+            if (!as_users_ratings[user_rating.rated_user]) as_users_ratings[user_rating.rated_user] = { users_rated: [], ratings: [], rating: null, highly_rated: false }
             as_users_ratings[user_rating.rated_user].users_rated.push(user_rating.discord_id)
             as_users_ratings[user_rating.rated_user].ratings.push(user_rating.rating)
         })
         // console.log(JSON.stringify(as_users_ratings,null,4))
         Object.keys(as_users_ratings).forEach(user_id => {
             as_users_ratings[user_id].rating = calcArrAvg(as_users_ratings[user_id].ratings)
+            if (as_users_ratings[user_id].rating >= 4.25)
+                as_users_ratings[user_id].highly_rated = true
         })
         // console.log(JSON.stringify(as_users_ratings,null,4))
         // var string = JSON.stringify(as_users_ratings,null,4)
