@@ -918,14 +918,19 @@ socket.on('squadbot/squads/selectedhost', async (payload) => {
 async function logSquad(squad,include_chat,action) {
     const channel = client.channels.cache.get('1059876227504152666') || await client.channels.fetch('1059876227504152666').catch(console.error)
     if (!channel) return
+    const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
+    const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`
+    const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>`).replace(log.split(' ')[1],`**${users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
     if (include_chat) {
         socket.emit('squadbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
+                const chats = res.data
+                const squadChat = `**⸻ Squad Chat ⸻**\n${chats.map(chat => `[<t:${Math.round(Number(chat.creation_timestamp) / 1000)}:t>] **${users_list[chat.discord_id]?.ingame_name}:** ${chat.message}`).join('\n')}`
                 channel.send({
                     content: convertUpper(action),
                     embeds: [{
                         title: convertUpper(squad.squad_string),
-                        description: `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}\n\n**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}\n\n**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>`).replace(log.split(' ')[1],`**${users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}\n\n**⸻ Squad Chat ⸻**\n${res.data.map(row => `[<t:${Math.round(Number(row.creation_timestamp) / 1000)}:t>] **${users_list[row.discord_id]?.ingame_name}:** ${row.message}`).join('\n')}`.replace(/_/g, '\\_'),
+                        description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadChat}`.trim().replace(/_/g, '\\_'),
                         timestamp: new Date(),
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
@@ -956,7 +961,7 @@ async function logSquad(squad,include_chat,action) {
             content: convertUpper(action),
             embeds: [{
                 title: convertUpper(squad.squad_string),
-                description: `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`.replace(/_/g, '\\_'),
+                description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}`.trim().replace(/_/g, '\\_'),
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
