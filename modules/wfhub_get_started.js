@@ -182,7 +182,8 @@ function openSquadRelicBot(squad) {
     client.channels.cache.get(get_started_cnl_id).threads.create({
         name: squad.name,
         autoArchiveDuration: 60,
-        reason: 'Sandbox Relic squad filled'
+        reason: 'Sandbox Relic squad filled',
+        type: 'private'
     }).then(thread => {
         setTimeout(() => client.channels.cache.get(get_started_cnl_id).messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
         thread.send({
@@ -210,7 +211,8 @@ function openSquadSquadBot(squad) {
     client.channels.cache.get(get_started_cnl_id).threads.create({
         name: squad.name,
         autoArchiveDuration: 60,
-        reason: 'Sandbox squad filled'
+        reason: 'Sandbox squad filled',
+        type: 'private'
     }).then(thread => {
         setTimeout(() => client.channels.cache.get(get_started_cnl_id).messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
         thread.send({
