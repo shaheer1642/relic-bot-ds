@@ -69,11 +69,6 @@ const default_squads = [{
     members: [],
     is_default: true
 },{
-    squad_string: 'bounties',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
     squad_string: 'leveling',
     spots: 4,
     members: [],
