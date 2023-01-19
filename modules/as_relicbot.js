@@ -1086,7 +1086,7 @@ async function fissures_check() {
             embeds: [{
                 title: "Fissures",
                 description: fissures_list.length == 0 ? 'No good fissures at the time <:kekmask:935214374933659741>' : '',
-                fields: fissures_list.length == 0 ? [] : [{
+                fields: [{
                     name: "Tier",
                     value: "\u200b",
                     inline: true
