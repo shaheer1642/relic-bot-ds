@@ -1086,17 +1086,17 @@ async function fissures_check() {
             embeds: [{
                 title: "Fissures",
                 description: fissures_list.length == 0 ? 'No good fissures at the time <:kekmask:935214374933659741>' : '',
-                fields: [{
+                fields: fissures_list.length == 0 ? [] : [{
                     name: "Tier",
-                    value: "\u200b",
+                    value: "",
                     inline: true
                 },{
                     name: "Mission",
-                    value: "\u200b",
+                    value: "",
                     inline: true
                 },{
                     name: "Expires",
-                    value: "\u200b",
+                    value: "",
                     inline: true
                 },{
                     name: "Next Reset",
@@ -1135,21 +1135,23 @@ async function fissures_check() {
             }]
         }
 
-        fissures_list.forEach(fissure => {
-            if (fissure.isHard) return
-            payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
-            payload.embeds[0].fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
-            payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
-        })
-        payload.embeds[0].fields[0].value += `\n`
-        payload.embeds[0].fields[1].value += `\n`
-        payload.embeds[0].fields[2].value += `\n`
-        fissures_list.forEach(fissure => {
-            if (!fissure.isHard) return
-            payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
-            payload.embeds[0].fields[1].value += `${emote_ids.steel_essence} ${fissure.missionType} - ${fissure.node}\n`
-            payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
-        })
+        if (fissures_list.length > 0) {
+            fissures_list.forEach(fissure => {
+                if (fissure.isHard) return
+                payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
+                payload.embeds[0].fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+            })
+            payload.embeds[0].fields[0].value += `\n`
+            payload.embeds[0].fields[1].value += `\n`
+            payload.embeds[0].fields[2].value += `\n`
+            fissures_list.forEach(fissure => {
+                if (!fissure.isHard) return
+                payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
+                payload.embeds[0].fields[1].value += `${emote_ids.steel_essence} ${fissure.missionType} - ${fissure.node}\n`
+                payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+            })
+        }
 
         webhook_messages.fissures?.forEach(msg => {
             new WebhookClient({url: msg.url}).editMessage(msg.m_id, translatePayload(payload, channels_list[msg.c_id].lang)).catch(console.error)
