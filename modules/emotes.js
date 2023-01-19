@@ -1,5 +1,6 @@
 
 const emote_ids = {
+    aya: '<:Aya:915887403590377542>',
     steel_essence: '<:steel_essence:962508988442869800>',
     railjack: '<:railjack:1045456185429594214>',
     lith: '<:Lith:1060995797807804496>',
