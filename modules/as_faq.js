@@ -5,8 +5,14 @@ const JSONbig = require('json-bigint');
 // const {tb_user_exist} = require('./trade_bot_modules')
 const {socket} = require('./socket')
 
-const faq_webhook_id = '1063388838015279146'
-const faq_message_id = '1063389533581885532'
+const faq_channels = [{
+    webhook_id: '1063388838015279146',
+    message_id: '1063389533581885532'
+},{
+    webhook_id: '1065719278780825730',
+    message_id: '1065719280504668271'
+}]
+
 //client.fetchWebhook('faq_webhook_id')
 
 client.on('interactionCreate', interaction => {
@@ -51,9 +57,11 @@ async function getFaqReply(faq_id) {
 
 function updateFaqWebhookMessage() {
     db.query(`SELECT * FROM as_faq ORDER BY id;`).then(res => {
-        client.fetchWebhook(faq_webhook_id).then(wh => {
-            wh.editMessage(faq_message_id, payloadGenerator(res.rows))
-        }).catch(console.error)
+        faq_channels.forEach(channel => {
+            client.fetchWebhook(channel.webhook_id).then(wh => {
+                wh.editMessage(channel.message_id, payloadGenerator(res.rows))
+            }).catch(console.error)
+        })
     }).catch(console.error)
 
     function payloadGenerator(faqs) {
