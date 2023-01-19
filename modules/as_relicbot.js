@@ -1086,17 +1086,17 @@ async function fissures_check() {
             embeds: [{
                 title: "Fissures",
                 description: fissures_list.length == 0 ? 'No good fissures at the time <:kekmask:935214374933659741>' : '',
-                fields: fissures_list.length == 0 ? [] : [{
-                    name: "Tier",
-                    value: "",
+                fields: [{
+                    name: fissures_list.length == 0 ? "\u200b":"Tier",
+                    value: "\u200b",
                     inline: true
                 },{
-                    name: "Mission",
-                    value: "",
+                    name: fissures_list.length == 0 ? "\u200b":"Mission",
+                    value: "\u200b",
                     inline: true
                 },{
-                    name: "Expires",
-                    value: "",
+                    name: fissures_list.length == 0 ? "\u200b":"Expires",
+                    value: "\u200b",
                     inline: true
                 },{
                     name: "Next Reset",
