@@ -29,6 +29,11 @@ client.on('channelDelete', channel => {
 })
 
 const default_squads = [{
+    squad_string: 'aya_farm',
+    spots: 4,
+    members: [],
+    is_default: true
+},{
     squad_string: 'sortie',
     spots: 4,
     members: [],
