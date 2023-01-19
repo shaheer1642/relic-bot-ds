@@ -538,7 +538,7 @@ function rb_remove_server(guild_id) {
 }
 
 function embed(squads, tier, with_all_names, name_for_squad_id) {
-    console.log('[as_relicbot.embed] as_users_ratings',as_users_ratings)
+    // console.log('[as_relicbot.embed] as_users_ratings',as_users_ratings)
     var fields = []
     var components = []
     squads = squads.sort(dynamicSort("main_relics"))
