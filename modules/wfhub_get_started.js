@@ -51,7 +51,7 @@ function relicbotembed(show_members, show_members_for_squad) {
             title: 'Axi',
             fields: squads.map(squad => ({
                 name: squad.name,
-                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `<@${id}>`).join('\n'):squad.members.length > 2 ? '🔥':'\u200b',
+                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `<@${id}>`).join('\n') : `${squad.members.length}/4 ${squad.members.length > 2 ? '🔥':''}`,
                 inline: true
             }))
         }],
