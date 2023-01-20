@@ -547,7 +547,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id))
             field_value = squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n')
         else {
-            field_value = `\`${squad.members.length}/4\``
+            field_value = squad.members.length > 1 ? `\`${squad.members.length}/4\`` : `${squad.members.length}/4`  // why? because john said so
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
             if (squad.is_steelpath) field_value += ' ' + emote_ids.steel_essence
             if (squad.is_railjack) field_value += ' ' + emote_ids.railjack
