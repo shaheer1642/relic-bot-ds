@@ -30,7 +30,7 @@ client.on('channelDelete', channel => {
 
 const default_squads = [{
     squad_string: 'aya_farm',
-    spots: 4,
+    spots: 3,
     members: [],
     is_default: true
 },{
@@ -40,7 +40,7 @@ const default_squads = [{
     is_default: true
 },{
     squad_string: 'steelpath_incursion',
-    spots: 4,
+    spots: 3,
     members: [],
     is_default: true
 },{
