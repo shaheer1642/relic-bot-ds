@@ -593,7 +593,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             fields: fields,
             color: tier == 'lith'? 'GREEN' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'RED' : tier == 'axi' ? 'YELLOW' : '',
             footer: {
-                text: `Type relic to host i.e. ${tier == 'lith' ? 'lith o2' : tier == 'meso' ? 'meso o3' : tier == 'neo' ? 'neo v8' : tier == 'axi' ? 'axi L4' : 'neo v8'}`
+                text: `Type relic to host i.e. ${tier == 'lith' ? 'lith o2' : tier == 'meso' ? 'meso o3' : tier == 'neo' ? 'neo v8' : tier == 'axi' ? 'axi L4' : 'neo v8'} ; Press button to join`
             }
         }],
         components: components
