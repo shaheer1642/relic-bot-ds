@@ -44,10 +44,10 @@ async function getFaqReply(faq_id,lang) {
                 return resolve({
                     content: ' ',
                     embeds: [{
-                        title: faq.title[lang] || `Could not find ${lang} translation`,
-                        description: faq.body[lang] || `Could not find ${lang} translation`,
+                        title: faq.title?.[lang] || `Could not find ${lang} translation`,
+                        description: faq.body?.[lang] || `Could not find ${lang} translation`,
                         image: {
-                            url: faq.image_url[lang] || null
+                            url: faq.image_url?.[lang] || null
                         }
                     }],
                     ephemeral: true
