@@ -7,10 +7,12 @@ const {socket} = require('./socket')
 
 const faq_channels = [{
     webhook_id: '1063388838015279146',
-    message_id: '1063389533581885532'
+    message_id: '1063389533581885532',
+    lang: 'en'
 },{
     webhook_id: '1065719278780825730',
-    message_id: '1065719280504668271'
+    message_id: '1065719280504668271',
+    lang: 'it'
 }]
 
 //client.fetchWebhook('faq_webhook_id')
@@ -18,14 +20,14 @@ const faq_channels = [{
 client.on('interactionCreate', interaction => {
     if (interaction.isButton()) {
         if (interaction.customId.split('.')[0] == 'as_faq_click') {
-            getFaqReply(interaction.customId.split('.')[1]).then(payload => {
+            getFaqReply(interaction.customId.split('.')[1],interaction.customId.split('.')[2]).then(payload => {
                 interaction.reply(payload).catch(console.error)
             }).catch(console.error)
         }
     }
 })
 
-async function getFaqReply(faq_id) {
+async function getFaqReply(faq_id,lang) {
     return new Promise((resolve,reject) => {
         db.query(`SELECT * FROM as_faq WHERE faq_id = '${faq_id}';`).then(res => {
             if (res.rowCount != 1) {
@@ -42,10 +44,10 @@ async function getFaqReply(faq_id) {
                 return resolve({
                     content: ' ',
                     embeds: [{
-                        title: faq.title,
-                        description: faq.body,
+                        title: faq.title[lang] || `Could not find ${lang} translation`,
+                        description: faq.body[lang] || `Could not find ${lang} translation`,
                         image: {
-                            url: faq.image_url
+                            url: faq.image_url[lang] || null
                         }
                     }],
                     ephemeral: true
@@ -59,12 +61,12 @@ function updateFaqWebhookMessage() {
     db.query(`SELECT * FROM as_faq ORDER BY id;`).then(res => {
         faq_channels.forEach(channel => {
             client.fetchWebhook(channel.webhook_id).then(wh => {
-                wh.editMessage(channel.message_id, payloadGenerator(res.rows))
+                wh.editMessage(channel.message_id, payloadGenerator(res.rows,channel.lang))
             }).catch(console.error)
         })
     }).catch(console.error)
 
-    function payloadGenerator(faqs) {
+    function payloadGenerator(faqs,lang) {
         const payload = {content: ' ', embeds: [{description: 'Frequently Asked Questions are listed below. Click the button to view information'}], components: []}
         faqs.map((faq,index) => {
             const payload_index = Math.ceil((index + 1)/15) - 1
@@ -72,9 +74,9 @@ function updateFaqWebhookMessage() {
             if (!payload.components[component_index]) payload.components[component_index] = { type: 1, components: [] }
             payload.components[component_index].components.push({
                 type: 2,
-                label: faq.title,
+                label: faq.title[lang] || `Could not find ${lang} translation`,
                 style: 3,
-                custom_id: `as_faq_click.${faq.faq_id}`,
+                custom_id: `as_faq_click.${faq.faq_id}.${lang}`,
             })
         })
         return payload
