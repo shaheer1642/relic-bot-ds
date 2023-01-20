@@ -544,9 +544,10 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     squads = squads.sort(dynamicSort("main_relics"))
     squads.map((squad,index) => {
         var field_value = '\u200b'
-        if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) 
+        if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id))
             field_value = squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n')
         else {
+            field_value = `\`${squad.members.length}/4\``
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
             if (squad.is_steelpath) field_value += ' ' + emote_ids.steel_essence
             if (squad.is_railjack) field_value += ' ' + emote_ids.railjack
@@ -554,7 +555,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         }
         fields.push({
             name: `${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim(),
-            value: field_value,
+            value: field_value.trim(),
             inline: true
         })
         // if (squads.length <= 12) {
