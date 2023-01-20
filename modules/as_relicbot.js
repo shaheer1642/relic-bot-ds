@@ -547,7 +547,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id))
             field_value = squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n')
         else {
-            if (squad.members.length > 2) field_value += ' ' + `${squad.members.length}/4`
+            if (squad.members.length > 1) field_value += ' ' + `${squad.members.length}/4`
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
             if (squad.is_steelpath) field_value += ' ' + emote_ids.steel_essence
             if (squad.is_railjack) field_value += ' ' + emote_ids.railjack
@@ -593,7 +593,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             fields: fields,
             color: tier == 'lith'? 'GREEN' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'RED' : tier == 'axi' ? 'YELLOW' : '',
             footer: {
-                text: `(Type relic to host! i.e. ${tier == 'lith' ? 'lith o2' : tier == 'meso' ? 'meso o3' : tier == 'neo' ? 'neo v8' : tier == 'axi' ? 'axi L4' : 'neo v8'})`
+                text: `Type relic to host i.e. ${tier == 'lith' ? 'lith o2' : tier == 'meso' ? 'meso o3' : tier == 'neo' ? 'neo v8' : tier == 'axi' ? 'axi L4' : 'neo v8'}`
             }
         }],
         components: components
