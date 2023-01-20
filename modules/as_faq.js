@@ -67,7 +67,11 @@ function updateFaqWebhookMessage() {
     }).catch(console.error)
 
     function payloadGenerator(faqs,lang) {
-        const payload = {content: ' ', embeds: [{description: 'Frequently Asked Questions are listed below. Click the button to view information'}], components: []}
+        const payload = {content: ' ', embeds: [{
+            description: 
+            lang == 'it' ? 'Qui sono sono listate le domande fatte di frequente. Clicca sul pulsante per vedere le informazioni'
+            : 'Frequently Asked Questions are listed below. Click the button to view information'
+        }], components: []}
         faqs.forEach((faq,index) => {
             if (!faq.title[lang] || !faq.body[lang]) return
             const payload_index = Math.ceil((index + 1)/15) - 1
