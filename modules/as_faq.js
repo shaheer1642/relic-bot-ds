@@ -68,7 +68,8 @@ function updateFaqWebhookMessage() {
 
     function payloadGenerator(faqs,lang) {
         const payload = {content: ' ', embeds: [{description: 'Frequently Asked Questions are listed below. Click the button to view information'}], components: []}
-        faqs.map((faq,index) => {
+        faqs.forEach((faq,index) => {
+            if (!faq.title[lang] || !faq.body[lang]) return
             const payload_index = Math.ceil((index + 1)/15) - 1
             const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
             if (!payload.components[component_index]) payload.components[component_index] = { type: 1, components: [] }
