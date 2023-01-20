@@ -588,7 +588,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     const msg = {
         content: '\u200b',
         embeds: fields.length == 0 ? []:[{
-            title: `${emote_ids[tier]} ${convertUpper(tier)}`,
+            title: `${emote_ids[tier]} ${convertUpper(tier)} (Type relic to host! i.e. ${tier == 'lith' ? 'lith o2' : tier == 'meso' ? 'meso o3' : tier == 'neo' ? 'neo v8' : tier == 'axi' ? 'axi L4' : 'neo v8'} ; Click buttons to join)`,
             description: '⸻'.repeat(13),
             fields: fields,
             color: tier == 'lith'? 'GREEN' : tier == 'meso' ? 'BLUE' : tier == 'neo' ? 'RED' : tier == 'axi' ? 'YELLOW' : ''
