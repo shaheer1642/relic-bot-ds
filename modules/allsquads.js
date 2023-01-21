@@ -435,7 +435,7 @@ function edit_leaderboard() {
             const payload = {
                 content: ' ',
                 embeds: Object.keys(leaderboards).map(key =>
-                    ['top_squads'].includes(key) ? null :
+                    ['total_squads'].includes(key) ? null :
                     ({
                         title: key == 'top_squads' ? 'Top Squads This Week' : key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
                         description: `${key == 'top_squads' ? `Total: ${leaderboards.total_squads}`:''}\n${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
