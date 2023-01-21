@@ -885,7 +885,7 @@ socket.on('squadbot/squads/closed', async (squad) => {
                     label: "Rate Squad",
                     emoji: "⭐",
                     style: 2,
-                    custom_id: `as_users_rate_v2.${squad.members.join('_')}`
+                    custom_id: `as_users_rate.${squad.members.join('_')}`
                 }]
             }]
         })

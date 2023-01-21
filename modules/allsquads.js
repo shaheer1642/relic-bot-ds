@@ -183,11 +183,7 @@ client.on('interactionCreate', (interaction) => {
             // interaction.update({
             //     components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
             // }).catch(console.error)
-        } 
-        else if (interaction.customId.split('.')[0] == 'as_users_rate') {
-            interaction.reply({content: 'Sorry this button has been deprecated. Please try rating again in a newer squad', ephemeral: true}).catch(console.error)
-        }
-        else if (interaction.customId.split('.')[0] == 'as_users_rate_v2') {
+        } else if (interaction.customId.split('.')[0] == 'as_users_rate') {
             const discord_id = interaction.user.id
             const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
             const rated_user = interaction.customId.split('.')[2]
@@ -263,7 +259,7 @@ function generateRateUserEmbed(discord_id, member_ids) {
                         components: Array.from([1,2,3]).map(rating => ({
                             type: 2,
                             label: rating == 1 ? 'Horrible' : rating == 2 ? 'Decent' : rating == 3 ? 'Excellent' : 'undefined',
-                            custom_id: `as_users_rate_v2.${member_ids.filter(id => id != rate_user).join('_')}.${rate_user}.${rating}`,
+                            custom_id: `as_users_rate.${member_ids.filter(id => id != rate_user).join('_')}.${rate_user}.${rating}`,
                             style: rating == 1 ? 2 : rating == 2 ? 1 : rating == 3 ? 3 : 2,
                             emoji: rating == 3 ? '<:tobey:931278673154306109>' : null
                         }))
@@ -273,7 +269,7 @@ function generateRateUserEmbed(discord_id, member_ids) {
                         components: [{
                             type: 2,
                             label: 'Skip',
-                            custom_id: `as_users_rate_v2.${member_ids.filter(id => id != rate_user).join('_')}`,
+                            custom_id: `as_users_rate.${member_ids.filter(id => id != rate_user).join('_')}`,
                             style: 4
                         }]
                     })
