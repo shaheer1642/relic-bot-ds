@@ -437,7 +437,7 @@ function edit_leaderboard() {
                 embeds: Object.keys(leaderboards).map(key =>
                     ({
                         title: key == 'top_squads' ? 'Top Squads This Week' : key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
-                        description: `${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
+                        description: `${key == 'top_squads' ? `Total: ${leaderboards.total_squads}`:''}\n${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
                         fields: leaderboards[key].length > 0 ? [{
                             name: 'Rank',
                             value: leaderboards[key].map((e,index) => `${index+1}`).join('\n'),
