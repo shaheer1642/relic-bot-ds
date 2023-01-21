@@ -11,7 +11,7 @@ event_emitter.on('db_connected', () => {
 
 function updateUserRatings() {
     console.log('[as_users_ratings.updateUserRatings] called')
-    db.query(`SELECT * FROM as_users_ratings`).then(res => {
+    db.query(`SELECT * FROM as_users_ratings WHERE rating_type = 'squad_rating';`).then(res => {
         const db_user_ratings = res.rows;
         // as_users_ratings = {}
         // clear object but not with obj = {} bcoz this deletes reference in referenced files

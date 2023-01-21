@@ -189,7 +189,7 @@ client.on('interactionCreate', (interaction) => {
             const rated_user = interaction.customId.split('.')[2]
             const rating = interaction.customId.split('.')[3]
             if (rated_user && rating) {
-                socket.emit(`allsquads/user/ratings/create`,{discord_id: discord_id, rated_user: rated_user, rating: rating})
+                socket.emit(`allsquads/user/ratings/create`,{discord_id: discord_id, rated_user: rated_user, rating: rating, rating_type: 'squad_rating'})
             }
             if (member_ids.length == 1 && !member_ids[0]) {
                 const payload = {
@@ -209,6 +209,65 @@ client.on('interactionCreate', (interaction) => {
                     else interaction.reply(payload).catch(console.error)
                 }).catch(console.error)
             }
+        } else if (interaction.customId.split('.')[0] == 'as_host_rate') {
+            const discord_id = interaction.user.id
+            const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
+            const rated_user = interaction.customId.split('.')[2]
+            const rating = interaction.customId.split('.')[3]
+            if (rated_user && rating) {
+                socket.emit(`allsquads/user/ratings/create`,{discord_id: discord_id, rated_user: rated_user, rating: rating, rating_type: 'host_rating'})
+                const payload = {
+                    content: ' ',
+                    embeds: [{
+                        description: '**Thank you for rating!**\nThis information will help choosing the best host for you in future squads',
+                        color: 'ORANGE'
+                    }],
+                    components: [],
+                    ephemeral: true
+                }
+                if (interaction.message.type == 'REPLY') interaction.update(payload).catch(console.error)
+                else interaction.reply(payload).catch(console.error)
+            } else {
+                interaction.reply({
+                    content: ' ',
+                    embeds: [{
+                        description: '**Please select who was the host:**',
+                        color: 'BLUE'
+                    }],
+                    components: [{
+                        type: 1,
+                        components: member_ids.map(id => ({
+                            type: 2,
+                            label: users_list[id]?.ingame_name,
+                            custom_id: `as_host_rate_selected_host.${member_ids}.${id}`,
+                            style: 2
+                        }))
+                    }],
+                    ephemeral: true
+                }).catch(console.log)
+            }
+        } else if (interaction.customId.split('.')[0] == 'as_host_rate_selected_host') {
+            const discord_id = interaction.user.id
+            const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
+            const rate_user = interaction.customId.split('.')[2]
+            interaction.reply({
+                content: ' ',
+                embeds: [{
+                    description: `**How much was your ping (ms) with ${users_list[rate_user]?.ingame_name}**`,
+                    color: 'BLUE'
+                }],
+                components: [{
+                    type: 1,
+                    components: Array.from([1,2,3,4,5]).map(rating => ({
+                        type: 2,
+                        label: rating == 1 ? '10 - 99' : rating == 2 ? '100 - 199' : rating == 3 ? '200 - 299' : rating == 4 ? '300 - 399' : rating == 4 ? '400+' : 'undefined',
+                        custom_id: `as_host_rate.${member_ids}.${rate_user}.${rating}`,
+                        style: rating == 1 ? 1 : rating == 2 ? 1 : rating == 3 ? 3 : rating == 4 ? 3 : rating == 5 ? 3 : 2,
+                        emoji: rating == 1 ? '<:tobey:931278673154306109>' : null
+                    }))
+                }],
+                ephemeral: true
+            }).catch(console.log)
         }
     }
     if (interaction.isModalSubmit()) {
@@ -232,7 +291,7 @@ client.on('interactionCreate', (interaction) => {
 
 function generateRateUserEmbed(discord_id, member_ids) {
     return new Promise((resolve,reject) => {
-        socket.emit(`allsquads/user/ratings/fetch`,{discord_id: discord_id},(res) => {
+        socket.emit(`allsquads/user/ratings/fetch`,{discord_id: discord_id, rating_type: 'squad_rating'},(res) => {
             if (res.code == 200) {
                 const rated_users = res.data
                 const payload = {content: ' ', embeds: [], components: [], ephemeral: true}
