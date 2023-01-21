@@ -843,12 +843,19 @@ socket.on('squadbot/squads/opened', async (payload) => {
                 }],
                 components: [{
                     type: 1,
-                    components: [{
+                    components: [
+                        squad.squad_string == 'aya_farm' ? {
+                            type: 2,
+                            label: `Best ways to farm Aya`,
+                            style: 3,
+                            custom_id: '47462eb6-982e-11ed-9ae6-0242ac1100a8',
+                        } : null,
+                        {
                         type: 2,
                         label: `Become Host`,
                         style: 1,
                         custom_id: `as_sq_become_host.squadbot.${squad.squad_id}`,
-                    }]
+                    }].filter(o => o !== null)
                 }]
             }).then(msg => {
                 squadOpenMessages[`${squad.squad_id}_${thread.id}`] = msg
