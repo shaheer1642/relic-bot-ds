@@ -69,7 +69,7 @@ function updateFaqWebhookMessage() {
     function payloadGenerator(faqs,lang) {
         const payload = {content: ' ', embeds: [{
             description: 
-            lang == 'it' ? 'Qui sono sono listate le domande fatte di frequente. Clicca sul pulsante per vedere le informazioni'
+            lang == 'it' ? 'Qui sono listate le domande fatte di frequente. Clicca sul pulsante per vedere le informazioni'
             : 'Frequently Asked Questions are listed below. Click the button to view information'
         }], components: []}
         faqs.forEach((faq,index) => {
