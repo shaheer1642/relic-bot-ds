@@ -256,12 +256,12 @@ function generateRateUserEmbed(discord_id, member_ids) {
                     })
                     payload.components.push({
                         type: 1,
-                        components: Array.from([1,2,3,4,5]).map(rating => ({
+                        components: Array.from([1,2,3]).map(rating => ({
                             type: 2,
-                            label: rating == 1 ? 'Horrible' : rating == 2 ? 'Decent' : rating == 3 ? 'Good' : rating == 4 ? 'Very Good' : rating == 5 ? 'Excellent' : 'undefined',
+                            label: rating == 1 ? 'Horrible' : rating == 2 ? 'Decent' : rating == 3 ? 'Excellent' : 'undefined',
                             custom_id: `as_users_rate.${member_ids.filter(id => id != rate_user).join('_')}.${rate_user}.${rating}`,
-                            style: rating == 1 ? 2 : rating == 2 ? 1 : rating == 3 ? 1 : rating == 4 ? 3 : rating == 5 ? 3 : 2,
-                            emoji: rating == 5 ? '<:tobey:931278673154306109>' : null
+                            style: rating == 1 ? 2 : rating == 2 ? 1 : rating == 3 ? 3 : 2,
+                            emoji: rating == 3 ? '<:tobey:931278673154306109>' : null
                         }))
                     })
                     payload.components.push({

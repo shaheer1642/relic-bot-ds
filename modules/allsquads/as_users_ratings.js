@@ -28,7 +28,7 @@ function updateUserRatings() {
         // console.log(JSON.stringify(as_users_ratings,null,4))
         Object.keys(as_users_ratings).forEach(user_id => {
             as_users_ratings[user_id].rating = calcArrAvg(as_users_ratings[user_id].ratings)
-            if (as_users_ratings[user_id].rating >= 4.25)
+            if (as_users_ratings[user_id].rating >= 2.5)
                 as_users_ratings[user_id].highly_rated = true
         })
         // console.log(JSON.stringify(as_users_ratings,null,4))
