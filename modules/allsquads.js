@@ -219,7 +219,7 @@ client.on('interactionCreate', (interaction) => {
                 const payload = {
                     content: ' ',
                     embeds: [{
-                        description: '**Thank you for rating!**\nThis information will help choosing the best host for you in future squads',
+                        description: '**Thank you for rating!**\n\nThis information will help choosing the best host for you in future squads',
                         color: 'ORANGE'
                     }],
                     components: [],
@@ -231,7 +231,7 @@ client.on('interactionCreate', (interaction) => {
                 interaction.reply({
                     content: ' ',
                     embeds: [{
-                        description: '**Please select who was the host:**',
+                        description: '**Please select who was the host**',
                         color: 'BLUE'
                     }],
                     components: [{
@@ -240,7 +240,7 @@ client.on('interactionCreate', (interaction) => {
                             type: 2,
                             label: users_list[id]?.ingame_name,
                             custom_id: `as_host_rate_selected_host.${member_ids}.${id}`,
-                            style: 2
+                            style: 3
                         }))
                     }],
                     ephemeral: true
@@ -250,19 +250,19 @@ client.on('interactionCreate', (interaction) => {
             const discord_id = interaction.user.id
             const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
             const rate_user = interaction.customId.split('.')[2]
-            interaction.reply({
+            interaction.update({
                 content: ' ',
                 embeds: [{
-                    description: `**How much was your ping (ms) with ${users_list[rate_user]?.ingame_name}**`,
+                    description: `How much was your ping (ms) with **${users_list[rate_user]?.ingame_name}**`,
                     color: 'BLUE'
                 }],
                 components: [{
                     type: 1,
                     components: Array.from([1,2,3,4,5]).map(rating => ({
                         type: 2,
-                        label: rating == 1 ? '10 - 99' : rating == 2 ? '100 - 199' : rating == 3 ? '200 - 299' : rating == 4 ? '300 - 399' : rating == 4 ? '400+' : 'undefined',
+                        label: rating == 1 ? '10 - 99' : rating == 2 ? '100 - 199' : rating == 3 ? '200 - 299' : rating == 4 ? '300 - 399' : rating == 5 ? '400+' : 'undefined',
                         custom_id: `as_host_rate.${member_ids}.${rate_user}.${rating}`,
-                        style: rating == 1 ? 1 : rating == 2 ? 1 : rating == 3 ? 3 : rating == 4 ? 3 : rating == 5 ? 3 : 2,
+                        style: rating == 1 ? 3 : rating == 2 ? 1 : rating == 3 ? 1 : rating == 4 ? 4 : rating == 5 ? 4 : 2,
                         emoji: rating == 1 ? '<:tobey:931278673154306109>' : null
                     }))
                 }],

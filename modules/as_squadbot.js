@@ -888,11 +888,10 @@ socket.on('squadbot/squads/closed', async (squad) => {
                     custom_id: `as_users_rate.${squad.members.join('_')}`
                 },{
                     type: 2,
-                    label: "Rate Host Connection",
+                    label: "Rate Host",
                     emoji: "⚡",
                     style: 2,
                     custom_id: `as_host_rate.${squad.members.join('_')}`,
-                    disabled: squad.members.includes('892087497998348349') ? false : true
                 },]
             }]
         })
