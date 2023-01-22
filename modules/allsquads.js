@@ -222,7 +222,7 @@ client.on('interactionCreate', (interaction) => {
                         components: member_ids.map(id => ({
                             type: 2,
                             label: users_list[id]?.ingame_name,
-                            custom_id: `as_host_rate_selected_host.${member_ids}.${id}`,
+                            custom_id: `as_host_rate_selected_host..${id}`,
                             style: 3
                         }))
                     }],
@@ -231,7 +231,7 @@ client.on('interactionCreate', (interaction) => {
             }
         } else if (interaction.customId.split('.')[0] == 'as_host_rate_selected_host') {
             const discord_id = interaction.user.id
-            const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
+            // const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
             const rate_user = interaction.customId.split('.')[2]
             interaction.update({
                 content: ' ',
@@ -244,7 +244,7 @@ client.on('interactionCreate', (interaction) => {
                     components: Array.from([1,2,3,4,5]).map(rating => ({
                         type: 2,
                         label: rating == 1 ? '10 - 99' : rating == 2 ? '100 - 199' : rating == 3 ? '200 - 299' : rating == 4 ? '300 - 399' : rating == 5 ? '400+' : 'undefined',
-                        custom_id: `as_host_rate.${member_ids}.${rate_user}.${rating}`,
+                        custom_id: `as_host_rate..${rate_user}.${rating}`,
                         style: rating == 1 ? 3 : rating == 2 ? 1 : rating == 3 ? 1 : rating == 4 ? 4 : rating == 5 ? 4 : 2,
                         emoji: rating == 1 ? '<:tobey:931278673154306109>' : null
                     }))
