@@ -184,31 +184,14 @@ client.on('interactionCreate', (interaction) => {
             //     components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
             // }).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_users_rate') {
-            const discord_id = interaction.user.id
-            const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
-            const rated_user = interaction.customId.split('.')[2]
-            const rating = interaction.customId.split('.')[3]
-            if (rated_user && rating) {
-                socket.emit(`allsquads/user/ratings/create`,{discord_id: discord_id, rated_user: rated_user, rating: rating, rating_type: 'squad_rating'})
-            }
-            if (member_ids.length == 1 && !member_ids[0]) {
-                const payload = {
-                    content: ' ',
-                    embeds: [{
-                        description: '**Thank you for rating!**',
-                        color: 'ORANGE'
-                    }],
-                    components: [],
-                    ephemeral: true
+            computeRateUser(interaction.customId, interaction.user.id).then(res => {
+                if (res.payload_type == 'reply') {
+                    if (interaction.message.type == 'REPLY') interaction.update(res.payload).catch(console.error)
+                    else interaction.reply(res.payload).catch(console.error)
+                } else if (res.payload_type == 'show_modal') {
+                    interaction.showModal(res.payload).catch(console.error)
                 }
-                if (interaction.message.type == 'REPLY') interaction.update(payload).catch(console.error)
-                else interaction.reply(payload).catch(console.error)
-            } else {
-                generateRateUserEmbed(discord_id,member_ids).then(payload => {
-                    if (interaction.message.type == 'REPLY') interaction.update(payload).catch(console.error)
-                    else interaction.reply(payload).catch(console.error)
-                }).catch(console.error)
-            }
+            }).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_host_rate') {
             const discord_id = interaction.user.id
             const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != discord_id)
@@ -285,9 +268,63 @@ client.on('interactionCreate', (interaction) => {
                     }).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
+        } else if (interaction.customId.split('.')[0] == 'as_users_rate') {
+            computeRateUser(`${interaction.customId}.${interaction.fields.getTextInputValue('reason')}`, interaction.user.id).then(res => {
+                interaction.update(res.payload).catch(console.error)
+            }).catch(console.error)
         }
     }
 })
+
+async function computeRateUser(query,discord_id) {
+    return new Promise((resolve,reject) => {
+        const member_ids = (query.split('.')[1]).split('_').filter(id => id != discord_id)
+        const rated_user = query.split('.')[2]
+        const rating = query.split('.')[3]
+        const reason = query.split('.')[4]
+        if (rated_user && rating) {
+            if (rating == 1 & !reason) {
+                return resolve({payload_type: 'show_modal', payload: {
+                    title: "User Rating",
+                    custom_id: query,
+                    components: [
+                        {
+                            type: 1,
+                            components: [{
+                                type: 4,
+                                custom_id: "reason",
+                                label: "Reason",
+                                style: 2,
+                                min_length: 5,
+                                max_length: 200,
+                                placeholder: "Please provide a reason why you chose this rating",
+                                required: true
+                            }]
+                        }
+                    ]
+                }})
+            } else {
+                socket.emit(`allsquads/user/ratings/create`,{discord_id: discord_id, rated_user: rated_user, rating: rating, rating_type: 'squad_rating', reason: reason})
+            }
+        }
+        if (member_ids.length == 1 && !member_ids[0]) {
+            const payload = {
+                content: ' ',
+                embeds: [{
+                    description: '**Thank you for rating!**',
+                    color: 'ORANGE'
+                }],
+                components: [],
+                ephemeral: true
+            }
+            return resolve({payload_type: 'reply', payload: payload})
+        } else {
+            generateRateUserEmbed(discord_id,member_ids).then(payload => {
+                return resolve({payload_type: 'reply', payload: payload})
+            }).catch(console.error)
+        }
+    })
+}
 
 function generateRateUserEmbed(discord_id, member_ids) {
     return new Promise((resolve,reject) => {
