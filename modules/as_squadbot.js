@@ -848,7 +848,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
                             type: 2,
                             label: `Best ways to farm Aya`,
                             style: 3,
-                            custom_id: '47462eb6-982e-11ed-9ae6-0242ac1100a8',
+                            custom_id: 'as_faq_click.47462eb6-982e-11ed-9ae6-0242ac1100a8',
                         } : null,
                         {
                         type: 2,
