@@ -46,7 +46,7 @@ function closeGiveaway(giveawayObj) {
             }
             winners_list = winners_list.filter(o => o != undefined)
             db.query(`
-                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}', status = 'ended' WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
+                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}', status = '${winners_list.length == 0? 'cancelled':'ended'}' WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
             `).catch(console.error)
         }).catch(console.error)
     }, giveawayObj.expiry_timestamp - new Date().getTime());
@@ -148,7 +148,7 @@ client.on('interactionCreate', async (interaction) => {
                         value: rp_cost.toString(),
                         inline: true
                     },{
-                        name: 'Expires',
+                        name: 'Ends',
                         value: `<t:${Math.round(Number(new Date().getTime() + expiration) / 1000)}:R>`,
                         inline: true
                     },],
@@ -305,7 +305,7 @@ function embedGenerator(giveaway) {
                 value: giveaway.rp_cost.toString(),
                 inline: true
             },{
-                name: 'Expires',
+                name: 'Ends',
                 value: `<t:${Math.round(giveaway.expiry_timestamp / 1000)}:R>`,
                 inline: true
             },],
