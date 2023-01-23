@@ -14,7 +14,7 @@ const guild_id = '865904902941048862'
 const channel_id = '890198895508992020'
 
 // function replyAndDelete(channel, message) {
-//     channel.send({
+//     channel.send({ 
 //         content: message
 //     }).then(msg => {
 //         setTimeout(() => {
