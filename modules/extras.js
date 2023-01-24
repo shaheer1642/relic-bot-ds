@@ -136,4 +136,8 @@ function ms_till_monday_12am() {
     return ms
 }
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper,ms_to_days_hours,ms_till_monday_12am};
+function sortCaseInsensitive(arr,descending) {
+    return arr.sort((a,b) => a.replace(/"/g,'').toLowerCase() < b.replace(/"/g,'').toLowerCase() ? descending ? 1 : -1 : descending ? -1 : 1)
+}
+
+module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper,ms_to_days_hours,ms_till_monday_12am,sortCaseInsensitive};

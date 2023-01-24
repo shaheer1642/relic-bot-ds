@@ -4,7 +4,7 @@ const uuid = require('uuid')
 const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper, sortCaseInsensitive} = require('./extras.js');
 const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
@@ -693,7 +693,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: relicBotSquadToString(squad,true),
-                    description: `Please decide a host and invite each other in the game\n\n/invite ${squad.members.map(id => enquote(users_list[id]?.ingame_name)).sort().join('\n/invite ').replace(/_/g, '\\_')}`,
+                    description: `Please decide a host and invite each other in the game\n\n/invite ${sortCaseInsensitive(squad.members.map(id => enquote(users_list[id]?.ingame_name))).join('\n/invite ').replace(/_/g, '\\_')}`,
                     footer: {
                         text: `This squad will auto-close in 15m`
                     }
