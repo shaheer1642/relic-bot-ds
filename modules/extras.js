@@ -140,4 +140,30 @@ function sortCaseInsensitive(arr,descending) {
     return arr.sort((a,b) => a.replace(/"/g,'').toLowerCase() < b.replace(/"/g,'').toLowerCase() ? descending ? 1 : -1 : descending ? -1 : 1)
 }
 
-module.exports = {dynamicSort,dynamicSortDesc,inform_dc,mod_log,msToTime,msToFullTime,getRandomColor,embedScore,convertUpper,ms_to_days_hours,ms_till_monday_12am,sortCaseInsensitive};
+function arrToStringsArrWithLimit(key_term,list,limit) {
+    const strings_arr = []
+    var str = `${key_term} `
+    list.forEach(element => {
+        if ((str + element).length >= limit) {
+            strings_arr.push(str.trim())
+            str = `${key_term} `
+        }
+        str = `${str} ${element}`
+    });
+    strings_arr.push(str)
+    return strings_arr;
+}
+
+module.exports = {
+    dynamicSort,
+    dynamicSortDesc,
+    inform_dc,mod_log,
+    msToTime,msToFullTime,
+    getRandomColor,
+    embedScore,
+    convertUpper,
+    ms_to_days_hours,
+    ms_till_monday_12am,
+    sortCaseInsensitive,
+    arrToStringsArrWithLimit
+};
