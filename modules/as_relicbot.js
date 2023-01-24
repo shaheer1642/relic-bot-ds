@@ -569,7 +569,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         if (!components[k]) components[k] = {type: 1, components: []}
         components[k].components.push({
             type: 2,
-            label: `${squad.members.length > 2 ? emote_ids.hot:''} ${squad.is_old? emote_ids.cold:''} ${squad.main_relics.join(' ').toUpperCase()}`.replace(/\s+/g, ' ').trim(),
+            label: labelNameGenerator(squad,index),
             style: squad.members.length > 1 ? 3 : 2,
             custom_id: `rb_sq_${squad.squad_id}`
         })
@@ -597,6 +597,21 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             }
         }],
         components: components
+    }
+
+    function labelNameGenerator(squad, index) {
+        var label = ''
+        if (squad.members.length > 2)
+            label += `${emote_ids.hot} `
+        if (squads[index-1]?.squad.main_relics.join(' ') == squads.squad.main_relics.join(' ')) {
+            if ((label + relicBotSquadToString(squad, false, true)).length < 80)
+                label += relicBotSquadToString(squad, false, true)
+            else
+                label += squad.main_relics.join(' ').toUpperCase()
+        } else {
+            label += squad.main_relics.join(' ').toUpperCase()
+        }
+        return label.replace(/\s+/g, ' ').trim()
     }
     return msg
 }
