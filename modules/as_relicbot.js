@@ -541,6 +541,8 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     // console.log('[as_relicbot.embed] as_users_ratings',as_users_ratings)
     var fields = []
     var components = []
+    squads = squads.sort(dynamicSort("main_refinements"))
+    squads = squads.sort(dynamicSortDesc("squad_type"))
     squads = squads.sort(dynamicSort("main_relics"))
     squads.map((squad,index) => {
         var field_value = '\u200b'
@@ -603,7 +605,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         var label = ''
         if (squad.members.length > 2)
             label += `${emote_ids.hot} `
-        if (squads[index-1]?.squad.main_relics.join(' ') == squads.squad.main_relics.join(' ')) {
+        if (squads[index-1]?.main_relics.join(' ') == squad.main_relics.join(' ') || squads[index+1]?.main_relics.join(' ') == squad.main_relics.join(' ')) {
             if ((label + relicBotSquadToString(squad, false, true)).length < 80)
                 label += relicBotSquadToString(squad, false, true)
             else
