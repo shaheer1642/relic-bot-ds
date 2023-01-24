@@ -4,7 +4,7 @@ const uuid = require('uuid')
 const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper, sortCaseInsensitive} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper, sortCaseInsensitive, arrToStringsArrWithLimit} = require('./extras.js');
 const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
@@ -781,13 +781,15 @@ socket.on('squadbot/squadCreate', (squad) => {
                     }, 120000);
                 })
                 if (discord_ids.length > 0) {
-                    new WebhookClient({url: webhooks_list[channel_id]}).send({
-                        content: `Someone is looking for ${convertUpper(squad.squad_string)} squad ${discord_ids.map(id => `<@${id}>`).join(', ')}`
-                    }).then(res => {
-                        setTimeout(() => {
-                            new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
-                        }, 10000);
-                    }).catch(console.error)
+                    arrToStringsArrWithLimit(`Someone is looking for ${convertUpper(squad.squad_string)} squad`, discord_ids.map(id => `<@${id}>`), 2000).forEach(str => {
+                        new WebhookClient({url: webhooks_list[channel_id]}).send({
+                            content: str
+                        }).then(res => {
+                            setTimeout(() => {
+                                new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
+                            }, 10000);
+                        }).catch(console.error)
+                    })
                 }
             }
         }
