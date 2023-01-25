@@ -624,7 +624,7 @@ function calculateBestPingRating(discord_ids) {
     })
     var hosts = Object.keys(hosts_rating).map(key => ({...hosts_rating[key], discord_id: key, ign: as_users_list[key]?.ingame_name}))
     hosts = hosts.sort(dynamicSort('considered_ping'))
-    return JSON.stringify(hosts)
+    return hosts
 
     function getPingFromRating(rating) {
         const high = Math.round(rating * 100)
