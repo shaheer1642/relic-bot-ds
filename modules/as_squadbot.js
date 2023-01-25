@@ -627,7 +627,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
             if (squad.members.length > 0) {
                 payloads[payload_index].embeds[0].fields.push({
                     name: convertUpper(squad.squad_string),
-                    value: squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n'),
+                    value: squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n').replace(/_/g, '\\_'),
                     inline: true
                 })
             }
@@ -936,7 +936,7 @@ async function logSquad(squad,include_chat,action) {
     const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
     const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`
     const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
-    const squadPingAlgo = `**⸻ Squad Ping Algorithm (Testing Purposes) ⸻**\n${calculateBestPingRating(squad.members)}`
+    const squadPingAlgo = calculateBestPingRating(squad.members)
     if (include_chat) {
         socket.emit('squadbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
@@ -977,7 +977,7 @@ async function logSquad(squad,include_chat,action) {
             content: convertUpper(action),
             embeds: [{
                 title: convertUpper(squad.squad_string),
-                description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadPingAlgo}`.trim().replace(/_/g, '\\_'),
+                description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n**⸻ Squad Ping Algorithm (Testing Purposes) ⸻**\n**Best Selected Host = ${squadPingAlgo[0].ign} with avg squad ping of ${squadPingAlgo[0].avg_squad_ping}**\n${JSON.stringify(squadPingAlgo)}`.trim().replace(/_/g, '\\_'),
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
