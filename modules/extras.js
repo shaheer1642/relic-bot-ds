@@ -154,6 +154,14 @@ function arrToStringsArrWithLimit(key_term,list,limit) {
     return strings_arr;
 }
 
+function calcArrAvg(arr) {
+    var sum = 0
+    arr.forEach(value => {
+        sum += value
+    })
+    return sum / arr.length
+}
+
 module.exports = {
     dynamicSort,
     dynamicSortDesc,
@@ -165,5 +173,6 @@ module.exports = {
     ms_to_days_hours,
     ms_till_monday_12am,
     sortCaseInsensitive,
-    arrToStringsArrWithLimit
+    arrToStringsArrWithLimit,
+    calcArrAvg
 };

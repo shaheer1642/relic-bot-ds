@@ -9,7 +9,7 @@ const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
-const {translatePayload} = require('./allsquads')
+const {translatePayload,calculateBestPingRating} = require('./allsquads')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
 
@@ -936,6 +936,7 @@ async function logSquad(squad,include_chat,action) {
     const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
     const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`
     const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
+    const squadPingAlgo = `**⸻ Squad Ping Algorithm (Testing Purposes) ⸻**\n${calculateBestPingRating(squad.members)}`
     if (include_chat) {
         socket.emit('squadbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
@@ -976,7 +977,7 @@ async function logSquad(squad,include_chat,action) {
             content: convertUpper(action),
             embeds: [{
                 title: convertUpper(squad.squad_string),
-                description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}`.trim().replace(/_/g, '\\_'),
+                description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadPingAlgo}`.trim().replace(/_/g, '\\_'),
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`

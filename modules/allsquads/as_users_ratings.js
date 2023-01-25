@@ -4,9 +4,11 @@ const {db} = require('../db_connection')
 const {event_emitter} = require('../event_emitter')
 
 var as_users_ratings = {}
+var as_hosts_ratings = {}
 
 event_emitter.on('db_connected', () => {
     updateUserRatings()
+    updateHostRatings()
 })
 
 function updateUserRatings() {
@@ -52,14 +54,30 @@ function updateUserRatings() {
         return sum / arr.length
     }
 }
+function updateHostRatings() {
+    console.log('[as_users_ratings.updateHostRatings] called')
+    db.query(`SELECT * FROM as_users_ratings WHERE rating_type = 'host_rating';`).then(res => {
+        const db_host_ratings = res.rows;
+        Object.keys(as_hosts_ratings).forEach(key => {
+            delete as_hosts_ratings[key]
+        })
+        db_host_ratings.forEach(user_rating => {
+            if (!as_hosts_ratings[user_rating.rated_user]) as_hosts_ratings[user_rating.rated_user] = {}
+            as_hosts_ratings[user_rating.rated_user][user_rating.discord_id] = user_rating.rating
+        })
+        console.log('[as_users_ratings.updateHostRatings] finished',as_hosts_ratings)
+    }).catch(console.error)
+}
 
 db.on('notification',(notification) => {
     // const payload = JSONbig.parse(notification.payload);
     if (['as_users_ratings_insert','as_users_ratings_update','as_users_ratings_delete'].includes(notification.channel)) {
         updateUserRatings()
+        updateHostRatings()
     }
 })
 
 module.exports = {
-    as_users_ratings
+    as_users_ratings,
+    as_hosts_ratings
 }
