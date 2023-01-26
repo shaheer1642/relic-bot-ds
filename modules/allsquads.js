@@ -503,7 +503,7 @@ function edit_leaderboard() {
 }
 function edit_staff_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: [], exclude_daily: false, exclude_squads: false}, (res) => {
+    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: [], exclude_daily: false, exclude_squads: false}, async (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             const payload = {
@@ -530,7 +530,11 @@ function edit_staff_leaderboard() {
                     })
                 ).filter(o => o !== null)
             }
-            client.channels.cache.get('1068289256268775534')?.messages.cache.get('1068289280889344010')?.edit(payload).catch(console.error)
+            const cnl = client.channels.cache.get('1068289256268775534') || await client.channels.fetch('1068289256268775534').catch(console.error)
+            if (!cnl) return
+            const msg = cnl.messages.cache.get('1068289280889344010') || await cnl.messages.fetch('1068289280889344010').catch(console.error)
+            if (!msg) return
+            msg.edit(payload).catch(console.error)
         }
     })
 }
