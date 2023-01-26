@@ -817,7 +817,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
     // host selection
     var hosts = calculateBestPingRating(squad.members);
     var host_selection;
-    if (hosts[0].considered_ping == null) {
+    if (hosts[0].considered_ping == Infinity) {
         host_selection = `Please decide a host and invite each other in the game`
     } else {
         host_selection = `Recommended Host: **${hosts[0].ign}** with avg squad ping of **${hosts[0].avg_squad_ping}**`
