@@ -814,6 +814,14 @@ socket.on('squadbot/squads/opened', async (payload) => {
         if (!channel_ids[channel_id]) channel_ids[channel_id] = []
         channel_ids[channel_id].push(discord_id)
     }
+    // host selection
+    var hosts = calculateBestPingRating(squad.members);
+    var host_selection;
+    if (hosts[0].considered_ping == null) {
+        host_selection = `Please decide a host and invite each other in the game`
+    } else {
+        host_selection = `Recommended Host: **${hosts[0].ign}** with avg squad ping of **${hosts[0].avg_squad_ping}**`
+    }
     //console.log('channel_ids:',channel_ids)
     //send dms
     for (const channel_id in channel_ids) {
@@ -838,7 +846,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: convertUpper(squad.squad_string),
-                    description: `Please decide a host and invite each other in the game\n\n/invite ${sortCaseInsensitive(squad.members.map(id => enquote(users_list[id]?.ingame_name))).join('\n/invite ').replace(/_/g, '\\_')}`,
+                    description: `${host_selection}\n\n/invite ${sortCaseInsensitive(squad.members.map(id => enquote(users_list[id]?.ingame_name))).join('\n/invite ').replace(/_/g, '\\_')}`,
                     footer: {
                         text: `This squad will auto-close in ${Math.round(squad.squad_closure / 60 / 1000)}m`
                     }
