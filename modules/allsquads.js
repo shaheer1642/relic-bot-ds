@@ -618,7 +618,7 @@ function calculateBestPingRating(discord_ids) {
             relative_ping_precision: relative_ping_precision,
             global_ping: global_ping || Infinity,
             global_ping_precision: global_ping_precision,
-            considered_ping: (relative_ping_precision/(discord_ids.length - 1)) >= 0.5 ? relative_ping : global_ping  || Infinity,
+            considered_ping: (((relative_ping_precision/(discord_ids.length - 1)) >= 0.5) ? relative_ping : (global_ping_precision >= 5 ? global_ping : Infinity)) || Infinity,
             avg_squad_ping: getPingFromRating(considered_ping)
         }
     })
