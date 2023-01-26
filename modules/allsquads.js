@@ -611,14 +611,14 @@ function calculateBestPingRating(discord_ids) {
         const global_ping = calcArrAvg(global_ratings)
         const global_ping_precision = global_ratings.length
         // calculate considered ping
-        const considered_ping = (relative_ping_precision/(discord_ids.length - 1)) >= 0.5 ? relative_ping : global_ping  || Infinity
+        const considered_ping = (((relative_ping_precision/(discord_ids.length - 1)) >= 0.5) ? relative_ping : (global_ping_precision >= 5 ? global_ping : Infinity)) || Infinity
         // assign values
         hosts_rating[host_id] = {
             relative_ping: relative_ping || Infinity,
             relative_ping_precision: relative_ping_precision,
             global_ping: global_ping || Infinity,
             global_ping_precision: global_ping_precision,
-            considered_ping: (((relative_ping_precision/(discord_ids.length - 1)) >= 0.5) ? relative_ping : (global_ping_precision >= 5 ? global_ping : Infinity)) || Infinity,
+            considered_ping: considered_ping,
             avg_squad_ping: getPingFromRating(considered_ping)
         }
     })
