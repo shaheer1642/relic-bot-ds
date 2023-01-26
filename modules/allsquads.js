@@ -20,8 +20,10 @@ client.on('ready', () => {
     edit_vip_message()
     assign_allsquads_roles()
     edit_leaderboard()
+    edit_staff_leaderboard()
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
+    setInterval(edit_staff_leaderboard, 300000);
 })
 
 event_emitter.on('allSquadsNewUserVerified', async data => {
@@ -468,7 +470,7 @@ async function assign_allsquads_roles() {
 
 function edit_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: ['253525146923433984','739833841686020216'], exclude_daily: true}, (res) => {
+    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: ['253525146923433984','739833841686020216'], exclude_daily: true, exclude_squads: true}, (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             const payload = {
@@ -496,6 +498,39 @@ function edit_leaderboard() {
                 ).filter(o => o !== null)
             }
             client.fetchWebhook('1064203940209643542').then(wh => wh.editMessage('1064203945834184745', payload).catch(console.error)).catch(console.error)
+        }
+    })
+}
+function edit_staff_leaderboard() {
+    console.log('[allsquads.edit_leaderboard] called')
+    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: [], exclude_daily: false, exclude_squads: false}, (res) => {
+        if (res.code == 200) {
+            const leaderboards = res.data
+            const payload = {
+                content: ' ',
+                embeds: Object.keys(leaderboards).map(key =>
+                    ['total_squads'].includes(key) ? null :
+                    ({
+                        title: key == 'top_squads' ? 'Top Squads This Week' : key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
+                        description: `${key == 'top_squads' ? `Total: ${leaderboards.total_squads}`:''}\n${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
+                        fields: leaderboards[key].length > 0 ? [{
+                            name: 'Rank',
+                            value: leaderboards[key].map((e,index) => `${index+1}`).join('\n'),
+                            inline: true
+                        },{
+                            name: key == 'top_squads' ? 'Squad' : 'Player',
+                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
+                            inline: true
+                        },{
+                            name: key == 'top_squads' ? 'Hosts' : 'Reputation',
+                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${squad.hosts}`).join('\n') : leaderboards[key].map(user => `${parseFloat(user.reputation.toFixed(2))}`).join('\n'),
+                            inline: true
+                        }] : [],
+                        color: key == 'top_squads' ? 'BLUE' : 'ORANGE'
+                    })
+                ).filter(o => o !== null)
+            }
+            client.channels.cache.get('1068289256268775534')?.messages.cache.get('1068289280889344010')?.edit(payload).catch(console.error)
         }
     })
 }
