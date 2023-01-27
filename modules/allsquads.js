@@ -40,7 +40,7 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
     })
 
     function payloadsGenerator() {
-        const squad_trackers = ['aya_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
+        const squad_trackers = ['aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
         'sister_(murmur)','endo_arena','archon_hunt']
         const relic_trackers = ['lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
         'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','meso f2 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
