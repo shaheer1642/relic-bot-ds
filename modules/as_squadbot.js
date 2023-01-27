@@ -44,8 +44,8 @@ const default_squads = [{
     members: [],
     is_default: true
 },{
-    squad_string: 'alert',
-    spots: 3,
+    squad_string: 'void_traces_farm',
+    spots: 4,
     members: [],
     is_default: true
 },{

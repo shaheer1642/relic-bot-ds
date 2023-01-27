@@ -23,6 +23,7 @@ const emote_ids = {
     sister: '<:lohkglyph2:1054126094715981944>',
     endo: '<:endo:962507075475370005>',
     archon: '<:tau_crimson_shard:1050150452852949073>',
+    traces: '<:void_traces:1068489485807009845>',
 }
 
 function emoteObjFromSquadString(squad_string) {
