@@ -11,6 +11,7 @@ const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
 const {translatePayload, calculateBestPingRating} = require('./allsquads')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
+const {as_users_list} = require('./allsquads/as_users_list')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -39,7 +40,6 @@ client.on('ready', async () => {
         edit_recruitment_intro()
         fissures_check()
     }).catch(console.error)
-    update_users_list()
 })
 
 function handleSquadCreateResponses(channel_id,discord_id,responses) {
@@ -382,18 +382,6 @@ function assign_global_variables() {
     })
 }
 
-var users_list = {}
-function update_users_list() {
-    socket.emit('relicbot/users/fetch',{},(res) => {
-        if (res.code == 200) {
-            users_list = {}
-            res.data.forEach(row => {
-                users_list[row.discord_id] = row
-            })
-        }
-    })
-}
-
 const recruitment_faq = {
     content: ' ',
     embeds: [{
@@ -547,7 +535,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     squads.map((squad,index) => {
         var field_value = '\u200b'
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id))
-            field_value = squad.members.map(id => `${users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n').replace(/_/g, '\\_')
+            field_value = squad.members.map(id => `${as_users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n').replace(/_/g, '\\_')
         else {
             if (squad.members.length > 1) field_value += ' ' + `${squad.members.length}/4`
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
@@ -669,7 +657,7 @@ function vip_hosts(squad) {
             setTimeout(() => {
                 vip_hosts_timeouts = vip_hosts_timeouts.filter(id => id != user_id)
             }, 30000);
-            sendMessage(`**${users_list[user_id].ingame_name}** ${squad.original_host == user_id ? 'is hosting':'has joined'} ${relicBotSquadToString(squad, true)}`)
+            sendMessage(`**${as_users_list[user_id].ingame_name}** ${squad.original_host == user_id ? 'is hosting':'has joined'} ${relicBotSquadToString(squad, true)}`)
         }
     })
 
@@ -719,7 +707,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: relicBotSquadToString(squad,true),
-                    description: `${host_selection}\n\n/invite ${sortCaseInsensitive(squad.members.map(id => enquote(users_list[id]?.ingame_name))).join('\n/invite ').replace(/_/g, '\\_')}`,
+                    description: `${host_selection}\n\n/invite ${sortCaseInsensitive(squad.members.map(id => enquote(as_users_list[id]?.ingame_name))).join('\n/invite ').replace(/_/g, '\\_')}`,
                     footer: {
                         text: `This squad will auto-close in 15m`
                     }
@@ -836,11 +824,11 @@ socket.on('relicbot/squads/selectedhost', async (payload) => {
     payload.thread_ids.forEach(async thread_id => {
         const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
         if (!channel) return
-        channel.send(`**${users_list[payload.squad_host].ingame_name}** is hosting this squad\n- Please invite everyone, and make sure the squad is set to "invite-only"\n- Only the host should initiate the mission\n- If host migrates, same rules apply`).catch(console.error)
+        channel.send(`**${as_users_list[payload.squad_host].ingame_name}** is hosting this squad\n- Please invite everyone, and make sure the squad is set to "invite-only"\n- Only the host should initiate the mission\n- If host migrates, same rules apply`).catch(console.error)
         const openMessage = squadOpenMessages[`${payload.squad_id}_${thread_id}`] 
         if (openMessage) {
             openMessage.edit({
-                components: openMessage.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId.split('.')[0] == 'as_sq_become_host' ?  {...subcomponent, disabled: true, label: `Become Host (${users_list[payload.squad_host].ingame_name} is Hosting)`} : subcomponent)}))
+                components: openMessage.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId.split('.')[0] == 'as_sq_become_host' ?  {...subcomponent, disabled: true, label: `Become Host (${as_users_list[payload.squad_host].ingame_name} is Hosting)`} : subcomponent)}))
             }).catch(console.error)
         }
     })
@@ -850,14 +838,14 @@ async function logSquad(squad,include_chat,action) {
     const channel = client.channels.cache.get('1059876227504152666') || await client.channels.fetch('1059876227504152666').catch(console.error)
     if (!channel) return
     const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
-    const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => users_list[id]?.ingame_name).join('\n')}`
-    const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
+    const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => as_users_list[id]?.ingame_name).join('\n')}`
+    const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${as_users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
     const squadPingAlgo = calculateBestPingRating(squad.members)
     if (include_chat) {
         socket.emit('relicbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
                 const chats = res.data
-                const squadChat = `**⸻ Squad Chat ⸻**\n${chats.map(chat => `[<t:${Math.round(Number(chat.creation_timestamp) / 1000)}:t>] **${users_list[chat.discord_id]?.ingame_name}:** ${chat.message}`).join('\n')}`
+                const squadChat = `**⸻ Squad Chat ⸻**\n${chats.map(chat => `[<t:${Math.round(Number(chat.creation_timestamp) / 1000)}:t>] **${as_users_list[chat.discord_id]?.ingame_name}:** ${chat.message}`).join('\n')}`
                 channel.send({
                     content: convertUpper(action),
                     embeds: [{
@@ -920,17 +908,12 @@ async function logSquad(squad,include_chat,action) {
     }
 }
 
-socket.on('tradebotUsersUpdated', (payload) => {
-    console.log('[relicbot] tradebotUsersUpdated')
-    update_users_list()
-})
-
 socket.on('squadMessageCreate',payload => {
     payload.squad_thread_ids.forEach(async thread_id => {
         if (thread_id != payload.thread_id) {
             const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
             if (!channel) return
-            channel.send({content: `**${users_list[payload.discord_id]?.ingame_name}**: ${payload.message}`})
+            channel.send({content: `**${as_users_list[payload.discord_id]?.ingame_name}**: ${payload.message}`})
         }
     })
 })

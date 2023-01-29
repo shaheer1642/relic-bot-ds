@@ -15,6 +15,12 @@ function updateUsersList() {
     }).catch(console.error)
 }
 
+db.on('notification',(notification) => {
+    if (['tradebot_users_list_insert','tradebot_users_list_update','tradebot_users_list_delete'].includes(notification.channel)) {
+        updateUsersList()
+    }
+})
+
 module.exports = {
     as_users_list
 }
