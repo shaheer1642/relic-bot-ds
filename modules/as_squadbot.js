@@ -638,7 +638,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
             label: `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}`,
             style: squad.members.length == 0 ? 2 : 1, // squad.members.length == 0 ? 2 : (squad.spots - squad.members.length) == 1 ? 4 : (squad.spots - squad.members.length) == 2 ? 3 : (squad.spots - squad.members.length) == 3 ? 1 : 2,
             custom_id: squad.is_default ?  `as_sb_sq_default_${squad.squad_string}_1/${squad.spots}`: `as_sb_sq_${squad.squad_id}`,
-            emoji: emoteObjFromSquadString(squad.squad_string)
+            emoji: (squad.spots - squad.members.length) == 1 ? emote_ids.hot : emoteObjFromSquadString(squad.squad_string)
         })
     })
     //console.log(JSON.stringify(payloads))

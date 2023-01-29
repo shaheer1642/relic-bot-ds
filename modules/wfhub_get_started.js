@@ -61,12 +61,13 @@ function relicbotembed(show_members, show_members_for_squad) {
                 ...squads.map(squad => ({
                     type: 2,
                     label: `${squad.members.length > 2 ? '🔥':''} ${squad.name.split(' ')[0]}`,
-                    style: squad.members.length > 1 ? 3:2,
-                    custom_id: `getting_started_sandbox_sq_${squad.id}`
+                    style: 1,
+                    custom_id: `getting_started_sandbox_sq_${squad.id}`,
+                    emoji: squad.members.length == 3 ? '🔥' : null
                 })),{
                 type: 2,
                 label: "Squad Info",
-                style: 1,
+                style: 2,
                 custom_id: `getting_started_sandbox_sq_info`
             }]
         }]
@@ -80,8 +81,9 @@ function squadbotembed() {
             components: sb_squads.map(squad => ({
                 type: 2,
                 label: `${squad.members.length}/${squad.spots} ${squad.name}`,
-                style: squad.members.length > 0 ? 3:2,
-                custom_id: `sb_getting_started_sandbox_sq_${squad.id}`
+                style: 1,
+                custom_id: `sb_getting_started_sandbox_sq_${squad.id}`,
+                emoji: (squad.spots - squad.members.length) == 1 ? '🔥' : null
             }))
         }]
     }
