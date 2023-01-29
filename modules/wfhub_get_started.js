@@ -216,7 +216,7 @@ function openSquadSquadBot(squad) {
     }).then(thread => {
         setTimeout(() => client.channels.cache.get(get_started_cnl_id).messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
         thread.send({
-            content: `Squad filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
+            content: `**Test Squad** filled ${squad.members.map(m => `<@${m}>`).join(', ')}`,
             embeds: [{
                 description: `**${squad.name}**\n\n/invite ${squad.members.map(id => `<@${id}>`).join('\n/invite ').replace(/_/g, '\_')}`
             }]
