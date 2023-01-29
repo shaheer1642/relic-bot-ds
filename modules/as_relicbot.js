@@ -572,7 +572,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
         components[k].components.push({
             type: 2,
             label: labelNameGenerator(squad,index),
-            style: squad.members.length > 1 ? 3 : 2,
+            style: 1, //squad.members.length > 1 ? 3 : 2,
             custom_id: `rb_sq_${squad.squad_id}`
         })
         if (index == squads.length - 1) {
@@ -581,7 +581,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             components[k].components.push({
                 type: 2,
                 label: "Squad Info",
-                style: 1,
+                style: 2,
                 custom_id: `rb_sq_info_${tier}`,
                 disabled: with_all_names ? true : false
             })

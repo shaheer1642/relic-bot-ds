@@ -43,7 +43,7 @@ function updateUserRatings() {
         //     }
         // })
         // console.log(string)
-        console.log('[as_users_ratings.updateUserRatings] finished',as_users_ratings)
+        console.log('[as_users_ratings.updateUserRatings] finished')
     }).catch(console.error)
 
     function calcArrAvg(arr) {
@@ -65,7 +65,7 @@ function updateHostRatings() {
             if (!as_hosts_ratings[user_rating.rated_user]) as_hosts_ratings[user_rating.rated_user] = {}
             as_hosts_ratings[user_rating.rated_user][user_rating.discord_id] = user_rating.rating
         })
-        console.log('[as_users_ratings.updateHostRatings] finished',as_hosts_ratings)
+        console.log('[as_users_ratings.updateHostRatings] finished')
     }).catch(console.error)
 }
 
