@@ -60,7 +60,7 @@ function relicbotembed(show_members, show_members_for_squad) {
             components: [
                 ...squads.map(squad => ({
                     type: 2,
-                    label: `${squad.members.length > 2 ? '🔥':''} ${squad.name.split(' ')[0]}`,
+                    label: squad.name.split(' ')[0],
                     style: 1,
                     custom_id: `getting_started_sandbox_sq_${squad.id}`,
                     emoji: squad.members.length == 3 ? '🔥' : null
