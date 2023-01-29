@@ -81,7 +81,7 @@ function squadbotembed() {
             components: sb_squads.map(squad => ({
                 type: 2,
                 label: `${squad.members.length}/${squad.spots} ${squad.name}`,
-                style: 1,
+                style: squad.members.length > 0 ? 1 : 2,
                 custom_id: `sb_getting_started_sandbox_sq_${squad.id}`,
                 emoji: (squad.spots - squad.members.length) == 1 ? '🔥' : null
             }))

@@ -573,7 +573,8 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             type: 2,
             label: labelNameGenerator(squad,index),
             style: 1, //squad.members.length > 1 ? 3 : 2,
-            custom_id: `rb_sq_${squad.squad_id}`
+            custom_id: `rb_sq_${squad.squad_id}`,
+            emoji: squad.members.length == 3 ? emote_ids.hot : null
         })
         if (index == squads.length - 1) {
             const k = Math.ceil((index + 2)/5) - 1
@@ -603,8 +604,6 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
 
     function labelNameGenerator(squad, index) {
         var label = ''
-        if (squad.members.length > 2)
-            label += `${emote_ids.hot} `
         if (squads[index-1]?.main_relics.join(' ') == squad.main_relics.join(' ') || squads[index+1]?.main_relics.join(' ') == squad.main_relics.join(' ')) {
             if ((label + relicBotSquadToString(squad, false, true)).length < 80)
                 label += relicBotSquadToString(squad, false, true)
