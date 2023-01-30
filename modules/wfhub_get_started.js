@@ -10,6 +10,10 @@ var default_squads = [{
 },{
     id: 's3_4b4_int',
     name: 'S3 4b4 int',
+    members: ['804072666192412702','892087497998348349']
+},{
+    id: 'e1_4b4_flaw',
+    name: 'E1 4b4 flaw',
     members: ['804072666192412702']
 }]
 var squads = JSON.parse(JSON.stringify(default_squads))
