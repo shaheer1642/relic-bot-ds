@@ -15,11 +15,38 @@ const message_id = '1063435290494111764'
 
 event_emitter.on('db_connected', () => {
     // updateUserRatings()
-    removeInactiveTrackers()
+    // removeInactiveTrackers()
 })
 
 client.on('ready', async () => {
     console.log('client is online')
+    const db_user = {
+        discord_id: '892087497998348349',
+        ingame_name: 'softy-alt',
+        platform: 'PC'
+    }
+    const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
+
+    const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
+    const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
+
+    if (user) {
+        await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
+    }
+
+    if (member) {
+        const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+        const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+        const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
+        const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
+        const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
+        const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+    
+        await member.roles.add(verified_role).catch(console.error)
+        await member.roles.add(awaken_role).catch(console.error)
+        await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
+        await member.setNickname(db_user.ingame_name).catch(console.error)
+    }
 })
 
 function removeInactiveTrackers() {

@@ -27,6 +27,7 @@ client.on('ready', () => {
 })
 
 event_emitter.on('allSquadsNewUserVerified', async db_user => {
+    console.log('db_user',db_user)
     const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
 
     const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
@@ -34,9 +35,6 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
 
     if (user) {
         await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
-        payloadsGenerator().forEach(payload => {
-            user.send(payload).catch(console.error)
-        })
     }
 
     function payloadsGenerator() {
@@ -87,6 +85,9 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
     }
 
     if (member) {
+        payloadsGenerator().forEach(payload => {
+            user.send(payload).catch(console.error)
+        })
         const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
         const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
         const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
@@ -102,6 +103,7 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
 })
 
 event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
+    console.log('db_user',db_user)
     const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
 
     const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
