@@ -178,30 +178,14 @@ async function gmail_api_call(auth) {
                         if (res.rowCount > 1) {
                             if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500').catch(console.error)
                         } else {
-                            try {
-                                const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
-                                const member = await guild.members.fetch(xx_discord).catch(console.error)
-                                const role1 = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
-                                const role2 = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-                                await member.roles.add(role1).catch(console.error)
-                                await member.roles.add(role2).catch(console.error)
-                                await member.setNickname(ingame_name).catch(console.error)
-                            } catch (e) {
-                                console.log(e)
-                            }
                             if (res.rowCount == 1) {
-                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = ${xx_discord}`).then(res => {
-                                    if (user) user.send('Your ign has been updated to **' + ingame_name + '**!').catch(console.error)
-                                }).catch (err => {
+                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = ${xx_discord}`).catch (err => {
                                     console.log(err)
                                     if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 501').catch(console.error)
                                 })
                             }
                             if (res.rowCount == 0) {
-                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values (${xx_discord},'${ingame_name}','${platform}',${new Date().getTime()})`).then(res => {
-                                    if (user) user.send('Welcome to AllSquads **' + ingame_name + '**! Your account has been verified').catch(console.error)
-                                    event_emitter.emit('allSquadsNewUserVerified', {discord_id: xx_discord})
-                                }).catch (err => {
+                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values (${xx_discord},'${ingame_name}','${platform}',${new Date().getTime()})`).catch (err => {
                                     console.log(err)
                                     if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 502').catch(console.error)
                                 })

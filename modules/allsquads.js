@@ -26,18 +26,18 @@ client.on('ready', () => {
     setInterval(edit_staff_leaderboard, 300000);
 })
 
-event_emitter.on('allSquadsNewUserVerified', async data => {
-    const user = client.users.cache.get(data.discord_id) || await client.users.fetch(data.discord_id).catch(console.error)
-    if (!user) return
+event_emitter.on('allSquadsNewUserVerified', async db_user => {
+    const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
 
     const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
-    const member = await guild.members.fetch(data.discord_id).catch(console.error)
+    const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
 
-    if (!member) return
-
-    payloadsGenerator().forEach(payload => {
-        user.send(payload).catch(console.error)
-    })
+    if (user) {
+        await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
+        payloadsGenerator().forEach(payload => {
+            user.send(payload).catch(console.error)
+        })
+    }
 
     function payloadsGenerator() {
         const squad_trackers = ['aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
@@ -84,6 +84,45 @@ event_emitter.on('allSquadsNewUserVerified', async data => {
         }]
         
         return squads_payloads.concat(relics_payloads)
+    }
+
+    if (member) {
+        const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+        const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+        const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
+        const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
+        const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
+        const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+    
+        await member.roles.add(verified_role).catch(console.error)
+        await member.roles.add(awaken_role).catch(console.error)
+        await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
+        await member.setNickname(db_user.ingame_name).catch(console.error)
+    }
+})
+
+event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
+    const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
+
+    const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
+    const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
+
+    if (user) {
+        await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
+    }
+
+    if (member) {
+        const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+        const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+        const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
+        const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
+        const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
+        const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+    
+        await member.roles.add(verified_role).catch(console.error)
+        await member.roles.add(awaken_role).catch(console.error)
+        await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
+        await member.setNickname(db_user.ingame_name).catch(console.error)
     }
 })
 
@@ -675,9 +714,6 @@ function calculateBestPingRating(discord_ids) {
 db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
     console.log('[warframe_hub] db notification: ',payload)
-
-    if (notification.channel == 'wfhub_payment_receipts_insert') {
-    }
 
     if (notification.channel == 'tradebot_users_list_update') {
         if ((payload[0].is_patron && !payload[1].is_patron) || (payload[0].is_patron && payload[0].patreon_expiry_timestamp != payload[1].patreon_expiry_timestamp)) {
