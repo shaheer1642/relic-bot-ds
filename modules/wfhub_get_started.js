@@ -10,10 +10,6 @@ var default_squads = [{
 },{
     id: 's3_4b4_int',
     name: 'S3 4b4 int',
-    members: ['804072666192412702','892087497998348349']
-},{
-    id: 'l4_4b4_rad',
-    name: 'S3 4b4 int',
     members: ['804072666192412702']
 }]
 var squads = JSON.parse(JSON.stringify(default_squads))
@@ -55,7 +51,7 @@ function relicbotembed(show_members, show_members_for_squad) {
             title: 'Axi',
             fields: squads.map(squad => ({
                 name: squad.name,
-                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `<@${id}>`).join('\n') : `${squad.members.length}/4 ${squad.members.length > 2 ? '🔥':''}`,
+                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `<@${id}>`).join('\n') : `${squad.members.length > 1 ? `${squad.members.length}/4`:''} ${squad.members.length > 2 ? '🔥':''}`.trim(),
                 inline: true
             }))
         }],
