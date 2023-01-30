@@ -22,11 +22,11 @@ db.on('notification',(notification) => {
         updateUsersList()
     }
     if (['tradebot_users_list_insert'].includes(notification.channel)) {
-        event_emitter.emit('allSquadsNewUserVerified', payload)
+        event_emitter.emit('allSquadsNewUserVerified', {...payload, discord_id: payload.discord_id.toString()})
     }
     if (['tradebot_users_list_update'].includes(notification.channel)) {
         if (payload[0].ingame_name != payload[1].ingame_name) {
-            event_emitter.emit('allSquadsUserUpdatedIGN', payload[0])
+            event_emitter.emit('allSquadsUserUpdatedIGN', {...payload[0], discord_id: payload[0].discord_id.toString()})
         }
     }
 })
