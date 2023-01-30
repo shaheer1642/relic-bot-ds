@@ -27,104 +27,111 @@ client.on('ready', () => {
 })
 
 event_emitter.on('allSquadsNewUserVerified', async db_user => {
-    console.log('db_user',db_user)
-    const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-
-    const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
-    const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
-
-    if (user) {
-        await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
-    }
-
-    function payloadsGenerator() {
-        const squad_trackers = ['aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
-        'sister_(murmur)','endo_arena','archon_hunt']
-        const relic_trackers = ['lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
-        'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','meso f2 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
-        ,'axi s6 relic','lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','neo n9 relic','axi s4 relic','lith v7 relic'
-        ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
-        const squads_payloads = []
-        const relics_payloads = []
-        squad_trackers.map((squad,index) => {
-            const payload_index = Math.ceil((index + 1)/15) - 1
-            const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
-            if (!squads_payloads[payload_index]) squads_payloads[payload_index] = {content: ' ', embeds: [], components: []}
-            if (!squads_payloads[payload_index].components[component_index]) squads_payloads[payload_index].components[component_index] = {type: 1, components: []}
-            squads_payloads[payload_index].components[component_index].components.push({
-                type: 2,
-                style: 1,
-                label: convertUpper(squad),
-                custom_id: `as_new_member_sq_trackers_add.${squad}`,
-                emoji: emoteObjFromSquadString(squad)
-            })
-        })
-        relic_trackers.map((squad,index) => {
-            const payload_index = Math.ceil((index + 1)/20) - 1
-            const component_index = Math.ceil((index - payload_index * 20 + 1)/4) - 1
-            if (!relics_payloads[payload_index]) relics_payloads[payload_index] = {content: ' ', embeds: [], components: []}
-            if (!relics_payloads[payload_index].components[component_index]) relics_payloads[payload_index].components[component_index] = {type: 1, components: []}
-            relics_payloads[payload_index].components[component_index].components.push({
-                type: 2,
-                style: 1,
-                label: convertUpper(squad.replace(' relic','')),
-                custom_id: `as_new_member_sq_trackers_add.${squad}`,
-                emoji: emoteObjFromSquadString(squad)
-            })
-        })
-        squads_payloads[0].embeds = [{
-            description: '**Click the squads** you are interested in, to be notified when someone hosts them.\nUse <#1054843353302323281> and <#1050717341123616851> channels to change this notification setting in the future\n\nFor further information about the server, check out <#890197385651838977>',
-            color: 'WHITE'
-        }]
-        relics_payloads[0].embeds = [{
-            description: 'Check out these vaulted relics in your relic console!\nSub to them if you have',
-            color: 'WHITE'
-        }]
-        
-        return squads_payloads.concat(relics_payloads)
-    }
-
-    if (member) {
-        payloadsGenerator().forEach(payload => {
-            user.send(payload).catch(console.error)
-        })
-        const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
-        const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-        const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
-        const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
-        const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
-        const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+    try {
+        const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
     
-        await member.roles.add(verified_role).catch(console.error)
-        await member.roles.add(awaken_role).catch(console.error)
-        await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
-        await member.setNickname(db_user.ingame_name).catch(console.error)
+        const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
+        const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
+    
+        if (user) {
+            await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
+        }
+    
+        if (member) {
+            const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+            const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+            const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
+            const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
+            const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
+            const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+        
+            await member.roles.add(verified_role).catch(console.error)
+            await member.roles.add(awaken_role).catch(console.error)
+            await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
+            await member.setNickname(db_user.ingame_name).catch(console.error)
+
+            payloadsGenerator().forEach(payload => {
+                user.send(payload).catch(console.error)
+            })
+        }
+        
+        function payloadsGenerator() {
+            const squad_trackers = ['aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
+            'sister_(murmur)','endo_arena','archon_hunt']
+            const relic_trackers = ['lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
+            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','meso f2 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
+            ,'axi s6 relic','lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','neo n9 relic','axi s4 relic','lith v7 relic'
+            ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
+            const squads_payloads = []
+            const relics_payloads = []
+            squad_trackers.map((squad,index) => {
+                const payload_index = Math.ceil((index + 1)/15) - 1
+                const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
+                if (!squads_payloads[payload_index]) squads_payloads[payload_index] = {content: ' ', embeds: [], components: []}
+                if (!squads_payloads[payload_index].components[component_index]) squads_payloads[payload_index].components[component_index] = {type: 1, components: []}
+                squads_payloads[payload_index].components[component_index].components.push({
+                    type: 2,
+                    style: 1,
+                    label: convertUpper(squad),
+                    custom_id: `as_new_member_sq_trackers_add.${squad}`,
+                    emoji: emoteObjFromSquadString(squad)
+                })
+            })
+            relic_trackers.map((squad,index) => {
+                const payload_index = Math.ceil((index + 1)/20) - 1
+                const component_index = Math.ceil((index - payload_index * 20 + 1)/4) - 1
+                if (!relics_payloads[payload_index]) relics_payloads[payload_index] = {content: ' ', embeds: [], components: []}
+                if (!relics_payloads[payload_index].components[component_index]) relics_payloads[payload_index].components[component_index] = {type: 1, components: []}
+                relics_payloads[payload_index].components[component_index].components.push({
+                    type: 2,
+                    style: 1,
+                    label: convertUpper(squad.replace(' relic','')),
+                    custom_id: `as_new_member_sq_trackers_add.${squad}`,
+                    emoji: emoteObjFromSquadString(squad)
+                })
+            })
+            squads_payloads[0].embeds = [{
+                description: '**Click the squads** you are interested in, to be notified when someone hosts them.\nUse <#1054843353302323281> and <#1050717341123616851> channels to change this notification setting in the future\n\nFor further information about the server, check out <#890197385651838977>',
+                color: 'WHITE'
+            }]
+            relics_payloads[0].embeds = [{
+                description: 'Check out these vaulted relics in your relic console!\nSub to them if you have',
+                color: 'WHITE'
+            }]
+            
+            return squads_payloads.concat(relics_payloads)
+        }
+    } catch (e) {
+        console.log(e)
     }
 })
 
 event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
-    console.log('db_user',db_user)
-    const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-
-    const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
-    const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
-
-    if (user) {
-        await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
-    }
-
-    if (member) {
-        const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
-        const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-        const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
-        const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
-        const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
-        const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+    try {
+        const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
     
-        await member.roles.add(verified_role).catch(console.error)
-        await member.roles.add(awaken_role).catch(console.error)
-        await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
-        await member.setNickname(db_user.ingame_name).catch(console.error)
+        const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
+        const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
+    
+        if (user) {
+            await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
+        }
+    
+        if (member) {
+            const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+            const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+            const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
+            const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
+            const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
+            const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+        
+            await member.roles.add(verified_role).catch(console.error)
+            await member.roles.add(awaken_role).catch(console.error)
+            await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
+            await member.setNickname(db_user.ingame_name).catch(console.error)
+        }
+    } catch (e) {
+        console.log(e)
     }
 })
 
