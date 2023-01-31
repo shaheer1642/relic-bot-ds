@@ -55,7 +55,7 @@ function relicbotembed(show_members, show_members_for_squad) {
             title: 'Axi',
             fields: squads.map(squad => ({
                 name: squad.name,
-                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `<@${id}>`).join('\n') : `${squad.members.length > 1 ? `${squad.members.length}/4`:''} ${squad.members.length > 2 ? '🔥':''}`.trim(), 
+                value: show_members || show_members_for_squad == squad.id ? squad.members.map(id => `<@${id}>`).join('\n') : `\u200b${squad.members.length > 1 ? `${squad.members.length}/4`:''} ${squad.members.length > 2 ? '🔥':''}`.trim(), 
                 inline: true
             }))
         }],
@@ -130,11 +130,11 @@ function editSquadMsgRelicBot(show_members, show_members_for_squad) {
     timeSinceLastCall = new Date().getTime()
     clearTimeout(editSquadMsgRelicBotTimeout1)
     editSquadMsgRelicBotTimeout1 = setTimeout(() => {
-        rb_webhook?.editMessage(rb_msg_id, relicbotembed(show_members, show_members_for_squad))
+        rb_webhook?.editMessage(rb_msg_id, relicbotembed(show_members, show_members_for_squad)).catch(console.error)
     }, timeout);
     clearTimeout(editSquadMsgRelicBotTimeout2)
     editSquadMsgRelicBotTimeout2 = setTimeout(() => {
-        rb_webhook?.editMessage(rb_msg_id, relicbotembed(false))
+        rb_webhook?.editMessage(rb_msg_id, relicbotembed(false)).catch(console.error)
     }, 3000);
 }
 
