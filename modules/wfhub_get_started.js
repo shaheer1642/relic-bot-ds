@@ -145,7 +145,7 @@ function editSquadMsgSquadBot(show_members, show_members_for_squad) {
     timeSinceLastCallSquad = new Date().getTime()
     clearTimeout(editSquadMsgSquadBotTimeout1)
     editSquadMsgSquadBotTimeout1 = setTimeout(() => {
-        sb_webhook?.editMessage(sb_msg_id, squadbotembed())
+        sb_webhook?.editMessage(sb_msg_id, squadbotembed()).catch(console.error)
     }, timeout);
 }
 
