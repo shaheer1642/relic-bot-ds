@@ -179,13 +179,25 @@ async function gmail_api_call(auth) {
                             if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500').catch(console.error)
                         } else {
                             if (res.rowCount == 1) {
-                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = ${xx_discord}`).catch (err => {
+                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = ${xx_discord} returning *;`).then(res => {
+                                    if (res.rowCount == 1) {
+                                        event_emitter.emit('allSquadsUserUpdatedIGN', res.rows[0])
+                                    } else {
+                                        if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 505').catch(console.error)
+                                    }
+                                }).catch(err => {
                                     console.log(err)
                                     if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 501').catch(console.error)
                                 })
                             }
                             if (res.rowCount == 0) {
-                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values (${xx_discord},'${ingame_name}','${platform}',${new Date().getTime()})`).catch (err => {
+                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values (${xx_discord},'${ingame_name}','${platform}',${new Date().getTime()}) returning *;`).then(res => {
+                                    if (res.rowCount == 1) {
+                                        event_emitter.emit('allSquadsNewUserVerified', res.rows[0])
+                                    } else {
+                                        if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 505').catch(console.error)
+                                    }
+                                }).catch(err => {
                                     console.log(err)
                                     if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 502').catch(console.error)
                                 })
