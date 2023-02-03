@@ -1,6 +1,6 @@
 const {client} = require('./discord_client.js');
 const {db} = require('./db_connection')
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper, arrToStringsArrWithLimit} = require('./extras.js');
 const JSONbig = require('json-bigint');
 
 const webhook_id = '1058463788560552028'
@@ -347,13 +347,15 @@ function mentionUsers(blessing) {
             else if (tracker.regions.includes(blessing.region)) ping_users.push(tracker.discord_id)
         })
         if (ping_users.length > 0) {
-            webhook_client.send({
-                content: `${convertUpper(blessing.bless_type)} Blessing in ${blessing.bless_time}\n${ping_users.map(id => `<@${id}>`).join(', ')}`
-            }).then(msg => {
-                setTimeout(() => {
-                    webhook_client.deleteMessage(msg.id)
-                }, 30000);
-            }).catch(console.error)
+            arrToStringsArrWithLimit(`${convertUpper(blessing.bless_type)} Blessing in ${blessing.bless_time}`,ping_users.map(id => `<@${id}>`),2000).forEach(str => {
+                webhook_client.send({
+                    content: str
+                }).then(msg => {
+                    setTimeout(() => {
+                        webhook_client.deleteMessage(msg.id)
+                    }, 30000);
+                }).catch(console.error)
+            })
         }
     }).catch(console.error)
 }
