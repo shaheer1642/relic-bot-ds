@@ -155,7 +155,7 @@ function update_users_list() {
 
 client.on('messageCreate', (message) => {
     if (message.channel.id == help_faq_channel_id) {
-        db_schedule_msg_deletion(new Date().getTime() + 21600000, message.id, message.channel.id)
+        db_schedule_msg_deletion(new Date().getTime() + 43200000, message.id, message.channel.id)
     }
 })
 
