@@ -16,12 +16,12 @@ function db_schedule_msg_deletion(delete_timestamp, message_id, channel_id) {
 
 function schedule_deletion(db_obj) {
     setTimeout(async () => {
+        db.query(`DELETE FROM discord_msg_auto_delete WHERE id = ${db_obj.id}`).catch(console.error)
         const cnl = client.channels.cache.get(db_obj.channel_id) || await client.channels.fetch(db_obj.channel_id).catch(console.error)
         if (!cnl) return
         const msg = cnl.messages.cache.get(db_obj.message_id) || await cnl.messages.fetch(db_obj.message_id).catch(console.error)
         if (!msg) return
         msg.delete().catch(console.error)
-        db.query(`DELETE FROM discord_msg_auto_delete WHERE id = ${db_obj.id}`).catch(console.error)
     }, db_obj.delete_timestamp - db_obj.creation_timestamp);
 }
 
