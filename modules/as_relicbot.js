@@ -9,9 +9,10 @@ const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
-const {translatePayload, calculateBestPingRating} = require('./allsquads')
+const {translatePayload} = require('./allsquads')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
 const {as_users_list} = require('./allsquads/as_users_list')
+const {emote_ids, emoteObjFromSquadString} = require('./emotes')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -23,17 +24,6 @@ const server_commands_perms = [
 const webhook_messages = {}
 const channels_list = {}
 const webhooks_list = {}
-
-const emote_ids = {
-    steel_essence: '<:steel_essence:962508988442869800>',
-    railjack: '<:railjack:1045456185429594214>',
-    hot: '🔥',
-    cold: '❄️',
-    lith: '<:Lith:1060995797807804496>',
-    meso: '<:Meso:1060997039808336002>',
-    neo: '<:Neo:1060997042702401646>',
-    axi: '<:Axi:1060997035815358634>',
-}
 
 client.on('ready', async () => {
     assign_global_variables().then(() => {
@@ -300,7 +290,34 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isSelectMenu()) {
         if (!Object.keys(channels_list).includes(interaction.channel.id)) return
-        if (interaction.customId.split('.')[0] == 'rb_sq_trackers_remove') {
+        
+        if (interaction.customId == 'rb_sq_trackers_add_menu') {
+            console.log('[rb_sq_trackers_add_menu]')
+            socket.emit('relicbot/trackers/create',{message: interaction.values,discord_id: interaction.user.id, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1050717341123616851'},(responses) => {
+                //console.log(responses)
+                if (!Array.isArray(responses)) responses = [responses]
+                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                    if (res.code == 200) {
+                        fissures_check()
+                        if (interaction.message) {
+                            if (interaction.message.embeds[0]) {
+                                if (interaction.message.embeds[0].title == 'Tracked Squads') {
+                                    interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                } else {
+                                    interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                                }
+                            } else {
+                                interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                            }
+                        } else {
+                            interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
+                        }
+                    } else {
+                        interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    }
+                })
+            })
+        } else if (interaction.customId.split('.')[0] == 'rb_sq_trackers_remove') {
             socket.emit('relicbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
                 socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
                     if (res.code == 200) {
@@ -679,9 +696,9 @@ socket.on('relicbot/squads/opened', async (payload) => {
         channel_ids[channel_id].push(discord_id)
     }
     // host selection
-    var hosts = calculateBestPingRating(squad.members);
+    var hosts = squad.host_recommendation;
     var host_selection;
-    if (hosts[0].considered_ping == Infinity) {
+    if (hosts?.[0].considered_ping == null) {
         host_selection = `Please decide a host and invite each other in the game`
     } else {
         host_selection = `Recommended Host: **${hosts[0].ign}** with avg squad ping of **${hosts[0].avg_squad_ping}**`
@@ -837,10 +854,11 @@ socket.on('relicbot/squads/selectedhost', async (payload) => {
 async function logSquad(squad,include_chat,action) {
     const channel = client.channels.cache.get('1059876227504152666') || await client.channels.fetch('1059876227504152666').catch(console.error)
     if (!channel) return
+    const squadHost = squad.squad_host ? `**Host:** ${as_users_list[squad.squad_host].ingame_name}` : 'Not determined'
+    const squadRecommendedHost = squad.host_recommendation[0].considered_ping == null ? '**Recommended Host:** Not determined' : `**Recommended Host:** ${squad.host_recommendation?.[0].ign} with avg squad ping of ${squad.host_recommendation?.[0].avg_squad_ping}`
     const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
     const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => as_users_list[id]?.ingame_name).join('\n')}`
     const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${as_users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
-    const squadPingAlgo = calculateBestPingRating(squad.members)
     if (include_chat) {
         socket.emit('relicbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
@@ -850,7 +868,7 @@ async function logSquad(squad,include_chat,action) {
                     content: convertUpper(action),
                     embeds: [{
                         title: relicBotSquadToString(squad,true),
-                        description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadChat}`.trim().replace(/_/g, '\\_'),
+                        description: `${squadFillTime}\n${squadRecommendedHost}\n${squadHost}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadChat}`.trim().replace(/_/g, '\\_'),
                         timestamp: new Date(),
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
@@ -881,7 +899,7 @@ async function logSquad(squad,include_chat,action) {
             content: convertUpper(action),
             embeds: [{
                 title: relicBotSquadToString(squad,true),
-                description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n**⸻ Squad Ping Algorithm (Testing Purposes) ⸻**\n**Best Selected Host = ${squadPingAlgo[0].ign} with avg squad ping of ${squadPingAlgo[0].avg_squad_ping}**\n${JSON.stringify(squadPingAlgo)}`.trim().replace(/_/g, '\\_'),
+                description: `${squadFillTime}\n${squadRecommendedHost}\n\n${squadMembers}\n\n${squadLogs}`.trim().replace(/_/g, '\\_'),
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
@@ -1059,6 +1077,11 @@ function constructTrackersEmbed(trackers, ephemeral) {
     return payload
 }
 
+const default_relic_trackers = ['lith o2','meso o3','neo v8','axi l4',
+'lith c5','lith v6','neo s13','lith g1','neo s5','axi e1','lith t3','meso o4','neo n11'
+,'lith b4','meso n6','neo r1','axi s3','lith m1','meso b3','neo n9','lith v7'
+,'neo n5','axi a7','neo o1','axi v8'].sort()
+
 var fissuresTimer;
 async function fissures_check() {
     console.log('[relicbot] fissures_check called')
@@ -1149,6 +1172,20 @@ async function fissures_check() {
                     label: "My Relics",
                     style: 2,
                     custom_id: `rb_sq_trackers_show`
+                }]
+            },{
+                type: 1,
+                components: [{
+                    type: 3,
+                    custom_id: "rb_sq_trackers_add_menu",
+                    options: default_relic_trackers.map((squad) => ({
+                        label: convertUpper(squad),
+                        value: squad,
+                        emoji: emoteObjFromSquadString(squad)
+                    })),
+                    placeholder: "Notification Settings",
+                    min_values: 1,
+                    max_values: default_relic_trackers.length
                 }]
             }]
         }

@@ -9,7 +9,7 @@ const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
-const {translatePayload,calculateBestPingRating} = require('./allsquads')
+const {translatePayload} = require('./allsquads')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
 const {as_users_list} = require('./allsquads/as_users_list')
@@ -31,7 +31,7 @@ client.on('channelDelete', channel => {
 
 const default_squads = [{
     squad_string: 'aya_farm',
-    spots: 3,
+    spots: 4,
     members: [],
     is_default: true
 },{
@@ -242,6 +242,54 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId == 'as_sb_sq_squad_info') {
             edit_webhook_messages(true, null, interaction.channel.id)
             interaction.deferUpdate().catch(console.error)
+        } else if (interaction.customId.split('.')[0] == 'as_sb_sq_auto_fill') {
+            const discord_id = interaction.user.id
+            const squad_id = interaction.customId.split('.')[1]
+            if (!squad_id) {
+                // get squads list the user can auto-fill
+                socket.emit('squadbot/squads/autofill/fetch',{discord_id: discord_id},(res) => {
+                    if (res.code == 200) {
+                        const components = []
+                        res.data.forEach((squad,index) => {
+                            if ((index + 1) > 125) return
+                            const component_index = Math.floor((index + 1) / 5)
+                            if (!components[component_index]) {
+                                components[component_index] = {
+                                    type: 1,
+                                    components: []
+                                }
+                            }
+                            components[component_index].components.push({
+                                type: 2,
+                                label: convertUpper(squad.squad_string),
+                                style: 3,
+                                custom_id: `as_sb_sq_auto_fill.${squad.squad_id}`
+                            })
+                        })
+                        interaction.reply({
+                            embeds: [{
+                                description: 'Select a squad you want to force open',
+                                color: 'GREEN'
+                            }],
+                            components: components,
+                            ephemeral: true
+                        }).catch(console.error)
+                    } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                })
+            } else {
+                // force open the squad
+                socket.emit('squadbot/squads/autofill/execute',{discord_id: discord_id, squad_id: squad_id},(res) => {
+                    if (res.code == 200) {
+                        interaction.update({
+                            embeds: [{
+                                description: 'Squad has been opened!',
+                                color: 'ORANGE'
+                            }],
+                            components: []
+                        }).catch(console.error)
+                    } else interaction.update(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                })
+            }
         } else if (interaction.customId.match('as_sb_sq_merge_false')) {
             socket.emit('squadbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
                 interaction.deferUpdate().catch(console.error)
@@ -633,7 +681,7 @@ function edit_recruitment_intro() {
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
-                description: `- Click on the button to join a squad. Click again to leave; or click 'Leave All'\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads expire in 1 hour${msg.c_id == '1054843353302323281' ? `\n\n- Ask anything in <#914990518558134292>. For any queries or bugs, use <#1003269491163148318>\n\n- The server just opened, give it some time to reach full activity! 🙂`:''}${msg.c_id == '1054843353302323281' ? '':'\n\n[This bot is created by Warframe Squads](https://discord.gg/346ZthxCe8)'}`,
+                description: `- Click on the button to join a squad. Click again to leave; or click 'Leave All'\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads expire in 1 hour${msg.c_id == '1054843353302323281' ? `\n\n- Ask anything in <#1063387040449835028>. For any queries or bugs, use <#1003269491163148318>\n\n- The server just opened, give it some time to reach full activity! 🙂`:''}${msg.c_id == '1054843353302323281' ? '':'\n\n[This bot is created by Warframe Squads](https://discord.gg/346ZthxCe8)'}`,
                 color: '#ffffff',
             }],
             components: [{
@@ -658,6 +706,14 @@ function edit_recruitment_intro() {
                     label: "Tracked Squads",
                     style: 2,
                     custom_id: `as_sb_sq_trackers_show`
+                }]
+            },{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Auto-Fill",
+                    style: 3,
+                    custom_id: `as_sb_sq_auto_fill`
                 }]
             },{
                 type: 1,
@@ -797,9 +853,9 @@ socket.on('squadbot/squads/opened', async (payload) => {
         channel_ids[channel_id].push(discord_id)
     }
     // host selection
-    var hosts = calculateBestPingRating(squad.members);
+    var hosts = squad.host_recommendation;
     var host_selection;
-    if (hosts[0].considered_ping == Infinity) {
+    if (hosts?.[0].considered_ping == null) {
         host_selection = `Please decide a host and invite each other in the game`
     } else {
         host_selection = `Recommended Host: **${hosts[0].ign}** with avg squad ping of **${hosts[0].avg_squad_ping}**`
@@ -828,7 +884,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
                 content: `Squad filled ${channel_ids[channel_id].map(m => `<@${m}>`).join(', ')}`,
                 embeds: [{
                     title: convertUpper(squad.squad_string),
-                    description: `${host_selection}\n\n/invite ${sortCaseInsensitive(squad.members.map(id => enquote(as_users_list[id]?.ingame_name))).join('\n/invite ').replace(/_/g, '\\_')}`,
+                    description: `${squad.autofilled_by ? `Auto-filled by ${as_users_list[squad.autofilled_by].ingame_name}\n\n` : ''}${host_selection}\n\n/invite ${sortCaseInsensitive(squad.members.map(id => enquote(as_users_list[id]?.ingame_name))).join('\n/invite ').replace(/_/g, '\\_')}`,
                     footer: {
                         text: `This squad will auto-close in ${Math.round(squad.squad_closure / 60 / 1000)}m`
                     }
@@ -923,10 +979,12 @@ socket.on('squadbot/squads/selectedhost', async (payload) => {
 async function logSquad(squad,include_chat,action) {
     const channel = client.channels.cache.get('1059876227504152666') || await client.channels.fetch('1059876227504152666').catch(console.error)
     if (!channel) return
+    const squadAutoFilledBy = squad.autofilled_by ? `**Auto-filled by:** ${as_users_list[squad.autofilled_by].ingame_name}` : ''
+    const squadHost = squad.squad_host ? `**Host:** ${as_users_list[squad.squad_host].ingame_name}` : '**Host:** Not determined'
+    const squadRecommendedHost = squad.host_recommendation?.[0].considered_ping == null ? '**Recommended Host:** Not determined' : `**Recommended Host:** ${squad.host_recommendation?.[0].ign} with avg squad ping of ${squad.host_recommendation[0].avg_squad_ping}`
     const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
     const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => as_users_list[id]?.ingame_name).join('\n')}`
     const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${as_users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
-    const squadPingAlgo = calculateBestPingRating(squad.members)
     if (include_chat) {
         socket.emit('squadbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
@@ -936,7 +994,7 @@ async function logSquad(squad,include_chat,action) {
                     content: convertUpper(action),
                     embeds: [{
                         title: convertUpper(squad.squad_string),
-                        description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadChat}`.trim().replace(/_/g, '\\_'),
+                        description: `${squadAutoFilledBy}\n${squadFillTime}\n${squadRecommendedHost}\n${squadHost}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadChat}`.trim().replace(/_/g, '\\_'),
                         timestamp: new Date(),
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
@@ -967,7 +1025,7 @@ async function logSquad(squad,include_chat,action) {
             content: convertUpper(action),
             embeds: [{
                 title: convertUpper(squad.squad_string),
-                description: `${squadFillTime}\n\n${squadMembers}\n\n${squadLogs}\n\n**⸻ Squad Ping Algorithm (Testing Purposes) ⸻**\n**Best Selected Host = ${squadPingAlgo[0].ign} with avg squad ping of ${squadPingAlgo[0].avg_squad_ping}**\n${JSON.stringify(squadPingAlgo)}`.trim().replace(/_/g, '\\_'),
+                description: `${squadAutoFilledBy}\n${squadFillTime}\n${squadRecommendedHost}\n\n${squadMembers}\n\n${squadLogs}`.trim().replace(/_/g, '\\_'),
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
