@@ -9,6 +9,7 @@ const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
+const {as_users_list} = require('./allsquads/as_users_list')
 
 const guild_id = '865904902941048862'
 const channel_id = '890198895508992020'
@@ -109,6 +110,12 @@ client.on('messageDelete', async (message) => {
 client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand() && interaction.guild.id == guild_id && interaction.commandName == 'giveaways') {
         if (interaction.options.getSubcommand() == 'create') {
+            if (!as_users_list[interaction.user.id]) {
+                return interaction.reply({
+                    content: 'Your account is not verified',
+                    ephemeral: true
+                })
+            }
             const discord_id = interaction.user.id
             const item = interaction.options.getString('item').replace(/'/g,`''`)
             const rp_cost = interaction.options.getNumber('rp_cost')
@@ -137,7 +144,7 @@ client.on('interactionCreate', async (interaction) => {
             channel.send({
                 content: ' ',
                 embeds: [{
-                    title: convertUpper(item),
+                    title: `[${as_users_list[discord_id]?.platform}] ${convertUpper(item)}`,
                     description: `Click 🎉 to join\n${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries`,
                     fields: [{
                         name: 'Hosted By',
@@ -219,6 +226,12 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isButton()) {
         if (interaction.customId == 'as_ga_join') {
+            if (!as_users_list[interaction.user.id]) {
+                return interaction.reply({
+                    content: 'Your account is not verified',
+                    ephemeral: true
+                })
+            }
             db.query(`
                 SELECT * FROM as_gabot_giveaways WHERE message_id = '${interaction.message.id}';
                 SELECT * FROM challenges_accounts WHERE discord_id = ${interaction.user.id};
@@ -247,6 +260,12 @@ client.on('interactionCreate', async (interaction) => {
                         ephemeral: true
                     }).catch(console.error)
                 }
+                if (as_users_list[giveaway.discord_id].platform != as_users_list[interaction.user.id].platform) {
+                    return interaction.reply({
+                        content: `Cannot join giveaway on another platform yet`, 
+                        ephemeral: true
+                    }).catch(console.error)
+                }
                 if (giveaway.join_list.includes(interaction.user.id)) {
                     return interaction.reply({
                         content: `You have already joined this giveaway`, 
@@ -266,7 +285,6 @@ client.on('interactionCreate', async (interaction) => {
 })
 
 client.on('ready', async () => {
-    update_users_list()
     db.query(`
         SELECT * FROM as_gabot_giveaways WHERE status = 'active';
     `).then(res => {
@@ -274,27 +292,11 @@ client.on('ready', async () => {
     }).catch(console.error)
 })
 
-var users_list = {}
-function update_users_list() {
-    socket.emit('relicbot/users/fetch',{},(res) => {
-        if (res.code == 200) {
-            users_list = {}
-            res.data.forEach(row => {
-                users_list[row.discord_id] = row
-            })
-        }
-    })
-}
-socket.on('tradebotUsersUpdated', (payload) => {
-    console.log('[relicbot] tradebotUsersUpdated')
-    update_users_list()
-})
-
 function embedGenerator(giveaway) {
     return {
         content: ' ',
         embeds: [{
-            title: convertUpper(giveaway.item),
+            title: `[${as_users_list[giveaway.discord_id]?.platform}] ${convertUpper(giveaway.item)}`,
             description: `Click 🎉 to join\n${giveaway.winner_count || 1} Winner${giveaway.winner_count > 1 ? 's':''} | ${giveaway.join_list.length} Entr${giveaway.join_list.length > 1 ? 'ies':'y'}`,
             fields: [{
                 name: 'Hosted By',
