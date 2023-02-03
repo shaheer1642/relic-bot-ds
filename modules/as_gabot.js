@@ -134,10 +134,10 @@ client.on('interactionCreate', async (interaction) => {
                     ephemeral: true
                 }).catch(console.error)
             }
-            db.query(`SELECT * FROM as_gabot_giveaways WHERE discord_id = '${interaction.user.id}' AND creation_timestamp > ${new Date().getTime() - 86400000}`).then(async res => {
+            db.query(`SELECT * FROM as_gabot_giveaways WHERE discord_id = '${interaction.user.id}' AND creation_timestamp > ${new Date().getTime() - 86400000} AND status = 'active'`).then(async res => {
                 if (res.rowCount != 0) {
                     return interaction.reply({
-                        content: `You have already hosted a giveaway today. You may host again in ${msToFullTime((Number(res.rows[0].creation_timestamp) + 86400000) - new Date().getTime())}`,
+                        content: `You have already hosted a giveaway today. You may host again in **${msToFullTime((Number(res.rows[0].creation_timestamp) + 86400000) - new Date().getTime())}**`,
                         ephemeral: true
                     }).catch(console.error)
                 } else {
