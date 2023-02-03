@@ -50,6 +50,8 @@ db.connect().then(async res => {
         LISTEN as_users_ratings_insert;
         LISTEN as_users_ratings_update;
         LISTEN as_users_ratings_delete;
+
+        LISTEN discord_msg_auto_delete_insert;
     `).catch(console.error)
 })
 
