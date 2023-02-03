@@ -336,7 +336,7 @@ client.on('interactionCreate', async (interaction) => {
                     }
                 })
             })
-        } else if (interaction.customId == 'as_sb_sq_trackers_remove') {
+        } else if (interaction.customId.split('.')[0] == 'as_sb_sq_trackers_remove') {
             socket.emit('squadbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
                 socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
                     if (res.code == 200) {
@@ -352,16 +352,30 @@ client.on('interactionCreate', async (interaction) => {
 
 function constructTrackersEmbed(trackers, ephemeral) {
 
-    const component_options = trackers.reduce((arr,tracker,index) => {
-        if (index < 25) {
-            arr.push({
-                label: `${convertUpper(tracker.squad_string)}`,
-                value: tracker.tracker_id,
-                emoji: emoteObjFromSquadString(tracker.squad_string)
-            })
+    const select_menus = []
+    trackers.forEach((tracker,index) => {
+        if ((index + 1) > 100) return
+        const component_index = Math.floor((index + 1) / 25)
+        if (!select_menus[component_index]) {
+            select_menus[component_index] = {
+                type: 1,
+                components: [{
+                    type: 3,
+                    custom_id: `as_sb_sq_trackers_remove.${component_index}`,
+                    options: [],
+                    placeholder: "Choose a tracker to remove",
+                    min_values: 1,
+                    max_values: null
+                }]
+            }
         }
-        return arr
-    },[])
+        select_menus[component_index].components[0].options.push({
+            label: `${convertUpper(tracker.squad_string)}`,
+            value: tracker.tracker_id,
+            emoji: emoteObjFromSquadString(tracker.squad_string)
+        })
+        select_menus[component_index].max_values = select_menus[component_index].components[0].options.length
+    })
 
     var payload = {
         content: ' ',
@@ -375,40 +389,20 @@ function constructTrackersEmbed(trackers, ephemeral) {
                 inline: true
             }]
         }],
-        components: component_options.length > 0 ? [{
-            type: 1,
-            components: [{
-                    type: 3,
-                    custom_id: "as_sb_sq_trackers_remove",
-                    options: component_options,
-                    placeholder: "Choose a tracker to remove",
-                    min_values: 1,
-                    max_values: component_options.length
-            }]
-        },{
+        components: select_menus.concat({
             type: 1,
             components: [{
                     type: 2,
                     label: "Add Tracker",
                     style: 3,
                     custom_id: "as_sb_sq_trackers_add_modal"
-                },{
+                }, select_menus.length > 0 ? {
                     type: 2,
                     label: "Remove All",
                     style: 4,
                     custom_id: "as_sb_sq_trackers_remove_all"
-            }]
-        }] : [{
-            type: 1,
-            components: [
-                {
-                    type: 2,
-                    label: "Add Tracker",
-                    style: 3,
-                    custom_id: "as_sb_sq_trackers_add_modal"
-                }
-            ]
-        }],
+                } : null].filter(o => o != null)
+        }),
         ephemeral: ephemeral
     }
     return payload

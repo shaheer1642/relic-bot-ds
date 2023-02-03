@@ -300,7 +300,7 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isSelectMenu()) {
         if (!Object.keys(channels_list).includes(interaction.channel.id)) return
-        if (interaction.customId == 'rb_sq_trackers_remove') {
+        if (interaction.customId.split('.')[0] == 'rb_sq_trackers_remove') {
             socket.emit('relicbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
                 socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
                     if (res.code == 200) {
@@ -986,27 +986,45 @@ function relicBotSquadToString(squad,include_sp_rj,exclude_tier) {
 }
 
 function constructTrackersEmbed(trackers, ephemeral) {
-
-    const component_options = trackers.reduce((arr,tracker,index) => {
-        if (index < 25) {
-            arr.push({
-                label: `${relicBotSquadToString(tracker)} ${tracker.is_steelpath ? 'Steelpath':tracker.is_railjack ? 'Railjack':''}`,
-                value: tracker.tracker_id,
-                emoji: {
-                    name: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[0],
-                    id: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[1],
-                }
-            })
+    trackers = trackers.sort(dynamicSort('main_relics'))
+    trackers = trackers.sort(dynamicSort('tier'))
+    const select_menus = []
+    trackers.forEach((tracker,index) => {
+        if ((index + 1) > 100) return
+        const component_index = Math.floor((index + 1) / 25)
+        if (!select_menus[component_index]) {
+            select_menus[component_index] = {
+                type: 1,
+                components: [{
+                    type: 3,
+                    custom_id: `rb_sq_trackers_remove.${component_index}`,
+                    options: [],
+                    placeholder: "Choose a tracker to remove",
+                    min_values: 1,
+                    max_values: null
+                }]
+            }
         }
-        return arr
-    },[])
+        select_menus[component_index].components[0].options.push({
+            label: `${relicBotSquadToString(tracker)} ${tracker.is_steelpath ? 'Steelpath':tracker.is_railjack ? 'Railjack':''}`,
+            value: tracker.tracker_id,
+            emoji: {
+                name: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[0],
+                id: emote_ids[tracker.tier].replace('<:','').replace('>','').split(':')[1],
+            }
+        })
+        select_menus[component_index].max_values = select_menus[component_index].components[0].options.length
+    })
+
+    // console.log(JSON.stringify(select_menus))
 
     var payload = {
         content: ' ',
         embeds: [{
             title: 'Tracked Squads',
+            description: trackers.length == 0 ? 'You are not tracking any squads':'',
             color: 'WHITE',
-            fields: [{
+            fields: trackers.length == 0 ? []:[{
                 name: 'Tier',
                 value: '\u200b',
                 inline: true
@@ -1016,40 +1034,20 @@ function constructTrackersEmbed(trackers, ephemeral) {
                 inline: true
             }]
         }],
-        components: component_options.length > 0 ? [{
-            type: 1,
-            components: [{
-                    type: 3,
-                    custom_id: "rb_sq_trackers_remove",
-                    options: component_options,
-                    placeholder: "Choose a tracker to remove",
-                    min_values: 1,
-                    max_values: component_options.length
-            }]
-        },{
+        components: select_menus.concat({
             type: 1,
             components: [{
                     type: 2,
                     label: "Add Tracker",
                     style: 3,
                     custom_id: "rb_sq_trackers_add_modal"
-                },{
+                }, select_menus.length > 0 ? {
                     type: 2,
                     label: "Remove All",
                     style: 4,
                     custom_id: "rb_sq_trackers_remove_all"
-            }]
-        }] : [{
-            type: 1,
-            components: [
-                {
-                    type: 2,
-                    label: "Add Tracker",
-                    style: 3,
-                    custom_id: "rb_sq_trackers_add_modal"
-                }
-            ]
-        }],
+                } : null].filter(o => o != null)
+        }),
         ephemeral: ephemeral
     }
     trackers.forEach(tracker => {
