@@ -5,10 +5,6 @@ const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
-const WorldState = require('warframe-worldstate-parser');
-const axios = require('axios');
-const axiosRetry = require('axios-retry');
-const {event_emitter} = require('./event_emitter')
 const {as_users_list} = require('./allsquads/as_users_list')
 
 const guild_id = '865904902941048862'
@@ -51,6 +47,28 @@ function closeGiveaway(giveawayObj) {
             `).catch(console.error)
         }).catch(console.error)
     }, giveawayObj.expiry_timestamp - new Date().getTime());
+}
+
+function rerollGiveaway(giveaway_id) {
+    return new Promise((resolve,reject) => {
+        db.query(`
+            SELECT * FROM as_gabot_giveaways WHERE giveaway_id='${giveaway_id}' AND status = 'ended';
+        `).then(res => {
+            const giveaway = res.rows[0]
+            if (!giveaway) return resolve('Could not find that giveaway')
+            var winners_list = giveaway.winners_list
+            var join_list = giveaway.join_list.filter(id => !winners_list.includes(id))
+            if (join_list.length == 0) return resolve('This giveaway cannot be rerolled anymore')
+            join_list = getShuffledArr(join_list);
+            winners_list.push(join_list.pop())
+            db.query(`
+                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}' WHERE giveaway_id='${giveaway_id}' AND status = 'ended';
+            `).then(res => {
+                if (res.rowCount != 1) return resolve('unexpected db response')
+                else return resolve('giveaway rerolled!')
+            }).catch(console.error)
+        }).catch(console.error)
+    })
 }
 
 // client.on('messageReactionAdd', async (reaction,user) => {
@@ -114,113 +132,138 @@ client.on('interactionCreate', async (interaction) => {
                 return interaction.reply({
                     content: 'Your account is not verified',
                     ephemeral: true
-                })
-            }
-            const discord_id = interaction.user.id
-            const item = interaction.options.getString('item').replace(/'/g,`''`)
-            const rp_cost = interaction.options.getNumber('rp_cost')
-            const winner_count = interaction.options.getNumber('winner_count')
-            const expiry = interaction.options.getString('expiry')
-            var expiration = 0
-            expiry.split(' ').map(word => {
-                if (word.match('d'))
-                    expiration += 1000 * 60 * 60 * 24 * Number(word.replace('d',''))
-                if (word.match('h'))
-                    expiration += 1000 * 60 * 60 * Number(word.replace('h',''))
-                if (word.match('m'))
-                    expiration += 1000 * 60 * Number(word.replace('m',''))
-            })
-            if (!expiration) {
-                return interaction.reply({
-                    content: ' ',
-                    embeds: [{
-                        description: 'Expiry time could not be determined\nType **1d** for one day, **2h** for two hours, **10m** for ten minutes'
-                    }],
-                    ephemeral: true
                 }).catch(console.error)
             }
-            const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
-            if (!channel) return
-            channel.send({
-                content: ' ',
-                embeds: [{
-                    title: `[${as_users_list[discord_id]?.platform}] ${convertUpper(item)}`,
-                    description: `Click 🎉 to join\n${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries`,
-                    fields: [{
-                        name: 'Hosted By',
-                        value: `<@${discord_id}>`,
-                        inline: true
-                    },{
-                        name: 'RP Required to Join',
-                        value: rp_cost.toString(),
-                        inline: true
-                    },{
-                        name: 'Ends',
-                        value: `<t:${Math.round(Number(new Date().getTime() + expiration) / 1000)}:R>`,
-                        inline: true
-                    },],
-                    color: 'RANDOM',
-                    timestamp: new Date().getTime()
-                }],
-                components: [{
-                    type: 1,
-                    components: [{
-                        type: 2,
-                        label: '0',
-                        emoji: '🎉',
-                        style: 3,
-                        custom_id: 'as_ga_join'
-                    }]
-                }],
-            }).then(msg => {
-                db.query(`
-                    INSERT INTO as_gabot_giveaways (
-                        discord_id,
-                        channel_id,
-                        message_id,
-                        item,
-                        rp_cost,
-                        winner_count,
-                        expiry_timestamp
-                    ) VALUES (
-                        '${discord_id}',
-                        '${msg.channel.id}',
-                        '${msg.id}',
-                        '${item}',
-                        ${rp_cost},
-                        ${winner_count || 1},
-                        ${new Date().getTime() + expiration}
-                    )
-                `).then(res => {
-                    if (res.rowCount == 1) {
-                        interaction.reply({
+            db.query(`SELECT * FROM as_gabot_giveaways WHERE discord_id = '${interaction.user.id}' AND creation_timestamp > ${new Date().getTime() - 86400000}`).then(async res => {
+                if (res.rowCount != 0) {
+                    return interaction.reply({
+                        content: `You have already hosted a giveaway today. You may host again in ${msToFullTime((Number(res.rows[0].creation_timestamp) + 86400000) - new Date().getTime())}`,
+                        ephemeral: true
+                    }).catch(console.error)
+                } else {
+                    const discord_id = interaction.user.id
+                    const item = interaction.options.getString('item').replace(/'/g,`''`)
+                    const rp_cost = interaction.options.getNumber('rp_cost')
+                    const winner_count = interaction.options.getNumber('winner_count')
+                    const expiry = interaction.options.getString('expiry')
+                    var expiration = 0
+                    expiry.split(' ').map(word => {
+                        if (word.match('d'))
+                            expiration += 1000 * 60 * 60 * 24 * Number(word.replace('d',''))
+                        if (word.match('h'))
+                            expiration += 1000 * 60 * 60 * Number(word.replace('h',''))
+                        if (word.match('m'))
+                            expiration += 1000 * 60 * Number(word.replace('m',''))
+                    })
+                    if (!expiration) {
+                        return interaction.reply({
                             content: ' ',
                             embeds: [{
-                                description: `Your giveaway **${convertUpper(item)}** has been hosted in <#${channel_id}> channel`
+                                description: 'Expiry time could not be determined\nType **3d** for three days, **2h** for two hours, **10m** for ten minutes'
                             }],
                             ephemeral: true
                         }).catch(console.error)
-                    } else {
-                        interaction.reply({
+                    }
+                    if (expiration < 259200000) {
+                        return interaction.reply({
                             content: ' ',
                             embeds: [{
-                                description: `Some error occured in db, received rows ${res.rowCount}\nContact <@253525146923433984>`
+                                description: 'Minimum expiry time should be 3 days'
                             }],
-                            ephemeral: false
+                            ephemeral: true
                         }).catch(console.error)
-                        msg.delete().catch(console.error)
                     }
-                }).catch(err => {
-                    console.log(err)
-                    interaction.reply({
+                    const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
+                    if (!channel) return
+                    channel.send({
                         content: ' ',
                         embeds: [{
-                            description: `Some error occured in db: ${err.detail || err.stack || err}\nContact <@253525146923433984>`
+                            title: `[${as_users_list[discord_id]?.platform}] ${convertUpper(item)}`,
+                            description: `Click 🎉 to join\n${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries`,
+                            fields: [{
+                                name: 'Hosted By',
+                                value: `<@${discord_id}>`,
+                                inline: true
+                            },{
+                                name: 'RP Required to Join',
+                                value: rp_cost.toString(),
+                                inline: true
+                            },{
+                                name: 'Ends',
+                                value: `<t:${Math.round(Number(new Date().getTime() + expiration) / 1000)}:R>`,
+                                inline: true
+                            },],
+                            color: 'RANDOM',
+                            timestamp: new Date().getTime()
                         }],
-                        ephemeral: false
+                        components: [{
+                            type: 1,
+                            components: [{
+                                type: 2,
+                                label: '0',
+                                emoji: '🎉',
+                                style: 3,
+                                custom_id: 'as_ga_join'
+                            }]
+                        }],
+                    }).then(msg => {
+                        db.query(`
+                            INSERT INTO as_gabot_giveaways (
+                                discord_id,
+                                channel_id,
+                                message_id,
+                                item,
+                                rp_cost,
+                                winner_count,
+                                expiry_timestamp
+                            ) VALUES (
+                                '${discord_id}',
+                                '${msg.channel.id}',
+                                '${msg.id}',
+                                '${item}',
+                                ${rp_cost},
+                                ${winner_count || 1},
+                                ${new Date().getTime() + expiration}
+                            )
+                        `).then(res => {
+                            if (res.rowCount == 1) {
+                                interaction.reply({
+                                    content: ' ',
+                                    embeds: [{
+                                        description: `Your giveaway **${convertUpper(item)}** has been hosted in <#${channel_id}> channel`
+                                    }],
+                                    ephemeral: true
+                                }).catch(console.error)
+                            } else {
+                                interaction.reply({
+                                    content: ' ',
+                                    embeds: [{
+                                        description: `Some error occured in db, received rows ${res.rowCount}\nContact <@253525146923433984>`
+                                    }],
+                                    ephemeral: false
+                                }).catch(console.error)
+                                msg.delete().catch(console.error)
+                            }
+                        }).catch(err => {
+                            console.log(err)
+                            interaction.reply({
+                                content: ' ',
+                                embeds: [{
+                                    description: `Some error occured in db: ${err.detail || err.stack || err}\nContact <@253525146923433984>`
+                                }],
+                                ephemeral: false
+                            }).catch(console.error)
+                            msg.delete().catch(console.error)
+                        })
                     }).catch(console.error)
-                    msg.delete().catch(console.error)
-                })
+                }
+            }).catch(console.error)
+        } else if (interaction.options.getSubcommand() == 'reroll') {
+            rerollGiveaway(interaction.options.getString('giveaway')).then(res => {
+                interaction.reply({
+                    content: res,
+                    ephemeral: true
+                }).catch(console.error)
             }).catch(console.error)
         }
     }
@@ -230,7 +273,7 @@ client.on('interactionCreate', async (interaction) => {
                 return interaction.reply({
                     content: 'Your account is not verified',
                     ephemeral: true
-                })
+                }).catch(console.error)
             }
             db.query(`
                 SELECT * FROM as_gabot_giveaways WHERE message_id = '${interaction.message.id}';
@@ -280,6 +323,19 @@ client.on('interactionCreate', async (interaction) => {
                 `).catch(console.error)
                 interaction.deferUpdate().catch(console.error)
             }).catch(console.error)
+        }
+    }
+    if (interaction.isAutocomplete()) {
+        if (interaction.commandName == 'giveaways') {
+            if (interaction.options.getSubcommand() == 'reroll') {
+                db.query(`SELECT * FROM as_gabot_giveaways WHERE LOWER(item) LIKE '%${interaction.options.getString('giveaway')}%' AND discord_id = '${interaction.user.id}' AND creation_timestamp > ${new Date().getTime() - 1209600000}`)
+                .then(res => {
+                    interaction.respond(res.rows.map(row => ({
+                        name: row.item,
+                        value: row.giveaway_id
+                    }))).catch(err => console.log(err))
+                }).catch(err => console.log(err))
+            }
         }
     }
 })
@@ -360,6 +416,10 @@ db.on('notification', async (notification) => {
             // }).catch(console.error)
             channel.send({
                 content: giveaway.winners_list.length == 0 ? `**Giveaway Ended: ${convertUpper(giveaway.item)}**\n*Not enough entries*` : `**Giveaway Ended**\n${giveaway.winners_list.map(id => `<@${id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}** giveaway by <@${giveaway.discord_id}>`,
+            }).catch(console.error)
+        } else if (giveaway.status == 'ended' && old_giveaway.status == 'ended' && old_giveaway.winners_list.length != giveaway.winners_list.length) {
+            channel.send({
+                content: `***Giveaway Rerolled***\n${`<@${giveaway.winners_list.pop()}>`} has won **${convertUpper(giveaway.item)}** giveaway by <@${giveaway.discord_id}>`,
             }).catch(console.error)
         } else if (giveaway.status == 'active') {
             message.edit(embedGenerator(giveaway)).catch(console.error)

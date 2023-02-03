@@ -23,6 +23,14 @@ module.exports = {
 				option.setName('winner_count')
 					.setDescription('Winner(s) count i.e. 1')
 					.setRequired(false))
+		)
+		.addSubcommand(subcommand =>
+			subcommand.setName('reroll')
+			.setDescription('Reroll previous giveaway')
+			.addStringOption(option => 
+				option.setName('giveaway')
+					.setDescription('Select giveaway')
+					.setRequired(true))
 		),
 	scope: 'private',
 	guildIds: [
