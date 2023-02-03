@@ -10,8 +10,8 @@ client.on('ready', () => {
     })
 })
 
-function db_schedule_msg_deletion(delete_timestamp, message_id, channel_id) {
-    db.query(`INSERT INTO discord_msg_auto_delete (message_id, channel_id, delete_timestamp) VALUES ('${message_id}','${channel_id}',${delete_timestamp})`).catch(console.error)
+function db_schedule_msg_deletion(message_id, channel_id, delete_timeout) {
+    db.query(`INSERT INTO discord_msg_auto_delete (message_id, channel_id, delete_timestamp) VALUES ('${message_id}','${channel_id}',${new Date().getTime() + delete_timeout})`).catch(console.error)
 }
 
 function schedule_deletion(db_obj) {
