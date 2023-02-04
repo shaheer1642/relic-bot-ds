@@ -334,6 +334,24 @@ client.on('interactionCreate', (interaction) => {
             }).catch(console.error)
         }
     }
+    if (interaction.isSelectMenu()) {
+        if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
+            const bot_type = interaction.customId.split('.')[1]
+            const squad_id = interaction.customId.split('.')[2]
+            const discord_id = interaction.user.id
+            const reason = 'Invalidated for specific members'
+            const invalidated_members = interaction.values
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,discord_id: discord_id, reason: reason, invalidated_members: invalidated_members},(res) => {
+                if (res.code == 200) {
+                    interaction.update({
+                        content: `Squad invalidated by <@${discord_id}>\nInvalidated Members: ${invalidated_members.map(id => `<@${id}>`).join(', ')}`,
+                        embeds: interaction.message.embeds.map(embed => ({...embed, color: 'RED'})),
+                        components: []
+                    }).catch(console.error)
+                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            })
+        }
+    }
 })
 
 async function computeRateUser(query,discord_id) {

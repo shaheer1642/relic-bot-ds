@@ -1001,22 +1001,7 @@ async function logSquad(squad,include_chat,action) {
                         },
                         color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'PURPLE' : 'WHITE'
                     }],
-                    components: action == 'squad_closed' ? [{
-                        type: 1,
-                        components: [{
-                            type: 2,
-                            label: "Validate",
-                            emoji: "✅",
-                            style: 2,
-                            custom_id: `as_sq_validate.squadbot.${squad.squad_id}`
-                        },{
-                            type: 2,
-                            label: "Invalidate",
-                            emoji: "🛑",
-                            style: 2,
-                            custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}`
-                        }]
-                    }]:[]
+                    components: generateComponentsPayload()
                 }).catch(console.error)
             }
         })
@@ -1032,23 +1017,41 @@ async function logSquad(squad,include_chat,action) {
                 },
                 color: action == 'squad_opened' ? 'GREEN' : action == 'squad_closed' ? 'BLUE' : action == 'squad_disbanded' ? 'PURPLE' : 'WHITE'
             }],
-            components: action == 'squad_closed' ? [{
-                type: 1,
-                components: [{
-                    type: 2,
-                    label: "Validate",
-                    emoji: "✅",
-                    style: 2,
-                    custom_id: `as_sq_validate.squadbot.${squad.squad_id}`
-                },{
-                    type: 2,
-                    label: "Invalidate",
-                    emoji: "🛑",
-                    style: 2,
-                    custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}`
-                }]
-            }]:[]
+            components: generateComponentsPayload()
         }).catch(console.error)
+    }
+
+    function generateComponentsPayload() {
+        return action == 'squad_closed' ? [{
+            type: 1,
+            components: [{
+                type: 2,
+                label: "Validate",
+                emoji: "✅",
+                style: 2,
+                custom_id: `as_sq_validate.squadbot.${squad.squad_id}`
+            },{
+                type: 2,
+                label: "Invalidate",
+                emoji: "🛑",
+                style: 2,
+                custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}`
+            }]
+        },{
+            type: 1,
+            components: [{
+                type: 3,
+                custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}`,
+                options: squad.members.map((discord_id) => ({
+                    label: as_users_list[discord_id]?.ingame_name,
+                    value: discord_id,
+                    emoji: '🛑'
+                })),
+                placeholder: "Invalidate specific member(s)",
+                min_values: 1,
+                max_values: squad.members.length
+            }]
+        }]:[]
     }
 }
 
