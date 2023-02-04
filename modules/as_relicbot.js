@@ -909,13 +909,13 @@ async function logSquad(squad,include_chat,action) {
                 label: "Invalidate",
                 emoji: "🛑",
                 style: 2,
-                custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}`
+                custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}.1`
             }]
         },{
             type: 1,
             components: [{
                 type: 3,
-                custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}`,
+                custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}.2`,
                 options: squad.members.map((discord_id) => ({
                     label: as_users_list[discord_id]?.ingame_name,
                     value: discord_id,
