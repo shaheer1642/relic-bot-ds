@@ -173,8 +173,8 @@ async function getGuildMembersStatus(members, guild_id) {
         members.forEach(async member => {
             const presence = guild.presences.cache.get(member.id)
             const presence_status = presence?.status || 'offline'
-            console.log(presence_status,member.id)
-            if (member.allowed_mentions.some(status => status == presence_status)) {
+            // console.log(presence_status,member.id)
+            if (member.allowed_mentions?.some(status => status == presence_status)) {
                 mentions_list.push(member.id)
             }
         })
