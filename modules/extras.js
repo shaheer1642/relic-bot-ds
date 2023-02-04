@@ -162,6 +162,26 @@ function calcArrAvg(arr) {
     return sum / arr.length
 }
 
+async function getGuildMembersStatus(members, guild_id) {
+    // note: the members is an array of object: {id: '', allowed_mentions: ['']}
+    return new Promise(async (resolve,reject) => {
+        const mentions_list = []
+        const guild = client.guilds.cache.get(guild_id) || await client.guilds.fetch(guild_id).catch(console.error)
+        if (!guild) {
+            return resolve(mentions_list)
+        }
+        members.forEach(async member => {
+            const presence = guild.presences.cache.get(member.id)
+            const presence_status = presence?.status || 'offline'
+            console.log(presence_status,member.id)
+            if (member.allowed_mentions.some(status => status == presence_status)) {
+                mentions_list.push(member.id)
+            }
+        })
+        return resolve(mentions_list)
+    })
+}
+
 module.exports = {
     dynamicSort,
     dynamicSortDesc,
@@ -174,5 +194,6 @@ module.exports = {
     ms_till_monday_12am,
     sortCaseInsensitive,
     arrToStringsArrWithLimit,
-    calcArrAvg
+    calcArrAvg,
+    getGuildMembersStatus
 };

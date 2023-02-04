@@ -18,16 +18,11 @@ function updateUsersList() {
 
 db.on('notification',(notification) => {
     const payload = JSONbig.parse(notification.payload);
-    if (['tradebot_users_list_insert','tradebot_users_list_update','tradebot_users_list_delete'].includes(notification.channel)) {
-        updateUsersList()
+    if (notification.channel == 'tradebot_users_list_insert') {
+        as_users_list[payload.discord_id] = payload
     }
-    if (['tradebot_users_list_insert'].includes(notification.channel)) {
-        // event_emitter.emit('allSquadsNewUserVerified', {...payload, discord_id: payload.discord_id.toString()})
-    }
-    if (['tradebot_users_list_update'].includes(notification.channel)) {
-        // if (payload[0].ingame_name != payload[1].ingame_name) {
-        //     event_emitter.emit('allSquadsUserUpdatedIGN', {...payload[0], discord_id: payload[0].discord_id.toString()})
-        // }
+    if (notification.channel == 'tradebot_users_list_update') {
+        as_users_list[payload[0].discord_id] = payload
     }
 })
 
