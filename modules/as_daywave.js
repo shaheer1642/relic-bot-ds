@@ -81,7 +81,7 @@ const message_formats = {
 
 client.on('ready', async () => {
     webhook_client = await client.fetchWebhook('1050488022132596807').catch(console.error)
-    webhook_client.editMessage(message_ids.challenges.faq, message_formats.challenges.faq)
+    webhook_client?.editMessage(message_ids.challenges.faq, message_formats.challenges.faq)
     console.log('[ms_till_monday_12am]', ms_till_monday_12am())
     setTimeout(weekly_challenges_reset, ms_till_monday_12am());
     setTimeout(weekly_deals_reset, ms_till_monday_12am());

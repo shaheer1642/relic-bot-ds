@@ -706,6 +706,12 @@ function edit_recruitment_intro() {
                     label: "Tracked Squads",
                     style: 2,
                     custom_id: `as_sb_sq_trackers_show`
+                },{
+                    type: 2,
+                    label: "Settings",
+                    style: 2,
+                    custom_id: `as_user_settings`,
+                    emoji: '⚙️'
                 }]
             },{
                 type: 1,

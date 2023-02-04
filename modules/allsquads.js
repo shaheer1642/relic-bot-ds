@@ -311,7 +311,19 @@ client.on('interactionCreate', (interaction) => {
                 }],
                 ephemeral: true
             }).catch(console.log)
-        }
+        } else if (interaction.customId.split('.')[0] == 'as_user_settings') {
+            if (!as_users_list[interaction.user.id]) return interaction.reply({content: 'You are not verified', ephemeral: true}).catch(console.error)
+            interaction.reply(userSettingsPanel(interaction, as_users_list[interaction.user.id])).catch(console.error)
+        } else if (interaction.customId.split('.')[0] == 'as_user_change_settings') {
+            const discord_id = interaction.user.id
+            const setting_type = interaction.customId.split('.')[1]
+            const setting_value = interaction.customId.split('.')[2] == 'true' ? true : interaction.customId.split('.')[2] == 'false' ? false : interaction.customId.split('.')[2]
+            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, discord_id: discord_id},(res) => {
+                if (res.code == 200) {
+                    interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
+                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+            })
+        } 
     }
     if (interaction.isModalSubmit()) {
         if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
@@ -353,6 +365,39 @@ client.on('interactionCreate', (interaction) => {
         }
     }
 })
+
+function userSettingsPanel(interaction, user_obj) {
+    const discord_id = interaction.user.id;
+    const ping_dnd = user_obj.allowed_pings_status?.includes('dnd') ? true : false
+    const ping_off = user_obj.allowed_pings_status?.includes('offline') ? true : false
+    return {
+        embeds: [{
+            title: 'Bot Settings',
+            author: {
+                name: user_obj.ingame_name,
+                icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.jpeg`,
+            },
+            description: 'Click the buttons below to change that setting for your account',
+            fields: [],
+            color: 'ORANGE'
+        }],
+        components: [{
+            type: 1,
+            components: [{
+                type: 2,
+                label: `${ping_dnd ? 'Disable' : 'Enable'} pinging on 'Do Not Disturb'`,
+                style: ping_dnd ? 4 : 3,
+                custom_id: `as_user_change_settings.ping_dnd.${ping_dnd ? false:true}`,
+            },{
+                type: 2,
+                label: `${ping_off ? 'Disable' : 'Enable'} pinging when offline`,
+                style: ping_off ? 4 : 3,
+                custom_id: `as_user_change_settings.ping_off.${ping_off ? false:true}`,
+            },]
+        }],
+        ephemeral: true
+    }
+}
 
 async function computeRateUser(query,discord_id) {
     return new Promise((resolve,reject) => {

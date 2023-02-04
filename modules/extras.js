@@ -167,7 +167,7 @@ async function getGuildMembersStatus(members, guild_id) {
     return new Promise(async (resolve,reject) => {
         const mentions_list = []
         const guild = client.guilds.cache.get(guild_id) || await client.guilds.fetch(guild_id).catch(console.error)
-        if (!guild) {
+        if (!guild || !guild.presences) {
             return resolve(mentions_list)
         }
         members.forEach(async member => {

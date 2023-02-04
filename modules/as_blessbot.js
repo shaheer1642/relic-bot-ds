@@ -410,7 +410,7 @@ function embedGenerator(blessing) {
 }
 
 function edit_intro() {
-    webhook_client.editMessage(intro_message_id, {
+    webhook_client?.editMessage(intro_message_id, {
         content: ' ',
         embeds: [{
             title: 'Warframe Blessing',

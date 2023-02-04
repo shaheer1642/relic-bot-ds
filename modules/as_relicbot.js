@@ -1181,6 +1181,12 @@ async function fissures_check() {
                     label: "My Relics",
                     style: 2,
                     custom_id: `rb_sq_trackers_show`
+                },{
+                    type: 2,
+                    label: "Settings",
+                    style: 2,
+                    custom_id: `as_user_settings`,
+                    emoji: '⚙️'
                 }]
             },{
                 type: 1,
