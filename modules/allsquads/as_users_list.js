@@ -22,7 +22,7 @@ db.on('notification',(notification) => {
         as_users_list[payload.discord_id] = payload
     }
     if (notification.channel == 'tradebot_users_list_update') {
-        as_users_list[payload[0].discord_id] = payload
+        as_users_list[payload[0].discord_id] = payload[0]
     }
 })
 
