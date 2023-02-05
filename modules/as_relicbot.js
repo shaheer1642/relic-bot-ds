@@ -874,7 +874,7 @@ async function logSquad(squad,include_chat,action) {
                     content: convertUpper(action),
                     embeds: [{
                         title: relicBotSquadToString(squad,true),
-                        description: `${squadFillTime}\n${squadRecommendedHost}\n${squadHost}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadChat}`.trim().replace(/_/g, '\\_'),
+                        description: `${squadFillTime}\n${squadRecommendedHost}\n${squadHost}\n\n${squadMembers}\n\n${squadLogs}\n\n${squadChat}`.trim().replace(/_/g, '\\_').substring(0,4096),
                         timestamp: new Date(),
                         footer: {
                             text: `Squad Id: ${squad.squad_id}\n\u200b`
@@ -890,7 +890,7 @@ async function logSquad(squad,include_chat,action) {
             content: convertUpper(action),
             embeds: [{
                 title: relicBotSquadToString(squad,true),
-                description: `${squadFillTime}\n${squadRecommendedHost}\n\n${squadMembers}\n\n${squadLogs}`.trim().replace(/_/g, '\\_'),
+                description: `${squadFillTime}\n${squadRecommendedHost}\n\n${squadMembers}\n\n${squadLogs}`.trim().replace(/_/g, '\\_').substring(0,4096),
                 timestamp: new Date(),
                 footer: {
                     text: `Squad Id: ${squad.squad_id}\n\u200b`
