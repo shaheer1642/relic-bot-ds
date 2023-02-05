@@ -539,7 +539,7 @@ function edit_challenges_embed() {
                 })
                 payload.embeds[0].fields.push({
                     name: challenge.name + ` (${challenge.rp} RP)`,
-                    value: challenge.description + '\n' + complete_count + ' players completed',
+                    value: challenge.description, // + '\n' + complete_count + ' players completed',
                     inline: true
                 })
             })
