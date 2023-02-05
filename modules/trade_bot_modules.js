@@ -2562,10 +2562,10 @@ async function trading_bot_item_orders(message,args,request_type = 1) {
 
 async function trading_bot_registeration(discord_id) {
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
+        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = '${discord_id}'`)
         .then(res => {
             const uni_id = generateId()
-            db.query(`INSERT INTO tradebot_users_unverified (id,discord_id) VALUES ('${uni_id}',${discord_id})`)
+            db.query(`INSERT INTO tradebot_users_unverified (id,discord_id) VALUES ('${uni_id}','${discord_id}')`)
             .then(() => {
                 resolve(allsquads.verificationInstructions('en',uni_id,res.rows.length == 0 ? false:true))
             }).catch(err => {
@@ -2812,7 +2812,7 @@ async function tb_close_lich_orders(message, interaction) {
 
 async function tb_user_exist(discord_id) {
     return new Promise((resolve, reject) => {
-        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
+        db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = '${discord_id}'`)
         .then(res => {
             if (res.rowCount==0) {
                 trading_bot_registeration(discord_id)
