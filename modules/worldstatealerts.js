@@ -2473,11 +2473,14 @@ async function cycles_check() {
                             }
                         })
                     })
-                    console.log('user_ids',user_ids)
+                    // console.log('user_ids',user_ids)
                     res.rows.forEach(row => {
                         if (row.cycles_alert) {
-                            if (user_ids[row.channel_id] && user_ids[row.channel_id].length > 0)
-                                client.channels.cache.get(row.channel_id).send(`Cetus: ${cetusCycle.state == 'day' ? 'night' : 'day'} starts in 10 minutes ${user_ids[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                            if (user_ids[row.channel_id] && user_ids[row.channel_id].length > 0) {
+                                arrToStringsArrWithLimit(`Cetus: ${cetusCycle.state == 'day' ? 'night' : 'day'} starts in 10 minutes`, user_ids[row.channel_id], 2000).forEach(str => {
+                                    client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                })
+                            }
                         }
                     })
                 }, (new Date(cetusCycle.expiry).getTime() - new Date().getTime()) - 600000);
