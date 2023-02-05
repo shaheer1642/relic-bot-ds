@@ -3,6 +3,7 @@ const {db} = require('./db_connection.js');
 const JSONbig = require('json-bigint');
 
 client.on('ready', () => {
+    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     db.query(`SELECT * FROM discord_msg_auto_delete`).then(res => {
         res.rows.forEach(row => {
             schedule_deletion(row)

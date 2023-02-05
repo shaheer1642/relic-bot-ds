@@ -2,7 +2,8 @@ const {client} = require('./discord_client.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor,convertUpper} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor,convertUpper, arrToStringsArrWithLimit} = require('./extras.js');
+const {db_schedule_msg_deletion} = require('./msg_auto_delete')
 const WorldState = require('warframe-worldstate-parser');
 const access_ids = [
     '253525146923433984'
@@ -2581,12 +2582,15 @@ async function cycles_check() {
                 if (row.cycles_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.cycles_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            content: ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
-                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`${cycles_changed.join(', ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                        arrToStringsArrWithLimit(`${cycles_changed.join(', ')}`, ping_users[row.channel_id], 2000).forEach(str => {
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                        })
+                    }
                 }
             })
         }).catch(console.error)
@@ -2736,12 +2740,15 @@ async function arbitration_check() {
                 if (row.arbitration_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.arbitration_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            content: ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
-                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Arbitration ${arbitration.type} has started ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                        arrToStringsArrWithLimit(`Arbitration ${arbitration.type} has started`, ping_users[row.channel_id], 2000).forEach(str => {
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                        })
+                    }
                 }
             })
         }).catch(console.error)
@@ -2946,7 +2953,7 @@ async function fissures_check() {
                 if (row.fissures_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.fissures_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            content: ' ',
                             embeds: [embed1, embed2, embed3],
                             components: [
                                 {
@@ -2969,8 +2976,11 @@ async function fissures_check() {
                             ]
                         }).catch(console.error)
                     }).catch(console.error)
-                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`${ping_string.join(' ')} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 60000)).catch(console.error)
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                        arrToStringsArrWithLimit(`${ping_string.join(' ')}`, ping_users[row.channel_id], 2000).forEach(str => {
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                        })
+                    }
                 }
             })
 
@@ -3080,12 +3090,15 @@ async function teshin_check() {
                 if (row.teshin_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.teshin_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            content: ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
-                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Teshin rotation: ${steelPath.currentReward.name} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                        arrToStringsArrWithLimit(`Teshin rotation: ${steelPath.currentReward.name}`, ping_users[row.channel_id], 2000).forEach(str => {
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                        })
+                    }
                 }
             })
 
@@ -3221,12 +3234,15 @@ async function alerts_check() {
                 if (row.alerts_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            content: ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
-                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Alert reward: ${convertUpper(alerts_rewards.join(', '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                        arrToStringsArrWithLimit(`Alert reward: ${convertUpper(alerts_rewards.join(', '))}`, ping_users[row.channel_id], 2000).forEach(str => {
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                        })
+                    }
                 }
             })
             var timer = 3600000
@@ -3355,12 +3371,15 @@ async function global_upgrades_check() {
                 if (row.global_upgrades_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            content: ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
-                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Event booster: ${convertUpper(active_booster.toString())} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                        arrToStringsArrWithLimit(`Event booster: ${convertUpper(active_booster.toString())}`, ping_users[row.channel_id], 2000).forEach(str => {
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                        })
+                    }
                 }
             })
             var timer = 3600000
@@ -3501,12 +3520,15 @@ async function invasions_check() {
                 if (row.invasions_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ') : ' ',
+                            content: ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
-                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0)
-                        client.channels.cache.get(row.channel_id).send(`Invasion reward: ${convertUpper(ping_rewards.join(', ').replace(/_/g,' '))} ${ping_users[row.channel_id].join(', ')}`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                    if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                        arrToStringsArrWithLimit(`Invasion reward: ${convertUpper(ping_rewards.join(', ').replace(/_/g,' '))}`, ping_users[row.channel_id], 2000).forEach(str => {
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                        })
+                    }
                 }
             })
 
