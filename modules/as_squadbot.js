@@ -248,33 +248,7 @@ client.on('interactionCreate', async (interaction) => {
             if (!squad_id) {
                 // get squads list the user can auto-fill
                 socket.emit('squadbot/squads/autofill/fetch',{discord_id: discord_id},(res) => {
-                    if (res.code == 200) {
-                        const components = []
-                        res.data.forEach((squad,index) => {
-                            if ((index + 1) > 125) return
-                            const component_index = Math.floor((index + 1) / 5)
-                            if (!components[component_index]) {
-                                components[component_index] = {
-                                    type: 1,
-                                    components: []
-                                }
-                            }
-                            components[component_index].components.push({
-                                type: 2,
-                                label: convertUpper(squad.squad_string),
-                                style: 3,
-                                custom_id: `as_sb_sq_auto_fill.${squad.squad_id}`
-                            })
-                        })
-                        interaction.reply({
-                            embeds: [{
-                                description: 'Select a squad you want to force open',
-                                color: 'GREEN'
-                            }],
-                            components: components,
-                            ephemeral: true
-                        }).catch(console.error)
-                    } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    interaction.reply(generateAutofillPanel(res)).catch(console.error)
                 })
             } else {
                 // force open the squad
@@ -287,7 +261,7 @@ client.on('interactionCreate', async (interaction) => {
                             }],
                             components: []
                         }).catch(console.error)
-                    } else interaction.update(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    } else interaction.update(generateAutofillPanel(res)).catch(console.error)
                 })
             }
         } else if (interaction.customId.match('as_sb_sq_merge_false')) {
@@ -397,6 +371,34 @@ client.on('interactionCreate', async (interaction) => {
         } 
     }
 })
+
+function generateAutofillPanel(res) {
+    const components = []
+    res.data?.forEach((squad,index) => {
+        if ((index + 1) > 125) return
+        const component_index = Math.floor((index + 1) / 5)
+        if (!components[component_index]) {
+            components[component_index] = {
+                type: 1,
+                components: []
+            }
+        }
+        components[component_index].components.push({
+            type: 2,
+            label: convertUpper(squad.squad_string),
+            style: 3,
+            custom_id: `as_sb_sq_auto_fill.${squad.squad_id}`
+        })
+    })
+    return {
+        embeds: [{
+            description: res.message || '\u200b',
+            color: res.code == 200 ? 'GREEN' : 'YELLOW'
+        }],
+        components: components,
+        ephemeral: true
+    }
+}
 
 function constructTrackersEmbed(trackers, ephemeral) {
 
