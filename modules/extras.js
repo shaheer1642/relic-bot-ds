@@ -171,6 +171,7 @@ async function getGuildMembersStatus(members, guild_id) {
             return resolve(mentions_list)
         }
         members.forEach(async member => {
+            if (!guild.members.cache.get(member.id)) return
             const presence = guild.presences.cache.get(member.id)
             const presence_status = presence?.status || 'offline'
             // console.log(presence_status,member.id)
