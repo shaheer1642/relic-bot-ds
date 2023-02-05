@@ -3,7 +3,6 @@ const {db} = require('./db_connection.js');
 const JSONbig = require('json-bigint');
 
 client.on('ready', () => {
-    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     db.query(`SELECT * FROM discord_msg_auto_delete`).then(res => {
         res.rows.forEach(row => {
             schedule_deletion(row)
@@ -23,7 +22,7 @@ function schedule_deletion(db_obj) {
         const msg = cnl.messages.cache.get(db_obj.message_id) || await cnl.messages.fetch(db_obj.message_id).catch(console.error)
         if (!msg) return
         msg.delete().catch(console.error)
-    }, db_obj.delete_timestamp - db_obj.creation_timestamp);
+    }, db_obj.delete_timestamp - new Date().getTime());
 }
 
 db.on('notification', async (notification) => {
