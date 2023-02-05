@@ -2588,7 +2588,7 @@ async function cycles_check() {
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                         arrToStringsArrWithLimit(`${cycles_changed.join(', ')}`, ping_users[row.channel_id], 2000).forEach(str => {
-                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                         })
                     }
                 }
@@ -2978,7 +2978,7 @@ async function fissures_check() {
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                         arrToStringsArrWithLimit(`${ping_string.join(' ')}`, ping_users[row.channel_id], 2000).forEach(str => {
-                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                         })
                     }
                 }
@@ -3096,7 +3096,7 @@ async function teshin_check() {
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                         arrToStringsArrWithLimit(`Teshin rotation: ${steelPath.currentReward.name}`, ping_users[row.channel_id], 2000).forEach(str => {
-                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                         })
                     }
                 }
@@ -3240,7 +3240,7 @@ async function alerts_check() {
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                         arrToStringsArrWithLimit(`Alert reward: ${convertUpper(alerts_rewards.join(', '))}`, ping_users[row.channel_id], 2000).forEach(str => {
-                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                         })
                     }
                 }
@@ -3377,7 +3377,7 @@ async function global_upgrades_check() {
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                         arrToStringsArrWithLimit(`Event booster: ${convertUpper(active_booster.toString())}`, ping_users[row.channel_id], 2000).forEach(str => {
-                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                         })
                     }
                 }
@@ -3526,7 +3526,7 @@ async function invasions_check() {
                     }).catch(console.error)
                     if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                         arrToStringsArrWithLimit(`Invasion reward: ${convertUpper(ping_rewards.join(', ').replace(/_/g,' '))}`, ping_users[row.channel_id], 2000).forEach(str => {
-                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 10000)).catch(console.error)
+                            client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                         })
                     }
                 }
