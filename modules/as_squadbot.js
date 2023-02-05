@@ -13,6 +13,7 @@ const {translatePayload} = require('./allsquads')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
 const {as_users_list} = require('./allsquads/as_users_list')
+const {global_variables} = require('./global_variables')
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -28,83 +29,6 @@ const webhooks_list = {}
 client.on('channelDelete', channel => {
     db.query(`DELETE FROM as_sb_trackers WHERE channel_id = '${channel.id}'; DELETE FROM rb_trackers WHERE channel_id = '${channel.id}';`).catch(console.error)
 })
-
-const default_squads = [{
-    squad_string: 'aya_farm',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'sortie',
-    spots: 3,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'steelpath_incursion',
-    spots: 3,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'void_traces_farm',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'eidolon',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'need_help',
-    spots: 2,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'index',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'profit_taker',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'leveling',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'arbitration',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'nightwave',
-    spots: 3,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'lich_(murmur)',
-    spots: 3,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'sister_(murmur)',
-    spots: 3,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'endo_arena',
-    spots: 4,
-    members: [],
-    is_default: true
-},{
-    squad_string: 'archon_hunt',
-    spots: 4,
-    members: [],
-    is_default: true
-},]
 
 client.on('ready', async () => {
     assign_global_variables().then(() => {
@@ -636,7 +560,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
     // console.log('embed called',new Date().getTime())
 
     const new_squads_obj = {}
-    default_squads.concat(squads).map((squad,index) => {
+    global_variables['squadbot.default_squads'].concat(squads).map((squad,index) => {
         if (new_squads_obj[squad.squad_string] && !new_squads_obj[squad.squad_string].is_default)
             new_squads_obj[squad.squad_string + index] = squad
         else
@@ -728,14 +652,14 @@ function edit_recruitment_intro() {
                 components: [{
                     type: 3,
                     custom_id: "as_sb_sq_trackers_add_menu",
-                    options: default_squads.map((squad) => ({
+                    options: global_variables['squadbot.default_squads'].map((squad) => ({
                         label: convertUpper(squad.squad_string),
                         value: squad.squad_string,
                         emoji: emoteObjFromSquadString(squad.squad_string)
                     })),
                     placeholder: "Notification Settings",
                     min_values: 1,
-                    max_values: default_squads.length
+                    max_values: global_variables['squadbot.default_squads'].length
                 }]
             }]
         }, channels_list[msg.c_id].lang)).catch(console.error)
@@ -1081,6 +1005,5 @@ socket.on('squadbot/squadMessageCreate',payload => {
 
 module.exports = {
     channels_list,
-    default_squads,
     emoteObjFromSquadString
 }

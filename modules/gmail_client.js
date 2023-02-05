@@ -174,12 +174,12 @@ async function gmail_api_call(auth) {
                     db.query(`DELETE FROM tradebot_users_unverified WHERE discord_id = '${xx_discord}'`).catch(err => console.log(err))
                     db.query(`UPDATE hubapp_users SET forums_username='${ingame_name}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
                     //---Check if user already exists
-                    db.query(`SELECT * FROM tradebot_users_list WHERE discord_id=${xx_discord}`).then(async res => {
+                    db.query(`SELECT * FROM tradebot_users_list WHERE discord_id='${xx_discord}'`).then(async res => {
                         if (res.rowCount > 1) {
                             if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500').catch(console.error)
                         } else {
                             if (res.rowCount == 1) {
-                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = ${xx_discord} returning *;`).then(res => {
+                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = '${xx_discord}' returning *;`).then(res => {
                                     if (res.rowCount == 1) {
                                         event_emitter.emit('allSquadsUserUpdatedIGN', res.rows[0])
                                     } else {
@@ -191,7 +191,7 @@ async function gmail_api_call(auth) {
                                 })
                             }
                             if (res.rowCount == 0) {
-                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values (${xx_discord},'${ingame_name}','${platform}',${new Date().getTime()}) returning *;`).then(res => {
+                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values ('${xx_discord}','${ingame_name}','${platform}',${new Date().getTime()}) returning *;`).then(res => {
                                     if (res.rowCount == 1) {
                                         event_emitter.emit('allSquadsNewUserVerified', res.rows[0])
                                     } else {

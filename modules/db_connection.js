@@ -52,6 +52,10 @@ db.connect().then(async res => {
         LISTEN as_users_ratings_delete;
 
         LISTEN discord_msg_auto_delete_insert;
+
+        LISTEN global_variables_list_insert;
+        LISTEN global_variables_list_update;
+        LISTEN global_variables_list_delete;
     `).catch(console.error)
 })
 
