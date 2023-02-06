@@ -727,7 +727,7 @@ function embed(squads, with_all_names, name_for_squad_id) {
         if (!payloads[payload_index].components[component_index]) payloads[payload_index].components[component_index] = {type: 1, components: []}
         payloads[payload_index].components[component_index].components.push({
             type: 2,
-            label: squad.is_default && squad.squad_type == 'normal' ? `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}` : convertUpper(squad.squad_string),
+            label: squad.is_default ? squad.squad_type == 'normal' ? `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}` : convertUpper(squad.squad_string) : `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}`,
             style: squad.members.length == 0 ? 2 : 1, // squad.members.length == 0 ? 2 : (squad.spots - squad.members.length) == 1 ? 4 : (squad.spots - squad.members.length) == 2 ? 3 : (squad.spots - squad.members.length) == 3 ? 1 : 2,
             custom_id: squad.is_default ? (squad.squad_type == 'choice_based' ? `as_sb_sq_pick_choice.${squad.id}` : squad.squad_type == 'input_based' ? `as_sb_sq_input.${squad.id}` : `as_sb_sq_create.${squad.squad_string}_1/${squad.spots}`) : `as_sb_sq_join.${squad.squad_id}`,
             emoji: (squad.spots - squad.members.length) == 1 ? emote_ids.hot : emoteObjFromSquadString(squad.squad_string)
