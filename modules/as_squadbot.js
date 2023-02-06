@@ -222,6 +222,13 @@ client.on('interactionCreate', async (interaction) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
+        } else if (interaction.customId.split('.')[0] == 'as_sb_sq_input') {
+            const default_squad_id = interaction.customId.split('.')[1]
+            const payload = generateInputPanel(default_squad_id)
+            if (payload.response_type == 'reply')
+                interaction.reply(payload).catch(console.error)
+            if (payload.response_type == 'showModal')
+                interaction.showModal(payload).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_pick_choice') {
             const default_squad_id = interaction.customId.split('.')[1]
             const picked_choice = interaction.customId.split('.')[2]
@@ -268,6 +275,14 @@ client.on('interactionCreate', async (interaction) => {
             //console.log('[relicbot rb_sq_create] content:',message.content)
             
             socket.emit('squadbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+                interaction.deferUpdate().catch(console.error)
+                handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
+            })
+        } else if (interaction.customId.split('.')[0] == 'as_sb_sq_input') {
+            const default_squad_id = interaction.customId.split('.')[1]
+            const default_squad = global_variables['squadbot.default_squads'].filter(squad => squad.id == default_squad_id)[0]
+            if (!default_squad) return interaction.reply({content: 'Something went wrong', ephemeral: true}).catch(console.error)
+            socket.emit('squadbot/squads/create',{message: `${default_squad.squad_string} ${interaction.fields.getTextInputValue('desc')}`, discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
             })
@@ -322,7 +337,11 @@ function generatePickChoicePanel(default_squad_id, discord_id, picked_choice) {
         edit_webhook_messages()
         delete generatedPickChoicePanelCache[`${default_squad_id}_${discord_id}`]
         return {
-            content: 'Something went wrong, please try again',
+            embeds: [{
+                description: 'Something went wrong, please try again',
+                color: 'RED'
+            }],
+            components: [],
             ephemeral: true
         }
     }
@@ -375,6 +394,42 @@ function generatePickChoicePanel(default_squad_id, discord_id, picked_choice) {
                 custom_id: `as_sb_sq_pick_choice.${default_squad.id}.${choice}`,
             })
         })
+    }
+}
+
+function generateInputPanel(default_squad_id) {
+    const default_squad = global_variables['squadbot.default_squads']?.filter(squad => squad.id == default_squad_id)[0]
+    if (!default_squad || default_squad.squad_type != 'input_based' || !default_squad.input_title || !default_squad.input_example) {
+        edit_webhook_messages()
+        return {
+            response_type: 'reply',
+            embeds: [{
+                description: 'Something went wrong, please try again',
+                color: 'RED'
+            }],
+            components: [],
+            ephemeral: true
+        }
+    }
+    return {
+        response_type: 'showModal',
+        title: convertUpper(default_squad.squad_string),
+        custom_id: `as_sb_sq_input.${default_squad.id}`,
+        components: [
+            {
+                type: 1,
+                components: [{
+                    type: 4,
+                    custom_id: 'desc',
+                    label: default_squad.input_title,
+                    placeholder: default_squad.input_example,
+                    style: 1,
+                    min_length: 1,
+                    max_length: 60,
+                    required: true
+                }]
+            }
+        ]
     }
 }
 
@@ -641,7 +696,7 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
 function embed(squads, with_all_names, name_for_squad_id) {
     // console.log('embed called',new Date().getTime())
     const new_squads_obj = {}
-    global_variables['squadbot.default_squads'].concat(squads).map((squad,index) => {
+    global_variables['squadbot.default_squads']?.concat(squads).map((squad,index) => {
         if (new_squads_obj[squad.squad_string] && !new_squads_obj[squad.squad_string].is_default)
             new_squads_obj[squad.squad_string + index] = squad
         else
@@ -672,9 +727,9 @@ function embed(squads, with_all_names, name_for_squad_id) {
         if (!payloads[payload_index].components[component_index]) payloads[payload_index].components[component_index] = {type: 1, components: []}
         payloads[payload_index].components[component_index].components.push({
             type: 2,
-            label: squad.is_default && squad.squad_type == 'choice_based' ? convertUpper(squad.squad_string) : `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}`,
+            label: squad.is_default && squad.squad_type == 'normal' ? `${squad.members.length}/${squad.spots} ${convertUpper(squad.squad_string)}` : convertUpper(squad.squad_string),
             style: squad.members.length == 0 ? 2 : 1, // squad.members.length == 0 ? 2 : (squad.spots - squad.members.length) == 1 ? 4 : (squad.spots - squad.members.length) == 2 ? 3 : (squad.spots - squad.members.length) == 3 ? 1 : 2,
-            custom_id: squad.is_default ?  squad.squad_type == 'normal' ? `as_sb_sq_create.${squad.squad_string}_1/${squad.spots}` : `as_sb_sq_pick_choice.${squad.id}`: `as_sb_sq_join.${squad.squad_id}`,
+            custom_id: squad.is_default ? (squad.squad_type == 'choice_based' ? `as_sb_sq_pick_choice.${squad.id}` : squad.squad_type == 'input_based' ? `as_sb_sq_input.${squad.id}` : `as_sb_sq_create.${squad.squad_string}_1/${squad.spots}`) : `as_sb_sq_join.${squad.squad_id}`,
             emoji: (squad.spots - squad.members.length) == 1 ? emote_ids.hot : emoteObjFromSquadString(squad.squad_string)
         })
     })
