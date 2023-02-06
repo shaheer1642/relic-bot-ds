@@ -282,7 +282,7 @@ client.on('interactionCreate', async (interaction) => {
             const default_squad_id = interaction.customId.split('.')[1]
             const default_squad = global_variables['squadbot.default_squads'].filter(squad => squad.id == default_squad_id)[0]
             if (!default_squad) return interaction.reply({content: 'Something went wrong', ephemeral: true}).catch(console.error)
-            socket.emit('squadbot/squads/create',{message: `${default_squad.squad_string} ${interaction.fields.getTextInputValue('desc')}`, discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+            socket.emit('squadbot/squads/create',{message: `${default_squad.squad_string} ${interaction.fields.getTextInputValue('desc')} 1/${default_squad.spots}`, discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
             })
