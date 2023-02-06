@@ -22,6 +22,9 @@ db.on('notification',(notification) => {
     if (['global_variables_list_insert','global_variables_list_update','global_variables_list_delete'].includes(notification.channel)) {
         updateGlobalVariablesList()
     }
+    if (notification.channel == 'global_variables_list_update') {
+        event_emitter.emit(`globalVariableUpdated/${payload[0].var_name}`, {})
+    }
 })
 
 module.exports = {

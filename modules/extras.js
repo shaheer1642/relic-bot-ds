@@ -119,6 +119,10 @@ function convertUpper(str) {
     return str.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
 }
 
+function lowerAndScore(str) {
+    return str.toLowerCase().replace(/ /g, '_')
+}
+
 function ms_to_days_hours(ms) {
     const days = Math.floor(ms / (24*60*60*1000));
     const daysms = ms % (24*60*60*1000);
@@ -196,5 +200,6 @@ module.exports = {
     sortCaseInsensitive,
     arrToStringsArrWithLimit,
     calcArrAvg,
-    getGuildMembersStatus
+    getGuildMembersStatus,
+    lowerAndScore
 };
