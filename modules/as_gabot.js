@@ -277,7 +277,7 @@ client.on('interactionCreate', async (interaction) => {
             }
             db.query(`
                 SELECT * FROM as_gabot_giveaways WHERE message_id = '${interaction.message.id}';
-                SELECT * FROM challenges_accounts WHERE discord_id = ${interaction.user.id};
+                SELECT * FROM challenges_accounts WHERE discord_id = '${interaction.user.id}';
             `).then(res => {
                 const giveaway = res[0].rows[0]
                 const user_account = res[1].rows[0]
@@ -318,7 +318,7 @@ client.on('interactionCreate', async (interaction) => {
                 db.query(`
                     INSERT INTO challenges_transactions
                     (transaction_id,discord_id,type,rp,balance_type,timestamp, guild_id)
-                    VALUES ('${uuid.v4()}',${interaction.user.id},'giveaway_join',${giveaway.rp_cost},'debit',${new Date().getTime()},'${interaction.message.guild.id}');
+                    VALUES ('${uuid.v4()}','${interaction.user.id}','giveaway_join',${giveaway.rp_cost},'debit',${new Date().getTime()},'${interaction.message.guild.id}');
                     UPDATE as_gabot_giveaways SET join_list = join_list || '"${interaction.user.id}"' WHERE giveaway_id = '${giveaway.giveaway_id}';
                 `).catch(console.error)
                 interaction.deferUpdate().catch(console.error)
