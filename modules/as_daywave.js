@@ -289,7 +289,7 @@ client.on('interactionCreate', (interaction) => {
     }
     if (interaction.isButton()) {
         if (interaction.customId == 'view_weekly_challenges_summary') {
-            db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed; SELECT * FROM challenges_accounts WHERE discord_id = ${interaction.user.id}`)
+            db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed; SELECT * FROM challenges_accounts WHERE discord_id = '${interaction.user.id}'`)
             .then(res => {
                 const discord_id = interaction.user.id
                 const challenges = res[0].rows
@@ -322,7 +322,7 @@ client.on('interactionCreate', (interaction) => {
             }).catch(console.error)
         }
         if (interaction.customId == 'purchase_weekly_deal') {
-            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
+            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id='${interaction.user.id}';`)
             .then(res => {
                 const deal = res[0].rows[0]
                 const user_bal = res[1].rows[0]?.balance || 0
@@ -360,7 +360,7 @@ client.on('interactionCreate', (interaction) => {
             }).catch(console.error)
         }
         if (interaction.customId == 'purchase_weekly_deal_yes') {
-            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id=${interaction.user.id};`)
+            db.query(`SELECT * FROM challenges_deals WHERE is_active = true; SELECT * FROM challenges_accounts WHERE discord_id='${interaction.user.id}';`)
             .then(res => {
                 const deal = res[0].rows[0]
                 const user_bal = res[1].rows[0]?.balance || 0
@@ -368,7 +368,7 @@ client.on('interactionCreate', (interaction) => {
                     db.query(`
                         INSERT INTO challenges_transactions
                         (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp, guild_id)
-                        VALUES ('${uuid.v4()}',${interaction.user.id},'weekly_deal_purchase','${deal.activation_id}',${deal.rp},'debit',${new Date().getTime()},'${interaction.guild.id}')
+                        VALUES ('${uuid.v4()}','${interaction.user.id}','weekly_deal_purchase','${deal.activation_id}',${deal.rp},'debit',${new Date().getTime()},'${interaction.guild.id}')
                     `).then(res => {
                         if (res.rowCount == 1) {
                             interaction.update({
@@ -638,7 +638,7 @@ db.on('notification', async (notification) => {
                 db.query(`
                     INSERT INTO challenges_completed
                     (discord_id,challenge_id,activation_id,timestamp)
-                    VALUES (${discord_id},'${payload[0].challenge_id}','${payload[0].activation_id}',${new Date().getTime()});
+                    VALUES ('${discord_id}','${payload[0].challenge_id}','${payload[0].activation_id}',${new Date().getTime()});
                 `).catch(console.error)
             }
         }
@@ -652,7 +652,7 @@ db.on('notification', async (notification) => {
             db.query(`
                 INSERT INTO challenges_transactions
                 (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp)
-                VALUES ('${uuid.v4()}',${payload.discord_id},'challenge_completion','${challenge.activation_id}',${challenge.rp},'credit',${new Date().getTime()})
+                VALUES ('${uuid.v4()}','${payload.discord_id}','challenge_completion','${challenge.activation_id}',${challenge.rp},'credit',${new Date().getTime()})
             `).catch(console.error)
         }).catch(console.error)
     }
@@ -662,13 +662,13 @@ db.on('notification', async (notification) => {
         db.query(`
             UPDATE challenges_accounts SET
             balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
-            WHERE discord_id = ${payload.discord_id};
+            WHERE discord_id = '${payload.discord_id}';
         `).then(async res => {
             if (res.rowCount == 0) {
                 await db.query(`
                     INSERT INTO challenges_accounts
                     (discord_id,balance)
-                    VALUES (${payload.discord_id},${payload.rp});
+                    VALUES ('${payload.discord_id}',${payload.rp});
                 `).catch(console.error)
             }
             //edit_challenges_leaderboard_embed()
