@@ -714,9 +714,11 @@ function embed(squads, with_all_names, name_for_squad_id) {
     new_squads.map((squad,index) => {
         const payload_index = Math.ceil((index + 1)/15) - 1
         const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
-        if (!payloads[payload_index]) payloads[payload_index] = {content: '\u200b', embeds: [{description: '⸻'.repeat(13), fields: []}], components: []}
+        if (!payloads[payload_index]) payloads[payload_index] = {content: '\u200b', embeds: [], components: []}
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id)) {
             if (squad.members.length > 0) {
+                if (!payloads[payload_index].embeds[0]) 
+                    payloads[payload_index].embeds[0] = {title: 'Squad Members', description: '⸻'.repeat(13), fields: []}
                 payloads[payload_index].embeds[0].fields.push({
                     name: convertUpper(squad.squad_string),
                     value: squad.members.map(id => `${as_users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n').replace(/_/g, '\\_'),
