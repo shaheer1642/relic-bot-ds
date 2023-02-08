@@ -763,7 +763,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                             if ((expiry - new Date().getTime()) > 0) {
                                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
                                     if (!['Stribog','Cervantes','Thebe'].includes(fissure.node.split(' (')[0]))
-                                        fissures_list.push(fissure)
+                                        fissures_list.push({...fissure, is_meta: (fissure.node.match('(Void)') || fissure.node.match('(Eris)') || fissure.node.match('Mariana') || fissure.node.match('E-Prime') || fissure.node.match('Roche')) ? true : false})
                                 }
                             }
                         }
@@ -775,15 +775,15 @@ socket.on('relicbot/squads/opened', async (payload) => {
                             ...msg.embeds[0],
                             fields: [{
                                 name: "Tier",
-                                value: fissures_list.map(fissure => `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}`).join('\n'),
+                                value: fissures_list.length == 0 ? '-' : fissures_list.map(fissure => `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}`).join('\n'),
                                 inline: true
                             },{
                                 name: "Mission",
-                                value: fissures_list.map(fissure => `${fissure.isHard ? emote_ids.steel_essence:fissure.isStorm ? emote_ids.railjack:''} ${fissure.missionType} - ${fissure.node}`.trim()).join('\n'),
+                                value: fissures_list.length == 0 ? '-' : fissures_list.map(fissure => `${fissure.isHard ? emote_ids.steel_essence:fissure.isStorm ? emote_ids.railjack:''} ${fissure.missionType} - ${fissure.node}${fissure.is_meta ? ' ★':''}`.trim()).join('\n'),
                                 inline: true
                             },{
                                 name: "Expires",
-                                value: fissures_list.map(fissure => `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>`).join('\n'),
+                                value: fissures_list.length == 0 ? '-' : fissures_list.map(fissure => `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>`).join('\n'),
                                 inline: true
                             }]
                         }]
@@ -1121,7 +1121,7 @@ async function fissures_check() {
                 if (expiry > expiries[key]) expiries[key] = expiry
                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
                     if (!['Stribog','Cervantes','Thebe'].includes(fissure.node.split(' (')[0]))
-                        fissures_list.push(fissure)
+                        fissures_list.push({...fissure, is_meta: (fissure.node.match('(Void)') || fissure.node.match('(Eris)') || fissure.node.match('Mariana') || fissure.node.match('E-Prime') || fissure.node.match('Roche')) ? true : false})
                 }
             }
         })
@@ -1209,7 +1209,7 @@ async function fissures_check() {
             fissures_list.forEach(fissure => {
                 if (fissure.isHard) return
                 payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
-                payload.embeds[0].fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                payload.embeds[0].fields[1].value += `${fissure.missionType} - ${fissure.node}${fissure.is_meta ? ' ★':''}\n`
                 payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
             payload.embeds[0].fields[0].value += `\n`
