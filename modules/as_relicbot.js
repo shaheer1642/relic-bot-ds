@@ -1009,7 +1009,7 @@ function error_codes_embed(response,discord_id) {
 }
 
 function relicBotSquadToString(squad,include_sp_rj,exclude_tier) {
-    return `${exclude_tier ? '' : convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'offcycle':''} ${include_sp_rj ? (squad.is_steelpath ? 'Steelpath':squad.is_railjack ? 'Railjack':''):''} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} cycles)`}`.replace(/\s+/g, ' ').trim()
+    return `${exclude_tier ? '' : convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with':''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'offcycle':''} ${include_sp_rj ? (squad.is_steelpath ? 'Steelpath':squad.is_railjack ? 'Railjack':''):''} ${squad.cycle_count == '' ? '':`(${squad.cycle_count} runs)`}`.replace(/\s+/g, ' ').trim()
 }
 
 function constructTrackersEmbed(trackers, ephemeral) {
