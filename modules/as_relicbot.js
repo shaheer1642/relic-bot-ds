@@ -1120,8 +1120,10 @@ async function fissures_check() {
                 if (!expiries[key]) expiries[key] = 0
                 if (expiry > expiries[key]) expiries[key] = expiry
                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
-                    if (!['Stribog','Cervantes','Thebe'].includes(fissure.node.split(' (')[0]))
+                    if (!['Stribog','Cervantes','Thebe'].includes(fissure.node.split(' (')[0])) {
+                        console.log(fissure.node)
                         fissures_list.push({...fissure, is_meta: (fissure.node.match('(Void)') || fissure.node.match('(Eris)') || fissure.node.match('Mariana') || fissure.node.match('E-Prime') || fissure.node.match('Roche')) ? true : false})
+                    }
                 }
             }
         })
@@ -1218,7 +1220,7 @@ async function fissures_check() {
             fissures_list.forEach(fissure => {
                 if (!fissure.isHard) return
                 payload.embeds[0].fields[0].value += `${emote_ids[fissure.tier.toLowerCase()]} ${fissure.tier}\n`
-                payload.embeds[0].fields[1].value += `${emote_ids.steel_essence} ${fissure.missionType} - ${fissure.node}\n`
+                payload.embeds[0].fields[1].value += `${emote_ids.steel_essence} ${fissure.missionType} - ${fissure.node}${fissure.is_meta ? ' ★':''}\n`
                 payload.embeds[0].fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
             })
         }
