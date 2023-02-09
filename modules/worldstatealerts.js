@@ -3416,7 +3416,7 @@ async function invasions_check() {
                     if (row.invasions_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
                             msg.edit({
-                                content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                                content: ' ',
                                 embeds: [{
                                     title: 'Invasions',
                                     description: `React to subscribe to specific rewards\n\n${emotes.forma.string} Forma BP${'\u3000'.repeat(5)}${emotes.orokin_catalyst.string} Orokin Catalyst BP${'\u3000'.repeat(5)}${emotes.orokin_reactor.string} Orokin Reactor BP\n${emotes.fieldron.string} Fieldron${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.detonite_injector.string} Detonite Injector${'\u3000'.repeat(5)}${'\u202F'.repeat(6)}${emotes.mutagen_mass.string} Mutagen Mass\n${emotes.exilus_adapter_blueprint.string} Exilus Adapater BP${'\u3000'.repeat(1)}${'\u202F'.repeat(2)}${emotes.mutalist_alad_v_nav_coordinate.string} Mutalist Alad V Nav Coordinate\n${emotes.snipetron_vandal.string} Snipetron Vandal BP & Parts${'\u3000'.repeat(5)}${emotes.dera_vandal.string} Dera Vandal BP & Parts\n${emotes.twin_vipers_wraith.string} Twin Vipers Wraith BP & Parts${'\u3000'.repeat(4)}${'\u202F'.repeat(1)}${emotes.sheev.string} Sheev BP & Parts\n${emotes.latron_wraith.string} Latron Wraith BP & Parts${'\u3000'.repeat(6)}${'\u202F'.repeat(3)}${emotes.karak_wraith.string} Karak Wraith BP & Parts\n${emotes.strun_wraith.string} Strun Wraith BP & Parts`,                
@@ -3523,7 +3523,7 @@ async function invasions_check() {
                 if (row.invasions_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
                         msg.edit({
-                            content: ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
