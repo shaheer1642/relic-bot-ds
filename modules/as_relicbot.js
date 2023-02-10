@@ -763,7 +763,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                             if ((expiry - new Date().getTime()) > 0) {
                                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
                                     if (!['Stribog','Cervantes','Thebe'].includes(fissure.node.split(' (')[0]))
-                                        fissures_list.push({...fissure, is_meta: (fissure.node.match('(Void)') || fissure.node.match('(Eris)') || fissure.node.match('Mariana') || fissure.node.match('E Prime') || fissure.node.match('Armaros') || fissure.node.match('Roche')) ? true : false})
+                                        fissures_list.push({...fissure, is_meta: (fissure.node.match('(Void)') || fissure.node.match('Saxis') || fissure.node.match('Isos') || fissure.node.match('Mariana') || fissure.node.match('E Prime') || fissure.node.match('Armaros') || fissure.node.match('Roche')) ? true : false})
                                 }
                             }
                         }
@@ -1122,7 +1122,7 @@ async function fissures_check() {
                 if (['Capture', 'Extermination', 'Disruption', 'Rescue', 'Sabotage'].includes(fissure.missionType)) {
                     if (!['Stribog','Cervantes','Thebe'].includes(fissure.node.split(' (')[0])) {
                         console.log(fissure.node)
-                        fissures_list.push({...fissure, is_meta: (fissure.node.match('(Void)') || fissure.node.match('(Eris)') || fissure.node.match('Mariana') || fissure.node.match('E Prime') || fissure.node.match('Armaros') || fissure.node.match('Roche')) ? true : false})
+                        fissures_list.push({...fissure, is_meta: (fissure.node.match('(Void)') || fissure.node.match('Saxis') || fissure.node.match('Isos') || fissure.node.match('Mariana') || fissure.node.match('E Prime') || fissure.node.match('Armaros') || fissure.node.match('Roche')) ? true : false})
                     }
                 }
             }
