@@ -2585,7 +2585,7 @@ async function cycles_check() {
                 if (row.cycles_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.cycles_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
@@ -2743,7 +2743,7 @@ async function arbitration_check() {
                 if (row.arbitration_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.arbitration_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
@@ -2956,7 +2956,7 @@ async function fissures_check() {
                 if (row.fissures_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.fissures_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                             embeds: [embed1, embed2, embed3],
                             components: [
                                 {
@@ -3093,7 +3093,7 @@ async function teshin_check() {
                 if (row.teshin_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.teshin_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
@@ -3150,7 +3150,7 @@ async function alerts_check() {
                     if (row.alerts_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
                             msg.edit({
-                                content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                                content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                                 embeds: [{
                                     title: 'Alerts',
                                     description: `React to subscribe to specific rewards\n\nNo alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
@@ -3278,7 +3278,7 @@ async function global_upgrades_check() {
                     if (row.global_upgrades_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
                             msg.edit({
-                                content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                                content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                                 embeds: [{
                                     title: 'Event Booster',
                                     description: `React to be notified when a booster is active\n\nNo booster active right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
@@ -3523,7 +3523,7 @@ async function invasions_check() {
                 if (row.invasions_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
                         msg.edit({
-                            content: users[row.channel_id] ? users[row.channel_id].join(', ').substring(0,2000) : ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
