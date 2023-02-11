@@ -3150,7 +3150,7 @@ async function alerts_check() {
                     if (row.alerts_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
                             msg.edit({
-                                content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
+                                content: ' ',
                                 embeds: [{
                                     title: 'Alerts',
                                     description: `React to subscribe to specific rewards\n\nNo alerts to show right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
@@ -3237,7 +3237,7 @@ async function alerts_check() {
                 if (row.alerts_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
                         msg.edit({
-                            content: ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
@@ -3278,7 +3278,7 @@ async function global_upgrades_check() {
                     if (row.global_upgrades_alert) {
                         client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
                             msg.edit({
-                                content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
+                                content: ' ',
                                 embeds: [{
                                     title: 'Event Booster',
                                     description: `React to be notified when a booster is active\n\nNo booster active right now. Checking back <t:${Math.round((new Date().getTime() + timer)/1000)}:R>`,
@@ -3374,7 +3374,7 @@ async function global_upgrades_check() {
                 if (row.global_upgrades_alert) {
                     client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
                         msg.edit({
-                            content: ' ',
+                            content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0,2000) : ' ',
                             embeds: [embed]
                         }).catch(console.error)
                     }).catch(console.error)
