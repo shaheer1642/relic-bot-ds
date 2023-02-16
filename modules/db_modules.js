@@ -193,11 +193,14 @@ async function updateDatabaseItems(up_origin = null) {
         console.log('Retrieving DB items list...')
         var status = await db.query(`SELECT * FROM items_list`)
         .then(async res => {
-            var db_items_list = res.rows
+            const db_items_list = {};
+            res.rows.forEach(row => {
+                db_items_list[row.id] = row
+            })
             console.log('Retrieving DB items list success.')
             console.log('Scanning DB items list...')
-            for (var i=0; i<wfm_items_list.data.payload.items.length;i++) {
-                const item_url = wfm_items_list.data.payload.items[i].url_name.toLowerCase().trim()
+            for (const item of wfm_items_list.data.payload.items) {
+                const item_url = item.url_name.toLowerCase().trim()
                     .replace(/ /g,'_')
                     .replace('_chassis_blueprint','_chassis')
                     .replace('_systems_blueprint','_systems')
@@ -205,22 +208,17 @@ async function updateDatabaseItems(up_origin = null) {
                     .replace('_harness_blueprint','_harness')
                     .replace('_wings_blueprint','_wings')
                     .replace('_&_','_and_');
-                const raw_item_url = wfm_items_list.data.payload.items[i].url_name
-                const item_id = wfm_items_list.data.payload.items[i].id
+                const raw_item_url = item.url_name
+                const item_id = item.id
                 //console.log(`Scanning item ${wfm_items_list.data.payload.items[i].url_name} (${i+1}/${wfm_items_list.data.payload.items.length})`)
-                var exists = Object.keys(db_items_list).some(function(k) {
-                    if (Object.values(db_items_list[k]).includes(item_id))
-                        return true
-                });
-                if (!exists) {
+                if (!db_items_list[item_id]) {
                     console.log(`${item_url} is not in the DB.`)
                     console.log(`Adding ${item_url} to the DB...`)
                     var status = await db.query(`INSERT INTO items_list (id,item_url,raw_item_url) VALUES ('${item_id}', '${item_url}','${raw_item_url}')`)
                     .then(() => {
                         console.log(`Susccessfully inserted ${item_url} into DB.`)
                         return 1
-                    })
-                    .catch (err => {
+                    }).catch (err => {
                         if (err.response)
                             console.log(err.response.data)
                         console.log(err)
@@ -258,34 +256,28 @@ async function updateDatabaseItems(up_origin = null) {
                         if (!status)
                             return 0
                         return 1
-                    })
-                    .catch (err => {
+                    }).catch (err => {
                         if (err.response)
                             console.log(err.response.data)
                         console.log(err)
                         console.log('Error retrieving item info.')
                         return 0
                     })
-                    if (!status)
-                        return 0
+                    if (!status) return 0
                 }
             }
             console.log('Scanned DB items list.')
             return 1
-        })
-        .catch (err => {
+        }).catch (err => {
             if (err.response)
                 console.log(err.response.data)
             console.log(err)
             console.log('Error retrieving DB items list.')
             return 0
         })
-        if (!status)
-            return 0
-        else
-            return 1
-    })
-    .catch (err => {
+        if (!status) return 0
+        else return 1
+    }).catch (err => {
         if (err.response)
             console.log(err.response.data)
         console.log(err)
@@ -318,36 +310,31 @@ async function updateDatabaseItems(up_origin = null) {
         response.data.payload.weapons.forEach(e => {
             weapons_list.push(e)
         })
-    })
-    .catch (err => console.log(err + 'Retrieving WFM lich list error'))
+    }).catch (err => console.log(err + 'Retrieving WFM lich list error'))
     var status = await db.query(`SELECT * FROM lich_list`)
     .then(async res => {
-        var db_lich_list = res.rows
+        const db_lich_list = {};
+        res.rows.forEach(row => {
+            db_lich_list[row.lich_id] = row
+        })
         console.log('Scanning DB lich list...')
-        for (var i=0; i<weapons_list.length;i++) {
-            var exists = Object.keys(db_lich_list).some(function(k) {
-                if (Object.values(db_lich_list[k]).includes(weapons_list[i].id))
-                    return true
-            });
-            if (!exists) {
+        for (const weapon of weapons_list) {
+            if (!db_lich_list[weapon.id]) {
                 console.log(`${weapons_list[i].url_name} is not in the DB. Adding...`)
                 var status = await db.query(`INSERT INTO lich_list (lich_id,weapon_url,icon_url) VALUES ('${weapons_list[i].id}', '${weapons_list[i].url_name}','${weapons_list[i].thumb}')`)
                 .then(() => {
                     console.log(`Susccessfully inserted ${weapons_list[i].url_name} into DB.`)
                     return true
-                })
-                .catch (err => {
+                }).catch (err => {
                     console.log(err + `Error inserting ${weapons_list[i].url_name} into DB.`)
                     return false
                 })
-                if (!status)
-                    return false
+                if (!status) return false
             }
         }
         console.log('Scanned DB lich list.')
         return true
-    })
-    .catch (err => {
+    }).catch (err => {
         console.log(err + 'Error retrieving DB lich list.')
         return false
     })
