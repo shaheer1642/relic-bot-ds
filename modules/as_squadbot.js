@@ -555,6 +555,7 @@ function assign_global_variables() {
         db.query(`SELECT * FROM as_sb_messages; SELECT * FROM as_sb_channels;`)
         .then(res => {
             res[1].rows.forEach((row) => { 
+                if (row.channel_id.match('web')) return
                 channels_list[row.channel_id] = row
                 webhooks_list[row.channel_id] = row.webhook_url
             })
