@@ -940,7 +940,13 @@ socket.on('squadbot/squads/opened', async (payload) => {
     //console.log('channel_ids:',channel_ids)
     //send dms
     for (const channel_id in channel_ids) {
-        if (channel_id.match('web')) continue
+        if (channel_id.match('web')) {
+            channel_ids[channel_id].map(async discord_id => {
+                const user = client.users.cache.get(discord_id) || client.users.fetch(discord_id).catch(console.error)
+                if (user) user.send(`Your **${convertUpper(squad.squad_string)}** squad has been filled. Click https://dev.allsquads.com/ to view squad chat`).catch(console.error)
+            })
+            continue
+        }
         const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
         if (!channel) continue
         await channel.threads.create({
