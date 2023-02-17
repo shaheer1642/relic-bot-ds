@@ -940,6 +940,7 @@ socket.on('squadbot/squads/opened', async (payload) => {
     //console.log('channel_ids:',channel_ids)
     //send dms
     for (const channel_id in channel_ids) {
+        if (channel_id.match('web')) continue
         const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
         if (!channel) continue
         await channel.threads.create({
