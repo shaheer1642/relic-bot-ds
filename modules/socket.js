@@ -15,7 +15,7 @@ socket.on("connect", () => {
 });
   
 socket.on("disconnect", () => {
-    console.log('[websocket] disconnected')
+    console.log('[websocket] disconnected') 
 });
 
 socket.on("connect_error", (err) => {
