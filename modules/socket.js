@@ -19,7 +19,7 @@ socket.on("disconnect", () => {
 });
 
 socket.on("connect_error", (err) => {
-    console.log('[websocket] connect_error',err)
+    console.log('[websocket] connect_error',err) 
 });
 
 async function socketHasConnected() {
