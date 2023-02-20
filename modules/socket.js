@@ -2,7 +2,7 @@
 const io = require('socket.io-client')
 
 const socket = io(process.env.SOCKET_URL, {
-    transports : ['websocket'],
+    transports : ['websocket','polling'],
     keepAlive: true,
     query: {
         bot_token: process.env.DISCORD_BOT_TOKEN
@@ -15,6 +15,10 @@ socket.on("connect", () => {
   
 socket.on("disconnect", () => {
     console.log('[websocket] disconnected')
+});
+
+socket.on("connect_error", (err) => {
+    console.log('[websocket] connect_error',err)
 });
 
 async function socketHasConnected() {
