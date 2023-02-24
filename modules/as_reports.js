@@ -166,7 +166,7 @@ client.on('interactionCreate', (interaction) => {
 function editEmbed() {
     const messages = [{
         channel_id: '1078709540222148739', 
-        message_id: '1078710608800792708', 
+        message_id: '1078714146805252147', 
     }]
     messages.forEach(async message => {
         const cnl = client.channels.cache.get(message.channel_id) || await client.channels.fetch(message.channel_id).catch(console.error)
