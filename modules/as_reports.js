@@ -149,7 +149,12 @@ client.on('interactionCreate', (interaction) => {
                 expiry: new Date().getTime() + expiry
             }, (res) => {
                 if (res.code == 200) {
-                    interaction.deferUpdate().catch(console.error)
+                    interaction.update({
+                        content: 'Report has been resolved',
+                        embeds: [],
+                        components: [],
+                        ephemeral: true
+                    }).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
         }
@@ -185,7 +190,8 @@ function editEmbed() {
                     type: 2,
                     label: 'My Reports',
                     custom_id: `as_reports_my_reports`,
-                    style: 2
+                    style: 2,
+                    disabled: true
                 }]
             }]
         }).catch(console.error)
