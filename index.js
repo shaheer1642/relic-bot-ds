@@ -33,6 +33,7 @@ require('./modules/prime_resurgence_tracker.js');
 require('./modules/as_faq.js');
 require('./modules/as_admin_tools.js');
 require('./modules/as_commands.js');
+require('./modules/as_reports.js');
 
 // restart after 24.5h
 setTimeout(() => {

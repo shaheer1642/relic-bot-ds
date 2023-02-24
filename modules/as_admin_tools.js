@@ -1,8 +1,9 @@
 const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js')
+const {timeStringToMs} = require('./extras.js');
+const { socket } = require('./socket.js');
 
-const channel_id = '1063435050802237540'
-const message_id = '1063435290494111764'
+
 
 client.on('ready', async () => {
     editMainMessage()
@@ -31,10 +32,43 @@ client.on('interactionCreate', interaction => {
                 ]
             }).catch(console.error)
         }
+        if (interaction.customId.split('.')[0] == 'as_at_lift_ban') {
+            interaction.showModal({
+                title: "Lift Global Ban",
+                custom_id: 'as_at_lift_ban',
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: "username",
+                            label: "Username",
+                            style: 2,
+                            min_length: 1,
+                            max_length: 50,
+                            placeholder: "Type user's in-game name, or discord id",
+                            required: true
+                        }]
+                    }
+                ]
+            }).catch(console.error)
+        }
     }
     if (interaction.isModalSubmit()) {
         if (interaction.customId.split('.')[0] == 'as_at_get_users_verified') {
             getUsersVerified(interaction.fields.getTextInputValue('time_since').trim()).then(payload => interaction.reply(payload).catch(console.error)).catch(console.error)
+        }
+        if (interaction.customId.split('.')[0] == 'as_at_lift_ban') {
+            socket.emit('allsquads/admincommands/liftglobalban', {discord_id: interaction.user.id, identifier: interaction.fields.getTextInputValue('username').trim()}, res => {
+                if (res.code == 200) {
+                    interaction.reply({
+                        content: 'Ban has been lifted',
+                        ephemeral: true
+                    }).catch(console.error)
+                } else {
+                    interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                }
+            })
         }
     }
 })
@@ -61,38 +95,101 @@ async function getUsersVerified(time_since) {
     })
 }
 
-function timeStringToMs(time_string) {
-    var ms = 0
-    time_string.split(' ').map(word => {
-        if (word.match('y')) ms += 31104000000 * Number(word.replace('y',''))
-        if (word.match('M')) ms += 2592000000 * Number(word.replace('M',''))
-        if (word.match('w')) ms += 604800000 * Number(word.replace('w',''))
-        if (word.match('d')) ms += 86400000 * Number(word.replace('d',''))
-        if (word.match('h')) ms += 3600000 * Number(word.replace('h',''))
-        if (word.match('m')) ms += 60000 * Number(word.replace('m',''))
-        if (word.match('s')) ms += 1000 * Number(word.replace('s',''))
+async function editMainMessage() {
+    const messages = [{
+        channel_id: '1063435050802237540',
+        message_id: '1063435290494111764'
+    },{
+        channel_id: '1078705376062611516', // dev
+        message_id: '1078705475190792222'  // dev
+    }]
+    messages.forEach(async msg => {
+        const channel = client.channels.cache.get(msg.channel_id) || await client.channels.fetch(msg.channel_id).catch(console.error)
+        if (!channel) return
+        const message = channel.messages.cache.get(msg.message_id) || await channel.messages.fetch(msg.message_id).catch(console.error)
+        if (!message) return
+        message.edit({
+            content: ' ',
+            embeds: [{
+                description: 'List of admin tools'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    style: 3,
+                    label: 'Get Users Verified',
+                    custom_id: 'as_at_get_users_verified'
+                },{
+                    type: 2,
+                    style: 3,
+                    label: 'Lift Global Ban',
+                    custom_id: 'as_at_lift_ban'
+                },]
+            }]
+        }).catch(console.error)
     })
-    return ms
 }
 
-async function editMainMessage() {
-    const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
-    if (!channel) return
-    const message = channel.messages.cache.get(message_id) || await channel.messages.fetch(message_id).catch(console.error)
-    if (!message) return
-    message.edit({
-        content: ' ',
-        embeds: [{
-            description: 'List of admin tools'
-        }],
-        components: [{
-            type: 1,
+function error_codes_embed(response,discord_id) {
+    if (response.code == 499) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> Please verify your Warframe account to access this feature\nClick Verify to proceed`,
+                color: 'YELLOW'
+            }],
             components: [{
-                type: 2,
-                style: 3,
-                label: 'Get Users Verified',
-                custom_id: 'as_at_get_users_verified'
-            }]
-        }]
-    }).catch(console.error)
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Verify",
+                    style: 1,
+                    custom_id: `tb_verify`
+                }]
+            }],
+            ephemeral: true
+        }
+    } else if (response.code == 399) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message}`,
+                color: 'GREEN'
+            }],
+            components: [{
+                type: 1,
+                components: [{
+                    type: 2,
+                    label: "Join Existing",
+                    style: 3,
+                    custom_id: `as_sb_sq_merge_true_${response.squad_id}`
+                },{
+                    type: 2,
+                    label: "Host New",
+                    style: 1,
+                    custom_id: `as_sb_sq_merge_false$${response.squad_string}`
+                }]
+            }],
+            ephemeral: true
+        }
+    } else if (response.code == 299) {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message}`,
+                color: 'GREEN'
+            }],
+            ephemeral: true
+        }
+    } else {
+        return {
+            content: ' ',
+            embeds: [{
+                description: `<@${discord_id}> ${response.message || response.err || response.error || 'error'}`,
+                color: 'RED'
+            }],
+            ephemeral: true
+        }
+    }
 }

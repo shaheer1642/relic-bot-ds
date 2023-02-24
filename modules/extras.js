@@ -116,6 +116,7 @@ function embedScore(text) {
 }
 
 function convertUpper(str) {
+    if (!str) return ''
     return str.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
 }
 
@@ -187,6 +188,21 @@ async function getGuildMembersStatus(members, guild_id) {
     })
 }
 
+function timeStringToMs(time_string) {
+    if (!time_string) return 0
+    var ms = 0
+    time_string.split(' ').map(word => {
+        if (word.match('y')) ms += 31104000000 * Number(word.replace('y',''))
+        if (word.match('M')) ms += 2592000000 * Number(word.replace('M',''))
+        if (word.match('w')) ms += 604800000 * Number(word.replace('w',''))
+        if (word.match('d')) ms += 86400000 * Number(word.replace('d',''))
+        if (word.match('h')) ms += 3600000 * Number(word.replace('h',''))
+        if (word.match('m')) ms += 60000 * Number(word.replace('m',''))
+        if (word.match('s')) ms += 1000 * Number(word.replace('s',''))
+    })
+    return ms
+}
+
 module.exports = {
     dynamicSort,
     dynamicSortDesc,
@@ -201,5 +217,6 @@ module.exports = {
     arrToStringsArrWithLimit,
     calcArrAvg,
     getGuildMembersStatus,
-    lowerAndScore
+    lowerAndScore,
+    timeStringToMs
 };

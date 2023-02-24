@@ -58,8 +58,9 @@ client.on('interactionCreate', (interaction) => {
                         components: [{
                             type: 4,
                             custom_id: "username",
-                            label: "Type the user's ingame-name",
-                            style: 2,
+                            label: "Username",
+                            placeholder: "Type the user's ingame-name",
+                            style: 1,
                             min_length: 1,
                             max_length: 250,
                             required: true
@@ -77,8 +78,6 @@ client.on('interactionCreate', (interaction) => {
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
         }
-    }
-    if (interaction.isSelectMenu()) {
     }
 })
 

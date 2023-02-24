@@ -56,6 +56,9 @@ db.connect().then(async res => {
         LISTEN global_variables_list_insert;
         LISTEN global_variables_list_update;
         LISTEN global_variables_list_delete;
+
+        LISTEN as_reports_insert;
+        LISTEN as_reports_update;
     `).catch(console.error)
 })
 
