@@ -131,8 +131,8 @@ client.on('interactionCreate', (interaction) => {
             const report_id = interaction.customId.split('.')[1]
             const action = interaction.customId.split('.')[2]
             const remarks = interaction.fields.getTextInputValue('remarks').trim()
-            const expiry = timeStringToMs(interaction.fields.getTextInputValue('expiry').trim())
-            if (expiry < 10800000 || expiry > 259200000) {
+            const expiry = action != 'reject' ? timeStringToMs(interaction.fields.getTextInputValue('expiry').trim()) : null
+            if (expiry && (expiry < 10800000 || expiry > 259200000)) {
                 return interaction.reply({
                     embeds: [{
                         description: 'Suspension expiry must not be less than 3 hours or greater than 3 days',
@@ -146,7 +146,7 @@ client.on('interactionCreate', (interaction) => {
                 report_id: report_id, 
                 remarks: remarks, 
                 action: action,
-                expiry: new Date().getTime() + expiry
+                expiry: action != 'reject' ? new Date().getTime() + expiry : null
             }, (res) => {
                 if (res.code == 200) {
                     interaction.update({
