@@ -149,12 +149,14 @@ client.on('interactionCreate', (interaction) => {
                 expiry: action != 'reject' ? new Date().getTime() + expiry : null
             }, (res) => {
                 if (res.code == 200) {
-                    interaction.update({
+                    const payload = {
                         content: 'Report has been resolved',
                         embeds: [],
                         components: [],
                         ephemeral: true
-                    }).catch(console.error)
+                    }
+                    if (interaction.message.type == 'REPLY') interaction.update(payload).catch(console.error)
+                    else interaction.reply(payload).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
         }
