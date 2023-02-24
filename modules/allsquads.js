@@ -559,7 +559,7 @@ async function assign_allsquads_roles() {
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'legendary'),
         requirement: 300
     }]
-    socket.emit('allsquads/statistics/fetch', {}, (res) => {
+    socket.emit('allsquads/leaderboards/fetch', {}, (res) => {
         if (res.code == 200) {
             const alltime_users = res.data.all_time
             alltime_users.map(user => {
@@ -589,7 +589,7 @@ async function assign_allsquads_roles() {
 
 function edit_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: ['253525146923433984','739833841686020216'], exclude_daily: true, exclude_squads: true}, (res) => {
+    socket.emit('allsquads/leaderboards/fetch', {limit: 10, skip_users: ['253525146923433984','739833841686020216'], exclude_daily: true, exclude_squads: true}, (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             const payload = {
@@ -622,7 +622,7 @@ function edit_leaderboard() {
 }
 function edit_staff_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/statistics/fetch', {limit: 10, skip_users: [], exclude_daily: false, exclude_squads: false}, async (res) => {
+    socket.emit('allsquads/leaderboards/fetch', {limit: 10, skip_users: [], exclude_daily: false, exclude_squads: false}, async (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             const payload = {
