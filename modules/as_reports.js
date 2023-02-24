@@ -36,7 +36,7 @@ client.on('interactionCreate', (interaction) => {
                             style: 1,
                             min_length: 1,
                             max_length: 250,
-                            placeholder: `Type the ingame-name of the user (ensure spelling is correct)`,
+                            placeholder: `In-game name of the user (ensure spelling is correct)`,
                             required: true
                         }]
                     },{
