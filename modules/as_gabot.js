@@ -275,6 +275,12 @@ client.on('interactionCreate', async (interaction) => {
                     ephemeral: true
                 }).catch(console.error)
             }
+            if (as_users_list[interaction.user.id].is_suspended) {
+                return interaction.reply({
+                    content: 'You are suspended from using this feature',
+                    ephemeral: true
+                }).catch(console.error)
+            }
             db.query(`
                 SELECT * FROM as_gabot_giveaways WHERE message_id = '${interaction.message.id}';
                 SELECT * FROM challenges_accounts WHERE discord_id = '${interaction.user.id}';
