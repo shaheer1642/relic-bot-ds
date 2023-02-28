@@ -334,7 +334,7 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'giveaways') {
             if (interaction.options.getSubcommand() == 'reroll') {
-                db.query(`SELECT * FROM as_gabot_giveaways WHERE LOWER(item) LIKE '%${interaction.options.getString('giveaway')}%' AND discord_id = '${interaction.user.id}' AND expiry_timestamp > ${new Date().getTime() - 1209600000}`)
+                db.query(`SELECT * FROM as_gabot_giveaways WHERE LOWER(item) LIKE '%${interaction.options.getString('giveaway')}%' AND discord_id = '${interaction.user.id}' AND status = 'ended' AND expiry_timestamp > ${new Date().getTime() - 1209600000}`)
                 .then(res => {
                     interaction.respond(res.rows.map(row => ({
                         name: row.item,
