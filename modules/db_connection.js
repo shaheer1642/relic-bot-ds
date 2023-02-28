@@ -3,7 +3,7 @@ const {event_emitter} = require('./event_emitter')
 
 const db = new DB.Client({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
+    ssl: process.env.ENVIRONMENT_TYPE == 'dev' ? null : {
         rejectUnauthorized: false
     },
     keepAlive: true
