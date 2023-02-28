@@ -173,6 +173,15 @@ client.on('interactionCreate', async (interaction) => {
                             ephemeral: true
                         }).catch(console.error)
                     }
+                    if (item.length > 100) {
+                        return interaction.reply({
+                            content: ' ',
+                            embeds: [{
+                                description: 'Item name is too long. Must be within 1 - 100 characters'
+                            }],
+                            ephemeral: true
+                        }).catch(console.error)
+                    }
                     const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
                     if (!channel) return
                     channel.send({
