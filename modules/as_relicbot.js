@@ -1240,7 +1240,7 @@ async function fissures_check() {
         })
 
         var timer = min_expiry - new Date().getTime()
-        if (timer <= 0) timer = 30000
+        if (timer <= 0 || timer == Infinity) timer = 30000
         clearTimeout(fissuresTimer)
         fissuresTimer = setTimeout(fissures_check, timer)
         console.log('[relicbot] fissures_check invokes in ' + msToTime(timer))
