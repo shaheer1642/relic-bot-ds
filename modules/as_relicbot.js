@@ -1110,6 +1110,7 @@ async function fissures_check() {
         if (!fissures) {
             console.log('[relicbot] Fissures check: no data available')
             var timer = 300000
+            clearTimeout(fissuresTimer)
             fissuresTimer = setTimeout(fissures_check, timer)
             console.log(`[relicbot] fissures_check reset in ${msToTime(timer)}`)
             return
@@ -1239,11 +1240,13 @@ async function fissures_check() {
 
         var timer = min_expiry - new Date().getTime()
         if (timer <= 0) timer = 30000
+        clearTimeout(fissuresTimer)
         fissuresTimer = setTimeout(fissures_check, timer)
         console.log('[relicbot] fissures_check invokes in ' + msToTime(timer))
         return
     }).catch(err => {
         console.log(err)
+        clearTimeout(fissuresTimer)
         fissuresTimer = setTimeout(fissures_check,5000)
     })
 }
