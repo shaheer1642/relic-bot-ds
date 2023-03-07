@@ -1136,9 +1136,10 @@ async function fissures_check() {
                 }
             }
         })
+        console.log('expiries',expiries)
 
         Object.keys(expiries).forEach(key => {
-            const reset_time = expiries[key] - 180000
+            const reset_time = (expiries[key] - new Date().getTime()) < 180000 ? expiries[key] : expiries[key] - 180000
             if (reset_time < min_expiry) min_expiry = reset_time
         })
 
