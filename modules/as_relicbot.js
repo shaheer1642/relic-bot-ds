@@ -1246,9 +1246,10 @@ async function fissures_check() {
         console.log('[relicbot] fissures_check invokes in ' + msToTime(timer))
         return
     }).catch(err => {
-        console.log(err)
+        console.log('relicbot] fissures_check error', err)
         clearTimeout(fissuresTimer)
-        fissuresTimer = setTimeout(fissures_check,5000)
+        fissuresTimer = setTimeout(fissures_check, 30000)
+        console.log('[relicbot] fissures_check invokes in ' + 30000)
     })
 }
 
