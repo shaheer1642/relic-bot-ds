@@ -1162,11 +1162,11 @@ async function fissures_check() {
                     inline: true
                 },{
                     name: "Next Reset",
-                    value: Object.keys(expiries).filter(e => !e.match('_SP')).map(key => `\`${key}\`: <t:${Math.round((expiries[key] - 180000)/1000)}:R>`).join('\n'),
+                    value: Object.keys(expiries).filter(e => !e.match('_SP')).map(key => `\`${key}\`: <t:${Math.round((expiries[key] - 180000)/1000)}:R>`).join('\n') || '\u200b',
                     inline: true
                 },{
                     name: "\u200b",
-                    value: Object.keys(expiries).filter(e => e.match('_SP')).map(key => `${emote_ids.steel_essence} \`${key.replace('_SP','')}\`: <t:${Math.round((expiries[key] - 180000)/1000)}:R>`).join('\n'),
+                    value: Object.keys(expiries).filter(e => e.match('_SP')).map(key => `${emote_ids.steel_essence} \`${key.replace('_SP','')}\`: <t:${Math.round((expiries[key] - 180000)/1000)}:R>`).join('\n') || '\u200b',
                     inline: true
                 }],
                 color: 'WHITE'
