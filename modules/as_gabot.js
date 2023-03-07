@@ -182,6 +182,15 @@ client.on('interactionCreate', async (interaction) => {
                             ephemeral: true
                         }).catch(console.error)
                     }
+                    if (rp_cost < 5) {
+                        return interaction.reply({
+                            content: ' ',
+                            embeds: [{
+                                description: 'Minimum RP value should 5'
+                            }],
+                            ephemeral: true
+                        }).catch(console.error)
+                    }
                     const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
                     if (!channel) return
                     channel.send({
