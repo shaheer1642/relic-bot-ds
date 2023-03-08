@@ -366,7 +366,7 @@ client.on('messageCreate', async message => {
                     break
                 ///*----------------------
                 case 'restart':
-                    if (message.author.id == '253525146923433984') {
+                    if (['253525146923433984','689646747172995107','253980061969940481'].includes(message.author.id)) {
                         console.log('restarting bot upon discord user request',message.author.id)
                         message.channel.send({content: 'restart command received, restarting bot'})
                         .then(() => process.exit()).catch(console.error)

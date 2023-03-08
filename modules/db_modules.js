@@ -714,7 +714,7 @@ async function updateDatabaseItem(db_items_list,item,index) {
 }
 
 async function updateDB(message,args) {
-    if (message.author.id == "253525146923433984" || message.author.id == "253980061969940481" || message.author.id == "353154275745988610" || message.author.id == "385459793508302851") {
+    if (['253525146923433984','689646747172995107','253980061969940481'].includes(message.author.id)) {
         if (DB_Updating) {
             message.channel.send(`An update is already in progress.`)
             return
@@ -722,11 +722,7 @@ async function updateDB(message,args) {
         setUpdateTimer(10000,message)
         inform_dc('(Forced) DB update launching in 10 seconds...')
         message.channel.send(`(Forced) DB update launching in 10 seconds...`)
-    }
-    else {
-        message.channel.send(`You do not have permission to use this command <:ItsFreeRealEstate:892141191301328896>`)
-        return
-    }
+    } else return message.channel.send(`Sorry, you do not have permission to use this command`)
 }
 
 async function preprocess_db_update() {
