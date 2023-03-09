@@ -810,8 +810,8 @@ async function setupReaction(reaction,user,type) {
             await msg.react(emotes.disruption.string).catch(console.error)
         }).catch(err => {console.log(err);reaction.message.channel.send('Some error occured').catch(console.error)})
 
-        clearTimeout(arbitrationTimer)
         var timer = 10000
+        clearTimeout(arbitrationTimer)
         arbitrationTimer = setTimeout(arbitration_check, 10000)
         console.log('arbitration_check invokes in ' + msToTime(timer))
     }
@@ -2633,6 +2633,7 @@ async function arbitration_check() {
             if (!status) {
                 //console.log('Arbitration check: no data available')
                 var timer = 300000
+                clearTimeout(arbitrationTimer)
                 arbitrationTimer = setTimeout(arbitration_check, timer)
                 console.log(`arbitration_check reset in ${msToTime(timer)}`)
                 return
@@ -2642,6 +2643,7 @@ async function arbitration_check() {
         if (!arbitration.type || typeof(arbitration.type) != "string") {
             //console.log('Arbitration check: arbitrary data')
             var timer = 20000
+            clearTimeout(arbitrationTimer)
             arbitrationTimer = setTimeout(arbitration_check, timer)
             //console.log(`arbitration_check reset in ${msToTime(timer)}`)
             return
@@ -2650,6 +2652,7 @@ async function arbitration_check() {
         if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
             //console.log('Arbitration check: negative expiry')
             var timer = 20000
+            clearTimeout(arbitrationTimer)
             arbitrationTimer = setTimeout(arbitration_check, timer)
             console.log(`arbitration_check reset in ${msToTime(timer)}`)
             return
@@ -2681,6 +2684,7 @@ async function arbitration_check() {
                     inform_dc('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
                     console.log('Arbitration check: mission type unknown')
                     var timer = 300000
+                    clearTimeout(arbitrationTimer)
                     arbitrationTimer = setTimeout(arbitration_check, timer)
                     console.log(`arbitration_check reset in ${msToTime(timer)}`)
                     return
@@ -2691,6 +2695,7 @@ async function arbitration_check() {
                 console.log('Arbitration check: unknown error')
                 console.log(arbitration)
                 var timer = 10000
+                clearTimeout(arbitrationTimer)
                 arbitrationTimer = setTimeout(arbitration_check, timer)
                 console.log(`arbitration_check reset in ${msToTime(timer)}`)
                 return
@@ -2757,12 +2762,14 @@ async function arbitration_check() {
         }).catch(console.error)
         
         var timer = new Date(arbitration.expiry).getTime() - new Date().getTime()
+        clearTimeout(arbitrationTimer)
         arbitrationTimer = setTimeout(arbitration_check, timer)
         console.log('arbitration_check invokes in ' + msToTime(timer))
         return
     })
     .catch(err => {
         console.log(err)
+        clearTimeout(arbitrationTimer)
         arbitrationTimer = setTimeout(arbitration_check,20000)
         return
     })
