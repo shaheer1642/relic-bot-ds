@@ -502,6 +502,8 @@ async function relics(message,args) {
             return
         }
         //----
+        if (relic_drops.rewards.common.length == 2) relic_drops.rewards.common.push('forma_blueprint')
+        if (relic_drops.rewards.uncommon.length == 1) relic_drops.rewards.uncommon.push('forma_blueprint')
         for (const item_url of relic_drops.rewards.common) {
             if (item_url == 'forma_blueprint') {
                 value1 += `:brown_circle: ${convertUpper(item_url).replace("Blueprint", "BP")}\u205F\u205F\u205F\u205F\u205F\n`
