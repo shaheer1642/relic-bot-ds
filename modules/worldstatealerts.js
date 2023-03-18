@@ -2680,7 +2680,7 @@ async function arbitration_check() {
                     mission = 'excavation'
                 else if (arbitration.type.toLowerCase().match('disruption'))
                     mission = 'disruption'
-                else if (arbitration.type.toLowerCase().match('SolNode450'))
+                else if (arbitration.type.toLowerCase().match('solnode450'))
                     mission = 'mirror_defense'
                 if (mission == "unknown") {
                     inform_dc('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
