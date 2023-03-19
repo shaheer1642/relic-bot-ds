@@ -41,6 +41,12 @@ client.on('ready', async () => {
     }).catch(console.error)
 })
 
+client.on('guildCreate',(guild) => {
+    console.log('[as_squadbot.guildCreate] joined guild', guild.name)
+    setTimeout(() => {
+        add_server(guild.id).catch(console.error)
+    }, 10000);
+})
 
 client.on('messageCreate', async (message) => {
     if (message.author.bot) return
@@ -67,8 +73,8 @@ client.on('messageCreate', async (message) => {
 client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand()) {
         if (interaction.commandName == 'squad_bot') {
-            if (!server_commands_perms.includes(interaction.user.id))
-                return interaction.reply('You do not have permission to use this command').catch(console.error)
+            // if (!server_commands_perms.includes(interaction.user.id))
+            //     return interaction.reply('You do not have permission to use this command').catch(console.error)
             await interaction.deferReply().catch(console.error)
             if (interaction.options.getSubcommand() == 'add_server') {
                 add_server(interaction.guild.id).then(res => {
@@ -581,10 +587,12 @@ function add_server(guild_id) {
         .then(res => {
             if (res.rowCount == 1) {
                 client.guilds.fetch(guild_id)
-                .then(guild => {
+                .then(async guild => {
+                    const category = await guild.channels.fetch().then(channels => channels.find(channel => channel.name == '⸻ WF RECRUITEMENT ⸻')).catch(console.error)  || await guild.channels.create('⸻ WF RECRUITEMENT ⸻',{type: 'GUILD_CATEGORY', position: 1}).catch(console.error)
                     guild.channels.create('🚀᲼find-squad',{
                         type: 'GUILD_TEXT',
                     }).then(async find_squads => {
+                        await find_squads.setParent(category).catch(console.error)
                         const find_squads_wh = await find_squads.createWebhook('Squad',{avatar: 'https://media.discordapp.net/attachments/864199722676125757/1050526257630171227/pngwing.com.png?width=528&height=521'}).catch(console.error)
                         db.query(`
                             INSERT INTO as_sb_channels (channel_id,webhook_url,guild_id,type) VALUES ('${find_squads.id}','${find_squads_wh.url}','${guild_id}','find_squads');
@@ -1151,5 +1159,6 @@ socket.on('squadbot/squadMessageCreate',payload => {
 
 module.exports = {
     channels_list,
-    emoteObjFromSquadString
+    emoteObjFromSquadString,
+    add_server
 }

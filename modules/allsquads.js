@@ -10,7 +10,7 @@ const translations = require('./../translations.json');
 const supported_langs = ['en','fr','it']
 const {as_users_list} = require('./allsquads/as_users_list')
 const {as_hosts_ratings} = require('./allsquads/as_users_ratings')
-const {db_schedule_msg_deletion} = require('./msg_auto_delete')
+const {db_schedule_msg_deletion} = require('./msg_auto_delete');
 
 const guild_id = '865904902941048862'
 const vip_channel_id = '1041306010331119667'

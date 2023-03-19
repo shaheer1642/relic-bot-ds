@@ -32,6 +32,13 @@ client.on('ready', async () => {
     }).catch(console.error)
 })
 
+client.on('guildCreate',(guild) => {
+    console.log('[as_relicbot.guildCreate] joined guild', guild.name)
+    setTimeout(() => {
+        rb_add_server(guild.id).catch(console.error)
+    }, 5000);
+})
+
 function handleSquadCreateResponses(channel_id,discord_id,responses) {
     if (!Array.isArray(responses)) responses = [responses]
     const payloads = [{content: ' ', embeds: [], ephemeral: false}]
@@ -114,8 +121,8 @@ client.on('messageCreate', async (message) => {
 client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand()) {
         if (interaction.commandName == 'relic_bot') {
-            if (!server_commands_perms.includes(interaction.user.id))
-                return interaction.reply('You do not have permission to use this command').catch(console.error)
+            // if (!server_commands_perms.includes(interaction.user.id))
+            //     return interaction.reply('You do not have permission to use this command').catch(console.error)
             await interaction.deferReply().catch(console.error)
             if (interaction.options.getSubcommand() == 'add_server') {
                 rb_add_server(interaction.guild.id).then(res => {
@@ -485,34 +492,35 @@ function rb_add_server(guild_id) {
         .then(res => {
             if (res.rowCount == 1) {
                 client.guilds.fetch(guild_id)
-                .then(guild => {
-                    guild.channels.create('━━ RELICS RECRUITEMENT ━━',{
-                        type: 'GUILD_CATEGORY',
-                    }).then(category => { 
-                        guild.channels.create('•🔮•relic-squads',{
-                            type: 'GUILD_TEXT',
-                        }).then(async relic_squads => {
-                            await relic_squads.setParent(category).catch(console.error)
-                            const relic_squads_wh = await relic_squads.createWebhook('Relic',{avatar: 'https://cdn.discordapp.com/attachments/943131999189733387/1043978374089019462/relic_pack.png'}).catch(console.error)
-                            db.query(`
-                                INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads.id}','${relic_squads_wh.url}','${guild_id}','relics_vaulted',${new Date().getTime()});
-                            `).then(() => {
-                                ['1','2','3','4','5','6'].forEach((val,index) => {
-                                    var msg_type;
-                                    if (index == 0) msg_type = 'recruitment_intro'
-                                    if (index == 1) msg_type = 'fissures'
-                                    if (index == 2) msg_type = 'lith_squads'
-                                    if (index == 3) msg_type = 'meso_squads'
-                                    if (index == 4) msg_type = 'neo_squads'
-                                    if (index == 5) msg_type = 'axi_squads'
-                                    relic_squads_wh.send('_ _').then(res => {
-                                        db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads.id}', '${msg_type}', '${relic_squads_wh.url}')`)
-                                    }).catch(console.error)
-                                })
-                                setTimeout(assign_global_variables, 10000);
-                                setTimeout(edit_recruitment_intro, 15000);
-                                resolve({id: relic_squads.id})
-                            }).catch(err => reject(err))
+                .then(async guild => {
+                    const category = await guild.channels.fetch().then(channels => channels.find(channel => channel.name == '⸻ WF RECRUITEMENT ⸻')).catch(console.error)  || await guild.channels.create('⸻ WF RECRUITEMENT ⸻',{type: 'GUILD_CATEGORY', position: 1}).catch(console.error)
+                    guild.channels.create('🔮᲼relic-squads',{
+                        type: 'GUILD_TEXT',
+                    }).then(async relic_squads => {
+                        await relic_squads.setParent(category).catch(console.error)
+                        const relic_squads_wh = await relic_squads.createWebhook('Relic',{avatar: 'https://cdn.discordapp.com/attachments/943131999189733387/1043978374089019462/relic_pack.png'}).catch(console.error)
+                        db.query(`
+                            INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads.id}','${relic_squads_wh.url}','${guild_id}','relics_vaulted',${new Date().getTime()});
+                        `).then(() => {
+                            ['1','2','3','4','5','6'].forEach((val,index) => {
+                                var msg_type;
+                                if (index == 0) msg_type = 'recruitment_intro'
+                                if (index == 1) msg_type = 'fissures'
+                                if (index == 2) msg_type = 'lith_squads'
+                                if (index == 3) msg_type = 'meso_squads'
+                                if (index == 4) msg_type = 'neo_squads'
+                                if (index == 5) msg_type = 'axi_squads'
+                                relic_squads_wh.send('_ _').then(res => {
+                                    db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads.id}', '${msg_type}', '${relic_squads_wh.url}')`)
+                                }).catch(console.error)
+                            })
+                            setTimeout(assign_global_variables, 10000);
+                            setTimeout(edit_recruitment_intro, 15000);
+                            setTimeout(() => edit_webhook_messages('lith'), 15000);
+                            setTimeout(() => edit_webhook_messages('meso'), 15000);
+                            setTimeout(() => edit_webhook_messages('neo'), 15000);
+                            setTimeout(() => edit_webhook_messages('axi'), 15000);
+                            resolve({id: relic_squads.id})
                         }).catch(err => reject(err))
                     }).catch(err => reject(err))
                 }).catch(err => reject(err))
@@ -1254,5 +1262,6 @@ async function fissures_check() {
 }
 
 module.exports = {
-    channels_list
+    channels_list,
+    rb_add_server
 }
