@@ -544,6 +544,7 @@ function rb_remove_server(guild_id) {
                     if (!channel) return
                     channel.send('This server has been unaffiliated from AllSquads. Farewell!').catch(console.error)
                 })
+                setTimeout(assign_global_variables, 10000);
                 resolve()
             } else return reject('Server is not affiliated')
         }).catch(err => reject(err))
