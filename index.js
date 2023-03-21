@@ -1525,8 +1525,9 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 })
 
 client.on('guildCreate',(guild) => {
-    console.log('[index.guildCreate] joined new server', guild.name)
-    client.channels.cache.get('892003813786017822')?.send({content: `Joined new server: **${guild.name}**`}).catch(console.error)
+    const log = `Joined new server\nName: ${guild.name}\nMember count: ${guild.memberCount}`
+    console.log('[index.guildCreate]', log)
+    client.channels.cache.get('892003813786017822')?.send({content: log}).catch(console.error)
 })
 
 axiosRetry(axios, {
