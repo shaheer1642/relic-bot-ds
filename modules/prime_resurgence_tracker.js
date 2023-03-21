@@ -254,7 +254,7 @@ function sendAlert(order,item) {
     const key = `${order.user.ingame_name}${item}`
     if (timeouts.includes(key)) return
     const pasta = `/w ${order.user.ingame_name} Hi! Are you still ${order.order_type}ing [${convertUpper(item)}] for ${order.platinum}p each? (warframe.market)`
-    client.channels.cache.get(log_channel).send({
+    client.channels.cache.get(log_channel)?.send({
         content: mention_users.map(id => `<@${id}>`).join(', '),
         embeds: [{
             description: `User **${order.user.ingame_name}** (status: ${order.user.status}) is selling x${order.quantity} [${convertUpper(item)}](https://warframe.market/items/${item}) (${order.subtype}) for ${order.platinum}p each\n${pasta}\n(react with 👍 before you are going to pm)`
