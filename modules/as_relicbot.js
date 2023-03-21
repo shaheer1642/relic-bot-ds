@@ -33,7 +33,6 @@ client.on('ready', async () => {
 })
 
 client.on('guildCreate',(guild) => {
-    console.log('[as_relicbot.guildCreate] joined guild', guild.name)
     setTimeout(() => {
         rb_add_server(guild.id).catch(console.error)
     }, 5000);

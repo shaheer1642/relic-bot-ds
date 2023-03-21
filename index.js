@@ -1524,6 +1524,10 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
         botv.guildMemberUpdate(oldMember, newMember)
 })
 
+client.on('guildCreate',(guild) => {
+    console.log('[index.guildCreate] joined new server', guild.name)
+    client.channels.cache.get('892003813786017822')?.send({content: `Joined new server: **${guild.name}**`}).catch(console.error)
+})
 
 axiosRetry(axios, {
     retries: 50, // number of retries

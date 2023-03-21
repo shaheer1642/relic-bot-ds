@@ -42,7 +42,6 @@ client.on('ready', async () => {
 })
 
 client.on('guildCreate',(guild) => {
-    console.log('[as_squadbot.guildCreate] joined guild', guild.name)
     setTimeout(() => {
         add_server(guild.id).catch(console.error)
     }, 10000);
