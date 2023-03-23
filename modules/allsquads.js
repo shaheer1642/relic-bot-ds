@@ -573,7 +573,7 @@ async function assign_allsquads_roles() {
                         const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
                         if (!member) return
                         if (!member.roles.cache.get(role.object.id)) {
-                            if (user.last_squad_timestamp >= (new Date().getTime() - 604800000)) {
+                            if (user.last_squad_timestamp >= (new Date().getTime() - 2592000000)) {
                                 member.roles.add(role.object).then(res => {
                                     if (role.requirement <= user.reputation && user.reputation <= role.requirement + 3) {
                                         client.channels.cache.get('1060716155150536754').send({
@@ -588,7 +588,7 @@ async function assign_allsquads_roles() {
                                 }).catch(console.error)
                             }
                         } else {
-                            if (user.last_squad_timestamp < (new Date().getTime() - 604800000))
+                            if (user.last_squad_timestamp < (new Date().getTime() - 2592000000))
                                 member.roles.remove(role.object).catch(console.error)
                         }
                     } else {
