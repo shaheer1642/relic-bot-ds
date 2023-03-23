@@ -591,6 +591,12 @@ async function assign_allsquads_roles() {
                             if (user.last_squad_timestamp < (new Date().getTime() - 604800000))
                                 member.roles.remove(role.object).catch(console.error)
                         }
+                    } else {
+                        const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
+                        if (!member) return
+                        if (member.roles.cache.get(role.object.id)) {
+                            member.roles.remove(role.object).catch(console.error)
+                        }
                     }
                 })
             })
