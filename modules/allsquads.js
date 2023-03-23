@@ -541,7 +541,7 @@ async function assign_allsquads_roles() {
     const roles = [{
         rank_type: 'rank_1',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'star child'),
-        requirement: 3
+        requirement: 5
     },{
         rank_type: 'rank_2',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'lotus lover'),
@@ -556,8 +556,12 @@ async function assign_allsquads_roles() {
         requirement: 100
     },{
         rank_type: 'rank_5',
-        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'legendary'),
+        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'void angel'),
         requirement: 300
+    },{
+        rank_type: 'rank_6',
+        object: guild.roles.cache.find(role => role.name.toLowerCase() === 'legendary'),
+        requirement: 500
     }]
     socket.emit('allsquads/leaderboards/fetch', {}, (res) => {
         if (res.code == 200) {
@@ -568,17 +572,22 @@ async function assign_allsquads_roles() {
                     if (user.reputation >= role.requirement) {
                         const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
                         if (!member) return
-                        if (!member.roles.cache.get(role.object.id)) {
+                        if (!member.roles.cache.get(role.object.id) && user.last_squad_timestamp >= (new Date().getTime() - 604800000)) {
                             member.roles.add(role.object).then(res => {
-                                client.channels.cache.get('1060716155150536754').send({
-                                    content: ' ',
-                                    embeds: [{
-                                        description: `<@${user.discord_id}> has achieved the rank <@&${role.object.id}>, Congratulations! 🎉`,
-                                        color: role.object.color
-                                    }]
-                                }).catch(console.error)
-                                db.query(`INSERT INTO as_rank_roles (discord_id,rank_type) VALUES ('${user.discord_id}','${role.rank_type}')`).catch(console.error)
+                                if (role.requirement <= user.reputation && user.reputation <= role.requirement + 3) {
+                                    client.channels.cache.get('1060716155150536754').send({
+                                        content: ' ',
+                                        embeds: [{
+                                            description: `<@${user.discord_id}> has achieved the rank <@&${role.object.id}>, Congratulations! 🎉`,
+                                            color: role.object.color
+                                        }]
+                                    }).catch(console.error)
+                                    db.query(`INSERT INTO as_rank_roles (discord_id,rank_type) VALUES ('${user.discord_id}','${role.rank_type}')`).catch(console.error)
+                                }
                             }).catch(console.error)
+                        } else {
+                            if (user.last_squad_timestamp < (new Date().getTime() - 604800000))
+                                member.roles.remove(role.object).catch(console.error)
                         }
                     }
                 })
