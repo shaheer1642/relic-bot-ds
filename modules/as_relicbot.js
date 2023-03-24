@@ -452,7 +452,7 @@ function edit_recruitment_intro() {
             content: ' ',
             embeds: [{
                 "title": "Relic Recruitment",
-                description: msg.c_id == '1050717341123616851' ? '':'[This bot is created by Warframe Squads](https://discord.gg/346ZthxCe8)',
+                description: msg.c_id == '1050717341123616851' ? '':'This bot is created by [Warframe Squads](https://discord.gg/346ZthxCe8)\nWant to add it to your server? [Click here](https://discord.com/api/oauth2/authorize?client_id=832682369831141417&permissions=8&scope=bot)',
                 "color": 5814783,
                 "fields": [
                   {

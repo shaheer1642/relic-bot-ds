@@ -754,7 +754,7 @@ function edit_recruitment_intro() {
             content: ' ',
             embeds: [{
                 title: 'Recruitment',
-                description: `- Click on the button to join a squad. Click again to leave; or click 'Leave All'\n\n- To make a custom squad, simply type what you need and send message\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads expire in 1 hour${msg.c_id == '1054843353302323281' ? `\n\n- Ask anything in <#1063387040449835028>. For any queries or bugs, use <#1003269491163148318>\n\n- The server just opened, give it some time to reach full activity! 🙂`:''}${msg.c_id == '1054843353302323281' ? '':'\n\n[This bot is created by Warframe Squads](https://discord.gg/346ZthxCe8)'}`,
+                description: `- Click on the button to join a squad. Click again to leave; or click 'Leave All'\n\n- To make a custom squad, simply type what you need and send message\n\n- If you have an open squad, **always be ready to play under 2-5 minutes!**\n\n- You will be notified in DMs when squad fills. Unfilled squads expire in 1 hour${msg.c_id == '1054843353302323281' ? `\n\n- Ask anything in <#1063387040449835028>. For any queries or bugs, use <#1003269491163148318>\n\n- The server just opened, give it some time to reach full activity! 🙂`:''}${msg.c_id == '1054843353302323281' ? '':'\n\nThis bot is created by [Warframe Squads](https://discord.gg/346ZthxCe8)\nWant to add it to your server? [Click here](https://discord.com/api/oauth2/authorize?client_id=832682369831141417&permissions=8&scope=bot)'}`,
                 color: '#ffffff',
             }],
             components: [{

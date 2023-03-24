@@ -1,7 +1,11 @@
 [{
-    "en": "This bot is created by Warframe Squads",
-    "fr": "ce bot a été créé par Warframe Squads",
-    "it": "Questo bot è stato creato da Warframe Squads"
+    "en": "This bot is created by [Warframe Squads]",
+    "fr": "ce bot a été créé par [Warframe Squads]",
+    "it": "Questo bot è stato creato da [Warframe Squads]"
+},{
+    "en": "Want to add it to your server? [Click here]",
+    "fr": "Vous voulez l'ajouter à votre serveur ? [Cliquez ici]",
+    "it": "Vuoi aggiungerlo al tuo server? [Clicca qui]"
 },{
     "en": "Note: Your ign has already been verified. It will be updated upon re-verification",
     "fr": "Note: Votre pseudo en jeu a déjà été vérifié. Il sera mis à jour après re-vérification",
@@ -42,6 +46,10 @@
     "en": "always be ready to play under 2-5 minutes",
     "fr": "soyez toujours prêt pour jouer dans les 2-5 minutes",
     "it": "assicurati sempre di essere pronto a giocare entro 2-5 minuti"
+},{
+    "en": "To make a custom squad, simply type what you need and send message",
+    "fr": "Pour créer une escouade personnalisée , écrire simplement ce dont vous avez besoin et envoyer le message",
+    "it": "Per creare una squadra personalizzata, semplicemente scrivi di cosa hai bisogno e invia il messaggio"
 },{
     "en": "You will be notified in DMs when squad fills. Unfilled squads expire in 1 hour",
     "fr": "Vous serez notifié dans vos messages privés lorsque l'escouade sera remplie. Les escouades non remplies expire après 1h",
@@ -161,9 +169,9 @@
 },{
     "en": "Settings",
     "fr": "Réglages",
-    "it": "Settings"
+    "it": "Settaggi"
 },{
     "en": "Auto-Fill",
     "fr": "Remplissage auto",
-    "it": "Auto-Fill"
+    "it": "Riempimento automatico"
 }]
