@@ -716,7 +716,7 @@ function translatePayload(payload, lang) {
         translations.forEach(sentence => {
             if (!sentence.en || sentence.en == "" || !sentence[lang] || sentence[lang] == "" || sentence.en == sentence[lang]) return
             var i = 0;
-            while (payloadString.match(sentence.en)) {
+            while (payloadString.match(sentence.en.replace(/\[/g,'\\['))) {
                 payloadString = payloadString.replace(sentence.en,sentence[lang])
                 // console.log('in loop',sentence.en,sentence[lang])
                 i++;
