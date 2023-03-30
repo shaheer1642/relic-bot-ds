@@ -12,7 +12,8 @@ const {event_emitter} = require('./event_emitter')
 const {translatePayload} = require('./allsquads')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
 const {as_users_list} = require('./allsquads/as_users_list')
-const {emote_ids, emoteObjFromSquadString} = require('./emotes')
+const {emote_ids, emoteObjFromSquadString} = require('./emotes');
+const { db_schedule_msg_deletion } = require('./msg_auto_delete');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -655,10 +656,8 @@ socket.on('squadCreate', (squad) => {
                         arrToStringsArrWithLimit(relicBotSquadToString(squad), mentions_list.map(id => `<@${id}>`), 2000).forEach(str => {
                             new WebhookClient({url: webhooks_list[channel_id]}).send({
                                 content: str
-                            }).then(res => {
-                                setTimeout(() => {
-                                    new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
-                                }, 10000);
+                            }).then(msg => {
+                                db_schedule_msg_deletion(msg.id, msg.channel_id, 10000)
                             }).catch(console.error)
                         })
                     }).catch(console.error)

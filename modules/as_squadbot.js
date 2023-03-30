@@ -906,10 +906,8 @@ socket.on('squadbot/squadCreate', (squad) => {
                         arrToStringsArrWithLimit(`Someone is looking for ${convertUpper(squad.squad_string)} squad`, mentions_list.map(id => `<@${id}>`), 2000).forEach(str => {
                             new WebhookClient({url: webhooks_list[channel_id]}).send({
                                 content: str
-                            }).then(res => {
-                                setTimeout(() => {
-                                    new WebhookClient({url: webhooks_list[channel_id]}).deleteMessage(res.id).catch(console.error)
-                                }, 10000);
+                            }).then(msg => {
+                                db_schedule_msg_deletion(msg.id, msg.channel_id, 10000)
                             }).catch(console.error)
                         })
                     }).catch(console.error)
