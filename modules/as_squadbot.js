@@ -13,7 +13,8 @@ const {translatePayload} = require('./allsquads')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
 const {as_users_list} = require('./allsquads/as_users_list')
-const {global_variables} = require('./global_variables')
+const {global_variables} = require('./global_variables');
+const { db_schedule_msg_deletion } = require('./msg_auto_delete');
 
 const server_commands_perms = [
     '253525146923433984', //softy
