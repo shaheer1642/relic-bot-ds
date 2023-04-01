@@ -101,8 +101,29 @@ function verify_squad_challenges(squad,operator,bot_type) {
         name: 'Credit is Due',
         match_string: 'profit_taker'
     },{
+        name: 'Credit is Due',
+        match_string: 'index'
+    },{
         name: 'Still Grinding',
         match_string: 'incursion'
+    },{
+        name: 'It is that Hour',
+        match_string: 'arbitration'
+    },{
+        name: 'Almost There',
+        match_string: 'leveling'
+    },{
+        name: 'Moarrr',
+        match_string: 'endo'
+    },{
+        name: 'Life is Pain',
+        match_string: 'aya_farm'
+    },{
+        name: 'Out of Traces',
+        match_string: 'traces'
+    },{
+        name: 'Still not 30',
+        match_string: 'nightwave'
     },]
 
     const completed_challenge = ''
