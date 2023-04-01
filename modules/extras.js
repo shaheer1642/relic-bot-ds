@@ -140,6 +140,9 @@ function ms_till_monday_12am() {
     if (ms < 0) return 86400000
     return ms
 }
+function ms_till_12am() {
+    return (new Date().setHours(23,59,59,999) - new Date().getTime())
+}
 
 function sortCaseInsensitive(arr,descending) {
     return arr.sort((a,b) => a.replace(/"/g,'').toLowerCase() < b.replace(/"/g,'').toLowerCase() ? descending ? 1 : -1 : descending ? -1 : 1)
@@ -218,5 +221,6 @@ module.exports = {
     calcArrAvg,
     getGuildMembersStatus,
     lowerAndScore,
-    timeStringToMs
+    timeStringToMs,
+    ms_till_12am
 };
