@@ -73,9 +73,9 @@ var webhook_client;
 client.on('ready', async () => {
     webhook_client = await client.fetchWebhook(process.env.ENVIRONMENT_TYPE == 'prod' ? '1050488022132596807':'1091817615963475998').catch(console.error)
     webhook_client?.editMessage(message_ids.challenges.faq, message_formats.challenges.faq)
-    console.log('[ms_till_monday_12am]', ms_till_monday_12am())
-    setInterval(weekly_challenges_reset, ms_till_monday_12am());
-    setInterval(daily_challenges_reset, ms_till_12am());
+    // console.log('[ms_till_monday_12am]', ms_till_monday_12am())
+    setTimeout(weekly_challenges_reset, ms_till_monday_12am());
+    setTimeout(daily_challenges_reset, ms_till_12am());
     // setTimeout(weekly_deals_reset, ms_till_monday_12am());
     edit_challenges_embed()
     //edit_deals_embed()
@@ -587,6 +587,8 @@ function weekly_challenges_reset() {
             }).catch(console.error)
         }).catch(console.error)
     }).catch(console.error)
+    
+    setTimeout(weekly_challenges_reset, ms_till_monday_12am());
 }
 
 function daily_challenges_reset() {
@@ -613,6 +615,8 @@ function daily_challenges_reset() {
             }).catch(console.error)
         }).catch(console.error)
     }).catch(console.error)
+
+    setTimeout(daily_challenges_reset, ms_till_12am());
 }
 
 // function weekly_deals_reset() {
