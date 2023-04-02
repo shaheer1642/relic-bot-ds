@@ -112,7 +112,7 @@ function getRandomColor() {
 }
 
 function embedScore(text) {
-    return text.replaceAll('_','\\_')
+    return text.replace(/_/g,'\\_')
 }
 
 function convertUpper(str) {

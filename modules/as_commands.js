@@ -5,7 +5,7 @@ const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
 const {emoteObjFromSquadString} = require('./emotes')
 const {event_emitter} = require('./event_emitter')
-const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg } = require('./extras.js');
+const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, embedScore } = require('./extras.js');
 const translations = require('../translations.json');
 const supported_langs = ['en','fr','it']
 const {as_users_list} = require('./allsquads/as_users_list')
@@ -122,7 +122,7 @@ function generateStatisticsEmbed(statistics) {
             inline: true
         }],
         author: {
-            name: `${statistics.user.ingame_name}'s Profile`,
+            name: `${embedScore(statistics.user.ingame_name)}'s Profile`,
             icon_url: client.users.cache.get(statistics.user.discord_id)?.avatarURL()
         },
         color: 'BLUE'

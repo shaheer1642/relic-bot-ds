@@ -1,6 +1,6 @@
 const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js')
-const {timeStringToMs} = require('./extras.js');
+const {timeStringToMs, embedScore} = require('./extras.js');
 const { socket } = require('./socket.js');
 
 
@@ -86,7 +86,7 @@ async function getUsersVerified(time_since) {
                     content: ' ',
                     embeds: [{
                         title: `${res.rows.length} users verified in last ${time_since}`,
-                        description: users.map(user => user.ingame_name).join(', ').substring(0, 1999)
+                        description: embedScore(users.map(user => user.ingame_name).join(', ').substring(0, 1999))
                     }],
                     ephemeral: true
                 })

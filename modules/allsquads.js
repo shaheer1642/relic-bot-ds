@@ -15,7 +15,6 @@ const {db_schedule_msg_deletion} = require('./msg_auto_delete');
 const guild_id = '865904902941048862'
 const vip_channel_id = '1041306010331119667'
 const vip_message_id = '1041306046280499200'
-const help_faq_channel_id = '1063387040449835028'
 
 client.on('ready', () => {
     update_users_list()
@@ -152,12 +151,6 @@ function update_users_list() {
         }
     })
 }
-
-client.on('messageCreate', (message) => {
-    if (message.channel.id == help_faq_channel_id && !message.author.bot) {
-        db_schedule_msg_deletion(message.id, message.channel.id, 43200000)
-    }
-})
 
 client.on('interactionCreate', (interaction) => {
     if (interaction.isButton()) {
@@ -622,7 +615,7 @@ function edit_leaderboard() {
                             inline: true
                         },{
                             name: key == 'top_squads' ? 'Squad' : 'Player',
-                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
+                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n').replace(/_/g,'\\_'),
                             inline: true
                         },{
                             name: key == 'top_squads' ? 'Hosts' : 'Reputation',
@@ -655,7 +648,7 @@ function edit_staff_leaderboard() {
                             inline: true
                         },{
                             name: key == 'top_squads' ? 'Squad' : 'Player',
-                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n'),
+                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n').replace(/_/g,'\\_'),
                             inline: true
                         },{
                             name: key == 'top_squads' ? 'Hosts' : 'Reputation',
