@@ -126,7 +126,7 @@ function verify_squad_challenges(squad,operator,bot_type) {
         match_string: 'nightwave'
     },]
 
-    const completed_challenge = ''
+    var completed_challenge = ''
     if (bot_type == 'squadbot') {
         challenges.map(challenge => {
             if (squad.squad_string.match(challenge.match_string)) {
