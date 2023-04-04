@@ -6,7 +6,8 @@ const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore,mo
 const uuid = require('uuid');
 const JSONbig = require('json-bigint');
 const {event_emitter} = require('./event_emitter')
-const {socket} = require('./socket')
+const {socket} = require('./socket');
+const { db_schedule_msg_deletion } = require('./msg_auto_delete.js');
 
 // const guild_id = '865904902941048862'
 
@@ -607,16 +608,15 @@ function daily_challenges_reset() {
             `)
         })
         db.query(query.join(' ')).then(res => {
+            edit_challenges_embed()
+            setTimeout(daily_challenges_reset, ms_till_12am());
             client.channels.fetch(channel_ids.challenges).then(channel => {
                 channel.send('Daily challenges have been reset').then(msg => {
-                    setTimeout(() => msg.delete().catch(console.error), 60000)
-                    edit_challenges_embed()
+                    db_schedule_msg_deletion(msg.id,msg.channel.id,60000)
                 }).catch(console.error)
             }).catch(console.error)
         }).catch(console.error)
     }).catch(console.error)
-
-    setTimeout(daily_challenges_reset, ms_till_12am());
 }
 
 // function weekly_deals_reset() {
