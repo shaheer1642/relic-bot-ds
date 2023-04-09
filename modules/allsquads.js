@@ -563,7 +563,7 @@ async function assign_allsquads_roles() {
                 roles.forEach(async role => {
                     if (!role.object) return
                     if (user.reputation >= role.requirement) {
-                        const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
+                        const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(err => err?.code == 10007 ? null : console.log(err))
                         if (!member) return
                         if (!member.roles.cache.get(role.object.id)) {
                             if (user.last_squad_timestamp >= (new Date().getTime() - 2592000000)) {
