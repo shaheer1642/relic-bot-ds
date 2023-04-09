@@ -585,7 +585,7 @@ async function assign_allsquads_roles() {
                                 member.roles.remove(role.object).catch(console.error)
                         }
                     } else {
-                        const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(console.error)
+                        const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(err => err?.code == 10007 ? null : console.log(err))
                         if (!member) return
                         if (member.roles.cache.get(role.object.id)) {
                             member.roles.remove(role.object).catch(console.error)
