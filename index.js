@@ -36,10 +36,10 @@ require('./modules/as_commands.js');
 require('./modules/as_reports.js');
 require('./modules/as_events.js');
 
-// restart after 24.5h
+// restart after 12.5h
 setTimeout(() => {
     process.exit()
-}, 88200000);
+}, 45000000);
 
 const defaultReactions = {
     check: {
