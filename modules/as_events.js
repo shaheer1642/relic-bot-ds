@@ -7,10 +7,6 @@ const channel_ids = {
     event_submission: '1095422056813834291'
 }
 
-client.on('ready', () => {
-    editEmbed()
-})
-
 client.on('messageCreate',(message) => {
     if (message.guild.id == '865904902941048862') {
         if (message.channel.id == channel_ids.event_submission) {
