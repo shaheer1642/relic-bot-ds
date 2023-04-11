@@ -8,8 +8,8 @@ const channel_ids = {
 }
 
 client.on('messageCreate',(message) => {
-    if (message.guild.id == '865904902941048862') {
-        if (message.channel.id == channel_ids.event_submission) {
+    if (message.guild?.id == '865904902941048862') {
+        if (message.channel?.id == channel_ids.event_submission) {
             const screenshots = message.attachments.map(attachment => attachment.url).join('\n')
             df_send_message({
                 embeds: [{
