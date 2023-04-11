@@ -15,7 +15,7 @@ client.on('messageCreate',(message) => {
                     title: 'New Event Submission',
                     author: message.member,
                     description: `${message.content}${message.attachments ? `\n\n**Attached Screenshots**${message.attachments.map(attachment => attachment.url).join('\n')}` : ''}`,
-                    color: 'purple'
+                    color: '#7243c4'
                 }]
             }, channel_ids.moderator).catch(console.error)
         }
