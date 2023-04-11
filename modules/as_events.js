@@ -10,11 +10,12 @@ const channel_ids = {
 client.on('messageCreate',(message) => {
     if (message.guild.id == '865904902941048862') {
         if (message.channel.id == channel_ids.event_submission) {
+            const screenshots = message.attachments.map(attachment => attachment.url).join('\n')
             df_send_message({
                 embeds: [{
                     title: 'New Event Submission',
                     author: message.member,
-                    description: `${message.content}${message.attachments ? `\n\n**Attached Screenshots**${message.attachments.map(attachment => attachment.url).join('\n')}` : ''}`,
+                    description: `${message.content}${screenshots ? `\n\n**Attached Screenshots**\n${screenshots}` : ''}`,
                     color: '#7243c4'
                 }]
             }, channel_ids.moderator).catch(console.error)
