@@ -673,7 +673,7 @@ db.on('notification', async (notification) => {
         //edit_deals_embed()
         db.query(`
             UPDATE challenges_accounts SET
-            balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.balance_type == 'credit'? payload.rp*2 : payload.rp}
+            balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
             WHERE discord_id = '${payload.discord_id}';
         `).then(async res => {
             if (res.rowCount == 0) {
