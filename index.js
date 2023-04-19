@@ -13,7 +13,7 @@ const osiris_guild = require('./modules/osiris.js');
 const hubapp = require('./modules/hubapp.js');
 const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
-const worldstatealerts = require('./modules/worldstatealerts.js');
+// const worldstatealerts = require('./modules/worldstatealerts.js');
 const relicbot = require('./modules/as_relicbot.js');
 const squadbot = require('./modules/as_squadbot.js');
 const deploy_commands = require('./deploy-commands.js');
@@ -124,7 +124,7 @@ client.on('ready', () => {
     osiris_tts.bot_initialize()
     osiris_guild.bot_initialize()
     twitch_affiliate.bot_initialize()
-    worldstatealerts.bot_initialize()
+    // worldstatealerts.bot_initialize()
 
     client.guilds.fetch().then(guilds => {
         guilds.forEach(guild => {
@@ -357,7 +357,7 @@ client.on('messageCreate', async message => {
                     test_modules.launchNuke(message,args)
                     break
                 case 'wssetup':
-                    worldstatealerts.wssetup(message,args)
+                    // worldstatealerts.wssetup(message,args)
                     break
                 case 'getserverstats':
                     discord_server_modules.computeServerStats(message,args)
@@ -399,7 +399,7 @@ client.on("messageUpdate", async function(oldMessage, newMessage) {
 
 client.on('interactionCreate', async interaction => {
 
-    worldstatealerts.interaction_handler(interaction)
+    // worldstatealerts.interaction_handler(interaction)
 
     if (interaction.channelId == '996418373137219595') {
         osiris_tts.interactionHandler(interaction);
@@ -1421,7 +1421,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
     
     if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
-        worldstatealerts.setupReaction(reaction, user, "add")
+        // worldstatealerts.setupReaction(reaction, user, "add")
     }
 });
 
@@ -1505,7 +1505,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         botv.reaction_handler(reaction,user,'remove')
 
     if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
-        worldstatealerts.setupReaction(reaction, user, "remove")
+        // worldstatealerts.setupReaction(reaction, user, "remove")
     }
 });
 
