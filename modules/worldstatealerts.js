@@ -3337,7 +3337,7 @@ async function global_upgrades_check() {
                 active_booster.push(booster.upgrade.toLowerCase().replace(/ /g,'_')
                 .replace('mission_kill_xp','affinity_booster')
                 .replace('resource_drop_amount','resource_drop_amount_booster')
-                .replace('credit_drop_chance','resource_drop_chance_booster')
+                .replace('credit_drop_chance','credit_booster')
                 .replace('credit_drop_amount','credit_booster')
                 )
             })
