@@ -14,6 +14,7 @@ const {as_users_ratings} = require('./allsquads/as_users_ratings')
 const {as_users_list} = require('./allsquads/as_users_list')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes');
 const { db_schedule_msg_deletion } = require('./msg_auto_delete');
+const { getRelicQuantity } = require('./allsquads/wfrim_relicsdb');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -562,7 +563,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     squads.map((squad,index) => {
         var field_value = '\u200b'
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id))
-            field_value = squad.members.map(id => `${as_users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''}`.trim()).join('\n').replace(/_/g, '\\_')
+            field_value = squad.members.map(id => `${as_users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''} ${getRelicQuantity(id,squad) ? `(x${getRelicQuantity(id,squad)} owned)` : ''}`.trim()).join('\n').replace(/_/g, '\\_')
         else {
             if (squad.members.length > 1) field_value += ' ' + `${squad.members.length}/4`
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot

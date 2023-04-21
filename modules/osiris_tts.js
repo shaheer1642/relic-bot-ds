@@ -1,5 +1,3 @@
-if (process.env.DEBUG_MODE == 1)
-    return
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore} = require('./extras.js');
