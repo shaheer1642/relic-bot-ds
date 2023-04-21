@@ -563,7 +563,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     squads.map((squad,index) => {
         var field_value = '\u200b'
         if (with_all_names || (name_for_squad_id && squad.squad_id == name_for_squad_id))
-            field_value = squad.members.map(id => `${as_users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''} ${getRelicQuantity(id,squad) ? `(x${getRelicQuantity(id,squad)} owned)` : ''}`.trim()).join('\n').replace(/_/g, '\\_')
+            field_value = squad.members.map(id => `${as_users_list[id]?.ingame_name} ${as_users_ratings[id]?.highly_rated ? '★':''} ${getRelicQuantity(id,squad) ? `(x${getRelicQuantity(id,squad)})` : ''}`.trim()).join('\n').replace(/_/g, '\\_')
         else {
             if (squad.members.length > 1) field_value += ' ' + `${squad.members.length}/4`
             if (squad.members.length > 2) field_value += ' ' + emote_ids.hot
