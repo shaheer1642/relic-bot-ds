@@ -1,5 +1,5 @@
 const {client} = require('../modules/discord_client.js');
-const {db} = require('../modules/db_connection')
+const {db} = require('../modules/db_connection.js')
 const {WebhookClient} = require('discord.js')
 const uuid = require('uuid')
 

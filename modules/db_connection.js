@@ -10,6 +10,7 @@ const db = new DB.Client({
 })
 
 db.connect().then(async res => {
+    db.emit('connected')
     console.log('DB Connection established.')
     event_emitter.emit('db_connected')
 
@@ -18,9 +19,9 @@ db.connect().then(async res => {
         LISTEN tradebot_filled_users_orders_update_new_message;
         LISTEN tradebot_filled_users_orders_update_archived;
 
-        LISTEN tradebot_users_list_insert;
-        LISTEN tradebot_users_list_update;
-        LISTEN tradebot_users_list_delete;
+        LISTEN as_users_list_insert;
+        LISTEN as_users_list_update;
+        LISTEN as_users_list_delete;
 
         LISTEN tradebot_users_orders_insert;
         LISTEN tradebot_users_orders_update;
@@ -35,6 +36,7 @@ db.connect().then(async res => {
         LISTEN rb_squads_insert;
         LISTEN rb_squads_update;
         LISTEN rb_squads_delete;
+        
         LISTEN as_gabot_giveaways_insert;
         LISTEN as_gabot_giveaways_update;
         LISTEN as_gabot_giveaways_delete;

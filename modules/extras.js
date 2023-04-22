@@ -206,6 +206,16 @@ function timeStringToMs(time_string) {
     return ms
 }
 
+function generateId() {
+    let ID = "";
+    let characters = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    for ( var i = 0; i < 6; i++ ) {
+      ID += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return ID;
+}
+
+
 module.exports = {
     dynamicSort,
     dynamicSortDesc,
@@ -222,5 +232,6 @@ module.exports = {
     getGuildMembersStatus,
     lowerAndScore,
     timeStringToMs,
-    ms_till_12am
+    ms_till_12am,
+    generateId
 };

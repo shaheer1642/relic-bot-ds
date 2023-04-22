@@ -77,6 +77,7 @@ function getNewToken(oAuth2Client, callback) {
  */
 
 async function gmail_api_call(auth) {
+    if (process.env.ENVIRONMENT_TYPE == "dev") return
     try {
         var gmail = google.gmail({version: 'v1', auth})
     }
@@ -110,19 +111,19 @@ async function gmail_api_call(auth) {
     if (msgs.data.resultSizeEstimate > 0) {
         //Read all msgs
         var ids_list = []
-        await db.query(`SELECT * FROM tradebot_users_unverified`)
+        await db.query(`SELECT * FROM as_users_secret`)
         .then(res => {
             ids_list = res.rows
         }).catch(err => console.log(err))
-        await db.query(`SELECT * FROM hubapp_users`)
-        .then(res => {
-            res.rows.forEach(row => {
-                ids_list.push({
-                    id: row.forums_auth_token,
-                    discord_id: row.discord_id
-                })
-            })
-        }).catch(err => console.log(err))
+        // await db.query(`SELECT * FROM hubapp_users`)
+        // .then(res => {
+        //     res.rows.forEach(row => {
+        //         ids_list.push({
+        //             id: row.forums_auth_token,
+        //             discord_id: row.discord_id
+        //         })
+        //     })
+        // }).catch(err => console.log(err))
         console.log(ids_list)
         for(var i=0;i<msgs.data.messages.length; i++) {
             const msg = msgs.data.messages[i]
@@ -152,8 +153,8 @@ async function gmail_api_call(auth) {
                 return part.mimeType == 'text/html';
             });
             for (var j=0; j<ids_list.length; j++) {
-                const xx_id = ids_list[j].id
-                const xx_discord = ids_list[j].discord_id
+                const xx_id = ids_list[j].code
+                const xx_discord = ids_list[j].identifier
                 console.log(xx_id)
                 if (atob(part[0].body.data.replace(/-/g, '+').replace(/_/g, '/')).toLowerCase().match(`>${xx_id.toLowerCase()}<`)) {
                     var ingame_name = ''
@@ -171,15 +172,15 @@ async function gmail_api_call(auth) {
                     //const ingame_name = `${res.data.snippet.split(' ')[4].replace('(PSN)','').replace('(NSW)','').replace('(XBOX)','')} ${res.data.snippet.split(' ')[5] == 'has'? '':res.data.snippet.split(' ')[5]}`.trim()
                     console.log('User', ingame_name, 'has verified their ign ; Platform:', platform)
                     const user = await client.users.fetch(xx_discord).catch(console.error)
-                    db.query(`DELETE FROM tradebot_users_unverified WHERE discord_id = '${xx_discord}'`).catch(err => console.log(err))
-                    db.query(`UPDATE hubapp_users SET forums_username='${ingame_name}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
+                    db.query(`DELETE FROM as_users_secret WHERE identifier = '${xx_discord}'`).catch(err => console.log(err))
+                    // db.query(`UPDATE hubapp_users SET forums_username='${ingame_name}', forums_verified=true WHERE discord_id=${xx_discord}`).catch(console.error)
                     //---Check if user already exists
-                    db.query(`SELECT * FROM tradebot_users_list WHERE discord_id='${xx_discord}'`).then(async res => {
+                    db.query(`SELECT * FROM as_users_list WHERE discord_id='${xx_discord}'`).then(async res => {
                         if (res.rowCount > 1) {
                             if (user) user.send('Something went wrong verifying your account. Please contact MrSofty#7012. Error code: 500').catch(console.error)
                         } else {
                             if (res.rowCount == 1) {
-                                db.query(`UPDATE tradebot_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = '${xx_discord}' returning *;`).then(res => {
+                                db.query(`UPDATE as_users_list SET ingame_name='${ingame_name}', platform='${platform}' WHERE discord_id = '${xx_discord}' returning *;`).then(res => {
                                     if (res.rowCount == 1) {
                                         event_emitter.emit('allSquadsUserUpdatedIGN', res.rows[0])
                                     } else {
@@ -191,7 +192,7 @@ async function gmail_api_call(auth) {
                                 })
                             }
                             if (res.rowCount == 0) {
-                                db.query(`INSERT INTO tradebot_users_list (discord_id,ingame_name,platform,registered_timestamp) values ('${xx_discord}','${ingame_name}','${platform}',${new Date().getTime()}) returning *;`).then(res => {
+                                db.query(`INSERT INTO as_users_list (discord_id,ingame_name,platform) values ('${xx_discord}','${ingame_name}','${platform}') returning *;`).then(res => {
                                     if (res.rowCount == 1) {
                                         event_emitter.emit('allSquadsNewUserVerified', res.rows[0])
                                     } else {

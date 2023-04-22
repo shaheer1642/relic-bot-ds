@@ -8,6 +8,7 @@ const JSONbig = require('json-bigint');
 const {event_emitter} = require('./event_emitter')
 const {socket} = require('./socket');
 const { db_schedule_msg_deletion } = require('./msg_auto_delete.js');
+const { getAsUserByDiscordId } = require('./allsquads/as_users_list.js');
 
 // const guild_id = '865904902941048862'
 
@@ -261,12 +262,11 @@ client.on('interactionCreate', (interaction) => {
     }
     if (interaction.isButton()) {
         if (interaction.customId == 'view_weekly_challenges_summary') {
-            db.query(`SELECT * FROM challenges WHERE is_active = true; SELECT * FROM challenges_completed; SELECT * FROM challenges_accounts WHERE discord_id = '${interaction.user.id}'`)
+            const user = getAsUserByDiscordId(interaction.user.id)
+            if (!user) return
+            db.query(`SELECT * FROM challenges WHERE is_active = true;`)
             .then(res => {
-                const discord_id = interaction.user.id
-                const challenges = res[0].rows
-                const completed = res[1].rows
-                const user_acc_bal = res[2].rows[0]?.balance || 0
+                const challenges = res.rows
                 const payload = {
                     content: ' ',
                     embeds: [{
@@ -274,18 +274,18 @@ client.on('interactionCreate', (interaction) => {
                             name: interaction.member.displayName,
                             icon_url: `https://cdn.discordapp.com/avatars/${interaction.user.id}/${interaction.user.avatar}.jpeg`,
                         },
-                        description: `RP: ${user_acc_bal}`,
+                        description: `RP: ${user.balance}`,
                         fields: [],
                         color: '#76b5c5'
                     }],
                     ephemeral: true
                 }
                 challenges.forEach(challenge => {
-                    if (challenge.progress[discord_id]) {
-                        const is_completed = challenge.progress[discord_id] >= challenge.completion_count ? true:false
+                    if (challenge.progress[user.user_id]) {
+                        const is_completed = challenge.progress[user.user_id] >= challenge.completion_count ? true:false
                         payload.embeds[0].fields.push({
-                            name: challenge.name + ` (${Math.round(challenge.progress[discord_id]/challenge.completion_count * 100)}%)`,
-                            value: `${is_completed? '**':''}${challenge.progress[discord_id]}/${challenge.completion_count}${is_completed? '**':''}`,
+                            name: challenge.name + ` (${Math.round(challenge.progress[user.user_id]/challenge.completion_count * 100)}%)`,
+                            value: `${is_completed? '**':''}${challenge.progress[user.user_id]}/${challenge.completion_count}${is_completed? '**':''}`,
                             inline: true
                         })
                     }
@@ -645,12 +645,12 @@ db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);
 
     if (notification.channel == 'challenges_update') {
-        for (const discord_id in payload[0].progress) {
-            if ((payload[0].progress[discord_id] == payload[0].completion_count) && ((!payload[1].progress[discord_id]) || (payload[1].progress[discord_id] < payload[0].progress[discord_id]))) {
+        for (const user_id in payload[0].progress) {
+            if ((payload[0].progress[user_id] == payload[0].completion_count) && ((!payload[1].progress[user_id]) || (payload[1].progress[user_id] < payload[0].progress[user_id]))) {
                 db.query(`
                     INSERT INTO challenges_completed
-                    (discord_id,challenge_id,activation_id,timestamp)
-                    VALUES ('${discord_id}','${payload[0].challenge_id}','${payload[0].activation_id}',${new Date().getTime()});
+                    (user_id,challenge_id,activation_id,timestamp)
+                    VALUES ('${user_id}','${payload[0].challenge_id}','${payload[0].activation_id}',${new Date().getTime()});
                 `).catch(console.error)
             }
         }
@@ -663,8 +663,8 @@ db.on('notification', async (notification) => {
             const challenge = res.rows[0]
             db.query(`
                 INSERT INTO challenges_transactions
-                (transaction_id,discord_id,type,activation_id,rp,balance_type,timestamp)
-                VALUES ('${uuid.v4()}','${payload.discord_id}','challenge_completion','${challenge.activation_id}',${challenge.rp},'credit',${new Date().getTime()})
+                (transaction_id,user_id,type,activation_id,rp,balance_type,timestamp)
+                VALUES ('${uuid.v4()}','${payload.user_id}','challenge_completion','${challenge.activation_id}',${challenge.rp},'credit',${new Date().getTime()})
             `).catch(console.error)
         }).catch(console.error)
     }
@@ -672,17 +672,10 @@ db.on('notification', async (notification) => {
     if (notification.channel == 'challenges_transactions_insert') {
         //edit_deals_embed()
         db.query(`
-            UPDATE challenges_accounts SET
+            UPDATE as_users_list SET
             balance = balance ${payload.balance_type == 'credit'? '+':'-'} ${payload.rp}
-            WHERE discord_id = '${payload.discord_id}';
+            WHERE user_id = '${payload.user_id}';
         `).then(async res => {
-            if (res.rowCount == 0) {
-                await db.query(`
-                    INSERT INTO challenges_accounts
-                    (discord_id,balance)
-                    VALUES ('${payload.discord_id}',${payload.rp});
-                `).catch(console.error)
-            }
             //edit_challenges_leaderboard_embed()
         }).catch(console.error)
         // if (payload.type == 'weekly_deal_purchase' && payload.guild_id == botv_guild_id) {

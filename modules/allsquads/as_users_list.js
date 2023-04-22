@@ -9,23 +9,33 @@ event_emitter.on('db_connected', () => {
 })
 
 function updateUsersList() {
-    db.query(`SELECT * FROM tradebot_users_list`).then(res => {
+    db.query(`SELECT * FROM as_users_list`).then(res => {
         res.rows.forEach(row => {
-            as_users_list[row.discord_id] = row
+            as_users_list[row.user_id] = row
         })
     }).catch(console.error)
 }
 
+function updateUser(user_id) {
+    db.query(`SELECT * FROM as_users_list WHERE user_id = ${user_id}`).then(res => {
+        res.rows.forEach(row => {
+            as_users_list[row.user_id] = row
+        })
+    }).catch(console.error)
+}
+
+function getAsUserByDiscordId(discord_id) {
+    return Object.values(as_users_list).filter(user => user.discord_id == discord_id || user.user_id == discord_id)?.[0]
+}
+
 db.on('notification',(notification) => {
     const payload = JSONbig.parse(notification.payload);
-    if (notification.channel == 'tradebot_users_list_insert') {
-        as_users_list[payload.discord_id] = payload
-    }
-    if (notification.channel == 'tradebot_users_list_update') {
-        as_users_list[payload[0].discord_id] = payload[0]
+    if (['as_users_list_insert','as_users_list_update'].includes(notification.channel)) {
+        updateUser(payload.user_id)
     }
 })
 
 module.exports = {
-    as_users_list
+    as_users_list,
+    getAsUserByDiscordId
 }

@@ -2,6 +2,7 @@ const {client} = require('./discord_client.js');
 const {db} = require('./db_connection')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper, arrToStringsArrWithLimit} = require('./extras.js');
 const JSONbig = require('json-bigint');
+const { getAsUserByDiscordId, as_users_list } = require('./allsquads/as_users_list.js');
 
 const webhook_id = '1058463788560552028'
 const channel_id = '1058462882968371331'
@@ -77,7 +78,9 @@ client.on('interactionCreate', interaction => {
                     }
                 }).catch(console.error)
             } else if (interaction.customId == 'as_bb_host') {
-                db.query(`SELECT * FROM as_bb_blesses WHERE discord_id = '${interaction.user.id}' AND status != 'setup' AND submit_timestamp > ${new Date().getTime() - 82800000}`).then(res => {
+                const user_id = getAsUserByDiscordId(interaction.user.id)?.user_id
+                if (!user_id) return
+                db.query(`SELECT * FROM as_bb_blesses WHERE user_id = '${user_id}' AND status != 'setup' AND submit_timestamp > ${new Date().getTime() - 82800000}`).then(res => {
                     if (res.rowCount != 0) {
                         interaction.reply({
                             content: ' ',
@@ -98,13 +101,15 @@ client.on('interactionCreate', interaction => {
                             ephemeral: true,
                             fetchReply: true
                         }).then(msg => {
-                            db.query(`INSERT INTO as_bb_blesses (setup_message_id,discord_id) VALUES ('${msg.id}','${interaction.user.id}')`).catch(console.error)
+                            db.query(`INSERT INTO as_bb_blesses (setup_message_id,user_id) VALUES ('${msg.id}','${user_id}')`).catch(console.error)
                         }).catch(console.error)
                     }
                 }).catch(console.error)
             } else if (interaction.customId == 'as_bb_participate') {
+                const user_id = getAsUserByDiscordId(interaction.user.id)?.user_id
+                if (!user_id) return
                 db.query(`UPDATE as_bb_blesses SET participants = participants || '"${interaction.user.id}"' 
-                WHERE bless_message_id = '${interaction.message.id}' AND status = 'active' AND NOT (participants @> '"${interaction.user.id}"') AND discord_id != '${interaction.user.id}'`)
+                WHERE bless_message_id = '${interaction.message.id}' AND status = 'active' AND NOT (participants @> '"${user_id}"') AND user_id != '${user_id}'`)
                 .then(res => interaction.deferUpdate().catch(console.error)).catch(console.error)
             }
         }
@@ -116,15 +121,17 @@ client.on('messageReactionAdd', (reaction,user) => {
     if (reaction.message.channel.id == channel_id) {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionAdd',reaction.emoji.identifier,user.id)
+            const user_id = getAsUserByDiscordId(user.id)?.user_id
+            if (!user_id) return reaction.remove().catch(console.error)
             const column = (reaction.emoji.identifier.match('north_america') || reaction.emoji.identifier.match('europe') || reaction.emoji.identifier.match('asia')) ? 'regions' : 'bless_types'
             db.query(`
                 INSERT INTO as_bb_trackers 
-                (discord_id,${column}) 
+                (user_id,${column}) 
                 VALUES (
-                    '${user.id}',
+                    '${user_id}',
                     '["${reaction.emoji.name}"]'
                 )
-                ON CONFLICT (discord_id) 
+                ON CONFLICT (user_id) 
                 DO UPDATE SET 
                 ${column} = as_bb_trackers.${column} || '"${reaction.emoji.name}"';
             `).catch(console.error)
@@ -137,10 +144,12 @@ client.on('messageReactionRemove', (reaction,user) => {
     if (reaction.message.channel.id == channel_id) {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionRemove',reaction.emoji.identifier,user.id)
+            const user_id = getAsUserByDiscordId(user.id)?.user_id
+            if (!user_id) return reaction.remove().catch(console.error)
             const column = (reaction.emoji.identifier.match('north_america') || reaction.emoji.identifier.match('europe') || reaction.emoji.identifier.match('asia')) ? 'regions' : 'bless_types'
             db.query(`
                 UPDATE as_bb_trackers SET ${column} = ${column} - '${reaction.emoji.name}'
-                WHERE discord_id = '${user.id}';
+                WHERE user_id = '${user_id}';
             `).catch(console.error)
         }
     }
@@ -312,7 +321,7 @@ db.on('notification', async (notification) => {
                 const submit_timestamp = new Date().getTime()
                 db.query(`
                     UPDATE as_bb_blesses SET submit_timestamp = ${submit_timestamp}, status = 'active' WHERE bless_id = '${blessing.bless_id}';
-                    DELETE FROM as_bb_blesses WHERE discord_id = '${blessing.discord_id}' AND status = 'setup' AND bless_id != '${blessing.bless_id}';
+                    DELETE FROM as_bb_blesses WHERE user_id = '${blessing.user_id}' AND status = 'setup' AND bless_id != '${blessing.bless_id}';
                 `).catch(console.error)
             }
         } else if (blessing.status == 'active' && old_blessing.status == 'setup') {
@@ -326,25 +335,25 @@ db.on('notification', async (notification) => {
                 webhook_client.deleteMessage(blessing.bless_message_id).catch(console.error)
             }, 60000);
             webhook_client.send({
-                content: `${convertUpper(blessing.bless_type)} Blessing countdown has ended <@${blessing.discord_id}>, ${blessing.participants.map(id => `<@${id}>`).join(', ')}`
+                content: `${convertUpper(blessing.bless_type)} Blessing countdown has ended <@${as_users_list[blessing.user_id]?.discord_id}>, ${blessing.participants.map(id => `<@${id}>`).join(', ')}`
             }).then(msg => {
                 setTimeout(() => {
                     webhook_client.deleteMessage(msg.id).catch(console.error)
                 }, 60000);
             }).catch(console.error)
         } else {
-            webhook_client.editMessage(blessing.bless_message_id, embedGenerator(blessing)).catch(console.error)
+            webhook_client?.editMessage(blessing.bless_message_id, embedGenerator(blessing)).catch(console.error)
         }
     }
 })
 
 function mentionUsers(blessing) {
-    db.query(`SELECT * FROM as_bb_trackers WHERE bless_types @> '"${blessing.bless_type}"' AND discord_id != '${blessing.discord_id}'`).then(res => {
+    db.query(`SELECT * FROM as_bb_trackers WHERE bless_types @> '"${blessing.bless_type}"' AND user_id != '${blessing.user_id}'`).then(res => {
         if (res.rowCount == 0) return
         const ping_users = []
         res.rows.forEach(tracker => {
-            if (tracker.regions.length == 0) ping_users.push(tracker.discord_id)
-            else if (tracker.regions.includes(blessing.region)) ping_users.push(tracker.discord_id)
+            if (tracker.regions.length == 0) ping_users.push(as_users_list[tracker.discord_id]?.discord_id)
+            else if (tracker.regions.includes(blessing.region)) ping_users.push(as_users_list[tracker.discord_id]?.discord_id)
         })
         if (ping_users.length > 0) {
             arrToStringsArrWithLimit(`${convertUpper(blessing.bless_type)} Blessing in ${blessing.bless_time}`,ping_users.map(id => `<@${id}>`),2000).forEach(str => {
@@ -387,7 +396,7 @@ function embedGenerator(blessing) {
                 inline: true
             },{
                 name: 'Blessed by',
-                value: `<@${blessing.discord_id}>`,
+                value: `<@${as_users_list[blessing.user_id]?.discord_id}>`,
                 inline: true
             },{
                 name: 'Bless Time',

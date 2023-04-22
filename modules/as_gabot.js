@@ -5,7 +5,7 @@ const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
-const {as_users_list} = require('./allsquads/as_users_list')
+const {as_users_list, getAsUserByDiscordId} = require('./allsquads/as_users_list')
 
 const guild_id = '865904902941048862'
 const channel_id = '890198895508992020'
@@ -128,20 +128,20 @@ client.on('messageDelete', async (message) => {
 client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand() && interaction.guild.id == guild_id && interaction.commandName == 'giveaways') {
         if (interaction.options.getSubcommand() == 'create') {
-            if (!as_users_list[interaction.user.id]) {
+            const user = getAsUserByDiscordId(interaction.user.id)
+            if (!user) {
                 return interaction.reply({
                     content: 'Your account is not verified',
                     ephemeral: true
                 }).catch(console.error)
             }
-            db.query(`SELECT * FROM as_gabot_giveaways WHERE discord_id = '${interaction.user.id}' AND creation_timestamp > ${new Date().getTime() - 86400000} AND status = 'active'`).then(async res => {
+            db.query(`SELECT * FROM as_gabot_giveaways WHERE user_id = '${user.user_id}' AND creation_timestamp > ${new Date().getTime() - 86400000} AND status = 'active'`).then(async res => {
                 if (res.rowCount != 0) {
                     return interaction.reply({
                         content: `You have already hosted a giveaway today. You may host again in **${msToFullTime((Number(res.rows[0].creation_timestamp) + 86400000) - new Date().getTime())}**`,
                         ephemeral: true
                     }).catch(console.error)
                 } else {
-                    const discord_id = interaction.user.id
                     const item = interaction.options.getString('item').replace(/'/g,`''`)
                     const rp_cost = interaction.options.getNumber('rp_cost')
                     const winner_count = interaction.options.getNumber('winner_count')
@@ -196,11 +196,11 @@ client.on('interactionCreate', async (interaction) => {
                     channel.send({
                         content: ' ',
                         embeds: [{
-                            title: `[${as_users_list[discord_id]?.platform}] ${convertUpper(item)}`,
+                            title: `[${user.platform}] ${convertUpper(item)}`,
                             description: `Click 🎉 to join\n${winner_count || 1} Winner${winner_count > 1 ? 's':''} | 0 Entries`,
                             fields: [{
                                 name: 'Hosted By',
-                                value: `<@${discord_id}>`,
+                                value: `<@${user.discord_id}>`,
                                 inline: true
                             },{
                                 name: 'RP Required to Join',
@@ -227,7 +227,7 @@ client.on('interactionCreate', async (interaction) => {
                     }).then(msg => {
                         db.query(`
                             INSERT INTO as_gabot_giveaways (
-                                discord_id,
+                                user_id,
                                 channel_id,
                                 message_id,
                                 item,
@@ -235,7 +235,7 @@ client.on('interactionCreate', async (interaction) => {
                                 winner_count,
                                 expiry_timestamp
                             ) VALUES (
-                                '${discord_id}',
+                                '${user.user_id}',
                                 '${msg.channel.id}',
                                 '${msg.id}',
                                 '${item}',
@@ -287,13 +287,14 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isButton()) {
         if (interaction.customId == 'as_ga_join') {
-            if (!as_users_list[interaction.user.id]) {
+            const user = getAsUserByDiscordId(interaction.user.id)
+            if (!user) {
                 return interaction.reply({
                     content: 'Your account is not verified',
                     ephemeral: true
                 }).catch(console.error)
             }
-            if (as_users_list[interaction.user.id].is_suspended) {
+            if (user.is_suspended) {
                 return interaction.reply({
                     content: 'You are suspended from using this feature',
                     ephemeral: true
@@ -301,19 +302,13 @@ client.on('interactionCreate', async (interaction) => {
             }
             db.query(`
                 SELECT * FROM as_gabot_giveaways WHERE message_id = '${interaction.message.id}';
-                SELECT * FROM challenges_accounts WHERE discord_id = '${interaction.user.id}';
+                SELECT * FROM as_users_list WHERE user_id = '${user.user_id}';
             `).then(res => {
                 const giveaway = res[0].rows[0]
                 const user_account = res[1].rows[0]
                 if (!giveaway) return interaction.reply({content: 'Some error occured. Please contact an admin or MrSofty#7012', ephemeral: true}).catch(console.error)
                 if (giveaway.status != 'active') return interaction.reply({content: 'Giveaway is not active', ephemeral: true}).catch(console.error)
                 if (giveaway.rp_cost > 0) {
-                    if (!user_account) {
-                        return interaction.reply({
-                            content: `You do not have enough RP to join this giveaway\nCurrent RP: 0\nCheck <#1050484747735924736> on how to earn RP`, 
-                            ephemeral: true
-                        }).catch(console.error)
-                    }
                     if (user_account.balance < giveaway.rp_cost) {
                         return interaction.reply({
                             content: `You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`, 
@@ -321,19 +316,19 @@ client.on('interactionCreate', async (interaction) => {
                         }).catch(console.error)
                     }
                 }
-                if (giveaway.discord_id == interaction.user.id) {
+                if (giveaway.user_id == user.user_id) {
                     return interaction.reply({
                         content: `Cannot join your own giveaway`, 
                         ephemeral: true
                     }).catch(console.error)
                 }
-                if (as_users_list[giveaway.discord_id].platform != as_users_list[interaction.user.id].platform) {
+                if (as_users_list[giveaway.user_id].platform != user.platform) {
                     return interaction.reply({
                         content: `Cannot join giveaway on another platform yet`, 
                         ephemeral: true
                     }).catch(console.error)
                 }
-                if (giveaway.join_list.includes(interaction.user.id)) {
+                if (giveaway.join_list.includes(user.user_id)) {
                     return interaction.reply({
                         content: `You have already joined this giveaway`, 
                         ephemeral: true
@@ -341,9 +336,9 @@ client.on('interactionCreate', async (interaction) => {
                 }
                 db.query(`
                     INSERT INTO challenges_transactions
-                    (transaction_id,discord_id,type,rp,balance_type,timestamp, guild_id)
-                    VALUES ('${uuid.v4()}','${interaction.user.id}','giveaway_join',${giveaway.rp_cost},'debit',${new Date().getTime()},'${interaction.message.guild.id}');
-                    UPDATE as_gabot_giveaways SET join_list = join_list || '"${interaction.user.id}"' WHERE giveaway_id = '${giveaway.giveaway_id}';
+                    (transaction_id,user_id,type,rp,balance_type,timestamp, guild_id)
+                    VALUES ('${uuid.v4()}','${user.user_id}','giveaway_join',${giveaway.rp_cost},'debit',${new Date().getTime()},'${interaction.message.guild.id}');
+                    UPDATE as_gabot_giveaways SET join_list = join_list || '"${user.user_id}"' WHERE giveaway_id = '${giveaway.giveaway_id}';
                 `).catch(console.error)
                 interaction.deferUpdate().catch(console.error)
             }).catch(console.error)
@@ -352,7 +347,9 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'giveaways') {
             if (interaction.options.getSubcommand() == 'reroll') {
-                db.query(`SELECT * FROM as_gabot_giveaways WHERE LOWER(item) LIKE '%${interaction.options.getString('giveaway')}%' AND discord_id = '${interaction.user.id}' AND status = 'ended' AND expiry_timestamp > ${new Date().getTime() - 1209600000}`)
+                const user = getAsUserByDiscordId(interaction.user.id)
+                if (!user) return
+                db.query(`SELECT * FROM as_gabot_giveaways WHERE LOWER(item) LIKE '%${interaction.options.getString('giveaway')}%' AND user_id = '${user.user_id}' AND status = 'ended' AND expiry_timestamp > ${new Date().getTime() - 1209600000}`)
                 .then(res => {
                     interaction.respond(res.rows.map(row => ({
                         name: row.item,
@@ -376,11 +373,11 @@ function embedGenerator(giveaway) {
     return {
         content: ' ',
         embeds: [{
-            title: `[${as_users_list[giveaway.discord_id]?.platform}] ${convertUpper(giveaway.item)}`,
+            title: `[${as_users_list[giveaway.user_id]?.platform}] ${convertUpper(giveaway.item)}`,
             description: `Click 🎉 to join\n${giveaway.winner_count || 1} Winner${giveaway.winner_count > 1 ? 's':''} | ${giveaway.join_list.length} Entr${giveaway.join_list.length > 1 ? 'ies':'y'}`,
             fields: [{
                 name: 'Hosted By',
-                value: `<@${giveaway.discord_id}>`,
+                value: `<@${as_users_list[giveaway.user_id]?.discord_id}>`,
                 inline: true
             },{
                 name: 'RP Required to Join',
@@ -439,11 +436,11 @@ db.on('notification', async (notification) => {
             //     })
             // }).catch(console.error)
             channel.send({
-                content: giveaway.winners_list.length == 0 ? `**Giveaway Ended: ${convertUpper(giveaway.item)}**\n*Not enough entries*` : `**Giveaway Ended**\n${giveaway.winners_list.map(id => `<@${id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}** giveaway by <@${giveaway.discord_id}>`,
+                content: giveaway.winners_list.length == 0 ? `**Giveaway Ended: ${convertUpper(giveaway.item)}**\n*Not enough entries*` : `**Giveaway Ended**\n${giveaway.winners_list.map(id => `<@${as_users_list[id].discord_id}>`).join(', ')} ${giveaway.winners_list.length > 1 ? 'have':'has'} won **${convertUpper(giveaway.item)}** giveaway by <@${as_users_list[giveaway.user_id].discord_id}>`,
             }).catch(console.error)
         } else if (giveaway.status == 'ended' && old_giveaway.status == 'ended' && old_giveaway.winners_list.length != giveaway.winners_list.length) {
             channel.send({
-                content: `***Giveaway Rerolled***\n${`<@${giveaway.winners_list.pop()}>`} has won **${convertUpper(giveaway.item)}** giveaway by <@${giveaway.discord_id}>`,
+                content: `***Giveaway Rerolled***\n${`<@${as_users_list[giveaway.winners_list.pop()].discord_id}>`} has won **${convertUpper(giveaway.item)}** giveaway by <@${as_users_list[giveaway.user_id].discord_id}>`,
             }).catch(console.error)
         } else if (giveaway.status == 'active') {
             message.edit(embedGenerator(giveaway)).catch(console.error)

@@ -11,7 +11,7 @@ const axiosRetry = require('axios-retry');
 const {event_emitter} = require('./event_emitter')
 const {translatePayload} = require('./allsquads')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
-const {as_users_list} = require('./allsquads/as_users_list')
+const {as_users_list, getAsUserByDiscordId} = require('./allsquads/as_users_list')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes');
 const { db_schedule_msg_deletion } = require('./msg_auto_delete');
 const { getRelicQuantity } = require('./allsquads/wfrim_relicsdb');
@@ -95,12 +95,12 @@ client.on('messageCreate', async (message) => {
         console.log('[relicbot messageCreate] content:',message.content)
         message.content = message.content.toLowerCase().trim()
         if (message.content.split(' ')[0] == 'leave') {
-            socket.emit('relicbot/squads/leave',{discord_id: message.author.id, tier: message.content.split(' ')[1] || 'all'},(res) => {
+            socket.emit('relicbot/squads/leave',{user_id: getAsUserByDiscordId(message.author.id)?.user_id, tier: message.content.split(' ')[1] || 'all'},(res) => {
                 if (res.code != 200) replyAndDelete(error_codes_embed(res, message.author.id),message)
                 setTimeout(() => message.delete().catch(console.error), 1000);
             })
         } else {
-            socket.emit('relicbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
+            socket.emit('relicbot/squads/create',{message: message.content, user_id: getAsUserByDiscordId(message.author.id)?.user_id, channel_id: message.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 handleSquadCreateResponses(message.channel.id,message.author.id,responses)
                 setTimeout(() => message.delete().catch(console.error), 1000);
@@ -111,7 +111,7 @@ client.on('messageCreate', async (message) => {
         if (message.channel.ownerId == client.user.id) {
             socket.emit('relicbot/squads/messageCreate', {
                 message_id: message.id,
-                discord_id: message.author.id,
+                user_id: getAsUserByDiscordId(message.author.id)?.user_id,
                 message: `${message.content}\n${message.attachments.map(attachment => attachment.url).join('\n')}`.trim(),
                 thread_id: message.channel.id
             })
@@ -161,7 +161,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.customId == 'rb_recruitment_faq') {
             interaction.reply(translatePayload(recruitment_faq, channels_list[interaction.channel.id].lang)).catch(console.error)
         } else if (interaction.customId == 'rb_sq_leave_all') {
-            socket.emit('relicbot/squads/leave',{discord_id: interaction.user.id, tier: 'all'},(res) => {
+            socket.emit('relicbot/squads/leave',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, tier: 'all'},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -188,7 +188,7 @@ client.on('interactionCreate', async (interaction) => {
                 ]
             }).catch(console.error)
         } else if (interaction.customId == 'rb_sq_trackers_show') {
-            socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+            socket.emit('relicbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                 if (res.code == 200) {
                     interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
                 } else {
@@ -196,8 +196,8 @@ client.on('interactionCreate', async (interaction) => {
                 }
             })
         } else if (interaction.customId == 'rb_sq_trackers_remove_all') {
-            socket.emit('relicbot/trackers/delete',{discord_id: interaction.user.id},(res) => {
-                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+            socket.emit('relicbot/trackers/delete',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
                     } else {
@@ -236,7 +236,7 @@ client.on('interactionCreate', async (interaction) => {
                 }
             })
         } else if (interaction.customId.match('rb_sq_merge_false')) { 
-            socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
                 interaction.deferUpdate().catch(console.error)
                 interaction.message.delete().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
@@ -244,7 +244,7 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.match('rb_sq_merge_true_')) {
             const squad_id = interaction.customId.split('rb_sq_merge_true_')[1]
             const discord_id = interaction.user.id
-            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id,channel_id: interaction.channel.id},(res) => {
+            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,user_id: getAsUserByDiscordId(discord_id)?.user_id,channel_id: interaction.channel.id},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
                     interaction.message.delete().catch(console.error)
@@ -254,7 +254,7 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.match('rb_sq_')) {
             const squad_id = interaction.customId.split('rb_sq_')[1]
             const discord_id = interaction.user.id
-            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id,channel_id: interaction.channel.id},(res) => {
+            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,user_id: getAsUserByDiscordId(discord_id)?.user_id,channel_id: interaction.channel.id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
@@ -264,10 +264,10 @@ client.on('interactionCreate', async (interaction) => {
         if (!Object.keys(channels_list).includes(interaction.channel.id)) return
         if (interaction.customId == 'rb_sq_trackers_add') {
             console.log('[rb_sq_trackers_add]')
-            socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: interaction.channel.id},(responses) => {
+            socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),user_id: getAsUserByDiscordId(interaction.user.id)?.user_id,channel_id: interaction.channel.id},(responses) => {
                 //console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
-                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         if (interaction.message) {
                             if (interaction.message.embeds[0]) {
@@ -289,7 +289,7 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId == 'rb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
-            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: interaction.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
@@ -301,10 +301,10 @@ client.on('interactionCreate', async (interaction) => {
         
         if (interaction.customId == 'rb_sq_trackers_add_menu') {
             console.log('[rb_sq_trackers_add_menu]')
-            socket.emit('relicbot/trackers/create',{message: interaction.values,discord_id: interaction.user.id, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1050717341123616851'},(responses) => {
+            socket.emit('relicbot/trackers/create',{message: interaction.values,user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1050717341123616851'},(responses) => {
                 //console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
-                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         fissures_check()
                         if (interaction.message) {
@@ -327,7 +327,7 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId.split('.')[0] == 'rb_sq_trackers_remove') {
             socket.emit('relicbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
-                socket.emit('relicbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
                     } else {
@@ -360,7 +360,7 @@ function edit_webhook_messages(tier,with_all_names,name_for_squad_id, single_cha
             if (res.code == 200) {
                 const squads = res.data
                 const payload = embed(squads,tier,with_all_names,name_for_squad_id)
-                webhook_messages[tier + '_squads'].forEach(msg => {
+                webhook_messages[tier + '_squads']?.forEach(msg => {
                     if (!single_channel_id || single_channel_id == msg.c_id)
                         new WebhookClient({url: msg.url}).editMessage(msg.m_id, payload).catch(console.error)
                 })
@@ -385,7 +385,7 @@ function edit_webhook_messages(tier,with_all_names,name_for_squad_id, single_cha
 
 function assign_global_variables() {
     return new Promise((resolve,reject) => {
-        db.query(`SELECT * FROM rb_messages; SELECT * FROM rb_channels;`)
+        db.query(`SELECT * FROM as_rb_messages; SELECT * FROM as_rb_channels;`)
         .then(res => {
             res[1].rows.forEach((row) => { 
                 if (row.channel_id.match('web')) return
@@ -489,7 +489,7 @@ function edit_recruitment_intro() {
 
 function rb_add_server(guild_id) {
     return new Promise((resolve,reject) => {
-        db.query(`INSERT INTO rb_guilds (guild_id, joined_timestamp) VALUES ('${guild_id}',${new Date().getTime()})`)
+        db.query(`INSERT INTO as_rb_guilds (guild_id, joined_timestamp) VALUES ('${guild_id}',${new Date().getTime()})`)
         .then(res => {
             if (res.rowCount == 1) {
                 client.guilds.fetch(guild_id)
@@ -501,7 +501,7 @@ function rb_add_server(guild_id) {
                         await relic_squads.setParent(category).catch(console.error)
                         const relic_squads_wh = await relic_squads.createWebhook('Relic',{avatar: 'https://cdn.discordapp.com/attachments/943131999189733387/1043978374089019462/relic_pack.png'}).catch(console.error)
                         db.query(`
-                            INSERT INTO rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads.id}','${relic_squads_wh.url}','${guild_id}','relics_vaulted',${new Date().getTime()});
+                            INSERT INTO as_rb_channels (channel_id,webhook_url,guild_id,type,created_timestamp) VALUES ('${relic_squads.id}','${relic_squads_wh.url}','${guild_id}','relics_vaulted',${new Date().getTime()});
                         `).then(() => {
                             ['1','2','3','4','5','6'].forEach((val,index) => {
                                 var msg_type;
@@ -512,7 +512,7 @@ function rb_add_server(guild_id) {
                                 if (index == 4) msg_type = 'neo_squads'
                                 if (index == 5) msg_type = 'axi_squads'
                                 relic_squads_wh.send('_ _').then(res => {
-                                    db.query(`INSERT INTO rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads.id}', '${msg_type}', '${relic_squads_wh.url}')`)
+                                    db.query(`INSERT INTO as_rb_messages (message_id, channel_id, type, webhook_url) VALUES ('${res.id}', '${relic_squads.id}', '${msg_type}', '${relic_squads_wh.url}')`)
                                 }).catch(console.error)
                             })
                             setTimeout(assign_global_variables, 10000);
@@ -537,8 +537,8 @@ function rb_add_server(guild_id) {
 function rb_remove_server(guild_id) {
     return new Promise((resolve,reject) => {
         db.query(`
-            SELECT * FROM rb_channels where guild_id='${guild_id}';
-            DELETE FROM rb_guilds where guild_id='${guild_id}';
+            SELECT * FROM as_rb_channels where guild_id='${guild_id}';
+            DELETE FROM as_rb_guilds where guild_id='${guild_id}';
         `).then(res => {
             if (res[1].rowCount == 1) {
                 res[0].rows.forEach(async row => {
@@ -638,20 +638,21 @@ socket.on('squadCreate', (squad) => {
     console.log('[relicbot/squadCreate]')
     edit_webhook_messages(squad.tier, false,squad.squad_id)
     socket.emit('relicbot/trackers/fetchSubscribers',{squad: squad},(res) => {
+        console.log('trackers fetch response',res)
         if (res.code == 200) {
             const channel_ids = res.data
             for (const channel_id in channel_ids) {
-                const discord_ids = channel_ids[channel_id].filter(sub => !subscribersTimeout[sub])
-                discord_ids.map(sub => {
+                const user_ids = channel_ids[channel_id].filter(sub => !subscribersTimeout[sub])
+                user_ids.map(sub => {
                     subscribersTimeout[sub] = true
                     setTimeout(() => {
                         delete subscribersTimeout[sub]
                     }, 120000);
                 })
-                if (discord_ids.length > 0) {
-                    getGuildMembersStatus(discord_ids.map(id => ({
-                        id: id,
-                        allowed_mentions: as_users_list[id]?.allowed_pings_status
+                if (user_ids.length > 0) {
+                    getGuildMembersStatus(user_ids.map(id => ({
+                        id: as_users_list[id].discord_id,
+                        allowed_mentions: as_users_list[id].allowed_pings_status
                     })),client.channels.cache.get(channel_id)?.guild?.id).then(mentions_list => {
                         if (mentions_list.length == 0) return
                         arrToStringsArrWithLimit(relicBotSquadToString(squad), mentions_list.map(id => `<@${id}>`), 2000).forEach(str => {
@@ -705,10 +706,10 @@ socket.on('relicbot/squads/opened', async (payload) => {
     const squad = payload
     const thread_ids = []
     const channel_ids = {}
-    for (const discord_id of squad.members) {
-        const channel_id = squad.joined_from_channel_ids[discord_id]
+    for (const user_id of squad.members) {
+        const channel_id = squad.joined_from_channel_ids[user_id]
         if (!channel_ids[channel_id]) channel_ids[channel_id] = []
-        channel_ids[channel_id].push(discord_id)
+        channel_ids[channel_id].push(as_users_list[user_id]?.discord_id)
     }
     // host selection
     var hosts = squad.host_recommendation;
@@ -894,7 +895,7 @@ async function logSquad(squad,include_chat,action) {
     const channel = client.channels.cache.get('1059876227504152666') || await client.channels.fetch('1059876227504152666').catch(console.error)
     if (!channel) return
     const squadHost = squad.squad_host ? `**Host:** ${as_users_list[squad.squad_host].ingame_name}` : 'Not determined'
-    const squadRecommendedHost = squad.host_recommendation[0].considered_ping == null ? '**Recommended Host:** Not determined' : `**Recommended Host:** ${squad.host_recommendation?.[0].ign} with avg squad ping of ${squad.host_recommendation?.[0].avg_squad_ping}`
+    const squadRecommendedHost = squad.host_recommendation?.[0]?.considered_ping == null ? '**Recommended Host:** Not determined' : `**Recommended Host:** ${as_users_list[squad.host_recommendation?.[0]?.user_id]?.ingame_name} with avg squad ping of ${squad.host_recommendation?.[0]?.avg_squad_ping}`
     const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
     const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => as_users_list[id]?.ingame_name).join('\n')}`
     const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${as_users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
@@ -902,7 +903,7 @@ async function logSquad(squad,include_chat,action) {
         socket.emit('relicbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
                 const chats = res.data
-                const squadChat = `**⸻ Squad Chat ⸻**\n${chats.map(chat => `[<t:${Math.round(Number(chat.creation_timestamp) / 1000)}:t>] **${as_users_list[chat.discord_id]?.ingame_name}:** ${chat.message}`).join('\n')}`
+                const squadChat = `**⸻ Squad Chat ⸻**\n${chats.map(chat => `[<t:${Math.round(Number(chat.creation_timestamp) / 1000)}:t>] **${as_users_list[chat.user_id]?.ingame_name}:** ${chat.message}`).join('\n')}`
                 channel.send({
                     content: convertUpper(action),
                     embeds: [{
@@ -955,9 +956,9 @@ async function logSquad(squad,include_chat,action) {
             components: [{
                 type: 3,
                 custom_id: `as_sq_invalidate.relicbot.${squad.squad_id}.2`,
-                options: squad.members.map((discord_id) => ({
-                    label: as_users_list[discord_id]?.ingame_name,
-                    value: discord_id,
+                options: squad.members.map((user_id) => ({
+                    label: as_users_list[user_id]?.ingame_name,
+                    value: user_id,
                     emoji: '🛑'
                 })),
                 placeholder: "Invalidate specific member(s)",
@@ -973,7 +974,7 @@ socket.on('squadMessageCreate',payload => {
         if (thread_id != payload.thread_id) {
             const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
             if (!channel) return
-            channel.send({content: `**${as_users_list[payload.discord_id]?.ingame_name}**: ${payload.message}`})
+            channel.send({content: `**${as_users_list[payload.user_id]?.ingame_name}**: ${payload.message}`})
         }
     })
 })

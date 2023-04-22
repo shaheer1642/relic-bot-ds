@@ -3,7 +3,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const wfm_api = require('./modules/wfm_api.js');
 const test_modules = require('./modules/test_modules.js');
-const trade_bot_modules = require('./modules/trade_bot_modules.js');
+// const trade_bot_modules = require('./modules/trade_bot_modules.js');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
 const fs = require('fs')
 const {db} = require('./modules/db_connection.js');
@@ -21,6 +21,7 @@ const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
 const osiris_guild_id = '905559118096531456'
 const {client} = require('./modules/discord_client.js');
+const { as_user_registeration } = require('./modules/allsquads.js');
 require('./modules/gmail_client.js');
 require('./modules/trackers.js');
 require('./modules/wfhub_get_started.js');
@@ -119,7 +120,7 @@ client.on('ready', () => {
     deploy_commands.bot_initialize()
 
     osiris_guild.bot_initialize()
-    trade_bot_modules.bot_initialize()
+    // trade_bot_modules.bot_initialize()
     botv.bot_initialize()
     osiris_tts.bot_initialize()
     osiris_guild.bot_initialize()
@@ -204,87 +205,87 @@ client.on('messageCreate', async message => {
         }
     }
 
-    if (message.channel.isThread()) {
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channel.parentId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channel.parentId))
-            trade_bot_modules.message_handler(message).catch(err => console.log(err))
-        return
-    }
+    // if (message.channel.isThread()) {
+    //     if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channel.parentId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channel.parentId))
+    //         trade_bot_modules.message_handler(message).catch(err => console.log(err))
+    //     return
+    // }
 
     const multiMessageArr = message.content.split('\n')
     for (const [index,multiMessage] of multiMessageArr.entries()) {
 
-        if (!message.guild) {
-            const args = multiMessage.trim().split(/ +/g)
-            if ((args[0] && args[1]) && ((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
-                trade_bot_modules.trading_bot_registeration(message.author.id)
-                .then(res => message.channel.send(res).catch(err => console.log(err)))
-                .catch(err => message.channel.send(err).catch(err => console.log(err)))
-                continue
-            }
-            else if (args[0].toLowerCase() == 'notifications' || args[0].toLowerCase() == 'notification') {
-                var user_data = null
-                var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
-                .then(res => {
-                    if (res.rows.length==0) {
-                        message.author.send({content: "⚠️ Your in-game name is not registered with the bot ⚠️"}).catch(err => console.log(err))
-                        message.author.send({content: "Type the following command to register your ign:\nverify ign"}).catch(err => console.log(err))
-                        return false
-                    }
-                    user_data = res.rows[0]
-                    return true
-                })
-                .catch(err => {
-                    console.log(err)
-                    message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
-                    return false
-                })
-                if (!status)
-                    return
-                var notify_offline = ""
-                var notify_order = ""
-                var notify_remove = ""
-                if (user_data.notify_offline)
-                    notify_offline = '🟢'
-                else
-                    notify_offline = '🔴'
-                if (user_data.notify_order)
-                    notify_order = '🟢'
-                else
-                    notify_order = '🔴'
-                if (user_data.notify_remove)
-                    notify_remove = '🟢'
-                else
-                    notify_remove = '🔴'
-                var postdata = {}
-                postdata.content = " "
-                postdata.embeds = []
-                postdata.embeds.push({
-                    title: 'Notification Settings',
-                    description: `
-                        ${notify_offline} Notify orders when going offline
-                        ${notify_order} Notify when orders auto-close in 3 hours
-                        ${notify_remove} Notify when orders are removed if item price changes`,
-                    footer: {text: `You will not receive these notfications on 'do not disturb'`},
-                    color: trade_bot_modules.tb_invisColor
-                })
-                console.log(postdata)
-                message.channel.send(postdata).then(res => {
-                    res.react(trade_bot_modules.tradingBotReactions.sell[0]).catch(err => console.log(err))
-                    res.react(trade_bot_modules.tradingBotReactions.sell[1]).catch(err => console.log(err))
-                    res.react(trade_bot_modules.tradingBotReactions.sell[2]).catch(err => console.log(err))
-                }).catch(err => console.log(err))
-                return
-            }
-        }
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
-            trade_bot_modules.message_handler(message,multiMessage)
-            if (index == (multiMessageArr.length-1)) {
-                console.log(`All requests executed for user ${message.author.username}`)
-                if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId))
-                    setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
-            }
-            continue;
-        }
+        // if (!message.guild) {
+        //     const args = multiMessage.trim().split(/ +/g)
+        //     if ((args[0] && args[1]) && ((args[0].toLowerCase() == 'verify') && (args[1].toLowerCase() == 'ign')) || ((args[0].toLowerCase() == 'ign') && (args[1].toLowerCase() == 'verify'))) {
+        //         trade_bot_modules.trading_bot_registeration(message.author.id)
+        //         .then(res => message.channel.send(res).catch(err => console.log(err)))
+        //         .catch(err => message.channel.send(err).catch(err => console.log(err)))
+        //         continue
+        //     }
+        //     else if (args[0].toLowerCase() == 'notifications' || args[0].toLowerCase() == 'notification') {
+        //         var user_data = null
+        //         var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${message.author.id}`)
+        //         .then(res => {
+        //             if (res.rows.length==0) {
+        //                 message.author.send({content: "⚠️ Your in-game name is not registered with the bot ⚠️"}).catch(err => console.log(err))
+        //                 message.author.send({content: "Type the following command to register your ign:\nverify ign"}).catch(err => console.log(err))
+        //                 return false
+        //             }
+        //             user_data = res.rows[0]
+        //             return true
+        //         })
+        //         .catch(err => {
+        //             console.log(err)
+        //             message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+        //             return false
+        //         })
+        //         if (!status)
+        //             return
+        //         var notify_offline = ""
+        //         var notify_order = ""
+        //         var notify_remove = ""
+        //         if (user_data.notify_offline)
+        //             notify_offline = '🟢'
+        //         else
+        //             notify_offline = '🔴'
+        //         if (user_data.notify_order)
+        //             notify_order = '🟢'
+        //         else
+        //             notify_order = '🔴'
+        //         if (user_data.notify_remove)
+        //             notify_remove = '🟢'
+        //         else
+        //             notify_remove = '🔴'
+        //         var postdata = {}
+        //         postdata.content = " "
+        //         postdata.embeds = []
+        //         postdata.embeds.push({
+        //             title: 'Notification Settings',
+        //             description: `
+        //                 ${notify_offline} Notify orders when going offline
+        //                 ${notify_order} Notify when orders auto-close in 3 hours
+        //                 ${notify_remove} Notify when orders are removed if item price changes`,
+        //             footer: {text: `You will not receive these notfications on 'do not disturb'`},
+        //             color: trade_bot_modules.tb_invisColor
+        //         })
+        //         console.log(postdata)
+        //         message.channel.send(postdata).then(res => {
+        //             res.react(trade_bot_modules.tradingBotReactions.sell[0]).catch(err => console.log(err))
+        //             res.react(trade_bot_modules.tradingBotReactions.sell[1]).catch(err => console.log(err))
+        //             res.react(trade_bot_modules.tradingBotReactions.sell[2]).catch(err => console.log(err))
+        //         }).catch(err => console.log(err))
+        //         return
+        //     }
+        // }
+        // if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(message.channelId)) {
+        //     trade_bot_modules.message_handler(message,multiMessage)
+        //     if (index == (multiMessageArr.length-1)) {
+        //         console.log(`All requests executed for user ${message.author.username}`)
+        //         if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId))
+        //             setTimeout(() => message.delete().catch(err => console.log(err)), 2000)
+        //     }
+        //     continue;
+        // }
         if (message.guild) {
             const args = multiMessage.replace(/\./g,'').trim().split(/ +/g)
             if (args[1] && !args[1].match(/\?/g) && !args[1].match(':') && !(args[1].length > 3) && (!args[2] || args[2]=='relic') && !args[3]) {
@@ -411,190 +412,190 @@ client.on('interactionCreate', async interaction => {
         return
     }
     
-    if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
-        const discord_id = interaction.member.user.id
-        var user_profile = null
-        var ingame_name = ""
-        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
-        .then(res => {
-            if (res.rows.length == 0) {
-                console.log(`User does not exist in db`)
-                return false
-            }
-            else if (res.rows.length > 1) {
-                console.log(`Multiple users with same discord id`)
-                return false
-            }
-            else {
-                ingame_name = res.rows[0].ingame_name
-                user_profile = res.rows[0]
-                return true
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status)
-            return Promise.resolve()
-        if (ingame_name.toLowerCase() != interaction.message.embeds[0].author.name.toLowerCase()) {
-            console.log(ingame_name + '   ' + interaction.message.embeds[0].author.name)
-            console.log(`Not same user`)
-            await interaction.deferUpdate()
-            return Promise.resolve()
-        }
-        await interaction.deferUpdate()
-        for (var interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
-            const item_id = interaction.values[interactionIndex]
-            var item_name = ""
-            var item_url = ""
-            var status = await db.query(`SELECT * FROM items_list WHERE items_list.id='${item_id}'`)
-            .then(async res => {
-                item_url = res.rows[0].item_url
-                item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return
-            console.log(`removing item order ${item_name}`)
-            //----check if order was visible----
-            var visibility = false
-            var all_orders = null
-            var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE tradebot_users_orders.discord_id=${discord_id} AND tradebot_users_orders.item_id='${item_id}'`)
-            .then(res => {
-                all_orders = res.rows
-                if (res.rows[0])
-                    if (res.rows[0].visibility == true)
-                        visibility = true
-                if (res.rows[1])
-                    if (res.rows[1].visibility == true)
-                        visibility = true
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return
-            var status = await db.query(`DELETE FROM tradebot_users_orders WHERE tradebot_users_orders.discord_id=${discord_id} AND tradebot_users_orders.item_id='${item_id}'`)
-            .then(res => {
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return
-            all_orders.forEach(async e => {
-                await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2,e.user_rank).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}` + err))
-            })
-        }
-        trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
-        .then(res => {
-            interaction.editReply(res).catch(err => console.log(err))
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.editReply({content: 'Some error occured, please contact softy'}).catch(err => console.log(err))
-        })
-    }
+    // if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
+    //     const discord_id = interaction.member.user.id
+    //     var user_profile = null
+    //     var ingame_name = ""
+    //     var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
+    //     .then(res => {
+    //         if (res.rows.length == 0) {
+    //             console.log(`User does not exist in db`)
+    //             return false
+    //         }
+    //         else if (res.rows.length > 1) {
+    //             console.log(`Multiple users with same discord id`)
+    //             return false
+    //         }
+    //         else {
+    //             ingame_name = res.rows[0].ingame_name
+    //             user_profile = res.rows[0]
+    //             return true
+    //         }
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         return false
+    //     })
+    //     if (!status)
+    //         return Promise.resolve()
+    //     if (ingame_name.toLowerCase() != interaction.message.embeds[0].author.name.toLowerCase()) {
+    //         console.log(ingame_name + '   ' + interaction.message.embeds[0].author.name)
+    //         console.log(`Not same user`)
+    //         await interaction.deferUpdate()
+    //         return Promise.resolve()
+    //     }
+    //     await interaction.deferUpdate()
+    //     for (var interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
+    //         const item_id = interaction.values[interactionIndex]
+    //         var item_name = ""
+    //         var item_url = ""
+    //         var status = await db.query(`SELECT * FROM items_list WHERE items_list.id='${item_id}'`)
+    //         .then(async res => {
+    //             item_url = res.rows[0].item_url
+    //             item_name = item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+    //             return true
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //             return false
+    //         })
+    //         if (!status)
+    //             return
+    //         console.log(`removing item order ${item_name}`)
+    //         //----check if order was visible----
+    //         var visibility = false
+    //         var all_orders = null
+    //         var status = await db.query(`SELECT * FROM tradebot_users_orders WHERE tradebot_users_orders.discord_id=${discord_id} AND tradebot_users_orders.item_id='${item_id}'`)
+    //         .then(res => {
+    //             all_orders = res.rows
+    //             if (res.rows[0])
+    //                 if (res.rows[0].visibility == true)
+    //                     visibility = true
+    //             if (res.rows[1])
+    //                 if (res.rows[1].visibility == true)
+    //                     visibility = true
+    //             return true
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //             return false
+    //         })
+    //         if (!status)
+    //             return
+    //         var status = await db.query(`DELETE FROM tradebot_users_orders WHERE tradebot_users_orders.discord_id=${discord_id} AND tradebot_users_orders.item_id='${item_id}'`)
+    //         .then(res => {
+    //             return true
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //             return false
+    //         })
+    //         if (!status)
+    //             return
+    //         all_orders.forEach(async e => {
+    //             await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,2,e.user_rank).then(res => console.log(`Updated orders for ${item_name}`)).catch(err => console.log(`Error updating orders for ${item_name}` + err))
+    //         })
+    //     }
+    //     trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
+    //     .then(res => {
+    //         interaction.editReply(res).catch(err => console.log(err))
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         interaction.editReply({content: 'Some error occured, please contact softy'}).catch(err => console.log(err))
+    //     })
+    // }
 
-    else if (interaction.customId == 'lich_orders' && interaction.componentType == 'SELECT_MENU') {
-        const discord_id = interaction.member.user.id
-        var user_profile = null
-        var ingame_name = ""
-        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
-        .then(res => {
-            if (res.rows.length == 0) {
-                console.log(`User does not exist in db`)
-                return false
-            }
-            else if (res.rows.length > 1) {
-                console.log(`Multiple users with same discord id`)
-                return false
-            }
-            else {
-                ingame_name = res.rows[0].ingame_name
-                user_profile = res.rows[0]
-                return true
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            return false
-        })
-        if (!status)
-            return Promise.resolve()
-        if (ingame_name.toLowerCase() != interaction.message.embeds[0].author.name.toLowerCase()) {
-            console.log(ingame_name + '   ' + interaction.message.embeds[0].author.name)
-            console.log(`Not same user`)
-            await interaction.deferUpdate()
-            return Promise.resolve()
-        }
-        await interaction.deferUpdate()
-        for (var interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
-            var lich_info = {lich_id: interaction.values[interactionIndex],weapon_url: ''}
-            var status = await db.query(`SELECT * FROM lich_list WHERE lich_id='${lich_info.lich_id}'`)
-            .then(async res => {
-                lich_info = res.rows[0]
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                continue
-            console.log(`removing lich order ${lich_info.weapon_url}`)
-            //----check if order was visible----
-            var visibility = false
-            var all_orders = null
-            var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE tradebot_users_lich_orders.discord_id=${discord_id} AND tradebot_users_lich_orders.lich_id='${lich_info.lich_id}'`)
-            .then(res => {
-                all_orders = res.rows
-                if (res.rows[0])
-                    if (res.rows[0].visibility == true)
-                        visibility = true
-                if (res.rows[1])
-                    if (res.rows[1].visibility == true)
-                        visibility = true
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                continue
-            var status = await db.query(`DELETE FROM tradebot_users_lich_orders WHERE tradebot_users_lich_orders.discord_id=${discord_id} AND tradebot_users_lich_orders.lich_id='${lich_info.lich_id}'`)
-            .then(res => {
-                return true
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                continue
-            all_orders.forEach(async e => {
-                await trade_bot_modules.trading_lich_orders_update(null,lich_info,2).then(res => console.log(`Updated orders for ${lich_info.weapon_url}`)).catch(err => console.log(`Error updating orders for ${lich_info.weapon_url}` + err))
-            })
-        }
-        trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
-        .then(res => {
-            interaction.editReply(res).catch(err => console.log(err))
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.editReply({content: 'Some error occured, please contact softy'}).catch(err => console.log(err))
-        })
-    }
+    // else if (interaction.customId == 'lich_orders' && interaction.componentType == 'SELECT_MENU') {
+    //     const discord_id = interaction.member.user.id
+    //     var user_profile = null
+    //     var ingame_name = ""
+    //     var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${discord_id}`)
+    //     .then(res => {
+    //         if (res.rows.length == 0) {
+    //             console.log(`User does not exist in db`)
+    //             return false
+    //         }
+    //         else if (res.rows.length > 1) {
+    //             console.log(`Multiple users with same discord id`)
+    //             return false
+    //         }
+    //         else {
+    //             ingame_name = res.rows[0].ingame_name
+    //             user_profile = res.rows[0]
+    //             return true
+    //         }
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         return false
+    //     })
+    //     if (!status)
+    //         return Promise.resolve()
+    //     if (ingame_name.toLowerCase() != interaction.message.embeds[0].author.name.toLowerCase()) {
+    //         console.log(ingame_name + '   ' + interaction.message.embeds[0].author.name)
+    //         console.log(`Not same user`)
+    //         await interaction.deferUpdate()
+    //         return Promise.resolve()
+    //     }
+    //     await interaction.deferUpdate()
+    //     for (var interactionIndex=0;interactionIndex<interaction.values.length;interactionIndex++) {
+    //         var lich_info = {lich_id: interaction.values[interactionIndex],weapon_url: ''}
+    //         var status = await db.query(`SELECT * FROM lich_list WHERE lich_id='${lich_info.lich_id}'`)
+    //         .then(async res => {
+    //             lich_info = res.rows[0]
+    //             return true
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //             return false
+    //         })
+    //         if (!status)
+    //             continue
+    //         console.log(`removing lich order ${lich_info.weapon_url}`)
+    //         //----check if order was visible----
+    //         var visibility = false
+    //         var all_orders = null
+    //         var status = await db.query(`SELECT * FROM tradebot_users_lich_orders WHERE tradebot_users_lich_orders.discord_id=${discord_id} AND tradebot_users_lich_orders.lich_id='${lich_info.lich_id}'`)
+    //         .then(res => {
+    //             all_orders = res.rows
+    //             if (res.rows[0])
+    //                 if (res.rows[0].visibility == true)
+    //                     visibility = true
+    //             if (res.rows[1])
+    //                 if (res.rows[1].visibility == true)
+    //                     visibility = true
+    //             return true
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //             return false
+    //         })
+    //         if (!status)
+    //             continue
+    //         var status = await db.query(`DELETE FROM tradebot_users_lich_orders WHERE tradebot_users_lich_orders.discord_id=${discord_id} AND tradebot_users_lich_orders.lich_id='${lich_info.lich_id}'`)
+    //         .then(res => {
+    //             return true
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //             return false
+    //         })
+    //         if (!status)
+    //             continue
+    //         all_orders.forEach(async e => {
+    //             await trade_bot_modules.trading_lich_orders_update(null,lich_info,2).then(res => console.log(`Updated orders for ${lich_info.weapon_url}`)).catch(err => console.log(`Error updating orders for ${lich_info.weapon_url}` + err))
+    //         })
+    //     }
+    //     trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
+    //     .then(res => {
+    //         interaction.editReply(res).catch(err => console.log(err))
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         interaction.editReply({content: 'Some error occured, please contact softy'}).catch(err => console.log(err))
+    //     })
+    // }
 
     else if (interaction.customId == 'bounty_lvl' && interaction.componentType == 'SELECT_MENU') {
         await interaction.deferUpdate()
@@ -628,143 +629,143 @@ client.on('interactionCreate', async interaction => {
         .catch(err => console.log(err))
     }
 
-    else if (interaction.customId == 'staff_trade_verification' && interaction.componentType == 'SELECT_MENU') {
-        await interaction.deferUpdate()
-        var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${interaction.user.id}`)
-        .then(res => {
-            if (res.rows.length == 0)
-                return false
-            if (!res.rows[0].is_staff)
-                return false 
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.message.channel.send(`<@${user.id}> Error retrieving ur info from db please contact softy`).catch(err => console.log(err))
-            return false
-        })
-        if (!status)
-            return Promise.resolve()
-        var q_table = 'tradebot_filled_users_orders'
-        var q_return = 'order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp'
-        if (interaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
-            var q_table = 'tradebot_filled_users_lich_orders'
-            var q_return = 'order_owner,order_filler,lich_id,element,damage,ephemera,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp'
-        }
-        var order_data = {}
-        var status = await db.query(`
-        SELECT * FROM ${q_table}
-        WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
-        `)
-        .then(res => {
-            if (res.rows.length != 1)
-                return false
-            order_data = res.rows[0]
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.message.channel.send(`<@${user.id}> Error retrieving order info from db please contact softy`).catch(err => console.log(err))
-            return false
-        })
-        if (!status)
-            return Promise.resolve()
-        var order_status = ''
-        var order_rating = ''
-        if (interaction.values[0] == 'NonePlat' || interaction.values[0] == 'NoneNoPlat') {
-            order_status = 'successful'
-            order_rating = `{"${order_data.order_owner}": 5,"${order_data.order_filler}": 5}`
-        }
-        else {
-            order_status = 'denied'
-            if (interaction.values[0] == order_data.order_owner)
-                order_rating = `{"${order_data.order_owner}": 1,"${order_data.order_filler}": 5}`
-            else if (interaction.values[0] == order_data.order_filler)
-                order_rating = `{"${order_data.order_owner}": 5,"${order_data.order_filler}": 1}`
-            else
-                order_rating = `{}`
-        }
-        var status = await db.query(`
-        UPDATE ${q_table} SET verification_staff = ${interaction.user.id}, order_status = '${order_status}', order_rating = '${order_rating}'
-        WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
-        RETURNING ${q_return}
-        `)
-        .then(async res => {
-            if (res.rowCount==1) {
-                await db.query(`
-                UPDATE tradebot_users_list
-                SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res.rows[0])}', true)
-                WHERE discord_id = ${(order_data.order_owner)}
-                OR discord_id = ${(order_data.order_filler)}
-                `)
-                .catch(err => {
-                    console.log(err)
-                })
-            }
-            return true
-        })
-        .catch(err => {
-            console.log(err)
-            interaction.message.channel.send(`<@${interaction.user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
-            return false
-        })
-        if (!status)
-            return Promise.resolve()
-        var postdata = interaction.message.embeds[0]
-        var desc = postdata.description.split('\n')
-        if (order_status == 'denied') {
-            postdata.color = null
-            desc[5] = `**Order status:** denied for <@${interaction.values[0]}> 🛑 (Verified by <@${interaction.user.id}>)`
-            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** No` : desc[7] = `**Users balance changed:** No`
-        }
-        else if (order_status == 'successful') {
-            var balanceChange = 'Yes'
-            if (interaction.values[0] == 'NoneNoPlat')
-                balanceChange = 'No'
-            postdata.color = order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor)
-            desc[5] = `**Order status:** successful ${trade_bot_modules.tradingBotReactions.success[0]} (Verified by <@${interaction.user.id}>)`
-            desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** ${balanceChange}` : desc[7] = `**Users balance changed:** ${balanceChange}`
-        }
-        postdata.description = desc.join('\n')
-        postdata.timestamp = new Date()
-        interaction.message.edit({content: ' ',embeds: [postdata],components: []})
-        .catch(err => {
-            console.log(err)
-            interaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
-        })
-        if (order_status == 'successful' && interaction.values[0] == 'NonePlat') {
-            //update plat balance for users
-            if (order_data.order_type == 'wts') {
-                var status = db.query(`
-                UPDATE tradebot_users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                WHERE discord_id = ${(order_data.order_owner)}
-                `)
-                .then(res => console.log(`updated plat balance for seller`))
-                .catch(err => console.log(err))
-                var status = db.query(`
-                UPDATE tradebot_users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                WHERE discord_id = ${(order_data.order_filler)}
-                `)
-                .then(res => console.log(`updated plat balance for buyer`))
-                .catch(err => console.log(err))
-            }
-            else if (order_data.order_type == 'wtb') {
-                var status = db.query(`
-                UPDATE tradebot_users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
-                WHERE discord_id = ${(order_data.order_owner)}
-                `)
-                .then(res => console.log(`updated plat balance for buyer`))
-                .catch(err => console.log(err))
-                var status = db.query(`
-                UPDATE tradebot_users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
-                WHERE discord_id = ${(order_data.order_filler)}
-                `)
-                .then(res => console.log(`updated plat balance for seller`))
-                .catch(err => console.log(err))
-            }
-        }
-        return Promise.resolve()
-    }
+    // else if (interaction.customId == 'staff_trade_verification' && interaction.componentType == 'SELECT_MENU') {
+    //     await interaction.deferUpdate()
+    //     var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${interaction.user.id}`)
+    //     .then(res => {
+    //         if (res.rows.length == 0)
+    //             return false
+    //         if (!res.rows[0].is_staff)
+    //             return false 
+    //         return true
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         interaction.message.channel.send(`<@${user.id}> Error retrieving ur info from db please contact softy`).catch(err => console.log(err))
+    //         return false
+    //     })
+    //     if (!status)
+    //         return Promise.resolve()
+    //     var q_table = 'tradebot_filled_users_orders'
+    //     var q_return = 'order_owner,order_filler,item_id,order_rating,order_type,user_price,user_rank,order_status,trade_timestamp'
+    //     if (interaction.message.embeds[0].description.match(/\*\*Lich traded:\*\*/)) {
+    //         var q_table = 'tradebot_filled_users_lich_orders'
+    //         var q_return = 'order_owner,order_filler,lich_id,element,damage,ephemera,lich_name,order_rating,order_type,user_price,order_status,trade_timestamp'
+    //     }
+    //     var order_data = {}
+    //     var status = await db.query(`
+    //     SELECT * FROM ${q_table}
+    //     WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+    //     `)
+    //     .then(res => {
+    //         if (res.rows.length != 1)
+    //             return false
+    //         order_data = res.rows[0]
+    //         return true
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         interaction.message.channel.send(`<@${user.id}> Error retrieving order info from db please contact softy`).catch(err => console.log(err))
+    //         return false
+    //     })
+    //     if (!status)
+    //         return Promise.resolve()
+    //     var order_status = ''
+    //     var order_rating = ''
+    //     if (interaction.values[0] == 'NonePlat' || interaction.values[0] == 'NoneNoPlat') {
+    //         order_status = 'successful'
+    //         order_rating = `{"${order_data.order_owner}": 5,"${order_data.order_filler}": 5}`
+    //     }
+    //     else {
+    //         order_status = 'denied'
+    //         if (interaction.values[0] == order_data.order_owner)
+    //             order_rating = `{"${order_data.order_owner}": 1,"${order_data.order_filler}": 5}`
+    //         else if (interaction.values[0] == order_data.order_filler)
+    //             order_rating = `{"${order_data.order_owner}": 5,"${order_data.order_filler}": 1}`
+    //         else
+    //             order_rating = `{}`
+    //     }
+    //     var status = await db.query(`
+    //     UPDATE ${q_table} SET verification_staff = ${interaction.user.id}, order_status = '${order_status}', order_rating = '${order_rating}'
+    //     WHERE trade_log_message = ${interaction.message.id} AND archived = true AND verification_staff is null AND order_status = 'unsuccessful'
+    //     RETURNING ${q_return}
+    //     `)
+    //     .then(async res => {
+    //         if (res.rowCount==1) {
+    //             await db.query(`
+    //             UPDATE tradebot_users_list
+    //             SET orders_history = jsonb_set(orders_history, '{payload,999999}', '${JSON.stringify(res.rows[0])}', true)
+    //             WHERE discord_id = ${(order_data.order_owner)}
+    //             OR discord_id = ${(order_data.order_filler)}
+    //             `)
+    //             .catch(err => {
+    //                 console.log(err)
+    //             })
+    //         }
+    //         return true
+    //     })
+    //     .catch(err => {
+    //         console.log(err)
+    //         interaction.message.channel.send(`<@${interaction.user.id}> Error updating order info in db please contact softy`).catch(err => console.log(err))
+    //         return false
+    //     })
+    //     if (!status)
+    //         return Promise.resolve()
+    //     var postdata = interaction.message.embeds[0]
+    //     var desc = postdata.description.split('\n')
+    //     if (order_status == 'denied') {
+    //         postdata.color = null
+    //         desc[5] = `**Order status:** denied for <@${interaction.values[0]}> 🛑 (Verified by <@${interaction.user.id}>)`
+    //         desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** No` : desc[7] = `**Users balance changed:** No`
+    //     }
+    //     else if (order_status == 'successful') {
+    //         var balanceChange = 'Yes'
+    //         if (interaction.values[0] == 'NoneNoPlat')
+    //             balanceChange = 'No'
+    //         postdata.color = order_data.order_type.replace('wts',trade_bot_modules.tb_sellColor).replace('wtb',trade_bot_modules.tb_buyColor)
+    //         desc[5] = `**Order status:** successful ${trade_bot_modules.tradingBotReactions.success[0]} (Verified by <@${interaction.user.id}>)`
+    //         desc[6].match('Users balance changed') ? desc[6] = `**Users balance changed:** ${balanceChange}` : desc[7] = `**Users balance changed:** ${balanceChange}`
+    //     }
+    //     postdata.description = desc.join('\n')
+    //     postdata.timestamp = new Date()
+    //     interaction.message.edit({content: ' ',embeds: [postdata],components: []})
+    //     .catch(err => {
+    //         console.log(err)
+    //         interaction.message.channel.send(`<@${user.id}> Error editing embed please contact softy`).catch(err => console.log(err))
+    //     })
+    //     if (order_status == 'successful' && interaction.values[0] == 'NonePlat') {
+    //         //update plat balance for users
+    //         if (order_data.order_type == 'wts') {
+    //             var status = db.query(`
+    //             UPDATE tradebot_users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+    //             WHERE discord_id = ${(order_data.order_owner)}
+    //             `)
+    //             .then(res => console.log(`updated plat balance for seller`))
+    //             .catch(err => console.log(err))
+    //             var status = db.query(`
+    //             UPDATE tradebot_users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+    //             WHERE discord_id = ${(order_data.order_filler)}
+    //             `)
+    //             .then(res => console.log(`updated plat balance for buyer`))
+    //             .catch(err => console.log(err))
+    //         }
+    //         else if (order_data.order_type == 'wtb') {
+    //             var status = db.query(`
+    //             UPDATE tradebot_users_list SET plat_spent = plat_spent + ${Number(order_data.user_price)}
+    //             WHERE discord_id = ${(order_data.order_owner)}
+    //             `)
+    //             .then(res => console.log(`updated plat balance for buyer`))
+    //             .catch(err => console.log(err))
+    //             var status = db.query(`
+    //             UPDATE tradebot_users_list SET plat_gained = plat_gained + ${Number(order_data.user_price)}
+    //             WHERE discord_id = ${(order_data.order_filler)}
+    //             `)
+    //             .then(res => console.log(`updated plat balance for seller`))
+    //             .catch(err => console.log(err))
+    //         }
+    //     }
+    //     return Promise.resolve()
+    // }
 
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'track') {
@@ -841,70 +842,70 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (interaction.isButton()) {
-        if (interaction.customId == 'tb_actv_orders') {
-            console.log('activate orders clicked')
-            await trade_bot_modules.tb_user_exist(interaction.user.id)
-            .then(() => {
-                trade_bot_modules.tb_user_online(null,interaction)
-                .then(() => {
-                    interaction.deferUpdate().catch(err => console.log(err))
-                    trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
-            return
-        }
-        if (interaction.customId == 'tb_actv_lich_orders') {
-            console.log('activate lich orders clicked')
-            await trade_bot_modules.tb_user_exist(interaction.user.id)
-            .then(() => {
-                trade_bot_modules.tb_user_online(null,interaction)
-                .then(() => {
-                    interaction.deferUpdate().catch(err => console.log(err))
-                    trade_bot_modules.tb_activate_lich_orders(null, interaction).catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
-            return
-        }
-        if (interaction.customId == 'tb_close_orders') {
-            console.log('close orders clicked')
-            await trade_bot_modules.tb_user_exist(interaction.user.id)
-            .then(() => {
-                trade_bot_modules.tb_user_online(null,interaction)
-                .then(() => {
-                    interaction.deferUpdate().catch(err => console.log(err))
-                    trade_bot_modules.tb_close_orders(null, interaction).catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
-            return
-        }
-        if (interaction.customId == 'tb_close_lich_orders') {
-            console.log('close lich orders clicked')
-            await trade_bot_modules.tb_user_exist(interaction.user.id)
-            .then(() => {
-                trade_bot_modules.tb_user_online(null,interaction)
-                .then(() => {
-                    interaction.deferUpdate().catch(err => console.log(err))
-                    trade_bot_modules.tb_close_lich_orders(null, interaction).catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
-            return
-        }
-        else if (interaction.customId == 'tb_my_profile') {
-            console.log('profile clicked')
-            await trade_bot_modules.tb_user_exist(interaction.user.id)
-            .then(() => {
-                trade_bot_modules.tb_user_online(null,interaction)
-                .then(() => {
-                    trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
-                    .then(res => interaction.reply(res).catch(err => console.log(err)))
-                    .catch(err => console.log(err))
-                }).catch(err => console.log(err))
-            }).catch(err => interaction.reply(err).catch(err => console.log(err)))
-            return
-        }
-        else if (interaction.customId == 'tb_verify') {
+        // if (interaction.customId == 'tb_actv_orders') {
+        //     console.log('activate orders clicked')
+        //     await trade_bot_modules.tb_user_exist(interaction.user.id)
+        //     .then(() => {
+        //         trade_bot_modules.tb_user_online(null,interaction)
+        //         .then(() => {
+        //             interaction.deferUpdate().catch(err => console.log(err))
+        //             trade_bot_modules.tb_activate_orders(null, interaction).catch(err => console.log(err))
+        //         }).catch(err => console.log(err))
+        //     }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+        //     return
+        // }
+        // if (interaction.customId == 'tb_actv_lich_orders') {
+        //     console.log('activate lich orders clicked')
+        //     await trade_bot_modules.tb_user_exist(interaction.user.id)
+        //     .then(() => {
+        //         trade_bot_modules.tb_user_online(null,interaction)
+        //         .then(() => {
+        //             interaction.deferUpdate().catch(err => console.log(err))
+        //             trade_bot_modules.tb_activate_lich_orders(null, interaction).catch(err => console.log(err))
+        //         }).catch(err => console.log(err))
+        //     }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+        //     return
+        // }
+        // if (interaction.customId == 'tb_close_orders') {
+        //     console.log('close orders clicked')
+        //     await trade_bot_modules.tb_user_exist(interaction.user.id)
+        //     .then(() => {
+        //         trade_bot_modules.tb_user_online(null,interaction)
+        //         .then(() => {
+        //             interaction.deferUpdate().catch(err => console.log(err))
+        //             trade_bot_modules.tb_close_orders(null, interaction).catch(err => console.log(err))
+        //         }).catch(err => console.log(err))
+        //     }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+        //     return
+        // }
+        // if (interaction.customId == 'tb_close_lich_orders') {
+        //     console.log('close lich orders clicked')
+        //     await trade_bot_modules.tb_user_exist(interaction.user.id)
+        //     .then(() => {
+        //         trade_bot_modules.tb_user_online(null,interaction)
+        //         .then(() => {
+        //             interaction.deferUpdate().catch(err => console.log(err))
+        //             trade_bot_modules.tb_close_lich_orders(null, interaction).catch(err => console.log(err))
+        //         }).catch(err => console.log(err))
+        //     }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+        //     return
+        // }
+        // else if (interaction.customId == 'tb_my_profile') {
+        //     console.log('profile clicked')
+        //     await trade_bot_modules.tb_user_exist(interaction.user.id)
+        //     .then(() => {
+        //         trade_bot_modules.tb_user_online(null,interaction)
+        //         .then(() => {
+        //             trade_bot_modules.trading_bot_user_orders(interaction.user.id,interaction.user.id,1)
+        //             .then(res => interaction.reply(res).catch(err => console.log(err)))
+        //             .catch(err => console.log(err))
+        //         }).catch(err => console.log(err))
+        //     }).catch(err => interaction.reply(err).catch(err => console.log(err)))
+        //     return
+        // }
+        if (interaction.customId == 'tb_verify') {
             console.log('verify clicked')
-            trade_bot_modules.trading_bot_registeration(interaction.user.id)
+            as_user_registeration(interaction.user.id)
             .then(res => interaction.reply(res).catch(err => console.log(err)))
             .catch(err => interaction.reply(err).catch(err => console.log(err)))
             return
@@ -913,23 +914,23 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (interaction.isCommand()) {
-        if (interaction.commandName == 'lich') {
-            await trade_bot_modules.trading_lich_bot(interaction).then(() => {
-                interaction.reply({
-                    content: 'Your order has been posted.',
-                    ephemeral: true
-                }).catch(err => console.log(err))
-                console.log(`Executed lich order for user ${interaction.user.username}`)
-            }).catch(err => {
-                console.log(err)
-                interaction.reply({
-                    content: 'Some error occured posting order. Contact MrSofty#7926',
-                    ephemeral: true
-                }).catch(err => console.log(err))
-            })
-        }
+        // if (interaction.commandName == 'lich') {
+        //     await trade_bot_modules.trading_lich_bot(interaction).then(() => {
+        //         interaction.reply({
+        //             content: 'Your order has been posted.',
+        //             ephemeral: true
+        //         }).catch(err => console.log(err))
+        //         console.log(`Executed lich order for user ${interaction.user.username}`)
+        //     }).catch(err => {
+        //         console.log(err)
+        //         interaction.reply({
+        //             content: 'Some error occured posting order. Contact MrSofty#7926',
+        //             ephemeral: true
+        //         }).catch(err => console.log(err))
+        //     })
+        // }
     
-        else if (interaction.commandName == 'query') {
+        if (interaction.commandName == 'query') {
             if (interaction.options.getSubcommand() === 'sets') {
                 db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon' OR tags ? 'companion' OR tags ? 'sentinel') AND sell_price >= ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
                 .then(res => {
@@ -1170,139 +1171,139 @@ client.on('shardError', error => {
     });
 });
 
-client.on('messageDelete', async message => {
-    if (Object.keys(hubapp.channel_ids).includes(message.channel.id))
-        hubapp.message_delete(message)
+// client.on('messageDelete', async message => {
+//     if (Object.keys(hubapp.channel_ids).includes(message.channel.id))
+//         hubapp.message_delete(message)
 
-    if (!message.author)
-        return
+//     if (!message.author)
+//         return
 
-    if (message.author.id == client.user.id) {
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId)) {
-            console.log(`an order message was deleted from the bot`)
-            var item_id = ""
-            var channel_id = ""
-            var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE message_id = ${message.id}`)
-            .then(async res => {
-                if (res.rows.length==0) {
-                    console.log(`no message id found in db`)
-                    return false
-                }
-                else if (res.rows.length>1) {
-                    console.log(`more than one message id found in db`)
-                    return false
-                }
-                else {
-                    item_id = res.rows[0].item_id
-                    channel_id = res.rows[0].channel_id
-                    var status = await db.query(`DELETE FROM tradebot_messages_ids WHERE message_id = ${message.id}`)
-                    .then(res => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(`error deleting message id from db`)
-                        return false
-                    })
-                    if (!status)
-                        return false
-                    return true
-                }
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return Promise.resolve()
-            var item_url = ""
-            var item_name = ""
-            var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
-            .then(res => {
-                if (res.rows.length==0) {
-                    console.log(`no item info found in db`)
-                    return false
-                }
-                else if (res.rows.length>1) {
-                    console.log(`more than one item info found in db`)
-                    return false
-                }
-                else {
-                    item_url = res.rows[0].item_url
-                    item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
-                    return true
-                }
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return Promise.resolve()
-            await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,1).catch(err => console.log(err))
-        }
-        else if (Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId)) {
-            console.log(`a lich order message was deleted from the bot`)
-            var lich_id = ""
-            var channel_id = ""
-            var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE message_id = ${message.id}`)
-            .then(async res => {
-                if (res.rows.length==0) {
-                    console.log(`no message id found in db`)
-                    return false
-                }
-                else if (res.rows.length>1) {
-                    console.log(`more than one message id found in db`)
-                    return false
-                }
-                else {
-                    lich_id = res.rows[0].lich_id
-                    channel_id = res.rows[0].channel_id
-                    var status = await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE message_id = ${message.id}`)
-                    .then(res => {
-                        return true
-                    })
-                    .catch(err => {
-                        console.log(`error deleting message id from db`)
-                        return false
-                    })
-                    if (!status)
-                        return false
-                    return true
-                }
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return Promise.resolve()
-            var lich_info = {}
-            var status = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${lich_id}'`)
-            .then(res => {
-                if (res.rows.length==0) {
-                    console.log(`no lich info found in db`)
-                    return false
-                }
-                else if (res.rows.length>1) {
-                    console.log(`more than one lich info found in db`)
-                    return false
-                }
-                else {
-                    lich_info = res.rows[0]
-                    return true
-                }
-            })
-            .catch(err => {
-                console.log(err)
-                return false
-            })
-            if (!status)
-                return Promise.resolve()
-            trade_bot_modules.trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
-        }
-    }
-    return
-})
+//     if (message.author.id == client.user.id) {
+//         if (Object.keys(trade_bot_modules.tradingBotChannels).includes(message.channelId)) {
+//             console.log(`an order message was deleted from the bot`)
+//             var item_id = ""
+//             var channel_id = ""
+//             var status = await db.query(`SELECT * FROM tradebot_messages_ids WHERE message_id = ${message.id}`)
+//             .then(async res => {
+//                 if (res.rows.length==0) {
+//                     console.log(`no message id found in db`)
+//                     return false
+//                 }
+//                 else if (res.rows.length>1) {
+//                     console.log(`more than one message id found in db`)
+//                     return false
+//                 }
+//                 else {
+//                     item_id = res.rows[0].item_id
+//                     channel_id = res.rows[0].channel_id
+//                     var status = await db.query(`DELETE FROM tradebot_messages_ids WHERE message_id = ${message.id}`)
+//                     .then(res => {
+//                         return true
+//                     })
+//                     .catch(err => {
+//                         console.log(`error deleting message id from db`)
+//                         return false
+//                     })
+//                     if (!status)
+//                         return false
+//                     return true
+//                 }
+//             })
+//             .catch(err => {
+//                 console.log(err)
+//                 return false
+//             })
+//             if (!status)
+//                 return Promise.resolve()
+//             var item_url = ""
+//             var item_name = ""
+//             var status = await db.query(`SELECT * FROM items_list WHERE id = '${item_id}'`)
+//             .then(res => {
+//                 if (res.rows.length==0) {
+//                     console.log(`no item info found in db`)
+//                     return false
+//                 }
+//                 else if (res.rows.length>1) {
+//                     console.log(`more than one item info found in db`)
+//                     return false
+//                 }
+//                 else {
+//                     item_url = res.rows[0].item_url
+//                     item_name = res.rows[0].item_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
+//                     return true
+//                 }
+//             })
+//             .catch(err => {
+//                 console.log(err)
+//                 return false
+//             })
+//             if (!status)
+//                 return Promise.resolve()
+//             await trade_bot_modules.trading_bot_orders_update(null,item_id,item_url,item_name,1).catch(err => console.log(err))
+//         }
+//         else if (Object.keys(trade_bot_modules.tradingBotLichChannels).includes(message.channelId)) {
+//             console.log(`a lich order message was deleted from the bot`)
+//             var lich_id = ""
+//             var channel_id = ""
+//             var status = await db.query(`SELECT * FROM tradebot_lich_messages_ids WHERE message_id = ${message.id}`)
+//             .then(async res => {
+//                 if (res.rows.length==0) {
+//                     console.log(`no message id found in db`)
+//                     return false
+//                 }
+//                 else if (res.rows.length>1) {
+//                     console.log(`more than one message id found in db`)
+//                     return false
+//                 }
+//                 else {
+//                     lich_id = res.rows[0].lich_id
+//                     channel_id = res.rows[0].channel_id
+//                     var status = await db.query(`DELETE FROM tradebot_lich_messages_ids WHERE message_id = ${message.id}`)
+//                     .then(res => {
+//                         return true
+//                     })
+//                     .catch(err => {
+//                         console.log(`error deleting message id from db`)
+//                         return false
+//                     })
+//                     if (!status)
+//                         return false
+//                     return true
+//                 }
+//             })
+//             .catch(err => {
+//                 console.log(err)
+//                 return false
+//             })
+//             if (!status)
+//                 return Promise.resolve()
+//             var lich_info = {}
+//             var status = await db.query(`SELECT * FROM lich_list WHERE lich_id = '${lich_id}'`)
+//             .then(res => {
+//                 if (res.rows.length==0) {
+//                     console.log(`no lich info found in db`)
+//                     return false
+//                 }
+//                 else if (res.rows.length>1) {
+//                     console.log(`more than one lich info found in db`)
+//                     return false
+//                 }
+//                 else {
+//                     lich_info = res.rows[0]
+//                     return true
+//                 }
+//             })
+//             .catch(err => {
+//                 console.log(err)
+//                 return false
+//             })
+//             if (!status)
+//                 return Promise.resolve()
+//             trade_bot_modules.trading_lich_orders_update(null,lich_info,1).catch(err => console.log(err))
+//         }
+//     }
+//     return
+// })
 
 client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
@@ -1317,81 +1318,81 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier)
         twitch_affiliate.reaction_handler(reaction,user,'add')
 
-    if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId))
-        trade_bot_modules.reaction_handler(reaction, user, 'add')
+    // if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId))
+    //     trade_bot_modules.reaction_handler(reaction, user, 'add')
 
-    if (reaction.message.channel.isThread()) {
-        if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channel.parentId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channel.parentId))
-            trade_bot_modules.reaction_handler(reaction, user, 'add')
-    }
+    // if (reaction.message.channel.isThread()) {
+    //     if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channel.parentId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channel.parentId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channel.parentId))
+    //         trade_bot_modules.reaction_handler(reaction, user, 'add')
+    // }
 
-    if (!reaction.message.guildId) {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id == client.user.id) {
-            if (reaction.message.embeds) {
-                if (reaction.message.embeds[0]) {
-                    if (reaction.message.embeds[0].title == 'Notification Settings') {
-                        if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
-                            if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
-                                var status = await db.query(`UPDATE tradebot_users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
-                                var status = await db.query(`UPDATE tradebot_users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
-                                var status = await db.query(`UPDATE tradebot_users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            var user_data = null
-                            var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
-                            .then(res => {
-                                if (res.rows.length==0) {
-                                    message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
-                                    return false
-                                }
-                                user_data = res.rows[0]
-                                return true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                message.channel.send(`☠️ Error fetching your info from DB.\nError code: 501\nPlease contact MrSofty#7926`).catch(err => console.log(err))
-                                return false
-                            })
-                            if (!status)
-                                return
-                            var notify_offline = ""
-                            var notify_order = ""
-                            var notify_remove = ""
-                            if (user_data.notify_offline)
-                                notify_offline = '🟢'
-                            else
-                                notify_offline = '🔴'
-                            if (user_data.notify_order)
-                                notify_order = '🟢'
-                            else
-                                notify_order = '🔴'
-                            if (user_data.notify_remove)
-                                notify_remove = '🟢'
-                            else
-                                notify_remove = '🔴'
-                            var postdata = {}
-                            postdata.content = " "
-                            postdata.embeds = []
-                            postdata.embeds.push({
-                                title: 'Notification Settings',
-                                description: `
-                                    ${notify_offline} Notify orders when going offline
-                                    ${notify_order} Notify when orders auto-close in 3 hours
-                                    ${notify_remove} Notify when orders are removed if item price changes`,
-                                footer: {text: `You will not receive these notfications on 'do not disturb'`},
-                                color: trade_bot_modules.tb_invisColor
-                            })
-                            console.log(postdata)
-                            reaction.message.edit(postdata).catch(err => console.log(err))
-                            return
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // if (!reaction.message.guildId) {
+    //     if (!reaction.message.author)
+    //         await reaction.message.channel.messages.fetch(reaction.message.id)
+    //     if (reaction.message.author.id == client.user.id) {
+    //         if (reaction.message.embeds) {
+    //             if (reaction.message.embeds[0]) {
+    //                 if (reaction.message.embeds[0].title == 'Notification Settings') {
+    //                     if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
+    //                         if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
+    //                             var status = await db.query(`UPDATE tradebot_users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+    //                         else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
+    //                             var status = await db.query(`UPDATE tradebot_users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+    //                         else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
+    //                             var status = await db.query(`UPDATE tradebot_users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+    //                         var user_data = null
+    //                         var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
+    //                         .then(res => {
+    //                             if (res.rows.length==0) {
+    //                                 message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+    //                                 return false
+    //                             }
+    //                             user_data = res.rows[0]
+    //                             return true
+    //                         })
+    //                         .catch(err => {
+    //                             console.log(err)
+    //                             message.channel.send(`☠️ Error fetching your info from DB.\nError code: 501\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+    //                             return false
+    //                         })
+    //                         if (!status)
+    //                             return
+    //                         var notify_offline = ""
+    //                         var notify_order = ""
+    //                         var notify_remove = ""
+    //                         if (user_data.notify_offline)
+    //                             notify_offline = '🟢'
+    //                         else
+    //                             notify_offline = '🔴'
+    //                         if (user_data.notify_order)
+    //                             notify_order = '🟢'
+    //                         else
+    //                             notify_order = '🔴'
+    //                         if (user_data.notify_remove)
+    //                             notify_remove = '🟢'
+    //                         else
+    //                             notify_remove = '🔴'
+    //                         var postdata = {}
+    //                         postdata.content = " "
+    //                         postdata.embeds = []
+    //                         postdata.embeds.push({
+    //                             title: 'Notification Settings',
+    //                             description: `
+    //                                 ${notify_offline} Notify orders when going offline
+    //                                 ${notify_order} Notify when orders auto-close in 3 hours
+    //                                 ${notify_remove} Notify when orders are removed if item price changes`,
+    //                             footer: {text: `You will not receive these notfications on 'do not disturb'`},
+    //                             color: trade_bot_modules.tb_invisColor
+    //                         })
+    //                         console.log(postdata)
+    //                         reaction.message.edit(postdata).catch(err => console.log(err))
+    //                         return
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     if (reaction.emoji.identifier == defaultReactions.update.identifier) {
         wfm_api.orders_update(reaction.message,reaction,user)
@@ -1433,73 +1434,73 @@ client.on('messageReactionRemove', async (reaction, user) => {
         twitch_affiliate.reaction_handler(reaction,user,'remove')
     }
 
-    if (!reaction.message.guildId) {
-        if (!reaction.message.author)
-            await reaction.message.channel.messages.fetch(reaction.message.id)
-        if (reaction.message.author.id == client.user.id) {
-            if (reaction.message.embeds) {
-                if (reaction.message.embeds[0]) {
-                    if (reaction.message.embeds[0].title == 'Notification Settings') {
-                        if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
-                            if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
-                                var status = await db.query(`UPDATE tradebot_users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
-                                var status = await db.query(`UPDATE tradebot_users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
-                                var status = await db.query(`UPDATE tradebot_users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
-                            var user_data = null
-                            var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
-                            .then(res => {
-                                if (res.rows.length==0) {
-                                    message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
-                                    return false
-                                }
-                                user_data = res.rows[0]
-                                return true
-                            })
-                            .catch(err => {
-                                console.log(err)
-                                message.channel.send(`☠️ Error fetching your info from DB.\nError code: 501\nPlease contact MrSofty#7926`).catch(err => console.log(err))
-                                return false
-                            })
-                            if (!status)
-                                return
-                            var notify_offline = ""
-                            var notify_order = ""
-                            var notify_remove = ""
-                            if (user_data.notify_offline)
-                                notify_offline = '🟢'
-                            else
-                                notify_offline = '🔴'
-                            if (user_data.notify_order)
-                                notify_order = '🟢'
-                            else
-                                notify_order = '🔴'
-                            if (user_data.notify_remove)
-                                notify_remove = '🟢'
-                            else
-                                notify_remove = '🔴'
-                            var postdata = {}
-                            postdata.content = " "
-                            postdata.embeds = []
-                            postdata.embeds.push({
-                                title: 'Notification Settings',
-                                description: `
-                                    ${notify_offline} Notify orders when going offline
-                                    ${notify_order} Notify when orders auto-close in 3 hours
-                                    ${notify_remove} Notify when orders are removed if item price changes`,
-                                footer: {text: `You will not receive these notfications on 'do not disturb'`},
-                                color: trade_bot_modules.tb_invisColor
-                            })
-                            console.log(postdata)
-                            reaction.message.edit(postdata).catch(err => console.log(err))
-                            return
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // if (!reaction.message.guildId) {
+    //     if (!reaction.message.author)
+    //         await reaction.message.channel.messages.fetch(reaction.message.id)
+    //     if (reaction.message.author.id == client.user.id) {
+    //         if (reaction.message.embeds) {
+    //             if (reaction.message.embeds[0]) {
+    //                 if (reaction.message.embeds[0].title == 'Notification Settings') {
+    //                     if (trade_bot_modules.tradingBotReactions.sell.includes(`<:${reaction.emoji.identifier}>`)) {
+    //                         if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[0])
+    //                             var status = await db.query(`UPDATE tradebot_users_list SET notify_offline = NOT notify_offline WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+    //                         else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[1])
+    //                             var status = await db.query(`UPDATE tradebot_users_list SET notify_order = NOT notify_order WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+    //                         else if (`<:${reaction.emoji.identifier}>` == trade_bot_modules.tradingBotReactions.sell[2])
+    //                             var status = await db.query(`UPDATE tradebot_users_list SET notify_remove = NOT notify_remove WHERE discord_id = ${user.id}`).catch(err => console.log(err))
+    //                         var user_data = null
+    //                         var status = await db.query(`SELECT * FROM tradebot_users_list WHERE discord_id = ${user.id}`)
+    //                         .then(res => {
+    //                             if (res.rows.length==0) {
+    //                                 message.channel.send(`☠️ Error fetching your info from DB.\nError code: 500\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+    //                                 return false
+    //                             }
+    //                             user_data = res.rows[0]
+    //                             return true
+    //                         })
+    //                         .catch(err => {
+    //                             console.log(err)
+    //                             message.channel.send(`☠️ Error fetching your info from DB.\nError code: 501\nPlease contact MrSofty#7926`).catch(err => console.log(err))
+    //                             return false
+    //                         })
+    //                         if (!status)
+    //                             return
+    //                         var notify_offline = ""
+    //                         var notify_order = ""
+    //                         var notify_remove = ""
+    //                         if (user_data.notify_offline)
+    //                             notify_offline = '🟢'
+    //                         else
+    //                             notify_offline = '🔴'
+    //                         if (user_data.notify_order)
+    //                             notify_order = '🟢'
+    //                         else
+    //                             notify_order = '🔴'
+    //                         if (user_data.notify_remove)
+    //                             notify_remove = '🟢'
+    //                         else
+    //                             notify_remove = '🔴'
+    //                         var postdata = {}
+    //                         postdata.content = " "
+    //                         postdata.embeds = []
+    //                         postdata.embeds.push({
+    //                             title: 'Notification Settings',
+    //                             description: `
+    //                                 ${notify_offline} Notify orders when going offline
+    //                                 ${notify_order} Notify when orders auto-close in 3 hours
+    //                                 ${notify_remove} Notify when orders are removed if item price changes`,
+    //                             footer: {text: `You will not receive these notfications on 'do not disturb'`},
+    //                             color: trade_bot_modules.tb_invisColor
+    //                         })
+    //                         console.log(postdata)
+    //                         reaction.message.edit(postdata).catch(err => console.log(err))
+    //                         return
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     if (reaction.message.guildId == '776804537095684108')
         botv.reaction_handler(reaction,user,'remove')
@@ -1509,15 +1510,15 @@ client.on('messageReactionRemove', async (reaction, user) => {
     }
 });
 
-client.on('threadUpdate', async (oldThread,newThread) => {
-    if (newThread.archived) {
-        if (newThread.ownerId != client.user.id)
-            return
-        if (!Object.keys(trade_bot_modules.tradingBotChannels).includes(newThread.parentId) || !Object.keys(trade_bot_modules.tradingBotLichChannels).includes(newThread.parentId) || !trade_bot_modules.tradingBotSpamChannels.includes(newThread.parentId)) {
-            trade_bot_modules.thread_update_handler(oldThread,newThread)
-        }
-    }
-})
+// client.on('threadUpdate', async (oldThread,newThread) => {
+//     if (newThread.archived) {
+//         if (newThread.ownerId != client.user.id)
+//             return
+//         if (!Object.keys(trade_bot_modules.tradingBotChannels).includes(newThread.parentId) || !Object.keys(trade_bot_modules.tradingBotLichChannels).includes(newThread.parentId) || !trade_bot_modules.tradingBotSpamChannels.includes(newThread.parentId)) {
+//             trade_bot_modules.thread_update_handler(oldThread,newThread)
+//         }
+//     }
+// })
 
 client.on('guildMemberUpdate', (oldMember, newMember) => {
     if (oldMember.user.bot) return

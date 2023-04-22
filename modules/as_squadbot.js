@@ -12,7 +12,7 @@ const {event_emitter} = require('./event_emitter')
 const {translatePayload} = require('./allsquads')
 const {emote_ids, emoteObjFromSquadString} = require('./emotes')
 const {as_users_ratings} = require('./allsquads/as_users_ratings')
-const {as_users_list} = require('./allsquads/as_users_list')
+const {as_users_list, getAsUserByDiscordId} = require('./allsquads/as_users_list')
 const {global_variables} = require('./global_variables');
 const { db_schedule_msg_deletion } = require('./msg_auto_delete');
 
@@ -52,8 +52,8 @@ client.on('messageCreate', async (message) => {
     if (message.author.bot) return
     if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id)) {
         if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
-        console.log('[squadbot messageCreate] content:',message.content)
-        socket.emit('squadbot/squads/create',{message: message.content, discord_id: message.author.id, channel_id: message.channel.id},responses => {
+        console.log('[squadbot messageCreate] content:',message.content) 
+        socket.emit('squadbot/squads/create',{message: message.content, user_id: getAsUserByDiscordId(message.author.id)?.user_id, channel_id: message.channel.id},responses => {
             handleSquadCreateResponses(message.channel.id,message.author.id,responses)
             setTimeout(() => message.delete().catch(console.error), 1000);
         })
@@ -62,7 +62,7 @@ client.on('messageCreate', async (message) => {
         if (message.channel.ownerId == client.user.id) {
             socket.emit('squadbot/squads/messageCreate', {
                 message_id: message.id,
-                discord_id: message.author.id,
+                user_id: getAsUserByDiscordId(message.author.id)?.user_id,
                 message: `${message.content}\n${message.attachments.map(attachment => attachment.url).join('\n')}`.trim(),
                 thread_id: message.channel.id
             }, res => console.log(res))
@@ -110,7 +110,7 @@ client.on('interactionCreate', async (interaction) => {
         if (!Object.keys(channels_list).includes(interaction.channel.id) && interaction.guild) return
 
         if (interaction.customId == 'as_sb_sq_leave_all') {
-            socket.emit('squadbot/squads/leaveall',{discord_id: interaction.user.id},(res) => {
+            socket.emit('squadbot/squads/leaveall',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -137,7 +137,7 @@ client.on('interactionCreate', async (interaction) => {
                 ]
             }).catch(console.error)
         } else if (interaction.customId == 'as_sb_sq_trackers_show') {
-            socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+            socket.emit('squadbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                 if (res.code == 200) {
                     interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
                 } else {
@@ -145,8 +145,8 @@ client.on('interactionCreate', async (interaction) => {
                 }
             })
         } else if (interaction.customId == 'as_sb_sq_trackers_remove_all') {
-            socket.emit('squadbot/trackers/delete',{discord_id: interaction.user.id},(res) => {
-                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+            socket.emit('squadbot/trackers/delete',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
+                socket.emit('squadbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
                     } else {
@@ -182,12 +182,12 @@ client.on('interactionCreate', async (interaction) => {
             const squad_id = interaction.customId.split('.')[1]
             if (!squad_id) {
                 // get squads list the user can auto-fill
-                socket.emit('squadbot/squads/autofill/fetch',{discord_id: discord_id},(res) => {
+                socket.emit('squadbot/squads/autofill/fetch',{user_id: getAsUserByDiscordId(discord_id)?.user_id},(res) => {
                     interaction.reply(generateAutofillPanel(res)).catch(console.error)
                 })
             } else {
                 // force open the squad
-                socket.emit('squadbot/squads/autofill/execute',{discord_id: discord_id, squad_id: squad_id},(res) => {
+                socket.emit('squadbot/squads/autofill/execute',{user_id: getAsUserByDiscordId(discord_id)?.user_id, squad_id: squad_id},(res) => {
                     if (res.code == 200) {
                         interaction.update({
                             embeds: [{
@@ -200,7 +200,7 @@ client.on('interactionCreate', async (interaction) => {
                 })
             }
         } else if (interaction.customId.match('as_sb_sq_merge_false')) {
-            socket.emit('squadbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), discord_id: interaction.user.id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
+            socket.emit('squadbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
                 interaction.deferUpdate().catch(console.error)
                 interaction.message.delete().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
@@ -208,7 +208,7 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.match('as_sb_sq_merge_true_')) {
             const squad_id = interaction.customId.split('as_sb_sq_merge_true_')[1]
             const discord_id = interaction.user.id
-            socket.emit('squadbot/squads/addmember',{squad_id: squad_id,discord_id: discord_id,channel_id: interaction.channel.id},(res) => {
+            socket.emit('squadbot/squads/addmember',{squad_id: squad_id,user_id: getAsUserByDiscordId(discord_id)?.user_id,channel_id: interaction.channel.id},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
                     interaction.message.delete().catch(console.error)
@@ -217,14 +217,14 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_create') {
             const squad_string = interaction.customId.split('.')[1].replace(/_/g,' ')
-            socket.emit('squadbot/squads/create',{message: squad_string, discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+            socket.emit('squadbot/squads/create',{message: squad_string, user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: interaction.channel.id},responses => {
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_join') {
             const discord_id = interaction.user.id
             const squad_id = interaction.customId.split('.')[1]
-            socket.emit('squadbot/squads/addmember',{squad_id: squad_id, discord_id: discord_id, channel_id: interaction.channel.id},(res) => {
+            socket.emit('squadbot/squads/addmember',{squad_id: squad_id, user_id: getAsUserByDiscordId(discord_id)?.user_id, channel_id: interaction.channel.id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
@@ -238,9 +238,9 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_pick_choice') {
             const default_squad_id = interaction.customId.split('.')[1]
             const picked_choice = interaction.customId.split('.')[2]
-            const payload = generatePickChoicePanel(default_squad_id, interaction.user.id, picked_choice)
+            const payload = generatePickChoicePanel(default_squad_id, getAsUserByDiscordId(interaction.user.id)?.user_id, picked_choice)
             if (payload.createSquad) {
-                socket.emit('squadbot/squads/create',{message: payload.squad_string, discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+                socket.emit('squadbot/squads/create',{message: payload.squad_string, user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: interaction.channel.id},responses => {
                     interaction.update(payload).catch(console.error)
                     handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
                 })
@@ -254,10 +254,10 @@ client.on('interactionCreate', async (interaction) => {
         if (!Object.keys(channels_list).includes(interaction.channel.id) && interaction.guild) return
         if (interaction.customId == 'as_sb_sq_trackers_add') {
             console.log('[as_sb_sq_trackers_add]')
-            socket.emit('squadbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),discord_id: interaction.user.id,channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1054843353302323281'},(responses) => {
+            socket.emit('squadbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),user_id: getAsUserByDiscordId(interaction.user.id)?.user_id,channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1054843353302323281'},(responses) => {
                 // console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
-                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                socket.emit('squadbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         if (interaction.message) {
                             if (interaction.message.embeds[0]) {
@@ -280,7 +280,7 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
             
-            socket.emit('squadbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+            socket.emit('squadbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: interaction.channel.id},responses => {
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
             })
@@ -288,7 +288,7 @@ client.on('interactionCreate', async (interaction) => {
             const default_squad_id = interaction.customId.split('.')[1]
             const default_squad = global_variables['squadbot.default_squads'].filter(squad => squad.id == default_squad_id)[0]
             if (!default_squad) return interaction.reply({content: 'Something went wrong', ephemeral: true}).catch(console.error)
-            socket.emit('squadbot/squads/create',{message: `${default_squad.squad_string} ${interaction.fields.getTextInputValue('desc')} 1/${default_squad.spots}`, discord_id: interaction.user.id, channel_id: interaction.channel.id},responses => {
+            socket.emit('squadbot/squads/create',{message: `${default_squad.squad_string} ${interaction.fields.getTextInputValue('desc')} 1/${default_squad.spots}`, user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: interaction.channel.id},responses => {
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
             })
@@ -298,10 +298,10 @@ client.on('interactionCreate', async (interaction) => {
         if (!Object.keys(channels_list).includes(interaction.channel.id) && interaction.guild) return
         if (interaction.customId == 'as_sb_sq_trackers_add_menu') {
             console.log('[as_sb_sq_trackers_add_menu]')
-            socket.emit('squadbot/trackers/create',{message: interaction.values,discord_id: interaction.user.id, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1054843353302323281'},(responses) => {
+            socket.emit('squadbot/trackers/create',{message: interaction.values,user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1054843353302323281'},(responses) => {
                 //console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
-                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                socket.emit('squadbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         edit_recruitment_intro()
                         if (interaction.message) {
@@ -324,7 +324,7 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_trackers_remove') {
             socket.emit('squadbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
-                socket.emit('squadbot/trackers/fetch',{discord_id: interaction.user.id},(res) => {
+                socket.emit('squadbot/trackers/fetch',{user_id: getAsUserByDiscordId(interaction.user.id)?.user_id},(res) => {
                     if (res.code == 200) {
                         interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
                     } else {
@@ -337,11 +337,11 @@ client.on('interactionCreate', async (interaction) => {
 })
 
 const generatedPickChoicePanelCache = {}
-function generatePickChoicePanel(default_squad_id, discord_id, picked_choice) {
+function generatePickChoicePanel(default_squad_id, user_id, picked_choice) {
     const default_squad = global_variables['squadbot.default_squads']?.filter(squad => squad.id == default_squad_id)[0]
     if (!default_squad || default_squad.squad_type != 'choice_based' || default_squad.choices.length == 0 || default_squad.choices.some(sub_choices => sub_choices.length == 0) ) {
         edit_webhook_messages()
-        delete generatedPickChoicePanelCache[`${default_squad_id}_${discord_id}`]
+        delete generatedPickChoicePanelCache[`${default_squad_id}_${user_id}`]
         return {
             embeds: [{
                 description: 'Something went wrong, please try again',
@@ -351,10 +351,10 @@ function generatePickChoicePanel(default_squad_id, discord_id, picked_choice) {
             ephemeral: true
         }
     }
-    var squad_string = generatedPickChoicePanelCache[`${default_squad_id}_${discord_id}`]
+    var squad_string = generatedPickChoicePanelCache[`${default_squad_id}_${user_id}`]
     if (!squad_string) {
         squad_string = default_squad.squad_string
-        generatedPickChoicePanelCache[`${default_squad_id}_${discord_id}`] = default_squad.squad_string
+        generatedPickChoicePanelCache[`${default_squad_id}_${user_id}`] = default_squad.squad_string
     }
     if (picked_choice) squad_string += `_${picked_choice}`
     var components = []
@@ -367,9 +367,9 @@ function generatePickChoicePanel(default_squad_id, discord_id, picked_choice) {
     })
     if (components.length == 0) {
         squad_string += `_1/${default_squad.spots}`
-        delete generatedPickChoicePanelCache[`${default_squad_id}_${discord_id}`]
+        delete generatedPickChoicePanelCache[`${default_squad_id}_${user_id}`]
     } else {
-        generatedPickChoicePanelCache[`${default_squad_id}_${discord_id}`] = squad_string
+        generatedPickChoicePanelCache[`${default_squad_id}_${user_id}`] = squad_string
     }
     return {
         createSquad: components.length > 0 ? false : true,
@@ -655,7 +655,7 @@ function edit_webhook_messages(with_all_names,name_for_squad_id, single_channel_
                 const squads = res.data
                 const payloads = embed(squads,with_all_names,name_for_squad_id)
                 Array(5).fill(0).forEach((value,index) => {
-                    webhook_messages[`find_squads_${index+1}`].forEach(async msg => {
+                    webhook_messages[`find_squads_${index+1}`]?.forEach(async msg => {
                         if (!single_channel_id || single_channel_id == msg.c_id) {
                             if (payloads[index]) {
                                 new WebhookClient({url: msg.url}).editMessage(msg.m_id, payloads[index]).catch(console.error)
@@ -891,16 +891,16 @@ socket.on('squadbot/squadCreate', (squad) => {
         if (res.code == 200) {
             const channel_ids = res.data
             for (const channel_id in channel_ids) {
-                const discord_ids = channel_ids[channel_id].filter(sub => !subscribersTimeout[sub])
-                discord_ids.map(sub => {
+                const user_ids = channel_ids[channel_id].filter(sub => !subscribersTimeout[sub])
+                user_ids.map(sub => {
                     subscribersTimeout[sub] = true
                     setTimeout(() => {
                         delete subscribersTimeout[sub]
                     }, 120000);
                 })
-                if (discord_ids.length > 0) {
-                    getGuildMembersStatus(discord_ids.map(id => ({
-                        id: id,
+                if (user_ids.length > 0) {
+                    getGuildMembersStatus(user_ids.map(id => ({
+                        id: as_users_list[id]?.discord_id,
                         allowed_mentions: as_users_list[id]?.allowed_pings_status
                     })),client.channels.cache.get(channel_id)?.guild?.id).then(mentions_list => {
                         if (mentions_list.length == 0) return
@@ -931,10 +931,10 @@ socket.on('squadbot/squads/opened', async (payload) => {
     const squad = payload
     const thread_ids = []
     const channel_ids = {}
-    for (const discord_id of squad.members) {
-        const channel_id = squad.joined_from_channel_ids[discord_id] || '1054843353302323281'
+    for (const user_id of squad.members) {
+        const channel_id = squad.joined_from_channel_ids[user_id]
         if (!channel_ids[channel_id]) channel_ids[channel_id] = []
-        channel_ids[channel_id].push(discord_id)
+        channel_ids[channel_id].push(as_users_list[user_id]?.discord_id)
     }
     // host selection
     var hosts = squad.host_recommendation;
@@ -1089,7 +1089,7 @@ async function logSquad(squad,include_chat,action) {
     if (!channel) return
     const squadAutoFilledBy = squad.autofilled_by ? `**Auto-filled by:** ${as_users_list[squad.autofilled_by].ingame_name}` : ''
     const squadHost = squad.squad_host ? `**Host:** ${as_users_list[squad.squad_host].ingame_name}` : '**Host:** Not determined'
-    const squadRecommendedHost = squad.host_recommendation?.[0].considered_ping == null ? '**Recommended Host:** Not determined' : `**Recommended Host:** ${squad.host_recommendation?.[0].ign} with avg squad ping of ${squad.host_recommendation[0].avg_squad_ping}`
+    const squadRecommendedHost = squad.host_recommendation?.[0]?.considered_ping == null ? '**Recommended Host:** Not determined' : `**Recommended Host:** ${as_users_list[squad.host_recommendation?.[0]?.user_id]?.ingame_name} with avg squad ping of ${squad.host_recommendation?.[0]?.avg_squad_ping}`
     const squadFillTime = `**Squad Fill Time:** ${msToFullTime(Number(squad.open_timestamp) - Number(squad.creation_timestamp))}`
     const squadMembers = `**⸻ Squad Members ⸻**\n${squad.members.map(id => as_users_list[id]?.ingame_name).join('\n')}`
     const squadLogs = `**⸻ Squad Logs ⸻**\n${squad.logs.map(log => `${log.replace(log.split(' ')[0],`[<t:${Math.round(Number(log.split(' ')[0])/1000)}:t>]`).replace(log.split(' ')[1],`**${as_users_list[log.split(' ')[1]]?.ingame_name}**`)}`).join('\n')}`
@@ -1097,7 +1097,7 @@ async function logSquad(squad,include_chat,action) {
         socket.emit('squadbot/squads/messagesFetch', {squad_id: squad.squad_id}, async (res) => {
             if (res.code == 200) {
                 const chats = res.data
-                const squadChat = `**⸻ Squad Chat ⸻**\n${chats.map(chat => `[<t:${Math.round(Number(chat.creation_timestamp) / 1000)}:t>] **${as_users_list[chat.discord_id]?.ingame_name}:** ${chat.message}`).join('\n')}`
+                const squadChat = `**⸻ Squad Chat ⸻**\n${chats.map(chat => `[<t:${Math.round(Number(chat.creation_timestamp) / 1000)}:t>] **${as_users_list[chat.user_id]?.ingame_name}:** ${chat.message}`).join('\n')}`
                 channel.send({
                     content: convertUpper(action),
                     embeds: [{
@@ -1150,9 +1150,9 @@ async function logSquad(squad,include_chat,action) {
             components: [{
                 type: 3,
                 custom_id: `as_sq_invalidate.squadbot.${squad.squad_id}.2`,
-                options: squad.members.map((discord_id) => ({
-                    label: as_users_list[discord_id]?.ingame_name,
-                    value: discord_id,
+                options: squad.members.map((user_id) => ({
+                    label: as_users_list[user_id]?.ingame_name,
+                    value: user_id,
                     emoji: '🛑'
                 })),
                 placeholder: "Invalidate specific member(s)",
@@ -1168,7 +1168,7 @@ socket.on('squadbot/squadMessageCreate',payload => {
         if (thread_id != payload.thread_id) {
             const channel = client.channels.cache.get(thread_id) || await client.channels.fetch(thread_id).catch(console.error)
             if (!channel) return
-            channel.send({content: `**${as_users_list[payload.discord_id]?.ingame_name}**: ${payload.message}`})
+            channel.send({content: `**${as_users_list[payload.user_id]?.ingame_name}**: ${payload.message}`})
         }
     })
 })
