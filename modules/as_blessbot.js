@@ -352,8 +352,8 @@ function mentionUsers(blessing) {
         if (res.rowCount == 0) return
         const ping_users = []
         res.rows.forEach(tracker => {
-            if (tracker.regions.length == 0) ping_users.push(as_users_list[tracker.discord_id]?.discord_id)
-            else if (tracker.regions.includes(blessing.region)) ping_users.push(as_users_list[tracker.discord_id]?.discord_id)
+            if (tracker.regions.length == 0) ping_users.push(as_users_list[tracker.user_id]?.discord_id)
+            else if (tracker.regions.includes(blessing.region)) ping_users.push(as_users_list[tracker.user_id]?.discord_id)
         })
         if (ping_users.length > 0) {
             arrToStringsArrWithLimit(`${convertUpper(blessing.bless_type)} Blessing in ${blessing.bless_time}`,ping_users.map(id => `<@${id}>`),2000).forEach(str => {
