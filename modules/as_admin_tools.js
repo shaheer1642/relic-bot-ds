@@ -78,7 +78,7 @@ async function getUsersVerified(time_since) {
         var ms = timeStringToMs(time_since)
         if (!ms) return resolve({content: 'Invalid input for time_since', ephemeral: true})
         db.query(`
-            SELECT * FROM tradebot_users_list WHERE registered_timestamp > ${new Date().getTime() -  ms} ORDER BY registered_timestamp DESC;
+            SELECT * FROM as_users_list WHERE registered_timestamp > ${new Date().getTime() -  ms} ORDER BY registered_timestamp DESC;
         `).then(res => {
             const users = res.rows
             if (users.length > 0) {

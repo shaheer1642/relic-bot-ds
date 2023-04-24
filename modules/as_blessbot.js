@@ -2,7 +2,7 @@ const {client} = require('./discord_client.js');
 const {db} = require('./db_connection')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper, arrToStringsArrWithLimit} = require('./extras.js');
 const JSONbig = require('json-bigint');
-const { getAsUserByDiscordId, as_users_list } = require('./allsquads/as_users_list.js');
+const { as_users_list, as_users_list_discord } = require('./allsquads/as_users_list.js');
 
 const webhook_id = '1058463788560552028'
 const channel_id = '1058462882968371331'
@@ -78,7 +78,7 @@ client.on('interactionCreate', interaction => {
                     }
                 }).catch(console.error)
             } else if (interaction.customId == 'as_bb_host') {
-                const user_id = getAsUserByDiscordId(interaction.user.id)?.user_id
+                const user_id = as_users_list_discord[interaction.user.id]?.user_id
                 if (!user_id) return
                 db.query(`SELECT * FROM as_bb_blesses WHERE user_id = '${user_id}' AND status != 'setup' AND submit_timestamp > ${new Date().getTime() - 82800000}`).then(res => {
                     if (res.rowCount != 0) {
@@ -106,7 +106,7 @@ client.on('interactionCreate', interaction => {
                     }
                 }).catch(console.error)
             } else if (interaction.customId == 'as_bb_participate') {
-                const user_id = getAsUserByDiscordId(interaction.user.id)?.user_id
+                const user_id = as_users_list_discord[interaction.user.id]?.user_id
                 if (!user_id) return
                 db.query(`UPDATE as_bb_blesses SET participants = participants || '"${interaction.user.id}"' 
                 WHERE bless_message_id = '${interaction.message.id}' AND status = 'active' AND NOT (participants @> '"${user_id}"') AND user_id != '${user_id}'`)
@@ -121,7 +121,7 @@ client.on('messageReactionAdd', (reaction,user) => {
     if (reaction.message.channel.id == channel_id) {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionAdd',reaction.emoji.identifier,user.id)
-            const user_id = getAsUserByDiscordId(user.id)?.user_id
+            const user_id = as_users_list_discord[user.id]?.user_id
             if (!user_id) return reaction.remove().catch(console.error)
             const column = (reaction.emoji.identifier.match('north_america') || reaction.emoji.identifier.match('europe') || reaction.emoji.identifier.match('asia')) ? 'regions' : 'bless_types'
             db.query(`
@@ -144,7 +144,7 @@ client.on('messageReactionRemove', (reaction,user) => {
     if (reaction.message.channel.id == channel_id) {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionRemove',reaction.emoji.identifier,user.id)
-            const user_id = getAsUserByDiscordId(user.id)?.user_id
+            const user_id = as_users_list_discord[user.id]?.user_id
             if (!user_id) return reaction.remove().catch(console.error)
             const column = (reaction.emoji.identifier.match('north_america') || reaction.emoji.identifier.match('europe') || reaction.emoji.identifier.match('asia')) ? 'regions' : 'bless_types'
             db.query(`

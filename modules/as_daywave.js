@@ -8,7 +8,7 @@ const JSONbig = require('json-bigint');
 const {event_emitter} = require('./event_emitter')
 const {socket} = require('./socket');
 const { db_schedule_msg_deletion } = require('./msg_auto_delete.js');
-const { getAsUserByDiscordId } = require('./allsquads/as_users_list.js');
+const { as_users_list_discord } = require('./allsquads/as_users_list.js');
 
 // const guild_id = '865904902941048862'
 
@@ -262,7 +262,7 @@ client.on('interactionCreate', (interaction) => {
     }
     if (interaction.isButton()) {
         if (interaction.customId == 'view_weekly_challenges_summary') {
-            const user = getAsUserByDiscordId(interaction.user.id)
+            const user = as_users_list_discord[interaction.user.id]
             if (!user) return
             db.query(`SELECT * FROM challenges WHERE is_active = true;`)
             .then(res => {

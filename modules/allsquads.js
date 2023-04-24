@@ -8,7 +8,7 @@ const {event_emitter} = require('./event_emitter')
 const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, generateId } = require('./extras.js');
 const translations = require('./../translations.json');
 const supported_langs = ['en','fr','it']
-const {as_users_list, getAsUserByDiscordId} = require('./allsquads/as_users_list')
+const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_list')
 const {as_hosts_ratings} = require('./allsquads/as_users_ratings')
 const {db_schedule_msg_deletion} = require('./msg_auto_delete');
 
@@ -155,7 +155,7 @@ client.on('interactionCreate', (interaction) => {
             // })
         } else if (interaction.customId.split('.')[0] == 'as_new_member_sq_trackers_add') { 
             const value = interaction.customId.split('.')[1]
-            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,user_id: getAsUserByDiscordId(interaction.user.id)?.user_id, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
+            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,user_id: as_users_list_discord[interaction.user.id]?.user_id, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
                 console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 if (responses[0].code == 200) {
@@ -177,7 +177,7 @@ client.on('interactionCreate', (interaction) => {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,user_id: getAsUserByDiscordId(discord_id)?.user_id},(res) => {
+            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad Closed\nValidated by <@${discord_id}>`,
@@ -209,7 +209,7 @@ client.on('interactionCreate', (interaction) => {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,user_id: getAsUserByDiscordId(discord_id)?.user_id},(res) => {
+            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -220,7 +220,7 @@ client.on('interactionCreate', (interaction) => {
             //     components: interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? null : subcomponent).filter(o => o !== null)})).filter(component => component.components.length != 0)
             // }).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_users_rate') {
-            computeRateUser(interaction.customId, getAsUserByDiscordId(interaction.user.id)?.user_id).then(res => {
+            computeRateUser(interaction.customId, as_users_list_discord[interaction.user.id]?.user_id).then(res => {
                 if (res.payload_type == 'reply') {
                     if (interaction.message.type == 'REPLY') interaction.update(res.payload).catch(console.error)
                     else interaction.reply(res.payload).catch(console.error)
@@ -230,7 +230,7 @@ client.on('interactionCreate', (interaction) => {
             }).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_host_rate') {
             const discord_id = interaction.user.id
-            const user_id = getAsUserByDiscordId(discord_id)?.user_id
+            const user_id = as_users_list_discord[discord_id]?.user_id
             const member_ids = (interaction.customId.split('.')[1]).split('_').filter(id => id != user_id)
             const rated_user = interaction.customId.split('.')[2]
             const rating = interaction.customId.split('.')[3]
@@ -287,13 +287,13 @@ client.on('interactionCreate', (interaction) => {
                 ephemeral: true
             }).catch(console.log)
         } else if (interaction.customId.split('.')[0] == 'as_user_settings') {
-            if (!getAsUserByDiscordId(interaction.user.id)) return interaction.reply({content: 'You are not verified', ephemeral: true}).catch(console.error)
-            interaction.reply(userSettingsPanel(interaction, getAsUserByDiscordId(interaction.user.id))).catch(console.error)
+            if (!as_users_list_discord[interaction.user.id]) return interaction.reply({content: 'You are not verified', ephemeral: true}).catch(console.error)
+            interaction.reply(userSettingsPanel(interaction, as_users_list_discord[interaction.user.id])).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_user_change_settings') {
             const discord_id = interaction.user.id
             const setting_type = interaction.customId.split('.')[1]
             const setting_value = interaction.customId.split('.')[2] == 'true' ? true : interaction.customId.split('.')[2] == 'false' ? false : interaction.customId.split('.')[2]
-            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, user_id: getAsUserByDiscordId(discord_id)?.user_id},(res) => {
+            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
                 if (res.code == 200) {
                     interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -306,7 +306,7 @@ client.on('interactionCreate', (interaction) => {
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
             const reason = interaction.fields.getTextInputValue('reason')
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: getAsUserByDiscordId(discord_id)?.user_id,reason: reason},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id,reason: reason},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nReason: ${reason}`,
@@ -316,7 +316,7 @@ client.on('interactionCreate', (interaction) => {
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
         } else if (interaction.customId.split('.')[0] == 'as_users_rate') {
-            computeRateUser(`${interaction.customId}.${interaction.fields.getTextInputValue('reason')}`, getAsUserByDiscordId(interaction.user.id)?.user_id).then(res => {
+            computeRateUser(`${interaction.customId}.${interaction.fields.getTextInputValue('reason')}`, as_users_list_discord[interaction.user.id]?.user_id).then(res => {
                 interaction.update(res.payload).catch(console.error)
             }).catch(console.error)
         }
@@ -328,7 +328,7 @@ client.on('interactionCreate', (interaction) => {
             const discord_id = interaction.user.id
             const reason = 'Invalidated for specific members'
             const invalidated_members = interaction.values
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: getAsUserByDiscordId(discord_id)?.user_id, reason: reason, invalidated_members: invalidated_members},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id, reason: reason, invalidated_members: invalidated_members},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nInvalidated Members: ${invalidated_members.map(id => `<@${id}>`).join(', ')}`,
@@ -580,7 +580,7 @@ async function assign_allsquads_roles() {
 
 function edit_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/leaderboards/fetch', {limit: 10, skip_users: [getAsUserByDiscordId('253525146923433984').user_id,getAsUserByDiscordId('739833841686020216').user_id], exclude_daily: true, exclude_squads: true}, (res) => {
+    socket.emit('allsquads/leaderboards/fetch', {limit: 10, skip_users: [as_users_list_discord['253525146923433984'].user_id,as_users_list_discord['739833841686020216'].user_id], exclude_daily: true, exclude_squads: true}, (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             const payload = {
@@ -757,27 +757,27 @@ function error_codes_embed(response,discord_id) {
     }
 }
 
-db.on('notification', async (notification) => {
-    const payload = JSONbig.parse(notification.payload);
-    // console.log('[warframe_hub] db notification: ',payload)
+// db.on('notification', async (notification) => {
+//     const payload = JSONbig.parse(notification.payload);
+//     // console.log('[warframe_hub] db notification: ',payload)
 
-    if (notification.channel == 'as_users_list_update') {
-        if ((payload[0].is_patron && !payload[1].is_patron) || (payload[0].is_patron && payload[0].patreon_expiry_timestamp != payload[1].patreon_expiry_timestamp)) {
-            const user = client.users.cache.get(payload[0].discord_id.toString()) || await client.users.fetch(payload[0].discord_id.toString()).catch(console.error)
-            if (!user) return
+//     if (notification.channel == 'as_users_list_update') {
+//         if ((payload[0].is_patron && !payload[1].is_patron) || (payload[0].is_patron && payload[0].patreon_expiry_timestamp != payload[1].patreon_expiry_timestamp)) {
+//             const user = client.users.cache.get(payload[0].discord_id.toString()) || await client.users.fetch(payload[0].discord_id.toString()).catch(console.error)
+//             if (!user) return
     
-            user.send({
-                content: ' ',
-                embeds: [{
-                    title: 'Payment Successful',
-                    description: `Thank you for purchasing WarframeHub VIP Subscription!\nEnjoy your premium features\nYour subscription will expire <t:${Math.round(Number(payload[0].patreon_expiry_timestamp)/1000)}:R> unless you renew`,
-                    color: '#7d2ec4',
-                    timestamp: new Date().getTime()
-                }]
-            }).catch(console.error)
-        }
-    }
-})
+//             user.send({
+//                 content: ' ',
+//                 embeds: [{
+//                     title: 'Payment Successful',
+//                     description: `Thank you for purchasing WarframeHub VIP Subscription!\nEnjoy your premium features\nYour subscription will expire <t:${Math.round(Number(payload[0].patreon_expiry_timestamp)/1000)}:R> unless you renew`,
+//                     color: '#7d2ec4',
+//                     timestamp: new Date().getTime()
+//                 }]
+//             }).catch(console.error)
+//         }
+//     }
+// })
 
 module.exports = {
     verificationInstructions,

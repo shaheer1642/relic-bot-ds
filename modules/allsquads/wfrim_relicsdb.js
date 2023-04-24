@@ -1,12 +1,11 @@
 
 const {db} = require('../db_connection')
 // const {as_users_list} = require('./modules/allsquads/as_users_list')
-const {event_emitter} = require('../event_emitter')
 const { as_users_list } = require('./as_users_list')
 
 var wfrim_relicsdb = {}
 
-event_emitter.on('db_connected', () => {
+db.on('connected', () => {
     updateWfrimRelicsDB()
 })
 
@@ -15,21 +14,21 @@ function updateWfrimRelicsDB() {
     console.log('[wfrim_relicsdb.updateWfrimRelicsDB] called')
     db.query(`SELECT * FROM wfrim_relicsdb`).then(res => {
         res.rows.forEach(relicdb => {
-            const discord_id = Object.values(as_users_list).filter(user => user.ingame_name == relicdb.username)?.[0]?.discord_id
-            if (!discord_id) return
-            wfrim_relicsdb[discord_id] = relicdb.data
+            const user_id = Object.values(as_users_list).filter(user => user.ingame_name == relicdb.username)?.[0]?.user_id
+            if (!user_id) return
+            wfrim_relicsdb[user_id] = relicdb.data
         })
         console.log('[wfrim_relicsdb.updateWfrimRelicsDB] finished')
     }).catch(console.error)
 }
 
-function getRelicQuantity(discord_id, squad) {
+function getRelicQuantity(user_id, squad) {
     console.log('[wfrim_relicsdb.getRelicQuantity] called')
-    if (!wfrim_relicsdb[discord_id]) return 0
+    if (!wfrim_relicsdb[user_id]) return 0
     var quantity = 0
     squad.main_relics.map(relic_type => {
         const squad_relic = `${squad.tier} ${relic_type}`
-        const relic_quantity = wfrim_relicsdb[discord_id].filter(relic => relic.name.toLowerCase() == squad_relic.toLowerCase())?.[0]?.quantity
+        const relic_quantity = wfrim_relicsdb[user_id].filter(relic => relic.name.toLowerCase() == squad_relic.toLowerCase())?.[0]?.quantity
         if (relic_quantity) quantity += relic_quantity
     })
     console.log('[wfrim_relicsdb.getRelicQuantity] quantity=',quantity)

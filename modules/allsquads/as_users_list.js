@@ -1,10 +1,10 @@
 const {db} = require('../db_connection')
-const {event_emitter} = require('../event_emitter')
 const JSONbig = require('json-bigint');
 
 var as_users_list = {}
+var as_users_list_discord = {}
 
-event_emitter.on('db_connected', () => {
+db.on('connected', () => {
     updateUsersList()
 })
 
@@ -12,20 +12,18 @@ function updateUsersList() {
     db.query(`SELECT * FROM as_users_list`).then(res => {
         res.rows.forEach(row => {
             as_users_list[row.user_id] = row
+            if (row.discord_id) as_users_list_discord[row.discord_id] = row
         })
     }).catch(console.error)
 }
 
 function updateUser(user_id) {
-    db.query(`SELECT * FROM as_users_list WHERE user_id = ${user_id}`).then(res => {
+    db.query(`SELECT * FROM as_users_list WHERE user_id = '${user_id}'`).then(res => {
         res.rows.forEach(row => {
             as_users_list[row.user_id] = row
+            if (row.discord_id) as_users_list_discord[row.discord_id] = row
         })
     }).catch(console.error)
-}
-
-function getAsUserByDiscordId(discord_id) {
-    return Object.values(as_users_list).filter(user => user.discord_id == discord_id || user.user_id == discord_id)?.[0]
 }
 
 db.on('notification',(notification) => {
@@ -37,5 +35,5 @@ db.on('notification',(notification) => {
 
 module.exports = {
     as_users_list,
-    getAsUserByDiscordId
+    as_users_list_discord
 }

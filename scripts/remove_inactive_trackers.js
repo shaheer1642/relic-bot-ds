@@ -6,7 +6,6 @@ const uuid = require('uuid')
 const JSONbig = require('json-bigint');
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper, calcArrAvg} = require('./modules/extras.js');
 const {as_users_list} = require('./modules/allsquads/as_users_list')
-const {as_users_ratings,as_hosts_ratings} = require('./modules/allsquads/as_users_ratings')
 const {event_emitter} = require('./modules/event_emitter')
 const {emoteObjFromSquadString} = require('./modules/emotes')
 
@@ -52,7 +51,7 @@ client.on('ready', async () => {
 function removeInactiveTrackers() {
     db.query(`
         SELECT * FROM as_sb_squads WHERE open_timestamp > ${new Date().getTime() - 1209600000};
-        SELECT * FROM rb_squads WHERE open_timestamp > ${new Date().getTime() - 1209600000};
+        SELECT * FROM as_rb_squads WHERE open_timestamp > ${new Date().getTime() - 1209600000};
     `).then(res => {
         const squads = res[0].rows.concat(res[1].rows)
         console.log('res ',squads.length)

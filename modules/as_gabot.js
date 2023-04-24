@@ -5,7 +5,7 @@ const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
 const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,embedScore, convertUpper} = require('./extras.js');
-const {as_users_list, getAsUserByDiscordId} = require('./allsquads/as_users_list')
+const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_list')
 
 const guild_id = '865904902941048862'
 const channel_id = '890198895508992020'
@@ -128,7 +128,7 @@ client.on('messageDelete', async (message) => {
 client.on('interactionCreate', async (interaction) => {
     if (interaction.isCommand() && interaction.guild.id == guild_id && interaction.commandName == 'giveaways') {
         if (interaction.options.getSubcommand() == 'create') {
-            const user = getAsUserByDiscordId(interaction.user.id)
+            const user = as_users_list_discord[interaction.user.id]
             if (!user) {
                 return interaction.reply({
                     content: 'Your account is not verified',
@@ -287,7 +287,7 @@ client.on('interactionCreate', async (interaction) => {
     }
     if (interaction.isButton()) {
         if (interaction.customId == 'as_ga_join') {
-            const user = getAsUserByDiscordId(interaction.user.id)
+            const user = as_users_list_discord[interaction.user.id]
             if (!user) {
                 return interaction.reply({
                     content: 'Your account is not verified',
@@ -347,7 +347,7 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.isAutocomplete()) {
         if (interaction.commandName == 'giveaways') {
             if (interaction.options.getSubcommand() == 'reroll') {
-                const user = getAsUserByDiscordId(interaction.user.id)
+                const user = as_users_list_discord[interaction.user.id]
                 if (!user) return
                 db.query(`SELECT * FROM as_gabot_giveaways WHERE LOWER(item) LIKE '%${interaction.options.getString('giveaway')}%' AND user_id = '${user.user_id}' AND status = 'ended' AND expiry_timestamp > ${new Date().getTime() - 1209600000}`)
                 .then(res => {

@@ -33,9 +33,9 @@ db.connect().then(async res => {
         LISTEN challenges_transactions_insert;
         LISTEN challenges_completed_insert;
 
-        LISTEN rb_squads_insert;
-        LISTEN rb_squads_update;
-        LISTEN rb_squads_delete;
+        LISTEN as_rb_squads_insert;
+        LISTEN as_rb_squads_update;
+        LISTEN as_rb_squads_delete;
         
         LISTEN as_gabot_giveaways_insert;
         LISTEN as_gabot_giveaways_update;

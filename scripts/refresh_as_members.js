@@ -6,7 +6,7 @@ const uuid = require('uuid')
 client.on('ready', async () => {
     console.log('client is online')
 
-    db.query(`SELECT * FROM tradebot_users_list ORDER BY discord_id`).then(async res => {
+    db.query(`SELECT * FROM as_users_list ORDER BY discord_id`).then(async res => {
         const guild = client.guilds.cache.get('865904902941048862') || await client.guilds.fetch('865904902941048862').catch(console.error)
         const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
         const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
