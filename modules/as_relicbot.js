@@ -716,7 +716,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
     if (hosts?.[0].considered_ping == null) {
         host_selection = `Please decide a host and invite each other in the game`
     } else {
-        host_selection = `Recommended Host: **${hosts[0].ign}** with avg squad ping of **${hosts[0].avg_squad_ping}**`
+        host_selection = `Recommended Host: **${as_users_list[hosts[0]?.user_id]?.ingame_name}** with avg squad ping of **${hosts[0].avg_squad_ping}**`
     }
     //console.log('channel_ids:',channel_ids)
     //send dms
