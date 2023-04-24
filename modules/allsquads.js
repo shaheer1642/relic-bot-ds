@@ -443,6 +443,7 @@ function generateRateUserEmbed(user_id, member_ids) {
                     })
                 } else {
                     const rate_user = member_ids[0]
+                    console.log('[allsquads.generateRateUserEmbed] rate_user=',rate_user,'member_ids=',member_ids)
                     payload.embeds.push({
                         description: `How was your experience with **${as_users_list[rate_user].ingame_name}**?`,
                         color: 'BLUE'
