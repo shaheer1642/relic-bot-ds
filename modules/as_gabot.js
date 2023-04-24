@@ -308,13 +308,11 @@ client.on('interactionCreate', async (interaction) => {
                 const user_account = res[1].rows[0]
                 if (!giveaway) return interaction.reply({content: 'Some error occured. Please contact an admin or MrSofty#7012', ephemeral: true}).catch(console.error)
                 if (giveaway.status != 'active') return interaction.reply({content: 'Giveaway is not active', ephemeral: true}).catch(console.error)
-                if (giveaway.rp_cost > 0) {
-                    if (user_account.balance < giveaway.rp_cost) {
-                        return interaction.reply({
-                            content: `You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`, 
-                            ephemeral: true
-                        }).catch(console.error)
-                    }
+                if (giveaway.join_list.includes(user.user_id)) {
+                    return interaction.reply({
+                        content: `You have already joined this giveaway`, 
+                        ephemeral: true
+                    }).catch(console.error)
                 }
                 if (giveaway.user_id == user.user_id) {
                     return interaction.reply({
@@ -328,11 +326,13 @@ client.on('interactionCreate', async (interaction) => {
                         ephemeral: true
                     }).catch(console.error)
                 }
-                if (giveaway.join_list.includes(user.user_id)) {
-                    return interaction.reply({
-                        content: `You have already joined this giveaway`, 
-                        ephemeral: true
-                    }).catch(console.error)
+                if (giveaway.rp_cost > 0) {
+                    if (user_account.balance < giveaway.rp_cost) {
+                        return interaction.reply({
+                            content: `You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`, 
+                            ephemeral: true
+                        }).catch(console.error)
+                    }
                 }
                 db.query(`
                     INSERT INTO challenges_transactions
