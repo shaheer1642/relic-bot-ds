@@ -577,6 +577,14 @@ async function assign_allsquads_roles() {
             })
         }
     })
+
+    const early_supporter_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'early supporter')
+    Object.values(as_users_list).forEach(async user => {
+        if (user.is_early_supporter) {
+            const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(err => err?.code == 10007 ? null : console.log(err))
+            if (!member.roles.cache.get(early_supporter_role.id)) member.roles.add(early_supporter_role).catch(console.error)
+        }
+    })
 }
 
 function edit_leaderboard() {
