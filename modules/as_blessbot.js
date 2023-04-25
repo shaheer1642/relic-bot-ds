@@ -108,7 +108,7 @@ client.on('interactionCreate', interaction => {
             } else if (interaction.customId == 'as_bb_participate') {
                 const user_id = as_users_list_discord[interaction.user.id]?.user_id
                 if (!user_id) return
-                db.query(`UPDATE as_bb_blesses SET participants = participants || '"${interaction.user.id}"' 
+                db.query(`UPDATE as_bb_blesses SET participants = participants || '"${user_id}"' 
                 WHERE bless_message_id = '${interaction.message.id}' AND status = 'active' AND NOT (participants @> '"${user_id}"') AND user_id != '${user_id}'`)
                 .then(res => interaction.deferUpdate().catch(console.error)).catch(console.error)
             }
@@ -335,7 +335,7 @@ db.on('notification', async (notification) => {
                 webhook_client.deleteMessage(blessing.bless_message_id).catch(console.error)
             }, 60000);
             webhook_client.send({
-                content: `${convertUpper(blessing.bless_type)} Blessing countdown has ended <@${as_users_list[blessing.user_id]?.discord_id}>, ${blessing.participants.map(id => `<@${id}>`).join(', ')}`
+                content: `${convertUpper(blessing.bless_type)} Blessing countdown has ended <@${as_users_list[blessing.user_id]?.discord_id}>, ${blessing.participants.map(id => `<@${as_users_list[id]?.discord_id}>`).join(', ')}`
             }).then(msg => {
                 setTimeout(() => {
                     webhook_client.deleteMessage(msg.id).catch(console.error)
