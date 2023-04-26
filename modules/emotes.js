@@ -24,6 +24,7 @@ const emote_ids = {
     endo: '<:endo:962507075475370005>',
     archon: '<:tau_crimson_shard:1050150452852949073>',
     traces: '<:void_traces:1068489485807009845>',
+    duviri: '<:duviri:1100917270852677662>',
     hot: '🔥',
     cold: '❄️',
 }
