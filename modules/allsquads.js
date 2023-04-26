@@ -56,11 +56,11 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
         }
         
         function payloadsGenerator() {
-            const squad_trackers = ['aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
-            'sister_(murmur)','endo_arena','archon_hunt']
-            const relic_trackers = ['lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
-            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','meso f2 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
-            ,'axi s6 relic','lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','neo n9 relic','axi s4 relic','lith v7 relic'
+            const squad_trackers = ['duviri','aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich',
+            'sister','endo_arena','archon_hunt']
+            const relic_trackers = ['lith b1 relic','meso m1 relic','neo b3 relic','axi r1 relic','lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
+            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
+            ,'lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','lith v7 relic'
             ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
             const squads_payloads = []
             const relics_payloads = []
