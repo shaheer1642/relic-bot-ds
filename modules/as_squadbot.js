@@ -32,7 +32,7 @@ event_emitter.on(`globalVariableUpdated/squadbot.default_squads`, data => {
 })
 
 client.on('channelDelete', channel => {
-    db.query(`DELETE FROM as_sb_trackers WHERE channel_id = '${channel.id}'; DELETE FROM rb_trackers WHERE channel_id = '${channel.id}';`).catch(console.error)
+    db.query(`DELETE FROM as_sb_trackers WHERE channel_id = '${channel.id}'; DELETE FROM as_rb_trackers WHERE channel_id = '${channel.id}';`).catch(console.error)
 })
 
 
