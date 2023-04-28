@@ -889,7 +889,7 @@ socket.on('relicbot/squads/selectedhost', async (payload) => {
         const openMessage = squadOpenMessages[`${payload.squad_id}_${thread_id}`] 
         if (openMessage) {
             openMessage.edit({
-                components: openMessage.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId.split('.')[0] == 'as_sq_become_host' ?  {...subcomponent, disabled: true, label: `Become Host (${as_users_list[payload.squad_host].ingame_name} is Hosting)`} : subcomponent)}))
+                components: openMessage.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId.split('.')[0] == 'as_sq_become_host' ?  {...subcomponent, disabled: true, label: `Become Host (${as_users_list[payload.squad_host].ingame_name} is hosting)`} : subcomponent)}))
             }).catch(console.error)
         }
     })
