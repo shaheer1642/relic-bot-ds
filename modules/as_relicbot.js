@@ -95,12 +95,12 @@ client.on('messageCreate', async (message) => {
         console.log('[relicbot messageCreate] content:',message.content)
         message.content = message.content.toLowerCase().trim()
         if (message.content.split(' ')[0] == 'leave') {
-            socket.emit('relicbot/squads/leave',{user_id: as_users_list_discord[message.author.id]?.user_id, tier: message.content.split(' ')[1] || 'all'},(res) => {
+            socket.emit('relicbot/squads/leave',{user_id: as_users_list_discord[message.author.id]?.user_id || -1, tier: message.content.split(' ')[1] || 'all'},(res) => {
                 if (res.code != 200) replyAndDelete(error_codes_embed(res, message.author.id),message)
                 setTimeout(() => message.delete().catch(console.error), 1000);
             })
         } else {
-            socket.emit('relicbot/squads/create',{message: message.content, user_id: as_users_list_discord[message.author.id]?.user_id, channel_id: message.channel.id},responses => {
+            socket.emit('relicbot/squads/create',{message: message.content, user_id: as_users_list_discord[message.author.id]?.user_id || -1, channel_id: message.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 handleSquadCreateResponses(message.channel.id,message.author.id,responses)
                 setTimeout(() => message.delete().catch(console.error), 1000);
@@ -111,7 +111,7 @@ client.on('messageCreate', async (message) => {
         if (message.channel.ownerId == client.user.id) {
             socket.emit('relicbot/squads/messageCreate', {
                 message_id: message.id,
-                user_id: as_users_list_discord[message.author.id]?.user_id,
+                user_id: as_users_list_discord[message.author.id]?.user_id || -1,
                 message: `${message.content}\n${message.attachments.map(attachment => attachment.url).join('\n')}`.trim(),
                 thread_id: message.channel.id
             })
@@ -161,7 +161,7 @@ client.on('interactionCreate', async (interaction) => {
         if (interaction.customId == 'rb_recruitment_faq') {
             interaction.reply(translatePayload(recruitment_faq, channels_list[interaction.channel.id].lang)).catch(console.error)
         } else if (interaction.customId == 'rb_sq_leave_all') {
-            socket.emit('relicbot/squads/leave',{user_id: as_users_list_discord[interaction.user.id]?.user_id, tier: 'all'},(res) => {
+            socket.emit('relicbot/squads/leave',{user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, tier: 'all'},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else {
                     interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -188,7 +188,7 @@ client.on('interactionCreate', async (interaction) => {
                 ]
             }).catch(console.error)
         } else if (interaction.customId == 'rb_sq_trackers_show') {
-            socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id},(res) => {
+            socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id || -1},(res) => {
                 if (res.code == 200) {
                     interaction.reply(constructTrackersEmbed(res.data,true)).catch(console.error)
                 } else {
@@ -196,8 +196,8 @@ client.on('interactionCreate', async (interaction) => {
                 }
             })
         } else if (interaction.customId == 'rb_sq_trackers_remove_all') {
-            socket.emit('relicbot/trackers/delete',{user_id: as_users_list_discord[interaction.user.id]?.user_id},(res) => {
-                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id},(res) => {
+            socket.emit('relicbot/trackers/delete',{user_id: as_users_list_discord[interaction.user.id]?.user_id || -1},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id || -1},(res) => {
                     if (res.code == 200) {
                         interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
                     } else {
@@ -236,7 +236,7 @@ client.on('interactionCreate', async (interaction) => {
                 }
             })
         } else if (interaction.customId.match('rb_sq_merge_false')) { 
-            socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), user_id: as_users_list_discord[interaction.user.id]?.user_id, channel_id: interaction.channel.id, merge_squad: false}, responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.customId.split('$')[1].replace(/_/g,' '), user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: interaction.channel.id, merge_squad: false}, responses => {
                 interaction.deferUpdate().catch(console.error)
                 interaction.message.delete().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
@@ -244,7 +244,7 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.match('rb_sq_merge_true_')) {
             const squad_id = interaction.customId.split('rb_sq_merge_true_')[1]
             const discord_id = interaction.user.id
-            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id,channel_id: interaction.channel.id},(res) => {
+            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1,channel_id: interaction.channel.id},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
                     interaction.message.delete().catch(console.error)
@@ -254,7 +254,7 @@ client.on('interactionCreate', async (interaction) => {
         } else if (interaction.customId.match('rb_sq_')) {
             const squad_id = interaction.customId.split('rb_sq_')[1]
             const discord_id = interaction.user.id
-            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id,channel_id: interaction.channel.id},(res) => {
+            socket.emit('relicbot/squads/addmember',{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1,channel_id: interaction.channel.id},(res) => {
                 if (res.code == 200) interaction.deferUpdate().catch(console.error)
                 else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
             })
@@ -264,10 +264,10 @@ client.on('interactionCreate', async (interaction) => {
         if (!Object.keys(channels_list).includes(interaction.channel.id)) return
         if (interaction.customId == 'rb_sq_trackers_add') {
             console.log('[rb_sq_trackers_add]')
-            socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),user_id: as_users_list_discord[interaction.user.id]?.user_id,channel_id: interaction.channel.id},(responses) => {
+            socket.emit('relicbot/trackers/create',{message: interaction.fields.getTextInputValue('squad_name'),user_id: as_users_list_discord[interaction.user.id]?.user_id || -1,channel_id: interaction.channel.id},(responses) => {
                 //console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
-                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id || -1},(res) => {
                     if (res.code == 200) {
                         if (interaction.message) {
                             if (interaction.message.embeds[0]) {
@@ -289,7 +289,7 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId == 'rb_sq_create') {
             //console.log('[relicbot rb_sq_create] content:',message.content)
-            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), user_id: as_users_list_discord[interaction.user.id]?.user_id, channel_id: interaction.channel.id},responses => {
+            socket.emit('relicbot/squads/create',{message: interaction.fields.getTextInputValue('squad_name'), user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: interaction.channel.id},responses => {
                 //console.log('[relicbot/squads/create] response',responses)
                 interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id,interaction.user.id,responses)
@@ -301,10 +301,10 @@ client.on('interactionCreate', async (interaction) => {
         
         if (interaction.customId == 'rb_sq_trackers_add_menu') {
             console.log('[rb_sq_trackers_add_menu]')
-            socket.emit('relicbot/trackers/create',{message: interaction.values,user_id: as_users_list_discord[interaction.user.id]?.user_id, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1050717341123616851'},(responses) => {
+            socket.emit('relicbot/trackers/create',{message: interaction.values,user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: Object.keys(channels_list).includes(interaction.channel.id) ? interaction.channel.id : '1050717341123616851'},(responses) => {
                 //console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
-                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id || -1},(res) => {
                     if (res.code == 200) {
                         fissures_check()
                         if (interaction.message) {
@@ -327,7 +327,7 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId.split('.')[0] == 'rb_sq_trackers_remove') {
             socket.emit('relicbot/trackers/delete',{tracker_ids: interaction.values},(res) => {
-                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id},(res) => {
+                socket.emit('relicbot/trackers/fetch',{user_id: as_users_list_discord[interaction.user.id]?.user_id || -1},(res) => {
                     if (res.code == 200) {
                         interaction.update(constructTrackersEmbed(res.data,true)).catch(console.error)
                     } else {

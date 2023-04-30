@@ -155,7 +155,7 @@ client.on('interactionCreate', (interaction) => {
             // })
         } else if (interaction.customId.split('.')[0] == 'as_new_member_sq_trackers_add') { 
             const value = interaction.customId.split('.')[1]
-            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,user_id: as_users_list_discord[interaction.user.id]?.user_id, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
+            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
                 console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 if (responses[0].code == 200) {
@@ -177,7 +177,7 @@ client.on('interactionCreate', (interaction) => {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
+            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad Closed\nValidated by <@${discord_id}>`,
@@ -209,7 +209,7 @@ client.on('interactionCreate', (interaction) => {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
+            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -293,7 +293,7 @@ client.on('interactionCreate', (interaction) => {
             const discord_id = interaction.user.id
             const setting_type = interaction.customId.split('.')[1]
             const setting_value = interaction.customId.split('.')[2] == 'true' ? true : interaction.customId.split('.')[2] == 'false' ? false : interaction.customId.split('.')[2]
-            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
+            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
                 if (res.code == 200) {
                     interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -306,7 +306,7 @@ client.on('interactionCreate', (interaction) => {
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
             const reason = interaction.fields.getTextInputValue('reason')
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id,reason: reason},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1,reason: reason},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nReason: ${reason}`,
@@ -328,7 +328,7 @@ client.on('interactionCreate', (interaction) => {
             const discord_id = interaction.user.id
             const reason = 'Invalidated for specific members'
             const invalidated_members = interaction.values
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id, reason: reason, invalidated_members: invalidated_members},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1, reason: reason, invalidated_members: invalidated_members},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nInvalidated Members: ${invalidated_members.map(id => `<@${id}>`).join(', ')}`,
