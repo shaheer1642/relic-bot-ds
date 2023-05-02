@@ -712,7 +712,7 @@ async function as_user_registeration(discord_id) {
         db.query(`SELECT * FROM as_users_list WHERE discord_id = '${discord_id}'`)
         .then(res => {
             const uni_id = generateId()
-            db.query(`INSERT INTO as_users_secret (code,identifier) VALUES ('${uni_id}','${discord_id}')`)
+            db.query(`INSERT INTO as_users_secret (code,identifier,id_type) VALUES ('${uni_id}','${discord_id}','discord_id')`)
             .then(() => {
                 resolve(verificationInstructions('en',uni_id,res.rows.length == 0 ? false:true))
             }).catch(err => {

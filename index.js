@@ -22,7 +22,6 @@ const botv = require('./modules/botv.js');
 const osiris_guild_id = '905559118096531456'
 const {client} = require('./modules/discord_client.js');
 const { as_user_registeration } = require('./modules/allsquads.js');
-require('./modules/gmail_client.js');
 require('./modules/trackers.js');
 require('./modules/wfhub_get_started.js');
 require('./modules/as_daywave.js');
