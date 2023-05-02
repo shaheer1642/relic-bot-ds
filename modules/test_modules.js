@@ -1,4 +1,3 @@
-const { post } = require('request-promise');
 const {db} = require('./db_connection.js');
 const {client} = require('./discord_client.js');
 

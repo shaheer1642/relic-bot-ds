@@ -20,7 +20,6 @@
     "json-bigint": "^1.0.0",
     "nodemon": "^2.0.15",
     "pg": "^8.7.1",
-    "request-promise": "^0.0.1",
     "rimraf": "^3.0.2",
     "socket.io-client": "^4.5.3",
     "uuid": "^9.0.0",

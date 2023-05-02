@@ -1,6 +1,7 @@
 const request = require('request');
 const {client} = require('./discord_client.js');
 const {convertUpper} = require('./extras.js');
+const { default: axios } = require('axios');
 
 const items_list = [{
     item_url: 'axi_l4_relic',
@@ -228,7 +229,7 @@ setInterval(() => {
     if (process.env.MAINTENANCE_MODE) return
     //console.log('pr tracker invoked')
     getShuffledArr(items_list).forEach(tracker => {
-        request(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`, function (error, response, body) {
+        axios(`https://api.warframe.market/v1/items/${tracker.item_url}/orders`, function (error, response, body) {
             if (error || !response || response.statusCode != 200 || !body) return
             const orders = JSON.parse(body).payload.orders
             orders.forEach(order => {
