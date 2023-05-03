@@ -8,7 +8,7 @@ const {event_emitter} = require('./event_emitter')
 const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, embedScore } = require('./extras.js');
 const translations = require('../translations.json');
 const supported_langs = ['en','fr','it']
-const {as_users_list} = require('./allsquads/as_users_list')
+const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_list')
 const {as_hosts_ratings} = require('./allsquads/as_users_ratings')
 const {db_schedule_msg_deletion} = require('./msg_auto_delete')
 
@@ -42,7 +42,7 @@ client.on('messageCreate', (message) => {
 client.on('interactionCreate', (interaction) => {
     if (interaction.isButton()) {
         if (interaction.customId == 'as_commands_my_profile') {
-            socket.emit(`allsquads/statistics/fetch`,{identifier: interaction.user.id},(res) => {
+            socket.emit(`allsquads/user/statistics/fetch`,{identifier: interaction.user.id},(res) => {
                 if (res.code == 200) {
                     interaction.reply(generateStatisticsEmbed(res.data)).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -72,7 +72,8 @@ client.on('interactionCreate', (interaction) => {
     }
     if (interaction.isModalSubmit()) {
         if (interaction.customId == 'as_commands_user_profile') {
-            socket.emit(`allsquads/statistics/fetch`,{identifier: interaction.fields.getTextInputValue('username').trim()},(res) => {
+            console.log('as_commands_user_profile',as_users_list_discord[interaction.user.id]?.user_id)
+            socket.emit(`allsquads/user/statistics/fetch`,{identifier: interaction.fields.getTextInputValue('username').trim(), user_id: as_users_list_discord[interaction.user.id]?.user_id},(res) => {
                 if (res.code == 200) {
                     interaction.reply(generateStatisticsEmbed(res.data)).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -83,7 +84,7 @@ client.on('interactionCreate', (interaction) => {
 
 function generateStatisticsEmbed(statistics) {
     const embed = {
-        description: '⸻'.repeat(13),
+        description: `${statistics.total_profile_views} profile views\n${'⸻'.repeat(13)}`,
         fields: [{
             name: 'Current RP',
             value: statistics.account_balance.toString() || 'No data',
