@@ -117,6 +117,12 @@ function rerollGiveaway(giveaway_id) {
 //     }
 // })
 
+client.on('messageCreate',(message) => {
+    if (message.author?.id == client.user.id && message.channel?.id == channel_id && message.type == 'CHANNEL_PINNED_MESSAGE') {
+        message.delete().catch(console.error)
+    }
+})
+
 client.on('messageDelete', async (message) => {
     if (message.channel.id == channel_id) {
         db.query(`
@@ -225,6 +231,7 @@ client.on('interactionCreate', async (interaction) => {
                             }]
                         }],
                     }).then(msg => {
+                        msg.pin().catch(console.error)
                         db.query(`
                             INSERT INTO as_gabot_giveaways (
                                 user_id,

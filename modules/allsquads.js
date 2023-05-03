@@ -56,11 +56,11 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
         }
         
         function payloadsGenerator() {
-            const squad_trackers = ['aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich_(murmur)',
-            'sister_(murmur)','endo_arena','archon_hunt']
-            const relic_trackers = ['lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
-            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','meso f2 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
-            ,'axi s6 relic','lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','neo n9 relic','axi s4 relic','lith v7 relic'
+            const squad_trackers = ['duviri','aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich',
+            'sister','endo_arena','archon_hunt']
+            const relic_trackers = ['lith b1 relic','meso m1 relic','neo b3 relic','axi r1 relic','lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
+            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
+            ,'lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','lith v7 relic'
             ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
             const squads_payloads = []
             const relics_payloads = []
@@ -155,7 +155,7 @@ client.on('interactionCreate', (interaction) => {
             // })
         } else if (interaction.customId.split('.')[0] == 'as_new_member_sq_trackers_add') { 
             const value = interaction.customId.split('.')[1]
-            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,user_id: as_users_list_discord[interaction.user.id]?.user_id, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
+            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
                 console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 if (responses[0].code == 200) {
@@ -177,7 +177,7 @@ client.on('interactionCreate', (interaction) => {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
+            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad Closed\nValidated by <@${discord_id}>`,
@@ -209,7 +209,7 @@ client.on('interactionCreate', (interaction) => {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
+            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -293,7 +293,7 @@ client.on('interactionCreate', (interaction) => {
             const discord_id = interaction.user.id
             const setting_type = interaction.customId.split('.')[1]
             const setting_value = interaction.customId.split('.')[2] == 'true' ? true : interaction.customId.split('.')[2] == 'false' ? false : interaction.customId.split('.')[2]
-            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id},(res) => {
+            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
                 if (res.code == 200) {
                     interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
                 } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
@@ -306,7 +306,7 @@ client.on('interactionCreate', (interaction) => {
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
             const reason = interaction.fields.getTextInputValue('reason')
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id,reason: reason},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1,reason: reason},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nReason: ${reason}`,
@@ -328,7 +328,7 @@ client.on('interactionCreate', (interaction) => {
             const discord_id = interaction.user.id
             const reason = 'Invalidated for specific members'
             const invalidated_members = interaction.values
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id, reason: reason, invalidated_members: invalidated_members},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1, reason: reason, invalidated_members: invalidated_members},(res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nInvalidated Members: ${invalidated_members.map(id => `<@${id}>`).join(', ')}`,
@@ -443,6 +443,7 @@ function generateRateUserEmbed(user_id, member_ids) {
                     })
                 } else {
                     const rate_user = member_ids[0]
+                    console.log('[allsquads.generateRateUserEmbed] rate_user=',rate_user,'member_ids=',member_ids)
                     payload.embeds.push({
                         description: `How was your experience with **${as_users_list[rate_user].ingame_name}**?`,
                         color: 'BLUE'
@@ -574,6 +575,15 @@ async function assign_allsquads_roles() {
                     }
                 })
             })
+        }
+    })
+
+    const early_supporter_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'early supporter')
+    Object.values(as_users_list).forEach(async user => {
+        if (user.is_early_supporter) {
+            const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(err => err?.code == 10007 ? null : console.log(err))
+            if (!member) return
+            if (!member.roles.cache.get(early_supporter_role.id)) member.roles.add(early_supporter_role).catch(console.error)
         }
     })
 }
