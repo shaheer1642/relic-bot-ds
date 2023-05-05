@@ -3,6 +3,7 @@
 const {Client, Options} = require('discord.js');
 
 const client = new Client({ 
+	restRequestTimeout: 60000,
     intents: 14095, 
     partials: ['REACTION', 'MESSAGE', 'CHANNEL', 'GUILD_MEMBER', 'USER'], 
     sweepers: {
