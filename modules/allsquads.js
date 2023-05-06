@@ -300,7 +300,7 @@ client.on('interactionCreate', (interaction) => {
             })
         } 
     }
-    if (interaction.isModalSubmit()) {
+    if (interaction.isModalSubmit()) { 
         if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
