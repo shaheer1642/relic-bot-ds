@@ -40,7 +40,7 @@ function updateUser(user_id, notification) {
 db.on('notification',(notification) => {
     const payload = JSONbig.parse(notification.payload);
     if (['as_users_list_insert','as_users_list_update'].includes(notification.channel)) {
-        updateUser(payload.user_id,'as_users_list_insert')
+        updateUser(payload.user_id,notification.channel)
     }
 })
 
