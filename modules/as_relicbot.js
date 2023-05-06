@@ -1055,7 +1055,7 @@ function constructTrackersEmbed(trackers, ephemeral) {
     trackers = trackers.sort(dynamicSort('tier'))
     const select_menus = []
     trackers.forEach((tracker,index) => {
-        if ((index + 1) > 100) return
+        if ((index + 1) > 99) return
         const component_index = Math.floor((index + 1) / 25)
         if (!select_menus[component_index]) {
             select_menus[component_index] = {
