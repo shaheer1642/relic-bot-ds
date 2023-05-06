@@ -624,7 +624,7 @@ async function check_member_discord_roles({db_user, discord_id}) {
             if (!member.roles.cache.get(awaken_role.id)) await member.roles.add(awaken_role).catch(console.error)
             if (!member.roles.cache.get(pc_role.id) && !member.roles.cache.get(xbox_role.id) && !member.roles.cache.get(playstation_role.id) && !member.roles.cache.get(switch_role.id)) 
                 await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
-            if (member.nickname != db_user.ingame_name) await member.setNickname(db_user.ingame_name).catch(console.error)
+            if ((member.displayName || member.nickname) != db_user.ingame_name) await member.setNickname(db_user.ingame_name).catch(console.error)
         }
     } catch (e) {
         console.log(e)
