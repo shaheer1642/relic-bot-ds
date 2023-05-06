@@ -28,6 +28,13 @@ function updateUser(user_id, notification) {
                     }
                 }
             }
+            if (notification == 'as_users_list_update') {
+                if (row.discord_id) {
+                    if (row.ingame_name != as_users_list[row.user_id]?.ingame_name) {
+                        event_emitter.emit('allSquadsNewUserVerified',row)
+                    }
+                }
+            }
 
             as_users_list[row.user_id] = row
             if (row.discord_id) as_users_list_discord[row.discord_id] = row
