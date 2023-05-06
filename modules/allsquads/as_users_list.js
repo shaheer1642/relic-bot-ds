@@ -1,5 +1,6 @@
 const {db} = require('../db_connection')
 const JSONbig = require('json-bigint');
+const { event_emitter } = require('../event_emitter');
 
 var as_users_list = {}
 var as_users_list_discord = {}
@@ -17,11 +18,21 @@ function updateUsersList() {
     }).catch(console.error)
 }
 
-function updateUser(user_id) {
+function updateUser(user_id, notification) {
     db.query(`SELECT * FROM as_users_list WHERE user_id = '${user_id}'`).then(res => {
         res.rows.forEach(row => {
+            if (notification == 'as_users_list_insert') {
+                if (row.discord_id) {
+                    if (row.ingame_name) {
+                        event_emitter.emit('allSquadsNewUserVerified',row)
+                    }
+                }
+            }
+
             as_users_list[row.user_id] = row
             if (row.discord_id) as_users_list_discord[row.discord_id] = row
+
+            if ()
         })
     }).catch(console.error)
 }
@@ -29,7 +40,7 @@ function updateUser(user_id) {
 db.on('notification',(notification) => {
     const payload = JSONbig.parse(notification.payload);
     if (['as_users_list_insert','as_users_list_update'].includes(notification.channel)) {
-        updateUser(payload.user_id)
+        updateUser(payload.user_id,'as_users_list_insert')
     }
 })
 

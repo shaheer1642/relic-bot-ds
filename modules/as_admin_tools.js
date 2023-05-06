@@ -4,8 +4,6 @@ const {timeStringToMs, embedScore} = require('./extras.js');
 const { socket } = require('./socket.js');
 const { as_users_list_discord } = require('./allsquads/as_users_list.js');
 
-
-
 client.on('ready', async () => {
     editMainMessage()
 })
