@@ -724,7 +724,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
         if (channel_id.match('web')) {
             channel_ids[channel_id].map(async discord_id => {
                 const user = client.users.cache.get(discord_id) || client.users.fetch(discord_id).catch(console.error)
-                if (user) user.send(`Your **${relicBotSquadToString(squad)}** squad has been filled. Click https://dev.allsquads.com/ to view squad chat`).catch(console.error)
+                if (user && user.send) user.send(`Your **${relicBotSquadToString(squad)}** squad has been filled. Click https://dev.allsquads.com/ to view squad chat`).catch(console.error)
             })
             continue
         }

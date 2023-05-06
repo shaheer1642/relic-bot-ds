@@ -8,7 +8,7 @@ const {event_emitter} = require('./event_emitter')
 const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, timeStringToMs } = require('./extras.js');
 const translations = require('../translations.json');
 const supported_langs = ['en','fr','it']
-const {as_users_list} = require('./allsquads/as_users_list')
+const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_list')
 const {as_hosts_ratings} = require('./allsquads/as_users_ratings')
 const {db_schedule_msg_deletion} = require('./msg_auto_delete')
 
@@ -73,6 +73,11 @@ client.on('interactionCreate', (interaction) => {
                             style: 4,
                         },{
                             type: 2,
+                            label: 'Warned',
+                            custom_id: `as_reports_take_action.${report_id}.warned`,
+                            style: 2,
+                        },{
+                            type: 2,
                             label: 'Temporary Server Mute',
                             custom_id: `as_reports_take_action.${report_id}.server_mute`,
                             style: 1,
@@ -97,7 +102,7 @@ client.on('interactionCreate', (interaction) => {
                             max_length: 500,
                             required: true
                         }]
-                    }, action == 'reject' ? null : {
+                    }, action == 'reject' || action == 'warned' ? null : {
                         type: 1,
                         components: [{
                             type: 4,
@@ -116,7 +121,7 @@ client.on('interactionCreate', (interaction) => {
     }
     if (interaction.isModalSubmit()) {
         if (interaction.customId == 'as_reports_report_user') {
-            socket.emit(`allsquads/reports/lodge`,{discord_id: interaction.user.id, identifier: interaction.fields.getTextInputValue('username').trim(), reason: interaction.fields.getTextInputValue('reason').trim()}, (res) => {
+            socket.emit(`allsquads/reports/lodge`,{user_id: as_users_list_discord[interaction.user.id]?.user_id, identifier: interaction.fields.getTextInputValue('username').trim(), reason: interaction.fields.getTextInputValue('reason').trim()}, (res) => {
                 if (res.code == 200) {
                     interaction.reply({
                         embeds: [{
@@ -131,7 +136,7 @@ client.on('interactionCreate', (interaction) => {
             const report_id = interaction.customId.split('.')[1]
             const action = interaction.customId.split('.')[2]
             const remarks = interaction.fields.getTextInputValue('remarks').trim()
-            const expiry = action != 'reject' ? timeStringToMs(interaction.fields.getTextInputValue('expiry').trim()) : null
+            const expiry = action == 'reject' || action == 'warned' ? null : timeStringToMs(interaction.fields.getTextInputValue('expiry').trim())
             if (expiry && (expiry < 10800000 || expiry > 259200000)) {
                 return interaction.reply({
                     embeds: [{
@@ -142,7 +147,7 @@ client.on('interactionCreate', (interaction) => {
                 })
             }
             socket.emit(`allsquads/reports/resolve`, {
-                discord_id: interaction.user.id, 
+                user_id: as_users_list_discord[interaction.user.id]?.user_id, 
                 report_id: report_id, 
                 remarks: remarks, 
                 action: action,
@@ -268,8 +273,13 @@ async function editReportEmbed(report) {
         content: ' ',
         embeds: [{
             title: `Report #${report.report_id}`,
-            description: `${report.report}\n\n**Reported by:** <@${report.discord_id}> (${as_users_list[report.discord_id]?.ingame_name})\n**Reported user:** <@${report.reported_user}> (${as_users_list[report.reported_user]?.ingame_name})\n**Status:** ${convertUpper(report.status)}\n**Resolved by:** <@${report.resolved_by}> (${as_users_list[report.resolved_by]?.ingame_name})\n**Action Taken:** ${convertUpper(report.action_taken)}\n**Remarks:** ${report.remarks}`,
-            color: 'RANDOM',
+            description: `${report.report}\n\n**Reported by:** <@${as_users_list[report.user_id]?.discord_id}> (${as_users_list[report.user_id]?.ingame_name})\n**Reported user:** <@${as_users_list[report.reported_user]?.discord_id}> (${as_users_list[report.reported_user]?.ingame_name})\n**Status:** ${convertUpper(report.status)}\n**Resolved by:** <@${as_users_list[report.resolved_by]?.discord_id}> (${as_users_list[report.resolved_by]?.ingame_name})\n**Action Taken:** ${convertUpper(report.action_taken)}\n**Remarks:** ${report.remarks}`,
+            color: report.status == 'under_review' ? 'YELLOW' : 
+                    report.status == 'rejected' ? 'BLACK'  : 
+                    report.action_taken == 'warned' ? 'PURPLE'  : 
+                    report.action_taken == 'global_ban' ? 'RED'  : 
+                    'RANDOM'
+            ,
             timestamp: new Date()
         }],
         components: [{
@@ -289,7 +299,7 @@ async function editReportEmbed(report) {
             }]
         }]
     }
-    const channel_id = '1078710660873080912'
+    const channel_id =  process.env.ENVIRONMENT_TYPE == 'dev' ? '1078646707312660500' : '1078710660873080912'
     const channel = client.channels.cache.get(channel_id) || await client.channels.fetch(channel_id).catch(console.error)
     if (!channel) return
     if (report.message_id) {

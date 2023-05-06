@@ -2,6 +2,7 @@ const {client} = require('./discord_client.js');
 const {db} = require('./db_connection.js')
 const {timeStringToMs, embedScore} = require('./extras.js');
 const { socket } = require('./socket.js');
+const { as_users_list_discord } = require('./allsquads/as_users_list.js');
 
 
 
@@ -46,7 +47,7 @@ client.on('interactionCreate', interaction => {
                             style: 2,
                             min_length: 1,
                             max_length: 50,
-                            placeholder: "Type user's in-game name, or discord id",
+                            placeholder: "Type user's in-game name (ensure spelling is correct)",
                             required: true
                         }]
                     }
@@ -59,7 +60,7 @@ client.on('interactionCreate', interaction => {
             getUsersVerified(interaction.fields.getTextInputValue('time_since').trim()).then(payload => interaction.reply(payload).catch(console.error)).catch(console.error)
         }
         if (interaction.customId.split('.')[0] == 'as_at_lift_ban') {
-            socket.emit('allsquads/admincommands/liftglobalban', {discord_id: interaction.user.id, identifier: interaction.fields.getTextInputValue('username').trim()}, res => {
+            socket.emit('allsquads/admincommands/liftglobalban', {user_id: as_users_list_discord[interaction.user.id]?.user_id, identifier: interaction.fields.getTextInputValue('username').trim()}, res => {
                 if (res.code == 200) {
                     interaction.reply({
                         content: 'Ban has been lifted',
