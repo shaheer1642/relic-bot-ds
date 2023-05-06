@@ -12,7 +12,7 @@ const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_lis
 const {as_hosts_ratings} = require('./allsquads/as_users_ratings')
 const {db_schedule_msg_deletion} = require('./msg_auto_delete');
 
-const guild_id = '865904902941048862'
+const allsquads_discord_server = '865904902941048862'
 const vip_channel_id = '1041306010331119667'
 const vip_message_id = '1041306046280499200'
 
@@ -24,32 +24,17 @@ client.on('ready', () => {
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
     setInterval(edit_staff_leaderboard, 300000);
+    setTimeout(check_allsquads_members_roles, 120000);
 })
 
 event_emitter.on('allSquadsNewUserVerified', async db_user => {
     try {
+        check_member_discord_roles({db_user: db_user})
+
         const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-    
-        const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
-        const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
     
         if (user) {
             await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
-        }
-    
-        if (member) {
-            const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
-            const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-            const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
-            const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
-            const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
-            const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
-        
-            await member.roles.add(verified_role).catch(console.error)
-            await member.roles.add(awaken_role).catch(console.error)
-            await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
-            await member.setNickname(db_user.ingame_name).catch(console.error)
-
             payloadsGenerator().forEach(payload => {
                 user.send(payload).catch(console.error)
             })
@@ -108,27 +93,12 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
 
 event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
     try {
+        check_member_discord_roles({db_user: db_user})
+
         const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-    
-        const guild = await client.guilds.fetch('865904902941048862').catch(console.error)
-        const member = await guild?.members.fetch(db_user.discord_id).catch(console.error)
     
         if (user) {
             await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
-        }
-    
-        if (member) {
-            const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
-            const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
-            const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
-            const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
-            const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
-            const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
-        
-            await member.roles.add(verified_role).catch(console.error)
-            await member.roles.add(awaken_role).catch(console.error)
-            await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
-            await member.setNickname(db_user.ingame_name).catch(console.error)
         }
     } catch (e) {
         console.log(e)
@@ -341,6 +311,14 @@ client.on('interactionCreate', (interaction) => {
     }
 })
 
+client.on('guildMemberAdd',(member) => {
+    if (member.guild.id == allsquads_discord_server) {
+        if (as_users_list_discord[member.id]) {
+            check_member_discord_roles({discord_id: member.id})
+        }
+    }
+})
+
 function userSettingsPanel(interaction, user_obj) {
     const ping_dnd = user_obj.allowed_pings_status?.includes('dnd') ? true : false
     const ping_off = user_obj.allowed_pings_status?.includes('offline') ? true : false
@@ -511,7 +489,7 @@ async function edit_vip_message() {
 
 async function assign_allsquads_roles() {
     console.log('[allsquads.assign_allsquads_roles] called')
-    const guild = await client.guilds.fetch(guild_id).catch(console.error)
+    const guild = await client.guilds.fetch(allsquads_discord_server).catch(console.error)
     if (!guild) return
     const roles = [{
         rank_type: 'rank_1',
@@ -621,6 +599,49 @@ function edit_leaderboard() {
         }
     })
 }
+
+async function check_member_discord_roles({db_user, discord_id}) {
+    try {
+        if (!db_user) {
+            if (!discord_id) return
+            db_user = as_users_list_discord[discord_id]
+        }
+        if (!db_user) return
+        const guild = client.guilds.cache.get(allsquads_discord_server) || await client.guilds.fetch(allsquads_discord_server).catch(console.error)
+        if (!guild) return
+        const member = guild?.members.cache.get(db_user.discord_id) || await guild?.members.fetch(db_user.discord_id).catch(console.error)
+        if (!member) return
+    
+        if (member) {
+            const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
+            const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
+            const pc_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'pc tenno')
+            const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
+            const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
+            const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
+        
+            if (!member.roles.cache.get(verified_role.id)) await member.roles.add(verified_role).catch(console.error)
+            if (!member.roles.cache.get(awaken_role.id)) await member.roles.add(awaken_role).catch(console.error)
+            if (!member.roles.cache.get(pc_role.id) && !member.roles.cache.get(xbox_role.id) && !member.roles.cache.get(playstation_role.id) && !member.roles.cache.get(switch_role.id)) 
+                await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
+            if (member.nickname != db_user.ingame_name) await member.setNickname(db_user.ingame_name).catch(console.error)
+        }
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+async function check_allsquads_members_roles() {
+    console.log('[allsquads.check_allsquads_members_roles] called')
+    client.guilds.fetch(allsquads_discord_server).then(guild => {
+        guild.members.fetch(members => {
+            members.forEach(member => {
+                check_member_discord_roles({discord_id: member.id})
+            })
+        })
+    })
+}
+
 function edit_staff_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
     socket.emit('allsquads/leaderboards/fetch', {limit: 10, skip_users: [], exclude_daily: false, exclude_squads: false}, async (res) => {
