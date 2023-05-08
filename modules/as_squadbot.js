@@ -1087,6 +1087,7 @@ socket.on('squadbot/squads/selectedhost', async (payload) => {
 })
 
 async function logSquad(squad,include_chat,action) {
+    if (action == 'squad_opened') return
     const channel = client.channels.cache.get('1059876227504152666') || await client.channels.fetch('1059876227504152666').catch(console.error)
     if (!channel) return
     const squadAutoFilledBy = squad.autofilled_by ? `**Auto-filled by:** ${as_users_list[squad.autofilled_by].ingame_name}` : ''
