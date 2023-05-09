@@ -33,12 +33,6 @@ function update_users_list() {
     })
 }
 
-client.on('messageCreate', (message) => {
-    if (message.channel.id == help_faq_channel_id && !message.author.bot) {
-        db_schedule_msg_deletion(message.id, message.channel.id, 43200000)
-    }
-})
-
 client.on('interactionCreate', (interaction) => {
     if (interaction.isButton()) {
         if (interaction.customId == 'as_commands_my_profile') {
