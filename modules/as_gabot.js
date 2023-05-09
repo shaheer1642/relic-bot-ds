@@ -10,15 +10,6 @@ const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_lis
 const guild_id = '865904902941048862'
 const channel_id = '890198895508992020'
 
-// function replyAndDelete(channel, message) {
-//     channel.send({ 
-//         content: message
-//     }).then(msg => {
-//         setTimeout(() => {
-//             msg.delete().catch(console.error)
-//         }, 10000);
-//     }).catch(console.error)
-// }
 const getShuffledArr = arr => {
     const newArr = arr.slice()
     for (let i = newArr.length - 1; i > 0; i--) {
@@ -70,58 +61,6 @@ function rerollGiveaway(giveaway_id) {
         }).catch(console.error)
     })
 }
-
-// client.on('messageReactionAdd', async (reaction,user) => {
-//     if (user.bot) return
-
-//     if (reaction.message.guild.id == guild_id && reaction.message.channel.id == channel_id && reaction.emoji.name == '🎉') {
-//         if (!reaction.message.author)
-//             reaction.message = await client.channels.cache.get(reaction.message.channel.id).messages.fetch(reaction.message.id).catch(console.error)
-//         if (!reaction.message) {
-//             reaction.users.remove(user.id).catch(console.error)
-//             return
-//         }
-//         if (!reaction.message.author.bot) return
-//         db.query(`
-//             SELECT * FROM as_gabot_giveaways WHERE message_id = '${reaction.message.id}';
-//             SELECT * FROM challenges_accounts WHERE discord_id = ${user.id};
-//         `).then(res => {
-//             const giveaway = res[0].rows[0]
-//             const user_account = res[1].rows[0]
-//             if (!giveaway) return reaction.users.remove(user.id).catch(console.error)
-//             if (giveaway.status != 'active') return reaction.users.remove(user.id).catch(console.error)
-//             if (giveaway.rp_cost > 0) {
-//                 if (!user_account) {
-//                     reaction.users.remove(user.id).catch(console.error)
-//                     return replyAndDelete(reaction.message.channel, `<@${user.id}> You do not have enough RP to join this giveaway\nCurrent RP: 0\nCheck <#1050484747735924736> on how to earn RP`)
-//                 }
-//                 if (user_account.balance < giveaway.rp_cost) {
-//                     reaction.users.remove(user.id).catch(console.error)
-//                     return replyAndDelete(reaction.message.channel, `<@${user.id}> You do not have enough RP to join this giveaway\nCurrent RP: ${user_account.balance}\nCheck <#1050484747735924736> on how to earn RP`)
-//                 }
-//             }
-//             if (giveaway.discord_id == user.id) {
-//                 reaction.users.remove(user.id).catch(console.error)
-//                 return replyAndDelete(reaction.message.channel, `<@${user.id}> Cannot join your own giveaway`)
-//             }
-//             if (giveaway.join_list.includes(user.id)) {
-//                 return replyAndDelete(reaction.message.channel, `<@${user.id}> You have already joined this giveaway`)
-//             }
-//             db.query(`
-//                 INSERT INTO challenges_transactions
-//                 (transaction_id,discord_id,type,rp,balance_type,timestamp, guild_id)
-//                 VALUES ('${uuid.v4()}',${user.id},'giveaway_join',${giveaway.rp_cost},'debit',${new Date().getTime()},'${reaction.message.guild.id}');
-//                 UPDATE as_gabot_giveaways SET join_list = join_list || '"${user.id}"' WHERE giveaway_id = '${giveaway.giveaway_id}';
-//             `).catch(console.error)
-//         }).catch(console.error)
-//     }
-// })
-
-client.on('messageCreate',(message) => {
-    if (message.author?.id == client.user.id && message.channel?.id == channel_id && message.type == 'CHANNEL_PINNED_MESSAGE') {
-        message.delete().catch(console.error)
-    }
-})
 
 client.on('messageDelete', async (message) => {
     if (message.channel.id == channel_id) {
@@ -410,7 +349,6 @@ function embedGenerator(giveaway) {
         }],
     }
 }
-
 
 db.on('notification', async (notification) => {
     const payload = JSONbig.parse(notification.payload);

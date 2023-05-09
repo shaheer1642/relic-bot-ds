@@ -27,84 +27,6 @@ client.on('ready', () => {
     setTimeout(check_allsquads_members_roles, 120000);
 })
 
-event_emitter.on('allSquadsNewUserVerified', async db_user => {
-    try {
-        check_member_discord_roles({db_user: db_user})
-
-        const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-    
-        if (user) {
-            await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
-            payloadsGenerator().forEach(payload => {
-                user.send(payload).catch(console.error)
-            })
-        }
-        
-        function payloadsGenerator() {
-            const squad_trackers = ['duviri','aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich',
-            'sister','endo_arena','archon_hunt']
-            const relic_trackers = ['lith b1 relic','meso m1 relic','neo b3 relic','axi r1 relic','lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
-            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
-            ,'lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','lith v7 relic'
-            ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
-            const squads_payloads = []
-            const relics_payloads = []
-            squad_trackers.map((squad,index) => {
-                const payload_index = Math.ceil((index + 1)/15) - 1
-                const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
-                if (!squads_payloads[payload_index]) squads_payloads[payload_index] = {content: ' ', embeds: [], components: []}
-                if (!squads_payloads[payload_index].components[component_index]) squads_payloads[payload_index].components[component_index] = {type: 1, components: []}
-                squads_payloads[payload_index].components[component_index].components.push({
-                    type: 2,
-                    style: 1,
-                    label: convertUpper(squad),
-                    custom_id: `as_new_member_sq_trackers_add.${squad}`,
-                    emoji: emoteObjFromSquadString(squad)
-                })
-            })
-            relic_trackers.map((squad,index) => {
-                const payload_index = Math.ceil((index + 1)/20) - 1
-                const component_index = Math.ceil((index - payload_index * 20 + 1)/4) - 1
-                if (!relics_payloads[payload_index]) relics_payloads[payload_index] = {content: ' ', embeds: [], components: []}
-                if (!relics_payloads[payload_index].components[component_index]) relics_payloads[payload_index].components[component_index] = {type: 1, components: []}
-                relics_payloads[payload_index].components[component_index].components.push({
-                    type: 2,
-                    style: 1,
-                    label: convertUpper(squad.replace(' relic','')),
-                    custom_id: `as_new_member_sq_trackers_add.${squad}`,
-                    emoji: emoteObjFromSquadString(squad)
-                })
-            })
-            squads_payloads[0].embeds = [{
-                description: '**Click the squads** you are interested in, to be notified when someone hosts them.\nUse <#1054843353302323281> and <#1050717341123616851> channels to change this notification setting in the future\n\nFor further information about the server, check out <#890197385651838977>',
-                color: 'WHITE'
-            }]
-            relics_payloads[0].embeds = [{
-                description: 'Check out these vaulted relics in your relic console!\nSub to them if you have',
-                color: 'WHITE'
-            }]
-            
-            return squads_payloads.concat(relics_payloads)
-        }
-    } catch (e) {
-        console.log(e)
-    }
-})
-
-event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
-    try {
-        check_member_discord_roles({db_user: db_user})
-
-        const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-    
-        if (user) {
-            await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
-        }
-    } catch (e) {
-        console.log(e)
-    }
-})
-
 client.on('interactionCreate', (interaction) => {
     if (interaction.isButton()) {
         if (interaction.customId == 'warframe_hub_purchase_vip') {
@@ -316,6 +238,116 @@ client.on('guildMemberAdd',(member) => {
         if (as_users_list_discord[member.id]) {
             check_member_discord_roles({discord_id: member.id})
         }
+    }
+})
+
+client.on('messageCreate',(message) => {
+    if (message.channel?.id == '890198895508992020') {
+        if (message.type == 'CHANNEL_PINNED_MESSAGE' && message.author?.id == client.user.id) {
+            message.delete().catch(console.error)
+        }
+        if (message.type == 'THREAD_STARTER_MESSAGE') {
+            message.delete().catch(console.error)
+        }
+    }
+    if (message.channel.id == '1063387040449835028') {
+        if (message.author?.id != client.user.id) {
+            db_schedule_msg_deletion(message.id, message.channel.id, 43200000)
+        }
+    }
+    if (message.channel.id == '890198895508992020') {
+        if (message.author?.id != client.user.id) {
+            db_schedule_msg_deletion(message.id, message.channel.id, 3600000)
+        }
+    }
+    if (message.channel.id == '1058462882968371331') {
+        if (message.author?.id != client.user.id) {
+            db_schedule_msg_deletion(message.id, message.channel.id, 3600000)
+        }
+    }
+    if (message.channel.id == '1003269624521044039') {
+        if (message.author?.id != client.user.id) {
+            if (message.attachments.map(o => o).length == 0)
+            db_schedule_msg_deletion(message.id, message.channel.id, 21600000)
+        }
+    }
+})
+
+event_emitter.on('allSquadsNewUserVerified', async db_user => {
+    try {
+        check_member_discord_roles({db_user: db_user})
+
+        const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
+    
+        if (user) {
+            await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
+            payloadsGenerator().forEach(payload => {
+                user.send(payload).catch(console.error)
+            })
+        }
+        
+        function payloadsGenerator() {
+            const squad_trackers = ['duviri','aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich',
+            'sister','endo_arena','archon_hunt']
+            const relic_trackers = ['lith b1 relic','meso m1 relic','neo b3 relic','axi r1 relic','lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
+            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
+            ,'lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','lith v7 relic'
+            ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
+            const squads_payloads = []
+            const relics_payloads = []
+            squad_trackers.map((squad,index) => {
+                const payload_index = Math.ceil((index + 1)/15) - 1
+                const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
+                if (!squads_payloads[payload_index]) squads_payloads[payload_index] = {content: ' ', embeds: [], components: []}
+                if (!squads_payloads[payload_index].components[component_index]) squads_payloads[payload_index].components[component_index] = {type: 1, components: []}
+                squads_payloads[payload_index].components[component_index].components.push({
+                    type: 2,
+                    style: 1,
+                    label: convertUpper(squad),
+                    custom_id: `as_new_member_sq_trackers_add.${squad}`,
+                    emoji: emoteObjFromSquadString(squad)
+                })
+            })
+            relic_trackers.map((squad,index) => {
+                const payload_index = Math.ceil((index + 1)/20) - 1
+                const component_index = Math.ceil((index - payload_index * 20 + 1)/4) - 1
+                if (!relics_payloads[payload_index]) relics_payloads[payload_index] = {content: ' ', embeds: [], components: []}
+                if (!relics_payloads[payload_index].components[component_index]) relics_payloads[payload_index].components[component_index] = {type: 1, components: []}
+                relics_payloads[payload_index].components[component_index].components.push({
+                    type: 2,
+                    style: 1,
+                    label: convertUpper(squad.replace(' relic','')),
+                    custom_id: `as_new_member_sq_trackers_add.${squad}`,
+                    emoji: emoteObjFromSquadString(squad)
+                })
+            })
+            squads_payloads[0].embeds = [{
+                description: '**Click the squads** you are interested in, to be notified when someone hosts them.\nUse <#1054843353302323281> and <#1050717341123616851> channels to change this notification setting in the future\n\nFor further information about the server, check out <#890197385651838977>',
+                color: 'WHITE'
+            }]
+            relics_payloads[0].embeds = [{
+                description: 'Check out these vaulted relics in your relic console!\nSub to them if you have',
+                color: 'WHITE'
+            }]
+            
+            return squads_payloads.concat(relics_payloads)
+        }
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
+    try {
+        check_member_discord_roles({db_user: db_user})
+
+        const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
+    
+        if (user) {
+            await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
+        }
+    } catch (e) {
+        console.log(e)
     }
 })
 
