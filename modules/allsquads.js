@@ -246,7 +246,7 @@ client.on('messageCreate',(message) => {
         if (message.type == 'CHANNEL_PINNED_MESSAGE' && message.author?.id == client.user.id) {
             message.delete().catch(console.error)
         }
-        if (message.type == 'THREAD_STARTER_MESSAGE') {
+        if (message.type == 'THREAD_CREATED') {
             message.delete().catch(console.error)
         }
     }
