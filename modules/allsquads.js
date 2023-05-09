@@ -255,11 +255,6 @@ client.on('messageCreate',(message) => {
             db_schedule_msg_deletion(message.id, message.channel.id, 43200000)
         }
     }
-    if (message.channel.id == '890198895508992020') {
-        if (message.author?.id != client.user.id) {
-            db_schedule_msg_deletion(message.id, message.channel.id, 3600000)
-        }
-    }
     if (message.channel.id == '1058462882968371331') {
         if (message.author?.id != client.user.id) {
             db_schedule_msg_deletion(message.id, message.channel.id, 3600000)
