@@ -126,7 +126,10 @@ function verify_squad_challenges(squad,operator,bot_type) {
     },{
         name: 'Still not 30',
         match_string: 'nightwave'
-    },]
+    },{
+        name: 'Neverending',
+        match_string: 'duviri'
+    }]
 
     var completed_challenge = ''
     if (bot_type == 'squadbot') {
