@@ -223,7 +223,7 @@ client.on('interactionCreate', (interaction) => {
             socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1, reason: reason, invalidated_members: invalidated_members},(res) => {
                 if (res.code == 200) {
                     interaction.update({
-                        content: `Squad invalidated by <@${discord_id}>\nInvalidated Members: ${invalidated_members.map(id => `<@${as_users_list_discord[id]?.discord_id}>`).join(', ')}`,
+                        content: `Squad invalidated by <@${discord_id}>\nInvalidated Members: ${invalidated_members.map(id => `<@${as_users_list[id]?.discord_id}>`).join(', ')}`,
                         embeds: interaction.message.embeds.map(embed => ({...embed, color: 'RED'})),
                         components: []
                     }).catch(console.error)
