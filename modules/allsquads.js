@@ -5,12 +5,13 @@ const JSONbig = require('json-bigint');
 const {socket} = require('./socket')
 const {emoteObjFromSquadString} = require('./emotes')
 const {event_emitter} = require('./event_emitter')
-const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, generateId } = require('./extras.js');
+const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, generateId, responsiveEmbedFields } = require('./extras.js');
 const translations = require('./../translations.json');
 const supported_langs = ['en','fr','it']
 const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_list')
 const {as_hosts_ratings} = require('./allsquads/as_users_ratings')
 const {db_schedule_msg_deletion} = require('./msg_auto_delete');
+const { WebhookClient } = require('discord.js');
 
 const allsquads_discord_server = '865904902941048862'
 const vip_channel_id = '1041306010331119667'
@@ -21,10 +22,13 @@ client.on('ready', () => {
     assign_allsquads_roles()
     edit_leaderboard()
     edit_staff_leaderboard()
+    edit_event_leaderboard()
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
     setInterval(edit_staff_leaderboard, 300000);
+    setInterval(edit_event_leaderboard, 300000);
     setTimeout(check_allsquads_members_roles, 120000);
+    setTimeout(channelsVerification, 300000);
 })
 
 client.on('interactionCreate', (interaction) => {
@@ -593,36 +597,233 @@ async function assign_allsquads_roles() {
     })
 }
 
-function edit_leaderboard() {
+async function edit_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/leaderboards/fetch', {limit: 10, skip_users: [as_users_list_discord['253525146923433984'].user_id,as_users_list_discord['739833841686020216'].user_id], exclude_daily: true, exclude_squads: true}, (res) => {
+    socket.emit('allsquads/leaderboards/fetch', {
+        options: { 
+            limit: 10, 
+            skip_users: [as_users_list_discord['253525146923433984'].user_id,as_users_list_discord['739833841686020216'].user_id],
+        }
+    }, async (res) => {
+        if (res.code == 200) {
+            const leaderboards = res.data
+            console.log(leaderboards)
+            const payload = {
+                content: ' ',
+                embeds: [{
+                    title: 'All-time Leaderboard',
+                    description: `${'⸻'.repeat(10)}${leaderboards.all_time.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.all_time.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.all_time.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Reputation',
+                            valueArr: leaderboards.all_time.map(user => `${parseFloat(user.reputation.toFixed(2))}`),
+                        }
+                    }),
+                    color: 'ORANGE'
+                },{
+                    title: 'Monthly Leaderboard',
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_month.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.this_month.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.this_month.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Reputation',
+                            valueArr: leaderboards.this_month.map(user => `+${parseFloat(user.reputation.toFixed(2))}`),
+                        }
+                    }),
+                    color: 'ORANGE'
+                },{
+                    title: 'Weekly Leaderboard',
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_week.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.this_week.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.this_week.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Reputation',
+                            valueArr: leaderboards.this_week.map(user => `+${parseFloat(user.reputation.toFixed(2))}`),
+                        }
+                    }),
+                    color: 'ORANGE'
+                }]
+            }
+            const cnl = client.channels.cache.get(process.env.ENVIRONMENT_TYPE == 'prod' ? '1064189673632702494' : '1107765783049797723') || await client.channels.fetch(process.env.ENVIRONMENT_TYPE == 'prod' ? '1064189673632702494' : '1107765783049797723').catch(console.error)
+            if (!cnl) return
+            const msg = cnl.messages.cache.get(process.env.ENVIRONMENT_TYPE == 'prod' ? '1108088097570308106' : '1108111962782584882') || await cnl.messages.fetch(process.env.ENVIRONMENT_TYPE == 'prod' ? '1108088097570308106' : '1108111962782584882').catch(console.error)
+            if (!msg) return
+            msg.edit(payload).catch(console.error)
+        }
+    })
+}
+
+function edit_staff_leaderboard() {
+    console.log('[allsquads.edit_leaderboard] called')
+    socket.emit('allsquads/leaderboards/fetch', {
+        options: {
+            limit: 10, 
+        }
+    }, async (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             const payload = {
                 content: ' ',
-                embeds: Object.keys(leaderboards).map(key =>
-                    ['total_squads'].includes(key) ? null :
-                    ({
-                        title: key == 'top_squads' ? 'Top Squads This Week' : key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
-                        description: `${key == 'top_squads' ? `Total: ${leaderboards.total_squads}`:''}\n${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
-                        fields: leaderboards[key].length > 0 ? [{
-                            name: 'Rank',
-                            value: leaderboards[key].map((e,index) => `${index+1}`).join('\n'),
-                            inline: true
-                        },{
-                            name: key == 'top_squads' ? 'Squad' : 'Player',
-                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n').replace(/_/g,'\\_'),
-                            inline: true
-                        },{
-                            name: key == 'top_squads' ? 'Hosts' : 'Reputation',
-                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${squad.hosts}`).join('\n') : leaderboards[key].map(user => `${parseFloat(user.reputation.toFixed(2))}`).join('\n'),
-                            inline: true
-                        }] : [],
-                        color: key == 'top_squads' ? 'BLUE' : 'ORANGE'
-                    })
-                ).filter(o => o !== null)
+                embeds: [{
+                    title: 'All-time Leaderboard',
+                    description: `${'⸻'.repeat(10)}${leaderboards.all_time.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.all_time.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.all_time.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Reputation',
+                            valueArr: leaderboards.all_time.map(user => `${parseFloat(user.reputation.toFixed(2))}`),
+                        }
+                    }),
+                    color: 'ORANGE'
+                },{
+                    title: 'Monthly Leaderboard',
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_month.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.this_month.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.this_month.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Reputation',
+                            valueArr: leaderboards.this_month.map(user => `+${parseFloat(user.reputation.toFixed(2))}`),
+                        }
+                    }),
+                    color: 'ORANGE'
+                },{
+                    title: 'Weekly Leaderboard',
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_week.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.this_week.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.this_week.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Reputation',
+                            valueArr: leaderboards.this_week.map(user => `+${parseFloat(user.reputation.toFixed(2))}`),
+                        }
+                    }),
+                    color: 'ORANGE'
+                },{
+                    title: `Today's Leaderboard`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.today.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.today.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.today.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Reputation',
+                            valueArr: leaderboards.today.map(user => `+${parseFloat(user.reputation.toFixed(2))}`),
+                        }
+                    }),
+                    color: 'ORANGE'
+                },{
+                    title: `Top Squads This Week`,
+                    description: `Total: ${leaderboards.total_squads}\n${'⸻'.repeat(10)}${leaderboards.top_squads.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Squad',
+                            valueArr: leaderboards.top_squads.map(squad => `${convertUpper(squad.squad_string)}`)
+                        },
+                        field2: {
+                            label: 'Hosts',
+                            valueArr: leaderboards.top_squads.map(squad => `${squad.hosts}`),
+                        }
+                    }),
+                    color: 'BLUE'
+                }]
             }
-            client.fetchWebhook('1064203940209643542').then(wh => wh.editMessage('1064203945834184745', payload).catch(console.error)).catch(console.error)
+            const cnl = client.channels.cache.get(process.env.ENVIRONMENT_TYPE == 'prod' ? '1068289256268775534' : '1108080744120713217') || await client.channels.fetch(process.env.ENVIRONMENT_TYPE == 'prod' ? '1068289256268775534' : '1108080744120713217').catch(console.error)
+            if (!cnl) return
+            const msg = cnl.messages.cache.get(process.env.ENVIRONMENT_TYPE == 'prod' ? '1068289280889344010' : '1108080766182756372') || await cnl.messages.fetch(process.env.ENVIRONMENT_TYPE == 'prod' ? '1068289280889344010' : '1108080766182756372').catch(console.error)
+            if (!msg) return
+            msg.edit(payload).catch(console.error)
+        }
+    })
+}
+
+async function edit_event_leaderboard() {
+    console.log('[allsquads.edit_event_leaderboard] called')
+    socket.emit('allsquads/leaderboards/fetch', {}, async (res) => {
+        if (res.code == 200) {
+            const leaderboards = res.data
+            console.log(leaderboards)
+            const payload = {
+                content: ' ',
+                embeds: [{
+                    title: 'Event Leaderboard',
+                    description: `${'⸻'.repeat(10)}${leaderboards.top_runners.event_runners.length > 0 ? '':'\nNo data available yet'}`,
+                    fields: responsiveEmbedFields({
+                        field1: {
+                            label: 'Rank',
+                            valueArr: leaderboards.top_runners.event_runners.map((e,index) => `${index+1}`)
+                        },
+                        field2: {
+                            label: 'Player',
+                            valueArr: leaderboards.top_runners.event_runners.map(user => `${user.ingame_name}`),
+                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                        },
+                        field3: {
+                            label: 'Squads',
+                            valueArr: leaderboards.top_runners.event_runners.map(user => `${user.squads_count}`)
+                        },
+                    }),
+                    color: '#570e75'
+                }]
+            }
+            const cnl = client.channels.cache.get(process.env.ENVIRONMENT_TYPE == 'prod' ? '1108087906159034369' : '1107770000879648798') || await client.channels.fetch(process.env.ENVIRONMENT_TYPE == 'prod' ? '1108087906159034369' : '1107770000879648798').catch(console.error)
+            if (!cnl) return
+            const msg = cnl.messages.cache.get(process.env.ENVIRONMENT_TYPE == 'prod' ? '1108087962278834266' : '1108084794803367967') || await cnl.messages.fetch(process.env.ENVIRONMENT_TYPE == 'prod' ? '1108087962278834266' : '1108084794803367967').catch(console.error)
+            if (!msg) return
+            msg.edit(payload).catch(console.error)
         }
     })
 }
@@ -665,46 +866,49 @@ async function check_allsquads_members_roles() {
             members.forEach(member => {
                 check_member_discord_roles({discord_id: member.id})
             })
-        })
-    })
+        }).catch(console.error)
+    }).catch(console.error)
 }
 
-function edit_staff_leaderboard() {
-    console.log('[allsquads.edit_leaderboard] called')
-    socket.emit('allsquads/leaderboards/fetch', {limit: 10, skip_users: [], exclude_daily: false, exclude_squads: false}, async (res) => {
-        if (res.code == 200) {
-            const leaderboards = res.data
-            const payload = {
-                content: ' ',
-                embeds: Object.keys(leaderboards).map(key =>
-                    ['total_squads'].includes(key) ? null :
-                    ({
-                        title: key == 'top_squads' ? 'Top Squads This Week' : key == 'all_time' ? 'All-time Leaderboard' : key == 'today' ? 'Today\'s Leaderboard' : key == 'this_week' ? 'Weekly Leaderboard' : key == 'this_month' ? 'Monthly Leaderboard' : key,
-                        description: `${key == 'top_squads' ? `Total: ${leaderboards.total_squads}`:''}\n${'⸻'.repeat(10)}${leaderboards[key].length > 0 ? '':'\nNo data available yet'}`,
-                        fields: leaderboards[key].length > 0 ? [{
-                            name: 'Rank',
-                            value: leaderboards[key].map((e,index) => `${index+1}`).join('\n'),
-                            inline: true
-                        },{
-                            name: key == 'top_squads' ? 'Squad' : 'Player',
-                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${convertUpper(squad.squad_string)}`).join('\n') : leaderboards[key].map(user => `${user.ingame_name}`).join('\n').replace(/_/g,'\\_'),
-                            inline: true
-                        },{
-                            name: key == 'top_squads' ? 'Hosts' : 'Reputation',
-                            value: key == 'top_squads' ? leaderboards[key].map(squad => `${squad.hosts}`).join('\n') : leaderboards[key].map(user => `${parseFloat(user.reputation.toFixed(2))}`).join('\n'),
-                            inline: true
-                        }] : [],
-                        color: key == 'top_squads' ? 'BLUE' : 'ORANGE'
-                    })
-                ).filter(o => o !== null)
-            }
-            const cnl = client.channels.cache.get('1068289256268775534') || await client.channels.fetch('1068289256268775534').catch(console.error)
-            if (!cnl) return
-            const msg = cnl.messages.cache.get('1068289280889344010') || await cnl.messages.fetch('1068289280889344010').catch(console.error)
-            if (!msg) return
-            msg.edit(payload).catch(console.error)
-        }
-    })
+function channelsVerification() {
+    if (process.env.ENVIRONMENT_TYPE != 'prod') return
+    console.log('[allsquads.channelsVerification] called')
+    db.query('select * from as_rb_channels').then(res => {
+        res.rows.map((channel) => {
+            if (channel.channel_id == 'web-111') return
+            client.channels.fetch(channel.channel_id).catch(err => {
+                if (err.code == 10003 || err.code == 50001) {
+                    console.log('[allsquads.channelsVerification] channel',channel.channel_id,'does not exist')
+                    new WebhookClient({url: channel.webhook_url})?.send({
+                        content: `[Warframe Squads] Some error occured verifying bot permissions in this server. To conserve resources, this server has been removed from affiliation. If you'd like to re-affiliate, please either re-invite the bot or use \`/relic_bot add_server\` slash command`
+                    }).then(res => console.log('[allsquads.channelsVerification] announced deaffiliation message in channel',channel.channel_id)).catch(e => {})
+                    db.query(`delete from as_rb_guilds where guild_id = '${channel.guild_id}'`).then(res => {
+                        if (res.rowCount == 1) {
+                            console.log('[allsquads.channelsVerification] removed guild',channel.guild_id)
+                        }
+                    }).catch(console.error)
+                }
+            })
+        })
+    }).catch(console.error)
+    db.query('select * from as_sb_channels').then(res => {
+        res.rows.map((channel) => {
+            if (channel.channel_id == 'web-111') return
+            client.channels.fetch(channel.channel_id).catch(err => {
+                if (err.code == 10003 || err.code == 50001) {
+                    console.log('[allsquads.channelsVerification] channel',channel.channel_id,'does not exist')
+                    new WebhookClient({url: channel.webhook_url})?.send({
+                        content: `[Warframe Squads] Some error occured verifying bot permissions in this server. To conserve resources, this server has been removed from affiliation. If you'd like to re-affiliate, please either re-invite the bot or use \`/squad_bot add_server\` slash command`
+                    }).then(res => console.log('[allsquads.channelsVerification] announced deaffiliation message in channel',channel.channel_id)).catch(e => {})
+                    db.query(`delete from as_sb_guilds where guild_id = '${channel.guild_id}'`).then(res => {
+                        if (res.rowCount == 1) {
+                            console.log('[allsquads.channelsVerification] removed guild',channel.guild_id)
+                        }
+                    }).catch(console.error)
+                }
+            })
+        })
+    }).catch(console.error)
 }
 
 function verificationInstructions(language,code,already_verified) {
@@ -814,6 +1018,7 @@ function error_codes_embed(response,discord_id) {
         }
     }
 }
+
 
 // db.on('notification', async (notification) => {
 //     const payload = JSONbig.parse(notification.payload);

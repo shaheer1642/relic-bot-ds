@@ -215,6 +215,56 @@ function generateId() {
     return ID;
 }
 
+function responsiveEmbedFields({ field1, field2, field3 }) {
+    if (!field1) {
+        console.log('[responsiveEmbedFields] fieldOneArr is undefined')
+        return []
+    }
+    if (field1.valueArr.length == 0) {
+        console.log('[responsiveEmbedFields] size is 0')
+        return []
+    }
+    if (field2 && field1.valueArr.length != field2.valueArr.length) {
+        console.log('[responsiveEmbedFields] size mismatch')
+        return []
+    }
+    if (field3 && field2.valueArr.length != field3.valueArr.length) {
+        console.log('[responsiveEmbedFields] size mismatch')
+        return []
+    }
+    const fields = []
+    const fieldsCounter = {
+        one: 0,
+        two: 1,
+        three: 2
+    }
+    field1.valueArr.forEach((v,i) => {
+        if (!fields[fieldsCounter.one]) {
+            fields.push({ name: fieldsCounter.one == 0 ? field1.label : '\u200b', value: '', inline: true })
+        }
+        if (!fields[fieldsCounter.two]) {
+            if (field2) fields.push({ name: fieldsCounter.two == 1 ? field2.label : '\u200b', value: '', inline: true })
+            else fields.push({ name: '\u200b', value: '\u200b', inline: true })
+        }
+        if (!fields[fieldsCounter.three]) {
+            if (field3) fields.push({ name: fieldsCounter.three == 2 ? field3.label : '\u200b', value: '', inline: true })
+            else fields.push({ name: '\u200b', value: '\u200b', inline: true })
+        }
+        if (field1) fields[fieldsCounter.one].value += `${field1.valueArr[i]}\n`
+        if (field2) fields[fieldsCounter.two].value += `${field2.valueArr[i]}\n`
+        if (field3) fields[fieldsCounter.three].value += `${field3.valueArr[i]}\n`
+        if (fields[fieldsCounter.one].value.length > 950 || fields[fieldsCounter.two].value.length > 950 || fields[fieldsCounter.three].value.length > 950) {
+            if (field1.valueFormatter) fields[fieldsCounter.one].value = field1.valueFormatter(fields[fieldsCounter.one].value)
+            if (field2.valueFormatter) fields[fieldsCounter.two].value = field2.valueFormatter(fields[fieldsCounter.two].value)
+            if (field3.valueFormatter) fields[fieldsCounter.three].value = field3.valueFormatter(fields[fieldsCounter.three].value)
+            fieldsCounter.one += 3
+            fieldsCounter.two += 3
+            fieldsCounter.three += 3
+        }
+    })
+    return fields
+}
+
 
 module.exports = {
     dynamicSort,
@@ -233,5 +283,6 @@ module.exports = {
     lowerAndScore,
     timeStringToMs,
     ms_till_12am,
-    generateId
+    generateId,
+    responsiveEmbedFields
 };
