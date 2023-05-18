@@ -792,7 +792,14 @@ function edit_staff_leaderboard() {
 
 async function edit_event_leaderboard() {
     console.log('[allsquads.edit_event_leaderboard] called')
-    socket.emit('allsquads/leaderboards/fetch', {}, async (res) => {
+    socket.emit('allsquads/leaderboards/fetch', {
+        options: {
+            top_runners: {
+                start_timestamp: 1684519200000,
+                end_timestamp: 1684778340000,
+            }
+        }
+    }, async (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
             console.log(leaderboards)
@@ -812,7 +819,7 @@ async function edit_event_leaderboard() {
                             valueFormatter: (value) => value.replace(/_/g,'\\_')
                         },
                         field3: {
-                            label: 'Squads',
+                            label: 'Points',
                             valueArr: leaderboards.top_runners.event_runners.map(user => `${user.squads_count}`)
                         },
                     }),
