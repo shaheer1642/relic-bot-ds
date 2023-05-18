@@ -15,6 +15,7 @@ const {as_users_ratings} = require('./allsquads/as_users_ratings')
 const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_list')
 const {global_variables} = require('./global_variables');
 const { db_schedule_msg_deletion } = require('./msg_auto_delete');
+const { getServerPingChannel } = require('./objects/discord_servers_ping_channel');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -889,6 +890,7 @@ socket.on('squadbot/squadCreate', (squad) => {
         }
     })
     socket.emit('squadbot/trackers/fetchSubscribers',{squad: squad},(res) => {
+        console.log('[relicbot] trackers fetch response',res)
         if (res.code == 200) {
             const channel_ids = res.data
             for (const channel_id in channel_ids) {
@@ -905,12 +907,17 @@ socket.on('squadbot/squadCreate', (squad) => {
                         allowed_mentions: as_users_list[id]?.allowed_pings_status
                     })),client.channels.cache.get(channel_id)?.guild?.id).then(mentions_list => {
                         if (mentions_list.length == 0) return
-                        arrToStringsArrWithLimit(`Someone is looking for ${convertUpper(squad.squad_string)} squad`, mentions_list.map(id => `<@${id}>`), 2000).forEach(str => {
-                            new WebhookClient({url: webhooks_list[channel_id]}).send({
-                                content: str
-                            }).then(msg => {
-                                db_schedule_msg_deletion(msg.id, msg.channel_id, 10000)
-                            }).catch(console.error)
+                        const ping = getServerPingChannel(channel_id)
+                        arrToStringsArrWithLimit(`${ping ? `<#${ping.redirect_channel_id}> `:''}Someone is looking for ${convertUpper(squad.squad_string)} squad`, mentions_list.map(id => `<@${id}>`), 2000).forEach(str => {
+                            if (ping) {
+                                client.channels.cache.get(ping.ping_channel_id)?.send({content: str}).catch(console.error)
+                            } else {
+                                new WebhookClient({url: webhooks_list[channel_id]}).send({
+                                    content: str
+                                }).then(msg => {
+                                    db_schedule_msg_deletion(msg.id, msg.channel_id, 10000)
+                                }).catch(console.error)
+                            }
                         })
                     }).catch(console.error)
                 }
