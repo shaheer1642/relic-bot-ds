@@ -262,6 +262,9 @@ function responsiveEmbedFields({ field1, field2, field3 }) {
             fieldsCounter.three += 3
         }
     })
+    if (field1?.valueFormatter) fields[fieldsCounter.one].value = field1.valueFormatter(fields[fieldsCounter.one].value)
+    if (field2?.valueFormatter) fields[fieldsCounter.two].value = field2.valueFormatter(fields[fieldsCounter.two].value)
+    if (field3?.valueFormatter) fields[fieldsCounter.three].value = field3.valueFormatter(fields[fieldsCounter.three].value)
     return fields
 }
 
