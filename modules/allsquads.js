@@ -18,11 +18,11 @@ const vip_channel_id = '1041306010331119667'
 const vip_message_id = '1041306046280499200'
 
 client.on('ready', () => {
-    edit_vip_message()
-    assign_allsquads_roles()
+    // edit_vip_message()
     edit_leaderboard()
     edit_staff_leaderboard()
     edit_event_leaderboard()
+    setTimeout(assign_allsquads_roles, 10000);
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
     setInterval(edit_staff_leaderboard, 300000);
@@ -586,7 +586,7 @@ async function assign_allsquads_roles() {
             })
         }
     })
-
+    
     const early_supporter_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'early supporter')
     Object.values(as_users_list).forEach(async user => {
         if (user.is_early_supporter) {
