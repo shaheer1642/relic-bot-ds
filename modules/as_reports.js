@@ -167,7 +167,7 @@ client.on('interactionCreate', (interaction) => {
 
 client.on('messageCreate', async (message) => {
     if (message.channel.id == '1078709540222148739') {
-        db_schedule_msg_deletion(message.id,message.channel.id,10000)
+        db_schedule_msg_deletion(message.id,message.channel.id,2000)
         const staff_channel = client.channels.cache.get('1078710660873080912') || await client.channels.fetch('1078710660873080912').catch(console.error)
         if (!staff_channel) return message.channel.send(`<@${message.author?.id}> Unable to redirect your message to staff channel. Please try again`).then(msg => db_schedule_msg_deletion(msg.id,msg.channel.id,10000)).catch(console.error)
         staff_channel.send({
