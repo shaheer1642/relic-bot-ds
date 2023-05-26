@@ -34,7 +34,7 @@ function closeGiveaway(giveawayObj) {
             }
             winners_list = winners_list.filter(o => o != undefined)
             db.query(`
-                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}', status = '${winners_list.length == 0? 'cancelled':'ended'}' WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
+                UPDATE as_gabot_giveaways SET winners_list = '${JSON.stringify(winners_list)}', status = 'ended' WHERE giveaway_id='${giveawayObj.giveaway_id}' AND status = 'active';
             `).catch(console.error)
         }).catch(console.error)
     }, giveawayObj.expiry_timestamp - new Date().getTime());
