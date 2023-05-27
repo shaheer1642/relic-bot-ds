@@ -551,6 +551,7 @@ async function assign_allsquads_roles() {
         if (res.code == 200) {
             const alltime_users = res.data.all_time
             alltime_users.map(user => {
+                if (!user.discord_id) return
                 roles.forEach(async role => {
                     if (!role.object) return
                     if (user.reputation >= role.requirement) {
@@ -578,7 +579,7 @@ async function assign_allsquads_roles() {
                     } else {
                         const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(err => err?.code == 10007 ? null : console.log(err))
                         if (!member) return
-                        if (member.roles.cache.get(role.object.id)) {
+                        if (member.roles?.cache.get(role.object.id)) {
                             member.roles.remove(role.object).catch(console.error)
                         }
                     }
@@ -590,6 +591,7 @@ async function assign_allsquads_roles() {
     const early_supporter_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'early supporter')
     Object.values(as_users_list).forEach(async user => {
         if (user.is_early_supporter) {
+            if (!user.discord_id) return
             const member = guild.members.cache.get(user.discord_id) || await guild.members.fetch(user.discord_id).catch(err => err?.code == 10007 ? null : console.log(err))
             if (!member) return
             if (!member.roles.cache.get(early_supporter_role.id)) member.roles.add(early_supporter_role).catch(console.error)
