@@ -150,15 +150,15 @@ function sortCaseInsensitive(arr,descending) {
 
 function arrToStringsArrWithLimit(key_term,list,limit,censor_ping) {
     const strings_arr = []
-    var str = `${key_term} `
+    var str = ''
     list.forEach(element => {
-        if ((str + element).length >= limit) {
-            strings_arr.push(censor_ping ? `||${str.trim()}||` : str.trim())
-            str = `${key_term} `
+        if ((str + element).length >= (limit - 4 - key_term.length)) {
+            strings_arr.push(censor_ping ? `${key_term} ||${str.trim()}||` : `${key_term} ${str.trim()}`)
+            str = ''
         }
         str = `${str} ${element}`
     });
-    strings_arr.push(censor_ping ? `||${str.trim()}||` : str.trim())
+    strings_arr.push(censor_ping ? `${key_term} ||${str.trim()}||` : `${key_term} ${str.trim()}`)
     return strings_arr;
 }
 
