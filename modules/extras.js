@@ -148,17 +148,17 @@ function sortCaseInsensitive(arr,descending) {
     return arr.sort((a,b) => a.replace(/"/g,'').toLowerCase() < b.replace(/"/g,'').toLowerCase() ? descending ? 1 : -1 : descending ? -1 : 1)
 }
 
-function arrToStringsArrWithLimit(key_term,list,limit) {
+function arrToStringsArrWithLimit(key_term,list,limit,censor_ping) {
     const strings_arr = []
     var str = `${key_term} `
     list.forEach(element => {
         if ((str + element).length >= limit) {
-            strings_arr.push(str.trim())
+            strings_arr.push(censor_ping ? `||${str.trim()}||` : str.trim())
             str = `${key_term} `
         }
         str = `${str} ${element}`
     });
-    strings_arr.push(str)
+    strings_arr.push(censor_ping ? `||${str.trim()}||` : str.trim())
     return strings_arr;
 }
 

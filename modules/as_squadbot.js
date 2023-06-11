@@ -908,7 +908,7 @@ socket.on('squadbot/squadCreate', (squad) => {
                     })),client.channels.cache.get(channel_id)?.guild?.id).then(mentions_list => {
                         if (mentions_list.length == 0) return
                         const ping = getServerPingChannel(channel_id)
-                        arrToStringsArrWithLimit(`${ping ? `<#${ping.redirect_channel_id}> `:''}Someone is looking for ${convertUpper(squad.squad_string)} squad`, mentions_list.map(id => `<@${id}>`), 2000).forEach(str => {
+                        arrToStringsArrWithLimit(`${ping ? `<#${ping.redirect_channel_id}> `:''}Someone is looking for ${convertUpper(squad.squad_string)} squad`, mentions_list.map(id => `<@${id}>`), 2000,true).forEach(str => {
                             if (ping) {
                                 client.channels.cache.get(ping.ping_channel_id)?.send({content: str}).catch(console.error)
                             } else {
