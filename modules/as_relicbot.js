@@ -41,6 +41,10 @@ client.on('guildCreate',(guild) => {
     }, 5000);
 })
 
+client.on('rateLimit',(rateLimitData) => {
+    console.error('You are being rate limited',rateLimitData)
+})
+
 function handleSquadCreateResponses(channel_id,discord_id,responses) {
     if (!Array.isArray(responses)) responses = [responses]
     const payloads = [{content: ' ', embeds: [], ephemeral: false}]
