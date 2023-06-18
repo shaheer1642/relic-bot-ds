@@ -22,13 +22,15 @@ client.on('ready', () => {
     edit_leaderboard()
     edit_staff_leaderboard()
     edit_event_leaderboard()
+
     setTimeout(assign_allsquads_roles, 10000);
-    setInterval(assign_allsquads_roles, 3600000);
-    setInterval(edit_leaderboard, 300000);
-    setInterval(edit_staff_leaderboard, 300000);
-    setInterval(edit_event_leaderboard, 300000);
     setTimeout(check_allsquads_members_roles, 120000);
     setTimeout(channelsVerification, 300000);
+
+    setInterval(assign_allsquads_roles, 3600000);
+    setInterval(edit_leaderboard, 3600000);
+    setInterval(edit_staff_leaderboard, 3600000);
+    setInterval(edit_event_leaderboard, 3600000);
 })
 
 client.on('interactionCreate', (interaction) => {
