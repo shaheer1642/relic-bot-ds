@@ -23,7 +23,7 @@ function updateWfrimRelicsDB() {
 }
 
 function getRelicQuantity(user_id, squad) {
-    console.log('[wfrim_relicsdb.getRelicQuantity] called')
+    // console.log('[wfrim_relicsdb.getRelicQuantity] called')
     if (!wfrim_relicsdb[user_id]) return 0
     var quantity = 0
     squad.main_relics.map(relic_type => {
@@ -31,7 +31,7 @@ function getRelicQuantity(user_id, squad) {
         const relic_quantity = wfrim_relicsdb[user_id].filter(relic => relic.name.toLowerCase() == squad_relic.toLowerCase())?.[0]?.quantity
         if (relic_quantity) quantity += relic_quantity
     })
-    console.log('[wfrim_relicsdb.getRelicQuantity] quantity=',quantity)
+    // console.log('[wfrim_relicsdb.getRelicQuantity] quantity=',quantity)
     return quantity
 }
 

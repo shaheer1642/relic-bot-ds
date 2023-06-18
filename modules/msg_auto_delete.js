@@ -18,6 +18,7 @@ function db_schedule_msg_deletion(message_id, channel_id, delete_timeout) {
 }
 
 function schedule_deletion(db_obj) {
+    if (process.env.ENVIRONMENT_TYPE != 'prod') return
     setTimeout(async () => {
         const cnl = client.channels.cache.get(db_obj.channel_id) || await client.channels.fetch(db_obj.channel_id).catch(console.error)
         if (!cnl) return

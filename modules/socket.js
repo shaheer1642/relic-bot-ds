@@ -8,6 +8,18 @@ var socket = io(process.env.SOCKET_URL, {
     }
 });
 
+/* middleware for diagnosis */
+socket.emit = (function (oldEmit) {
+    return function () {
+        const args = Array.from(arguments); // Convert the arguments to an array
+        const ts = new Date().getTime();
+        oldEmit.apply(socket, [args[0], args[1], (res) => {
+            console.log('[Websocket] Request:',args[0],'Response time:', new Date().getTime() - ts, 'ms');
+            args[2] ? args[2](res) : null;
+        }]);
+    };
+})(socket.emit);
+
 socket.on("connect", () => {
     console.log('[websocket] connected',socket.id)
 });
@@ -31,19 +43,6 @@ async function socketHasConnected() {
     })
 }
 
-/* middleware for diagnosis */
-socket = (function(oldSocket){
-    return {
-        ...oldSocket,
-        emit: function(...args){
-            const ts = new Date().getTime()
-            oldSocket.emit(args[0],args[1], (res) => {
-                console.log('wss response: took',new Date().getTime() - ts,'ms')
-                args[2] ? args[2](res) : null
-            });
-        },
-    };
-}(socket));
 
 module.exports = {
     socket,
