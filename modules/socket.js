@@ -1,7 +1,7 @@
 
 const io = require('socket.io-client')
 
-const socket = io(process.env.SOCKET_URL, {
+var socket = io(process.env.SOCKET_URL, {
     transports : ['websocket'],
     query: {
         bot_token: process.env.DISCORD_BOT_TOKEN
@@ -30,6 +30,20 @@ async function socketHasConnected() {
         }
     })
 }
+
+/* middleware for diagnosis */
+socket = (function(oldSocket){
+    return {
+        ...oldSocket,
+        emit: function(...args){
+            const ts = new Date().getTime()
+            oldSocket.emit(args[0],args[1], (res) => {
+                console.log('wss response: took',new Date().getTime() - ts,'ms')
+                args[2] ? args[2](res) : null
+            });
+        },
+    };
+}(socket));
 
 module.exports = {
     socket,
