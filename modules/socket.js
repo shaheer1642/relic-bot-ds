@@ -14,7 +14,11 @@ socket.emit = (function (oldEmit) {
         const args = Array.from(arguments); // Convert the arguments to an array
         const ts = new Date().getTime();
         oldEmit.apply(socket, [args[0], args[1], (res) => {
-            console.log('[Websocket] Request:',args[0],'Response time:', new Date().getTime() - ts, 'ms');
+            const response_time = new Date().getTime() - ts
+            if (response_time > 1000)
+                console.error('[websocket] Request:',args[0],'Response time:', response_time, 'ms');
+            else 
+                console.log('[websocket] Request:',args[0],'Response time:', response_time, 'ms');
             args[2] ? args[2](res) : null;
         }]);
     };
