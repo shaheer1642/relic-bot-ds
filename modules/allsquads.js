@@ -610,7 +610,6 @@ async function edit_leaderboard() {
         }
     }, async (res) => {
         if (res.code == 200) {
-            console.log('**********************************************',res.data,'**********************************************')
             const leaderboards = res.data
             console.log(leaderboards)
             const payload = {
