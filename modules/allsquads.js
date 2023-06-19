@@ -28,9 +28,9 @@ client.on('ready', () => {
     setTimeout(channelsVerification, 300000);
 
     setInterval(assign_allsquads_roles, 3600000);
-    setInterval(edit_leaderboard, 3600000);
-    setInterval(edit_staff_leaderboard, 3600000);
-    setInterval(edit_event_leaderboard, 3600000);
+    setInterval(edit_leaderboard, 900000);
+    setInterval(edit_staff_leaderboard, 900000);
+    setInterval(edit_event_leaderboard, 900000);
 })
 
 client.on('interactionCreate', (interaction) => {
