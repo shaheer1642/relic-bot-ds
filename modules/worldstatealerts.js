@@ -579,8 +579,8 @@ function construct_your_fissures_embed(fissures_users, user_id) {
                     label: tracker.fissure_type + ' ' + tracker.fissure_name,
                     value: tracker.tracker_id,
                     emoji: {
-                        name: emotes[tracker.fissure_name.split(' ')[0]].identifier.split(':')[0],
-                        id: emotes[tracker.fissure_name.split(' ')[0]].identifier.split(':')[1],
+                        name: emotes[tracker.fissure_name.split(' ')[0]]?.identifier.split(':')[0],
+                        id: emotes[tracker.fissure_name.split(' ')[0]]?.identifier.split(':')[1],
                     }
                 })
             }
