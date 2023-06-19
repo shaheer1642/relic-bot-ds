@@ -29,8 +29,8 @@ client.on('ready', () => {
 
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
-    setInterval(edit_staff_leaderboard, 300000);
-    setInterval(edit_event_leaderboard, 300000);
+    setInterval(edit_staff_leaderboard, 310000);
+    setInterval(edit_event_leaderboard, 320000);
 })
 
 client.on('interactionCreate', (interaction) => {
@@ -610,6 +610,7 @@ async function edit_leaderboard() {
         }
     }, async (res) => {
         if (res.code == 200) {
+            console.log('**********************************************',res.data,'**********************************************')
             const leaderboards = res.data
             console.log(leaderboards)
             const payload = {
