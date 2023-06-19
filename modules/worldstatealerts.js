@@ -555,7 +555,7 @@ function construct_your_fissures_embed(fissures_users, user_id) {
                 name: 'Fissure',
                 value:
                     trackers.length > 0
-                    ? trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0]].string} ${tracker.fissure_name}`).join('\n')
+                    ? trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0]]?.string} ${tracker.fissure_name}`).join('\n')
                     : '\u200b',
                 inline: true
                 },
