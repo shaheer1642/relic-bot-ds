@@ -19,9 +19,9 @@ const vip_message_id = '1041306046280499200'
 
 client.on('ready', () => {
     // edit_vip_message()
-    edit_leaderboard()
-    edit_staff_leaderboard()
-    edit_event_leaderboard()
+    setTimeout(edit_leaderboard, 5000);
+    setTimeout(edit_staff_leaderboard, 10000);
+    setTimeout(edit_event_leaderboard, 15000);
 
     setTimeout(assign_allsquads_roles, 10000);
     setTimeout(check_allsquads_members_roles, 120000);
@@ -29,8 +29,8 @@ client.on('ready', () => {
 
     setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 900000);
-    setInterval(edit_staff_leaderboard, 900000);
-    setInterval(edit_event_leaderboard, 900000);
+    setInterval(edit_staff_leaderboard, 910000);
+    setInterval(edit_event_leaderboard, 920000);
 })
 
 client.on('interactionCreate', (interaction) => {
