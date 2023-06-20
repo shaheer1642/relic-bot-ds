@@ -89,6 +89,7 @@ function bot_initialize() {
         client.guilds.cache.get(botv_guild_id).members.fetch().catch(console.error)
         setTimeout(updateMasteryDistr, 10000);
     }
+    setTimeout(removeNewMemberRole, 12000)
 }
 
 function message_handler(message) {
@@ -349,6 +350,21 @@ async function guildMemberUpdate(oldMember, newMember) {
     } catch (e) {
         console.log(e)
     }
+}
+
+function removeNewMemberRole() {
+    console.log('[botv.js] removeNewMemberRole called')
+    client.guilds.fetch(botv_guild_id).then(guild => {
+        const newMemberRole = guild.roles.cache.find(role => role.name == 'New Members')
+        if (!newMemberRole) return console.log('[botv.js] newMemberRole is not found')
+        guild.members.fetch().then(members => {
+            members.forEach(member => {
+                if (member.roles.cache.find(newMemberRole) && (new Date().getTime() - member.joinedTimestamp) > 1209600000) {
+                    member.roles.remove(newMemberRole).catch(console.error)
+                }
+            })
+        }).catch(console.error)
+    }).catch(console.error)
 }
 
 async function check_hiatus_expiry() {
