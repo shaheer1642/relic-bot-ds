@@ -881,41 +881,58 @@ async function check_allsquads_members_roles() {
     }).catch(console.error)
 }
 
+function removeAffiliatedServer(channel_id,guild_id, type) {
+    db.query(`delete from ${type == 'relic_bot' ? 'as_rb_guilds':'as_sb_guilds'} where guild_id = '${guild_id}'`).then(res => {
+        if (res.rowCount == 1) {
+            client.channels.cache.get(channel_id)?.send({
+                content: 
+`[Warframe Squads] Some error occured verifying bot permissions in this server.
+To conserve resources, this server has been removed from affiliation.
+If you'd like to re-affiliate, please either re-invite the bot or use \`/${type == 'relic_bot' ? 'relic_bot':'squad_bot'} add_server\` slash command`
+            }).catch(console.error)
+        }
+    }).catch(console.error)
+}
+
 function channelsVerification() {
     if (process.env.ENVIRONMENT_TYPE != 'prod') return
     console.log('[allsquads.channelsVerification] called')
     db.query('select * from as_rb_channels').then(res => {
-        res.rows.map((channel) => {
+        res.rows.forEach((channel) => {
             if (channel.channel_id == 'web-111') return
-            client.channels.fetch(channel.channel_id).catch(err => {
+            client.channels.fetch(channel.channel_id).then(cnl => {
+                db.query(`select * from as_rb_messages WHERE channel_id = '${channel.channel_id}'`).then(res => {
+                    res.rows.forEach((message) => {
+                        cnl.messages.fetch(message.message_id).catch(err => {
+                            if (err.code == 10008) {
+                                removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
+                            }
+                        })
+                    })
+                }).catch(console.error)
+            }).catch(err => {
                 if (err.code == 10003 || err.code == 50001) {
-                    console.log('[allsquads.channelsVerification] channel',channel.channel_id,'does not exist')
-                    new WebhookClient({url: channel.webhook_url})?.send({
-                        content: `[Warframe Squads] Some error occured verifying bot permissions in this server. To conserve resources, this server has been removed from affiliation. If you'd like to re-affiliate, please either re-invite the bot or use \`/relic_bot add_server\` slash command`
-                    }).then(res => console.log('[allsquads.channelsVerification] announced deaffiliation message in channel',channel.channel_id)).catch(e => {})
-                    db.query(`delete from as_rb_guilds where guild_id = '${channel.guild_id}'`).then(res => {
-                        if (res.rowCount == 1) {
-                            console.log('[allsquads.channelsVerification] removed guild',channel.guild_id)
-                        }
-                    }).catch(console.error)
+                    removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
                 }
             })
         })
     }).catch(console.error)
     db.query('select * from as_sb_channels').then(res => {
-        res.rows.map((channel) => {
+        res.rows.forEach((channel) => {
             if (channel.channel_id == 'web-111') return
-            client.channels.fetch(channel.channel_id).catch(err => {
+            client.channels.fetch(channel.channel_id).then(cnl => {
+                db.query(`select * from as_sb_messages WHERE channel_id = '${channel.channel_id}'`).then(res => {
+                    res.rows.forEach((message) => {
+                        cnl.messages.fetch(message.message_id).catch(err => {
+                            if (err.code == 10008) {
+                                removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
+                            }
+                        })
+                    })
+                }).catch(console.error)
+            }).catch(err => {
                 if (err.code == 10003 || err.code == 50001) {
-                    console.log('[allsquads.channelsVerification] channel',channel.channel_id,'does not exist')
-                    new WebhookClient({url: channel.webhook_url})?.send({
-                        content: `[Warframe Squads] Some error occured verifying bot permissions in this server. To conserve resources, this server has been removed from affiliation. If you'd like to re-affiliate, please either re-invite the bot or use \`/squad_bot add_server\` slash command`
-                    }).then(res => console.log('[allsquads.channelsVerification] announced deaffiliation message in channel',channel.channel_id)).catch(e => {})
-                    db.query(`delete from as_sb_guilds where guild_id = '${channel.guild_id}'`).then(res => {
-                        if (res.rowCount == 1) {
-                            console.log('[allsquads.channelsVerification] removed guild',channel.guild_id)
-                        }
-                    }).catch(console.error)
+                    removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
                 }
             })
         })
