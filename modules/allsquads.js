@@ -902,13 +902,17 @@ function channelsVerification() {
             if (channel.channel_id == 'web-111') return
             client.channels.fetch(channel.channel_id).then(cnl => {
                 db.query(`select * from as_rb_messages WHERE channel_id = '${channel.channel_id}'`).then(res => {
-                    res.rows.forEach((message) => {
-                        cnl.messages.fetch(message.message_id).catch(err => {
-                            if (err.code == 10008) {
-                                removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
-                            }
+                    if (res.rowCount == 0) {
+                        removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
+                    } else {
+                        res.rows.forEach((message) => {
+                            cnl.messages.fetch(message.message_id).catch(err => {
+                                if (err.code == 10008) {
+                                    removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
+                                }
+                            })
                         })
-                    })
+                    }
                 }).catch(console.error)
             }).catch(err => {
                 if (err.code == 10003 || err.code == 50001) {
@@ -922,13 +926,17 @@ function channelsVerification() {
             if (channel.channel_id == 'web-111') return
             client.channels.fetch(channel.channel_id).then(cnl => {
                 db.query(`select * from as_sb_messages WHERE channel_id = '${channel.channel_id}'`).then(res => {
-                    res.rows.forEach((message) => {
-                        cnl.messages.fetch(message.message_id).catch(err => {
-                            if (err.code == 10008) {
-                                removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
-                            }
+                    if (res.rowCount == 0) {
+                        removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
+                    } else {
+                        res.rows.forEach((message) => {
+                            cnl.messages.fetch(message.message_id).catch(err => {
+                                if (err.code == 10008) {
+                                    removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
+                                }
+                            })
                         })
-                    })
+                    }
                 }).catch(console.error)
             }).catch(err => {
                 if (err.code == 10003 || err.code == 50001) {
@@ -937,6 +945,8 @@ function channelsVerification() {
             })
         })
     }).catch(console.error)
+    db.query(`DELETE FROM as_rb_guilds t1 WHERE NOT EXISTS ( SELECT FROM as_rb_channels t2 WHERE t1.guild_id = t2.guild_id )`).catch(console.error)
+    db.query(`DELETE FROM as_sb_guilds t1 WHERE NOT EXISTS ( SELECT FROM as_sb_channels t2 WHERE t1.guild_id = t2.guild_id )`).catch(console.error)
 }
 
 function verificationInstructions(language,code,already_verified) {
