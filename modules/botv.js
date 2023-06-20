@@ -359,8 +359,8 @@ function removeNewMemberRole() {
         if (!newMemberRole) return console.log('[botv.js] newMemberRole is not found')
         guild.members.fetch().then(members => {
             members.forEach(member => {
-                if (member.roles.cache.find(newMemberRole) && (new Date().getTime() - member.joinedTimestamp) > 1209600000) {
-                    member.roles.remove(newMemberRole).catch(console.error)
+                if (member.roles.cache.get(newMemberRole.id) && ((new Date().getTime() - member.joinedTimestamp) > 1209600000)) {
+                    member.roles.remove(newMemberRole.id).catch(console.error)
                 }
             })
         }).catch(console.error)
