@@ -360,7 +360,9 @@ function removeNewMemberRole() {
         guild.members.fetch().then(members => {
             members.forEach(member => {
                 if (member.roles.cache.get(newMemberRole.id) && ((new Date().getTime() - member.joinedTimestamp) > 1209600000)) {
-                    member.roles.remove(newMemberRole.id).catch(console.error)
+                    member.roles.remove(newMemberRole.id).then(res => {
+                        mod_log(`Removed role <@&${newMemberRole.id}> from user <@${member.id}>`,'#ff0000')
+                    }).catch(console.error)
                 }
             })
         }).catch(console.error)
