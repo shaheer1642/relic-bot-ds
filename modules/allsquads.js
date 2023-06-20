@@ -901,23 +901,21 @@ function channelsVerification() {
         res.rows.forEach((channel) => {
             if (channel.channel_id == 'web-111') return
             client.channels.fetch(channel.channel_id).then(cnl => {
+                cnl.fetchWebhooks().then(whs => {
+                    if (whs.every(wh => wh.url != channel.webhook_url)) removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
+                }).catch(console.error)
                 db.query(`select * from as_rb_messages WHERE channel_id = '${channel.channel_id}'`).then(res => {
-                    if (res.rowCount == 0) {
-                        removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
-                    } else {
+                    if (res.rowCount == 0) removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
+                    else {
                         res.rows.forEach((message) => {
                             cnl.messages.fetch(message.message_id).catch(err => {
-                                if (err.code == 10008) {
-                                    removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
-                                }
+                                if (err.code == 10008) removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
                             })
                         })
                     }
                 }).catch(console.error)
             }).catch(err => {
-                if (err.code == 10003 || err.code == 50001) {
-                    removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
-                }
+                if (err.code == 10003 || err.code == 50001) removeAffiliatedServer(channel.channel_id, channel.guild_id, 'relic_bot')
             })
         })
     }).catch(console.error)
@@ -925,15 +923,15 @@ function channelsVerification() {
         res.rows.forEach((channel) => {
             if (channel.channel_id == 'web-111') return
             client.channels.fetch(channel.channel_id).then(cnl => {
+                cnl.fetchWebhooks().then(whs => {
+                    if (whs.every(wh => wh.url != channel.webhook_url)) removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
+                }).catch(console.error)
                 db.query(`select * from as_sb_messages WHERE channel_id = '${channel.channel_id}'`).then(res => {
-                    if (res.rowCount == 0) {
-                        removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
-                    } else {
+                    if (res.rowCount == 0) removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
+                    else {
                         res.rows.forEach((message) => {
                             cnl.messages.fetch(message.message_id).catch(err => {
-                                if (err.code == 10008) {
-                                    removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
-                                }
+                                if (err.code == 10008) removeAffiliatedServer(channel.channel_id, channel.guild_id, 'squad_bot')
                             })
                         })
                     }
