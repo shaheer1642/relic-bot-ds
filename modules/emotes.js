@@ -25,6 +25,7 @@ const emote_ids = {
     archon: '<:tau_crimson_shard:1050150452852949073>',
     traces: '<:void_traces:1068489485807009845>',
     duviri: '<:duviri:1100917270852677662>',
+    kullervo: '🆕',
     hot: '🔥',
     cold: '❄️',
 }
