@@ -2,8 +2,8 @@ const { client } = require("./discord_client")
 
 var message = undefined
 
-client.on('ready', () => {
-    message = client.channels.cache.get('1121557842017665135').messages.fetch('1121575714043465739').catch(console.error)
+client.on('ready', async () => {
+    message = await client.channels.cache.get('1121557842017665135').messages.fetch('1121575714043465739').catch(console.error)
 })
 
 client.on('interaction', interaction => {
@@ -37,8 +37,7 @@ client.on('interaction', interaction => {
 })
 
 function editMessage() {
-    if (!message) return
-    message.edit({
+    message?.edit({
         content: generateMap(),
         components :[{
             type: 1,
