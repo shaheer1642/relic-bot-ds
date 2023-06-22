@@ -35,6 +35,7 @@ require('./modules/as_admin_tools.js');
 require('./modules/as_commands.js');
 require('./modules/as_reports.js');
 require('./modules/as_events.js');
+require('./modules/miniframe.js');
 
 // restart after 12.5h
 setTimeout(() => {
