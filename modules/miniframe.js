@@ -36,19 +36,23 @@ client.on('interaction', interaction => {
     }
 })
 
+var editMessageTimeout = undefined
 function editMessage() {
-    message?.edit({
-        content: generateMap(),
-        components :[{
-            type: 1,
-            components: Array.from([1,2,3,4,5]).map((e,i) => ({
-                type: 2,
-                label: i == 0 ? 'Move Up' : i == 1 ? 'Move Down' : i == 2 ? 'Move Left' : i == 3 ? 'Move Right' : i == 4 ? 'Reset Game' : '',
-                custom_id: i == 0 ? 'miniframe_char_mu' : i == 1 ? 'miniframe_char_md' : i == 2 ? 'miniframe_char_ml' : i == 3 ? 'miniframe_char_mr' : i == 4 ? 'miniframe_reset_game' : '',
-                style: i == 4 ? 1 : 2,
-            }))
-        }],
-    }).catch(console.error)
+    clearTimeout(editMessageTimeout)
+    editMessageTimeout = setTimeout(() => {
+        message?.edit({
+            content: generateMap(),
+            components :[{
+                type: 1,
+                components: Array.from([1,2,3,4,5]).map((e,i) => ({
+                    type: 2,
+                    label: i == 0 ? 'Move Up' : i == 1 ? 'Move Down' : i == 2 ? 'Move Left' : i == 3 ? 'Move Right' : i == 4 ? 'Reset Game' : '',
+                    custom_id: i == 0 ? 'miniframe_char_mu' : i == 1 ? 'miniframe_char_md' : i == 2 ? 'miniframe_char_ml' : i == 3 ? 'miniframe_char_mr' : i == 4 ? 'miniframe_reset_game' : '',
+                    style: i == 4 ? 1 : 2,
+                }))
+            }],
+        }).catch(console.error)
+    }, 500);
 }
 
 var char_pos = []
