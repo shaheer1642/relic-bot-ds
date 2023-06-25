@@ -821,7 +821,7 @@ socket.on('relicbot/squads/opened', async (payload) => {
                     }).catch(console.error)
                 }).catch(console.error)
             }).catch(console.error)
-            if (Object.keys(channel_ids).length > 1) thread.send({content: 'This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
+            if (Object.keys(channel_ids).length > 1) thread.send({content: '## This is a cross-server communication. Messages sent here will also be sent to respective members'}).catch(console.error)
             setTimeout(() => channel.messages.cache.get(thread.id)?.delete().catch(console.error), 5000)
         }).catch(console.error)
     }
