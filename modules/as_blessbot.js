@@ -122,7 +122,7 @@ client.on('messageReactionAdd', (reaction,user) => {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionAdd',reaction.emoji.identifier,user.id)
             const user_id = as_users_list_discord[user.id]?.user_id
-            if (!user_id) return reaction.remove().catch(console.error)
+            if (!user_id) return reaction.users.remove(user).catch(console.error)
             const column = (reaction.emoji.identifier.match('north_america') || reaction.emoji.identifier.match('europe') || reaction.emoji.identifier.match('asia')) ? 'regions' : 'bless_types'
             db.query(`
                 INSERT INTO as_bb_trackers 
@@ -145,7 +145,7 @@ client.on('messageReactionRemove', (reaction,user) => {
         if (Object.values(emotes).map(str => getEmojiIdentifier(str)).includes(reaction.emoji.identifier)) {
             console.log('[blessbot]','messageReactionRemove',reaction.emoji.identifier,user.id)
             const user_id = as_users_list_discord[user.id]?.user_id
-            if (!user_id) return reaction.remove().catch(console.error)
+            if (!user_id) return reaction.users.remove(user).catch(console.error)
             const column = (reaction.emoji.identifier.match('north_america') || reaction.emoji.identifier.match('europe') || reaction.emoji.identifier.match('asia')) ? 'regions' : 'bless_types'
             db.query(`
                 UPDATE as_bb_trackers SET ${column} = ${column} - '${reaction.emoji.name}'
