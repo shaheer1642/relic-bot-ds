@@ -36,6 +36,7 @@ require('./modules/as_commands.js');
 require('./modules/as_reports.js');
 require('./modules/as_events.js');
 require('./modules/miniframe.js');
+require('./modules/discord_cross_server_communication.js')
 
 // restart after 12.5h
 setTimeout(() => {
