@@ -2,7 +2,7 @@ const {client} = require('./discord_client.js');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const {db} = require('./db_connection.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor,convertUpper, arrToStringsArrWithLimit} = require('./extras.js');
+const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log,getRandomColor,convertUpper, arrToStringsArrWithLimit, responsiveEmbedFields} = require('./extras.js');
 const {db_schedule_msg_deletion} = require('./msg_auto_delete')
 const WorldState = require('warframe-worldstate-parser');
 const access_ids = [
@@ -542,34 +542,20 @@ function construct_your_fissures_embed(fissures_users, user_id) {
         
         const embed = {
             title: 'Your Fissure Trackers',
-            fields: [
-                {
-                name: 'Type',
-                value:
-                    trackers.length > 0
-                    ? trackers.map(tracker => tracker.fissure_type).join('\n')
-                    : '\u200b',
-                inline: true
+            fields: responsiveEmbedFields({
+                field1: {
+                    label: 'Type',
+                    valueArr: trackers.map(tracker => tracker.fissure_type)
                 },
-                {
-                name: 'Fissure',
-                value:
-                    trackers.length > 0
-                    ? trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0]]?.string} ${tracker.fissure_name}`).join('\n')
-                    : '\u200b',
-                inline: true
+                field2: {
+                    label: 'Fissure',
+                    valueArr: trackers.map(tracker => `${emotes[tracker.fissure_name.split(' ')[0]]?.string} ${tracker.fissure_name}`),
                 },
-                {
-                name: 'Last Appeared',
-                value:
-                    trackers.length > 0
-                    ? trackers
-                        .map(tracker => tracker.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(tracker.last_appeared/1000) + ':R>')
-                        .join('\n')
-                    : '\u200b',
-                inline: true
+                field3: {
+                    label: 'Last Appeared',
+                    valueArr: trackers.map(tracker => tracker.last_appeared == 0 ? 'Unknown':'<t:' + Math.round(tracker.last_appeared/1000) + ':R>'),
                 }
-            ],
+            }),
             color: '#ffffff'
         }
 
@@ -638,7 +624,7 @@ function construct_your_fissures_embed(fissures_users, user_id) {
     } catch (e) {
         console.log(e)
         return {
-            content: 'Sorry, an eror occured constructing embed',
+            content: 'Sorry, an error occured constructing embed',
         }
     }
 }
