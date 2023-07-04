@@ -94,7 +94,7 @@ function replyAndDelete(payload,messageObj,timeout) {
 }
 
 client.on('messageCreate', async (message) => {
-    if (message.author.bot) return
+    if (message.author?.bot) return
     if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id) && ['relics_vaulted','relics_non_vaulted'].includes(channels_list[message.channel.id].type)) {
         if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
         console.log('[relicbot messageCreate] content:',message.content)

@@ -149,7 +149,7 @@ client.on('messageCreate', async message => {
         hubapp.message_create(message)
 
     //prevent botception
-    if (message.author.bot)
+    if (message.author?.bot)
         return Promise.resolve()
 
     //auto-delete in warframe hub recruit channels

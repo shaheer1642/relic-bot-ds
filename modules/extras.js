@@ -66,19 +66,17 @@ function msToTime(s) {
 }
 
 function msToFullTime(ms) {
-    console.log(ms)
-    var seconds = Math.floor(ms / 1000),
-    minutes = Math.floor(seconds / 60),
-    hours   = Math.floor(minutes / 60),
-    days    = Math.floor(hours / 24),
-    months  = Math.floor(days / 30),
-    years   = Math.floor(days / 365);
+    var seconds = ms > 0 ? Math.floor(ms / 1000) : Math.ceil(ms / 1000),
+    minutes = seconds > 0 ? Math.floor(seconds / 60) : Math.ceil(seconds / 60),
+    hours   = minutes > 0 ? Math.floor(minutes / 60) : Math.ceil(minutes / 60),
+    days    = hours > 0 ? Math.floor(hours / 24) : Math.ceil(hours / 24),
+    months  = days > 0 ? Math.floor(days / 30) : Math.ceil(days / 30),
+    years   = days > 0 ? Math.floor(days / 365) : Math.ceil(days / 365);
     seconds %= 60;
     minutes %= 60;
     hours %= 24;
     days %= 30;
     months %= 12;
-
     var str = ''
     if (years != 0)
         if (years > 1)
@@ -99,7 +97,7 @@ function msToFullTime(ms) {
     if (str == '')
         str = `${hours} hours ${minutes} minutes ${seconds} seconds`
 
-    return str;
+    return str.trim();
 }
 
 function getRandomColor() {

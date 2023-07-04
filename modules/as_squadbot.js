@@ -51,7 +51,7 @@ client.on('guildCreate',(guild) => {
 })
 
 client.on('messageCreate', async (message) => {
-    if (message.author.bot) return
+    if (message.author?.bot) return
     if (message.channel.isText() && Object.keys(channels_list).includes(message.channel.id)) {
         if (server_commands_perms.includes(message.author.id) && message.content.toLowerCase().match(/^persist/)) return
         console.log('[squadbot messageCreate] content:',message.content) 

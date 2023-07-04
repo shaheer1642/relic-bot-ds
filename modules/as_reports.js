@@ -166,7 +166,7 @@ client.on('interactionCreate', (interaction) => {
 })
 
 client.on('messageCreate', async (message) => {
-    if (message.author.bot) return
+    if (message.author?.bot) return
     if (message.channel.id == '1078709540222148739') {
         db_schedule_msg_deletion(message.id,message.channel.id,2000)
         const staff_channel = client.channels.cache.get('1078710660873080912') || await client.channels.fetch('1078710660873080912').catch(console.error)

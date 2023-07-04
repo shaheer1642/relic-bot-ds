@@ -347,7 +347,7 @@ client.on('interactionCreate', (interaction) => {
 })
 
 client.on('messageCreate', (message) => {
-    if (message.author.bot) return
+    if (message.author?.bot) return
 
     if (message.channel.id != recruit_channel_id) return
     

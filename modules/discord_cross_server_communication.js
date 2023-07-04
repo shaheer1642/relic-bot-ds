@@ -6,7 +6,7 @@ const cross_channels = {
 }
 
 client.on('messageCreate',(message) => {
-    if (message.author.bot) return
+    if (message.author?.bot) return
     if (Object.keys(cross_channels).includes(message.channel.id)) {
         cross_channels[message.channel.id].push({
             original_message_id: message.id,
@@ -55,7 +55,7 @@ client.on('messageCreate',(message) => {
 })
 
 client.on('messageUpdate',(oldMessage, message) => {
-    if (message.author.bot) return
+    if (message.author?.bot) return
     if (Object.keys(cross_channels).includes(message.channel.id)) {
         cross_channels[message.channel.id].find(o => o.original_message_id == message.id).reference_messages.forEach(reference_message => {
             client.channels.cache.get(reference_message.channel_id)?.messages.cache.get(reference_message.message_id)?.edit({
