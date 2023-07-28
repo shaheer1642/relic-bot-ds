@@ -12,4 +12,4 @@ Source code for the Discord bot (Gauss Prime). The bot is equipped with several 
 
 # Running the code
 - First install the node modules using the command: `npm install`
-- Run the website using: `npm start`
+- Run the bot using: `npm start`
