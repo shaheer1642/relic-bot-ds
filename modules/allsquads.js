@@ -1,16 +1,16 @@
-const {client} = require('./discord_client.js');
-const {db} = require('./db_connection.js');
+const { client } = require('./discord_client.js');
+const { db } = require('./db_connection.js');
 const JSONbig = require('json-bigint');
 // const {tb_user_exist} = require('./trade_bot_modules')
-const {socket} = require('./socket')
-const {emoteObjFromSquadString} = require('./emotes')
-const {event_emitter} = require('./event_emitter')
+const { socket } = require('./socket')
+const { emoteObjFromSquadString } = require('./emotes')
+const { event_emitter } = require('./event_emitter')
 const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, generateId, responsiveEmbedFields } = require('./extras.js');
 const translations = require('./../translations.json');
-const supported_langs = ['en','fr','it']
-const {as_users_list, as_users_list_discord} = require('./allsquads/as_users_list')
-const {as_hosts_ratings} = require('./allsquads/as_users_ratings')
-const {db_schedule_msg_deletion} = require('./msg_auto_delete');
+const supported_langs = ['en', 'fr', 'it']
+const { as_users_list, as_users_list_discord } = require('./allsquads/as_users_list')
+const { as_hosts_ratings } = require('./allsquads/as_users_ratings')
+const { db_schedule_msg_deletion } = require('./msg_auto_delete');
 const { WebhookClient } = require('discord.js');
 
 const allsquads_discord_server = '865904902941048862'
@@ -51,13 +51,13 @@ client.on('interactionCreate', (interaction) => {
             //         ephemeral: true
             //     }).catch(console.error)
             // })
-        } else if (interaction.customId.split('.')[0] == 'as_new_member_sq_trackers_add') { 
+        } else if (interaction.customId.split('.')[0] == 'as_new_member_sq_trackers_add') {
             const value = interaction.customId.split('.')[1]
-            socket.emit(`${value.match(' relic') ? 'relicbot':'squadbot'}/trackers/create`,{message: value,user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: value.match(' relic') ? '1050717341123616851':'1054843353302323281'},(responses) => {
+            socket.emit(`${value.match(' relic') ? 'relicbot' : 'squadbot'}/trackers/create`, { message: value, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: value.match(' relic') ? '1050717341123616851' : '1054843353302323281' }, (responses) => {
                 console.log(responses)
                 if (!Array.isArray(responses)) responses = [responses]
                 if (responses[0].code == 200) {
-                    const components = interaction.message.components.map(component => ({type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? {...subcomponent, disabled: true} : subcomponent)}))
+                    const components = interaction.message.components.map(component => ({ type: 1, components: component.components.map(subcomponent => subcomponent.customId == interaction.customId ? { ...subcomponent, disabled: true } : subcomponent) }))
                     if (components.length == 0) interaction.message.delete().catch(console.error)
                     else {
                         interaction.update({
@@ -70,18 +70,18 @@ client.on('interactionCreate', (interaction) => {
             const code = interaction.message.embeds[0].footer?.text.split('_')[0]
             const already_verified = interaction.message.embeds[0].footer?.text.split('_')[1] == 'alrver' ? true : false
             const language = interaction.customId.split('.')[1]
-            interaction.update(verificationInstructions(language,code,already_verified)).catch(console.error)
+            interaction.update(verificationInstructions(language, code, already_verified)).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_sq_validate') {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/validate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
+            socket.emit(`${bot_type}/squads/validate`, { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad Closed\nValidated by <@${discord_id}>`,
                         components: []
                     }).catch(console.error)
-                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
         } else if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
             interaction.showModal({
@@ -107,10 +107,10 @@ client.on('interactionCreate', (interaction) => {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
-            socket.emit(`${bot_type}/squads/selecthost`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
+            socket.emit(`${bot_type}/squads/selecthost`, { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
                 if (res.code == 200) {
                     interaction.deferUpdate().catch(console.error)
-                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
             // interaction.channel.send(`**${users_list[interaction.user.id].ingame_name}** is hosting this squad\nPlease invite everyone, and make sure the squad is set to "invite-only"\nOnly the host should initiate the mission\nIf host migrates, same rules apply"`).catch(console.error)
             // // interaction.deferUpdate().catch(console.error)
@@ -133,7 +133,7 @@ client.on('interactionCreate', (interaction) => {
             const rated_user = interaction.customId.split('.')[2]
             const rating = interaction.customId.split('.')[3]
             if (rated_user && rating) {
-                socket.emit(`allsquads/user/ratings/create`,{user_id: user_id, rated_user: rated_user, rating: rating, rating_type: 'host_rating'})
+                socket.emit(`allsquads/user/ratings/create`, { user_id: user_id, rated_user: rated_user, rating: rating, rating_type: 'host_rating' })
                 const payload = {
                     content: ' ',
                     embeds: [{
@@ -174,7 +174,7 @@ client.on('interactionCreate', (interaction) => {
                 }],
                 components: [{
                     type: 1,
-                    components: Array.from([1,2,3,4,5]).map(rating => ({
+                    components: Array.from([1, 2, 3, 4, 5]).map(rating => ({
                         type: 2,
                         label: rating == 1 ? '10 - 99' : rating == 2 ? '100 - 199' : rating == 3 ? '200 - 299' : rating == 4 ? '300 - 399' : rating == 5 ? '400+' : 'undefined',
                         custom_id: `as_host_rate..${rate_user}.${rating}`,
@@ -185,33 +185,33 @@ client.on('interactionCreate', (interaction) => {
                 ephemeral: true
             }).catch(console.log)
         } else if (interaction.customId.split('.')[0] == 'as_user_settings') {
-            if (!as_users_list_discord[interaction.user.id]) return interaction.reply({content: 'You are not verified', ephemeral: true}).catch(console.error)
+            if (!as_users_list_discord[interaction.user.id]) return interaction.reply({ content: 'You are not verified', ephemeral: true }).catch(console.error)
             interaction.reply(userSettingsPanel(interaction, as_users_list_discord[interaction.user.id])).catch(console.error)
         } else if (interaction.customId.split('.')[0] == 'as_user_change_settings') {
             const discord_id = interaction.user.id
             const setting_type = interaction.customId.split('.')[1]
             const setting_value = interaction.customId.split('.')[2] == 'true' ? true : interaction.customId.split('.')[2] == 'false' ? false : interaction.customId.split('.')[2]
-            socket.emit(`allsquads/user/settings/update`,{setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1},(res) => {
+            socket.emit(`allsquads/user/settings/update`, { setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
                 if (res.code == 200) {
                     interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
-                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
-        } 
+        }
     }
-    if (interaction.isModalSubmit()) { 
+    if (interaction.isModalSubmit()) {
         if (interaction.customId.split('.')[0] == 'as_sq_invalidate') {
             const bot_type = interaction.customId.split('.')[1]
             const squad_id = interaction.customId.split('.')[2]
             const discord_id = interaction.user.id
             const reason = interaction.fields.getTextInputValue('reason')
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1,reason: reason},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`, { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, reason: reason }, (res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nReason: ${reason}`,
-                        embeds: interaction.message.embeds.map(embed => ({...embed, color: 'RED'})),
+                        embeds: interaction.message.embeds.map(embed => ({ ...embed, color: 'RED' })),
                         components: []
                     }).catch(console.error)
-                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
         } else if (interaction.customId.split('.')[0] == 'as_users_rate') {
             computeRateUser(`${interaction.customId}.${interaction.fields.getTextInputValue('reason')}`, as_users_list_discord[interaction.user.id]?.user_id).then(res => {
@@ -226,28 +226,28 @@ client.on('interactionCreate', (interaction) => {
             const discord_id = interaction.user.id
             const reason = 'Invalidated for specific members'
             const invalidated_members = interaction.values
-            socket.emit(`${bot_type}/squads/invalidate`,{squad_id: squad_id,user_id: as_users_list_discord[discord_id]?.user_id || -1, reason: reason, invalidated_members: invalidated_members},(res) => {
+            socket.emit(`${bot_type}/squads/invalidate`, { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, reason: reason, invalidated_members: invalidated_members }, (res) => {
                 if (res.code == 200) {
                     interaction.update({
                         content: `Squad invalidated by <@${discord_id}>\nInvalidated Members: ${invalidated_members.map(id => `<@${as_users_list[id]?.discord_id}>`).join(', ')}`,
-                        embeds: interaction.message.embeds.map(embed => ({...embed, color: 'RED'})),
+                        embeds: interaction.message.embeds.map(embed => ({ ...embed, color: 'RED' })),
                         components: []
                     }).catch(console.error)
-                } else interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
         }
     }
 })
 
-client.on('guildMemberAdd',(member) => {
+client.on('guildMemberAdd', (member) => {
     if (member.guild.id == allsquads_discord_server) {
         if (as_users_list_discord[member.id]) {
-            check_member_discord_roles({discord_id: member.id})
+            check_member_discord_roles({ discord_id: member.id })
         }
     }
 })
 
-client.on('messageCreate',(message) => {
+client.on('messageCreate', (message) => {
     if (message.channel?.id == '890198895508992020') {
         if (message.type == 'CHANNEL_PINNED_MESSAGE' && message.author?.id == client.user.id) {
             message.delete().catch(console.error)
@@ -269,38 +269,38 @@ client.on('messageCreate',(message) => {
     if (message.channel.id == '1003269624521044039') {
         if (message.author?.id != client.user.id) {
             if (message.attachments.map(o => o).length == 0)
-            db_schedule_msg_deletion(message.id, message.channel.id, 21600000)
+                db_schedule_msg_deletion(message.id, message.channel.id, 21600000)
         }
     }
 })
 
 event_emitter.on('allSquadsNewUserVerified', async db_user => {
     try {
-        check_member_discord_roles({db_user: db_user})
+        check_member_discord_roles({ db_user: db_user })
 
         const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-    
+
         if (user) {
             await user.send('Welcome to AllSquads **' + db_user.ingame_name + '**! Your account has been verified').catch(console.error)
             payloadsGenerator().forEach(payload => {
                 user.send(payload).catch(console.error)
             })
         }
-        
+
         function payloadsGenerator() {
-            const squad_trackers = ['duviri','aya_farm','void_traces_farm','sortie','steelpath_incursion','eidolon','index','profit_taker','leveling','arbitration','nightwave','lich',
-            'sister','endo_arena','archon_hunt']
-            const relic_trackers = ['lith b1 relic','meso m1 relic','neo b3 relic','axi r1 relic','lith o2 relic','meso o3 relic','neo v8 relic','axi l4 relic',
-            'lith c5 relic','lith v6 relic','neo s13 relic','neo s2 relic','lith g1 relic','neo s5 relic','axi e1 relic','lith t3 relic','meso o4 relic','neo n11 relic'
-            ,'lith b4 relic','meso n6 relic','neo r1 relic','axi s3 relic','lith m1 relic','meso b3 relic','lith v7 relic'
-            ,'lith v8 relic','neo n5 relic','axi a7 relic','neo o1 relic','axi v8 relic']
+            const squad_trackers = ['duviri', 'aya_farm', 'void_traces_farm', 'sortie', 'steelpath_incursion', 'eidolon', 'index', 'profit_taker', 'leveling', 'arbitration', 'nightwave', 'lich',
+                'sister', 'endo_arena', 'archon_hunt']
+            const relic_trackers = ['lith b1 relic', 'meso m1 relic', 'neo b3 relic', 'axi r1 relic', 'lith o2 relic', 'meso o3 relic', 'neo v8 relic', 'axi l4 relic',
+                'lith c5 relic', 'lith v6 relic', 'neo s13 relic', 'neo s2 relic', 'lith g1 relic', 'neo s5 relic', 'axi e1 relic', 'lith t3 relic', 'meso o4 relic', 'neo n11 relic'
+                , 'lith b4 relic', 'meso n6 relic', 'neo r1 relic', 'axi s3 relic', 'lith m1 relic', 'meso b3 relic', 'lith v7 relic'
+                , 'lith v8 relic', 'neo n5 relic', 'axi a7 relic', 'neo o1 relic', 'axi v8 relic']
             const squads_payloads = []
             const relics_payloads = []
-            squad_trackers.map((squad,index) => {
-                const payload_index = Math.ceil((index + 1)/15) - 1
-                const component_index = Math.ceil((index - payload_index * 15 + 1)/3) - 1
-                if (!squads_payloads[payload_index]) squads_payloads[payload_index] = {content: ' ', embeds: [], components: []}
-                if (!squads_payloads[payload_index].components[component_index]) squads_payloads[payload_index].components[component_index] = {type: 1, components: []}
+            squad_trackers.map((squad, index) => {
+                const payload_index = Math.ceil((index + 1) / 15) - 1
+                const component_index = Math.ceil((index - payload_index * 15 + 1) / 3) - 1
+                if (!squads_payloads[payload_index]) squads_payloads[payload_index] = { content: ' ', embeds: [], components: [] }
+                if (!squads_payloads[payload_index].components[component_index]) squads_payloads[payload_index].components[component_index] = { type: 1, components: [] }
                 squads_payloads[payload_index].components[component_index].components.push({
                     type: 2,
                     style: 1,
@@ -309,15 +309,15 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
                     emoji: emoteObjFromSquadString(squad)
                 })
             })
-            relic_trackers.map((squad,index) => {
-                const payload_index = Math.ceil((index + 1)/20) - 1
-                const component_index = Math.ceil((index - payload_index * 20 + 1)/4) - 1
-                if (!relics_payloads[payload_index]) relics_payloads[payload_index] = {content: ' ', embeds: [], components: []}
-                if (!relics_payloads[payload_index].components[component_index]) relics_payloads[payload_index].components[component_index] = {type: 1, components: []}
+            relic_trackers.map((squad, index) => {
+                const payload_index = Math.ceil((index + 1) / 20) - 1
+                const component_index = Math.ceil((index - payload_index * 20 + 1) / 4) - 1
+                if (!relics_payloads[payload_index]) relics_payloads[payload_index] = { content: ' ', embeds: [], components: [] }
+                if (!relics_payloads[payload_index].components[component_index]) relics_payloads[payload_index].components[component_index] = { type: 1, components: [] }
                 relics_payloads[payload_index].components[component_index].components.push({
                     type: 2,
                     style: 1,
-                    label: convertUpper(squad.replace(' relic','')),
+                    label: convertUpper(squad.replace(' relic', '')),
                     custom_id: `as_new_member_sq_trackers_add.${squad}`,
                     emoji: emoteObjFromSquadString(squad)
                 })
@@ -330,7 +330,7 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
                 description: 'Check out these vaulted relics in your relic console!\nSub to them if you have',
                 color: 'WHITE'
             }]
-            
+
             return squads_payloads.concat(relics_payloads)
         }
     } catch (e) {
@@ -340,10 +340,10 @@ event_emitter.on('allSquadsNewUserVerified', async db_user => {
 
 event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
     try {
-        check_member_discord_roles({db_user: db_user})
+        check_member_discord_roles({ db_user: db_user })
 
         const user = client.users.cache.get(db_user.discord_id) || await client.users.fetch(db_user.discord_id).catch(console.error)
-    
+
         if (user) {
             await user.send('Your ign has been updated to **' + db_user.ingame_name + '**!').catch(console.error)
         }
@@ -372,47 +372,49 @@ function userSettingsPanel(interaction, user_obj) {
                 type: 2,
                 label: `${ping_dnd ? 'Disable' : 'Enable'} pinging on 'Do Not Disturb'`,
                 style: ping_dnd ? 4 : 3,
-                custom_id: `as_user_change_settings.ping_dnd.${ping_dnd ? false:true}`,
-            },{
+                custom_id: `as_user_change_settings.ping_dnd.${ping_dnd ? false : true}`,
+            }, {
                 type: 2,
                 label: `${ping_off ? 'Disable' : 'Enable'} pinging when offline`,
                 style: ping_off ? 4 : 3,
-                custom_id: `as_user_change_settings.ping_off.${ping_off ? false:true}`,
+                custom_id: `as_user_change_settings.ping_off.${ping_off ? false : true}`,
             },]
         }],
         ephemeral: true
     }
 }
 
-async function computeRateUser(query,user_id) {
-    return new Promise((resolve,reject) => {
+async function computeRateUser(query, user_id) {
+    return new Promise((resolve, reject) => {
         const member_ids = (query.split('.')[1]).split('_').filter(id => id != user_id)
         const rated_user = query.split('.')[2]
         const rating = query.split('.')[3]
         const reason = query.split('.')[4]
         if (rated_user && rating) {
             if (rating == 1 & !reason) {
-                return resolve({payload_type: 'show_modal', payload: {
-                    title: "User Rating",
-                    custom_id: query,
-                    components: [
-                        {
-                            type: 1,
-                            components: [{
-                                type: 4,
-                                custom_id: "reason",
-                                label: "Reason",
-                                style: 2,
-                                min_length: 5,
-                                max_length: 200,
-                                placeholder: "Please provide a reason why you chose this rating",
-                                required: true
-                            }]
-                        }
-                    ]
-                }})
+                return resolve({
+                    payload_type: 'show_modal', payload: {
+                        title: "User Rating",
+                        custom_id: query,
+                        components: [
+                            {
+                                type: 1,
+                                components: [{
+                                    type: 4,
+                                    custom_id: "reason",
+                                    label: "Reason",
+                                    style: 2,
+                                    min_length: 5,
+                                    max_length: 200,
+                                    placeholder: "Please provide a reason why you chose this rating",
+                                    required: true
+                                }]
+                            }
+                        ]
+                    }
+                })
             } else {
-                socket.emit(`allsquads/user/ratings/create`,{user_id: user_id, rated_user: rated_user, rating: rating, rating_type: 'squad_rating', reason: reason})
+                socket.emit(`allsquads/user/ratings/create`, { user_id: user_id, rated_user: rated_user, rating: rating, rating_type: 'squad_rating', reason: reason })
             }
         }
         if (member_ids.length == 1 && !member_ids[0]) {
@@ -425,21 +427,21 @@ async function computeRateUser(query,user_id) {
                 components: [],
                 ephemeral: true
             }
-            return resolve({payload_type: 'reply', payload: payload})
+            return resolve({ payload_type: 'reply', payload: payload })
         } else {
-            generateRateUserEmbed(user_id,member_ids).then(payload => {
-                return resolve({payload_type: 'reply', payload: payload})
+            generateRateUserEmbed(user_id, member_ids).then(payload => {
+                return resolve({ payload_type: 'reply', payload: payload })
             }).catch(console.error)
         }
     })
 }
 
 function generateRateUserEmbed(user_id, member_ids) {
-    return new Promise((resolve,reject) => {
-        socket.emit(`allsquads/user/ratings/fetch`,{user_id: user_id, rating_type: 'squad_rating'},(res) => {
+    return new Promise((resolve, reject) => {
+        socket.emit(`allsquads/user/ratings/fetch`, { user_id: user_id, rating_type: 'squad_rating' }, (res) => {
             if (res.code == 200) {
                 const rated_users = res.data
-                const payload = {content: ' ', embeds: [], components: [], ephemeral: true}
+                const payload = { content: ' ', embeds: [], components: [], ephemeral: true }
                 member_ids.forEach(user_id => {
                     if (Object.keys(rated_users).includes(user_id))
                         member_ids = member_ids.filter(id => id != user_id)
@@ -454,14 +456,14 @@ function generateRateUserEmbed(user_id, member_ids) {
                     })
                 } else {
                     const rate_user = member_ids[0]
-                    console.log('[allsquads.generateRateUserEmbed] rate_user=',rate_user,'member_ids=',member_ids)
+                    console.log('[allsquads.generateRateUserEmbed] rate_user=', rate_user, 'member_ids=', member_ids)
                     payload.embeds.push({
                         description: `How was your experience with **${as_users_list[rate_user].ingame_name}**?`,
                         color: 'BLUE'
                     })
                     payload.components.push({
                         type: 1,
-                        components: Array.from([1,2,3]).map(rating => ({
+                        components: Array.from([1, 2, 3]).map(rating => ({
                             type: 2,
                             label: rating == 1 ? 'Horrible' : rating == 2 ? 'Good' : rating == 3 ? 'Excellent' : 'undefined',
                             custom_id: `as_users_rate.${member_ids.filter(id => id != rate_user).join('_')}.${rate_user}.${rating}`,
@@ -497,8 +499,8 @@ async function edit_vip_message() {
         content: ' ',
         embeds: [{
             title: 'VIP Subscription',
-            description: 
-`Subscribe to the monthly VIP access for only **$3.79** to gain premium perks including:
+            description:
+                `Subscribe to the monthly VIP access for only **$3.79** to gain premium perks including:
 
 ◉ Removing ads from our [HubApp](https://www.hubapp.site/)
 ◉ Claiming the <@&1041308552905629746> role
@@ -528,23 +530,23 @@ async function assign_allsquads_roles() {
         rank_type: 'rank_1',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'star child'),
         requirement: 5
-    },{
+    }, {
         rank_type: 'rank_2',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'lotus lover'),
         requirement: 20
-    },{
+    }, {
         rank_type: 'rank_3',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'sentient'),
         requirement: 50
-    },{
+    }, {
         rank_type: 'rank_4',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'true master'),
         requirement: 100
-    },{
+    }, {
         rank_type: 'rank_5',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'void angel'),
         requirement: 300
-    },{
+    }, {
         rank_type: 'rank_6',
         object: guild.roles.cache.find(role => role.name.toLowerCase() === 'legendary'),
         requirement: 500
@@ -589,7 +591,7 @@ async function assign_allsquads_roles() {
             })
         }
     })
-    
+
     const early_supporter_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'early supporter')
     Object.values(as_users_list).forEach(async user => {
         if (user.is_early_supporter) {
@@ -604,9 +606,9 @@ async function assign_allsquads_roles() {
 async function edit_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
     socket.emit('allsquads/leaderboards/fetch', {
-        options: { 
-            limit: 10, 
-            skip_users: [as_users_list_discord['253525146923433984'].user_id,as_users_list_discord['739833841686020216'].user_id],
+        options: {
+            limit: 10,
+            skip_users: [as_users_list_discord['253525146923433984'].user_id, as_users_list_discord['739833841686020216'].user_id],
         }
     }, async (res) => {
         if (res.code == 200) {
@@ -616,16 +618,16 @@ async function edit_leaderboard() {
                 content: ' ',
                 embeds: [{
                     title: 'All-time Leaderboard',
-                    description: `${'⸻'.repeat(10)}${leaderboards.all_time.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.all_time.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.all_time.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.all_time.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.all_time.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Reputation',
@@ -633,18 +635,18 @@ async function edit_leaderboard() {
                         }
                     }),
                     color: 'ORANGE'
-                },{
+                }, {
                     title: 'Monthly Leaderboard',
-                    description: `${'⸻'.repeat(10)}${leaderboards.this_month.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_month.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.this_month.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.this_month.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.this_month.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Reputation',
@@ -652,18 +654,18 @@ async function edit_leaderboard() {
                         }
                     }),
                     color: 'ORANGE'
-                },{
+                }, {
                     title: 'Weekly Leaderboard',
-                    description: `${'⸻'.repeat(10)}${leaderboards.this_week.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_week.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.this_week.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.this_week.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.this_week.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Reputation',
@@ -686,7 +688,7 @@ function edit_staff_leaderboard() {
     console.log('[allsquads.edit_leaderboard] called')
     socket.emit('allsquads/leaderboards/fetch', {
         options: {
-            limit: 10, 
+            limit: 10,
         }
     }, async (res) => {
         if (res.code == 200) {
@@ -695,16 +697,16 @@ function edit_staff_leaderboard() {
                 content: ' ',
                 embeds: [{
                     title: 'All-time Leaderboard',
-                    description: `${'⸻'.repeat(10)}${leaderboards.all_time.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.all_time.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.all_time.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.all_time.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.all_time.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Reputation',
@@ -712,18 +714,18 @@ function edit_staff_leaderboard() {
                         }
                     }),
                     color: 'ORANGE'
-                },{
+                }, {
                     title: 'Monthly Leaderboard',
-                    description: `${'⸻'.repeat(10)}${leaderboards.this_month.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_month.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.this_month.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.this_month.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.this_month.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Reputation',
@@ -731,18 +733,18 @@ function edit_staff_leaderboard() {
                         }
                     }),
                     color: 'ORANGE'
-                },{
+                }, {
                     title: 'Weekly Leaderboard',
-                    description: `${'⸻'.repeat(10)}${leaderboards.this_week.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.this_week.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.this_week.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.this_week.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.this_week.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Reputation',
@@ -750,18 +752,18 @@ function edit_staff_leaderboard() {
                         }
                     }),
                     color: 'ORANGE'
-                },{
+                }, {
                     title: `Today's Leaderboard`,
-                    description: `${'⸻'.repeat(10)}${leaderboards.today.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.today.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.today.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.today.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.today.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Reputation',
@@ -769,9 +771,9 @@ function edit_staff_leaderboard() {
                         }
                     }),
                     color: 'ORANGE'
-                },{
+                }, {
                     title: `Top Squads This Week`,
-                    description: `Total: ${leaderboards.total_squads}\n${'⸻'.repeat(10)}${leaderboards.top_squads.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `Total: ${leaderboards.total_squads}\n${'⸻'.repeat(10)}${leaderboards.top_squads.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Squad',
@@ -811,16 +813,16 @@ async function edit_event_leaderboard() {
                 content: ' ',
                 embeds: [{
                     title: 'Event Leaderboard',
-                    description: `${'⸻'.repeat(10)}${leaderboards.top_runners.event_runners.length > 0 ? '':'\nNo data available yet'}`,
+                    description: `${'⸻'.repeat(10)}${leaderboards.top_runners.event_runners.length > 0 ? '' : '\nNo data available yet'}`,
                     fields: responsiveEmbedFields({
                         field1: {
                             label: 'Rank',
-                            valueArr: leaderboards.top_runners.event_runners.map((e,index) => `${index+1}`)
+                            valueArr: leaderboards.top_runners.event_runners.map((e, index) => `${index + 1}`)
                         },
                         field2: {
                             label: 'Player',
                             valueArr: leaderboards.top_runners.event_runners.map(user => `${user.ingame_name}`),
-                            valueFormatter: (value) => value.replace(/_/g,'\\_')
+                            valueFormatter: (value) => value.replace(/_/g, '\\_')
                         },
                         field3: {
                             label: 'Points',
@@ -839,7 +841,7 @@ async function edit_event_leaderboard() {
     })
 }
 
-async function check_member_discord_roles({db_user, discord_id}) {
+async function check_member_discord_roles({ db_user, discord_id }) {
     try {
         if (!db_user) {
             if (!discord_id) return
@@ -850,7 +852,7 @@ async function check_member_discord_roles({db_user, discord_id}) {
         if (!guild) return
         const member = guild?.members.cache.get(db_user.discord_id) || await guild?.members.fetch(db_user.discord_id).catch(console.error)
         if (!member) return
-    
+
         if (member) {
             const verified_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'verified')
             const awaken_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'awaken')
@@ -858,10 +860,10 @@ async function check_member_discord_roles({db_user, discord_id}) {
             const xbox_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'xbox tenno')
             const playstation_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'playstation tenno')
             const switch_role = guild.roles.cache.find(role => role.name.toLowerCase() === 'switch tenno')
-        
+
             if (!member.roles.cache.get(verified_role.id)) await member.roles.add(verified_role).catch(console.error)
             if (!member.roles.cache.get(awaken_role.id)) await member.roles.add(awaken_role).catch(console.error)
-            if (!member.roles.cache.get(pc_role.id) && !member.roles.cache.get(xbox_role.id) && !member.roles.cache.get(playstation_role.id) && !member.roles.cache.get(switch_role.id)) 
+            if (!member.roles.cache.get(pc_role.id) && !member.roles.cache.get(xbox_role.id) && !member.roles.cache.get(playstation_role.id) && !member.roles.cache.get(switch_role.id))
                 await member.roles.add(db_user.platform == 'PC' ? pc_role : db_user.platform == 'XBOX' ? xbox_role : db_user.platform == 'PSN' ? playstation_role : db_user.platform == 'NSW' ? switch_role : null).catch(console.error)
             if ((member.displayName || member.nickname) != db_user.ingame_name) await member.setNickname(db_user.ingame_name).catch(console.error)
         }
@@ -875,20 +877,20 @@ async function check_allsquads_members_roles() {
     client.guilds.fetch(allsquads_discord_server).then(guild => {
         guild.members.fetch(members => {
             members.forEach(member => {
-                check_member_discord_roles({discord_id: member.id})
+                check_member_discord_roles({ discord_id: member.id })
             })
         }).catch(console.error)
     }).catch(console.error)
 }
 
-function removeAffiliatedServer(channel_id,guild_id, type) {
-    db.query(`delete from ${type == 'relic_bot' ? 'as_rb_guilds':'as_sb_guilds'} where guild_id = '${guild_id}'`).then(res => {
+function removeAffiliatedServer(channel_id, guild_id, type) {
+    db.query(`delete from ${type == 'relic_bot' ? 'as_rb_guilds' : 'as_sb_guilds'} where guild_id = '${guild_id}'`).then(res => {
         if (res.rowCount == 1) {
             client.channels.cache.get(channel_id)?.send({
-                content: 
-`[Warframe Squads] Some error occured verifying bot permissions in this server.
+                content:
+                    `[Warframe Squads] Some error occured verifying bot permissions in this server.
 To conserve resources, this server has been removed from affiliation.
-If you'd like to re-affiliate, please either re-invite the bot or use \`/${type == 'relic_bot' ? 'relic_bot':'squad_bot'} add_server\` slash command`
+If you'd like to re-affiliate, please either re-invite the bot or use \`/${type == 'relic_bot' ? 'relic_bot' : 'squad_bot'} add_server\` slash command`
             }).catch(console.error)
         }
     }).catch(console.error)
@@ -947,7 +949,7 @@ function channelsVerification() {
     db.query(`DELETE FROM as_sb_guilds t1 WHERE NOT EXISTS ( SELECT FROM as_sb_channels t2 WHERE t1.guild_id = t2.guild_id )`).catch(console.error)
 }
 
-function verificationInstructions(language,code,already_verified) {
+function verificationInstructions(language, code, already_verified) {
     const components = [{
         type: 1,
         components: [{
@@ -955,12 +957,12 @@ function verificationInstructions(language,code,already_verified) {
             label: 'English',
             style: 3,
             custom_id: 'allsquads_verification_translate.en'
-        },{
+        }, {
             type: 2,
             label: 'Français',
             style: 3,
             custom_id: 'allsquads_verification_translate.fr'
-        },{
+        }, {
             type: 2,
             label: 'Italian',
             style: 3,
@@ -968,11 +970,11 @@ function verificationInstructions(language,code,already_verified) {
         }].filter(obj => obj.custom_id.split('.')[1] != language)
     }]
     const payload = {
-        content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n':''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (TradeKeeper): https://forums.warframe.com/messenger/compose/?to=6931114\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
+        content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n' : ''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (Gauss.Prime.wfs): https://forums.warframe.com/messenger/compose/?to=8672715\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
         embeds: [{
-            description: '[Visit the forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=6931114)',
+            description: '[Visit the forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=8672715)',
             footer: {
-                text: already_verified ? `${code}_alrver`:`${code}_!alrver`
+                text: already_verified ? `${code}_alrver` : `${code}_!alrver`
             }
         }],
         components: components,
@@ -988,8 +990,8 @@ function translatePayload(payload, lang) {
         translations.forEach(sentence => {
             if (!sentence.en || sentence.en == "" || !sentence[lang] || sentence[lang] == "" || sentence.en == sentence[lang]) return
             var i = 0;
-            while (payloadString.match(sentence.en.replace(/\[/g,'\\[').replace(/\?/g,'\\?'))) {
-                payloadString = payloadString.replace(sentence.en,sentence[lang])
+            while (payloadString.match(sentence.en.replace(/\[/g, '\\[').replace(/\?/g, '\\?'))) {
+                payloadString = payloadString.replace(sentence.en, sentence[lang])
                 // console.log('in loop',sentence.en,sentence[lang])
                 i++;
                 if (i > 100) {
@@ -999,7 +1001,7 @@ function translatePayload(payload, lang) {
             }
         })
         return JSON.parse(payloadString)
-    } catch(e) {
+    } catch (e) {
         console.log(`[allsquads.translatePayload] Error while translating\npayload:${JSON.stringify(payload)}\nlang: ${lang}\nerror: ${e}`)
         return payload
     }
@@ -1008,23 +1010,23 @@ function translatePayload(payload, lang) {
 async function as_user_registeration(discord_id) {
     return new Promise((resolve, reject) => {
         db.query(`SELECT * FROM as_users_list WHERE discord_id = '${discord_id}'`)
-        .then(res => {
-            const uni_id = generateId()
-            db.query(`INSERT INTO as_users_secret (code,identifier,id_type) VALUES ('${uni_id}','${discord_id}','discord_id')`)
-            .then(() => {
-                resolve(verificationInstructions('en',uni_id,res.rows.length == 0 ? false:true))
+            .then(res => {
+                const uni_id = generateId()
+                db.query(`INSERT INTO as_users_secret (code,identifier,id_type) VALUES ('${uni_id}','${discord_id}','discord_id')`)
+                    .then(() => {
+                        resolve(verificationInstructions('en', uni_id, res.rows.length == 0 ? false : true))
+                    }).catch(err => {
+                        console.log(err)
+                        reject({ content: "Some error occured inserting record into db.\nError code: 502\nPlease contact MrSofty#7012" })
+                    })
             }).catch(err => {
                 console.log(err)
-                reject({content: "Some error occured inserting record into db.\nError code: 502\nPlease contact MrSofty#7012"})
+                reject({ content: "Some error occured retrieving database info.\nError code: 500\nPlease contact MrSofty#7012" })
             })
-        }).catch(err => {
-            console.log(err)
-            reject({content: "Some error occured retrieving database info.\nError code: 500\nPlease contact MrSofty#7012"})
-        })
     })
 }
 
-function error_codes_embed(response,discord_id) {
+function error_codes_embed(response, discord_id) {
     if (response.code == 499) {
         return {
             content: ' ',
@@ -1064,7 +1066,7 @@ function error_codes_embed(response,discord_id) {
 //         if ((payload[0].is_patron && !payload[1].is_patron) || (payload[0].is_patron && payload[0].patreon_expiry_timestamp != payload[1].patreon_expiry_timestamp)) {
 //             const user = client.users.cache.get(payload[0].discord_id.toString()) || await client.users.fetch(payload[0].discord_id.toString()).catch(console.error)
 //             if (!user) return
-    
+
 //             user.send({
 //                 content: ' ',
 //                 embeds: [{
