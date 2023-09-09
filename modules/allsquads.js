@@ -970,9 +970,9 @@ function verificationInstructions(language, code, already_verified) {
         }].filter(obj => obj.custom_id.split('.')[1] != language)
     }]
     const payload = {
-        content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n' : ''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (Gauss.Prime.wfs): https://forums.warframe.com/messenger/compose/?to=8672715\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
+        content: `${already_verified ? 'Note: Your ign has already been verified. It will be updated upon re-verification\n' : ''}**Please follow these steps to verify your account:**\n1) First make sure you are signed-in on Warframe forums by visiting this link: https://forums.warframe.com/\n2) Visit this page to compose a new message to the bot (Utsugi_Renka): https://forums.warframe.com/messenger/compose/?to=8550102\n3) Write the message body as given below:\nSubject: **${code}**\nMessage: Hi\n4) Click 'Send' button\n5) Bot will check the inbox in next couple of seconds and message you about the verification. Thanks!`,
         embeds: [{
-            description: '[Visit the forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=8672715)',
+            description: '[Visit the forums](https://forums.warframe.com/)\n\n[Message the bot](https://forums.warframe.com/messenger/compose/?to=8550102)',
             footer: {
                 text: already_verified ? `${code}_alrver` : `${code}_!alrver`
             }
