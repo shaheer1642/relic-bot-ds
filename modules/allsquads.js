@@ -274,6 +274,38 @@ client.on('messageCreate', (message) => {
     }
 })
 
+var presences = {}
+setInterval(() => {
+    presences = {}
+}, 3600000);
+
+client.on('presenceUpdate', (_, presence) => {
+
+    if (presences[presence.user.id]?.presence == presence.status) return
+    else presences[presence.user.id] = { presence: presence.status }
+
+    if (as_users_list_discord[presence.user.id]?.auto_leave_offline && (!presence.status || presence.status == 'offline')) {
+        socket.emit('allsquads/user/activeSquads/fetch', { user_id: as_users_list_discord[presence.user.id]?.user_id || -1 }, (res) => {
+            if (res.code == 200 && res.data.length > 0) {
+                socket.emit('relicbot/squads/leave', { user_id: as_users_list_discord[presence.user.id]?.user_id || -1, tier: 'all' }, (res) => {
+                    if (res.code == 200) {
+                        socket.emit('squadbot/squads/leaveall', { user_id: as_users_list_discord[presence.user.id]?.user_id || -1 }, (res) => {
+                            if (res.code == 200) {
+                                presence.user.send('You have been removed from the joined squads as you have went offline.').catch(console.error)
+                            } else {
+                                presence.user.send('An error occured removing you from the joined squads as you have went offline.').catch(console.error)
+                            }
+                        })
+                    } else {
+                        presence.user.send('An error occured removing you from the joined squads as you have went offline.').catch(console.error)
+                    }
+                })
+            }
+        })
+    }
+
+})
+
 event_emitter.on('allSquadsNewUserVerified', async db_user => {
     try {
         check_member_discord_roles({ db_user: db_user })
@@ -355,6 +387,7 @@ event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
 function userSettingsPanel(interaction, user_obj) {
     const ping_dnd = user_obj.allowed_pings_status?.includes('dnd') ? true : false
     const ping_off = user_obj.allowed_pings_status?.includes('offline') ? true : false
+    const { auto_leave_offline } = user_obj
     return {
         embeds: [{
             title: 'Bot Settings',
@@ -378,6 +411,11 @@ function userSettingsPanel(interaction, user_obj) {
                 label: `${ping_off ? 'Disable' : 'Enable'} pinging when offline`,
                 style: ping_off ? 4 : 3,
                 custom_id: `as_user_change_settings.ping_off.${ping_off ? false : true}`,
+            }, {
+                type: 2,
+                label: `${auto_leave_offline ? 'Disable' : 'Enable'} auto-leave squads when going offline`,
+                style: auto_leave_offline ? 4 : 3,
+                custom_id: `as_user_change_settings.auto_leave_offline.${auto_leave_offline ? false : true}`,
             },]
         }],
         ephemeral: true
