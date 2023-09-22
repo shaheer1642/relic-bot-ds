@@ -5,7 +5,7 @@ const JSONbig = require('json-bigint');
 const { socket } = require('./socket')
 const { emoteObjFromSquadString } = require('./emotes')
 const { event_emitter } = require('./event_emitter')
-const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, generateId, responsiveEmbedFields } = require('./extras.js');
+const { convertUpper, dynamicSort, dynamicSortDesc, calcArrAvg, generateId, responsiveEmbedFields, timeStringToMs } = require('./extras.js');
 const translations = require('./../translations.json');
 const supported_langs = ['en', 'fr', 'it']
 const { as_users_list, as_users_list_discord } = require('./allsquads/as_users_list')
@@ -187,15 +187,6 @@ client.on('interactionCreate', (interaction) => {
         } else if (interaction.customId.split('.')[0] == 'as_user_settings') {
             if (!as_users_list_discord[interaction.user.id]) return interaction.reply({ content: 'You are not verified', ephemeral: true }).catch(console.error)
             interaction.reply(userSettingsPanel(interaction, as_users_list_discord[interaction.user.id])).catch(console.error)
-        } else if (interaction.customId.split('.')[0] == 'as_user_change_settings') {
-            const discord_id = interaction.user.id
-            const setting_type = interaction.customId.split('.')[1]
-            const setting_value = interaction.customId.split('.')[2] == 'true' ? true : interaction.customId.split('.')[2] == 'false' ? false : interaction.customId.split('.')[2]
-            socket.emit(`allsquads/user/settings/update`, { setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
-                if (res.code == 200) {
-                    interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
-                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
-            })
         }
     }
     if (interaction.isModalSubmit()) {
@@ -236,6 +227,45 @@ client.on('interactionCreate', (interaction) => {
                 } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
         }
+    }
+    if (interaction.customId.split('.')[0] == 'as_user_change_settings') {
+        const discord_id = interaction.user.id
+        const setting_type = interaction.customId.split('.')[1]
+        var setting_value = interaction.isButton() ?
+            interaction.customId.split('.')[2] == 'true' ? true :
+                interaction.customId.split('.')[2] == 'false' ? false :
+                    interaction.customId.split('.')[2] :
+            interaction.isModalSubmit() ? interaction.fields.getTextInputValue(setting_type) : undefined
+        if (!setting_value) {
+            return interaction.showModal({
+                title: convertUpper(setting_type),
+                custom_id: interaction.customId,
+                components: [
+                    {
+                        type: 1,
+                        components: [{
+                            type: 4,
+                            custom_id: setting_type,
+                            label: setting_type == 'squad_timeout' ? "Duration (in minutes)" : "error",
+                            style: 1,
+                            min_length: 3,
+                            max_length: 4,
+                            placeholder: "i.e. 30m",
+                            required: true
+                        }]
+                    }
+                ]
+            }).catch(console.error)
+        }
+        if (setting_type == 'squad_timeout') {
+            setting_value = timeStringToMs(setting_value)
+        }
+        if (!setting_value) return
+        socket.emit(`allsquads/user/settings/update`, { setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
+            if (res.code == 200) {
+                interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
+            } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
+        })
     }
 })
 
@@ -416,7 +446,15 @@ function userSettingsPanel(interaction, user_obj) {
                 label: `${auto_leave_offline ? 'Disable' : 'Enable'} auto-leave squads when going offline`,
                 style: auto_leave_offline ? 4 : 3,
                 custom_id: `as_user_change_settings.auto_leave_offline.${auto_leave_offline ? false : true}`,
-            },]
+            }]
+        }, {
+            type: 1,
+            components: [{
+                type: 2,
+                label: `Change Squad Timeout (${Math.round((user_obj.squad_timeout / 1000) / 60)}m)`,
+                style: 1,
+                custom_id: `as_user_change_settings.squad_timeout`,
+            }]
         }],
         ephemeral: true
     }
