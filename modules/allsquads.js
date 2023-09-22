@@ -248,9 +248,9 @@ client.on('interactionCreate', (interaction) => {
                             custom_id: setting_type,
                             label: setting_type == 'squad_timeout' ? "Duration (in minutes)" : "error",
                             style: 1,
-                            min_length: 3,
-                            max_length: 4,
-                            placeholder: "i.e. 30m",
+                            min_length: 2,
+                            max_length: 3,
+                            placeholder: "i.e. 30",
                             required: true
                         }]
                     }
@@ -258,7 +258,7 @@ client.on('interactionCreate', (interaction) => {
             }).catch(console.error)
         }
         if (setting_type == 'squad_timeout') {
-            setting_value = timeStringToMs(setting_value)
+            setting_value = setting_value * 60000
         }
         if (!setting_value) return
         socket.emit(`allsquads/user/settings/update`, { setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
