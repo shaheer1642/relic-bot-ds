@@ -228,7 +228,7 @@ client.on('interactionCreate', (interaction) => {
             })
         }
     }
-    if (interaction.customId.split('.')[0] == 'as_user_change_settings') {
+    if (interaction.customId?.split('.')[0] == 'as_user_change_settings') {
         const discord_id = interaction.user.id
         const setting_type = interaction.customId.split('.')[1]
         var setting_value = interaction.isButton() ?
