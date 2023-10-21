@@ -28,6 +28,9 @@ const emote_ids = {
     kullervo: '🆕',
     hot: '🔥',
     cold: '❄️',
+    squad_1: '<:squad1:1165428876080599092>',
+    squad_2: '<:squad2:1165428873131995246>',
+    squad_3: '<:squad3:1165429713595006997>',
 }
 
 function emoteObjFromSquadString(squad_string) {

@@ -600,7 +600,7 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
             label: labelNameGenerator(squad, index),
             style: 1, //squad.members.length > 1 ? 3 : 2,
             custom_id: `rb_sq_${squad.squad_id}`,
-            emoji: squad.members.length == 3 ? emote_ids.hot : null
+            emoji: squad.members.length == 3 ? emote_ids.squad_3 : squad.members.length == 2 ? emote_ids.squad_2 : squad.members.length == 1 ? emote_ids.squad_1 : null
         })
         if (index == squads.length - 1) {
             const k = Math.ceil((index + 2) / 5) - 1
