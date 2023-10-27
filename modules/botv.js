@@ -441,6 +441,7 @@ async function reaction_handler(reaction, user, action) {
                 .then(member => {
                     const role = client.guilds.cache.get(botv_guild_id).roles.cache.find(role => role.name.toLowerCase() == (reaction.emoji.name == 'PC' ? 'pc tenno' : reaction.emoji.name == 'PS' ? 'playstation tenno' : reaction.emoji.name == 'XBOX' ? 'xbox tenno' : reaction.emoji.name == 'NSW' ? 'switch tenno' : ''))
                     if (role) {
+                        console.log('setting nickname')
                         member.setNickname(`[${reaction.emoji.name}] ${member.displayName.replace(/^\[.*\] /, '')}`).catch(console.error)
                         member.roles.add(role)
                             .then(res => {
