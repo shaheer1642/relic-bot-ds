@@ -600,29 +600,6 @@ async function reaction_handler(reaction, user, action) {
                         inform_dc(`Error removing role ${role.name} from user ${user.username} `)
                     })
             }
-            else if (reaction.message.id == platformRolesMessageId) {
-                client.guilds.cache.get(botv_guild_id).members.fetch(user.id)
-                    .then(member => {
-                        const role = member.roles.cache.find(role => role.name.toLowerCase() == (reaction.emoji.name == 'PC' ? 'pc tenno' : reaction.emoji.name == 'PS' ? 'playstation tenno' : reaction.emoji.name == 'XBOX' ? 'xbox tenno' : reaction.emoji.name == 'NSW' ? 'switch tenno' : ''))
-                        if (role) {
-                            member.roles.remove(role)
-                                .then(res => {
-                                    user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                                        .then(() => {
-                                            mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`, '#2ECC71')
-                                        }).catch(err => {
-                                            mod_log(`Error removing role <@&${role.id}> from user <@${user.id}>`, '#2ECC71')
-                                            console.log(err)
-                                        })
-                                }).catch(function (error) {
-                                    console.log(`${error} Error removing role ${role.name} from user ${user.username}`)
-                                    user.send('Error occured removing role. Please try again.\nError Code: 500')
-                                    mod_log(`Error assigning role <@&${role.id}> to user <@${user.id}>`, '#2ECC71')
-                                    inform_dc(`Error adding role ${role.name} for user ${user.username}`)
-                                })
-                        }
-                    }).catch(console.error)
-            }
             else if (reaction.emoji.id == "892062164813225994") {
                 const role = reaction.message.guild.roles.cache.find(role => role.name === 'MR 16+')
                 reaction.message.guild.members.cache.get(user.id).roles.remove(role)
@@ -696,6 +673,26 @@ async function reaction_handler(reaction, user, action) {
                         inform_dc(`Error removing role ${role.name} from user ${user.username} `)
                     })
             }
+        }
+        if (reaction.message.id == platformRolesMessageId) {
+            client.guilds.cache.get(botv_guild_id).members.fetch(user.id)
+                .then(member => {
+                    const role = member.roles.cache.find(role => role.name.toLowerCase() == (reaction.emoji.name == 'PC' ? 'pc tenno' : reaction.emoji.name == 'PS' ? 'playstation tenno' : reaction.emoji.name == 'XBOX' ? 'xbox tenno' : reaction.emoji.name == 'NSW' ? 'switch tenno' : ''))
+                    if (role) {
+                        member.roles.remove(role)
+                            .then(res => {
+                                user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
+                                    .then(() => {
+                                        mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`, '#E74C3C')
+                                    }).catch(console.error)
+                            }).catch(function (error) {
+                                console.log(`${error} Error removing role ${role.name} from user ${user.username}`)
+                                user.send('Error occured removing role. Please try again.\nError Code: 500').catch(console.error)
+                                mod_log(`Error removing role <@&${role.id}> from user <@${user.id}>`, '#E74C3C')
+                                inform_dc(`Error removing role ${role.name} from user ${user.username}`)
+                            })
+                    }
+                }).catch(console.error)
         }
     }
 
