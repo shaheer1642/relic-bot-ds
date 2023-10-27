@@ -442,19 +442,15 @@ async function reaction_handler(reaction, user, action) {
                     const role = client.guilds.cache.get(botv_guild_id).roles.cache.find(role => role.name.toLowerCase() == (reaction.emoji.name == 'PC' ? 'pc tenno' : reaction.emoji.name == 'PS' ? 'playstation tenno' : reaction.emoji.name == 'XBOX' ? 'xbox tenno' : reaction.emoji.name == 'NSW' ? 'switch tenno' : ''))
                     if (role) {
                         console.log('setting nickname')
-                        member.setNickname(`[${reaction.emoji.name}] ${member.displayName.replace(/^\[.*\] /, '')}`).catch(console.error)
                         member.roles.add(role)
-                            .then(res => {
-                                user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.')
-                                    .then(() => {
-                                        mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`, '#2ECC71')
-                                    }).catch(err => {
-                                        mod_log(`Error assigning role <@&${role.id}> to user <@${user.id}>`, '#2ECC71')
-                                        console.log(err)
-                                    })
+                            .then(async res => {
+                                mod_log(`Assigned role <@&${role.id}> to user <@${user.id}>`, '#2ECC71')
+                                user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**.').catch(console.error)
+                                member = await member.fetch().catch(console.error)
+                                member.setNickname(`[${reaction.emoji.name}] ${member.displayName.replace(/^\[.*\] /, '')}`).catch(console.error)
                             }).catch(function (error) {
                                 console.log(`${error} Error adding role ${role.name} for user ${user.username}`)
-                                user.send('Error occured adding role. Please try again.\nError Code: 500')
+                                user.send('Error occured adding role. Please try again.\nError Code: 500').catch(console.error)
                                 mod_log(`Error assigning role <@&${role.id}> to user <@${user.id}>`, '#2ECC71')
                                 inform_dc(`Error adding role ${role.name} for user ${user.username}`)
                             })
@@ -682,10 +678,8 @@ async function reaction_handler(reaction, user, action) {
                     if (role) {
                         member.roles.remove(role)
                             .then(res => {
-                                user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.')
-                                    .then(() => {
-                                        mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`, '#E74C3C')
-                                    }).catch(console.error)
+                                mod_log(`Removed role <@&${role.id}> from user <@${user.id}>`, '#E74C3C')
+                                user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**.').catch(console.error)
                             }).catch(function (error) {
                                 console.log(`${error} Error removing role ${role.name} from user ${user.username}`)
                                 user.send('Error occured removing role. Please try again.\nError Code: 500').catch(console.error)
