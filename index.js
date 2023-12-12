@@ -4,23 +4,23 @@ const axiosRetry = require('axios-retry');
 const wfm_api = require('./modules/wfm_api.js');
 const test_modules = require('./modules/test_modules.js');
 // const trade_bot_modules = require('./modules/trade_bot_modules.js');
-const {inform_dc,dynamicSort,dynamicSortDesc,msToTime,msToFullTime,mod_log, embedScore} = require('./modules/extras.js');
+const { inform_dc, dynamicSort, dynamicSortDesc, msToTime, msToFullTime, mod_log, embedScore } = require('./modules/extras.js');
 const fs = require('fs')
-const {db} = require('./modules/db_connection.js');
-const {pins_handler} = require('./modules/pins_handler.js');
+const { db } = require('./modules/db_connection.js');
+const { pins_handler } = require('./modules/pins_handler.js');
 const db_modules = require('./modules/db_modules.js');
 const osiris_guild = require('./modules/osiris.js');
 const hubapp = require('./modules/hubapp.js');
 const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
-const worldstatealerts = require('./modules/worldstatealerts.js');
+// const worldstatealerts = require('./modules/worldstatealerts.js');
 const relicbot = require('./modules/as_relicbot.js');
 const squadbot = require('./modules/as_squadbot.js');
 const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
 const osiris_guild_id = '905559118096531456'
-const {client} = require('./modules/discord_client.js');
+const { client } = require('./modules/discord_client.js');
 const { as_user_registeration } = require('./modules/allsquads.js');
 require('./modules/trackers.js');
 require('./modules/wfhub_get_started.js');
@@ -117,7 +117,7 @@ client.on('ready', () => {
     inform_dc(`Bot has started.`)
 
     client.user.setActivity('.help', { type: 2 })
-    
+
     deploy_commands.bot_initialize()
 
     osiris_guild.bot_initialize()
@@ -126,11 +126,11 @@ client.on('ready', () => {
     osiris_tts.bot_initialize()
     osiris_guild.bot_initialize()
     twitch_affiliate.bot_initialize()
-    worldstatealerts.bot_initialize()
+    // worldstatealerts.bot_initialize()
 
     client.guilds.fetch().then(guilds => {
         guilds.forEach(guild => {
-            client.guilds.cache.get(guild.id).me.setNickname(`${client.guilds.cache.get(guild.id).me.displayName.replace(/\[Maintenance Mode\]/g,'').trim()}${process.env.MAINTENANCE_MODE == 1 ? ' [Maintenance Mode]':''}`).catch(console.error)
+            client.guilds.cache.get(guild.id).me.setNickname(`${client.guilds.cache.get(guild.id).me.displayName.replace(/\[Maintenance Mode\]/g, '').trim()}${process.env.MAINTENANCE_MODE == 1 ? ' [Maintenance Mode]' : ''}`).catch(console.error)
         })
     }).catch(console.error)
 })
@@ -153,7 +153,7 @@ client.on('messageCreate', async message => {
         return Promise.resolve()
 
     //auto-delete in warframe hub recruit channels
-    if (message.type == 'DEFAULT' && !message.author?.bot && (['1039266854545403935','901799370071101460','901799369941073940','901799369974616094','901799369647484979'].includes(message.channel.id))) {
+    if (message.type == 'DEFAULT' && !message.author?.bot && (['1039266854545403935', '901799370071101460', '901799369941073940', '901799369974616094', '901799369647484979'].includes(message.channel.id))) {
         const guild = client.guilds.cache.get(message.guild.id) || await client.guilds.fetch(message.guild.id).catch(console.error)
         const member = guild.members.cache.get(message.author.id) || await guild.members.fetch(message.author.id).catch(console.error)
         const isStaff = member.roles.cache.get('891717782348136488') || member.roles.cache.get('891718083520122880')
@@ -162,7 +162,7 @@ client.on('messageCreate', async message => {
     }
 
     if (message.guild) {
-        if (message.guild.id==osiris_guild_id) {
+        if (message.guild.id == osiris_guild_id) {
             osiris_guild.messageHandler(message).catch(err => console.log(err))
         }
 
@@ -173,32 +173,32 @@ client.on('messageCreate', async message => {
         if (message.guild.id == '776804537095684108') {
             botv.message_handler(message)
         }
-        if (message.guild.id=='865904902941048862' && message.content=='!rhino') {
+        if (message.guild.id == '865904902941048862' && message.content == '!rhino') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891071818495053925/unknown.png')
             return Promise.resolve()
         }
-        else if (message.guild.id=='865904902941048862' && message.content=='!rhino2') {
+        else if (message.guild.id == '865904902941048862' && message.content == '!rhino2') {
             message.channel.send('https://cdn.discordapp.com/attachments/735610769068261436/891227421800562698/unknown.png')
             return Promise.resolve()
         }
-        else if (message.guild.id=='865904902941048862' && message.content=='!rhino3') {
+        else if (message.guild.id == '865904902941048862' && message.content == '!rhino3') {
             message.channel.send('https://cdn.discordapp.com/attachments/864199722676125757/896138812718219345/unknown.png')
             return Promise.resolve()
         }
-        else if ((message.guild.id=='865904902941048862' || '832677897411493949') && message.content=='!kek') {
+        else if ((message.guild.id == '865904902941048862' || '832677897411493949') && message.content == '!kek') {
             message.channel.send('<:kek:892005941195714570>').then(async msg => {
-                var i=1
+                var i = 1
                 console.log(`started kekfunc`)
-                setTimeout(function(){kekfunc(msg,i)},1500)
+                setTimeout(function () { kekfunc(msg, i) }, 1500)
             }).catch(err => console.log(err))
-            async function kekfunc(msg,i) {
+            async function kekfunc(msg, i) {
                 var postdata = ""
-                for (var j=0;j<=i;j++) {
+                for (var j = 0; j <= i; j++) {
                     postdata += '<:kek:892005941195714570>'
                 }
                 i++
-                if (i<50)
-                    msg.edit(postdata).then(msg => setTimeout(function(){kekfunc(msg,i)},1500)).catch(err=>console.log(err))
+                if (i < 50)
+                    msg.edit(postdata).then(msg => setTimeout(function () { kekfunc(msg, i) }, 1500)).catch(err => console.log(err))
                 else
                     console.log(`closed kekfunc`)
             }
@@ -213,7 +213,7 @@ client.on('messageCreate', async message => {
     // }
 
     const multiMessageArr = message.content.split('\n')
-    for (const [index,multiMessage] of multiMessageArr.entries()) {
+    for (const [index, multiMessage] of multiMessageArr.entries()) {
 
         // if (!message.guild) {
         //     const args = multiMessage.trim().split(/ +/g)
@@ -288,20 +288,20 @@ client.on('messageCreate', async message => {
         //     continue;
         // }
         if (message.guild) {
-            const args = multiMessage.replace(/\./g,'').trim().split(/ +/g)
-            if (args[1] && !args[1].match(/\?/g) && !args[1].match(':') && !(args[1].length > 3) && (!args[2] || args[2]=='relic') && !args[3]) {
-                switch(args[0].toLowerCase()) {
+            const args = multiMessage.replace(/\./g, '').trim().split(/ +/g)
+            if (args[1] && !args[1].match(/\?/g) && !args[1].match(':') && !(args[1].length > 3) && (!args[2] || args[2] == 'relic') && !args[3]) {
+                switch (args[0].toLowerCase()) {
                     case 'lith':
-                        wfm_api.relics(message,args)
+                        wfm_api.relics(message, args)
                         break
                     case 'meso':
-                        wfm_api.relics(message,args)
+                        wfm_api.relics(message, args)
                         break
                     case 'neo':
-                        wfm_api.relics(message,args)
+                        wfm_api.relics(message, args)
                         break
                     case 'axi':
-                        wfm_api.relics(message,args)
+                        wfm_api.relics(message, args)
                         break
                 }
             }
@@ -318,72 +318,72 @@ client.on('messageCreate', async message => {
 
         //call function if any
         if (message.guild) {
-            switch(command) {
+            switch (command) {
                 case 'uptime':
-                    wfm_api.uptime(message,args)
+                    wfm_api.uptime(message, args)
                     break
                 case 'help':
-                    wfm_api.help(message,args)
+                    wfm_api.help(message, args)
                     break
                 case 'orders':
-                    wfm_api.orders(message,args)
+                    wfm_api.orders(message, args)
                     break
                 case 'order':
-                    wfm_api.orders(message,args)
+                    wfm_api.orders(message, args)
                     break
                 case 'auctions':
-                    wfm_api.auctions(message,args)
+                    wfm_api.auctions(message, args)
                     break
                 case 'auction':
-                    wfm_api.auctions(message,args)
+                    wfm_api.auctions(message, args)
                     break
                 case 'relist':
-                    wfm_api.relist(message,args)
+                    wfm_api.relist(message, args)
                     break
                 case 'list':
-                    wfm_api.list(message,args)
+                    wfm_api.list(message, args)
                     break
                 case 'relic':
-                    wfm_api.relics(message,args)
+                    wfm_api.relics(message, args)
                     break
                 case 'relics':
-                    wfm_api.relics(message,args)
+                    wfm_api.relics(message, args)
                     break
                 case 'updatedb':
-                    db_modules.updateDB(message,args)
+                    db_modules.updateDB(message, args)
                     break
                 case 'say':
-                    test_modules.saySomething(message,args)
+                    test_modules.saySomething(message, args)
                     break
                 case 'launchnuke':
-                    test_modules.launchNuke(message,args)
+                    test_modules.launchNuke(message, args)
                     break
                 case 'wssetup':
-                    worldstatealerts.wssetup(message,args)
+                    // worldstatealerts.wssetup(message, args)
                     break
                 case 'getserverstats':
-                    discord_server_modules.computeServerStats(message,args)
+                    discord_server_modules.computeServerStats(message, args)
                     break
-                case 'viewhiatus': 
+                case 'viewhiatus':
                     botv.getHiatusMembers(message)
                     break
                 ///*----------------------
                 case 'restart':
-                    if (['253525146923433984','689646747172995107','253980061969940481'].includes(message.author.id)) {
-                        console.log('restarting bot upon discord user request',message.author.id)
-                        message.channel.send({content: 'restart command received, restarting bot'})
-                        .then(() => process.exit()).catch(console.error)
-                    } else message.channel.send({content: 'Sorry, you don\'t have permission to use this command'}).catch(console.error)
+                    if (['253525146923433984', '689646747172995107', '253980061969940481'].includes(message.author.id)) {
+                        console.log('restarting bot upon discord user request', message.author.id)
+                        message.channel.send({ content: 'restart command received, restarting bot' })
+                            .then(() => process.exit()).catch(console.error)
+                    } else message.channel.send({ content: 'Sorry, you don\'t have permission to use this command' }).catch(console.error)
                     break
                 //-----------------------*/
             }
         }
-        
+
         //for dms
-        else 
-            switch(command) {
+        else
+            switch (command) {
                 case 'authorize':
-                    wfm_api.WFMauthorize(message,args)
+                    wfm_api.WFMauthorize(message, args)
                     break
             }
         continue
@@ -391,8 +391,8 @@ client.on('messageCreate', async message => {
     return
 })
 
-client.on("messageUpdate", async function(oldMessage, newMessage) {
-    if (newMessage.guildId == "776804537095684108") 
+client.on("messageUpdate", async function (oldMessage, newMessage) {
+    if (newMessage.guildId == "776804537095684108")
         botv.messageUpdate(oldMessage, newMessage)
 
     if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id) && !hubapp.ignore_messages_ids.includes(newMessage.id))
@@ -401,7 +401,7 @@ client.on("messageUpdate", async function(oldMessage, newMessage) {
 
 client.on('interactionCreate', async interaction => {
 
-    worldstatealerts.interaction_handler(interaction)
+    // worldstatealerts.interaction_handler(interaction)
 
     if (interaction.channelId == '996418373137219595') {
         osiris_tts.interactionHandler(interaction);
@@ -412,7 +412,7 @@ client.on('interactionCreate', async interaction => {
         twitch_affiliate.interaction_handler(interaction)
         return
     }
-    
+
     // if (interaction.customId == 'user_orders' && interaction.componentType == 'SELECT_MENU') {
     //     const discord_id = interaction.member.user.id
     //     var user_profile = null
@@ -601,33 +601,33 @@ client.on('interactionCreate', async interaction => {
     else if (interaction.customId == 'bounty_lvl' && interaction.componentType == 'SELECT_MENU') {
         await interaction.deferUpdate()
         var msg = interaction.message.content.split('\n')
-        var syndicate = msg[0].replace('Syndicate:','').replace(/_/g,' ').trim()
-        var bounty_type = msg[1].replace('Bounty:','').replace(/_/g,' ').trim()
+        var syndicate = msg[0].replace('Syndicate:', '').replace(/_/g, ' ').trim()
+        var bounty_type = msg[1].replace('Bounty:', '').replace(/_/g, ' ').trim()
         await db.query(`
         SELECT * FROM bounties_list
         WHERE LOWER(syndicate) = '${syndicate}' AND LOWER(type) = '${bounty_type}'
         `)
-        .then(async res => {
-            if (res.rowCount == 0 || res.rowCount > 1) {
-                await interaction.editReply({ content: 'Some error occured. Please contact softy. Code 500',embeds: [],components:[] }).catch(err => console.log(err));
-                return
-            }
-            res.rows[0].users2[interaction.user.id] = {levels: interaction.values}
-            await db.query(`
+            .then(async res => {
+                if (res.rowCount == 0 || res.rowCount > 1) {
+                    await interaction.editReply({ content: 'Some error occured. Please contact softy. Code 500', embeds: [], components: [] }).catch(err => console.log(err));
+                    return
+                }
+                res.rows[0].users2[interaction.user.id] = { levels: interaction.values }
+                await db.query(`
             UPDATE bounties_list
             SET users2 = '${JSON.stringify(res.rows[0].users2)}'
             WHERE LOWER(syndicate) = '${syndicate}' AND LOWER(type) = '${bounty_type}'
             `)
-            .then(async res => {
-                if (res.rowCount == 0)
-                    await interaction.editReply({ content: 'Some error occured. Please contact softy. Code 501',embeds: [],components:[] }).catch(err => console.log(err));
-                else
-                    await interaction.editReply({ content: 'Added tracker.',embeds: [],components:[] }).catch(err => console.log(err));
+                    .then(async res => {
+                        if (res.rowCount == 0)
+                            await interaction.editReply({ content: 'Some error occured. Please contact softy. Code 501', embeds: [], components: [] }).catch(err => console.log(err));
+                        else
+                            await interaction.editReply({ content: 'Added tracker.', embeds: [], components: [] }).catch(err => console.log(err));
+                    })
+                    .catch(err => console.log(err))
+                return
             })
             .catch(err => console.log(err))
-            return
-        })
-        .catch(err => console.log(err))
     }
 
     // else if (interaction.customId == 'staff_trade_verification' && interaction.componentType == 'SELECT_MENU') {
@@ -775,21 +775,21 @@ client.on('interactionCreate', async interaction => {
                     return
                 var mission_type = interaction.options.getString('mission_type')
                 var bounties_list = []
-                await db.query(`SELECT * FROM bounties_list WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' ORDER BY type ASC`)
-                .then(res => {
-                    bounties_list = res.rows
-                })
-                .catch(err => console.log(err))
+                await db.query(`SELECT * FROM bounties_list WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g, ' ')}' ORDER BY type ASC`)
+                    .then(res => {
+                        bounties_list = res.rows
+                    })
+                    .catch(err => console.log(err))
                 var postdata = []
-                for (var i=0; i<bounties_list.length; i++) {
-                    if (postdata.length==25)
+                for (var i = 0; i < bounties_list.length; i++) {
+                    if (postdata.length == 25)
                         break
                     var bounty = bounties_list[i]
                     if (bounty.type.toLowerCase().match(mission_type.toLowerCase())) {
                         if (bounty.users2.hasOwnProperty(interaction.member.id))
-                            postdata.push({name: bounty.type + ' (Remove)', value: bounty.type.toLowerCase().replace(/ /g,'_')})
+                            postdata.push({ name: bounty.type + ' (Remove)', value: bounty.type.toLowerCase().replace(/ /g, '_') })
                         else
-                            postdata.push({name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g,'_')})
+                            postdata.push({ name: bounty.type, value: bounty.type.toLowerCase().replace(/ /g, '_') })
                     }
                 }
                 interaction.respond(postdata).catch(err => console.log(err))
@@ -799,20 +799,20 @@ client.on('interactionCreate', async interaction => {
             if (interaction.options.getSubcommand() == 'teshin') {
                 var rotation = interaction.options.getString('item')
                 var rotation_list = await db.query(`SELECT * FROM teshin_rotation ORDER BY id ASC`)
-                .then(res => {
-                    return res.rows
-                })
-                .catch(err => console.log(err))
+                    .then(res => {
+                        return res.rows
+                    })
+                    .catch(err => console.log(err))
                 var postdata = []
-                for (var i=0; i<rotation_list.length; i++) {
-                    if (postdata.length==25)
+                for (var i = 0; i < rotation_list.length; i++) {
+                    if (postdata.length == 25)
                         break
                     var e = rotation_list[i]
                     if (e.type.toLowerCase().match(rotation.toLowerCase())) {
                         if (e.users.users.includes(interaction.member.id))
-                            postdata.push({name: e.type + ' (Remove)', value: e.type.toLowerCase().replace(/ /g,'_')})
+                            postdata.push({ name: e.type + ' (Remove)', value: e.type.toLowerCase().replace(/ /g, '_') })
                         else
-                            postdata.push({name: e.type, value: e.type.toLowerCase().replace(/ /g,'_')})
+                            postdata.push({ name: e.type, value: e.type.toLowerCase().replace(/ /g, '_') })
                     }
                 }
                 interaction.respond(postdata).catch(err => console.log(err))
@@ -824,17 +824,17 @@ client.on('interactionCreate', async interaction => {
             var weapon = interaction.options.getString('weapon')
             var lich_list = []
             await db.query(`SELECT * FROM lich_list ORDER BY weapon_url ASC`)
-            .then(res => {
-                lich_list = res.rows
-            })
-            .catch(err => console.log(err))
+                .then(res => {
+                    lich_list = res.rows
+                })
+                .catch(err => console.log(err))
             var postdata = []
-            for (var i=0; i<lich_list.length; i++) {
-                if (i==25)
+            for (var i = 0; i < lich_list.length; i++) {
+                if (i == 25)
                     break
                 var lich = lich_list[i]
-                if (lich.weapon_url.toLowerCase().replace(/_/g,' ').match(weapon.toLowerCase()))
-                    postdata.push({name: lich.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), value: lich.weapon_url})
+                if (lich.weapon_url.toLowerCase().replace(/_/g, ' ').match(weapon.toLowerCase()))
+                    postdata.push({ name: lich.weapon_url.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), value: lich.weapon_url })
             }
             interaction.respond(postdata).catch(err => console.log(err))
             console.log('autocomplete (lich)')
@@ -907,8 +907,8 @@ client.on('interactionCreate', async interaction => {
         if (interaction.customId == 'tb_verify') {
             console.log('verify clicked')
             as_user_registeration(interaction.user.id)
-            .then(res => interaction.reply(res).catch(err => console.log(err)))
-            .catch(err => interaction.reply(err).catch(err => console.log(err)))
+                .then(res => interaction.reply(res).catch(err => console.log(err)))
+                .catch(err => interaction.reply(err).catch(err => console.log(err)))
             return
         }
         return
@@ -930,230 +930,230 @@ client.on('interactionCreate', async interaction => {
         //         }).catch(err => console.log(err))
         //     })
         // }
-    
+
         if (interaction.commandName == 'query') {
             if (interaction.options.getSubcommand() === 'sets') {
                 db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND tags ? 'set' AND (tags ? 'warframe' OR tags ? 'weapon' OR tags ? 'companion' OR tags ? 'sentinel') AND sell_price >= ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
-                .then(res => {
-                    var embed = []
-                    embed.push({
-                        title: 'Prime sets >= ' + interaction.options.getNumber('threshold') + 'p',
-                        fields: [
-                            {name: 'Set', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
-                            {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
-                            {name: 'Volume Sold (30 days)', value: res.rows.map(e => {return e.volume_sold}).toString().replace(/,/g, '\n'), inline: true}
-                        ],
-                        timestamp: new Date()
+                    .then(res => {
+                        var embed = []
+                        embed.push({
+                            title: 'Prime sets >= ' + interaction.options.getNumber('threshold') + 'p',
+                            fields: [
+                                { name: 'Set', value: res.rows.map(e => { return e.item_url }).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true },
+                                { name: 'Price', value: res.rows.map(e => { return e.sell_price }).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true },
+                                { name: 'Volume Sold (30 days)', value: res.rows.map(e => { return e.volume_sold }).toString().replace(/,/g, '\n'), inline: true }
+                            ],
+                            timestamp: new Date()
+                        })
+                        console.log(JSON.stringify(embed))
+                        interaction.reply({ content: ' ', embeds: embed, ephemeral: false })
+                            .catch(err => {
+                                console.log(err)
+                                if (err.code == 50035)
+                                    interaction.reply({ content: 'Too many search results. Could not send embed. Please increase your price threshold', ephemeral: true }).catch(err => console.log(err))
+                                else
+                                    interaction.reply({ content: 'Unexpected error. Please try again', ephemeral: false }).catch(err => console.log(err))
+                            })
                     })
-                    console.log(JSON.stringify(embed))
-                    interaction.reply({ content: ' ', embeds: embed,ephemeral: false })
                     .catch(err => {
                         console.log(err)
-                        if (err.code == 50035)
-                            interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
-                        else 
-                            interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
+                        interaction.reply({ content: 'Sorry some error occured.', ephemeral: false })
                     })
-                })
-                .catch(err => {
-                    console.log(err)
-                    interaction.reply({ content: 'Sorry some error occured.', ephemeral: false })
-                })
             }
             else if (interaction.options.getSubcommand() === 'parts') {
                 db.query(`SELECT * FROM items_list WHERE tags ? 'prime' AND (tags ? 'component' OR tags ? 'blueprint') AND (tags ? 'warframe' OR tags ? 'weapon' OR tags ? 'sentinel' OR tags ? 'kubrow') AND sell_price >= ${interaction.options.getNumber('threshold')} ORDER BY sell_price DESC`)
-                .then(res => {
-                    var embed = []
-                    embed.push({
-                        title: 'Prime parts >= ' + interaction.options.getNumber('threshold') + 'p',
-                        fields: [
-                            {name: 'Part', value: res.rows.map(e => {return e.item_url}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true},
-                            {name: 'Price', value: res.rows.map(e => {return e.sell_price}).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true},
-                            {name: 'Volume Sold (30 days)', value: res.rows.map(e => {return e.volume_sold}).toString().replace(/,/g, '\n'), inline: true}
-                        ],
-                        timestamp: new Date()
+                    .then(res => {
+                        var embed = []
+                        embed.push({
+                            title: 'Prime parts >= ' + interaction.options.getNumber('threshold') + 'p',
+                            fields: [
+                                { name: 'Part', value: res.rows.map(e => { return e.item_url }).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n').replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase()), inline: true },
+                                { name: 'Price', value: res.rows.map(e => { return e.sell_price }).toString().replace(/,/g, '\u205F\u205F\u205F\u205F\u205F\n'), inline: true },
+                                { name: 'Volume Sold (30 days)', value: res.rows.map(e => { return e.volume_sold }).toString().replace(/,/g, '\n'), inline: true }
+                            ],
+                            timestamp: new Date()
+                        })
+                        console.log(JSON.stringify(embed))
+                        interaction.reply({ content: ' ', embeds: embed, ephemeral: false })
+                            .catch(err => {
+                                console.log(err)
+                                if (err.code == 50035)
+                                    interaction.reply({ content: 'Too many search results. Could not send embed. Please increase your price threshold', ephemeral: true }).catch(err => console.log(err))
+                                else
+                                    interaction.reply({ content: 'Unexpected error. Please try again', ephemeral: false }).catch(err => console.log(err))
+                            })
                     })
-                    console.log(JSON.stringify(embed))
-                    interaction.reply({ content: ' ', embeds: embed,ephemeral: false })
                     .catch(err => {
                         console.log(err)
-                        if (err.code == 50035)
-                            interaction.reply({content: 'Too many search results. Could not send embed. Please increase your price threshold',ephemeral: true}).catch(err => console.log(err))
-                        else 
-                            interaction.reply({content: 'Unexpected error. Please try again',ephemeral: false}).catch(err => console.log(err))
+                        interaction.reply({ content: 'Sorry some error occured.', ephemeral: false }).catch(err => console.log(err))
                     })
-                })
-                .catch(err => {
-                    console.log(err)
-                    interaction.reply({ content: 'Sorry some error occured.', ephemeral: false }).catch(err => console.log(err))
-                })
             }
         }
-    
+
         else if (interaction.commandName == 'track') {
             if (interaction.options.getSubcommand() === 'bounties') {
                 //SET users = users || '[${interaction.member.user.id}]'::jsonb
                 await db.query(`
                 SELECT * FROM bounties_list
-                WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
+                WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g, ' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g, ' ')}'
                 `)
-                .then(async res => {
-                    if (res.rowCount == 0 || res.rowCount > 1) {
-                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
-                        return
-                    }
-                    if (res.rows[0].users2.hasOwnProperty(interaction.user.id)) {
-                        delete res.rows[0].users2[interaction.user.id]
-                        await db.query(`
+                    .then(async res => {
+                        if (res.rowCount == 0 || res.rowCount > 1) {
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false }).catch(err => console.log(err));
+                            return
+                        }
+                        if (res.rows[0].users2.hasOwnProperty(interaction.user.id)) {
+                            delete res.rows[0].users2[interaction.user.id]
+                            await db.query(`
                         UPDATE bounties_list
                         SET users2 = '${JSON.stringify(res.rows[0].users2)}'
-                        WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g,' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g,' ')}'
+                        WHERE LOWER(syndicate) = '${interaction.options.getString('syndicate').replace(/_/g, ' ')}' AND LOWER(type) = '${interaction.options.getString('mission_type').replace(/_/g, ' ')}'
                         `)
-                        .then(async res => {
-                            console.log(res)
-                            if (res.rowCount == 0)
-                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false}).catch(err => console.log(err));
-                            else
-                                await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
-                        })
-                        .catch(err => console.log(err))
-                        return
-                    }
-                    else {
-                        postdata = {content: `Syndicate: ${interaction.options.getString('syndicate')}\nBounty: ${interaction.options.getString('mission_type')}`, embeds: [], ephemeral: true}
-                        postdata.components = []
-                        postdata.components.push({
-                            type:1,
-                            components: [{
-                                type:3,
-                                placeholder: 'Choose bounty levels',
-                                custom_id: 'bounty_lvl',
-                                min_values: 1,
-                                max_values: 6,
-                                options: [
-                                    {
-                                        label: "Level 1 (5-15)",
-                                        value: "5-15"
-                                    },
-                                    {
-                                        label: "Level 2 (10-30)",
-                                        value: "10-30"
-                                    },
-                                    {
-                                        label: "Level 3 (20-40)",
-                                        value: "20-40"
-                                    },
-                                    {
-                                        label: "Level 4 (30-50)",
-                                        value: "30-50"
-                                    },
-                                    {
-                                        label: "Level 5 (40-60)",
-                                        value: "40-60"
-                                    },
-                                    {
-                                        label: "Steel Path (100-100)",
-                                        value: "100-100"
-                                    },
-                                ]
-                            }]
-                        })
-                        await interaction.reply(postdata).catch(err => console.log(err));
-                        return
-                    }
-                }).catch(err => console.log(err))
+                                .then(async res => {
+                                    console.log(res)
+                                    if (res.rowCount == 0)
+                                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false }).catch(err => console.log(err));
+                                    else
+                                        await interaction.reply({ content: 'Removed tracker.', ephemeral: true }).catch(err => console.log(err));
+                                })
+                                .catch(err => console.log(err))
+                            return
+                        }
+                        else {
+                            postdata = { content: `Syndicate: ${interaction.options.getString('syndicate')}\nBounty: ${interaction.options.getString('mission_type')}`, embeds: [], ephemeral: true }
+                            postdata.components = []
+                            postdata.components.push({
+                                type: 1,
+                                components: [{
+                                    type: 3,
+                                    placeholder: 'Choose bounty levels',
+                                    custom_id: 'bounty_lvl',
+                                    min_values: 1,
+                                    max_values: 6,
+                                    options: [
+                                        {
+                                            label: "Level 1 (5-15)",
+                                            value: "5-15"
+                                        },
+                                        {
+                                            label: "Level 2 (10-30)",
+                                            value: "10-30"
+                                        },
+                                        {
+                                            label: "Level 3 (20-40)",
+                                            value: "20-40"
+                                        },
+                                        {
+                                            label: "Level 4 (30-50)",
+                                            value: "30-50"
+                                        },
+                                        {
+                                            label: "Level 5 (40-60)",
+                                            value: "40-60"
+                                        },
+                                        {
+                                            label: "Steel Path (100-100)",
+                                            value: "100-100"
+                                        },
+                                    ]
+                                }]
+                            })
+                            await interaction.reply(postdata).catch(err => console.log(err));
+                            return
+                        }
+                    }).catch(err => console.log(err))
             }
             if (interaction.options.getSubcommand() === 'teshin') {
                 await db.query(`
                 SELECT * FROM teshin_rotation
-                WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g,' ')}'
+                WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g, ' ')}'
                 `)
-                .then(async res => {
-                    if (res.rowCount == 0 || res.rowCount > 1) {
-                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
-                        return
-                    }
-                    var user_list = res.rows[0].users
-                    if (user_list.users.includes(interaction.user.id)) {
-                        user_list.users = user_list.users.filter(item => item !== interaction.user.id)
-                        await db.query(`
+                    .then(async res => {
+                        if (res.rowCount == 0 || res.rowCount > 1) {
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false }).catch(err => console.log(err));
+                            return
+                        }
+                        var user_list = res.rows[0].users
+                        if (user_list.users.includes(interaction.user.id)) {
+                            user_list.users = user_list.users.filter(item => item !== interaction.user.id)
+                            await db.query(`
                         UPDATE teshin_rotation
                         SET users = '${JSON.stringify(user_list)}'
-                        WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g,' ')}'
+                        WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g, ' ')}'
                         `)
-                        .then(async res => {
-                            if (res.rowCount == 0)
-                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false}).catch(err => console.log(err));
-                            else
-                                await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
-                        })
-                        .catch(err => console.log(err))
-                        return
-                    }
-                    else {
-                        user_list.users.push(interaction.user.id)
-                        await db.query(`
+                                .then(async res => {
+                                    if (res.rowCount == 0)
+                                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false }).catch(err => console.log(err));
+                                    else
+                                        await interaction.reply({ content: 'Removed tracker.', ephemeral: true }).catch(err => console.log(err));
+                                })
+                                .catch(err => console.log(err))
+                            return
+                        }
+                        else {
+                            user_list.users.push(interaction.user.id)
+                            await db.query(`
                         UPDATE teshin_rotation
                         SET users = '${JSON.stringify(user_list)}'
-                        WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g,' ')}'
+                        WHERE LOWER(type) = '${interaction.options.getString('item').replace(/_/g, ' ')}'
                         `)
-                        .then(async res => {
-                            if (res.rowCount == 0)
-                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false}).catch(err => console.log(err));
-                            else
-                                await interaction.reply({ content: 'Added tracker.', ephemeral: true}).catch(err => console.log(err));
-                        })
-                        .catch(err => console.log(err))
-                        return
-                    }
-                }).catch(err => console.log(err))
+                                .then(async res => {
+                                    if (res.rowCount == 0)
+                                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false }).catch(err => console.log(err));
+                                    else
+                                        await interaction.reply({ content: 'Added tracker.', ephemeral: true }).catch(err => console.log(err));
+                                })
+                                .catch(err => console.log(err))
+                            return
+                        }
+                    }).catch(err => console.log(err))
             }
             if (interaction.options.getSubcommand() === 'cetus') {
                 db.query(`SELECT * FROM world_state WHERE type = 'cetusCycle'`)
-                .then(async res => {
-                    if (res.rowCount == 0 || res.rowCount > 1) {
-                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false}).catch(err => console.log(err));
-                        return
-                    }
-                    const world_state = res.rows[0]
-                    if (interaction.options.getString('condition') == 'remove') {
-                        delete world_state.users.day[interaction.user.id]
-                        delete world_state.users.night[interaction.user.id]
-                        await db.query(`
+                    .then(async res => {
+                        if (res.rowCount == 0 || res.rowCount > 1) {
+                            await interaction.reply({ content: 'Some error occured. Please contact softy. Code 500', ephemeral: false }).catch(err => console.log(err));
+                            return
+                        }
+                        const world_state = res.rows[0]
+                        if (interaction.options.getString('condition') == 'remove') {
+                            delete world_state.users.day[interaction.user.id]
+                            delete world_state.users.night[interaction.user.id]
+                            await db.query(`
                         UPDATE world_state
                         SET users = '${JSON.stringify(world_state.users)}'
                         WHERE type = 'cetusCycle'
                         `)
-                        .then(async res => {
-                            if (res.rowCount == 0)
-                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false}).catch(err => console.log(err));
-                            else
-                                await interaction.reply({ content: 'Removed tracker.', ephemeral: true}).catch(err => console.log(err));
-                        })
-                        .catch(err => console.log(err))
-                    }
-                    else {
-                        world_state.users[interaction.options.getString('condition')][interaction.user.id] = {guild_id: interaction.guildId}
-                        await db.query(`
+                                .then(async res => {
+                                    if (res.rowCount == 0)
+                                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 501', ephemeral: false }).catch(err => console.log(err));
+                                    else
+                                        await interaction.reply({ content: 'Removed tracker.', ephemeral: true }).catch(err => console.log(err));
+                                })
+                                .catch(err => console.log(err))
+                        }
+                        else {
+                            world_state.users[interaction.options.getString('condition')][interaction.user.id] = { guild_id: interaction.guildId }
+                            await db.query(`
                         UPDATE world_state
                         SET users = '${JSON.stringify(world_state.users)}'
                         WHERE type = 'cetusCycle'
                         `)
-                        .then(async res => {
-                            if (res.rowCount == 0)
-                                await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false}).catch(err => console.log(err));
-                            else
-                                await interaction.reply({ content: 'Added tracker.', ephemeral: true}).catch(err => console.log(err));
-                        })
-                        .catch(err => console.log(err))
-                    }
-                }).catch(err => console.log(err))
+                                .then(async res => {
+                                    if (res.rowCount == 0)
+                                        await interaction.reply({ content: 'Some error occured. Please contact softy. Code 502', ephemeral: false }).catch(err => console.log(err));
+                                    else
+                                        await interaction.reply({ content: 'Added tracker.', ephemeral: true }).catch(err => console.log(err));
+                                })
+                                .catch(err => console.log(err))
+                        }
+                    }).catch(err => console.log(err))
             }
             return
         }
-    
+
         else if (interaction.commandName == 'ping') {
-            interaction.reply({content: 'Pong!', ephemeral:true}).catch(err => console.log(err));
+            interaction.reply({ content: 'Pong!', ephemeral: true }).catch(err => console.log(err));
         }
 
         return
@@ -1162,10 +1162,9 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('shardError', error => {
-	console.error('A websocket connection encountered an error:', error);
-    fs.appendFile('ErrorLog.log',error + '\n\n', function (err) {
-        if (err)
-        {
+    console.error('A websocket connection encountered an error:', error);
+    fs.appendFile('ErrorLog.log', error + '\n\n', function (err) {
+        if (err) {
             console.log('Error occured writing to file.')
             return
         }
@@ -1311,13 +1310,13 @@ client.on('messageReactionAdd', async (reaction, user) => {
         return
 
     if (reaction.message.guildId == osiris_guild_id)
-        osiris_guild.reactionAddHandler(reaction,user).catch(err => console.log(err))
+        osiris_guild.reactionAddHandler(reaction, user).catch(err => console.log(err))
 
     if (reaction.message.guildId == '776804537095684108')
-        botv.reaction_handler(reaction,user,'add')
+        botv.reaction_handler(reaction, user, 'add')
 
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier)
-        twitch_affiliate.reaction_handler(reaction,user,'add')
+        twitch_affiliate.reaction_handler(reaction, user, 'add')
 
     // if (Object.keys(trade_bot_modules.tradingBotChannels).includes(reaction.message.channelId) || Object.keys(trade_bot_modules.tradingBotLichChannels).includes(reaction.message.channelId) || trade_bot_modules.tradingBotSpamChannels.includes(reaction.message.channelId))
     //     trade_bot_modules.reaction_handler(reaction, user, 'add')
@@ -1396,34 +1395,34 @@ client.on('messageReactionAdd', async (reaction, user) => {
     // }
 
     if (reaction.emoji.identifier == defaultReactions.update.identifier) {
-        wfm_api.orders_update(reaction.message,reaction,user)
+        wfm_api.orders_update(reaction.message, reaction, user)
         return
     }
-    
+
     if (reaction.emoji.identifier == defaultReactions.auto_update.identifier) {
         db.query(`INSERT INTO auto_update_items (message_id,channel_id) VALUES (${reaction.message.id},${reaction.message.channelId})`)
-        .catch(err => console.log(err))
+            .catch(err => console.log(err))
         var counter = 0;
-        reaction.message.edit({content: 'Auto-update has been turned on!'}).catch(err => console.log(err))
+        reaction.message.edit({ content: 'Auto-update has been turned on!' }).catch(err => console.log(err))
         reaction.message.reactions.removeAll().catch(err => console.log(err))
         var intervalID = setInterval(function () {
-        
+
             wfm_api.orders_update(reaction.message)
-        
+
             if (++counter === 120) {
                 clearInterval(intervalID);
-                reaction.message.edit({content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update`}).catch(err => console.log(err))
+                reaction.message.edit({ content: `React with ${defaultReactions.update.string} to update\nReact with ${defaultReactions.auto_update.string} to turn on auto-update` }).catch(err => console.log(err))
                 reaction.message.react(defaultReactions.update.string).catch(err => console.log(err))
                 reaction.message.react(defaultReactions.auto_update.string).catch(err => console.log(err))
                 db.query(`DELETE FROM auto_update_items WHERE message_id = ${reaction.message.id} AND channel_id = ${reaction.message.channelId}`)
-                .catch(err => console.log(err))
+                    .catch(err => console.log(err))
             }
         }, 30000);
         return
     }
-    
+
     if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
-        worldstatealerts.setupReaction(reaction, user, "add")
+        // worldstatealerts.setupReaction(reaction, user, "add")
     }
 });
 
@@ -1432,7 +1431,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         return
 
     if (reaction.emoji.identifier == twitch_affiliate.emotes.notify.identifier) {
-        twitch_affiliate.reaction_handler(reaction,user,'remove')
+        twitch_affiliate.reaction_handler(reaction, user, 'remove')
     }
 
     // if (!reaction.message.guildId) {
@@ -1504,10 +1503,10 @@ client.on('messageReactionRemove', async (reaction, user) => {
     // }
 
     if (reaction.message.guildId == '776804537095684108')
-        botv.reaction_handler(reaction,user,'remove')
+        botv.reaction_handler(reaction, user, 'remove')
 
     if (worldstatealertEmotes.includes(reaction.emoji.identifier) || worldstatealertEmotes.includes(reaction.emoji.name)) {
-        worldstatealerts.setupReaction(reaction, user, "remove")
+        // worldstatealerts.setupReaction(reaction, user, "remove")
     }
 });
 
@@ -1527,17 +1526,17 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
         botv.guildMemberUpdate(oldMember, newMember)
 })
 
-client.on('guildCreate',(guild) => {
+client.on('guildCreate', (guild) => {
     const log = `Joined new server\nName: ${guild.name}\nMember count: ${guild.memberCount}`
     console.log('[index.guildCreate]', log)
-    client.channels.cache.get('892003813786017822')?.send({content: log}).catch(console.error)
+    client.channels.cache.get('892003813786017822')?.send({ content: log }).catch(console.error)
 })
 
 axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
-      console.log(`retry attempt: ${retryCount}`);
-      return retryCount * 1000; // time interval between retries
+        console.log(`retry attempt: ${retryCount}`);
+        return retryCount * 1000; // time interval between retries
     },
     retryCondition: (error) => {
         // if retry condition is not specified, by default idempotent requests are retried
