@@ -2352,10 +2352,10 @@ async function baro_check() {
                 console.log('baro_check invokes in ' + msToTime(timer))
             }
             return
-        })
-        .catch(err => {
-            console.log(err)
-            baroTimer = setTimeout(baro_check, 5000)
+        }).catch(err => {
+            console.error(err)
+            clearTimeout(baroTimer)
+            baroTimer = setTimeout(baro_check, 60000)
         })
 }
 
@@ -2594,10 +2594,10 @@ async function cycles_check() {
             cyclesTimer = setTimeout(cycles_check, timer)
             console.log('cycles_check invokes in ' + msToTime(timer))
             return
-        })
-        .catch(err => {
-            console.log(err)
-            cyclesTimer = setTimeout(cycles_check, 5000)
+        }).catch(err => {
+            console.error(err)
+            clearTimeout(cyclesTimer)
+            cyclesTimer = setTimeout(cycles_check, 60000)
         })
 }
 
@@ -2755,11 +2755,10 @@ async function arbitration_check() {
             arbitrationTimer = setTimeout(arbitration_check, timer)
             console.log('arbitration_check invokes in ' + msToTime(timer))
             return
-        })
-        .catch(err => {
-            console.log(err)
+        }).catch(err => {
+            console.error(err)
             clearTimeout(arbitrationTimer)
-            arbitrationTimer = setTimeout(arbitration_check, 20000)
+            arbitrationTimer = setTimeout(arbitration_check, 60000)
             return
         })
 }
@@ -2992,10 +2991,10 @@ async function fissures_check() {
                 fissuresTimer = setTimeout(fissures_check, 5000)
             })
             return
-        })
-        .catch(err => {
-            console.log(err)
-            fissuresTimer = setTimeout(fissures_check, 5000)
+        }).catch(err => {
+            console.error(err)
+            clearTimeout(fissuresTimer)
+            fissuresTimer = setTimeout(fissures_check, 60000)
         })
 }
 
@@ -3118,10 +3117,10 @@ async function teshin_check() {
             teshinTimer = setTimeout(teshin_check, timer)
             console.log('teshin_check invokes in ' + msToTime(timer))
             return
-        })
-        .catch(err => {
-            console.log(err)
-            teshinTimer = setTimeout(teshin_check, 5000)
+        }).catch(err => {
+            console.error(err)
+            clearTimeout(teshinTimer)
+            teshinTimer = setTimeout(teshin_check, 60000)
         })
 }
 
@@ -3248,10 +3247,10 @@ async function alerts_check() {
                 alertsTimer = setTimeout(alerts_check, timer)
                 console.log(`alerts_check invokes in ${msToTime(timer)}`)
             }).catch(console.error)
-        })
-        .catch(err => {
-            console.log(err)
-            alertsTimer = setTimeout(alerts_check, 5000)
+        }).catch(err => {
+            console.error(err)
+            clearTimeout(alertsTimer)
+            alertsTimer = setTimeout(alerts_check, 60000)
         })
 }
 
@@ -3363,10 +3362,10 @@ async function global_upgrades_check() {
                 console.log('global_upgrades_check invokes in ' + msToTime(timer))
                 return
             }).catch(console.error)
-        })
-        .catch(err => {
-            console.log(err)
-            global_upgrades_timer = setTimeout(global_upgrades_check, 5000)
+        }).catch(err => {
+            console.error(err)
+            clearTimeout(global_upgrades_timer)
+            global_upgrades_timer = setTimeout(global_upgrades_check, 60000)
         })
 }
 
@@ -3528,8 +3527,9 @@ async function invasions_check() {
                 invasions_timer = setTimeout(invasions_check, 5000)
             })
         }).catch(err => {
-            console.log(err)
-            invasions_timer = setTimeout(invasions_check, 5000)
+            console.error(err)
+            clearTimeout(invasions_timer)
+            invasions_timer = setTimeout(invasions_check, 60000)
         })
 }
 
