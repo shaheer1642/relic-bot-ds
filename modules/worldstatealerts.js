@@ -1095,7 +1095,7 @@ async function setupReaction(reaction, user, type) {
                 return
             const role = reaction.message.guild.roles.cache.find(role => role.id === res.rows[0].baro_role)
             if (type == "add") {
-                reaction.message.guild.members.cache.get(user.id).roles.add(role)
+                reaction.message.guild.members.cache.get(user.id)?.roles.add(role)
                     .then(response => {
                         console.log(JSON.stringify(response))
                         user.send('Role **' + role.name + '** added on server **' + reaction.message.guild.name + '**')
@@ -1109,7 +1109,7 @@ async function setupReaction(reaction, user, type) {
                         inform_dc(`Error adding role ${role.name} for user ${user.username}`)
                     })
             } else if (type == "remove") {
-                reaction.message.guild.members.cache.get(user.id).roles.remove(role)
+                reaction.message.guild.members.cache.get(user.id)?.roles.remove(role)
                     .then(response => {
                         console.log(JSON.stringify(response))
                         user.send('Role **' + role.name + '** removed on server **' + reaction.message.guild.name + '**')
@@ -2286,7 +2286,7 @@ async function baro_check() {
                         db.query(`UPDATE worldstatealert SET baro_status = true`).catch(console.error)
                         res.rows.forEach(row => {
                             if (row.baro_alert)
-                                client.channels.cache.get(row.channel_id).send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(`Baro has arrived! <@&${row.baro_role}>`).then(msg => setTimeout(() => msg.delete().catch(console.error), 10000)).catch(console.error)
                         })
                     }
                     var embed = [{
@@ -2316,7 +2316,7 @@ async function baro_check() {
                     console.log(JSON.stringify(embed))
                     res.rows.forEach(row => {
                         if (row.baro_alert) {
-                            client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
+                            client.channels.cache.get(row.channel_id)?.messages.fetch(row.baro_alert).then(msg => {
                                 msg.edit({
                                     content: `<@&${row.baro_role}>`,
                                     embeds: embed
@@ -2328,7 +2328,7 @@ async function baro_check() {
                     db.query(`UPDATE worldstatealert SET baro_status = false`).catch(console.error)
                     res.rows.forEach(row => {
                         if (row.baro_alert) {
-                            client.channels.cache.get(row.channel_id).messages.fetch(row.baro_alert).then(msg => {
+                            client.channels.cache.get(row.channel_id)?.messages.fetch(row.baro_alert).then(msg => {
                                 msg.edit({
                                     content: ' ',
                                     embeds: [{
@@ -2404,7 +2404,7 @@ async function cycles_check() {
                                 ping_users[row.channel_id] = []
                             if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
                                 // get user discord status
-                                const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
                                 if (!user_presc || user_presc.status == 'offline') {
                                     if (!row.ping_filter.offline.includes(user)) {
                                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2439,7 +2439,7 @@ async function cycles_check() {
                                     user_ids[row.channel_id] = []
                                 if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
                                     // get user discord status
-                                    const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                    const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
                                     if (!user_presc || user_presc.status == 'offline') {
                                         if (!row.ping_filter.offline.includes(user)) {
                                             if (!user_ids[row.channel_id].includes(`<@${user}>`))
@@ -2465,7 +2465,7 @@ async function cycles_check() {
                             if (row.cycles_alert) {
                                 if (user_ids[row.channel_id] && user_ids[row.channel_id].length > 0) {
                                     arrToStringsArrWithLimit(`Cetus: ${cetusCycle.state == 'day' ? 'night' : 'day'} starts in 10 minutes`, user_ids[row.channel_id], 2000).forEach(str => {
-                                        client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                        client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                                     })
                                 }
                             }
@@ -2487,7 +2487,7 @@ async function cycles_check() {
                                 ping_users[row.channel_id] = []
                             if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
                                 // get user discord status
-                                const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
                                 if (!user_presc || user_presc.status == 'offline') {
                                     if (!row.ping_filter.offline.includes(user)) {
                                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2524,7 +2524,7 @@ async function cycles_check() {
                                 ping_users[row.channel_id] = []
                             if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
                                 // get user discord status
-                                const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
                                 if (!user_presc || user_presc.status == 'offline') {
                                     if (!row.ping_filter.offline.includes(user)) {
                                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2570,7 +2570,7 @@ async function cycles_check() {
                 // ---- send msg
                 res.rows.forEach(row => {
                     if (row.cycles_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.cycles_alert).then(msg => {
+                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.cycles_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
                                 embeds: [embed]
@@ -2578,7 +2578,7 @@ async function cycles_check() {
                         }).catch(console.error)
                         if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                             arrToStringsArrWithLimit(`${cycles_changed.join(', ')}`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                             })
                         }
                     }
@@ -2702,7 +2702,7 @@ async function arbitration_check() {
                                 ping_users[row.channel_id] = []
                             if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
                                 // get user discord status
-                                const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
                                 if (!user_presc || user_presc.status == 'offline') {
                                     if (!row.ping_filter.offline.includes(user)) {
                                         if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2735,7 +2735,7 @@ async function arbitration_check() {
                 // ---- send msg
                 res.rows.forEach(row => {
                     if (row.arbitration_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.arbitration_alert).then(msg => {
+                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.arbitration_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
                                 embeds: [embed]
@@ -2743,7 +2743,7 @@ async function arbitration_check() {
                         }).catch(console.error)
                         if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                             arrToStringsArrWithLimit(`Arbitration ${arbitration.type} has started`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                             })
                         }
                     }
@@ -2886,7 +2886,7 @@ async function fissures_check() {
                                         ping_users[row.channel_id] = []
                                     if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
                                         // get user discord status
-                                        const user_presc = client.channels.cache.get(row.channel_id).guild.presences.cache.find(mem => mem.userId == user)
+                                        const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
                                         if (!user_presc || user_presc.status == 'offline') {
                                             if (!row.ping_filter.offline.includes(user)) {
                                                 if (!ping_users[row.channel_id].includes(`<@${user}>`))
@@ -2950,7 +2950,7 @@ async function fissures_check() {
 
                 res.rows.forEach(row => {
                     if (row.fissures_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.fissures_alert).then(msg => {
+                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.fissures_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
                                 embeds: [embed1, embed2, embed3],
@@ -2977,7 +2977,7 @@ async function fissures_check() {
                         }).catch(console.error)
                         if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                             arrToStringsArrWithLimit(`${ping_string.join(' ')}`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                             })
                         }
                     }
@@ -3087,7 +3087,7 @@ async function teshin_check() {
 
                 res.rows.forEach(row => {
                     if (row.teshin_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.teshin_alert).then(msg => {
+                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.teshin_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
                                 embeds: [embed]
@@ -3095,7 +3095,7 @@ async function teshin_check() {
                         }).catch(console.error)
                         if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                             arrToStringsArrWithLimit(`Teshin rotation: ${steelPath.currentReward.name}`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                             })
                         }
                     }
@@ -3144,7 +3144,7 @@ async function alerts_check() {
                     db.query(`UPDATE worldstatealert SET alerts_rewards = '[]'`).catch(console.error)
                     res.rows.forEach(row => {
                         if (row.alerts_alert) {
-                            client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
+                            client.channels.cache.get(row.channel_id)?.messages.fetch(row.alerts_alert).then(msg => {
                                 msg.edit({
                                     content: ' ',
                                     embeds: [{
@@ -3231,7 +3231,7 @@ async function alerts_check() {
 
                 res.rows.forEach(row => {
                     if (row.alerts_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.alerts_alert).then(msg => {
+                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.alerts_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
                                 embeds: [embed]
@@ -3239,7 +3239,7 @@ async function alerts_check() {
                         }).catch(console.error)
                         if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                             arrToStringsArrWithLimit(`Alert reward: ${convertUpper(alerts_rewards.join(', '))}`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                             })
                         }
                     }
@@ -3272,7 +3272,7 @@ async function global_upgrades_check() {
                     console.log(`global_upgrades_check: no data available, reset in ${msToTime(timer)}`)
                     res.rows.forEach(row => {
                         if (row.global_upgrades_alert) {
-                            client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
+                            client.channels.cache.get(row.channel_id)?.messages.fetch(row.global_upgrades_alert).then(msg => {
                                 msg.edit({
                                     content: ' ',
                                     embeds: [{
@@ -3287,29 +3287,6 @@ async function global_upgrades_check() {
                     })
                     return
                 }
-
-                /*if (global_upgrades.length > 1) {
-                    // check back in 15m
-                    var timer = 900000
-                    global_upgrades_timer = setTimeout(global_upgrades_check, timer)
-                    console.log(`global_upgrades_check: no data available, reset in ${msToTime(timer)}`)
-                    res.rows.forEach(row => {
-                        if (row.global_upgrades_alert) {
-                            client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
-                                msg.edit({
-                                    content: ' ',
-                                    embeds: [{
-                                        title: 'Event Booster',
-                                        description: `React to be notified when a booster is active\n\nSome issue with API results. Please contact <@253525146923433984>`,
-                                        footer: {text: 'Note: This alert is unstable at the moment'},
-                                        color: colors.global_upgrades
-                                    }]
-                                }).catch(console.error)
-                            }).catch(console.error)
-                        }
-                    })
-                    return
-                }*/
 
                 if (new Date(global_upgrades[0].end).getTime() < new Date().getTime()) {     //negative expiry, retry
                     var timer = 10000
@@ -3368,7 +3345,7 @@ async function global_upgrades_check() {
 
                 res.rows.forEach(row => {
                     if (row.global_upgrades_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.global_upgrades_alert).then(msg => {
+                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.global_upgrades_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
                                 embeds: [embed]
@@ -3376,7 +3353,7 @@ async function global_upgrades_check() {
                         }).catch(console.error)
                         if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                             arrToStringsArrWithLimit(`Event booster: ${convertUpper(active_booster.toString())}`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                             })
                         }
                     }
@@ -3410,7 +3387,7 @@ async function invasions_check() {
                     console.log(`invasions_check: no data available, reset in ${msToTime(timer)}`)
                     res.rows.forEach(row => {
                         if (row.invasions_alert) {
-                            client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
+                            client.channels.cache.get(row.channel_id)?.messages.fetch(row.invasions_alert).then(msg => {
                                 msg.edit({
                                     content: ' ',
                                     embeds: [{
@@ -3517,7 +3494,7 @@ async function invasions_check() {
 
                 res.rows.forEach(row => {
                     if (row.invasions_alert) {
-                        client.channels.cache.get(row.channel_id).messages.fetch(row.invasions_alert).then(msg => {
+                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.invasions_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
                                 embeds: [embed]
@@ -3525,7 +3502,7 @@ async function invasions_check() {
                         }).catch(console.error)
                         if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
                             arrToStringsArrWithLimit(`Invasion reward: ${convertUpper(ping_rewards.join(', ').replace(/_/g, ' '))}`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id).send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
                             })
                         }
                     }
@@ -3550,8 +3527,7 @@ async function invasions_check() {
                 console.log(err)
                 invasions_timer = setTimeout(invasions_check, 5000)
             })
-        })
-        .catch(err => {
+        }).catch(err => {
             console.log(err)
             invasions_timer = setTimeout(invasions_check, 5000)
         })
