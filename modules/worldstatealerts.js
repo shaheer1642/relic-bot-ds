@@ -246,7 +246,9 @@ function bot_initialize() {
     teshinTimer = setTimeout(teshin_check, 14000)
     alertsTimer = setTimeout(alerts_check, 15000)
     global_upgrades_timer = setTimeout(global_upgrades_check, 16000)
-    invasions_timer = setTimeout(invasions_check, 9000)
+    invasions_timer = setTimeout(invasions_check, 17000)
+    // db cleanup
+    cleanUpDB()
 }
 
 async function interaction_handler(interaction) {
@@ -2243,6 +2245,33 @@ async function setupReaction(reaction, user, type) {
             }
         }
     }
+}
+
+async function cleanUpDB() {
+    db.query('SELECT * FROM worldstatealert')
+        .then(res => {
+            res.rows.forEach(row => {
+                const cnl_id = row.channel_id
+                client.channels.fetch(cnl_id).then(cnl => {
+                    ['baro_alert', 'cycles_alert', 'arbitration_alert', 'fissures_alert', 'teshin_alert', 'alerts_alert', 'global_upgrades_alert', 'invasions_alert']
+                        .forEach(alert_type => {
+                            const msg_id = row[alert_type]
+                            cnl.messages.fetch(msg_id)
+                                .catch(err => {
+                                    if (err.code == 10008) {
+                                        db.query(`UPDATE worldstatealert SET ${alert_type} = NULL WHERE channel_id = ${cnl_id}`).catch(console.error)
+                                        console.log('[worldstatealerts.cleanUpDB] removed message channel_id =', cnl_id, 'message_id =', msg_id)
+                                    }
+                                })
+                        })
+                }).catch(err => {
+                    if (err.code == 10003 || err.code == 50001) {
+                        db.query(`DELETE FROM worldstatealert WHERE channel_id = ${cnl_id}`).catch(console.error)
+                        console.log('[worldstatealerts.cleanUpDB] removed channel channel_id =', cnl_id)
+                    }
+                })
+            })
+        }).catch(console.error)
 }
 
 //----tracking----
