@@ -65,6 +65,10 @@ db.connect().then(async res => {
         LISTEN wfrim_relicsdb_insert;
         LISTEN wfrim_relicsdb_update;
         LISTEN wfrim_relicsdb_delete;
+
+        LISTEN botv_giveaways_insert;
+        LISTEN botv_giveaways_update;
+        LISTEN botv_giveaways_delete;
     `).catch(console.error)
 })
 
