@@ -340,6 +340,33 @@ async function messageUpdate(oldMessage, newMessage) {
                     content: ' ',
                     embeds: newMessage.embeds
                 }).catch(console.error)
+
+
+                const embed = newMessage.embeds[0]
+
+                const giveaway_items = embed.title
+
+                const desc = embed.description
+                if (desc.toLowerCase().match('not enough entrants')) return
+
+                // console.log('descArr', descArr)
+                // Extract the captured groups
+
+                const ended_at = new Date().getTime()  // desc.split('\n')[0].split(' ')[1].replace('<t:', '').replace(':R>', '').trim()
+                const hosted_by = desc.split('\n')[1]?.split(' ')[2].replace('<@', '').replace('>', '').trim()
+                const winners = desc.split('\n')[3]?.split(' ').map((str, i) => i == 0 ? undefined : str.replace('<@', '').replace('>', '').replace(/,/g, '').trim()).filter(str => str)
+
+                db.query(`
+                    INSERT INTO botv_giveaways 
+                    (giveaway_items, hosted_by, winners, ended_at, message_id)
+                    VALUES
+                    ($1,$2,$3,$4,$5)
+                `, [giveaway_items, hosted_by, JSON.stringify(winners), ended_at, newMessage.id])
+                    .catch(err => {
+                        console.error(err)
+                        client.channels.cache.get('892072612002418718').send({ content: `<@253525146923433984> failed to insert giveaway in db` })
+                    })
+
             }
         }
     }
@@ -720,6 +747,63 @@ async function reaction_handler(reaction, user, action) {
         }
     }
 }
+
+function updateBotvHallOfFame() {
+    db.query(`SELECT * FROM botv_giveaways`)
+        .then(res => {
+            const topHosts = Object.values(res.rows.filter(ga => ga.hosted_by != '0').reduce((hosts, ga) => {
+                if (!hosts[ga.hosted_by]) hosts[ga.hosted_by] = { id: ga.hosted_by, count: 0, plat_value: 0 }
+                hosts[ga.hosted_by].plat_value += (ga.total_plat_value || 0)
+                hosts[ga.hosted_by].count++
+                return hosts
+            }, {})).sort((a, b) => b.count - a.count)
+            const topWinners = Object.values(res.rows.reduce((winners, ga) => {
+                ga.winners.filter(w => w != '0').forEach(winner => {
+                    if (!winners[winner]) winners[winner] = { id: winner, count: 0 }
+                    winners[winner].count++
+                })
+                return winners
+            }, {})).sort((a, b) => b.count - a.count)
+            client.channels.cache.get('1185877734916894780').messages.fetch('1191440454525407294').then(msg => {
+                msg.edit({
+                    content: ' ',
+                    embeds: [{
+                        title: 'Top Hosts',
+                        fields: [{
+                            name: 'User',
+                            value: topHosts.slice(0, 15).map(ga => `<@${ga.id}>`).join('\n'),
+                            inline: true
+                        }, {
+                            name: 'Giveaways Hosted',
+                            value: topHosts.slice(0, 15).map(ga => ga.count).join('\n'),
+                            inline: true
+                        }, {
+                            name: 'Plats Given Away',
+                            value: topHosts.slice(0, 15).map(ga => ga.plat_value).join('\n'),
+                            inline: true
+                        },]
+                    }, {
+                        title: 'Top Winners',
+                        fields: [{
+                            name: 'User',
+                            value: topWinners.slice(0, 15).map(w => `<@${w.id}>`).join('\n'),
+                            inline: true
+                        }, {
+                            name: 'Giveaways Won',
+                            value: topWinners.slice(0, 15).map(w => w.count).join('\n'),
+                            inline: true
+                        }]
+                    }]
+                })
+            })
+        }).catch(console.error)
+}
+
+db.on('notification', (notification) => {
+    if (['botv_giveaways_insert', 'botv_giveaways_update', 'botv_giveaways_delete'].includes(notification.channel)) {
+        updateBotvHallOfFame()
+    }
+})
 
 module.exports = {
     updateMasteryDistr,
