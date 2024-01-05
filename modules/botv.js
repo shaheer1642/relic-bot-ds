@@ -15,6 +15,7 @@ const otherRolesMessageId = "957330415734095932"
 const hiatusRoleId = '838888922971897856'
 const hiatus_removal_interval = 5184000000 // 60 days in ms
 const botv_guild_id = '776804537095684108'
+const hallOfFamePermRoleId = '1192913215349334159'
 
 setInterval(check_hiatus_expiry, 3600000);
 
@@ -81,6 +82,67 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
             console.log('hiatus role removed from a member')
             db.query(`DELETE FROM botv_hiatus_members WHERE discord_id = ${newMember.id}`).catch(console.error)
             mod_log(`<@&${hiatusRoleId}> role removed from user <@${newMember.id}>`, '#E74C3C')
+        }
+    }
+})
+
+client.on('interactionCreate', (interaction) => {
+    if (interaction.isButton()) {
+        if (interaction.customId == 'botv_giveaway_edit_total_plat_value') {
+            if (interaction.member.roles.cache.find(r => r.id == hallOfFamePermRoleId)) {
+                interaction.showModal({
+                    title: "Edit Giveaway Plat Value",
+                    custom_id: interaction.customId,
+                    components: [
+                        {
+                            type: 1,
+                            components: [{
+                                type: 4,
+                                custom_id: "total_plat_value",
+                                label: "Total Plat Value",
+                                style: 1,
+                                min_length: 1,
+                                max_length: 5,
+                                placeholder: "Enter value i.e. 50",
+                                required: true
+                            }]
+                        }
+                    ]
+                }).catch(console.error)
+            } else {
+                interaction.reply({ content: 'You do not have permission to use this command', ephemeral: true }).catch(console.error)
+            }
+        }
+    }
+    if (interaction.isModalSubmit()) {
+        if (interaction.customId == 'botv_giveaway_edit_total_plat_value') {
+            if (interaction.member.roles.cache.find(r => r.id == hallOfFamePermRoleId)) {
+                const total_plat_value = parseInt(interaction.fields.getTextInputValue('total_plat_value'))
+                if (!total_plat_value) return interaction.reply({ content: 'Invalid value', ephemeral: true })
+                if (total_plat_value < 1) return interaction.reply({ content: 'Value must be positive', ephemeral: true })
+                db.query(`UPDATE botv_giveaways SET total_plat_value = ${total_plat_value} WHERE message_id = '${interaction.message.id}' RETURNING *`)
+                    .then(res => {
+                        if (res.rowCount == 1) {
+                            interaction.deferUpdate().catch(console.error)
+                            const giveaway = res.rows[0]
+                            interaction.message.edit({
+                                components: [{
+                                    type: 1,
+                                    components: [{
+                                        type: 2,
+                                        label: `Edit total plat value (${giveaway.total_plat_value || 0})`,
+                                        custom_id: `botv_giveaway_edit_total_plat_value`,
+                                        style: !giveaway.total_plat_value ? 3 : 2
+                                    }]
+                                }]
+                            }).catch(console.error)
+                        } else {
+                            interaction.reply({ content: 'Unexpected DB response', ephemeral: true }).catch(console.error)
+                        }
+                    }).catch(console.error)
+            } else {
+                interaction.reply({ content: 'You do not have permission to use this command', ephemeral: true }).catch(console.error)
+            }
         }
     }
 })
@@ -338,7 +400,16 @@ async function messageUpdate(oldMessage, newMessage) {
             if (newMessage.embeds.length == 1 && newMessage.embeds[0].description.match('Ended:')) {
                 client.channels.cache.get('964217621266456586').send({
                     content: ' ',
-                    embeds: newMessage.embeds
+                    embeds: newMessage.embeds,
+                    components: [{
+                        type: 1,
+                        components: [{
+                            type: 2,
+                            label: `Edit total plat value (0)`,
+                            custom_id: `botv_giveaway_edit_total_plat_value`,
+                            style: 3
+                        }]
+                    }]
                 }).catch(console.error)
 
 
