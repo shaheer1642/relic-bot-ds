@@ -236,7 +236,7 @@ client.on('interactionCreate', (interaction) => {
                 interaction.customId.split('.')[2] == 'false' ? false :
                     interaction.customId.split('.')[2] :
             interaction.isModalSubmit() ? interaction.fields.getTextInputValue(setting_type) : undefined
-        if (!setting_value) {
+        if (setting_value == undefined) {
             return interaction.showModal({
                 title: convertUpper(setting_type),
                 custom_id: interaction.customId,
@@ -260,7 +260,7 @@ client.on('interactionCreate', (interaction) => {
         if (setting_type == 'squad_timeout') {
             setting_value = setting_value * 60000
         }
-        if (!setting_value) return
+        if (setting_value == undefined) return
         socket.emit(`allsquads/user/settings/update`, { setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
             if (res.code == 200) {
                 interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
