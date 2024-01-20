@@ -137,7 +137,7 @@ client.on('interactionCreate', (interaction) => {
                                 }]
                             }).catch(console.error)
                         } else {
-                            interaction.reply({ content: 'Unexpected DB response', ephemeral: true }).catch(console.error)
+                            interaction.reply({ content: `Unexpected DB response. Updated ${res.rowCount} records`, ephemeral: true }).catch(console.error)
                         }
                     }).catch(console.error)
             } else {
@@ -410,34 +410,32 @@ async function messageUpdate(oldMessage, newMessage) {
                             style: 3
                         }]
                     }]
+                }).then(msg => {
+                    const embed = newMessage.embeds[0]
+
+                    const giveaway_items = embed.title
+
+                    const desc = embed.description
+                    if (desc.toLowerCase().match('not enough entrants')) return
+
+                    // console.log('descArr', descArr)
+                    // Extract the captured groups
+
+                    const ended_at = new Date().getTime()  // desc.split('\n')[0].split(' ')[1].replace('<t:', '').replace(':R>', '').trim()
+                    const hosted_by = desc.split('\n')[1]?.split(' ')[2].replace('<@', '').replace('>', '').trim()
+                    const winners = desc.split('\n')[3]?.split(' ').map((str, i) => i == 0 ? undefined : str.replace('<@', '').replace('>', '').replace(/,/g, '').trim()).filter(str => str)
+
+                    db.query(`
+                        INSERT INTO botv_giveaways 
+                        (giveaway_items, hosted_by, winners, ended_at, message_id)
+                        VALUES
+                        ($1,$2,$3,$4,$5)
+                    `, [giveaway_items, hosted_by, JSON.stringify(winners), ended_at, msg.id])
+                        .catch(err => {
+                            console.error(err)
+                            client.channels.cache.get('892072612002418718').send({ content: `<@253525146923433984> failed to insert giveaway in db` })
+                        })
                 }).catch(console.error)
-
-
-                const embed = newMessage.embeds[0]
-
-                const giveaway_items = embed.title
-
-                const desc = embed.description
-                if (desc.toLowerCase().match('not enough entrants')) return
-
-                // console.log('descArr', descArr)
-                // Extract the captured groups
-
-                const ended_at = new Date().getTime()  // desc.split('\n')[0].split(' ')[1].replace('<t:', '').replace(':R>', '').trim()
-                const hosted_by = desc.split('\n')[1]?.split(' ')[2].replace('<@', '').replace('>', '').trim()
-                const winners = desc.split('\n')[3]?.split(' ').map((str, i) => i == 0 ? undefined : str.replace('<@', '').replace('>', '').replace(/,/g, '').trim()).filter(str => str)
-
-                db.query(`
-                    INSERT INTO botv_giveaways 
-                    (giveaway_items, hosted_by, winners, ended_at, message_id)
-                    VALUES
-                    ($1,$2,$3,$4,$5)
-                `, [giveaway_items, hosted_by, JSON.stringify(winners), ended_at, newMessage.id])
-                    .catch(err => {
-                        console.error(err)
-                        client.channels.cache.get('892072612002418718').send({ content: `<@253525146923433984> failed to insert giveaway in db` })
-                    })
-
             }
         }
     }
