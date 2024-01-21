@@ -115,31 +115,41 @@ client.on('interactionCreate', (interaction) => {
         }
         if (interaction.customId == 'botv_giveaway_history') {
             db.query(`SELECT * FROM botv_giveaways WHERE hosted_by = '${interaction.user.id}' ORDER BY ended_at DESC`)
-                .then(res => {
+                .then(async res => {
                     if (res.rowCount == 0) return interaction.reply({ content: 'You have not hosted any giveaways', ephemeral: true })
-                    interaction.reply({
+
+                    const generateEmbed = (giveaways, fieldsOnly) => ({
                         embeds: [{
-                            title: 'My Giveaways',
-                            description: `Giveaways hosted: ${res.rowCount}\nPlat value: ${res.rows.reduce((sum, ga) => sum += ga.total_plat_value, 0)}`,
+                            title: fieldsOnly ? undefined : 'My Giveaways',
+                            description: fieldsOnly ? undefined : `Giveaways hosted: ${res.rowCount}\nPlat value: ${res.rows.reduce((sum, ga) => sum += ga.total_plat_value, 0)}`,
                             fields: responsiveEmbedFields({
                                 field1: {
                                     label: 'Items',
-                                    valueArr: res.rows.map((ga) => ga.giveaway_items),
+                                    valueArr: giveaways.map((ga) => ga.giveaway_items),
                                     valueFormatter: (value) => value.replace(/_/g, '\\_')
                                 },
                                 field2: {
                                     label: 'Total Plat Value',
-                                    valueArr: res.rows.map((ga) => ga.total_plat_value || 'No data'),
+                                    valueArr: giveaways.map((ga) => ga.total_plat_value || 'No data'),
                                 },
                                 field3: {
                                     label: 'Hosted on',
-                                    valueArr: res.rows.map((ga) => ga.ended_at ? `<t:${Math.round(Number(ga.ended_at) / 1000)}:R>` : 'No data'),
+                                    valueArr: giveaways.map((ga) => ga.ended_at ? `<t:${Math.round(Number(ga.ended_at) / 1000)}:R>` : 'No data'),
                                 }
                             }),
                             color: 'WHITE'
                         }],
                         ephemeral: true
-                    }).catch(console.error)
+                    })
+                    const chunkSize = 50
+                    const allGiveaways = Array.from({ length: Math.ceil(res.rows.length / chunkSize) }, (_, index) =>
+                        res.rows.slice(index * chunkSize, index * chunkSize + chunkSize)
+                    )
+                    for (const i in allGiveaways) {
+                        const giveaways = allGiveaways[i];
+                        if (i == 0) await interaction.reply(generateEmbed(giveaways, false)).catch(console.error)
+                        else await interaction.followUp(generateEmbed(giveaways, true)).catch(console.error)
+                    }
                 }).catch(console.error)
         }
     }
