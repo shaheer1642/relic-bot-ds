@@ -2,7 +2,7 @@ const { client } = require('./discord_client.js');
 const { db } = require('./db_connection.js');
 const { MessageAttachment, Message, MessageEmbed } = require('discord.js');
 const fs = require('fs');
-const { inform_dc, dynamicSort, dynamicSortDesc, msToTime, msToFullTime, embedScore, mod_log, ms_to_days_hours, ms_till_monday_12am } = require('./extras.js');
+const { inform_dc, dynamicSort, dynamicSortDesc, msToTime, msToFullTime, embedScore, mod_log, ms_to_days_hours, ms_till_monday_12am, responsiveEmbedFields } = require('./extras.js');
 const { randomUUID } = require('crypto');
 const uuid = require('uuid');
 const JSONbig = require('json-bigint');
@@ -112,6 +112,35 @@ client.on('interactionCreate', (interaction) => {
             } else {
                 interaction.reply({ content: 'You do not have permission to use this command', ephemeral: true }).catch(console.error)
             }
+        }
+        if (interaction.customId == 'botv_giveaway_history') {
+            db.query(`SELECT * FROM botv_giveaways WHERE hosted_by = '${interaction.user.id}' ORDER BY ended_at DESC`)
+                .then(res => {
+                    if (res.rowCount == 0) return interaction.reply({ content: 'You have not hosted any giveaways', ephemeral: true })
+                    interaction.reply({
+                        embeds: [{
+                            title: 'My Giveaways',
+                            description: `Giveaways hosted: ${res.rowCount}\nPlat value: ${res.rows.reduce((sum, ga) => sum += ga.total_plat_value, 0)}`,
+                            fields: responsiveEmbedFields({
+                                field1: {
+                                    label: 'Items',
+                                    valueArr: res.rows.map((ga) => ga.giveaway_items),
+                                    valueFormatter: (value) => value.replace(/_/g, '\\_')
+                                },
+                                field2: {
+                                    label: 'Total Plat Value',
+                                    valueArr: res.rows.map((ga) => ga.total_plat_value || 'No data'),
+                                },
+                                field3: {
+                                    label: 'Hosted on',
+                                    valueArr: res.rows.map((ga) => ga.ended_at ? `<t:${Math.round(Number(ga.ended_at) / 1000)}:R>` : 'No data'),
+                                }
+                            }),
+                            color: 'WHITE'
+                        }],
+                        ephemeral: true
+                    }).catch(console.error)
+                }).catch(console.error)
         }
     }
     if (interaction.isModalSubmit()) {
@@ -825,7 +854,7 @@ function updateBotvHallOfFame() {
                 hosts[ga.hosted_by].plat_value += (ga.total_plat_value || 0)
                 hosts[ga.hosted_by].count++
                 return hosts
-            }, {})).sort((a, b) => b.count - a.count)
+            }, {})).sort((a, b) => b.plat_value - a.plat_value)
             const topWinners = Object.values(res.rows.reduce((winners, ga) => {
                 ga.winners.filter(w => w != '0').forEach(winner => {
                     if (!winners[winner]) winners[winner] = { id: winner, count: 0 }
@@ -838,6 +867,7 @@ function updateBotvHallOfFame() {
                     content: ' ',
                     embeds: [{
                         title: 'Top Hosts',
+                        description: `Total giveaways hosted: ${res.rowCount}\nTotal plat value: ${res.rows.reduce((sum, ga) => sum += ga.total_plat_value, 0)}`,
                         fields: [{
                             name: 'User',
                             value: topHosts.slice(0, 15).map(ga => `<@${ga.id}>`).join('\n'),
@@ -861,6 +891,15 @@ function updateBotvHallOfFame() {
                             name: 'Giveaways Won',
                             value: topWinners.slice(0, 15).map(w => w.count).join('\n'),
                             inline: true
+                        }]
+                    }],
+                    components: [{
+                        type: 1,
+                        components: [{
+                            type: 1,
+                            label: `View my giveaways`,
+                            custom_id: `botv_giveaway_history`,
+                            style: 3
                         }]
                     }]
                 })
