@@ -862,7 +862,7 @@ function updateBotvHallOfFame() {
                 })
                 return winners
             }, {})).sort((a, b) => b.count - a.count)
-            client.channels.cache.get('1185877734916894780').messages.fetch('1198615428503703573').then(msg => {
+            client.channels.cache.get('845683679321522186').messages.fetch('1198615428503703573').then(msg => {
                 msg.edit({
                     content: ' ',
                     embeds: [{
