@@ -896,10 +896,10 @@ function updateBotvHallOfFame() {
                     components: [{
                         type: 1,
                         components: [{
-                            type: 1,
+                            type: 2,
                             label: `View my giveaways`,
                             custom_id: `botv_giveaway_history`,
-                            style: 3
+                            style: 1
                         }]
                     }]
                 })

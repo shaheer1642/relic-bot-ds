@@ -42,7 +42,7 @@ client.on('guildCreate', (guild) => {
 })
 
 client.on('rateLimit', (rateLimitData) => {
-    console.error('You are being rate limited', rateLimitData)
+    // console.error('You are being rate limited', rateLimitData)
 })
 
 function handleSquadCreateResponses(channel_id, discord_id, responses) {
