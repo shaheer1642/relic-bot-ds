@@ -83,6 +83,7 @@ event_emitter.on('db_connected', () => {
 
 function keywordsCreate(data, callback) {
     console.log('[keywordsCreate] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.name) return callback({ code: 400, message: 'No name provided' })
     if (!data.include) return callback({ code: 400, message: 'No include provided' })
     db.query(`
@@ -134,6 +135,7 @@ function keywordsFetch(data, callback) {
 
 function keywordsDelete(data, callback) {
     console.log('[keywordsDelete] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.id) {
         if (callback) callback({ code: 400, message: 'No id provided' })
         return

@@ -23,14 +23,12 @@ function authorize(credentials, callback) {
     const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) return getNewToken(oAuth2Client, callback);
-        oAuth2Client.setCredentials(JSON.parse(token));
-        console.log('authorized gmail')
-        setInterval(() => {
-            callback(oAuth2Client)
-        }, 2000);
-    });
+    const token = JSON.parse(process.env.GMAIL_TOKEN)
+    if (!token) return getNewToken(oAuth2Client, callback);
+    console.log('authorized gmail')
+    setInterval(() => {
+        callback(oAuth2Client)
+    }, 2000);
 }
 
 /**

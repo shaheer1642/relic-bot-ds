@@ -26,6 +26,30 @@ api.use('/api/wfrim', require('./routes/wfrim'))
 api.get('/api', (req, res) => {
   res.send('Hello, this is the API for Gauss Prime. Nothing fancy to show on the web-page');
 });
+app.get('/supportsofty', (req, res) => {
+  res.redirect('https://patreon.com/join/mrsofty')
+})
+
+app.get('/donatesofty', (req, res) => {
+  res.redirect('https://patreon.com/join/mrsofty')
+})
+
+app.use((req, res, next) => {
+  if (req.subdomains.length > 0) {
+    if (req.subdomains[0] == 'relic')
+      return res.redirect('https://discord.com/invite/Kyf6NAuEsa')  // discord server 
+    else if (req.subdomains[0] == 'relics')
+      return res.redirect('https://discord.com/invite/Kyf6NAuEsa')  // discord server 
+    else if (req.subdomains[0] == 'discord')
+      return res.redirect('https://discord.com/invite/Kyf6NAuEsa')  // discord server 
+    else if (req.subdomains[0] == 'www')
+      return next() // website
+    else if (req.subdomains[0] == 'dev')
+      return next() // website
+  } else {
+    return next() // website
+  }
+})
 
 api.use(express.static(path.join(__dirname, '../frontend/build')))
 api.get("*", (req, res) => res.sendFile(path.join(__dirname, '../frontend/build', 'index.html')));

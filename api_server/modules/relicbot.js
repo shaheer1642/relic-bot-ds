@@ -568,6 +568,7 @@ function trackersDelete(data, callback) {
 
 function defaultHostingTableCreate(data, callback) {
     console.log('[defaultHostingTableCreate] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.tier) return callback({ code: 400, message: 'No tier provided' })
     if (!data.main_relics) return callback({ code: 400, message: 'No main_relics provided' })
     if (!data.main_refinements) return callback({ code: 400, message: 'No main_refinements provided' })
@@ -625,6 +626,7 @@ function defaultHostingTableFetch(data, callback) {
 
 function defaultHostingTableDelete(data, callback) {
     console.log('[defaultHostingTableDelete] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.id) {
         if (callback) callback({ code: 400, message: 'No id provided' })
         return

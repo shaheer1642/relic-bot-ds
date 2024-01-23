@@ -1,8 +1,8 @@
 const { db } = require("./db_connection")
 const uuid = require('uuid')
-const {convertUpper, dynamicSort, dynamicSortDesc} = require('./functions')
+const { convertUpper, dynamicSort, dynamicSortDesc } = require('./functions')
 const db_modules = require('./db_modules')
-const {event_emitter} = require('./event_emitter')
+const { event_emitter } = require('./event_emitter')
 const JSONbig = require('json-bigint');
 
 const endpoints = {
@@ -11,7 +11,7 @@ const endpoints = {
     'miniframe/gamedata/fetch': miniframeGamedataFetch,
 }
 
-function miniframeGamedataFetch(data,callback) {
+function miniframeGamedataFetch(data, callback) {
     callback({
         code: 200,
         data: {
@@ -23,29 +23,29 @@ function miniframeGamedataFetch(data,callback) {
     })
 }
 
-function miniframeCharacterSpawn(data,callback) {
-    if (characters.some(char => char.character_id == data.socket_id)) return callback({code: 400, message: 'character already exists'})
+function miniframeCharacterSpawn(data, callback) {
+    if (characters.some(char => char.character_id == data.socket_id)) return callback({ code: 400, message: 'character already exists' })
     characters.push({
         location: getRandomLocation(0, mapSizeH - 1, 0, mapSizeV - 1),
         health: 100,
         armor: 100,
         character_id: data.socket_id
     })
-    callback({code: 200})
+    callback({ code: 200 })
     event_emitter.emit('socketNotifyAll', {
         event: 'miniframe/listeners/characterUpdated',
         data: characters
     })
 }
 
-function miniframeCharacterUpdate(data,callback) {
-    if (!data.character || !data.socket_id) return callback({code: 400, message: 'Invalid data'})
+function miniframeCharacterUpdate(data, callback) {
+    if (!data.character || !data.socket_id) return callback({ code: 400, message: 'Invalid data' })
     characters = characters.map((char) => {
         if (char.character_id == data.socket_id)
             return data.character
         else return char
     })
-    callback({code: 200})
+    callback({ code: 200 })
     event_emitter.emit('socketNotifyAll', {
         event: 'miniframe/listeners/characterUpdated',
         data: characters
@@ -74,14 +74,14 @@ function resetGame() {
     Object.keys(props).forEach(prop => {
         props[prop] = []
     })
-    spawnProps('healths',2)
-    spawnProps('armors',3)
-    spawnProps('enemies',5)
-    spawnProps('swords',1)
-    spawnProps('guns',1)
+    spawnProps('healths', 2)
+    spawnProps('armors', 3)
+    spawnProps('enemies', 5)
+    spawnProps('swords', 1)
+    spawnProps('guns', 1)
 }
 
-function pickedProp(name,loc) {
+function pickedProp(name, loc) {
     if (!props[name]) throw Error(`${name} prop does not exist`)
     props[name] = props[name].filter(p_loc => p_loc[0] != loc[0] && p_loc[0] != loc[1])
     if (name == 'healths') {
@@ -93,22 +93,22 @@ function pickedProp(name,loc) {
         status = 'You gain 20 armor!'
     }
     if (name == 'enemies') {
-        const lose_health = getRandomInt(5,20)
+        const lose_health = getRandomInt(5, 20)
         status = `You fought an enemy and lost ${lose_health} ${char_armor > 0 ? 'armor' : 'health'}!`
         if (char_armor > 0) char_armor -= lose_health
         else char_health -= lose_health
     }
 }
 
-function spawnProps(name,amount) {
+function spawnProps(name, amount) {
     if (!props[name]) throw Error(`${name} prop does not exist`)
     for (let i = 0; i < amount; i++) {
         props[name].push(getRandomLocation(0, mapSizeH - 1, 0, mapSizeV - 1))
     }
-    console.log('spawnProps',props)
+    // console.log('spawnProps',props)
 }
 
-function getRandomLocation(xmin,xmax,ymin,ymax) {
+function getRandomLocation(xmin, xmax, ymin, ymax) {
     var locX = getRandomInt(xmin, xmax)
     var locY = getRandomInt(ymin, ymax)
     return [locX, locY]

@@ -368,6 +368,7 @@ function usersFetch(data, callback) {
 
 function clansCreate(data, callback) {
     console.log('[clansCreate] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.clan_name) return callback({ code: 400, message: 'No clan_name provided' })
     if (!data.logo_url) return callback({ code: 400, message: 'No logo_url provided' })
     if (!data.description) return callback({ code: 400, message: 'No description provided' })
@@ -428,6 +429,7 @@ function clansFetch(data, callback) {
 
 function clansDelete(data, callback) {
     console.log('[clansDelete] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.id) {
         if (callback) callback({ code: 400, message: 'No id provided' })
         return
@@ -489,6 +491,7 @@ function updateClanWebhookMessages() {
 
 function faqsCreate(data, callback) {
     console.log('[allsquads.faqsCreate] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.title) return callback({ code: 400, message: 'No title provided' })
     if (!data.body) return callback({ code: 400, message: 'No body provided' })
     if (!data.language) return callback({ code: 400, message: 'No language provided' })
@@ -525,6 +528,7 @@ function faqsCreate(data, callback) {
 
 function faqsUpdate(data, callback) {
     console.log('[allsquads.faqsUpdate] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.id) return callback({ code: 400, message: 'No id(order) provided' })
     if (!data.faq_id) return callback({ code: 400, message: 'No faq_id provided' })
     if (!data.title) return callback({ code: 400, message: 'No title provided' })
@@ -578,6 +582,7 @@ function faqsFetch(data, callback) {
 
 function faqsDelete(data, callback) {
     console.log('[allsquads.faqsDelete] data:', data)
+    if (!data.user_id || !as_users_list[data.user_id].is_staff) return callback && callback({ code: 401, message: 'Unauthorized' })
     if (!data.faq_id) {
         if (callback) callback({ code: 400, message: 'No faq_id provided' })
         return
