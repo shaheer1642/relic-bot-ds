@@ -599,6 +599,7 @@ async function edit_vip_message() {
 }
 
 async function assign_allsquads_roles() {
+    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     console.log('[allsquads.assign_allsquads_roles] called')
     const guild = await client.guilds.fetch(allsquads_discord_server).catch(console.error)
     if (!guild) return
@@ -680,6 +681,7 @@ async function assign_allsquads_roles() {
 }
 
 async function edit_leaderboard() {
+    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     console.log('[allsquads.edit_leaderboard] called')
     socket.emit('allsquads/leaderboards/fetch', {
         options: {
@@ -761,6 +763,7 @@ async function edit_leaderboard() {
 }
 
 function edit_staff_leaderboard() {
+    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     console.log('[allsquads.edit_leaderboard] called')
     socket.emit('allsquads/leaderboards/fetch', {
         options: {
@@ -873,6 +876,7 @@ function edit_staff_leaderboard() {
 }
 
 async function edit_event_leaderboard() {
+    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     console.log('[allsquads.edit_event_leaderboard] called')
     socket.emit('allsquads/leaderboards/fetch', {
         options: {
@@ -918,6 +922,7 @@ async function edit_event_leaderboard() {
 }
 
 async function check_member_discord_roles({ db_user, discord_id }) {
+    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     try {
         if (!db_user) {
             if (!discord_id) return
@@ -949,6 +954,7 @@ async function check_member_discord_roles({ db_user, discord_id }) {
 }
 
 async function check_allsquads_members_roles() {
+    if (process.env.ENVIRONMENT_TYPE == 'dev') return
     console.log('[allsquads.check_allsquads_members_roles] called')
     client.guilds.fetch(allsquads_discord_server).then(guild => {
         guild.members.fetch(members => {
