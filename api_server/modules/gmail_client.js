@@ -25,10 +25,11 @@ function authorize(credentials, callback) {
     // Check if we have previously stored a token.
     const token = JSON.parse(process.env.GMAIL_TOKEN)
     if (!token) return getNewToken(oAuth2Client, callback);
+    oAuth2Client.setCredentials(token);
     console.log('authorized gmail')
     setInterval(() => {
         callback(oAuth2Client)
-    }, 2000);
+    }, 60000);
 }
 
 /**
@@ -70,7 +71,7 @@ function getNewToken(oAuth2Client, callback) {
  */
 
 async function gmail_api_call(auth) {
-    if (process.env.ENVIRONMENT_TYPE == 'dev') return
+    // if (process.env.ENVIRONMENT_TYPE == 'dev') return
     try {
         var gmail = google.gmail({ version: 'v1', auth })
     }
