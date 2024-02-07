@@ -6,7 +6,7 @@ client.on('ready', async () => {
     message = await client.channels.cache.get('1121557842017665135')?.messages.fetch('1121575714043465739').catch(console.error)
 })
 
-client.on('interaction', interaction => {
+client.on('interactionCreate', interaction => {
     if (interaction.isButton()) {
         if (interaction.customId == 'miniframe_char_mu') {
             moveChar('up')

@@ -263,7 +263,8 @@ client.on('interactionCreate', (interaction) => {
         if (setting_value == undefined) return
         socket.emit(`allsquads/user/settings/update`, { setting_type: setting_type, setting_value: setting_value, user_id: as_users_list_discord[discord_id]?.user_id || -1 }, (res) => {
             if (res.code == 200) {
-                interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
+                if (!interaction.guild) interaction.update({ embeds: [{ description: 'Setting has been updated!', color: 'BLUE' }], components: [] })
+                else interaction.update(userSettingsPanel(interaction, res.data)).catch(console.error)
             } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
         })
     }
@@ -417,7 +418,7 @@ event_emitter.on('allSquadsUserUpdatedIGN', async db_user => {
 function userSettingsPanel(interaction, user_obj) {
     const ping_dnd = user_obj.allowed_pings_status?.includes('dnd') ? true : false
     const ping_off = user_obj.allowed_pings_status?.includes('offline') ? true : false
-    const { auto_leave_offline } = user_obj
+    const { ping_in_dm, auto_leave_offline } = user_obj
     return {
         embeds: [{
             title: 'Bot Settings',
@@ -450,6 +451,11 @@ function userSettingsPanel(interaction, user_obj) {
         }, {
             type: 1,
             components: [{
+                type: 2,
+                label: `${ping_in_dm ? 'Disable' : 'Enable'} DM Pings`,
+                style: ping_in_dm ? 4 : 3,
+                custom_id: `as_user_change_settings.ping_in_dm.${ping_in_dm ? false : true}`,
+            }, {
                 type: 2,
                 label: `Change Squad Timeout (${Math.round((user_obj.squad_timeout / 1000) / 60)}m)`,
                 style: 1,

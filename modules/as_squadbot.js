@@ -225,16 +225,41 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_create') {
             const squad_string = interaction.customId.split('.')[1].replace(/_/g, ' ')
-            socket.emit('squadbot/squads/create', { message: squad_string, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: interaction.channel.id }, responses => {
-                interaction.deferUpdate().catch(console.error)
+            socket.emit('squadbot/squads/create', { message: squad_string, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: interaction.channel.id, merge_squad: interaction.message.guild ? undefined : false }, responses => {
+                if (!interaction.message.guild) interaction.update({ embeds: [{ description: `**${convertUpper(squad_string)}** squad created! You will be notified via DM when squad is filled`, color: 'GREEN' }], components: [] }).catch(console.error)
+                else interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id, interaction.user.id, responses)
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_join') {
             const discord_id = interaction.user.id
             const squad_id = interaction.customId.split('.')[1]
             socket.emit('squadbot/squads/addmember', { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, channel_id: interaction.channel.id }, (res) => {
-                if (res.code == 200) interaction.deferUpdate().catch(console.error)
-                else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
+                if (res.code == 200) {
+                    if (!interaction.message.guild) interaction.update(generateSquadDMEmbed(res.data, discord_id)).catch(console.error)
+                    else interaction.deferUpdate().catch(console.error)
+                } else if (res.code == 404 && !interaction.message.guild) {
+                    socket.emit('squadbot/squads/fetchById', { squad_id }, (res) => {
+                        // console.log('squadbot/squads/fetchById', res);
+                        if (res.code != 200) return
+                        const squad = res.data[0]
+                        if (!squad) return
+                        interaction.update({
+                            embeds: [{
+                                description: `**${convertUpper(squad.squad_string)}** squad no longer exists. Click to create a new one`,
+                                color: 'RED',
+                            }],
+                            components: [{
+                                type: 1,
+                                components: [{
+                                    type: 2,
+                                    label: 'Create New Squad',
+                                    custom_id: `as_sb_sq_create.${squad.squad_string}`,
+                                    style: 1
+                                }]
+                            }]
+                        }).catch(console.error)
+                    })
+                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_input') {
             const default_squad_id = interaction.customId.split('.')[1]
@@ -689,7 +714,7 @@ function edit_webhook_messages(with_all_names, name_for_squad_id, single_channel
                 const squads = res.data
                 const payloads = embed(squads)
                 Array(5).fill(0).forEach((value, index) => {
-                    webhook_messages[`find_squads_${index + 1}`].forEach(async msg => {
+                    webhook_messages[`find_squads_${index + 1}`]?.forEach(async msg => {
                         if (!single_channel_id || single_channel_id == msg.c_id) {
                             if (payloads[index]) {
                                 new WebhookClient({ url: msg.url }).editMessage(msg.m_id, payloads[index]).catch(console.error)
@@ -755,6 +780,29 @@ function embed(squads, with_all_names, name_for_squad_id) {
     })
     //console.log(JSON.stringify(payloads))
     return payloads
+}
+
+function generateSquadDMEmbed(squad, discord_id) {
+    return ({
+        embeds: [{
+            description: squad.members.includes(as_users_list_discord[discord_id].user_id) ? `Joined **${convertUpper(squad.squad_string)}** squad. You will be notified via DM when squad is filled` : `Someone is looking for **${convertUpper(squad.squad_string)}** squad`,
+            color: 'WHITE',
+        }],
+        components: [{
+            type: 1,
+            components: [{
+                type: 2,
+                label: squad.members.includes(as_users_list_discord[discord_id].user_id) ? 'Leave Squad' : 'Join Squad',
+                custom_id: `as_sb_sq_join.${squad.squad_id}`,
+                style: squad.members.includes(as_users_list_discord[discord_id].user_id) ? 4 : 3
+            }, {
+                type: 2,
+                label: 'Disable DM pings',
+                custom_id: `as_user_change_settings.ping_in_dm.false`,
+                style: 2
+            },]
+        }]
+    })
 }
 
 function edit_recruitment_intro() {
@@ -885,7 +933,6 @@ function error_codes_embed(response, discord_id) {
     }
 }
 
-
 var subscribersTimeout = {}
 socket.on('squadbot/squadCreate', (squad) => {
     if (squad.status != 'active') return
@@ -896,7 +943,7 @@ socket.on('squadbot/squadCreate', (squad) => {
         }
     })
     socket.emit('squadbot/trackers/fetchSubscribers', { squad: squad }, (res) => {
-        console.log('[relicbot] trackers fetch response', res)
+        // console.log('[squadbot] trackers fetch response', res)
         if (res.code == 200) {
             const channel_ids = res.data
             for (const channel_id in channel_ids) {
@@ -924,6 +971,9 @@ socket.on('squadbot/squadCreate', (squad) => {
                                     db_schedule_msg_deletion(msg.id, msg.channel_id, 10000)
                                 }).catch(console.error)
                             }
+                        })
+                        mentions_list.filter(id => as_users_list_discord[id].ping_in_dm).forEach(discord_id => {
+                            client.users.cache.get(discord_id)?.send(generateSquadDMEmbed(squad, discord_id)).catch(console.error)
                         })
                     }).catch(console.error)
                 }

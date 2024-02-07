@@ -161,7 +161,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     if (interaction.isButton()) {
-        if (!Object.keys(channels_list).includes(interaction.channel.id)) return
+        if (!Object.keys(channels_list).includes(interaction.channel.id) && interaction.guild) return
 
         if (interaction.customId == 'rb_recruitment_faq') {
             interaction.reply(translatePayload(recruitment_faq, channels_list[interaction.channel.id].lang)).catch(console.error)
@@ -262,12 +262,42 @@ client.on('interactionCreate', async (interaction) => {
                 }
                 else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
+        } else if (interaction.customId.match('rb_sq_create_')) {
+            const squad_string = interaction.customId.split('rb_sq_create_')[1]
+            socket.emit('relicbot/squads/create', { message: squad_string, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: interaction.channel.id, merge_squad: interaction.guild ? undefined : false }, responses => {
+                if (!interaction.message.guild) interaction.update({ embeds: [{ description: `**${convertUpper(squad_string)}** squad created! You will be notified via DM when squad is filled`, color: 'GREEN' }], components: [] }).catch(console.error)
+                else interaction.deferUpdate().catch(console.error)
+                handleSquadCreateResponses(interaction.channel.id, interaction.user.id, responses)
+            })
         } else if (interaction.customId.match('rb_sq_')) {
             const squad_id = interaction.customId.split('rb_sq_')[1]
             const discord_id = interaction.user.id
             socket.emit('relicbot/squads/addmember', { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, channel_id: interaction.channel.id }, (res) => {
-                if (res.code == 200) interaction.deferUpdate().catch(console.error)
-                else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
+                if (res.code == 200) {
+                    if (!interaction.message.guild) interaction.update(generateSquadDMEmbed(res.data, discord_id)).catch(console.error)
+                    else interaction.deferUpdate().catch(console.error)
+                } else if (res.code == 404 && !interaction.message.guild) {
+                    socket.emit('relicbot/squads/fetchById', { squad_id }, (res) => {
+                        if (res.code != 200) return
+                        const squad = res.data[0]
+                        if (!squad) return
+                        interaction.update({
+                            embeds: [{
+                                description: `**${relicBotSquadToString(squad)}** squad no longer exists. Click to create a new one`,
+                                color: 'RED',
+                            }],
+                            components: [{
+                                type: 1,
+                                components: [{
+                                    type: 2,
+                                    label: 'Create New Squad',
+                                    custom_id: `rb_sq_create_${relicBotSquadToString(squad)}`,
+                                    style: 1
+                                }]
+                            }]
+                        }).catch(console.error)
+                    })
+                } else interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
             })
         }
     }
@@ -384,7 +414,7 @@ function edit_webhook_messages(tier, with_all_names, name_for_squad_id, single_c
             if (res.code == 200) {
                 const squads = res.data
                 const payload = embed(squads, tier)
-                webhook_messages[tier + '_squads'].forEach(msg => {
+                webhook_messages[tier + '_squads']?.forEach(msg => {
                     if (!single_channel_id || single_channel_id == msg.c_id)
                         new WebhookClient({ url: msg.url }).editMessage(msg.m_id, payload).catch(console.error)
                 })
@@ -643,6 +673,30 @@ function embed(squads, tier, with_all_names, name_for_squad_id) {
     return msg
 }
 
+function generateSquadDMEmbed(squad, discord_id) {
+    console.log(`generateSquadDMEmbed rb_sq_${squad.squad_id}`);
+    return ({
+        embeds: [{
+            description: squad.members.includes(as_users_list_discord[discord_id].user_id) ? `Joined **${relicBotSquadToString(squad)}** squad. You will be notified via DM when squad is filled` : `Someone is looking for **${relicBotSquadToString(squad)}** squad`,
+            color: 'WHITE',
+        }],
+        components: [{
+            type: 1,
+            components: [{
+                type: 2,
+                label: squad.members.includes(as_users_list_discord[discord_id].user_id) ? 'Leave Squad' : 'Join Squad',
+                custom_id: `rb_sq_${squad.squad_id}`,
+                style: squad.members.includes(as_users_list_discord[discord_id].user_id) ? 4 : 3
+            }, {
+                type: 2,
+                label: 'Disable DM pings',
+                custom_id: `as_user_change_settings.ping_in_dm.false`,
+                style: 2
+            },]
+        }]
+    })
+}
+
 var subscribersTimeout = {}
 socket.on('squadCreate', (squad) => {
     console.log('[relicbot/squadCreate]')
@@ -676,6 +730,9 @@ socket.on('squadCreate', (squad) => {
                                     db_schedule_msg_deletion(msg.id, msg.channel_id, 10000)
                                 }).catch(console.error)
                             }
+                        })
+                        mentions_list.filter(id => as_users_list_discord[id].ping_in_dm).forEach(discord_id => {
+                            client.users.cache.get(discord_id)?.send(generateSquadDMEmbed(squad, discord_id)).catch(console.error)
                         })
                     }).catch(console.error)
                 }

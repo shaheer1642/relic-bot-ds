@@ -9,6 +9,7 @@ const { as_users_list } = require("./allsquads/as_users_list")
 const endpoints = {
     'squadbot/squads/create': squadsCreate,
     'squadbot/squads/fetch': squadsFetch,
+    'squadbot/squads/fetchById': squadsFetchById,
     'squadbot/squads/update': squadsUpdate,
     'squadbot/squads/addmember': squadsAddMember,
     // 'squadbot/squads/removemember': squadsRemoveMember,
@@ -416,6 +417,24 @@ function squadsFetch(data, callback) {
     })
 }
 
+function squadsFetchById(data, callback) {
+    console.log('[squadbot/squadsFetchById] data:', data)
+    db.query(`
+        SELECT * FROM as_sb_squads WHERE squad_id = '${data.squad_id}';
+    `).then(res => {
+        return callback({
+            code: 200,
+            data: res.rows
+        })
+    }).catch(err => {
+        console.log(err)
+        return callback({
+            code: 500,
+            message: err.stack
+        })
+    })
+}
+
 function squadsUpdate(data, callback) {
     if (!data.params) return callback({ code: 500, err: 'No params provided' })
     db.query(`UPDATE as_sb_squads SET ${data.params}`).then(res => {
@@ -455,8 +474,9 @@ function squadsAddMember(data, callback) {
             if (res.rows[0].members.includes(data.user_id)) {
                 db_modules.schedule_query(`UPDATE as_sb_squads SET members = members-'${data.user_id}', logs = logs || '"${new Date().getTime()} ${data.user_id} removed from squad due to timeout"' WHERE members @> '"${data.user_id}"' AND status='active' AND squad_id = '${data.squad_id}'`, as_users_list[data.user_id].squad_timeout)
             }
-            return callback({ code: 200 })
-        } else return callback({ code: 500, message: 'unexpected db response' })
+            return callback({ code: 200, data: res.rows[0] })
+        } else if (res.rowCount == 0) return callback({ code: 404, message: 'Squad no longer exists' })
+        else return callback({ code: 500, message: 'unexpected db response' })
     }).catch(err => {
         console.log(err)
         return callback({
