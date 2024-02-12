@@ -24,7 +24,7 @@ client.on('ready', () => {
     edit_event_leaderboard()
 
     setTimeout(assign_allsquads_roles, 10000);
-    setTimeout(check_allsquads_members_roles, 120000);
+    setTimeout(check_allsquads_members_roles, 36000000);      // execute after 10 hours (to reduce cache)
     setTimeout(channelsVerification, 300000);
 
     setInterval(assign_allsquads_roles, 3600000);
