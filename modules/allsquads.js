@@ -19,18 +19,18 @@ const vip_message_id = '1041306046280499200'
 
 client.on('ready', () => {
     // edit_vip_message()
-    edit_leaderboard()
-    edit_staff_leaderboard()
-    edit_event_leaderboard()
+    // edit_leaderboard()
+    // edit_staff_leaderboard()
+    // edit_event_leaderboard()
 
-    setTimeout(assign_allsquads_roles, 10000);
-    setTimeout(check_allsquads_members_roles, 120000);
-    setTimeout(channelsVerification, 300000);
-
-    setInterval(assign_allsquads_roles, 3600000);
     setInterval(edit_leaderboard, 300000);
     setInterval(edit_staff_leaderboard, 310000);
     setInterval(edit_event_leaderboard, 320000);
+
+    // execute after 10 hours (to reduce cache)
+    setTimeout(check_allsquads_members_roles, 36000000);
+    setInterval(assign_allsquads_roles, 36000000);
+    setTimeout(channelsVerification, 36000000);
 })
 
 client.on('interactionCreate', (interaction) => {
