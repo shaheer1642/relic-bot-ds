@@ -225,19 +225,19 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_create') {
             const squad_string = interaction.customId.split('.')[1].replace(/_/g, ' ')
-            socket.emit('squadbot/squads/create', { message: squad_string, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: interaction.channel.id, merge_squad: interaction.message.guild ? undefined : false }, responses => {
-                if (!interaction.message.guild) interaction.update({ embeds: [{ description: `**${convertUpper(squad_string)}** squad created! You will be notified via DM when squad is filled`, color: 'GREEN' }], components: [] }).catch(console.error)
+            socket.emit('squadbot/squads/create', { message: squad_string, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: !interaction.guild ? '1054843353302323281' : interaction.channel.id, merge_squad: interaction.guild ? undefined : false }, responses => {
+                if (!interaction.guild) interaction.update({ embeds: [{ description: `**${convertUpper(squad_string)}** squad created! You will be notified via DM when squad is filled`, color: 'GREEN' }], components: [] }).catch(console.error)
                 else interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id, interaction.user.id, responses)
             })
         } else if (interaction.customId.split('.')[0] == 'as_sb_sq_join') {
             const discord_id = interaction.user.id
             const squad_id = interaction.customId.split('.')[1]
-            socket.emit('squadbot/squads/addmember', { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, channel_id: interaction.channel.id }, (res) => {
+            socket.emit('squadbot/squads/addmember', { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, channel_id: !interaction.guild ? '1054843353302323281' : interaction.channel.id }, (res) => {
                 if (res.code == 200) {
-                    if (!interaction.message.guild) interaction.update(generateSquadDMEmbed(res.data, discord_id)).catch(console.error)
+                    if (!interaction.guild) interaction.update(generateSquadDMEmbed(res.data, discord_id)).catch(console.error)
                     else interaction.deferUpdate().catch(console.error)
-                } else if (res.code == 404 && !interaction.message.guild) {
+                } else if (res.code == 404 && !interaction.guild) {
                     socket.emit('squadbot/squads/fetchById', { squad_id }, (res) => {
                         // console.log('squadbot/squads/fetchById', res);
                         if (res.code != 200) return

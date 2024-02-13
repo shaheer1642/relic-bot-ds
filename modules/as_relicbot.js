@@ -264,19 +264,19 @@ client.on('interactionCreate', async (interaction) => {
             })
         } else if (interaction.customId.match('rb_sq_create_')) {
             const squad_string = interaction.customId.split('rb_sq_create_')[1]
-            socket.emit('relicbot/squads/create', { message: squad_string, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: interaction.channel.id, merge_squad: interaction.guild ? undefined : false }, responses => {
-                if (!interaction.message.guild) interaction.update({ embeds: [{ description: `**${convertUpper(squad_string)}** squad created! You will be notified via DM when squad is filled`, color: 'GREEN' }], components: [] }).catch(console.error)
+            socket.emit('relicbot/squads/create', { message: squad_string, user_id: as_users_list_discord[interaction.user.id]?.user_id || -1, channel_id: !interaction.guild ? '1050717341123616851' : interaction.channel.id, merge_squad: interaction.guild ? undefined : false }, responses => {
+                if (!interaction.guild) interaction.update({ embeds: [{ description: `**${convertUpper(squad_string)}** squad created! You will be notified via DM when squad is filled`, color: 'GREEN' }], components: [] }).catch(console.error)
                 else interaction.deferUpdate().catch(console.error)
                 handleSquadCreateResponses(interaction.channel.id, interaction.user.id, responses)
             })
         } else if (interaction.customId.match('rb_sq_')) {
             const squad_id = interaction.customId.split('rb_sq_')[1]
             const discord_id = interaction.user.id
-            socket.emit('relicbot/squads/addmember', { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, channel_id: interaction.channel.id }, (res) => {
+            socket.emit('relicbot/squads/addmember', { squad_id: squad_id, user_id: as_users_list_discord[discord_id]?.user_id || -1, channel_id: !interaction.guild ? '1050717341123616851' : interaction.channel.id }, (res) => {
                 if (res.code == 200) {
-                    if (!interaction.message.guild) interaction.update(generateSquadDMEmbed(res.data, discord_id)).catch(console.error)
+                    if (!interaction.guild) interaction.update(generateSquadDMEmbed(res.data, discord_id)).catch(console.error)
                     else interaction.deferUpdate().catch(console.error)
-                } else if (res.code == 404 && !interaction.message.guild) {
+                } else if (res.code == 404 && !interaction.guild) {
                     socket.emit('relicbot/squads/fetchById', { squad_id }, (res) => {
                         if (res.code != 200) return
                         const squad = res.data[0]
