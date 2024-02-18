@@ -697,7 +697,7 @@ async function edit_leaderboard() {
     }, async (res) => {
         if (res.code == 200) {
             const leaderboards = res.data
-            console.log(leaderboards)
+            // console.log(leaderboards)
             const payload = {
                 content: ' ',
                 embeds: [{
