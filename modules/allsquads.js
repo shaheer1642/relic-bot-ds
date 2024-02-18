@@ -23,9 +23,9 @@ client.on('ready', () => {
     // edit_staff_leaderboard()
     // edit_event_leaderboard()
 
-    setInterval(edit_leaderboard, 300000);
-    setInterval(edit_staff_leaderboard, 310000);
-    setInterval(edit_event_leaderboard, 320000);
+    setInterval(edit_leaderboard, 900000);
+    setInterval(edit_staff_leaderboard, 3600000);
+    // setInterval(edit_event_leaderboard, 320000);
 
     // execute after 10 hours (to reduce cache)
     setTimeout(check_allsquads_members_roles, 36000000);
@@ -770,7 +770,7 @@ async function edit_leaderboard() {
 
 function edit_staff_leaderboard() {
     if (process.env.ENVIRONMENT_TYPE != 'prod') return
-    console.log('[allsquads.edit_leaderboard] called')
+    console.log('[allsquads.edit_staff_leaderboard] called')
     socket.emit('allsquads/leaderboards/fetch', {
         options: {
             limit: 10,
