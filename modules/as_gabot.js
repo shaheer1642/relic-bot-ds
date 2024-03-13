@@ -81,7 +81,7 @@ client.on('interactionCreate', async (interaction) => {
                 }).catch(console.error)
             }
             db.query(`SELECT * FROM as_gabot_giveaways WHERE user_id = '${user.user_id}' AND creation_timestamp > ${new Date().getTime() - 86400000} AND status = 'active'`).then(async res => {
-                if (res.rowCount != 0 && user.user_id != '253525146923433984') {
+                if (res.rowCount != 0 && interaction.user.id != '253525146923433984') {
                     return interaction.reply({
                         content: `You have already hosted a giveaway today. You may host again in **${msToFullTime((Number(res.rows[0].creation_timestamp) + 86400000) - new Date().getTime())}**`,
                         ephemeral: true
