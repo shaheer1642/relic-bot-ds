@@ -360,7 +360,7 @@ async function interaction_handler(interaction) {
                         style: 1,
                         min_length: 3,
                         max_length: 7,
-                        placeholder: "i.e. neo",
+                        placeholder: "Lith/Meso/Neo/Axi/Omni/Requiem",
                         required: true
                     }]
                 }, {
@@ -384,7 +384,7 @@ async function interaction_handler(interaction) {
                         style: 1,
                         min_length: 6,
                         max_length: 10,
-                        placeholder: "normal | steelpath | railjack",
+                        placeholder: "normal | steelpath | railjack | omni",
                         required: true
                     }]
                 }, {
@@ -427,7 +427,7 @@ async function interaction_handler(interaction) {
         //     interaction.reply({content: `Please put the planet name as well as the node, not just one of them`, ephemeral: true}).catch(console.error)
         //     return
         // }
-        if (relic_type != 'lith' && relic_type != 'meso' && relic_type != 'neo' && relic_type != 'axi' && relic_type != 'requiem') {
+        if (relic_type != 'lith' && relic_type != 'meso' && relic_type != 'neo' && relic_type != 'axi' && relic_type != 'omni' && relic_type != 'requiem') {
             interaction.reply({ content: `**${relic_type}** is an invalid relic type.\nPlease type one of: lith, meso, neo, axi, or requiem`, ephemeral: true }).catch(console.error)
             return
         }
@@ -2813,7 +2813,7 @@ async function fissures_check() {
                 var users = {}
                 var ping_users = {}
 
-                var fissures_list = { normal: [], steelPath: [], voidStorm: [] }
+                var fissures_list = { normal: [], steelPath: [], voidStorm: [], omni: [] }
                 var min_expiry = new Date().getTime() + 3600000
                 fissures.forEach(fissure => {
                     var expiry = new Date(fissure.expiry).getTime()
@@ -2824,6 +2824,8 @@ async function fissures_check() {
                             fissures_list.voidStorm.push(fissure)
                         else if (fissure.isHard)
                             fissures_list.steelPath.push(fissure)
+                        else if (fissure.tier == 'VoidT6')
+                            fissures_list.omni.push(fissure)
                         else
                             fissures_list.normal.push(fissure)
                     }
@@ -2831,6 +2833,7 @@ async function fissures_check() {
                 fissures_list.normal.sort(dynamicSort("tierNum"))
                 fissures_list.steelPath.sort(dynamicSort("tierNum"))
                 fissures_list.voidStorm.sort(dynamicSort("tierNum"))
+                fissures_list.omni.sort(dynamicSort("tierNum"))
 
                 var embed1 = {
                     title: "Fissures",
@@ -2868,6 +2871,23 @@ async function fissures_check() {
                 }
                 var embed3 = {
                     title: "Railjack Fissures",
+                    fields: [{
+                        name: "Tier",
+                        value: "",
+                        inline: true
+                    }, {
+                        name: "Mission",
+                        value: "",
+                        inline: true
+                    }, {
+                        name: "Expires",
+                        value: "",
+                        inline: true
+                    }],
+                    color: colors.fissures
+                }
+                var embed4 = {
+                    title: "Omni Fissures",
                     fields: [{
                         name: "Tier",
                         value: "",
@@ -2940,7 +2960,7 @@ async function fissures_check() {
                 }
 
                 fissures_list.normal.forEach(fissure => {
-                    embed1.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+                    embed1.fields[0].value += `${emotes[fissure.tier]?.string} ${fissure.tier}\n`
                     embed1.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                     embed1.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
                     // check only mission type
@@ -2951,7 +2971,7 @@ async function fissures_check() {
                     user_trackers(`normal_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(', '').replace(')', ''))}`, fissure)
                 })
                 fissures_list.steelPath.forEach(fissure => {
-                    embed2.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+                    embed2.fields[0].value += `${emotes[fissure.tier]?.string} ${fissure.tier}\n`
                     embed2.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                     embed2.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
                     // check only mission type
@@ -2962,7 +2982,7 @@ async function fissures_check() {
                     user_trackers(`steelpath_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(', '').replace(')', ''))}`, fissure)
                 })
                 fissures_list.voidStorm.forEach(fissure => {
-                    embed3.fields[0].value += `${emotes[fissure.tier].string} ${fissure.tier}\n`
+                    embed3.fields[0].value += `${emotes[fissure.tier]?.string} ${fissure.tier}\n`
                     embed3.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                     embed3.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
                     // check only mission type
@@ -2971,6 +2991,17 @@ async function fissures_check() {
                     user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split('(')[1].replace(')', ''))}`, fissure)
                     // check only mission type + planet + node
                     user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(', '').replace(')', ''))}`, fissure)
+                })
+                fissures_list.omni.forEach(fissure => {
+                    embed4.fields[0].value += `${emotes[fissure.tier]?.string} ${fissure.tier}\n`
+                    embed4.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
+                    embed4.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
+                    // check only mission type
+                    user_trackers(`omni_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                    // check only mission type + planet
+                    user_trackers(`omni_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split('(')[1].replace(')', ''))}`, fissure)
+                    // check only mission type + planet + node
+                    user_trackers(`omni_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(', '').replace(')', ''))}`, fissure)
                 })
                 // last_appeared query
                 console.log('[Fissure Tracker] query:', query.join(' '))
@@ -2981,7 +3012,7 @@ async function fissures_check() {
                         client.channels.cache.get(row.channel_id)?.messages.fetch(row.fissures_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
-                                embeds: [embed1, embed2, embed3],
+                                embeds: [embed1, embed2, embed3, embed4],
                                 components: [
                                     {
                                         type: 1,
