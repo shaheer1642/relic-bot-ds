@@ -91,8 +91,8 @@ const emotes = {
         identifier: 'Axi:962457563423735868'
     },
     VoidT6: {
-        string: '<:Omni:1222621183292342332>',
-        identifier: 'Omni:1222621183292342332'
+        string: '<:Omnia:1222621183292342332>',
+        identifier: 'Omnia:1222621183292342332'
     },
     Requiem: {
         string: '<:Requiem:962457575230701598>',
@@ -364,7 +364,7 @@ async function interaction_handler(interaction) {
                         style: 1,
                         min_length: 3,
                         max_length: 7,
-                        placeholder: "Lith/Meso/Neo/Axi/Omni/Requiem",
+                        placeholder: "Lith/Meso/Neo/Axi/Omnia/Requiem",
                         required: true
                     }]
                 }, {
@@ -388,7 +388,7 @@ async function interaction_handler(interaction) {
                         style: 1,
                         min_length: 6,
                         max_length: 10,
-                        placeholder: "normal | steelpath | railjack | omni",
+                        placeholder: "normal | steelpath | railjack | omnia",
                         required: true
                     }]
                 }, {
@@ -431,7 +431,7 @@ async function interaction_handler(interaction) {
         //     interaction.reply({content: `Please put the planet name as well as the node, not just one of them`, ephemeral: true}).catch(console.error)
         //     return
         // }
-        if (relic_type != 'lith' && relic_type != 'meso' && relic_type != 'neo' && relic_type != 'axi' && relic_type != 'omni' && relic_type != 'requiem') {
+        if (relic_type != 'lith' && relic_type != 'meso' && relic_type != 'neo' && relic_type != 'axi' && relic_type != 'omnia' && relic_type != 'requiem') {
             interaction.reply({ content: `**${relic_type}** is an invalid relic type.\nPlease type one of: lith, meso, neo, axi, or requiem`, ephemeral: true }).catch(console.error)
             return
         }
@@ -2817,7 +2817,7 @@ async function fissures_check() {
                 var users = {}
                 var ping_users = {}
 
-                var fissures_list = { normal: [], steelPath: [], voidStorm: [], omni: [] }
+                var fissures_list = { normal: [], steelPath: [], voidStorm: [], omnia: [] }
                 var min_expiry = new Date().getTime() + 3600000
                 fissures.forEach(fissure => {
                     var expiry = new Date(fissure.expiry).getTime()
@@ -2829,7 +2829,7 @@ async function fissures_check() {
                         else if (fissure.isHard)
                             fissures_list.steelPath.push(fissure)
                         else if (fissure.tier == 'VoidT6')
-                            fissures_list.omni.push(fissure)
+                            fissures_list.omnia.push(fissure)
                         else
                             fissures_list.normal.push(fissure)
                     }
@@ -2837,7 +2837,7 @@ async function fissures_check() {
                 fissures_list.normal.sort(dynamicSort("tierNum"))
                 fissures_list.steelPath.sort(dynamicSort("tierNum"))
                 fissures_list.voidStorm.sort(dynamicSort("tierNum"))
-                fissures_list.omni.sort(dynamicSort("tierNum"))
+                fissures_list.omnia.sort(dynamicSort("tierNum"))
 
                 var embed1 = {
                     title: "Fissures",
@@ -2891,7 +2891,7 @@ async function fissures_check() {
                     color: colors.fissures
                 }
                 var embed4 = {
-                    title: "Omni Fissures",
+                    title: "Omnia Fissures",
                     fields: [{
                         name: "Tier",
                         value: "",
@@ -2996,16 +2996,16 @@ async function fissures_check() {
                     // check only mission type + planet + node
                     user_trackers(`railjack_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(', '').replace(')', ''))}`, fissure)
                 })
-                fissures_list.omni.forEach(fissure => {
+                fissures_list.omnia.forEach(fissure => {
                     embed4.fields[0].value += `${emotes[fissure.tier]?.string} ${fissure.tier}\n`
                     embed4.fields[1].value += `${fissure.missionType} - ${fissure.node}\n`
                     embed4.fields[2].value += `<t:${Math.round(new Date(fissure.expiry).getTime() / 1000)}:R>\n`
                     // check only mission type
-                    user_trackers(`omni_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
+                    user_trackers(`omnia_${LU(fissure.tier)}_${LU(fissure.missionType)}`, fissure)
                     // check only mission type + planet
-                    user_trackers(`omni_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split('(')[1].replace(')', ''))}`, fissure)
+                    user_trackers(`omnia_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.split('(')[1].replace(')', ''))}`, fissure)
                     // check only mission type + planet + node
-                    user_trackers(`omni_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(', '').replace(')', ''))}`, fissure)
+                    user_trackers(`omnia_${LU(fissure.tier)}_${LU(fissure.missionType)}_${LU(fissure.node.replace('(', '').replace(')', ''))}`, fissure)
                 })
                 // last_appeared query
                 console.log('[Fissure Tracker] query:', query.join(' '))
