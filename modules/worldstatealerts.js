@@ -2910,7 +2910,7 @@ async function fissures_check() {
 
 
                 function LU(text) {
-                    return text.trim().toLowerCase().replace(/ /g, '_')
+                    return text?.trim().toLowerCase().replace(/ /g, '_')
                 }
 
                 var ping_string = []
