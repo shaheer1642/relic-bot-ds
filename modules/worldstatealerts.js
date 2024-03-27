@@ -90,6 +90,10 @@ const emotes = {
         string: '<:Axi:962457563423735868>',
         identifier: 'Axi:962457563423735868'
     },
+    VoidT6: {
+        string: '<:Omni:1222621183292342332>',
+        identifier: 'Omni:1222621183292342332'
+    },
     Requiem: {
         string: '<:Requiem:962457575230701598>',
         identifier: 'Requiem:962457575230701598'
