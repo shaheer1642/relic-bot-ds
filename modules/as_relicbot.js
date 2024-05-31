@@ -5,7 +5,6 @@ const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const { socket } = require('./socket')
 const { inform_dc, dynamicSort, dynamicSortDesc, msToTime, msToFullTime, embedScore, convertUpper, sortCaseInsensitive, arrToStringsArrWithLimit, getGuildMembersStatus } = require('./extras.js');
-const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const { event_emitter } = require('./event_emitter')
@@ -847,7 +846,8 @@ socket.on('relicbot/squads/opened', async (payload) => {
             }).then(msg => {
                 squadOpenMessages[`${squad.squad_id}_${thread.id}`] = msg
                 axios('http://content.warframe.com/dynamic/worldState.php')
-                    .then(worldstateData => {
+                    .then(async worldstateData => {
+                        const WorldState = (await import('warframe-worldstate-parser')).default
                         const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
                         if (!fissures) return
 
@@ -1208,7 +1208,8 @@ async function fissures_check() {
     console.log('[relicbot] fissures_check called')
 
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
 
             if (!fissures) {

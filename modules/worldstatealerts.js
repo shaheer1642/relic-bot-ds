@@ -3,12 +3,13 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const { db } = require('./db_connection.js');
 const { inform_dc, dynamicSort, dynamicSortDesc, msToTime, msToFullTime, mod_log, getRandomColor, convertUpper, arrToStringsArrWithLimit, responsiveEmbedFields } = require('./extras.js');
-const { db_schedule_msg_deletion } = require('./msg_auto_delete')
-const WorldState = require('warframe-worldstate-parser');
+const { db_schedule_msg_deletion } = require('./msg_auto_delete.js')
+
 const access_ids = [
     '253525146923433984',
     '834874419444711534'
 ]
+
 const emotes = {
     baro: {
         string: '<:baro:961548844368293969>',
@@ -219,6 +220,7 @@ const emotes = {
         identifier: 'karak_wraith:986655689097244692'
     }
 }
+
 const colors = {
     baro: "#95744",
     cycles: "#a83258",
@@ -258,7 +260,8 @@ function bot_initialize() {
 async function interaction_handler(interaction) {
     if (interaction.commandName == 'fissures') {
         axios('http://content.warframe.com/dynamic/worldState.php')
-            .then(worldstateData => {
+            .then(async worldstateData => {
+                const WorldState = (await import('warframe-worldstate-parser')).default
                 const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures;
 
                 if (fissures) {
@@ -2282,8 +2285,8 @@ async function cleanUpDB() {
 
 async function baro_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
-
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const voidTrader = new WorldState(JSON.stringify(worldstateData.data)).voidTrader;
 
             if (!voidTrader) {
@@ -2395,8 +2398,8 @@ async function baro_check() {
 var ping_10m_before_cetus_cycle_change_timeout = null
 async function cycles_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
-
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const cetusCycle = new WorldState(JSON.stringify(worldstateData.data)).cetusCycle;
             const vallisCycle = new WorldState(JSON.stringify(worldstateData.data)).vallisCycle;
             const cambionCycle = new WorldState(JSON.stringify(worldstateData.data)).cambionCycle;
@@ -2637,7 +2640,7 @@ async function cycles_check() {
 async function arbitration_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
-
+            const WorldState = (await import('warframe-worldstate-parser')).default
             var arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
 
             if (!arbitration) {
@@ -2798,8 +2801,8 @@ async function arbitration_check() {
 
 async function fissures_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
-
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures;
 
             if (!fissures) {
@@ -3064,8 +3067,8 @@ async function fissures_check() {
 
 async function teshin_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
-
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const steelPath = new WorldState(JSON.stringify(worldstateData.data)).steelPath;
 
             if (!steelPath) {
@@ -3190,8 +3193,8 @@ async function teshin_check() {
 
 async function alerts_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
-
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const alerts = new WorldState(JSON.stringify(worldstateData.data)).alerts;
             console.log(JSON.stringify(alerts))
 
@@ -3320,8 +3323,8 @@ async function alerts_check() {
 
 async function global_upgrades_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
-
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const global_upgrades = new WorldState(JSON.stringify(worldstateData.data)).globalUpgrades;
 
             db.query(`SELECT * FROM worldstatealert`).then(res => {
@@ -3435,8 +3438,8 @@ async function global_upgrades_check() {
 
 async function invasions_check() {
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
-
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const invasions = new WorldState(JSON.stringify(worldstateData.data)).invasions;
 
             db.query(`SELECT * FROM worldstatealert`).then(res => {

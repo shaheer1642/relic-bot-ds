@@ -32,7 +32,7 @@
     "undici": "^6.4.0",
     "uuid": "^9.0.0",
     "warframe-items": "^1.1262.74",
-    "warframe-worldstate-parser": "^2.23.1"
+    "warframe-worldstate-parser": "^3.0.9"
   },
   "name": "relic-bot-ds",
   "version": "1.0.0",

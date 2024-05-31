@@ -1,5 +1,4 @@
 const { db } = require("./db_connection")
-const WorldState = require('warframe-worldstate-parser');
 const axios = require('axios');
 const { escapeDBCharacters } = require("./functions");
 const { as_users_list } = require("./allsquads/as_users_list");
@@ -91,7 +90,8 @@ function updateNightwaveMissionsSquadBot() {
     console.log('[global_variables.updateNightwaveMissionsSquadBot] called')
 
     axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(worldstateData => {
+        .then(async worldstateData => {
+            const WorldState = (await import('warframe-worldstate-parser')).default
             const worldStateNightwave = new WorldState(JSON.stringify(worldstateData.data)).nightwave
 
             db.query(`SELECT * from global_variables_list WHERE var_name = 'squadbot.default_squads'`)
