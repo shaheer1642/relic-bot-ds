@@ -320,13 +320,13 @@ async function updateDatabaseItems(up_origin = null) {
             console.log('Scanning DB lich list...')
             for (const weapon of weapons_list) {
                 if (!db_lich_list[weapon.id]) {
-                    console.log(`${weapons_list[i].url_name} is not in the DB. Adding...`)
-                    var status = await db.query(`INSERT INTO lich_list (lich_id,weapon_url,icon_url) VALUES ('${weapons_list[i].id}', '${weapons_list[i].url_name}','${weapons_list[i].thumb}')`)
+                    console.log(`${weapon.url_name} is not in the DB. Adding...`)
+                    var status = await db.query(`INSERT INTO lich_list (lich_id,weapon_url,icon_url) VALUES ('${weapon.id}', '${weapon.url_name}','${weapon.thumb}')`)
                         .then(() => {
-                            console.log(`Susccessfully inserted ${weapons_list[i].url_name} into DB.`)
+                            console.log(`Susccessfully inserted ${weapon.url_name} into DB.`)
                             return true
                         }).catch(err => {
-                            console.log(err + `Error inserting ${weapons_list[i].url_name} into DB.`)
+                            console.log(err + `Error inserting ${weapon.url_name} into DB.`)
                             return false
                         })
                     if (!status) return false
