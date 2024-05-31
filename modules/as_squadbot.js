@@ -5,7 +5,6 @@ const { WebhookClient } = require('discord.js');
 const JSONbig = require('json-bigint');
 const { socket } = require('./socket')
 const { inform_dc, dynamicSort, dynamicSortDesc, msToTime, msToFullTime, embedScore, convertUpper, lowerAndScore, sortCaseInsensitive, arrToStringsArrWithLimit, getGuildMembersStatus } = require('./extras.js');
-const WorldState = import('warframe-worldstate-parser');
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const { event_emitter } = require('./event_emitter')
