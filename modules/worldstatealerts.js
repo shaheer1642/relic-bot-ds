@@ -91,7 +91,7 @@ const emotes = {
         string: '<:Axi:962457563423735868>',
         identifier: 'Axi:962457563423735868'
     },
-    VoidT6: {
+    Omnia: {
         string: '<:Omnia:1222621183292342332>',
         identifier: 'Omnia:1222621183292342332'
     },
@@ -2827,7 +2827,7 @@ async function fissures_check() {
                     if ((expiry - new Date().getTime()) > 0) {
                         if (expiry < min_expiry)
                             min_expiry = expiry
-                        if (fissure.tier == 'VoidT6')
+                        if (fissure.tier == 'Omnia')
                             fissures_list.omnia.push(fissure)
                         else if (fissure.isStorm)
                             fissures_list.voidStorm.push(fissure)
@@ -3482,7 +3482,7 @@ async function invasions_check() {
                     invasions_list.push({
                         title: invasion.desc,
                         node: `${invasion.node}`,
-                        reward: `${invasion.attacker.reward.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')} ${((invasion.defender.reward.asString != "") && (invasion.attacker.reward.asString != "")) ? 'vs' : ''} ${invasion.defender.reward.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')}`.trim(),
+                        reward: `${invasion.attacker.reward.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')} ${((invasion.defender.reward != "") && (invasion.attacker.reward != "")) ? 'vs' : ''} ${invasion.defender.reward.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')}`.trim(),
                         expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
                         completed: invasion.completed
                     })
