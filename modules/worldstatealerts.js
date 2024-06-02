@@ -3019,7 +3019,12 @@ async function fissures_check() {
                         client.channels.cache.get(row.channel_id)?.messages.fetch(row.fissures_alert).then(msg => {
                             msg.edit({
                                 content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
-                                embeds: [embed1, embed2, embed3, embed4],
+                                embeds: [
+                                    row.fissures_types.includes('normal') && embed1,
+                                    row.fissures_types.includes('steelpath') && embed2,
+                                    row.fissures_types.includes('railjack') && embed3,
+                                    row.fissures_types.includes('omnia') && embed4
+                                ].filter(o => o),
                                 components: [
                                     {
                                         type: 1,
