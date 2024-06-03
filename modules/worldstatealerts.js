@@ -2287,7 +2287,8 @@ async function cleanUpDB() {
 
                 const columns = ['cycles_users', 'arbitration_users', 'teshin_users', 'ping_filter', 'global_upgrades_users', 'alerts_users', 'invasions_users']
 
-                const users = columns.reduce((users, column) => users.concat(Object.values(row[column]).reduce((arr, v) => arr.concat(v), [])), [])
+                // note: Set removes duplicate values
+                const users = [...new Set(columns.reduce((users, column) => users.concat(Object.values(row[column]).reduce((arr, v) => arr.concat(v), [])), []))]
 
                 client.channels.fetch(channel_id).then(channel => {
                     client.guilds.fetch(channel.guildId).then(guild => {
