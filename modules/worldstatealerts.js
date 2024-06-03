@@ -2257,6 +2257,7 @@ async function setupReaction(reaction, user, type) {
 async function cleanUpDB() {
     db.query('SELECT * FROM worldstatealert')
         .then(res => {
+            // verify channels
             res.rows.forEach(row => {
                 const cnl_id = row.channel_id
                 client.channels.fetch(cnl_id).then(cnl => {
@@ -2278,6 +2279,35 @@ async function cleanUpDB() {
                         console.log('[worldstatealerts.cleanUpDB] removed channel channel_id =', cnl_id)
                     }
                 })
+            })
+
+            // verify users
+            res.rows.forEach(row => {
+                const channel_id = row.channel_id
+
+                const columns = ['cycles_users', 'arbitration_users', 'teshin_users', 'ping_filter', 'global_upgrades_users', 'alerts_users', 'invasions_users']
+
+                const users = columns.reduce((users, column) => users.concat(Object.values(row[column]).reduce((arr, v) => arr.concat(v), [])), [])
+
+                client.channels.fetch(channel_id).then(channel => {
+                    client.guilds.fetch(channel.guildId).then(guild => {
+                        users.forEach(user => {
+                            guild.members.fetch(user).catch(err => {
+                                if (err.code == 10007) {
+                                    db.query(
+                                        columns.map(column =>
+                                            Object.keys(row[column]).map(alert_type => `
+                                            UPDATE worldstatealert
+                                            SET ${column} = jsonb_set(${column}, '{${alert_type}}', (${column}->'${alert_type}') - '${user}')
+                                            WHERE channel_id = ${channel_id};
+                                        `).join('\n')
+                                        ).join('\n')
+                                    ).then(res => console.log('[worldstatealert.cleanUpDB] removed user', user, 'from alerts')).catch(console.error)
+                                } else console.error('[worldstatealert.cleanUpDB] unknown error', err)
+                            })
+                        })
+                    }).catch(console.error)
+                }).catch(console.error)
             })
         }).catch(console.error)
 }

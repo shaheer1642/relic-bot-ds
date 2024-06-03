@@ -132,7 +132,9 @@ client.on('ready', () => {
 
     client.guilds.fetch().then(guilds => {
         guilds.forEach(guild => {
-            client.guilds.cache.get(guild.id).me.setNickname(`${client.guilds.cache.get(guild.id).me.displayName.replace(/\[Maintenance Mode\]/g, '').trim()}${process.env.MAINTENANCE_MODE == 1 ? ' [Maintenance Mode]' : ''}`).catch(console.error)
+            client.guilds.fetch(guild.id).then(guild => {
+                guild.members.me.setNickname(`${client.guilds.cache.get(guild.id).me.displayName.replace(/\[Maintenance Mode\]/g, '').trim()}${process.env.MAINTENANCE_MODE == 1 ? ' [Maintenance Mode]' : ''}`).catch(console.error)
+            }).catch(console.error)
         })
     }).catch(console.error)
 })
