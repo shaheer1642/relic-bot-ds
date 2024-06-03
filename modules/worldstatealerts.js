@@ -2284,6 +2284,7 @@ async function cleanUpDB() {
 //----tracking----
 
 async function baro_check() {
+    console.log('baro_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -2397,6 +2398,7 @@ async function baro_check() {
 
 var ping_10m_before_cetus_cycle_change_timeout = null
 async function cycles_check() {
+    console.log('cycles_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -2638,6 +2640,7 @@ async function cycles_check() {
 }
 
 async function arbitration_check() {
+    console.log('arbitration_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -2800,6 +2803,7 @@ async function arbitration_check() {
 }
 
 async function fissures_check() {
+    console.log('fissures_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -3071,6 +3075,7 @@ async function fissures_check() {
 }
 
 async function teshin_check() {
+    console.log('teshin_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -3197,6 +3202,7 @@ async function teshin_check() {
 }
 
 async function alerts_check() {
+    console.log('alerts_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -3327,6 +3333,7 @@ async function alerts_check() {
 }
 
 async function global_upgrades_check() {
+    console.log('global_upgrades_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -3442,6 +3449,7 @@ async function global_upgrades_check() {
 }
 
 async function invasions_check() {
+    console.log('invasions_check called');
     axios('http://content.warframe.com/dynamic/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
@@ -3487,19 +3495,19 @@ async function invasions_check() {
                     invasions_list.push({
                         title: invasion.desc,
                         node: `${invasion.node}`,
-                        reward: `${invasion.attacker.reward.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')} ${((invasion.defender.reward != "") && (invasion.attacker.reward != "")) ? 'vs' : ''} ${invasion.defender.reward.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')}`.trim(),
+                        reward: `${invasion.attacker.reward?.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')} ${((invasion.defender.reward?.asString != "") && (invasion.attacker.reward?.asString != "")) ? 'vs' : ''} ${invasion.defender.reward?.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')}`.trim(),
                         expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
                         completed: invasion.completed
                     })
 
-                    invasion.attacker.reward.countedItems.forEach(item => {
+                    invasion.attacker.reward?.countedItems.forEach(item => {
                         var str = item.key.toLowerCase().replace(/ /g, '_') + '_' + new Date(invasion.activation).getTime()
                         str = str.replace('wraith_twin_vipers', 'twin_vipers_wraith')
                         if (!rewards_list.includes(str))
                             invasions_rewards.push(str)
 
                     })
-                    invasion.defender.reward.countedItems.forEach(item => {
+                    invasion.defender.reward?.countedItems.forEach(item => {
                         var str = item.key.toLowerCase().replace(/ /g, '_') + '_' + new Date(invasion.activation).getTime()
                         str = str.replace('wraith_twin_vipers', 'twin_vipers_wraith')
                         if (!rewards_list.includes(str))
