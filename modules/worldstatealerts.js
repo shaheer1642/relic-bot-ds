@@ -2272,6 +2272,7 @@ async function cleanUpDB() {
                                 })
                         })
                 }).catch(err => {
+                    console.log('[worldstatealerts.cleanUpDB] error:', err)
                     if (err.code == 10003 || err.code == 50001) {
                         db.query(`DELETE FROM worldstatealert WHERE channel_id = ${cnl_id}`).catch(console.error)
                         console.log('[worldstatealerts.cleanUpDB] removed channel channel_id =', cnl_id)
