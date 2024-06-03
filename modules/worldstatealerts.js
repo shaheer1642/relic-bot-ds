@@ -3550,7 +3550,7 @@ async function invasions_check() {
                 db.query(`UPDATE worldstatealert SET invasions_rewards = '${JSON.stringify(invasions_rewards)}'`).catch(console.error)
 
                 invasions_rewards.forEach(active_reward => {
-                    active_reward_key = active_reward.split('_')
+                    var active_reward_key = active_reward.split('_')
                     active_reward_key.pop()
                     active_reward_key = active_reward_key.join('_')
                     res.rows.forEach(row => {
