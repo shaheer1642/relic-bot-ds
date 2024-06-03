@@ -2265,7 +2265,7 @@ async function cleanUpDB() {
                             const msg_id = row[alert_type]
                             cnl.messages.fetch(msg_id)
                                 .catch(err => {
-                                    if (err.code == 10008) {
+                                    if (err.code == 10008 || err.code == 50001) {
                                         db.query(`UPDATE worldstatealert SET ${alert_type} = NULL WHERE channel_id = ${cnl_id}`).catch(console.error)
                                         console.log('[worldstatealerts.cleanUpDB] removed message channel_id =', cnl_id, 'message_id =', msg_id)
                                     }
