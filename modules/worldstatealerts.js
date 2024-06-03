@@ -3526,7 +3526,7 @@ async function invasions_check() {
                     invasions_list.push({
                         title: invasion.desc,
                         node: `${invasion.node}`,
-                        reward: `${invasion.attacker.reward?.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')} ${((invasion.defender.reward?.asString != "") && (invasion.attacker.reward?.asString != "")) ? 'vs' : ''} ${invasion.defender.reward?.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')}`.trim(),
+                        reward: `${invasion.attacker.reward && invasion.attacker.reward.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')} ${(invasion.attacker.reward && invasion.defender.reward) ? 'vs' : ''} ${invasion.defender.reward && invasion.defender.reward.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith')}`.trim(),
                         expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
                         completed: invasion.completed
                     })
