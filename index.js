@@ -16,7 +16,7 @@ const discord_server_modules = require('./modules/discord_server_modules.js');
 const worldstatealerts = require('./modules/worldstatealerts.js');
 const relicbot = require('./modules/as_relicbot.js');
 const squadbot = require('./modules/as_squadbot.js');
-const deploy_commands = require('./deploy-commands.js');
+// const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
 const osiris_guild_id = '905559118096531456'
@@ -120,7 +120,7 @@ client.on('ready', () => {
 
     client.user.setActivity('.help', { type: 2 })
 
-    deploy_commands.bot_initialize()
+    // deploy_commands.bot_initialize()
 
     osiris_guild.bot_initialize()
     // trade_bot_modules.bot_initialize()

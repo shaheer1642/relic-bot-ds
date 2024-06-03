@@ -6,24 +6,23 @@ const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_BOT_TOKEN);
 
 client.on("guildCreate", guild => {
 	console.log("Joined a new guild: " + guild.name);
-	console.log('redeploying app commands')
-	deployCommands()
+	deployCommands([guild.id])
 	//Your other stuff like adding to guildArray
 })
 
-async function deployCommands() {
+async function deployCommands(guild_ids) {
 	try {
-		console.log('Registering application commands...')
+		console.log('Registering application commands for guilds', guild_ids)
 
 		const commands = [];
 		const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-		const all_guild_ids = await client.guilds.fetch().then(guilds => { return guilds.map(guild => guild.id) }).catch(err => console.log(err))
-		console.log(all_guild_ids)
+		// const guild_ids = await client.guilds.fetch().then(guilds => { return guilds.map(guild => guild.id) }).catch(err => console.log(err))
+		// console.log(guild_ids)
 
 		if (false) {
 			// delete prev registered slash commands
-			all_guild_ids.forEach(guildId => {
+			guild_ids.forEach(guildId => {
 				rest.get(Routes.applicationGuildCommands(client.user.id, guildId))
 					.then(data => {
 						const promises = [];
@@ -43,7 +42,7 @@ async function deployCommands() {
 				if (command.scope == 'private')
 					commands.push({ commandBody: command.data.toJSON(), guildIds: command.guildIds, name: command.command_name });
 				else if (command.scope == 'global')
-					commands.push({ commandBody: command.data.toJSON(), guildIds: all_guild_ids, name: command.command_name });
+					commands.push({ commandBody: command.data.toJSON(), guildIds: guild_ids, name: command.command_name });
 			}
 		}
 		// modify commands if needed
@@ -69,7 +68,7 @@ async function deployCommands() {
 		}
 		//console.log(JSON.stringify(commands))
 
-		all_guild_ids.forEach(guildId => {
+		guild_ids.forEach(guildId => {
 			var all_commands = []
 			commands.forEach(command => {
 				if (command.guildIds.includes(guildId)) all_commands.push(command.commandBody)
