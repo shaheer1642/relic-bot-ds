@@ -2825,7 +2825,7 @@ async function fissures_check() {
                 var ping_users = {}
 
                 var fissures_list = { normal: [], steelPath: [], voidStorm: [], omnia: [] }
-                var min_expiry = new Date().getTime() + 3600000
+                var min_expiry = Infinity
                 fissures.forEach(fissure => {
                     var expiry = new Date(fissure.expiry).getTime()
                     if ((expiry - new Date().getTime()) > 0) {
@@ -3059,7 +3059,7 @@ async function fissures_check() {
                 })
 
                 var timer = min_expiry - new Date().getTime()
-                if (timer > 180000) timer -= 180000  // check 3 min before for reset
+                if (timer < 30000 || timer == Infinity) timer = 30000
                 fissuresTimer = setTimeout(fissures_check, timer)
                 console.log('fissures_check invokes in ' + msToTime(timer))
             }).catch(err => {
