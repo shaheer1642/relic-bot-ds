@@ -2264,20 +2264,19 @@ async function cleanUpDB() {
                     ['baro_alert', 'cycles_alert', 'arbitration_alert', 'fissures_alert', 'teshin_alert', 'alerts_alert', 'global_upgrades_alert', 'invasions_alert']
                         .forEach(alert_type => {
                             const msg_id = row[alert_type]
-                            cnl.messages.fetch(msg_id)
-                                .catch(err => {
-                                    if (err.code == 10008 || err.code == 50001) {
-                                        db.query(`UPDATE worldstatealert SET ${alert_type} = NULL WHERE channel_id = ${cnl_id}`).catch(console.error)
-                                        console.log('[worldstatealerts.cleanUpDB] removed message channel_id =', cnl_id, 'message_id =', msg_id)
-                                    }
-                                })
+                            if (!msg_id) return
+                            cnl.messages.fetch(msg_id).catch(err => {
+                                if (err.code == 10008 || err.code == 50001) {
+                                    db.query(`UPDATE worldstatealert SET ${alert_type} = NULL WHERE channel_id = ${cnl_id}`).catch(console.error)
+                                    console.log('[worldstatealerts.cleanUpDB] removed message channel_id =', cnl_id, 'message_id =', msg_id)
+                                } else console.log('[worldstatealerts.cleanUpDB] unknown error', err)
+                            })
                         })
                 }).catch(err => {
-                    console.log('[worldstatealerts.cleanUpDB] error:', err)
                     if (err.code == 10003 || err.code == 50001) {
                         db.query(`DELETE FROM worldstatealert WHERE channel_id = ${cnl_id}`).catch(console.error)
                         console.log('[worldstatealerts.cleanUpDB] removed channel channel_id =', cnl_id)
-                    }
+                    } else console.log('[worldstatealerts.cleanUpDB] unknown error', err)
                 })
             })
 
@@ -2287,7 +2286,7 @@ async function cleanUpDB() {
 
                 const columns = ['cycles_users', 'arbitration_users', 'teshin_users', 'ping_filter', 'global_upgrades_users', 'alerts_users', 'invasions_users']
 
-                // note: Set removes duplicate values
+                // note: Set() removes duplicate values
                 const users = [...new Set(columns.reduce((users, column) => users.concat(Object.values(row[column]).reduce((arr, v) => arr.concat(v), [])), []))]
 
                 client.channels.fetch(channel_id).then(channel => {
