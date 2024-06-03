@@ -1,5 +1,5 @@
-const {client} = require('./discord_client.js');
-const {db} = require('./db_connection.js');
+const { client } = require('./discord_client.js');
+const { db } = require('./db_connection.js');
 const JSONbig = require('json-bigint');
 
 client.on('ready', () => {
@@ -7,7 +7,8 @@ client.on('ready', () => {
         res.rows.forEach(row => {
             schedule_deletion(row)
         })
-    })
+        clean_db()
+    }).catch(console.error)
 })
 
 function db_schedule_msg_deletion(message_id, channel_id, delete_timeout) {
@@ -26,6 +27,12 @@ function schedule_deletion(db_obj) {
         if (!msg) return
         msg.delete().then(() => db.query(`DELETE FROM discord_msg_auto_delete WHERE id = ${db_obj.id}`).catch(console.error)).catch(console.error)
     }, db_obj.delete_timestamp - new Date().getTime());
+}
+
+function clean_db() {
+    db.query(`DELETE FROM discord_msg_auto_delete WHERE delete_timestamp < ${new Date().getTime()}`).then(res => {
+        console.log('[msg_auto_delete] purged', res.rowCount, 'messages from db')
+    }).catch(console.error)
 }
 
 db.on('notification', async (notification) => {
