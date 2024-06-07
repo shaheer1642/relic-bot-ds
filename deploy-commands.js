@@ -10,6 +10,15 @@ client.on("guildCreate", guild => {
 	//Your other stuff like adding to guildArray
 })
 
+client.on('ready', () => {
+	if (process.env.DEPLOY_COMMANDS) {
+		console.log('Bot has started')
+		client.guilds.fetch().then(guilds => {
+			deployCommands(guilds.map(g => g.id))
+		}).catch(console.error)
+	}
+})
+
 async function deployCommands(guild_ids) {
 	try {
 		console.log('Registering application commands for guilds', guild_ids)
@@ -22,17 +31,31 @@ async function deployCommands(guild_ids) {
 
 		if (false) {
 			// delete prev registered slash commands
-			guild_ids.forEach(guildId => {
-				rest.get(Routes.applicationGuildCommands(client.user.id, guildId))
-					.then(data => {
+			Promise.all(
+				guild_ids.map((guildId) => {
+					return new Promise(async (resolve) => {
 						const promises = [];
-						for (const command of data) {
-							const deleteUrl = `${Routes.applicationGuildCommands(client.user.id, guildId)}/${command.id}`;
-							promises.push(rest.delete(deleteUrl).then(res => console.log('deleted command', command.id)));
+
+						await rest.get(Routes.applicationGuildCommands(client.user.id, guildId))
+							.then(data => {
+								for (const command of data) {
+									const deleteUrl = `${Routes.applicationGuildCommands(client.user.id, guildId)}/${command.id}`;
+									promises.push(rest.delete(deleteUrl).then(res => console.log('deleted command', command.id)));
+								}
+							}).catch(console.error)
+
+						if (promises.length == 0) {
+							console.log('no commands found for guild', guildId)
+							return resolve()
 						}
-						return Promise.all(promises);
-					});
-			})
+
+						Promise.all(promises).then(res => {
+							console.log('finished removing commands for guild', guildId)
+							return resolve()
+						}).catch(console.error);
+					})
+				})
+			).then(res => console.log('finished removing commands for all guilds')).catch(console.error);
 			return
 		}
 
@@ -54,8 +77,8 @@ async function deployCommands(guild_ids) {
 			if (command.commandBody.name == 'track') {
 				if (command.commandBody.options[0].name == 'bounties')
 					commands[index].commandBody.options[0].options[1].autocomplete = true
-				if (command.commandBody.options[1].name == 'teshin')
-					commands[index].commandBody.options[1].options[0].autocomplete = true
+				// if (command.commandBody.options[1].name == 'teshin')
+				// 	commands[index].commandBody.options[1].options[0].autocomplete = true
 			}
 			if (command.commandBody.name == 'giveaways') {
 				if (command.commandBody.options[1].name == 'reroll')
@@ -68,20 +91,28 @@ async function deployCommands(guild_ids) {
 		}
 		//console.log(JSON.stringify(commands))
 
-		guild_ids.forEach(guildId => {
-			var all_commands = []
-			commands.forEach(command => {
-				if (command.guildIds.includes(guildId)) all_commands.push(command.commandBody)
-			})
+		Promise.all(
+			guild_ids.map(guildId => {
+				return new Promise((resolve, reject) => {
+					var all_commands = []
+					commands.forEach(command => {
+						if (command.guildIds.includes(guildId)) all_commands.push(command.commandBody)
+					})
 
-			rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: all_commands })
-				.then(() => console.log(`Successfully registered application commands ${all_commands.map(command => command.name).toString()} for guild ${guildId}`))
-				.catch(err => {
-					if (err.code == 50001) console.log(`Could not register application commands for guild ${guildId}: Missing Access`)
-					else console.log(err)
-				}
-				);
-		})
+					rest.put(Routes.applicationGuildCommands(client.user.id, guildId), { body: all_commands })
+						.then(() => {
+							console.log(`Successfully registered application commands ${all_commands.map(command => command.name).toString()} for guild ${guildId}`)
+							resolve()
+						})
+						.catch(err => {
+							if (err.code == 50001) console.log(`Could not register application commands for guild ${guildId}: Missing Access`)
+							else console.log(err)
+							reject()
+						}
+						);
+				})
+			})
+		).then(res => console.log('Finished registering commands for all guilds')).catch(console.error)
 
 	} catch (e) {
 		console.log(e)

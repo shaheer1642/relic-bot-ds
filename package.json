@@ -42,7 +42,8 @@
     "start": "node -r dotenv/config index.js",
     "test": "nodemon -r dotenv/config test.js",
     "dev": "nodemon -r dotenv/config index.js",
-    "script": "node -r dotenv/config scripts/replace_db_array_values.js"
+    "script": "node -r dotenv/config scripts/replace_db_array_values.js",
+    "deploy_commands": "DEPLOY_COMMANDS=true node -r dotenv/config deploy-commands.js"
   },
   "repository": {
     "type": "git",

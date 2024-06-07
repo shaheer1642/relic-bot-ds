@@ -126,6 +126,7 @@ client.on('ready', () => {
 })
 
 function cleanUpDB() {
+    console.log('[trackers.cleanUpDB] invoked');
     db.query('SELECT * FROM bounties_list').then(res => {
         const users = [...new Set(res.rows.map(row => Object.keys(row.users2)).reduce((arr, v) => arr.concat(v), []))]
 
