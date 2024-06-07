@@ -2284,10 +2284,10 @@ async function cleanUpDB() {
             res.rows.forEach(row => {
                 const channel_id = row.channel_id
 
-                const columns = ['cycles_users', 'arbitration_users', 'teshin_users', 'ping_filter', 'global_upgrades_users', 'alerts_users', 'invasions_users']
+                const columns = ['cycles_users', 'arbitration_users', 'teshin_users', 'ping_filter', 'global_upgrades_users', 'alerts_users', 'invasions_users', 'fissures_users']
 
                 // note: Set() removes duplicate values
-                const users = [...new Set(columns.reduce((users, column) => users.concat(Object.values(row[column]).reduce((arr, v) => arr.concat(v), [])), []))]
+                const users = [...new Set(columns.reduce((users, column) => users.concat(Object.values(row[column]).reduce((arr, v) => arr.concat(v.users || v), [])), []))]
 
                 client.channels.fetch(channel_id).then(channel => {
                     client.guilds.fetch(channel.guildId).then(guild => {
@@ -2298,7 +2298,7 @@ async function cleanUpDB() {
                                         columns.map(column =>
                                             Object.keys(row[column]).map(alert_type => `
                                             UPDATE worldstatealert
-                                            SET ${column} = jsonb_set(${column}, '{${alert_type}}', (${column}->'${alert_type}') - '${user}')
+                                            SET ${column} = jsonb_set(${column}, '{${alert_type}${column == 'fissures_users' ? ',users' : ''}}', (${column}->'${alert_type}'${column == "fissures_users" ? "->'users'" : ''}) - '${user}')
                                             WHERE channel_id = ${channel_id};
                                         `).join('\n')
                                         ).join('\n')
