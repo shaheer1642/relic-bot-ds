@@ -121,6 +121,28 @@ async function bounty_check() {
         })
 }
 
+client.on('ready', () => {
+    cleanUpDB()
+})
+
+function cleanUpDB() {
+    db.query('SELECT * FROM bounties_list').then(res => {
+        const users = [...new Set(res.rows.map(row => Object.keys(row.users2)).reduce((arr, v) => arr.concat(v), []))]
+
+        client.guilds.fetch('865904902941048862').then(guild => {
+            users.forEach(user => {
+                guild.members.fetch(user).catch(err => {
+                    if (err.code == 10007) {
+                        db.query(`
+                            UPDATE bounties_list SET users2 = users2 - '${user}'
+                        `).then(res => console.log('[trackers.cleanUpDB] removed user', user, 'from alerts')).catch(console.error)
+                    } else console.error('[trackers.cleanUpDB] unknown error', err)
+                })
+            })
+        }).catch(console.error)
+    }).catch(console.error)
+}
+
 axiosRetry(axios, {
     retries: 50, // number of retries
     retryDelay: (retryCount) => {
