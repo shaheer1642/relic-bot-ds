@@ -135,7 +135,7 @@ function cleanUpDB() {
                 guild.members.fetch(user).catch(err => {
                     if (err.code == 10007) {
                         db.query(`
-                            UPDATE bounties_list SET users2 = users2 - '${user}'
+                            UPDATE bounties_list SET users2 = users2::jsonb - '${user}'
                         `).then(res => console.log('[trackers.cleanUpDB] removed user', user, 'from alerts')).catch(console.error)
                     } else console.error('[trackers.cleanUpDB] unknown error', err)
                 })
