@@ -2672,165 +2672,153 @@ async function cycles_check() {
 
 async function arbitration_check() {
     console.log('arbitration_check called');
-    axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(async worldstateData => {
-            const WorldState = (await import('warframe-worldstate-parser')).default
-            var arbitration = new WorldState(JSON.stringify(worldstateData.data)).arbitration;
 
-            if (!arbitration) {
-                //console.log('Arbitration check: getting data from warframestat.us')
-                var status = await axios('https://api.warframestat.us/pc/arbitration')    // get data from warframestat.us
-                    .then(res => {
-                        arbitration = res.data
-                        return true
-                    }).catch(err => {
-                        console.log(err)
-                        return false
-                    })
-                if (!status) {
-                    //console.log('Arbitration check: no data available')
-                    var timer = 300000
-                    clearTimeout(arbitrationTimer)
-                    arbitrationTimer = setTimeout(arbitration_check, timer)
-                    console.log(`arbitration_check reset in ${msToTime(timer)}`)
-                    return
-                }
-            }
+    var arbitration;
 
-            if (!arbitration.type || typeof (arbitration.type) != "string") {
-                //console.log('Arbitration check: arbitrary data')
-                var timer = 20000
-                clearTimeout(arbitrationTimer)
-                arbitrationTimer = setTimeout(arbitration_check, timer)
-                //console.log(`arbitration_check reset in ${msToTime(timer)}`)
-                return
-            }
+    await axios('https://api.warframestat.us/pc/arbitration')    // get data from warframestat.us
+        .then(res => {
+            return res.data
+        }).catch(console.error)
 
-            if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
-                //console.log('Arbitration check: negative expiry')
-                var timer = 20000
-                clearTimeout(arbitrationTimer)
-                arbitrationTimer = setTimeout(arbitration_check, timer)
-                console.log(`arbitration_check reset in ${msToTime(timer)}`)
-                return
-            }
-            db.query(`SELECT * FROM worldstatealert`).then(res => {
-                if (res.rowCount == 0)
-                    return
-                var users = {}
-                var ping_users = {}
-                var mission = "unknown"
-                try {
-                    if (arbitration.type.toLowerCase().match('defection'))
-                        mission = 'defection'
-                    else if (arbitration.type.toLowerCase().match('mobile defense'))
-                        mission = 'salvage'
-                    else if (arbitration.type.toLowerCase().match('defense'))
-                        mission = 'defense'
-                    else if (arbitration.type.toLowerCase().match('interception'))
-                        mission = 'interception'
-                    else if (arbitration.type.toLowerCase().match('salvage'))
-                        mission = 'salvage'
-                    else if (arbitration.type.toLowerCase().match('survival'))
-                        mission = 'survival'
-                    else if (arbitration.type.toLowerCase().match('excavation'))
-                        mission = 'excavation'
-                    else if (arbitration.type.toLowerCase().match('disruption'))
-                        mission = 'disruption'
-                    else if (arbitration.type.toLowerCase().match('solnode450'))
-                        mission = 'mirror_defense'
-                    if (mission == "unknown") {
-                        inform_dc('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
-                        console.log('Arbitration check: mission type unknown')
-                        var timer = 300000
-                        clearTimeout(arbitrationTimer)
-                        arbitrationTimer = setTimeout(arbitration_check, timer)
-                        console.log(`arbitration_check reset in ${msToTime(timer)}`)
-                        return
-                    }
-                    console.log('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
-                } catch (e) {
-                    console.log(e)
-                    console.log('Arbitration check: unknown error')
-                    console.log(arbitration)
-                    var timer = 10000
-                    clearTimeout(arbitrationTimer)
-                    arbitrationTimer = setTimeout(arbitration_check, timer)
-                    console.log(`arbitration_check reset in ${msToTime(timer)}`)
-                    return
-                }
-                // -----
-                db.query(`UPDATE worldstatealert SET arbitration_mission = '${mission}_${arbitration.enemy}'`).catch(console.error)
-                res.rows.forEach(row => {
-                    row.arbitration_users[mission].forEach(user => {
-                        if (!users[row.channel_id])
-                            users[row.channel_id] = []
-                        if (!users[row.channel_id].includes(`<@${user}>`))
-                            users[row.channel_id].push(`<@${user}>`)
-                        if (row.arbitration_mission != `${mission}_${arbitration.enemy}`) {
-                            if (!ping_users[row.channel_id])
-                                ping_users[row.channel_id] = []
-                            if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
-                                // get user discord status
-                                const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
-                                if (!user_presc || user_presc.status == 'offline') {
-                                    if (!row.ping_filter.offline.includes(user)) {
-                                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                                            ping_users[row.channel_id].push(`<@${user}>`)
-                                    }
-                                } else if (user_presc.status == 'dnd') {
-                                    if (!row.ping_filter.dnd.includes(user)) {
-                                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                                            ping_users[row.channel_id].push(`<@${user}>`)
-                                    }
-                                } else {
-                                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                                        ping_users[row.channel_id].push(`<@${user}>`)
-                                }
-                            } else {
-                                if (!ping_users[row.channel_id].includes(`<@${user}>`))
-                                    ping_users[row.channel_id].push(`<@${user}>`)
-                            }
-                        }
-                    })
-                })
-                console.log('Arbitration check: user mention lists [users] :: ' + JSON.stringify(users) + ' [ping users] :: ' + JSON.stringify(ping_users))
-                // ---- construct embed
-                var embed = {
-                    title: 'Arbitration',
-                    description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${convertUpper(mission)}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`,
-                    color: colors.arbitration
-                }
-                console.log(JSON.stringify(embed))
-                // ---- send msg
-                res.rows.forEach(row => {
-                    if (row.arbitration_alert) {
-                        client.channels.cache.get(row.channel_id)?.messages.fetch(row.arbitration_alert).then(msg => {
-                            msg.edit({
-                                content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
-                                embeds: [embed]
-                            }).catch(console.error)
-                        }).catch(console.error)
-                        if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
-                            arrToStringsArrWithLimit(`Arbitration ${arbitration.type} has started`, ping_users[row.channel_id], 2000).forEach(str => {
-                                client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
-                            })
-                        }
-                    }
-                })
-            }).catch(console.error)
+    if (!arbitration) {
+        //console.log('Arbitration check: no data available')
+        var timer = 300000
+        clearTimeout(arbitrationTimer)
+        arbitrationTimer = setTimeout(arbitration_check, timer)
+        console.log(`arbitration_check reset in ${msToTime(timer)}`)
+        return
+    }
 
-            var timer = new Date(arbitration.expiry).getTime() - new Date().getTime()
+    if (!arbitration.type || typeof (arbitration.type) != "string") {
+        //console.log('Arbitration check: arbitrary data')
+        var timer = 20000
+        clearTimeout(arbitrationTimer)
+        arbitrationTimer = setTimeout(arbitration_check, timer)
+        //console.log(`arbitration_check reset in ${msToTime(timer)}`)
+        return
+    }
+
+    if (new Date(arbitration.expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+        //console.log('Arbitration check: negative expiry')
+        var timer = 20000
+        clearTimeout(arbitrationTimer)
+        arbitrationTimer = setTimeout(arbitration_check, timer)
+        console.log(`arbitration_check reset in ${msToTime(timer)}`)
+        return
+    }
+
+    const res = await db.query(`SELECT * FROM worldstatealert`).catch(console.error)
+
+    if (!res || res.rowCount == 0) return console.error('arbitration check: unable to retrieve worldstate from db')
+
+    var users = {}
+    var ping_users = {}
+    var mission = "unknown"
+    try {
+        if (arbitration.type.toLowerCase().match('defection'))
+            mission = 'defection'
+        else if (arbitration.type.toLowerCase().match('mobile defense'))
+            mission = 'salvage'
+        else if (arbitration.type.toLowerCase().match('defense'))
+            mission = 'defense'
+        else if (arbitration.type.toLowerCase().match('interception'))
+            mission = 'interception'
+        else if (arbitration.type.toLowerCase().match('salvage'))
+            mission = 'salvage'
+        else if (arbitration.type.toLowerCase().match('survival'))
+            mission = 'survival'
+        else if (arbitration.type.toLowerCase().match('excavation'))
+            mission = 'excavation'
+        else if (arbitration.type.toLowerCase().match('disruption'))
+            mission = 'disruption'
+        else if (arbitration.type.toLowerCase().match('solnode450'))
+            mission = 'mirror_defense'
+        if (mission == "unknown") {
+            inform_dc('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
+            console.log('Arbitration check: mission type unknown')
+            var timer = 600000
             clearTimeout(arbitrationTimer)
             arbitrationTimer = setTimeout(arbitration_check, timer)
-            console.log('arbitration_check invokes in ' + msToTime(timer))
+            console.log(`arbitration_check reset in ${msToTime(timer)}`)
             return
-        }).catch(err => {
-            console.error(err)
-            clearTimeout(arbitrationTimer)
-            arbitrationTimer = setTimeout(arbitration_check, 60000)
-            return
+        }
+        console.log('Arbitration check: mission is ' + mission + ` (${arbitration.type})`)
+    } catch (e) {
+        console.log(e)
+        console.log('Arbitration check: unknown error')
+        console.log(arbitration)
+        var timer = 600000
+        clearTimeout(arbitrationTimer)
+        arbitrationTimer = setTimeout(arbitration_check, timer)
+        console.log(`arbitration_check reset in ${msToTime(timer)}`)
+        return
+    }
+    // -----
+    db.query(`UPDATE worldstatealert SET arbitration_mission = '${mission}_${arbitration.enemy}'`).catch(console.error)
+    res.rows.forEach(row => {
+        row.arbitration_users[mission].forEach(user => {
+            if (!users[row.channel_id])
+                users[row.channel_id] = []
+            if (!users[row.channel_id].includes(`<@${user}>`))
+                users[row.channel_id].push(`<@${user}>`)
+            if (row.arbitration_mission != `${mission}_${arbitration.enemy}`) {
+                if (!ping_users[row.channel_id])
+                    ping_users[row.channel_id] = []
+                if (row.ping_filter.dnd.includes(user) || row.ping_filter.offline.includes(user)) {
+                    // get user discord status
+                    const user_presc = client.channels.cache.get(row.channel_id)?.guild.presences.cache.find(mem => mem.userId == user)
+                    if (!user_presc || user_presc.status == 'offline') {
+                        if (!row.ping_filter.offline.includes(user)) {
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
+                    } else if (user_presc.status == 'dnd') {
+                        if (!row.ping_filter.dnd.includes(user)) {
+                            if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                                ping_users[row.channel_id].push(`<@${user}>`)
+                        }
+                    } else {
+                        if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                            ping_users[row.channel_id].push(`<@${user}>`)
+                    }
+                } else {
+                    if (!ping_users[row.channel_id].includes(`<@${user}>`))
+                        ping_users[row.channel_id].push(`<@${user}>`)
+                }
+            }
         })
+    })
+    console.log('Arbitration check: user mention lists [users] :: ' + JSON.stringify(users) + ' [ping users] :: ' + JSON.stringify(ping_users))
+    // ---- construct embed
+    var embed = {
+        title: 'Arbitration',
+        description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${convertUpper(mission)}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`,
+        color: colors.arbitration
+    }
+    console.log(JSON.stringify(embed))
+    // ---- send msg
+    res.rows.forEach(row => {
+        if (row.arbitration_alert) {
+            client.channels.cache.get(row.channel_id)?.messages.fetch(row.arbitration_alert).then(msg => {
+                msg.edit({
+                    content: users[row.channel_id] ? users[row.channel_id].join(' ').substring(0, 2000) : ' ',
+                    embeds: [embed]
+                }).catch(console.error)
+            }).catch(console.error)
+            if (ping_users[row.channel_id] && ping_users[row.channel_id].length > 0) {
+                arrToStringsArrWithLimit(`Arbitration ${arbitration.type} has started`, ping_users[row.channel_id], 2000).forEach(str => {
+                    client.channels.cache.get(row.channel_id)?.send(str).then(msg => db_schedule_msg_deletion(msg.id, msg.channel.id, 60000)).catch(console.error)
+                })
+            }
+        }
+    })
+
+    var timer = new Date(arbitration.expiry).getTime() - new Date().getTime()
+    clearTimeout(arbitrationTimer)
+    arbitrationTimer = setTimeout(arbitration_check, timer)
+    console.log('arbitration_check invokes in ' + msToTime(timer))
+    return
+
 }
 
 async function fissures_check() {
