@@ -35,9 +35,21 @@ client.on('messageCreate', (message) => {
         const uptime_string_hours=parseInt((uptime_seconds%86400)/3600);
         const uptime_string_days=parseInt(uptime_seconds/86400);
         const uptime_string=uptime_string_days+' days '+uptime_string_hours+' hours '+uptime_string_minutes+' minutes '+uptime_string_seconds+' seconds ';
-        console.log('Uptime:',uptime_seconds)
+        console.log('Bot Uptime:',uptime_string)
+        //compute cycle restart time
+        const restart_seconds=uptime_seconds%45000;
+        const restart_string_seconds=parseInt(restart_seconds%60);
+        const restart_string_minutes=parseInt((restart_seconds%3600)/60);
+        const restart_string_hours=parseInt(restart_seconds/3600);
+        const restart_string=restart_string_hours+' hours '+restart_string_minutes+' minutes '+restart_string_seconds+' seconds ';
+        console.log('Cycle Restart in:',restart_string)
 
-        message.channel.send('Current uptime: '+uptime_string+'\nPing: '+client.ws.ping.toString()).then((_message) => {
+        //send uptime result in target channel
+        message.channel.send(
+            'Current uptime: '+uptime_string+
+            '\nPing: '+client.ws.ping.toString()+
+            '\nCycle Restart in: '+restart_string
+            ).then((_message) => {
             console.log('uptime data sent', _message.id);
             message.react('☑️').catch(console.error)
         }).catch((err) => {
