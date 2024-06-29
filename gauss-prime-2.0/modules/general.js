@@ -1,20 +1,24 @@
-const { Message } = require("discord.js");
+const { Message, Colors } = require("discord.js");
 const { client } = require("./client");
 
 var onlineDate = new Date();
 
 client.on('messageCreate', (message) => {
     if (message.content.startsWith('.')) {
-        const command = message.content.split('.')[1].trim()
-        switch (command) {
-            case 'ping':
-                pingCommand(message)
-                break
-            case 'uptime':
-                uptimeCommand(message)
-            case 'help':
-                helpCommand(message)
-                break
+        const commands = message.content.split('.')
+        for(i in commands){
+            // console.log(commands[i].trim())
+            switch (commands[i].trim()) {
+                case 'ping':
+                    pingCommand(message)
+                    break
+                case 'uptime':
+                    uptimeCommand(message)
+                    break
+                case 'help':
+                    helpCommand(message)
+                    break
+            }
         }
     }
 })
@@ -79,34 +83,50 @@ function uptimeCommand(message) {
  */
 function helpCommand(message) {
     message.channel.send({
-        content: 'Hello there :eee:',
+        content: 'Hello there <:eee:1256334253470388308>',
         embeds: [{
+            // color:0x00FF66,
+            color:Colors.Green,
             title: 'Game',
             description: 'Warframe',
             fields: [{
-                name: 'Play Time',
-                value: '50k hours',
-                inline: true
+                name: '.uptime',
+                value: 'Reports current uptime'+'\nUsage example:'+'\n.uptime',
+                inline: false
             }, {
-                name: 'Username',
-                value: 'Softy',
-                inline: true
+                name: '.orders <item_name>',
+                value: 'Retrieve top 5 sell orders for an item from warframe.market'+'\nUsage example:'+'\n.relics frost prime'
+                +'\n.relics ember'+'\n.relics kronen prime blade'+'\n.orders axi L4 relic'+'\n.orders primed pressure point',
+                inline: false
             }, {
-                name: '',
-                value: '',
-                inline: true
+                name: '.relics <prime_item> or <relic_name>',
+                value: 'Retrieve relics for a prime item'+'\nUsage example:'+'\n.relics frost prime'+'\n.relics ember'
+                +'\n.relics kronen prime blade'+'\n.relic axi s3',
+                inline: false
             }, {
-                name: 'Is Online',
-                value: 'False',
-                inline: true
+                name: '.auctions <kuva_weapon> <element>',
+                value: 'Retrieve auctions for a kuva weapon lich from warframe.market, sorted by buyout price and weapon damage'
+                +'\nUsage example:'+'\n.auctions kuva kohm'+'\n.auctions bramma'+'\n.auctions kuva hek toxin',
+                inline: false
             }, {
-                name: 'Addict',
-                value: 'Yes',
-                inline: true
-            },]
+                name: '.list <prime_item> <offset>',
+                value: 'List a prime item on warframe.market on your profile as the top selling order (requires authorization)'
+                +'\nUsage example:'+'\n.list frost_prime_blueprint'+'\n.list frost_prime_blueprint +10'+'\n.list frost_prime_blueprint -20',
+                inline: false
+            }, {
+                name: '.relist all <offset>',
+                value: 'Exactly like .list command except it relists all the sell orders on your profile for prime items. (requires authorization)'
+                +'\nIn order to prevent stress on the API, you can only use this command once every 15m.'+'\nUsage example:'+'\n.relist all'
+                +'\n.relist all +10'+'\n.relist all -20',
+                inline: false
+            },{
+                name:'.query <rarity> <ducat>',
+                value:'Show relics that contain X rarity drops worth Y amount of ducats.'+'\nUsage example:'+'\n.query common 45',
+                inline: false
+            }]
         }, {
-            title: 'Game',
-            description: 'Lost Ark :eee:'
+            title: 'Another embed',
+            description: 'Another embed description'
         }]
     })
 }
