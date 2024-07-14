@@ -1,13 +1,17 @@
 const { Message, Colors } = require("discord.js");
 const { client } = require("./client");
+const { WFM_API } = require("./WFM-API");
+
+const Items = require('warframe-items');
+const items = new Items();
 
 var onlineDate = new Date();
 
 client.on('messageCreate', (message) => {
     if (message.content.startsWith('.')) {
+        // console.log(message.content)
         const commands = message.content.split('.')
         for(i in commands){
-            // console.log(commands[i].trim())
             switch (commands[i].trim()) {
                 case 'ping':
                     pingCommand(message)
@@ -19,9 +23,23 @@ client.on('messageCreate', (message) => {
                     helpCommand(message)
                     break
             }
+            if(commands[i].startsWith('orders')){
+                orderCommand(message,commands[i])
+                // console.log(commands[i])
+            }
         }
     }
 })
+
+/**
+ * 
+ * @param {Message<boolean>} message 
+ */
+function orderCommand(message,command) {
+    //fetching and displaying item WFM orders via WFM-API module
+    WFM_API.ShowItemOrders(message,command)
+    // console.log("order command in general.js triggered")
+}
 
 /**
  * 
@@ -82,6 +100,7 @@ function uptimeCommand(message) {
  * @param {Message<boolean>} message 
  */
 function helpCommand(message) {
+    //send all available commands in the channel user triggered help Command
     message.channel.send({
         content: 'Hello there <:eee:1256334253470388308>',
         embeds: [{
