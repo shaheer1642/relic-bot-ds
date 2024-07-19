@@ -8,12 +8,15 @@ const items = new Items();
 var onlineDate = new Date();
 
 client.on('messageCreate', (message) => {
-    if (message.content.startsWith('.')) {
-        // console.log(message.content)
-        const commands = message.content.split('.')
-        for (i in commands) {
+    const msgs = message.content.split('\n')
+    console.log(msgs)
+    msgs.forEach((el)=>{
+        if (el.trim().startsWith('.')) {
+            const command=el.toLowerCase().split('.')[1]
+            console.log(command)
+            const segments = command.split(' ')
             // [softy-review]: put orders command inside the switch
-            switch (commands[i].trim()) {
+            switch (segments[0]) {
                 case 'ping':
                     pingCommand(message)
                     break
@@ -23,22 +26,21 @@ client.on('messageCreate', (message) => {
                 case 'help':
                     helpCommand(message)
                     break
-            }
-            if (commands[i].startsWith('orders')) {
-                orderCommand(message, commands[i])
-                // console.log(commands[i])
+                case 'orders':
+                    segments.shift();
+                    orderCommand(message,segments)
             }
         }
-    }
+    })  
 })
 
 /**
  * 
  * @param {Message<boolean>} message 
  */
-function orderCommand(message, command) {
+function orderCommand(message, segments) {
     //fetching and displaying item WFM orders via WFM-API module
-    WFM_API.ShowItemOrders(message, command)
+    WFM_API.ShowItemOrders(message, segments)
     // console.log("order command in general.js triggered")
 }
 
@@ -53,7 +55,7 @@ function pingCommand(message) {
     }).catch((err) => {
         console.error(err)
     })
-    console.log('After sending')
+    // console.log('After sending')
 }
 
 /**

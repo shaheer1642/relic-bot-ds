@@ -1,94 +1,73 @@
 const { Message, Colors } = require("discord.js");
 const fetch = require("node-fetch");
 const server_url = 'https://api.warframe.market/v1/items'
+const img_cdn='https://warframe.market/static/assets/'
 
 /**
  * 
  * @param {Message<boolean>} message 
  */
-function ShowItemOrders(message, command) {
-    //get the actual item name and use it as request url endpoint to retrive the target item orders json Array
+function ShowItemOrders(message, segments) {
+    //get the actual item name and use it as request url endpoint to retrive the target item orders json Array from WFM api
     // [softy-review]: next 2 lines should be optimized
-    const command_oneline = command.split('\n')
-    const command_segment = command_oneline[0].split(' ')
-    console.log(command_segment)
-    var item_endpoint = ''
-    for (i in command_segment) {
-        if (i != 0) {
-            if (i == (command_segment.length - 1)) {
-                item_endpoint = item_endpoint + command_segment[i]
-            } else {
-                item_endpoint = item_endpoint + command_segment[i] + '_'
-            }
-        }
-    }
-    var request_url = server_url + '/' + item_endpoint + '/' + 'orders'
-    console.log(request_url)
-    var item_data;
-    fetch(request_url)
+    console.log(segments)
+    const item_endpoint = segments.join('_')
+    fetch(server_url)
         .then((response) => response.json())
         .then((data) => {
-            item_data = data.payload.orders
-            item_data = item_data.sort((a, b) => (a.platinum > b.platinum ? 1 : -1));
-            onlineSellOrder_show(message, item_data, item_endpoint)
+            const items_list = data.payload.items.filter(el => el.url_name.includes(item_endpoint))
+            // console.log(items_list)
+            items_list.forEach(el => {
+                const request_url = server_url + '/' + el.url_name + '/' + 'orders'
+                console.log(request_url)
+                var item_data;
+                fetch(request_url)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const item_data = data.payload.orders.sort((a, b) => (a.platinum > b.platinum ? 1 : -1));
+                        onlineSellOrder_show(message, item_data, el.item_name, el.url_name, el.thumb)
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                    });
+            });
         })
         .catch((error) => {
             console.error(error)
         });
-
     console.log('orders command executed')
 }
 
-function onlineSellOrder_show(message, item_data, item_endpoint) {
+function onlineSellOrder_show(message, item_data, item_name, url_name, thumb) {
     //display top 5 online sell orders in the target message channel
-    var onlineSellOrders = [];
-    for (i in item_data) {
-        if (item_data[i].order_type == ('sell') && item_data[i].user.status == ('online')) {
-            onlineSellOrders.push(item_data[i])
-        }
-    }
-    console.log(onlineSellOrders)
+    const onlineSellOrders = item_data.filter(el => el.order_type.match('sell') && el.user.status.match('ingame'));
+    // console.log(onlineSellOrders)
 
-    var sellersValue, quantityValue, PriceValue;
+    const sellers=onlineSellOrders.map( el => el.user.ingame_name)
+    const quantities=onlineSellOrders.map( el => el.quantity)
+    const prices=onlineSellOrders.map( el => el.platinum)
+    var sellersValue, quantityValue, priceValue;
     if (onlineSellOrders.length >= 5) {
-        sellersValue = onlineSellOrders[0].user.ingame_name
-            + '\n' + onlineSellOrders[1].user.ingame_name
-            + '\n' + onlineSellOrders[2].user.ingame_name
-            + '\n' + onlineSellOrders[3].user.ingame_name
-            + '\n' + onlineSellOrders[4].user.ingame_name;
-        quantityValue = onlineSellOrders[0].quantity
-            + '\n' + onlineSellOrders[1].quantity
-            + '\n' + onlineSellOrders[2].quantity
-            + '\n' + onlineSellOrders[3].quantity
-            + '\n' + onlineSellOrders[4].quantity;
-        priceValue = onlineSellOrders[0].platinum
-            + '\n' + onlineSellOrders[1].platinum
-            + '\n' + onlineSellOrders[2].platinum
-            + '\n' + onlineSellOrders[3].platinum
-            + '\n' + onlineSellOrders[4].platinum;
+        sellersValue = sellers.slice(0,5).join('\n')
+        quantityValue = quantities.slice(0,5).join('\n')
+        priceValue = prices.slice(0,5).join('\n')
     } else if (onlineSellOrders.length <= 0) {
         sellersValue = "No sellers at this moment."
         quantityValue = ""
         priceValue = ""
     } else {
-        sellersValue = onlineSellOrders[0].user.ingame_name;
-        quantityValue = onlineSellOrders[0].quantity;
-        PriceValue = onlineSellOrders[0].platinum;
-        for (i in onlineSellOrders) {
-            if (i != 0) {
-                sellersValue = sellersValue + '\n' + onlineSellOrders[i].user.ingame_name;
-                quantityValue = quantityValue + '\n' + onlineSellOrders[i].quantity;
-                priceValue = priceValue + '\n' + onlineSellOrders[i].platinum;
-            }
-        }
+        sellersValue = sellers.join('\n')
+        quantityValue = quantities.join('\n')
+        priceValue = prices.join('\n')
+
     }
     message.channel.send({
         content: 'React with <:eee:1256334253470388308> for nothing',
         embeds: [{
-            title: item_endpoint,
-            url: 'https://warframe.market/items/' + item_endpoint,
-            // thumbnail: {url:'https://cdn.warframestat.us/img/${gauss-prime}'},
-            thumbnail: { url: 'https://warframe.market/static/assets/items/images/en/omega_beacon.65e5468044d5119a49463ec60b3e24e7.png' },
+            title: item_name,
+            url: 'https://warframe.market/items/' + url_name,
+            thumbnail: { url: img_cdn + thumb },
+            // thumbnail: { url: 'https://warframe.market/static/assets/items/images/en/omega_beacon.65e5468044d5119a49463ec60b3e24e7.png' },
             fields: [{
                 name: 'Sellers',
                 value: sellersValue,
