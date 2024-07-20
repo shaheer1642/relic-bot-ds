@@ -15,12 +15,11 @@ function ShowItemOrders(message, segments) {
     fetch(server_url)
         .then((response) => response.json())
         .then((data) => {
-            const items_list = data.payload.items.filter(el => el.url_name.includes(item_endpoint))
+            const items_list = data.payload.items.filter(el => el.url_name.startsWith(item_endpoint))
             // console.log(items_list)
             items_list.forEach(el => {
                 const request_url = server_url + '/' + el.url_name + '/' + 'orders'
                 console.log(request_url)
-                var item_data;
                 fetch(request_url)
                     .then((response) => response.json())
                     .then((data) => {
