@@ -2,9 +2,6 @@ const { Message, Colors } = require("discord.js");
 const { client } = require("./client");
 const { WFM_API } = require("./WFM-API");
 
-const Items = require('warframe-items');
-const items = new Items();
-
 var onlineDate = new Date();
 
 client.on('messageCreate', (message) => {
@@ -26,9 +23,14 @@ client.on('messageCreate', (message) => {
                 case 'help':
                     helpCommand(message)
                     break
+                case 'order':
+                    segments.shift();
+                    orderCommand(message,segments)
+                    break
                 case 'orders':
                     segments.shift();
                     orderCommand(message,segments)
+                    break
             }
         }
     })  
@@ -40,7 +42,7 @@ client.on('messageCreate', (message) => {
  */
 function orderCommand(message, segments) {
     //fetching and displaying item WFM orders via WFM-API module
-    WFM_API.ShowItemOrders(message, segments)
+    WFM_API.main(message, segments)
     // console.log("order command in general.js triggered")
 }
 
