@@ -6,7 +6,7 @@ var onlineDate = new Date();
 
 client.on('messageCreate', (message) => {
     const msgs = message.content.split('\n')
-    console.log(msgs)
+    // console.log(msgs)
     msgs.forEach((el)=>{
         if (el.trim().startsWith('.')) {
             const command=el.toLowerCase().split('.')[1]

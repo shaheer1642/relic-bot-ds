@@ -1,4 +1,4 @@
-const { Message, Colors,EmbedBuilder } = require("discord.js");
+const { Message, Colors,EmbedBuilder, MessageReaction } = require("discord.js");
 const CLIENT_URL= 'https://warframe.market/items/'
 const API_URL = 'https://api.warframe.market/v1/items'
 const IMG_URL='https://warframe.market/static/assets/'
@@ -124,8 +124,8 @@ async function main(message, segments) {
     console.log(segments)
     const item_endpoint = segments.join('_')
     const items_list = all_items.filter(el => el.url_name.startsWith(item_endpoint))
-    const response = await getResponse(items_list)
-    const response_embed = response.map(el => el.value)
+    var response = await getResponse(items_list)
+    var response_embed = response.map(el => el.value)
     console.log(response_embed)
 
     message.channel.send({
@@ -135,6 +135,20 @@ async function main(message, segments) {
         console.log('Responded with WFM online sell orders!', _message.id);
         _message.react('🆙').catch(console.error)
         message.react('☑️').catch(console.error)
+
+        const collectorFilter = (reaction) => {
+            return reaction.emoji.name === '🆙'
+        }  
+        const collector = _message.createReactionCollector({collectorFilter})
+
+        collector.on('collect',async (reaction) => {
+            console.log("orders updated")
+            response = await getResponse(items_list)
+            response_embed = response.map(el => el.value)
+            _message.edit({embeds: response_embed})
+        })
+
+
     }).catch((err) => {
         console.error(err)
     })
