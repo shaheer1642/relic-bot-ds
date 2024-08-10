@@ -1,50 +1,8 @@
 const { Message, Colors } = require("discord.js");
 const { client } = require("./client");
-const { WFM_API } = require("./WFM-API");
 
 var onlineDate = new Date();
 
-client.on('messageCreate', (message) => {
-    const msgs = message.content.split('\n')
-    // console.log(msgs)
-    msgs.forEach((el)=>{
-        if (el.trim().startsWith('.')) {
-            const command=el.toLowerCase().split('.')[1]
-            console.log(command)
-            const segments = command.split(' ')
-            // [softy-review]: put orders command inside the switch
-            switch (segments[0]) {
-                case 'ping':
-                    pingCommand(message)
-                    break
-                case 'uptime':
-                    uptimeCommand(message)
-                    break
-                case 'help':
-                    helpCommand(message)
-                    break
-                case 'order':
-                    segments.shift();
-                    orderCommand(message,segments)
-                    break
-                case 'orders':
-                    segments.shift();
-                    orderCommand(message,segments)
-                    break
-            }
-        }
-    })  
-})
-
-/**
- * 
- * @param {Message<boolean>} message 
- */
-function orderCommand(message, segments) {
-    //fetching and displaying item WFM orders via WFM-API module
-    WFM_API.main(message, segments)
-    // console.log("order command in general.js triggered")
-}
 
 /**
  * 
@@ -153,4 +111,10 @@ function helpCommand(message) {
             description: 'Another embed description'
         }]
     })
+}
+
+module.exports = {
+    pingCommand,
+    uptimeCommand,
+    helpCommand,
 }

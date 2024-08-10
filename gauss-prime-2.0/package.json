@@ -12,7 +12,6 @@
   "dependencies": {
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
-    "node-fetch": "^2.6.0",
     "warframe-items": "^1.1262.91"
   }
 }
