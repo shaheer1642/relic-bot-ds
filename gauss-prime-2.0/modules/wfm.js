@@ -1,120 +1,22 @@
-const { Message, Colors, EmbedBuilder, MessageReaction } = require("discord.js");
+const { Message, Colors, EmbedBuilder, MessageReaction, userMention } = require("discord.js");
 const CLIENT_URL = 'https://warframe.market/items/'
 const API_URL = 'https://api.warframe.market/v1/items'
 const IMG_URL = 'https://warframe.market/static/assets/'
 
-//fetch all items data from WFM-API and save in memory
-var all_items
-fetch(API_URL)
-    .then((response) => response.json())
-    .then((data) => {
-        all_items = data.payload.items
-        console.log('WFM-API module online')
-    })
-    .catch((error) => {
-        console.error(error)
-    });
-
-//using the specific item orders to get the top sell orders
-function getTopSellOrder(item_orders) {
-    const TopSellOrders = item_orders.filter(el => el.order_type.match('sell') && el.user.status.match('ingame'));
-    const sellers = TopSellOrders.map(el => el.user.ingame_name)
-    const quantities = TopSellOrders.map(el => el.quantity)
-    const prices = TopSellOrders.map(el => el.platinum)
-    var sellersValue, quantityValue, priceValue;
-    if (TopSellOrders.length >= 5) {
-        sellersValue = sellers.slice(0, 5).join('\n')
-        quantityValue = quantities.slice(0, 5).join('\n')
-        priceValue = prices.slice(0, 5).join('\n')
-    } else if (TopSellOrders.length <= 0) {
-        sellersValue = "No sellers at this moment."
-        quantityValue = ""
-        priceValue = ""
-    } else {
-        sellersValue = sellers.join('\n')
-        quantityValue = quantities.join('\n')
-        priceValue = prices.join('\n')
-
-    }
-    return {
-        sellers: sellersValue,
-        quantities: quantityValue,
-        prices: priceValue
-    }
-}
-
-//get the actual item url_name and use it as request url endpoint to retrive the target item orders json Array from WFM api
-function getItemOrder(item) {
-    return new Promise((resolve, reject) => {
-        const request_url = API_URL + '/' + item.url_name + '/' + 'orders'
-        console.log(request_url)
-        fetch(request_url)
-            .then((response) => response.json())
-            .then((data) => {
-                const item_orders = data.payload.orders.sort((a, b) => (a.platinum > b.platinum ? 1 : -1));
-                resolve({
-                    orders: item_orders,
-                    item: item
-                })
-            })
-            .catch((err) => {
-                reject(err)
-            });
-    })
-}
+const { getAllItems,getItemInformation,getItemOrders,getItemDropSources,matchItems } = require('../sdk/wfm')
+const { wfmItemOrders } = require('./embeds')
 
 //u name it
-async function getResponse(items_list) {
-    // return new Promise(async (resolve) => {
-    //     const promises = items_list.map(async (item) => {
-    //         return new Promise(async (resolve) => {
-    //             const item_orders = await getItemOrder(item);
-    //             const top_orders = getTopSellOrder(item_orders)
-    //             const item_embed = {
-    //                 title: item.item_name,
-    //                 url: CLIENT_URL + item.url_name,
-    //                 thumbnail:{ url: IMG_URL +item.thumb },
-    //                 fileds:[{
-    //                     name: 'Sellers',value:top_orders.sellers,inline:true
-    //                 },{
-    //                     name: 'Quantity',value:top_orders.quantities,inline:true
-    //                 },{
-    //                     name: 'Price',value:top_orders.prices,inline:true
-    //                 }],
-    //                 timestamp: new Date().toISOString()
-    //             }
-    //             resolve(item_embed)
-    //         })
-    //     })
-    //     const response =await Promise.allSettled(promises).then(
-    //         resolve(response)
-    //     )
-    // })
-
-    return new Promise((resolve, reject) => {
-        Promise.allSettled(
-            items_list.map((item) => getItemOrder(item))
-        ).then(responses => {
-            const item_embeds = responses.map(item_orders => {
-                const item = item_orders.value.item
-                const top_orders = getTopSellOrder(item_orders.value.orders)
-                const item_embed = {
-                    title: item.item_name,
-                    url: CLIENT_URL + item.url_name,
-                    thumbnail: { url: IMG_URL + item.thumb },
-                    fields: [{
-                        name: 'Sellers', value: top_orders.sellers, inline: true
-                    }, {
-                        name: 'Quantity', value: top_orders.quantities, inline: true
-                    }, {
-                        name: 'Price', value: top_orders.prices, inline: true
-                    }],
-                    timestamp: new Date().toISOString()
-                }
-                return item_embed
-            })
-            resolve(item_embeds)
-        }).catch(reject)
+async function getResponseEmbed(item) {
+    return new Promise(async(resolve,reject) => {
+        try{
+            const orders = await getItemOrders(item)
+            const item_embed = wfmItemOrders(item,orders)
+            resolve(item_embed)
+        }
+        catch(err){
+            reject(err)
+        }
     })
 }
 
@@ -124,33 +26,53 @@ async function getResponse(items_list) {
  * @param {Message<boolean>} message 
  */
 async function ordersCommand(message, args) {
-    console.log(args)
-    const item_endpoint = args.replace(/ /g, '_')
-    const items_list = all_items.filter(el => el.url_name.startsWith(item_endpoint))
-    const response_embed = await getResponse(items_list)
-    // var response_embed = response.map(el => el.value)
-    console.log(response_embed)
-
+    const items_matched = matchItems(args)
+    items_matched.forEach(item => {
+        console.log(item.item_name)
+    })
+    var response_embed,rsp
+    
     message.channel.send({
-        content: 'React with :up: to update',
+        content: 'Processing',
         embeds: response_embed
     }).then((_message) => {
-        console.log('Responded with WFM online sell orders!', _message.id);
+        console.log('Responded with WFM Top sell orders!', _message.id);
         _message.react('🆙').catch(console.error)
         message.react('☑️').catch(console.error)
 
-        const collectorFilter = (reaction) => {
-            return reaction.emoji.name === '🆙'
+        const Filter_bot = (reaction,user) => {
+            return reaction.emoji.name === '🆙' && user.id == 1254916120864100403
         }
-        const collector = _message.createReactionCollector({ collectorFilter })
+        const collector_bot = _message.createReactionCollector({ filter:Filter_bot })
 
-        collector.on('collect', async (reaction) => {
-            console.log("orders updated")
-            const response_embed = await getResponse(items_list)
-            // const response_embed = response.map(el => el.value)
-            _message.edit({ embeds: response_embed })
+        collector_bot.on('collect', async (reaction) => {
+            rsp = await Promise.allSettled(items_matched.map((item) => getResponseEmbed(item)))
+            response_embed = rsp.map(el => el.value)
+            // console.log(response_embed)
+            _message.edit({ content:'React with :up: to update',embeds: response_embed })
+            console.log("orders sent by bot")
         })
 
+        const Filter_client = (reaction,user) => {
+            return reaction.emoji.name === '🆙' && user.id != 1254916120864100403
+        }
+
+        const collector_client = _message.createReactionCollector({ filter:Filter_client })
+
+        collector_client.on('collect', async (reaction,user) => {
+            response_embed = response_embed.map((item) => {
+                item.title = item.title + '(Updating...)'
+                return item
+            })
+            // console.log(response_embed)
+            _message.edit({ embeds: response_embed })
+            rsp = await Promise.allSettled(items_matched.map((item) => getResponseEmbed(item)))
+            response_embed = rsp.map(el => el.value)
+            // console.log(response_embed)
+            _message.edit({ content:'React with :up: to update',embeds: response_embed })
+            console.log("orders updated")
+            reaction.users.remove(user)
+        })
 
     }).catch((err) => {
         console.error(err)

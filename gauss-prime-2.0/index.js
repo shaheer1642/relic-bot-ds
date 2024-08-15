@@ -14,10 +14,9 @@ client.on('messageCreate', (message) => {
         const words = line.split(' ')
         const command = words.shift()
         const args = words.join(' ')
-        console.log('command', command, 'args', args)
+        // console.log('command:', command, 'args:', args)
 
         if (command.startsWith('.')) {
-            // [softy-review]: put orders command inside the switch
             switch (command.replace('.', '')) {
                 case 'ping':
                     pingCommand(message)

@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.7.3",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "warframe-items": "^1.1262.91"
