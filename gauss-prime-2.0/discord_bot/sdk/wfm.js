@@ -2,6 +2,9 @@ const CLIENT_URL = 'https://warframe.market/items/'
 const BASE_URL = 'https://api.warframe.market/v1'
 const IMG_URL = 'https://warframe.market/static/assets/'
 
+// const API_URL= 'http://localhost:4000/api/wfm/item/orders?url_name=gauss_prime_set'
+const API_URL= 'http://localhost:4000/api/wfm/item'
+
 const axios = require('axios')
 
 var items_list;
@@ -36,11 +39,17 @@ function getItemInformation({ url_name }) {
 function getItemOrders({ url_name }) {
     //fetch target item orders from WFM-API using item.url_name
     return new Promise((resolve, reject) => {
-        axios.get(BASE_URL + '/items/' + url_name + '/orders').then(res => {
+        axios.get(API_URL+'/orders?url_name='+url_name).then(res => {
             const orders = res.data.payload.orders
             const orders_ordered = orders.sort((a, b) => (a.platinum > b.platinum ? 1 : -1))
             resolve(orders_ordered)
         }).catch(reject)
+
+        // axios.get(BASE_URL + '/items/' + url_name + '/orders').then(res => {
+        //     const orders = res.data.payload.orders
+        //     const orders_ordered = orders.sort((a, b) => (a.platinum > b.platinum ? 1 : -1))
+        //     resolve(orders_ordered)
+        // }).catch(reject)
     })
 }
 
@@ -53,10 +62,11 @@ function getItemDropSources({ url_name }) {
 
 function matchItems(item_name) {
     //find items that matched given item_name in items_list and return
-    var item_name_raw = item_name.replace(/ /g, '_')
-    item_name_raw = item_name_raw.replace(/_bp/g, '_blueprint')
-    item_name_raw = item_name_raw.replace(/_prime/g, '_p')
-    item_name_raw = item_name_raw.replace(/_p/g, '_prime')
+    var item_name_raw = item_name.replace(/\W\bbp/g, '_blueprint').replace(/\W\bprime/g,' p').replace(/\W\bp/g,'_prime').replace(/ /g,'_')
+    // var item_name_raw = item_name.replace(/ /g, '_')
+    // item_name_raw = item_name_raw.replace(/_bp/g, '_blueprint')
+    // item_name_raw = item_name_raw.replace(/_prime/g, '_p')
+    // item_name_raw = item_name_raw.replace(/_p/g, '_prime')
     console.log(item_name_raw)
     const items_matched = items_list.filter(item => item.url_name.startsWith(item_name_raw))
     return items_matched

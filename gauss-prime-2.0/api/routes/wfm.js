@@ -1,6 +1,20 @@
 const express = require('express');
-const { getItemOrders } = require('../sdk/wfm');
+const { getItemInformation,getItemOrders,getItemDropSources,matchItems } = require('../sdk/wfm');
 const router = new express.Router();
+
+router.get('/wfm/item/information', (req, res) => {
+    if (!req.query.url_name) return res.status(400).json({ message: 'url_name is required' })
+
+    getItemInformation({
+        url_name: req.query.url_name
+    }).then(r => {
+        res.json(r)
+    }).catch(err => {
+        res.status(500).json({
+            message: err.message || 'Unexpected error occured'
+        })
+    })
+})
 
 router.get('/wfm/item/orders', (req, res) => {
     if (!req.query.url_name) return res.status(400).json({ message: 'url_name is required' })
@@ -14,6 +28,29 @@ router.get('/wfm/item/orders', (req, res) => {
             message: err.message || 'Unexpected error occured'
         })
     })
+})
+
+router.get('/wfm/item/dropSources', (req, res) => {
+    if (!req.query.url_name) return res.status(400).json({ message: 'url_name is required' })
+
+    getItemDropSources({
+        url_name: req.query.url_name
+    }).then(r => {
+        res.json(r)
+    }).catch(err => {
+        res.status(500).json({
+            message: err.message || 'Unexpected error occured'
+        })
+    })
+})
+
+router.get('/wfm/item/match', (req, res) => {
+    if (!req.query.item_name) return res.status(400).json({ message: 'item_name is required' })
+    
+    const items_matched=matchItems({
+        item_name: req.query.item_name
+    })
+    res.json(items_matched)
 })
 
 module.exports = router

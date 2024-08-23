@@ -51,7 +51,7 @@ function getItemDropSources({ url_name }) {
     })
 }
 
-function matchItems(item_name) {
+function matchItems({item_name}) {
     //find items that matched given item_name in items_list and return
     var item_name_raw = item_name.replace(/ /g, '_')
     item_name_raw = item_name_raw.replace(/_bp/g, '_blueprint')
