@@ -51,12 +51,9 @@ function getItemDropSources({ url_name }) {
     })
 }
 
-function matchItems({item_name}) {
+function matchItems({ item_name }) {
     //find items that matched given item_name in items_list and return
-    var item_name_raw = item_name.replace(/ /g, '_')
-    item_name_raw = item_name_raw.replace(/_bp/g, '_blueprint')
-    item_name_raw = item_name_raw.replace(/_prime/g, '_p')
-    item_name_raw = item_name_raw.replace(/_p/g, '_prime')
+    var item_name_raw = item_name.replace(/\W\bbp/g, '_blueprint').replace(/\W\bprime/g, ' p').replace(/\W\bp/g, '_prime').replace(/ /g, '_')
     console.log(item_name_raw)
     const items_matched = items_list.filter(item => item.url_name.startsWith(item_name_raw))
     return items_matched

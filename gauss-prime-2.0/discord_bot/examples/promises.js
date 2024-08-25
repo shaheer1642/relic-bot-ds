@@ -3,11 +3,17 @@
 main()
 
 async function main() {
-    asyncFunc().then((res, str) => {
-        console.log('got items', res)
-    }).catch(err => {
-        console.error('error occured', err)
-    })
+    // asyncFunc().then((res, str) => {
+    //     console.log('got items', res)
+    // }).catch(err => {
+    //     console.error('error occured', err)
+    // })
+
+    const arr = [1, 2, 3]
+
+    var responses = (await Promise.allSettled(arr.map((num) => multiply(num))))
+
+    console.log('responses', responses)
 }
 
 
@@ -95,4 +101,13 @@ async function asyncFunc() {
     // })
 
     // return all_items
+}
+
+async function multiply(num) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (num === 2) return reject('error occured')
+            resolve(num * 2)
+        }, 1000);
+    })
 }

@@ -1,6 +1,6 @@
-const {client} = require('./discord_client.js');
-const {db} = require('./db_connection.js')
-const {timeStringToMs, embedScore} = require('./extras.js');
+const { client } = require('./discord_client.js');
+const { db } = require('./db_connection.js')
+const { timeStringToMs, embedScore } = require('./extras.js');
 const { socket } = require('./socket.js');
 const { as_users_list_discord } = require('./allsquads/as_users_list.js');
 
@@ -58,14 +58,14 @@ client.on('interactionCreate', interaction => {
             getUsersVerified(interaction.fields.getTextInputValue('time_since').trim()).then(payload => interaction.reply(payload).catch(console.error)).catch(console.error)
         }
         if (interaction.customId.split('.')[0] == 'as_at_lift_ban') {
-            socket.emit('allsquads/admincommands/liftglobalban', {user_id: as_users_list_discord[interaction.user.id]?.user_id, identifier: interaction.fields.getTextInputValue('username').trim()}, res => {
+            socket.emit('allsquads/admincommands/liftglobalban', { user_id: as_users_list_discord[interaction.user.id]?.user_id, identifier: interaction.fields.getTextInputValue('username').trim() }, res => {
                 if (res.code == 200) {
                     interaction.reply({
                         content: 'Ban has been lifted',
                         ephemeral: true
                     }).catch(console.error)
                 } else {
-                    interaction.reply(error_codes_embed(res,interaction.user.id)).catch(console.error)
+                    interaction.reply(error_codes_embed(res, interaction.user.id)).catch(console.error)
                 }
             })
         }
@@ -73,11 +73,11 @@ client.on('interactionCreate', interaction => {
 })
 
 async function getUsersVerified(time_since) {
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
         var ms = timeStringToMs(time_since)
-        if (!ms) return resolve({content: 'Invalid input for time_since', ephemeral: true})
+        if (!ms) return resolve({ content: 'Invalid input for time_since', ephemeral: true })
         db.query(`
-            SELECT * FROM as_users_list WHERE registered_timestamp > ${new Date().getTime() -  ms} ORDER BY registered_timestamp DESC;
+            SELECT * FROM as_users_list WHERE registered_timestamp > ${new Date().getTime() - ms} ORDER BY registered_timestamp DESC;
         `).then(res => {
             const users = res.rows
             if (users.length > 0) {
@@ -89,7 +89,7 @@ async function getUsersVerified(time_since) {
                     }],
                     ephemeral: true
                 })
-            } else return resolve({content: `0 users returned for last ${time_since}`, ephemeral: true})
+            } else return resolve({ content: `0 users returned for last ${time_since}`, ephemeral: true })
         }).catch(console.error)
     })
 }
@@ -98,10 +98,11 @@ async function editMainMessage() {
     const messages = [{
         channel_id: '1063435050802237540',
         message_id: '1063435290494111764'
-    },{
-        channel_id: '1078705376062611516', // dev
-        message_id: '1078705475190792222'  // dev
     }]
+    // {
+    //     channel_id: '1078705376062611516', // dev
+    //     message_id: '1078705475190792222'  // dev
+    // }
     messages.forEach(async msg => {
         const channel = client.channels.cache.get(msg.channel_id) || await client.channels.fetch(msg.channel_id).catch(console.error)
         if (!channel) return
@@ -119,7 +120,7 @@ async function editMainMessage() {
                     style: 3,
                     label: 'Get Users Verified',
                     custom_id: 'as_at_get_users_verified'
-                },{
+                }, {
                     type: 2,
                     style: 3,
                     label: 'Lift Global Ban',
@@ -130,7 +131,7 @@ async function editMainMessage() {
     })
 }
 
-function error_codes_embed(response,discord_id) {
+function error_codes_embed(response, discord_id) {
     if (response.code == 499) {
         return {
             content: ' ',
@@ -163,7 +164,7 @@ function error_codes_embed(response,discord_id) {
                     label: "Join Existing",
                     style: 3,
                     custom_id: `as_sb_sq_merge_true_${response.squad_id}`
-                },{
+                }, {
                     type: 2,
                     label: "Host New",
                     style: 1,

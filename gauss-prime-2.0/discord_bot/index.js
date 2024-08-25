@@ -1,3 +1,6 @@
+
+const dotenv = require('dotenv')
+dotenv.config()
 const { client } = require("./modules/client");
 const { pingCommand, uptimeCommand, helpCommand } = require("./modules/general");
 const { ordersCommand } = require("./modules/wfm");

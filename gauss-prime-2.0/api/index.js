@@ -1,8 +1,14 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 4000
-const dotenv = require('dotenv');
-dotenv.config();
+
+app.use('/api', (req, res, next) => {
+    console.log(`[${req.url}] called`)
+    console.log(`body ${req.body}`)
+    next()
+})
 
 app.use('/api', require('./routes/wfm'))
 
