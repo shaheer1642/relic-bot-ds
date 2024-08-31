@@ -59,6 +59,12 @@ function matchItems({ item_name }) {
     return items_matched
 }
 
+function getItemByTitle({ item_title }){
+    console.log(item_title)
+    const item_matched = items_list.find((item) => item.item_name.startsWith(item_title))
+    return item_matched
+}
+
 // matchItems('gauss prime bp') // returns gauss_prime_blueprint
 // matchItems('gauss p bp') // returns gauss_prime_blueprint
 // matchItems('gauss p') // returns gauss_prime
@@ -69,5 +75,6 @@ module.exports = {
     getItemInformation,
     getItemOrders,
     getItemDropSources,
-    matchItems
+    matchItems,
+    getItemByTitle
 }

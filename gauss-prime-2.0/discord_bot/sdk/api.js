@@ -32,6 +32,12 @@ async function matchItems({ item_name }) {
     })
 }
 
+async function getItemByTitle({item_title}){
+    return new Promise((resovle,reject) => {
+        axios.get(API_URL + '/api/wfm/item/title',{ params: { item_title } }).then(res => resolve(res.data)).catch(reject)
+    })
+}
+
 
 module.exports = {
     getItems,
@@ -39,4 +45,5 @@ module.exports = {
     getItemOrders,
     getItemDropSources,
     matchItems,
+    getItemByTitle
 }

@@ -3,7 +3,9 @@ const dotenv = require('dotenv')
 dotenv.config()
 const { client } = require("./modules/client");
 const { pingCommand, uptimeCommand, helpCommand } = require("./modules/general");
-const { ordersCommand } = require("./modules/wfm");
+const { ordersCommand,ordersUpdate } = require("./modules/wfm");
+
+const { testCommand } =require('./modules/wfm')
 
 client.on('ready', () => {
     console.log('Bot is online!')
@@ -12,7 +14,7 @@ client.on('ready', () => {
 
 client.on('messageCreate', (message) => {
     const lines = message.content.split('\n').map(line => line.toLowerCase().trim())
-    // console.log(msgs)
+    // console.log(message.reactions)
     lines.forEach((line) => {
         const words = line.split(' ')
         const command = words.shift()
@@ -36,9 +38,23 @@ client.on('messageCreate', (message) => {
                 case 'orders':
                     ordersCommand(message, args)
                     break
+                case 'test':
+                    testCommand(message)
+                    break
             }
         }
     })
+})
+
+client.on('messageReactionAdd',(reaction,user) => {
+    if(user.id!=client.user.id){
+        const emoji_name=reaction.emoji.name
+        switch(emoji_name){
+            case '🆙':
+                ordersUpdate(reaction,user)
+                break
+    }
+    }
 })
 
 setTimeout(() => {
