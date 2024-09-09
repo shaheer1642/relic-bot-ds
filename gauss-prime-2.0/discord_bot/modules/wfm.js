@@ -86,8 +86,8 @@ async function ordersUpdate(reaction,user){
         const item_embeds = reaction.message.embeds
         const item_titles = item_embeds.map(item => item.data.title)
         console.log(item_titles)
-        const items = (await Promise.allSettled(item_titles.map(item => getItemByTitle(item)))).map(el => el.value)
-        console.log(items)
+        const items = (await Promise.allSettled(item_titles.map(item => getItemByTitle({item_title: item})))).map(el => el.value)
+        // console.log(items)
 
         var response_embed = item_embeds.map((item) => {
             item.data.title = item.data.title + ' (Updating...)'
@@ -98,7 +98,7 @@ async function ordersUpdate(reaction,user){
         reaction.message.edit({ content: 'React with :up: to update', embeds: response_embed }).catch(console.error)
 
         reaction.users.remove(user).catch(console.error)
-        console.log("user reaction removed")
+        console.log("Orders Updated successful,user reaction removed")
 
         async function getResponseEmbed(item) {
             return new Promise(async (resolve, reject) => {
