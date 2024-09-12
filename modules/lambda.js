@@ -20,7 +20,10 @@ async function getWorldState(key) {
 
         try {
             const result = await lambda.invoke(params).promise();
-            resolve(JSON.parse(result.Payload))
+            const payload = JSON.parse(result.Payload)
+            if (payload.statusCode !== 200) return reject(payload)
+            const body = JSON.parse(payload.body)
+            resolve(body)
         } catch (error) {
             console.error('Error invoking Lambda:', error);
             reject(error)
