@@ -3076,7 +3076,7 @@ async function fissures_check() {
                 console.log('fissures_check invokes in ' + msToTime(timer))
             }).catch(err => {
                 console.log(err)
-                fissuresTimer = setTimeout(fissures_check, 5000)
+                fissuresTimer = setTimeout(fissures_check, 60000)
             })
             return
         }).catch(err => {
@@ -3499,7 +3499,8 @@ async function invasions_check() {
                         title: invasion.desc,
                         node: `${invasion.node}`,
                         reward: `${invasion.attacker.reward ? invasion.attacker.reward.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith') : ''} ${(invasion.attacker.reward && invasion.defender.reward) ? 'vs' : ''} ${invasion.defender.reward ? invasion.defender.reward.asString.replace('Wraith Twin Vipers', 'Twin Vipers Wraith') : ''}`.trim(),
-                        expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
+                        // expiry: Math.round((new Date().getTime() + invasion.getRemainingTime()) / 1000),
+                        expiry: invasion.eta,
                         completed: invasion.completed
                     })
 
@@ -3568,10 +3569,11 @@ async function invasions_check() {
                 invasions_list.forEach(invasion => {
                     embed.fields[0].value += invasion.node + '\n'
                     embed.fields[1].value += rewardIcon(invasion.reward) + '\n'
-                    if (invasion.expiry == Infinity || invasion.expiry == -Infinity || invasion.expiry > ((new Date().getTime() + 172800000) / 1000))
-                        embed.fields[2].value += 'Not estimated yet' + '\n'
-                    else
-                        embed.fields[2].value += '<t:' + invasion.expiry + ':R>' + '\n'
+                    embed.fields[2].value += invasion.expiry + '\n'
+                    // if (invasion.expiry == Infinity || invasion.expiry == -Infinity || invasion.expiry > ((new Date().getTime() + 172800000) / 1000))
+                    //     embed.fields[2].value += 'Not estimated yet' + '\n'
+                    // else
+                    //     embed.fields[2].value += '<t:' + invasion.expiry + ':R>' + '\n'
                 })
 
                 res.rows.forEach(row => {
@@ -3607,7 +3609,7 @@ async function invasions_check() {
                 console.log('invasions_check invokes in ' + msToTime(timer))
             }).catch((err) => {
                 console.log(err)
-                invasions_timer = setTimeout(invasions_check, 5000)
+                invasions_timer = setTimeout(invasions_check, 60000)
             })
         }).catch(err => {
             console.error(err)
