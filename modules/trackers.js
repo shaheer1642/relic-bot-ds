@@ -3,6 +3,7 @@ const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const { db } = require('./db_connection.js');
 const { inform_dc, dynamicSort, dynamicSortDesc, msToTime, msToFullTime, mod_log, getRandomColor } = require('./extras.js');
+const { getWorldState } = require('./lambda.js');
 
 const bountyHints = [
     'Consider donating to poor softy!',
@@ -18,10 +19,8 @@ setTimeout(() => {
 
 async function bounty_check() {
     console.log('bounty check')
-    axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(async worldstateData => {
-            const WorldState = (await import('warframe-worldstate-parser')).default
-            const syndicateMissions = new WorldState(JSON.stringify(worldstateData.data)).syndicateMissions;
+    getWorldState('syndicateMissions')
+        .then(async syndicateMissions => {
             if (new Date(syndicateMissions[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
                 console.log('negative expiry')
                 var timer = 10000

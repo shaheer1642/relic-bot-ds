@@ -15,6 +15,7 @@ const { emote_ids, emoteObjFromSquadString } = require('./emotes');
 const { db_schedule_msg_deletion } = require('./msg_auto_delete');
 const { getRelicQuantity } = require('./allsquads/wfrim_relicsdb');
 const { getServerPingChannel } = require('./objects/discord_servers_ping_channel');
+const { getWorldState } = require('./lambda.js');
 
 const server_commands_perms = [
     '253525146923433984', //softy
@@ -845,11 +846,10 @@ socket.on('relicbot/squads/opened', async (payload) => {
                 }]
             }).then(msg => {
                 squadOpenMessages[`${squad.squad_id}_${thread.id}`] = msg
-                axios('http://content.warframe.com/dynamic/worldState.php')
-                    .then(async worldstateData => {
-                        const WorldState = (await import('warframe-worldstate-parser')).default
-                        const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
+                getWorldState('fissures')
+                    .then(async fissures => {
                         if (!fissures) return
+                        fissures = fissures.sort(dynamicSort("tierNum"));
 
                         var fissures_list = []
                         fissures.forEach(fissure => {
@@ -1207,10 +1207,8 @@ var fissuresTimer;
 async function fissures_check() {
     console.log('[relicbot] fissures_check called')
 
-    axios('http://content.warframe.com/dynamic/worldState.php')
-        .then(async worldstateData => {
-            const WorldState = (await import('warframe-worldstate-parser')).default
-            const fissures = new WorldState(JSON.stringify(worldstateData.data)).fissures.sort(dynamicSort("tierNum"));
+    getWorldState('fissures')
+        .then(async fissures => {
 
             if (!fissures) {
                 console.log('[relicbot] Fissures check: no data available')
@@ -1220,6 +1218,8 @@ async function fissures_check() {
                 console.log(`[relicbot] fissures_check reset in ${msToTime(timer)}`)
                 return
             }
+
+            fissures = fissures.sort(dynamicSort("tierNum"));
 
             var fissures_list = []
             var min_expiry = Infinity
