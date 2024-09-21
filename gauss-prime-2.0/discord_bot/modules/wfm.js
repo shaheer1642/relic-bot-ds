@@ -4,7 +4,7 @@ const { client } = require("./client");
 const { wfmItemOrders } = require('./embeds');
 const { getItemOrders, matchItems } = require("../sdk/api");
 
-const{ getItemByTitle} = require("../sdk/api");
+const { getItemByTitle } = require("../sdk/api");
 const axios = require('axios')
 /**
  * 
@@ -66,40 +66,43 @@ async function ordersCommand(message, args) {
     }
 }
 
-function testCommand(message){
+function testCommand(message) {
     message.channel.send({
         content: 'Hello there <:eee:1256334253470388308>',
         embeds: [{
             title: 'Gauss Prime Set',
             description: 'Warframe',
-            thumbnail: {url:"https://warframe.market/static/assets/items/images/en/thumbs/gauss_prime_set.df5aa569d863730a4de767fd449c107e.128x128.png"}
-        },{
+            thumbnail: { url: "https://warframe.market/static/assets/items/images/en/thumbs/gauss_prime_set.df5aa569d863730a4de767fd449c107e.128x128.png" }
+        }, {
             title: 'Gauss Prime Neuroptics',
             description: 'Warframe',
-            thumbnail: {url:"https://warframe.market/static/assets/sub_icons/warframe/prime_helmet_128x128.png"}
+            thumbnail: { url: "https://warframe.market/static/assets/sub_icons/warframe/prime_helmet_128x128.png" }
         }]
     })
 }
 
-async function ordersUpdate(reaction,user){
-    try{
+/** should use jsdocs to define type for reaction and user */
+async function ordersUpdate(reaction, user) {
+    try {
         const item_embeds = reaction.message.embeds
         const item_titles = item_embeds.map(item => item.data.title)
         console.log(item_titles)
-        const items = (await Promise.allSettled(item_titles.map(item => getItemByTitle({item_title: item})))).map(el => el.value)
+        /** this should be achieved via item/match endpoint */
+        const items = (await Promise.allSettled(item_titles.map(item => getItemByTitle({ item_title: item })))).map(el => el.value)
         // console.log(items)
 
         var response_embed = item_embeds.map((item) => {
             item.data.title = item.data.title + ' (Updating...)'
             return item
         })
-        reaction.message.edit({embeds: response_embed}).catch(console.error)
+        reaction.message.edit({ embeds: response_embed }).catch(console.error)
         response_embed = (await Promise.allSettled(items.map((item) => getResponseEmbed(item)))).map(el => el.value)
         reaction.message.edit({ content: 'React with :up: to update', embeds: response_embed }).catch(console.error)
 
         reaction.users.remove(user).catch(console.error)
         console.log("Orders Updated successful,user reaction removed")
 
+        /** this function should not be repeated */
         async function getResponseEmbed(item) {
             return new Promise(async (resolve, reject) => {
                 try {
@@ -118,13 +121,13 @@ async function ordersUpdate(reaction,user){
                 }
             })
         }
-    }catch(err){
+    } catch (err) {
         console.error(err)
-        message.channel.send(`Error occured: ${err?.response?.data?.message || err?.message || JSON.stringify(err)}`).catch(console.error)
-    }   
+        reaction.message.channel.send(`Error occured: ${err?.response?.data?.message || err?.message || JSON.stringify(err)}`).catch(console.error)
+    }
 }
 
 
 module.exports = {
-    ordersCommand,ordersUpdate,testCommand
+    ordersCommand, ordersUpdate, testCommand
 }
