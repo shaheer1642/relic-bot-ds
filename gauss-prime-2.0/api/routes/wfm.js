@@ -1,5 +1,5 @@
 const express = require('express');
-const { getItemInformation, getItemOrders, getItemDropSources, matchItems, getAllItems,getItemByTitle } = require('../sdk/wfm');
+const { getItemInformation, getItemOrders, getItemDropSources, matchItems, getAllItems, getItemByTitle } = require('../sdk/wfm');
 const router = new express.Router();
 
 router.get('/wfm/items', (req, res) => {
@@ -64,6 +64,7 @@ router.get('/wfm/item/match', (req, res) => {
     res.json(items_matched)
 })
 
+/** this should not be an endpoint */
 router.get('/wfm/item/title', (req, res) => {
     if (!req.query.item_title) return res.status(400).json({ message: 'item_title is required' })
 
