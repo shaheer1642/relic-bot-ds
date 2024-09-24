@@ -46,27 +46,7 @@ client.on('messageCreate', (message) => {
     })
 })
 
-/** this listener should be inside its own modules (wfm.js) */
-client.on('messageReactionAdd', async (reaction, user) => {
-    try {
-        if (reaction.partial) {
-            console.log('message was partial. fetching data')
-            reaction.message = await reaction.message.fetch()
-        }
-        /** use the approach below instead */
-        // if (user.id == client.user.id) return
-        if (user.id != client.user.id) {
-            const emoji_name = reaction.emoji.name
-            switch (emoji_name) {
-                case '🆙':
-                    ordersUpdate(reaction, user)
-                    break
-            }
-        }
-    } catch (err) {
-        console.error('FATAL ERROR in messageReactionAdd', err)
-    }
-})
+
 
 setTimeout(() => {
     process.exit()

@@ -51,7 +51,7 @@ function getItemDropSources({ url_name }) {
     })
 }
 
-function matchItems({ item_name }) {
+function matchItemsByName({ item_name }) {
     //find items that matched given item_name in items_list and return
     var item_name_raw = item_name.replace(/\W\bbp/g, '_blueprint').replace(/\W\bprime/g, ' p').replace(/\W\bp/g, '_prime').replace(/ /g, '_')
     console.log(item_name_raw)
@@ -59,7 +59,7 @@ function matchItems({ item_name }) {
     return items_matched
 }
 
-function getItemByTitle({ item_title }){
+function matchItemByTitle({ item_title }) {
     console.log(item_title)
     const item_matched = items_list.find((item) => item.item_name.startsWith(item_title))
     return item_matched
@@ -75,6 +75,6 @@ module.exports = {
     getItemInformation,
     getItemOrders,
     getItemDropSources,
-    matchItems,
-    getItemByTitle
+    matchItemsByName,
+    matchItemByTitle
 }

@@ -2,9 +2,9 @@ const { Message, } = require("discord.js");
 const { client } = require("./client");
 
 const { wfmItemOrders } = require('./embeds');
-const { getItemOrders, matchItems } = require("../sdk/api");
+const { getItemOrders, matchItemsByName } = require("../sdk/api");
 
-const { getItemByTitle } = require("../sdk/api");
+const { matchItemByTitle } = require("../sdk/api");
 const axios = require('axios')
 /**
  * 
@@ -12,7 +12,7 @@ const axios = require('axios')
  */
 async function ordersCommand(message, args) {
     try {
-        const items_matched = await matchItems({ item_name: args })
+        const items_matched = await matchItemsByName({ item_name: args })
         if (items_matched.length === 0) return message.channel.send({ content: `No items matched **${args}**` })
 
         const _message = await message.channel.send({ content: 'Processing' })
@@ -82,13 +82,17 @@ function testCommand(message) {
 }
 
 /** should use jsdocs to define type for reaction and user */
+/**
+ * 
+ * @param {Message<boolean>} message 
+ */
 async function ordersUpdate(reaction, user) {
     try {
         const item_embeds = reaction.message.embeds
         const item_titles = item_embeds.map(item => item.data.title)
         console.log(item_titles)
         /** this should be achieved via item/match endpoint */
-        const items = (await Promise.allSettled(item_titles.map(item => getItemByTitle({ item_title: item })))).map(el => el.value)
+        const items = (await Promise.allSettled(item_titles.map(item => matchItemByTitle({ item_title: item })))).map(el => el.value)
         // console.log(items)
 
         var response_embed = item_embeds.map((item) => {
@@ -96,14 +100,14 @@ async function ordersUpdate(reaction, user) {
             return item
         })
         reaction.message.edit({ embeds: response_embed }).catch(console.error)
-        response_embed = (await Promise.allSettled(items.map((item) => getResponseEmbed(item)))).map(el => el.value)
+        response_embed = (await Promise.allSettled(items.map((item) => getUpdatedResponseEmbed(item)))).map(el => el.value)
         reaction.message.edit({ content: 'React with :up: to update', embeds: response_embed }).catch(console.error)
 
         reaction.users.remove(user).catch(console.error)
         console.log("Orders Updated successful,user reaction removed")
 
         /** this function should not be repeated */
-        async function getResponseEmbed(item) {
+        async function getUpdatedResponseEmbed(item) {
             return new Promise(async (resolve, reject) => {
                 try {
                     // const orders = await axios.get('https://api.warframe.market/v1/items/'+item.url_name+'/orders').then(r => r.data.payload.orders)
@@ -126,6 +130,37 @@ async function ordersUpdate(reaction, user) {
         reaction.message.channel.send(`Error occured: ${err?.response?.data?.message || err?.message || JSON.stringify(err)}`).catch(console.error)
     }
 }
+
+
+/** this listener should be inside its own modules (wfm.js) */
+client.on('messageReactionAdd', async (reaction, user) => {
+    try {
+        if (reaction.partial) {
+            console.log('message was partial. fetching data')
+            reaction.message = await reaction.message.fetch()
+        }
+        /** use the approach below instead */
+        if (user.id == client.user.id) return
+        else {
+            const emoji_name = reaction.emoji.name
+            switch (emoji_name) {
+                case '🆙':
+                    ordersUpdate(reaction, user)
+                    break
+            }
+        }
+        // if (user.id != client.user.id) {
+        //     const emoji_name = reaction.emoji.name
+        //     switch (emoji_name) {
+        //         case '🆙':
+        //             ordersUpdate(reaction, user)
+        //             break
+        //     }
+        // }
+    } catch (err) {
+        console.error('FATAL ERROR in messageReactionAdd', err)
+    }
+})
 
 
 module.exports = {
