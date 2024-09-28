@@ -26,15 +26,15 @@ async function getItemDropSources({ url_name }) {
     })
 }
 
-async function matchItems({ item_name }) {
+async function matchItemsByName({ item_name }) {
     return new Promise((resolve, reject) => {
         axios.get(API_URL + '/api/wfm/item/match', { params: { item_name } }).then(res => resolve(res.data)).catch(reject)
     })
 }
 
-async function getItemByTitle({item_title}){
-    return new Promise((resolve,reject) => {
-        axios.get(API_URL + '/api/wfm/item/title',{ params: { item_title } }).then(res => resolve(res.data)).catch(reject)
+async function matchItemByTitle({ item_title }) {
+    return new Promise((resolve, reject) => {
+        axios.get(API_URL + '/api/wfm/item/match', { params: { item_title } }).then(res => resolve(res.data)).catch(reject)
     })
 }
 
@@ -44,6 +44,6 @@ module.exports = {
     getItemInformation,
     getItemOrders,
     getItemDropSources,
-    matchItems,
-    getItemByTitle
+    matchItemsByName,
+    matchItemByTitle
 }
