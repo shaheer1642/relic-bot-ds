@@ -23,7 +23,7 @@ async function bounty_check() {
         .then(async syndicateMissions => {
             if (!syndicateMissions[0] || new Date(syndicateMissions[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
                 console.log('negative expiry')
-                var timer = 10000
+                var timer = 300000
                 setTimeout(bounty_check, timer)
                 console.log(`bounty_check reset in ${msToTime(timer)}`)
                 return
