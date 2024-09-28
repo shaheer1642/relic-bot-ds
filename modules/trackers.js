@@ -21,7 +21,7 @@ async function bounty_check() {
     console.log('bounty check')
     getWorldState('syndicateMissions')
         .then(async syndicateMissions => {
-            if (new Date(syndicateMissions[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
+            if (!syndicateMissions[0] || new Date(syndicateMissions[0].expiry).getTime() < new Date().getTime()) {     //negative expiry, retry
                 console.log('negative expiry')
                 var timer = 10000
                 setTimeout(bounty_check, timer)

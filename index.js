@@ -9,7 +9,7 @@ const fs = require('fs')
 const { db } = require('./modules/db_connection.js');
 const { pins_handler } = require('./modules/pins_handler.js');
 const db_modules = require('./modules/db_modules.js');
-const osiris_guild = require('./modules/osiris.js');
+// const osiris_guild = require('./modules/osiris.js');
 const hubapp = require('./modules/hubapp.js');
 const osiris_tts = require('./modules/osiris_tts.js');
 const discord_server_modules = require('./modules/discord_server_modules.js');
@@ -19,7 +19,7 @@ const squadbot = require('./modules/as_squadbot.js');
 // const deploy_commands = require('./deploy-commands.js');
 const twitch_affiliate = require('./modules/twitch_affiliate.js');
 const botv = require('./modules/botv.js');
-const osiris_guild_id = '905559118096531456'
+// const osiris_guild_id = '905559118096531456'
 const { client } = require('./modules/discord_client.js');
 const { as_user_registeration } = require('./modules/allsquads.js');
 require('./modules/trackers.js');
@@ -122,11 +122,11 @@ client.on('ready', () => {
 
     // deploy_commands.bot_initialize()
 
-    osiris_guild.bot_initialize()
+    // osiris_guild.bot_initialize()
     // trade_bot_modules.bot_initialize()
     botv.bot_initialize()
     osiris_tts.bot_initialize()
-    osiris_guild.bot_initialize()
+    // osiris_guild.bot_initialize()
     twitch_affiliate.bot_initialize()
     worldstatealerts.bot_initialize()
 
@@ -166,9 +166,9 @@ client.on('messageCreate', async message => {
     }
 
     if (message.guild) {
-        if (message.guild.id == osiris_guild_id) {
-            osiris_guild.messageHandler(message).catch(err => console.log(err))
-        }
+        // if (message.guild.id == osiris_guild_id) {
+        //     osiris_guild.messageHandler(message).catch(err => console.log(err))
+        // }
 
         message.attachments.map(attachment => {
             attachment.url
@@ -1313,8 +1313,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot)
         return
 
-    if (reaction.message.guildId == osiris_guild_id)
-        osiris_guild.reactionAddHandler(reaction, user).catch(err => console.log(err))
+    // if (reaction.message.guildId == osiris_guild_id)
+    //     osiris_guild.reactionAddHandler(reaction, user).catch(err => console.log(err))
 
     if (reaction.message.guildId == '776804537095684108')
         botv.reaction_handler(reaction, user, 'add')
