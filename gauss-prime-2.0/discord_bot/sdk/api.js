@@ -15,6 +15,7 @@ async function getItemInformation({ url_name }) {
 }
 
 async function getItemOrders({ url_name }) {
+    console.log('getItemOrders url_name', url_name)
     return new Promise((resolve, reject) => {
         axios.get(API_URL + '/api/wfm/item/orders', { params: { url_name } }).then(res => resolve(res.data)).catch(reject)
     })
@@ -26,15 +27,9 @@ async function getItemDropSources({ url_name }) {
     })
 }
 
-async function matchItemsByName({ item_name }) {
+async function matchItems({ item_name }) {
     return new Promise((resolve, reject) => {
         axios.get(API_URL + '/api/wfm/item/match', { params: { item_name } }).then(res => resolve(res.data)).catch(reject)
-    })
-}
-
-async function matchItemByTitle({ item_title }) {
-    return new Promise((resolve, reject) => {
-        axios.get(API_URL + '/api/wfm/item/match', { params: { item_title } }).then(res => resolve(res.data)).catch(reject)
     })
 }
 
@@ -44,6 +39,5 @@ module.exports = {
     getItemInformation,
     getItemOrders,
     getItemDropSources,
-    matchItemsByName,
-    matchItemByTitle
+    matchItems,
 }

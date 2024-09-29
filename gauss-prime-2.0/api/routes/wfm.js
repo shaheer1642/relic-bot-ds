@@ -1,5 +1,5 @@
 const express = require('express');
-const { getItemInformation, getItemOrders, getItemDropSources, matchItemsByName, getAllItems, matchItemByTitle } = require('../sdk/wfm');
+const { getItemInformation, getItemOrders, getItemDropSources, getAllItems, matchItems } = require('../sdk/wfm');
 const router = new express.Router();
 
 router.get('/wfm/items', (req, res) => {
@@ -55,27 +55,13 @@ router.get('/wfm/item/dropSources', (req, res) => {
 })
 
 router.get('/wfm/item/match', (req, res) => {
-    // if (!req.query.item_name) return res.status(400).json({ message: 'item_name is required' })
+    if (!req.query.item_name) return res.status(400).json({ message: 'item_name is required' })
 
-    // const items_matched = matchItems({
-    //     item_name: req.query.item_name
-    // })
-    // res.json(items_matched)
+    const items_matched = matchItems({
+        item_name: req.query.item_name
+    })
 
-    if (req.query.item_name) {
-        const items_matched = matchItemsByName({
-            item_name: req.query.item_name
-        })
-        res.json(items_matched)
-    } else if (req.query.item_title) {
-        const item_matched = matchItemByTitle({
-            item_title: req.query.item_title
-        })
-        res.json(item_matched)
-    } else {
-        return res.status(400).json({ message: 'item_name/item_title is required' })
-    }
-
+    res.json(items_matched)
 })
 
 /** this should not be an endpoint */
