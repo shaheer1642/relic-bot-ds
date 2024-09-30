@@ -54,9 +54,8 @@ async function ordersUpdate(reaction, user) {
         const item_embeds = reaction.message.embeds
         const item_names = item_embeds.map(item => item.data.title?.toLowerCase().trim())
         console.log('item names are', item_names)
-        /** this should be achieved via item/match endpoint */
         const items = (await Promise.allSettled(item_names.map(name => matchItems({ item_name: name })))).map(el => el.value[0])
-        console.log('the response is', items)
+        // console.log('the response is', items)
 
         var response_embed = item_embeds.map((item) => {
             item.data.title = item.data.title + ' (Updating...)'
@@ -77,7 +76,7 @@ async function ordersUpdate(reaction, user) {
 async function getResponseEmbed(item) {
     return new Promise(async (resolve, reject) => {
         try {
-            console.log('getResponseEmbed item is', item)
+            // console.log('getResponseEmbed item is', item)
             const orders = await getItemOrders(item)
             const item_embed = wfmItemOrders(item, orders)
             resolve(item_embed)
@@ -99,7 +98,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
             console.log('message was partial. fetching data')
             reaction.message = await reaction.message.fetch()
         }
-        // console.log(reaction.message)
+        //console.log(reaction.message)
         //execute if the author of the message is the bot
         if (reaction.message.author.id == client.user.id) {
             //execute if it's not the bot itself that reacted to the message

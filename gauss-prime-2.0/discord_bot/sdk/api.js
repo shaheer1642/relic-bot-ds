@@ -15,7 +15,7 @@ async function getItemInformation({ url_name }) {
 }
 
 async function getItemOrders({ url_name }) {
-    console.log('getItemOrders url_name', url_name)
+    // console.log('getItemOrders url_name', url_name)
     return new Promise((resolve, reject) => {
         axios.get(API_URL + '/api/wfm/item/orders', { params: { url_name } }).then(res => resolve(res.data)).catch(reject)
     })
