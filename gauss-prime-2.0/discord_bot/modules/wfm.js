@@ -99,16 +99,32 @@ client.on('messageReactionAdd', async (reaction, user) => {
             console.log('message was partial. fetching data')
             reaction.message = await reaction.message.fetch()
         }
-        /** use the approach below instead */
-        if (user.id == client.user.id) return
-        else {
-            const emoji_name = reaction.emoji.name
-            switch (emoji_name) {
-                case '🆙':
-                    ordersUpdate(reaction, user)
-                    break
+        // console.log(reaction.message)
+        //execute if the author of the message is the bot
+        if (reaction.message.author.id == client.user.id) {
+            //execute if it's not the bot itself that reacted to the message
+            if (user.id == client.user.id) return
+            else {
+                const emoji_name = reaction.emoji.name
+                switch (emoji_name) {
+                    case '🆙':
+                        //execute if the message is for .orders command
+                        if (reaction.message.content == 'React with :up: to update') {
+                            ordersUpdate(reaction, user)
+                        }
+                        break
+                }
             }
         }
+        // if (user.id == client.user.id) return
+        // else {
+        //     const emoji_name = reaction.emoji.name
+        //     switch (emoji_name) {
+        //         case '🆙':
+        //             ordersUpdate(reaction, user)
+        //             break
+        //     }
+        // }
         // if (user.id != client.user.id) {
         //     const emoji_name = reaction.emoji.name
         //     switch (emoji_name) {
