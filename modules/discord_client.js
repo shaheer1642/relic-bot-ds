@@ -27,7 +27,7 @@ const client = new Client({
 	}
 })
 
-client.login(process.env.ENVIRONMENT_TYPE == 'dev' ? process.env.DISCORD_BOT_TOKEN_DEV : process.env.DISCORD_BOT_TOKEN).catch(err => {
+client.login(process.env.DISCORD_BOT_TOKEN).catch(err => {
 	console.log(err);
 	process.exit()
 });

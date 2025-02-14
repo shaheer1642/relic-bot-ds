@@ -31,7 +31,7 @@ function dynamicSortDesc(property) {
 }
 
 async function inform_dc(str) {
-    await client.channels.cache.get('891756819045826621').send(str).catch(err => console.log(err + '\nError posting bot update.'))
+    await client.channels.cache.get('891756819045826621')?.send(str).catch(err => console.log(err + '\nError posting bot update.'))
 }
 
 async function mod_log(str, color = 'RANDOM') {
