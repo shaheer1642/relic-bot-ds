@@ -11,12 +11,14 @@ client.on("guildCreate", guild => {
 })
 
 client.on('ready', () => {
-	if (process.env.DEPLOY_COMMANDS) {
-		console.log('Bot has started')
-		client.guilds.fetch().then(guilds => {
-			deployCommands(guilds.map(g => g.id))
-		}).catch(console.error)
-	}
+	// if (process.env.DEPLOY_COMMANDS) {
+	console.log('Bot has started')
+	client.guilds.fetch().then(guilds => {
+		deployCommands(guilds.map(g => g.id))
+	}).catch(console.error)
+	// } else {
+	// 	console.log('Deployment commands are disabled')
+	// }
 })
 
 async function deployCommands(guild_ids) {

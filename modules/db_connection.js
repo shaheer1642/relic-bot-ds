@@ -2,10 +2,10 @@ const DB = require('pg');
 const { event_emitter } = require('./event_emitter')
 
 const db = new DB.Client({
-    connectionString: process.env.ENVIRONMENT_TYPE == 'dev' ? process.env.DATABASE_URL_DEV : process.env.DATABASE_URL,
-    ssl: process.env.ENVIRONMENT_TYPE == 'dev' ? null : {
-        rejectUnauthorized: false
-    },
+    connectionString: process.env.DATABASE_URL,
+    // ssl: process.env.ENVIRONMENT_TYPE == 'dev' ? null : {
+    //     rejectUnauthorized: false
+    // },
     keepAlive: true
 })
 
