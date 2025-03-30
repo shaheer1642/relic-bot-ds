@@ -2668,9 +2668,7 @@ async function cycles_check() {
 async function arbitration_check() {
     console.log('arbitration_check called');
 
-    var arbitration;
-
-    await axios('https://api.warframestat.us/pc/arbitration')    // get data from warframestat.us
+    const arbitration = await axios('https://api.warframestat.us/pc/arbitration')    // get data from warframestat.us
         .then(res => {
             return res.data
         }).catch(console.error)
