@@ -4,7 +4,7 @@ import { Typography, Grid, Link } from '@mui/material';
 import { withHooksHOC } from '../withHooksHOC';
 import theme from '../theme';
 
-class MainFooter extends React.Component {
+class Footer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -84,4 +84,4 @@ class MainFooter extends React.Component {
   }
 }
 
-export default withHooksHOC(MainFooter);
+export default withHooksHOC(Footer);

@@ -1,16 +1,13 @@
 /* eslint eqeqeq: "off", no-unused-vars: "off" */
-import React from 'react';
-import { Link, Outlet } from "react-router-dom";
-import { Grid, Typography } from '@mui/material';
-import { socket, socketHasConnected } from '../websocket/socket'
-import Squads from './Squads/Squads';
+import Squads from '../../components/Squads';
+import { Grid } from '@mui/material';
 
 export default function Home() {
     return (
-        <Grid2 container>
-            <Grid2 item>
+        <Grid container flexDirection="column">
+            <Grid>
                 <Squads />
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     );
 }
