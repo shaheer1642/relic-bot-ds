@@ -1,51 +1,62 @@
 /* eslint eqeqeq: "off", no-unused-vars: "off" */
-import React from 'react';
-import {Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText, Button, Drawer, Grid, Typography, CircularProgress} from '@mui/material';
-import {socket,socketHasConnected} from '../websocket/socket'
-import eventHandler from '../event_handler/eventHandler';
-import { withHooksHOC } from '../withHooksHOC';
+import React, { useState } from 'react';
+import { Button, CircularProgress } from '@mui/material';
+// import eventHandler from '../../event_handler/eventHandler'; TODO: implement app context
 
-class ApiButton extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      callingApi: false
-    }
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillUnmount() {
-  }
-
-  componentDidUpdate() {
-  }
-
-  render() {
-    return (
-        <Button 
-            style={this.props.style}
-            disabled={this.props.disabled || this.state.callingApi ? true : false}
-            variant={this.props.variant}
-            color={this.props.color}
-            startIcon={this.state.callingApi ? null : this.props.startIcon}
-            onClick={(e) => {
-                if (!this.props.user) return eventHandler.emit('requestLogin', {})
-                if (!this.props.user.ingame_name) return eventHandler.emit('requestVerify', {})
-                this.setState({callingApi: true} , () => {
-                    this.props.onClick(e, () => {
-                        this.setState({callingApi: false})
-                    })
-                })
-            }}
-            size={this.props.size}
-        >
-            {this.state.callingApi ? <CircularProgress size='25px' color='secondary' /> : this.props.label}
-        </Button>
-    );
-  }
+interface ApiButtonProps {
+  style?: React.CSSProperties; // TODO: update type
+  disabled?: boolean;
+  variant?: 'text' | 'contained' | 'outlined';
+  color?: 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+  startIcon?: React.ReactNode;
+  onClick: (event: React.MouseEvent, callback: () => void) => void; // TODO: verify type
+  size?: 'small' | 'medium' | 'large';
+  label: string;
+  user?: {
+    ingame_name?: string;
+  };
 }
 
+export default function ApiButton({
+  style,
+  disabled = false,
+  variant,
+  color,
+  startIcon,
+  onClick,
+  size,
+  label,
+  user
+}: ApiButtonProps) {
+  const [callingApi, setCallingApi] = useState(false);
 
-export default withHooksHOC(ApiButton);
+  const handleClick = (e: React.MouseEvent) => {
+    if (!user) {
+      // eventHandler.emit('requestLogin', {}); TODO: implement app context
+      return;
+    }
+    if (!user.ingame_name) {
+      // eventHandler.emit('requestVerify', {}); TODO: implement app context
+      return;
+    }
+
+    setCallingApi(true);
+    onClick(e, () => {
+      setCallingApi(false);
+    });
+  };
+
+  return (
+    <Button
+      style={style}
+      disabled={disabled || callingApi}
+      variant={variant}
+      color={color}
+      startIcon={callingApi ? null : startIcon}
+      onClick={handleClick}
+      size={size}
+    >
+      {callingApi ? <CircularProgress size='25px' color='secondary' /> : label}
+    </Button>
+  );
+};
