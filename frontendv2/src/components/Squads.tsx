@@ -108,7 +108,7 @@ export default function Squads({ user }: { user: { user_id: string; ingame_name?
     setSquadsArr(prev => prev.filter(squad => squad.squad_id != deletedSquad.squad_id));
   }, []);
 
-  const leaveAllSquads = useCallback((e: any, callback?: () => void) => {
+  const leaveAllSquads = useCallback((_: any, callback?: () => void) => {
     socket.emit(`squadbot/squads/leaveall`, {
       user_id: user?.user_id,
     }, (res: ISocketResponse) => {
@@ -236,7 +236,7 @@ export default function Squads({ user }: { user: { user_id: string; ingame_name?
         squadsArr.filter(filterSquads).sort(dynamicSort('squad_string')).sort((a, b) => a.bot_type == 'squadbot' && b.bot_type != 'squadbot' ? -1 : 0).map((squad, index) => {
           return (
             <Grid key={index}>
-              <SquadCard squad={squad} showMembers={filters.showMembers} disableActions={false} />
+              <SquadCard squad={squad} showMembers={filters.showMembers} />
             </Grid>
           )
         })

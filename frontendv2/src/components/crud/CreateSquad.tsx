@@ -1,5 +1,5 @@
 /* eslint eqeqeq: "off", no-unused-vars: "off" */
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, TextField, Alert, useTheme, } from '@mui/material';
 import { socket } from '../../socket'
 // import eventHandler from '../../event_handler/eventHandler'; TODO: implement app context
