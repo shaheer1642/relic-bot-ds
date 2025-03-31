@@ -1,6 +1,4 @@
 
-const emote_ids = {
-}
 const emotes = {
     aya: 'https://cdn.discordapp.com/emojis/915887403590377542.webp',
     steel_essence: 'https://cdn.discordapp.com/emojis/962508988442869800.webp',
@@ -28,10 +26,10 @@ const emotes = {
     traces: 'https://cdn.discordapp.com/emojis/1068489485807009845.webp',
 }
 
-function getImageFromSquadString(squad_string) {
+function getImageFromSquadString(squad_string: string) {
     for (const key in emotes) {
         if (squad_string.match(key)) {
-            return emotes[key]
+            return emotes[key as keyof typeof emotes]
         }
     }
     return undefined

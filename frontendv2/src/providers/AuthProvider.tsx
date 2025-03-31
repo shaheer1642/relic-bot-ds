@@ -1,10 +1,11 @@
-import { useContext } from 'react';
+import { ReactNode, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
+import { IAuthUser } from '../interfaces/IAuthUser';
 // import { getCookie, putCookie } from '../cookie_handler'; TODO: rewrite to localStorage
 // import eventHandler from '../event_handler/eventHandler'; TODO: implment app context
 
-export const useAuth = () => {
-    const { setUser } = useContext(AuthContext);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const [user, setUser] = useState<IAuthUser | null>(null);
 
     const login = (callback: () => void) => {
         console.log('[useAuth.login] login called')
@@ -14,10 +15,13 @@ export const useAuth = () => {
             .then((res) => res.json())
             .then((res) => {
                 if (res.code == 200) {
-                    setUser(res.data, () => {
-                        // eventHandler.emit('user/login') TODO: implement app context
-                        if (callback) callback()
-                    })
+                    // TODO: original code
+                    // setUser(res.data, () => {
+                    //     eventHandler.emit('user/login')
+                    //     if (callback) callback()
+                    // })
+                    setUser(res.data)
+
                     console.log('[useAuth.login] logged in')
                 } else {
                     console.log('[useAuth.login] error', res)
@@ -28,12 +32,19 @@ export const useAuth = () => {
 
     const logout = (callback: () => void) => {
         console.log('[useAuth.logout] called')
-        setUser(null, () => {
-            // eventHandler.emit('user/logout') TODO: implement app context
-            if (callback) callback()
-            // putCookie('login_token', '') TODO: rewrite to localStorage
-        })
+        // TODO: original code
+        // setUser(null, () => {
+        //     eventHandler.emit('user/logout')
+        //     if (callback) callback()
+        //     putCookie('login_token', '')
+        // })
+        setUser(null)
     };
 
-    return { login, logout };
+    return (
+        <AuthContext.Provider value={{ user, login, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
+
 };
