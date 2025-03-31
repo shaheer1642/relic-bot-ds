@@ -2,14 +2,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Grid, Typography, FormControlLabel, Checkbox, CircularProgress, Button } from '@mui/material';
 import { ControlPoint, CancelOutlined } from '@mui/icons-material'
-import { socket, socketHasConnected } from '../socket';
-import { dynamicSort, relicBotSquadToString } from '../utils/functions';
-import SquadCard from './cards/SquadCard';
-import CreateSquad from './crud/CreateSquad';
+import { socket, socketHasConnected } from '../../../socket';
+import { dynamicSort, relicBotSquadToString } from '../../../utils/functions';
+import SquadCard from '../../../components/cards/SquadCard';
+import CreateSquad from '../../../components/modals/CreateSquad';
 // import eventHandler from '../../event_handler/eventHandler'; TODO: implement app context
-import ApiButton from './ui/ApiButton';
+import ApiButton from '../../../components/ui/ApiButton';
 // import { usersLoaded } from '../objects/as_users_list'; TODO: implement to app context
-import { ISocketResponse } from '../interfaces/ISocketResponse';
+import { ISocketResponse } from '../../../interfaces/ISocketResponse';
 
 export default function Squads({ user }: { user: { user_id: string; ingame_name?: string; } }) {
   const [squadsLoading, setSquadsLoading] = useState(true);

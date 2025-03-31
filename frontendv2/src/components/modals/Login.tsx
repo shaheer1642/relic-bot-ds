@@ -13,7 +13,7 @@ const login_url = 'https://discord.com/api/oauth2/authorize?' + new URLSearchPar
   state: `${process.env.VITE_SERVER_URL}`
 }).toString();
 
-export default function LoginScreen(props: { user: any, login: (callback?: () => void) => void }) {
+export default function Login(props: { user: any, login: (callback?: () => void) => void }) {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState('login');
   const [email, setEmail] = useState('');
