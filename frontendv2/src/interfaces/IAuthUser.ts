@@ -1,6 +1,6 @@
 export interface IAuthUser {
-    id: string;
-    email: string;
+    user_id: string;
+    ingame_name: string;
     username: string;
     avatar: string;
 }

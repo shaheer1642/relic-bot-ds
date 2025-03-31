@@ -7,7 +7,7 @@ import { IAuthUser } from '../interfaces/IAuthUser';
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<IAuthUser | null>(null);
 
-    const login = (callback: () => void) => {
+    const login = (callback?: () => void) => {
         console.log('[useAuth.login] login called')
         // if (!getCookie('login_token')) return console.log('login_token not found') TODO: rewrite to localStorage
         // TODO: original call: `${process.env.VITE_SERVER_URL}api/allsquads/authorization/authenticate?login_token=${getCookie('login_token')}`
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }).catch(console.error);
     };
 
-    const logout = (callback: () => void) => {
+    const logout = (callback?: () => void) => {
         console.log('[useAuth.logout] called')
         // TODO: original code
         // setUser(null, () => {

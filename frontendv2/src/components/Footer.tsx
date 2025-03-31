@@ -1,17 +1,15 @@
 /* eslint eqeqeq: "off", no-unused-vars: "off" */
 import { Typography, Grid, Link } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-
-interface FooterProps {
-  navigate: (path: string) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 const special_thanks_members = [
   'Crive33', '--FL--MattHarrigan', 'tia1331', '-Isana_Yashiro-', 'JohnWickPrime', '--DR--XIII.XI.MMVIII', 'Ady88', 'Leopard33'
 ];
 
-export default function Footer({ navigate }: FooterProps) {
+export default function Footer() {
   const theme = useTheme();
+  const navigate = useNavigate()
 
   const handleNavigation = (path: string) => {
     navigate(path);
