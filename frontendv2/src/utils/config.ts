@@ -1,10 +1,17 @@
 // TODO: verify localStorage is working
 // TODO: verify types are correct
 
+const local = {
+    new_message: !localStorage.getItem('config.play_sounds.new_message') ? undefined :
+        localStorage.getItem('config.play_sounds.new_message') === 'true' ? true : false,
+    squad_open: !localStorage.getItem('config.play_sounds.squad_open') ? undefined :
+        localStorage.getItem('config.play_sounds.squad_open') === 'true' ? true : false,
+}
+
 const config = {
     play_sounds: {
-        new_message: localStorage.getItem('config.play_sounds.new_message') || true,
-        squad_open: localStorage.getItem('config.play_sounds.squad_open') || true
+        new_message: local.new_message === undefined ? true : local.new_message,
+        squad_open: local.squad_open === undefined ? true : local.squad_open
     }
 }
 
