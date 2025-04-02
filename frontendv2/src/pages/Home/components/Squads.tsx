@@ -8,7 +8,6 @@ import SquadCard from '../../../components/cards/SquadCard';
 import CreateSquad from '../../../components/modals/CreateSquad';
 // import eventHandler from '../../event_handler/eventHandler'; TODO: implement app context
 import ApiButton from '../../../components/ui/ApiButton';
-// import { usersLoaded } from '../objects/as_users_list'; TODO: implement to app context
 import { ISocketResponse } from '../../../interfaces/ISocketResponse';
 
 export default function Squads({ user }: { user: { user_id: string; ingame_name?: string; } }) {
@@ -50,7 +49,8 @@ export default function Squads({ user }: { user: { user_id: string; ingame_name?
   useEffect(() => {
     console.log('[Squads] mounted')
     socketHasConnected().then(async () => {
-      // await usersLoaded() TODO: implement app context
+      // note: this is not needed anymore, as we are using the app context
+      // await usersLoaded()
       fetchSquads()
     })
 

@@ -4,7 +4,6 @@ import { Button, Grid, CircularProgress, TextField } from '@mui/material';
 import { Send } from '@mui/icons-material'
 import { socket } from '../../socket'
 import { sortCaseInsensitive } from '../../utils/functions';
-// import { as_users_list } from '../../objects/as_users_list';TODO: implement app context
 import * as uuid from 'uuid';
 import * as Colors from '@mui/material/colors';
 import theme from '../../theme';
@@ -14,7 +13,7 @@ import { ISocketResponse } from '../../interfaces/ISocketResponse';
 import { IChatMessage } from '../../interfaces/IChatMessage';
 import { useAuth } from '../../hooks/useAuth';
 import { ISquad } from '../../interfaces/ISquad';
-
+import { useStore } from '../../hooks/useStore';
 function enquote(username: string) {
   return username.match(' ') ? `"${username}"` : username
 }
@@ -31,6 +30,8 @@ interface ChatChannelMessagesProps {
 
 export default function ChatChannelMessages(props: ChatChannelMessagesProps) {
   const { user } = useAuth()
+  const { usersList } = useStore()
+
   const [newMessage, setNewMessage] = useState('');
   const [chatsArr, setChatsArr] = useState<IChatMessage[]>([]);
   const [loadingChats, setLoadingChats] = useState(true);
@@ -94,16 +95,11 @@ export default function ChatChannelMessages(props: ChatChannelMessagesProps) {
   if (hosts?.[0].considered_ping == null) {
     host_selection = `Please decide a host and invite each other in the game`;
   } else {
-    // TODO: implement app context
-    // host_selection = `Recommended Host: ${as_users_list[hosts[0]?.user_id]?.ingame_name} with avg squad ping of ${hosts[0]?.avg_squad_ping}`;
+    host_selection = `Recommended Host: ${usersList[hosts[0]?.user_id]?.ingame_name} with avg squad ping of ${hosts[0]?.avg_squad_ping}`;
   }
-  // TODO: implement app context
-  // const invite_list = `/invite ${sortCaseInsensitive(props.squad.members.map(id => enquote(as_users_list[id]?.ingame_name))).join('\n/invite ')}`;
-  const invite_list = ''; // temp code
+  const invite_list = `/invite ${sortCaseInsensitive(props.squad.members.map(id => enquote(usersList[id]?.ingame_name))).join('\n/invite ')}`;
   const squad_status_message = props.squad.status != 'opened' ? `This squad has been ${props.squad.status}` : '';
-  // TODO: implement app context
-  // const squad_host = props.squad.squad_host ? `${as_users_list[props.squad.squad_host]?.ingame_name} is hosting this squad\n- Please invite everyone, and make sure the squad is set to "invite-only"\n- Only the host should initiate the mission\n- If host migrates, same rules apply` : '';
-  const squad_host = ''; // temp code
+  const squad_host = props.squad.squad_host ? `${usersList[props.squad.squad_host]?.ingame_name} is hosting this squad\n- Please invite everyone, and make sure the squad is set to "invite-only"\n- Only the host should initiate the mission\n- If host migrates, same rules apply` : '';
   console.log('squad host', squad_host, props.squad.squad_host);
 
   return (
@@ -122,8 +118,7 @@ export default function ChatChannelMessages(props: ChatChannelMessagesProps) {
                 <Grid size={12} key='squad-messages' >
                   {chatsArr.map((chat, index) =>
                   (<Grid size={12} key={`squad-message-${index}`} style={{ wordWrap: 'break-word' }}>
-                    {/* TODO: implement app context
-                    {`${getTimestamp(Number(chat.creation_timestamp))} ${as_users_list[chat.user_id]?.ingame_name}: ${chat.message}`} */}
+                    {`${getTimestamp(Number(chat.creation_timestamp))} ${usersList[chat.user_id]?.ingame_name}: ${chat.message}`}
                   </Grid>)
                   )}
                 </Grid>

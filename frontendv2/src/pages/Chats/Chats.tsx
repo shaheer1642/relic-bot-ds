@@ -4,7 +4,6 @@ import { Button, Drawer, Grid, Typography, CircularProgress } from '@mui/materia
 import { ArrowBack } from '@mui/icons-material'
 import { socket } from '../../socket'
 import { convertUpper } from '../../utils/functions';
-// import { usersLoaded } from '../../objects/as_users_list'; TODO: implement app context
 // import eventHandler from '../../event_handler/eventHandler'; TODO: implement app context
 import ChatChannel from '../../components/cards/ChatChannel';
 import { relicBotSquadToString } from '../../utils/functions';
@@ -55,7 +54,8 @@ export default function Chats(props: ChatsProps) {
   };
 
   const fetchFilledSquads = async (callback: () => void) => {
-    // await usersLoaded(); TODO: implement app context
+    // note: this is not needed anymore, as we are using the app context
+    // await usersLoaded();
     if (!props.user) {
       setFilledSquads([]);
       setLoadingSquads(false);

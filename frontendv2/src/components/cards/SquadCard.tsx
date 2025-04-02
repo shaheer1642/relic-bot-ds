@@ -4,10 +4,9 @@ import { Card, CardContent, Typography, CardActions, Grid, useTheme } from '@mui
 import { DoneOutlined, CancelOutlined } from '@mui/icons-material'
 import { socket } from '../../socket'
 import { convertUpper } from '../../utils/functions';
-// import { as_users_list } from '../../objects/as_users_list'; TODO: implement app context
 import ApiButton from '../ui/ApiButton';
 import { getImageFromSquadString } from '../../utils/image_handler';
-
+import { useStore } from '../../hooks/useStore';
 interface SquadCardProps {
   squad: {
     squad_id: string;
@@ -23,7 +22,7 @@ interface SquadCardProps {
 }
 
 export default function SquadCard({ squad, showMembers, user }: SquadCardProps) {
-
+  const { usersList } = useStore()
   const theme = useTheme();
   const [hoverShowMembers, setHoverShowMembers] = useState(false); // do not remove, part of a commented code
 
@@ -55,13 +54,13 @@ export default function SquadCard({ squad, showMembers, user }: SquadCardProps) 
               {convertUpper(squad.squad_string)}
             </Typography>
             {/* Squad members */}
-            {/*TODO: implement app context <Typography variant="body1">
+            <Typography variant="body1">
               <pre>
                 {showMembers || hoverShowMembers
-                  ? squad.members.map(id => as_users_list[id]?.ingame_name).join('\n')
+                  ? squad.members.map(id => usersList[id]?.ingame_name).join('\n')
                   : `${squad.members.length}/${squad.spots || 4}`}
               </pre>
-            </Typography> */}
+            </Typography>
           </Grid>
         </Grid>
       </CardContent>
