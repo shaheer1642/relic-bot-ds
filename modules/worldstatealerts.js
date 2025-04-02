@@ -248,7 +248,8 @@ function bot_initialize() {
     //----set timers----
     baroTimer = setTimeout(baro_check, 10000)
     cyclesTimer = setTimeout(cycles_check, 11000)
-    arbitrationTimer = setTimeout(arbitration_check, 12000)
+    // TODO: fix arbitrations
+    // arbitrationTimer = setTimeout(arbitration_check, 12000)
     fissuresTimer = setTimeout(fissures_check, 13000)
     teshinTimer = setTimeout(teshin_check, 14000)
     alertsTimer = setTimeout(alerts_check, 15000)
@@ -791,7 +792,7 @@ async function setupReaction(reaction, user, type) {
             content: ' ',
             embeds: [{
                 title: 'Arbitration',
-                description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption`,
+                description: `⚠️ The API we are relying on has broken. This alert will be fixed in the near future\n\nReact to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption`,
                 color: colors.arbitration
             }]
         }).then(async msg => {
@@ -2785,7 +2786,7 @@ async function arbitration_check() {
     // ---- construct embed
     var embed = {
         title: 'Arbitration',
-        description: `React to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${convertUpper(mission)}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`,
+        description: `⚠️ The API we are relying on has broken. This alert will be fixed in the near future\n\nReact to subscribe to specific mission types\n\n${emotes.defection.string} Defection | ${emotes.defense.string} Defense | ${emotes.interception.string} Interception | ${emotes.salvage.string} Salvage\n${emotes.survival.string} Survival | ${emotes.excavation.string} Excavation | ${emotes.disruption.string} Disruption\n\n**Mission**: ${convertUpper(mission)}\n**Faction**: ${arbitration.enemy}\n**Node**: ${arbitration.node}\nExpires <t:${new Date(arbitration.expiry).getTime() / 1000}:R>`,
         color: colors.arbitration
     }
     console.log(JSON.stringify(embed))
