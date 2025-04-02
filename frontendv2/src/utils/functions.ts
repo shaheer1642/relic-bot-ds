@@ -1,10 +1,10 @@
-function dynamicSort(property) {
+function dynamicSort(property: string) {
     var sortOrder = 1;
     if (property[0] === "-") {
         sortOrder = -1;
         property = property.substr(1);
     }
-    return function (a, b) {
+    return function (a: any, b: any) {
         /* next line works with strings and numbers, 
          * and you may want to customize it to your needs
          */
@@ -13,17 +13,17 @@ function dynamicSort(property) {
     }
 }
 
-function sortCaseInsensitive(arr, descending) {
+function sortCaseInsensitive(arr: string[], descending = false) {
     return arr.sort((a, b) => a.replace(/"/g, '').toLowerCase() < b.replace(/"/g, '').toLowerCase() ? descending ? 1 : -1 : descending ? -1 : 1)
 }
 
-function dynamicSortDesc(property) {
+function dynamicSortDesc(property: string) {
     var sortOrder = 1;
     if (property[0] === "-") {
         sortOrder = -1;
         property = property.substr(1);
     }
-    return function (a, b) {
+    return function (a: any, b: any) {
         /* next line works with strings and numbers, 
          * and you may want to customize it to your needs
          */
@@ -32,11 +32,10 @@ function dynamicSortDesc(property) {
     }
 }
 
-function msToTime(s) {
+function msToTime(s: number) {
 
     // Pad to 2 or 3 digits, default is 2
-    function pad(n, z) {
-        z = z || 2;
+    function pad(n: number, z = 2) {
         return ('00' + n).slice(-z);
     }
 
@@ -54,7 +53,7 @@ function msToTime(s) {
     return pad(secs) + ' seconds';
 }
 
-function msToFullTime(ms) {
+function msToFullTime(ms: number) {
     var seconds = ms > 0 ? Math.floor(ms / 1000) : Math.ceil(ms / 1000),
         minutes = seconds > 0 ? Math.floor(seconds / 60) : Math.ceil(seconds / 60),
         hours = minutes > 0 ? Math.floor(minutes / 60) : Math.ceil(minutes / 60),
@@ -98,11 +97,11 @@ function getRandomColor() {
     return color;
 }
 
-function embedScore(text) {
-    return text.replaceAll('_', '\\_')
+function embedScore(text: string) {
+    return text.replace(/_/g, '\\_') // TODO: verify implementation
 }
 
-function convertUpper(str) {
+function convertUpper(str: string) {
     if (!str) return ''
     return str.replace(/_/g, " ").replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())
 }
@@ -122,7 +121,7 @@ function getMonthStartMs() {
     return new Date(new Date(new Date().getFullYear(), new Date().getMonth(), 1)).getTime()
 }
 
-function calcArrAvg(arr) {
+function calcArrAvg(arr: number[]) {
     var sum = 0
     arr.forEach(value => {
         sum += value
@@ -134,11 +133,12 @@ function relicBotSquadToString(squad: any, include_sp_rj: boolean, exclude_cycle
     return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with' : ''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${include_sp_rj ? (squad.is_steelpath ? 'Steelpath' : squad.is_railjack ? 'Railjack' : '') : ''} ${exclude_cycle_count ? '' : squad.cycle_count == '' ? '' : `(${squad.cycle_count} runs)`}`.replace(/\s+/g, ' ').trim().toLowerCase()
 }
 
-function getCookie(name) {
+// TODO: probably remove this function
+function getCookie(name: string) {
     return document.cookie.split('; ').find((row) => row.startsWith(`${name}=`))?.split('=')[1]
 }
 
-function isEmailValid(str) {
+function isEmailValid(str: string) {
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(str)) return false
     else return true
 }
