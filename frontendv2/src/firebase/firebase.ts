@@ -4,6 +4,7 @@ import { socket } from '../socket';
 import { ISocketResponse } from '../interfaces/ISocketResponse';
 
 const firebaseConfig = {
+  // TODO: secure API key in .env
   apiKey: "AIzaSyAxDsMVypgqkrY31cJici7P-KsISDkb5-Y",
   authDomain: "gaussprime-2e46e.firebaseapp.com",
   projectId: "gaussprime-2e46e",
