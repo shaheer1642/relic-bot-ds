@@ -133,11 +133,6 @@ function relicBotSquadToString(squad: any, include_sp_rj: boolean, exclude_cycle
     return `${convertUpper(squad.tier)} ${squad.main_relics.join(' ').toUpperCase()} ${squad.squad_type} ${squad.main_refinements.join(' ')} ${squad.off_relics.length > 0 ? 'with' : ''} ${squad.off_relics.join(' ').toUpperCase()} ${squad.off_refinements.join(' ')} ${include_sp_rj ? (squad.is_steelpath ? 'Steelpath' : squad.is_railjack ? 'Railjack' : '') : ''} ${exclude_cycle_count ? '' : squad.cycle_count == '' ? '' : `(${squad.cycle_count} runs)`}`.replace(/\s+/g, ' ').trim().toLowerCase()
 }
 
-// TODO: probably remove this function
-function getCookie(name: string) {
-    return document.cookie.split('; ').find((row) => row.startsWith(`${name}=`))?.split('=')[1]
-}
-
 function isEmailValid(str: string) {
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(str)) return false
     else return true
@@ -146,6 +141,6 @@ function isEmailValid(str: string) {
 export {
     dynamicSort, dynamicSortDesc, msToTime, msToFullTime, getRandomColor,
     embedScore, convertUpper, getTodayStartMs, getWeekStartMs, getMonthStartMs,
-    calcArrAvg, relicBotSquadToString, getCookie, sortCaseInsensitive,
+    calcArrAvg, relicBotSquadToString, sortCaseInsensitive,
     isEmailValid
 };

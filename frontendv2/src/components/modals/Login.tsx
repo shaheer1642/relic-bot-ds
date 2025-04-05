@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Dialog, Button, Typography, TextField, Grid, Alert, CircularProgress, Link } from '@mui/material';
 import { isEmailValid } from '../../utils/functions';
 // import eventHandler from '../../event_handler/eventHandler'; TODO: implement app context
-// import { putCookie } from '../../cookie_handler'; TODO: implement localStorage
 
 const login_url = 'https://discord.com/api/oauth2/authorize?' + new URLSearchParams({
   client_id: process.env.VITE_ENVIRONMENT == 'dev' ? '878017655028723803' : '832682369831141417',
@@ -65,7 +64,7 @@ export default function Login(props: { user: any, login: (callback?: () => void)
       .then((res) => {
         setCallingApi(false);
         if (res.code == 200) {
-          // putCookie('login_token', res.data.login_token); TODO: implement localStorage
+          localStorage.setItem('login_token', res.data.login_token);
           props.login(() => closeLogin());
         } else {
           return setAlertMessage(res.message || 'Error occured');
@@ -86,7 +85,7 @@ export default function Login(props: { user: any, login: (callback?: () => void)
         setCallingApi(false);
         console.log(res);
         if (res.code == 200) {
-          // putCookie('login_token', res.data.login_token); TODO: implement localStorage
+          localStorage.setItem('login_token', res.data.login_token);
           props.login();
         } else {
           return setAlertMessage(res.message || 'Error occured');

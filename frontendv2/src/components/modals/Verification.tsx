@@ -1,6 +1,5 @@
 import { Snackbar, Button, Dialog, Grid, Typography, useTheme } from '@mui/material';
 import React, { useState, useEffect } from 'react';
-// import { getCookie } from '../../cookie_handler'; TODO: implement localStorage
 // import eventHandler from '../../event_handler/eventHandler'; TODO: implement app context
 
 export default function Verification(props: { user: any }) {
@@ -70,10 +69,8 @@ export default function Verification(props: { user: any }) {
 
     const fetchVerificationCode = async () => {
         if (verificationCode) return;
-        // if (!getCookie('login_token')) return console.log('[fetchVerificationCode] login_token not found') TODO: implement localStorage
-        // TODO: original url
-        // `${process.env.REACT_APP_SOCKET_URL}api/allsquads/authorization/verification/ign/fetchCode?login_token=${getCookie('login_token')}`
-        const res = await (await fetch(`${process.env.VITE_SERVER_URL}api/allsquads/authorization/verification/ign/fetchCode`, { credentials: 'include' })).json()
+        if (!localStorage.getItem('login_token')) return console.log('[fetchVerificationCode] login_token not found')
+        const res = await (await fetch(`${process.env.VITE_SERVER_URL}api/allsquads/authorization/verification/ign/fetchCode?login_token=${localStorage.getItem('login_token')}`, { credentials: 'include' })).json()
         if (res.code == 200) {
             setVerificationCode(res.verificationCode)
         }

@@ -1,7 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { IAuthUser } from '../interfaces/IAuthUser';
-// import { getCookie, putCookie } from '../cookie_handler'; TODO: rewrite to localStorage
 // import eventHandler from '../event_handler/eventHandler'; TODO: implment app context
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -9,13 +8,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const login = (callback?: () => void) => {
         console.log('[useAuth.login] login called')
-        // if (!getCookie('login_token')) return console.log('login_token not found') TODO: rewrite to localStorage
-        // TODO: original call: `${process.env.VITE_SERVER_URL}api/allsquads/authorization/authenticate?login_token=${getCookie('login_token')}`
-        fetch(`${process.env.VITE_SERVER_URL}api/allsquads/authorization/authenticate`, { credentials: 'include' })
+        const login_token = localStorage.getItem('login_token')
+        if (!login_token) return console.log('login_token not found')
+        fetch(`${process.env.VITE_SERVER_URL}api/allsquads/authorization/authenticate?login_token=${login_token}`, { credentials: 'include' })
             .then((res) => res.json())
             .then((res) => {
                 if (res.code == 200) {
-                    // TODO: original code
+                    // TODO: implement app context
                     // setUser(res.data, () => {
                     //     eventHandler.emit('user/login')
                     //     if (callback) callback()
@@ -32,11 +31,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const logout = (callback?: () => void) => {
         console.log('[useAuth.logout] called')
-        // TODO: original code
+        localStorage.removeItem('login_token')
+        // TODO: implement app context
         // setUser(null, () => {
         //     eventHandler.emit('user/logout')
         //     if (callback) callback()
-        //     putCookie('login_token', '')
         // })
         setUser(null)
     };

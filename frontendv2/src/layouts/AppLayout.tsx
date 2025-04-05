@@ -12,7 +12,9 @@ import Chats from '../views/Chats/Chats';
 import CookieConsent from '../views/CookieConsent/CookieConsent';
 import Verification from '../views/Verification/Verification';
 import { useAuth } from '../hooks/useAuth';
-// import { putCookie } from '../cookie_handler'; TODO: implement local storage
+
+
+// TODO: fix imports
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -30,10 +32,10 @@ export default function MainLayout() {
     if (searchParams.has('login_token')) {
       const login_token = searchParams.get('login_token');
       if (login_token) {
-        // putCookie('login_token', login_token) TODO: implement local storage
+        localStorage.setItem('login_token', login_token)
         login()
         setTimeout(() => {
-          // TODO: original code
+          // TODO: verify new code
           // setSearchParams(searchParams.delete('login_token'))
           searchParams.delete('login_token')
         }, 1000);

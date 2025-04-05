@@ -12,4 +12,6 @@ export const routes: RouteObject[] = [
     }
 ]
 
+// TODO: add routes
+
 export const router = createBrowserRouter(routes);

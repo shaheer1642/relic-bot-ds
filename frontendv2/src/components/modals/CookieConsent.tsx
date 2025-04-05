@@ -1,12 +1,14 @@
 /* eslint eqeqeq: "off", no-unused-vars: "off" */
 import { useState } from 'react';
 import { Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText, Button } from '@mui/material';
-// import { getCookie } from '../../cookie_handler'; TODO: implement localStorage
+
+const local = {
+  allow_cookies: !localStorage.getItem('allow_cookies') ? true :
+    localStorage.getItem('allow_cookies') === 'true' ? true : false
+}
 
 export default function CookieConsent() {
-  // TODO: implement localStorage
-  // const [open, setOpen] = useState(getCookie('allow_cookies') == undefined ? true : false);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(local.allow_cookies);
 
   return (
     <Dialog
