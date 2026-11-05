@@ -89,7 +89,7 @@ function globalVariablesUpdate(data, callback) {
 function updateNightwaveMissionsSquadBot() {
     console.log('[global_variables.updateNightwaveMissionsSquadBot] called')
 
-    axios('http://content.warframe.com/dynamic/worldState.php')
+    axios('https://api.warframe.com/cdn/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
             const worldStateNightwave = new WorldState(JSON.stringify(worldstateData.data)).nightwave
