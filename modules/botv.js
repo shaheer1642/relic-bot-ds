@@ -432,52 +432,69 @@ React to this message with desired emoji to obtain your mastery role.
 }
 
 async function messageUpdate(oldMessage, newMessage) {
-    if (newMessage.channel.id == "793207311891562556") {
-        if (!newMessage.author)
-            newMessage = await newMessage.channel.messages.fetch(newMessage.id).catch(console.error)
-        if (newMessage.author.id == "294882584201003009") {
-            if (newMessage.embeds.length == 1 && newMessage.embeds[0].description.match('Ended:')) {
-                client.channels.cache.get('964217621266456586').send({
-                    content: ' ',
-                    embeds: newMessage.embeds,
-                    components: [{
-                        type: 1,
-                        components: [{
-                            type: 2,
-                            label: `Edit total plat value (0)`,
-                            custom_id: `botv_giveaway_edit_total_plat_value`,
-                            style: 3
-                        }]
-                    }]
-                }).then(msg => {
-                    const embed = newMessage.embeds[0]
+    if (newMessage.channel.id != "793207311891562556") return
+    if (!newMessage.author)
+        newMessage = await newMessage.channel.messages.fetch(newMessage.id).catch(console.error)
+    if (!newMessage || newMessage.author.id != "294882584201003009") return
+    if (newMessage.embeds.length != 1 || !newMessage.embeds[0].description?.match('Ended:')) return
 
-                    const giveaway_items = embed.title
+    const embed = newMessage.embeds[0]
+    const desc = embed.description
+    if (desc.toLowerCase().match('not enough entrants')) return
 
-                    const desc = embed.description
-                    if (desc.toLowerCase().match('not enough entrants')) return
+    const giveaway_items = embed.title
+    const ended_at = new Date().getTime()
+    const hosted_by = desc.split('\n')[1]?.split(' ')[2]?.replace('<@', '').replace('>', '').trim()
+    const winners = desc.split('\n')[3]?.split(' ').map((str, i) => i == 0 ? undefined : str.replace('<@', '').replace('>', '').replace(/,/g, '').trim()).filter(str => str)
 
-                    // console.log('descArr', descArr)
-                    // Extract the captured groups
+    const notifyFailure = (reason) => client.channels.cache.get('892072612002418718').send({ content: `<@253525146923433984> ${reason} (giveaway message ${newMessage.id})` }).catch(console.error)
 
-                    const ended_at = new Date().getTime()  // desc.split('\n')[0].split(' ')[1].replace('<t:', '').replace(':R>', '').trim()
-                    const hosted_by = desc.split('\n')[1]?.split(' ')[2].replace('<@', '').replace('>', '').trim()
-                    const winners = desc.split('\n')[3]?.split(' ').map((str, i) => i == 0 ? undefined : str.replace('<@', '').replace('>', '').replace(/,/g, '').trim()).filter(str => str)
+    // GiveawayBot can edit an ended giveaway more than once (seconds to hours apart), and each edit fires
+    // messageUpdate. Claim the giveaway in the DB first: the unique source_message_id lets exactly one
+    // event through, even when two edits arrive at the same moment.
+    const claim = await db.query(`
+        INSERT INTO botv_giveaways
+        (giveaway_items, hosted_by, winners, ended_at, source_message_id)
+        VALUES
+        ($1,$2,$3,$4,$5)
+        ON CONFLICT (source_message_id) DO NOTHING
+        RETURNING id
+    `, [giveaway_items, hosted_by, JSON.stringify(winners), ended_at, newMessage.id]).catch(err => {
+        console.error(err)
+        notifyFailure('failed to insert giveaway in db')
+        return null
+    })
+    if (!claim || claim.rowCount == 0) return // insert failed, or this giveaway was already logged
 
-                    db.query(`
-                        INSERT INTO botv_giveaways 
-                        (giveaway_items, hosted_by, winners, ended_at, message_id)
-                        VALUES
-                        ($1,$2,$3,$4,$5)
-                    `, [giveaway_items, hosted_by, JSON.stringify(winners), ended_at, msg.id])
-                        .catch(err => {
-                            console.error(err)
-                            client.channels.cache.get('892072612002418718').send({ content: `<@253525146923433984> failed to insert giveaway in db` })
-                        })
-                }).catch(console.error)
-            }
-        }
+    const giveaway_id = claim.rows[0].id
+
+    const msg = await client.channels.cache.get('964217621266456586').send({
+        content: ' ',
+        embeds: newMessage.embeds,
+        components: [{
+            type: 1,
+            components: [{
+                type: 2,
+                label: `Edit total plat value (0)`,
+                custom_id: `botv_giveaway_edit_total_plat_value`,
+                style: 3
+            }]
+        }]
+    }).catch(err => {
+        console.error(err)
+        return null
+    })
+
+    if (!msg) {
+        // release the claim so a later edit of the same giveaway can retry
+        await db.query(`DELETE FROM botv_giveaways WHERE id = $1`, [giveaway_id]).catch(console.error)
+        return notifyFailure('failed to post giveaway in log channel')
     }
+
+    await db.query(`UPDATE botv_giveaways SET message_id = $1 WHERE id = $2`, [msg.id, giveaway_id]).catch(err => {
+        console.error(err)
+        notifyFailure(`failed to link giveaway log message ${msg.id} in db`)
+    })
 }
 
 async function guildMemberUpdate(oldMember, newMember) {
