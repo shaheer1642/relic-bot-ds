@@ -87,6 +87,14 @@ client.on('guildMemberUpdate', (oldMember, newMember) => {
 })
 
 client.on('interactionCreate', (interaction) => {
+    if (isGiveawayLeaderboardInteraction(interaction)) {
+        return handleGiveawayLeaderboardInteraction(interaction).catch(err => {
+            console.error(err)
+            const reply = { content: 'Something went wrong loading the leaderboard', ephemeral: true }
+            if (interaction.deferred || interaction.replied) interaction.followUp(reply).catch(console.error)
+            else interaction.reply(reply).catch(console.error)
+        })
+    }
     if (interaction.isButton()) {
         if (interaction.customId == 'botv_giveaway_edit_total_plat_value') {
             if (interaction.member.roles.cache.find(r => r.id == hallOfFamePermRoleId)) {
@@ -190,6 +198,7 @@ function bot_initialize() {
     if (client.guilds.cache.get(botv_guild_id)) {
         client.guilds.cache.get(botv_guild_id).members.fetch().catch(console.error)
         setTimeout(updateMasteryDistr, 10000);
+        setTimeout(updateBotvHallOfFame, 15000); // keep the Hall of Fame buttons current after a deploy
     }
     setTimeout(removeNewMemberRole, 12000)
 }
@@ -910,11 +919,125 @@ function updateBotvHallOfFame() {
                             label: `View my giveaways`,
                             custom_id: `botv_giveaway_history`,
                             style: 1
+                        }, {
+                            type: 2,
+                            label: `Full leaderboard`,
+                            custom_id: `botv_giveaway_leaderboard`,
+                            style: 2
                         }]
                     }]
-                })
-            })
+                }).catch(console.error)
+            }).catch(console.error)
         }).catch(console.error)
+}
+
+// ---- Full giveaway host leaderboard (ephemeral, paginated, filterable by period) ----
+// State lives in the component custom_ids, so the view keeps working across bot restarts.
+
+const LEADERBOARD_PAGE_SIZE = 15
+const LEADERBOARD_PERIODS = {
+    all: { label: 'All-time', since: () => 0 },
+    year: { label: 'This year', since: () => Date.UTC(new Date().getUTCFullYear(), 0, 1) },
+    month: { label: 'This month', since: () => Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1) },
+    '30d': { label: 'Last 30 days', since: () => Date.now() - 30 * 24 * 60 * 60 * 1000 },
+}
+
+function isGiveawayLeaderboardInteraction(interaction) {
+    if (interaction.isButton()) return interaction.customId == 'botv_giveaway_leaderboard' || interaction.customId.startsWith('botv_ga_lb_page.')
+    if (interaction.isSelectMenu()) return interaction.customId == 'botv_ga_lb_period'
+    return false
+}
+
+async function handleGiveawayLeaderboardInteraction(interaction) {
+    if (interaction.customId == 'botv_giveaway_leaderboard') {
+        await interaction.deferReply({ ephemeral: true })
+        return interaction.editReply(await generateGiveawayLeaderboard('all', 0))
+    }
+    let period, page
+    if (interaction.customId == 'botv_ga_lb_period') {
+        period = interaction.values[0]
+        page = 0
+    } else {
+        // botv_ga_lb_page.<period>.<page>
+        const [, p, n] = interaction.customId.split('.')
+        period = p
+        page = parseInt(n) || 0
+    }
+    await interaction.deferUpdate()
+    return interaction.editReply(await generateGiveawayLeaderboard(period, page))
+}
+
+async function generateGiveawayLeaderboard(period, page) {
+    if (!LEADERBOARD_PERIODS[period]) period = 'all'
+    const since = LEADERBOARD_PERIODS[period].since()
+
+    const res = await db.query(`
+        SELECT hosted_by, count(*)::int AS giveaways, coalesce(sum(total_plat_value), 0)::int AS plat
+        FROM botv_giveaways
+        WHERE hosted_by != '0' AND ended_at >= $1
+        GROUP BY hosted_by
+        ORDER BY plat DESC, giveaways DESC
+    `, [since])
+    const hosts = res.rows
+
+    const totalPages = Math.max(1, Math.ceil(hosts.length / LEADERBOARD_PAGE_SIZE))
+    page = Math.min(Math.max(0, page), totalPages - 1)
+    const offset = page * LEADERBOARD_PAGE_SIZE
+    const pageHosts = hosts.slice(offset, offset + LEADERBOARD_PAGE_SIZE)
+
+    const totalGiveaways = hosts.reduce((sum, h) => sum + h.giveaways, 0)
+    const totalPlat = hosts.reduce((sum, h) => sum + h.plat, 0)
+
+    const description = [
+        period != 'all' ? `Since <t:${Math.floor(since / 1000)}:D>` : null,
+        `Hosts: **${hosts.length}**`,
+        `Giveaways hosted: **${totalGiveaways}**`,
+        `Plat given away: **${totalPlat}**`,
+        hosts.length == 0 ? '\nNo giveaways in this period.' : null,
+    ].filter(line => line != null).join('\n')
+
+    return {
+        content: ' ',
+        embeds: [{
+            title: `Giveaway Leaderboard (${LEADERBOARD_PERIODS[period].label})`,
+            description,
+            fields: pageHosts.length == 0 ? [] : responsiveEmbedFields({
+                field1: { label: 'Host', valueArr: pageHosts.map((h, i) => `\`#${offset + i + 1}\` <@${h.hosted_by}>`) },
+                field2: { label: 'Giveaways', valueArr: pageHosts.map(h => h.giveaways) },
+                field3: { label: 'Plat', valueArr: pageHosts.map(h => h.plat) },
+            }),
+            color: 'GOLD'
+        }],
+        components: [{
+            type: 1,
+            components: [{
+                type: 3,
+                custom_id: 'botv_ga_lb_period',
+                options: Object.entries(LEADERBOARD_PERIODS).map(([value, { label }]) => ({ label, value, default: value == period }))
+            }]
+        }, {
+            type: 1,
+            components: [{
+                type: 2,
+                label: '◀',
+                custom_id: `botv_ga_lb_page.${period}.${page - 1}`,
+                style: 2,
+                disabled: page == 0
+            }, {
+                type: 2,
+                label: `Page ${page + 1}/${totalPages}`,
+                custom_id: 'botv_ga_lb_page_indicator',
+                style: 2,
+                disabled: true
+            }, {
+                type: 2,
+                label: '▶',
+                custom_id: `botv_ga_lb_page.${period}.${page + 1}`,
+                style: 2,
+                disabled: page >= totalPages - 1
+            }]
+        }]
+    }
 }
 
 db.on('notification', (notification) => {
