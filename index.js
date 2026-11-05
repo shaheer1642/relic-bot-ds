@@ -397,7 +397,7 @@ client.on('messageCreate', async message => {
 
 client.on("messageUpdate", async function (oldMessage, newMessage) {
     if (newMessage.guildId == "776804537095684108")
-        botv.messageUpdate(oldMessage, newMessage)
+        botv.messageUpdate(oldMessage, newMessage).catch(console.error)
 
     if (Object.keys(hubapp.channel_ids).includes(newMessage.channel.id) && !hubapp.ignore_messages_ids.includes(newMessage.id))
         hubapp.message_update(newMessage)
