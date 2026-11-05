@@ -11,7 +11,7 @@ updateWorldState()
 async function updateWorldState() {
     console.log('[updateWorldState] called')
 
-    axios('http://content.warframe.com/dynamic/worldState.php')
+    axios('https://api.warframe.com/cdn/worldState.php')
         .then(async worldstateData => {
             const WorldState = (await import('warframe-worldstate-parser')).default
             const worldState = new WorldState(JSON.stringify(worldstateData.data))
