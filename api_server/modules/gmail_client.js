@@ -4,7 +4,7 @@ const { google } = require('googleapis');
 const { db } = require('./db_connection');
 
 // If modifying these scopes, delete gmail_token.json.
-const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/gmail.modify'];
 // The file gmail_token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
