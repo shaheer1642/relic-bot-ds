@@ -1,6 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
-const { google } = require('googleapis');
+// Standalone Gmail client instead of the full `googleapis` package, which loads every Google API (~70MB RSS)
+const { gmail: gmailApi, auth: googleAuth } = require('@googleapis/gmail');
 const { db } = require('./db_connection');
 
 // If modifying these scopes, delete gmail_token.json.
@@ -20,7 +21,7 @@ authorize(JSON.parse(process.env.GMAIL_CREDENTIAL), gmail_api_call);
  */
 function authorize(credentials, callback) {
     const { client_secret, client_id, redirect_uris } = credentials.installed;
-    const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
+    const oAuth2Client = new googleAuth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
     // Check if we have previously stored a token.
     const token = JSON.parse(process.env.GMAIL_TOKEN)
@@ -73,7 +74,7 @@ function getNewToken(oAuth2Client, callback) {
 async function gmail_api_call(auth) {
     // if (process.env.ENVIRONMENT_TYPE == 'dev') return
     try {
-        var gmail = google.gmail({ version: 'v1', auth })
+        var gmail = gmailApi({ version: 'v1', auth })
     }
     catch (err) {
         console.log(err)
