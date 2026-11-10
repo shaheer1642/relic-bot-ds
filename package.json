@@ -2,6 +2,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.8.2",
     "@discordjs/rest": "^0.1.0-canary.0",
+    "@googleapis/gmail": "^12.0.1",
     "@twurple/api": "^5.1.8",
     "@twurple/auth": "^5.1.8",
     "anychart": "^8.11.0",
@@ -22,7 +23,6 @@
     "firebase-admin": "^12.0.0",
     "fs": "^0.0.1-security",
     "g": "^2.0.1",
-    "googleapis": "^131.0.0",
     "jsdom": "^19.0.0",
     "json-bigint": "^1.0.0",
     "nodemon": "^3.0.3",
